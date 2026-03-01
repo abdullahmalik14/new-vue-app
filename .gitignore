@@ -25,11 +25,14 @@ dist-ssr
 *.sw?
 
 # Environment files (keep templates, ignore with actual values)
+.env
+.env.example
 .env.local
 .env.*.local
 .env.production
-.env.development.local
+.env.development
 .env.production.local
+.env.development.local
 # Keep .env.example and .env.development for reference
 
 # Build outputs
