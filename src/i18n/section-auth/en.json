@@ -1,0 +1,201 @@
+{
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Please enter your credentials to continue.",
+      "button": "Log In",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email address",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "********",
+      "forgotPassword": "Forgot your password?",
+      "rememberMe": "Remember Me",
+      "noAccount": "Don't have an account?",
+      "continueWithX": "Continue with X (twitter)",
+      "continueWithTelegram": "Continue with Telegram",
+      "welcome": "Hello, {0}!",
+      "error": "Invalid credentials"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Create your account to continue.",
+      "button": "Sign Up",
+      "firstName": "First Name",
+      "firstNameLabel": "Name",
+      "emailLabel": "Email",
+      "emailAddress": "Email address",
+      "emailPlaceholder": "Email address",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "********",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "********",
+      "haveAccount": "Already have an account?",
+      "Onboarding": {
+        "title": "Complete Your Profile",
+        "description": "Choose your role and username to continue.",
+        "usernameLabel": "Username",
+        "usernamePlaceholder": "Enter a username",
+        "roleLabel": "Role",
+        "rolePlaceholder": "Select your role",
+        "roles": {
+          "creator": "Creator",
+          "fan": "Fan",
+          "vendor": "Vendor",
+          "agent": "Agent"
+        },
+        "button": "Continue"
+      },
+      "KYC": {
+        "title": "Verify Your Identity",
+        "description": "Complete creator verification to access the dashboard.",
+        "button": "Confirm & Proceed",
+        "logout": "Logout & Exit"
+      }
+    },
+    "confirmEmail": {
+      "title": "Confirm Email",
+      "subtitle": "Enter the email you used and the verification code we sent you.",
+      "button": "Confirm",
+      "buttonLoading": "Confirming...",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "codeLabel": "Confirmation Code",
+      "codePlaceholder": "6-digit code",
+      "error": "Confirmation failed",
+      "autoLoginError": "Email confirmed, but auto-login failed. Please log in manually."
+    },
+    "reset": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive a reset code.",
+      "subtitleConfirm": "Enter the code you received and a new password.",
+      "sendCode": "Send Reset Code",
+      "codeLabel": "Reset Code",
+      "codePlaceholder": "Enter reset code",
+      "resetButton": "Reset Password",
+      "codeSent": "Reset code sent to your email.",
+      "sendCodeError": "Failed to send code",
+      "success": "Password reset successful. Please log in.",
+      "error": "Reset failed"
+    },
+    "validation": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "At least 8 characters long",
+      "passwordHasUpper": "Contain at least 1 uppercase letter",
+      "passwordHasLower": "Contain at least 1 lowercase letter",
+      "passwordHasNumber": "Contain at least 1 number",
+      "passwordHasSpecial": "Contain at least 1 special character",
+      "confirmPasswordRequired": "Please confirm your password",
+      "confirmPasswordMatch": "Passwords do not match",
+      "confirmPasswordMatchSuccess": "Password matches",
+      "codeRequired": "Code is required",
+      "roleRequired": "Role is required",
+      "roleSelect": "Please select a role",
+      "usernameRequired": "Username is required",
+      "usernameMinLength": "Username must be at least 4 characters",
+      "usernameMaxLength": "Username must be less than 100 characters",
+      "usernameTaken": "Username is already taken"
+    },
+    "common": {
+      "logout": "Sign Out",
+      "loading": "Loading...",
+      "user": "User",
+      "admin": "Admin",
+      "guest": "Guest"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "An error occurred while completing your profile"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard",
+      "description": "Overview of your account"
+    },
+    "actions": {
+      "editProfile": "Edit Profile",
+      "editSettings": "Edit Settings",
+      "myMedia": "My Media",
+      "viewStats": "View Statistics"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Edit Profile",
+        "description": "Update your personal information"
+      },
+      "editSettings": {
+        "title": "Account Settings",
+        "description": "Manage your account preferences"
+      },
+      "myMedia": {
+        "title": "My Media",
+        "description": "Manage your uploaded content"
+      }
+    },
+    "messages": {
+      "welcome": "Welcome back, {0}!",
+      "stats": "You have {0} items"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profile",
+      "description": "Manage your profile information"
+    },
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "bio": "Biography",
+      "save": "Save Changes"
+    },
+    "messages": {
+      "updated": "Profile updated successfully",
+      "error": "Failed to update profile"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Discover",
+      "description": "Explore new content and features"
+    },
+    "sections": {
+      "featured": "Featured Content"
+    },
+    "messages": {
+      "explore": "Start exploring our platform"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Shop",
+      "description": "Browse and purchase products"
+    },
+    "sections": {
+      "products": "Products"
+    },
+    "messages": {
+      "comingSoon": "More products coming soon!"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation completed",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "submit": "Submit",
+    "reset": "Reset",
+    "back": "Go Back",
+    "next": "Next",
+    "previous": "Previous"
+  }
+}

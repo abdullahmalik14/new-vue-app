@@ -1,0 +1,36 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back!",
+    "overview": "Overview",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "more": "More",
+    "menu": {
+      "analytics": "Analytics",
+      "payout": "Payout",
+      "orders": "Orders",
+      "media": "Media",
+      "chats": "Chats",
+      "subscriptions": "Subscriptions",
+      "shops": "Shops",
+      "xrepost": "X Repost",
+      "blog": "Blog",
+      "ordersReceived": "Orders Received",
+      "customProductRequest": "Custom Product Request",
+      "itemPurchased": "Item Purchased",
+      "editProfile": "Edit Profile",
+      "subscribersFollowers": "Subscribers & Followers",
+      "yourPosts": "Your Posts",
+      "referrals": "Referrals"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete"
+  }
+}

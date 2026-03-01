@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AssetHandler Real Browser Testing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2196f3;
+            margin-bottom: 20px;
+        }
+
+        #app-container {
+            background: #fff3e0;
+            padding: 10px;
+            border: 2px dashed #ff9800;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="instructions">
+        <h2>🚀 AssetHandler Real Browser Testing</h2>
+        <p><strong>⚠️ IMPORTANT:</strong> This file must be served from a web server (not opened as file://)</p>
+        <p><strong>Quick Start:</strong></p>
+        <ol>
+            <li>Open terminal in project root</li>
+            <li>Run: <code>python -m http.server 8000</code> (or <code>npx serve</code>)</li>
+            <li>Open: <code>http://localhost:8000/tests/AssetHandler.browser-test.html</code></li>
+            <li>Open Browser DevTools (F12)</li>
+            <li>Go to Console tab</li>
+            <li>Click "Run All Tests" button below</li>
+            <li>Watch console output for test results</li>
+            <li>Inspect DOM elements in Elements tab to verify actual changes</li>
+        </ol>
+        <p><strong>Note:</strong> All tests run in real browser environment with actual DOM manipulation and console
+            logging.</p>
+    </div>
+
+    <div class="test-container">
+        <h3>Test Environment</h3>
+        <button id="run-tests-btn"
+            style="background: #4caf50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+            🧪 Run All Tests
+        </button>
+        <button id="clear-console-btn"
+            style="background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+            🗑️ Clear Console
+        </button>
+        <div id="app-container">
+            <p>App Container (used for 'after' insertion tests)</p>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h3>Console Output Preview</h3>
+        <div class="console-output" id="console-preview">
+            Click "Run All Tests" to see console output here and in browser DevTools...
+        </div>
+    </div>
+
+    <!-- Include Real AssetHandler -->
+    <script type="module">
+        // Import the real AssetHandler with error handling using async IIFE
+        (async () => {
+            const importPaths = [
+                '../src/utils/assets/assetsHandlerNew.js',
+                './src/utils/assets/assetsHandlerNew.js',
+                '/src/utils/assets/assetsHandlerNew.js'
+            ];
+
+            let loaded = false;
+            let lastError = null;
+
+            for (const importPath of importPaths) {
+                try {
+                    console.log(`🔄 Trying to import AssetHandler from: ${importPath}`);
+                    const module = await import(importPath);
+                    window.AssetHandler = module.default;
+                    console.log('✅ AssetHandler loaded successfully from:', importPath);
+                    loaded = true;
+                    break;
+                } catch (error) {
+                    console.warn(`⚠️  Failed to import from ${importPath}:`, error.message);
+                    lastError = error;
+                    // Continue to next path
+                }
+            }
+
+            if (!loaded) {
+                const isFileProtocol = window.location.protocol === 'file:';
+                console.error('❌ Failed to load AssetHandler from all attempted paths');
+                console.error('Last error:', lastError);
+                if (lastError) {
+                    console.error('Error message:', lastError.message);
+                    console.error('Error stack:', lastError.stack);
+                }
+
+                if (isFileProtocol) {
+                    console.error('');
+                    console.error('🚨 CORS ERROR: You are opening this file directly (file://)');
+                    console.error('ES modules require a web server due to browser security restrictions.');
+                    console.error('');
+                    console.error('📋 SOLUTION:');
+                    console.error('1. Open terminal in project root directory');
+                    console.error('2. Run: python -m http.server 8000');
+                    console.error('   OR: npx serve');
+                    console.error('3. Open: http://localhost:8000/tests/AssetHandler.browser-test.html');
+                    console.error('');
+                } else {
+                    console.warn('⚠️  Tests will fail without AssetHandler, but buttons should still work');
+                    console.warn('💡 Check that the file exists at: src/utils/assets/assetsHandlerNew.js');
+                }
+                // Store error for later use
+                window.AssetHandlerError = lastError;
+            }
+
+            // Console logging helper
+            function logToConsole(message, isError = false) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logMessage = `[${timestamp}] ${message}`;
+
+                if (isError) {
+                    console.error(logMessage);
+                } else {
+                    console.log(logMessage);
+                }
+
+                // Also show in preview
+                const preview = document.getElementById('console-preview');
+                if (preview) {
+                    preview.textContent += logMessage + '\n';
+                    preview.scrollTop = preview.scrollHeight;
+                }
+            }
+
+            // Test configuration
+            const testConfig = [
+                {
+                    name: 'critical-css',
+                    url: '/css/critical.css',
+                    type: 'css',
+                    flags: ['init'],
+                    priority: 'critical',
+                    critical: true,
+                    version: '2.0.0',
+                    location: 'head-first'
+                },
+                {
+                    name: 'vendor-js',
+                    url: '/js/vendor.js',
+                    type: 'script',
+                    flags: ['init'],
+                    priority: 'high',
+                    defer: true,
+                    version: '1.5.0'
+                },
+                {
+                    name: 'app-main',
+                    url: '/js/app.js',
+                    type: 'script',
+                    flags: ['dashboard'],
+                    dependencies: ['vendor-js'],
+                    priority: 'normal',
+                    async: true,
+                    after: '#app-container'
+                },
+                {
+                    name: 'hero-image',
+                    url: '/img/hero.jpg',
+                    type: 'image',
+                    flags: ['dashboard'],
+                    priority: 'low',
+                    imagesrcset: '/img/hero.jpg 1x, /img/hero@2x.jpg 2x'
+                },
+                {
+                    name: 'site-icon',
+                    url: '/favicon.ico',
+                    type: 'icon',
+                    flags: ['init'],
+                    priority: 'low'
+                }
+            ];
+
+            // Import comprehensive test functions from AssetHandler.console-test.js
+            // This includes all the real API tests with actual DOM manipulation
+
+            // Test runner function - comprehensive real browser testing
+            window.runAllTests = async function () {
+                if (!window.AssetHandler) {
+                    const errorMsg = '❌ AssetHandler not loaded! Cannot run tests. Check console for import errors.';
+                    console.error(errorMsg);
+                    logToConsole(errorMsg, true);
+                    alert(errorMsg);
+                    return;
+                }
+
+                logToConsole('🚀 AssetHandler Real Browser Testing Started...');
+                logToConsole('================================================');
+                logToConsole('⚠️  NO JEST - NO MOCKING - REAL BROWSER APIS ONLY');
+                logToConsole('================================================');
+
+                // Create real AssetHandler instance with comprehensive test config
+                const handler = new window.AssetHandler(testConfig, { debug: true });
+
+                let passedTests = 0;
+                let totalTests = 0;
+
+                // Helper function for test results
+                function testResult(testName, passed, details = '') {
+                    totalTests++;
+                    if (passed) {
+                        passedTests++;
+                        logToConsole(`✅ ${testName} - PASSED ${details}`);
+                    } else {
+                        logToConsole(`❌ ${testName} - FAILED ${details}`);
+                    }
+                }
+
+                // TEST 1: Asset already in DOM → should not add again (Real DOM API)
+                logToConsole('\n📋 TEST 1: Asset already in DOM → should not add again');
+                try {
+                    // Manually add element to real DOM
+                    const existingEl = document.createElement('script');
+                    existingEl.setAttribute('data-asset-name', 'existing-test');
+                    existingEl.src = '/js/existing.js';
+                    document.head.appendChild(existingEl);
+                    logToConsole('   → Added existing element to DOM manually');
+
+                    // Try to load same asset through AssetHandler
+                    const result = await handler.loadAsset({
+                        name: 'existing-test',
+                        url: '/js/existing.js',
+                        type: 'script'
+                    });
+
+                    const elementsFound = document.querySelectorAll('[data-asset-name="existing-test"]').length;
+                    testResult('Asset already in DOM',
+                        result.skipped === true && elementsFound === 1,
+                        `- skipped: ${result.skipped}, elements in DOM: ${elementsFound}`);
+
+                } catch (e) {
+                    testResult('Asset already in DOM', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 2: Asset not in DOM → should add (Real DOM Creation)
+                logToConsole('\n📋 TEST 2: Asset not in DOM → should add');
+                try {
+                    const beforeCount = document.querySelectorAll('[data-asset-name="new-test-script"]').length;
+
+                    const result = await handler.loadAsset({
+                        name: 'new-test-script',
+                        url: '/js/new-test.js',
+                        type: 'script',
+                        location: 'head-last'
+                    });
+
+                    const afterCount = document.querySelectorAll('[data-asset-name="new-test-script"]').length;
+                    const addedEl = document.querySelector('[data-asset-name="new-test-script"]');
+
+                    testResult('Asset not in DOM',
+                        !result.skipped && afterCount === 1 && addedEl !== null,
+                        `- before: ${beforeCount}, after: ${afterCount}, element added: ${addedEl !== null}`);
+
+                } catch (e) {
+                    testResult('Asset not in DOM', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 3: Add only once even if called multiple times (Real Concurrency)
+                logToConsole('\n📋 TEST 3: Add only once even if called multiple times');
+                try {
+                    const asset = {
+                        name: 'once-test',
+                        url: '/js/once.js',
+                        type: 'script'
+                    };
+
+                    // Call loadAsset multiple times simultaneously
+                    logToConsole('   → Calling loadAsset 3 times simultaneously...');
+                    const results = await Promise.all([
+                        handler.loadAsset(asset),
+                        handler.loadAsset(asset),
+                        handler.loadAsset(asset)
+                    ]);
+
+                    const elementsInDOM = document.querySelectorAll('[data-asset-name="once-test"]').length;
+                    const skippedCount = results.filter(r => r.skipped).length;
+
+                    testResult('Add only once',
+                        elementsInDOM === 1 && skippedCount === 2,
+                        `- elements in DOM: ${elementsInDOM}, skipped calls: ${skippedCount}`);
+
+                } catch (e) {
+                    testResult('Add only once', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 4: Versioning handled (?v=...) (Real URL Manipulation)
+                logToConsole('\n📋 TEST 4: Versioning handled (?v=...)');
+                try {
+                    const asset = { version: '2.1.0', critical: false };
+                    const versionedUrl = handler.applyVersioning('/js/app.js', asset);
+
+                    const hasVersion = versionedUrl.includes('?ver=2.1.0');
+                    testResult('Versioning handled', hasVersion, `- URL: ${versionedUrl}`);
+
+                    // Test with critical flag
+                    const criticalAsset = { version: '1.5.0', critical: true };
+                    const criticalUrl = handler.applyVersioning('/css/style.css?theme=dark', criticalAsset);
+                    const hasCritical = criticalUrl.includes('&critical=1');
+
+                    logToConsole(`   → Critical asset URL: ${criticalUrl}`);
+                    testResult('Critical versioning', hasCritical, `- has critical flag: ${hasCritical}`);
+
+                } catch (e) {
+                    testResult('Versioning handled', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 5: Correct DOM location (head or body) (Real DOM Insertion)
+                logToConsole('\n📋 TEST 5: Correct DOM location (head or body)');
+                try {
+                    // Test head-first
+                    const headElement = document.createElement('link');
+                    headElement.id = 'head-first-test';
+                    headElement.setAttribute('data-test', 'head-first');
+
+                    const existingHeadEl = document.createElement('meta');
+                    existingHeadEl.name = 'existing';
+                    document.head.appendChild(existingHeadEl);
+
+                    const wasBefore = (target, reference) => {
+                        let node = reference;
+                        while (node) {
+                            if (node === target) return true;
+                            node = node.previousElementSibling;
+                        }
+                        return false;
+                    };
+
+                    const originalHeadFirst = document.head.firstElementChild;
+                    handler.insertAssetElement(headElement, 'head-first');
+                    const headPositionValid = document.head.firstElementChild === headElement || (originalHeadFirst && wasBefore(headElement, originalHeadFirst));
+
+                    // Test footer-last
+                    const bodyElement = document.createElement('script');
+                    bodyElement.id = 'footer-last-test';
+                    bodyElement.setAttribute('data-test', 'footer-last');
+
+                    const originalBodyLast = document.body.lastElementChild;
+                    handler.insertAssetElement(bodyElement, 'footer-last');
+                    const bodyPositionValid = document.body.lastElementChild === bodyElement || (originalBodyLast && originalBodyLast.parentElement === document.body && bodyElement.previousElementSibling === originalBodyLast);
+
+                    testResult('DOM location head-first', headPositionValid, `- inserted before previous first: ${headPositionValid}`);
+                    testResult('DOM location footer-last', bodyPositionValid, `- inserted after previous last: ${bodyPositionValid}`);
+
+                } catch (e) {
+                    testResult('DOM location', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 6: Async attribute handling (Real Element Attributes)
+                logToConsole('\n📋 TEST 6: Async attribute handling');
+                try {
+                    // Test defer
+                    const deferAsset = {
+                        name: 'defer-test',
+                        url: '/js/defer.js',
+                        type: 'script',
+                        defer: true,
+                        async: false
+                    };
+
+                    const deferElement = handler.createElementForAsset(deferAsset);
+                    const deferCorrect = deferElement.defer === true && !deferElement.async;
+
+                    // Test async
+                    const asyncAsset = {
+                        name: 'async-test',
+                        url: '/js/async.js',
+                        type: 'script',
+                        defer: false,
+                        async: true
+                    };
+
+                    const asyncElement = handler.createElementForAsset(asyncAsset);
+                    const asyncCorrect = asyncElement.async === true && !asyncElement.defer;
+
+                    testResult('Defer attribute', deferCorrect, `- defer: ${deferElement.defer}, async: ${deferElement.async}`);
+                    testResult('Async attribute', asyncCorrect, `- async: ${asyncElement.async}, defer: ${asyncElement.defer}`);
+
+                } catch (e) {
+                    testResult('Async attributes', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 7: Dependencies load first (Real Dependency Algorithm)
+                logToConsole('\n📋 TEST 7: Dependencies load first');
+                try {
+                    const depAssets = [
+                        { name: 'app', dependencies: ['jquery', 'bootstrap'], url: '/app.js', type: 'script', flags: [] },
+                        { name: 'bootstrap', dependencies: ['jquery'], url: '/bootstrap.js', type: 'script', flags: [] },
+                        { name: 'jquery', dependencies: [], url: '/jquery.js', type: 'script', flags: [] }
+                    ];
+
+                    const depHandler = new window.AssetHandler(depAssets);
+                    const resolved = depHandler.resolveDependencies(depAssets);
+                    const names = resolved.map(a => a.name);
+
+                    const jqueryIndex = names.indexOf('jquery');
+                    const bootstrapIndex = names.indexOf('bootstrap');
+                    const appIndex = names.indexOf('app');
+
+                    const orderCorrect = jqueryIndex < bootstrapIndex && bootstrapIndex < appIndex;
+
+                    testResult('Dependencies load first', orderCorrect, `- load order: ${names.join(' → ')}`);
+
+                } catch (e) {
+                    testResult('Dependencies load first', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 8: Correct order of assets (critical first) (Real Priority Sorting)
+                logToConsole('\n📋 TEST 8: Correct order of assets (critical first)');
+                try {
+                    const priorityAssets = [
+                        { priority: 'low', name: 'low-asset' },
+                        { priority: 'critical', name: 'critical-asset' },
+                        { priority: 'normal', name: 'normal-asset' },
+                        { priority: 'high', name: 'high-asset' }
+                    ];
+
+                    const sorted = handler.sortByPriority(priorityAssets);
+                    const priorities = sorted.map(a => a.priority);
+                    const expectedOrder = ['critical', 'high', 'normal', 'low'];
+
+                    const orderCorrect = JSON.stringify(priorities) === JSON.stringify(expectedOrder);
+
+                    testResult('Priority ordering', orderCorrect, `- order: ${priorities.join(' → ')}`);
+
+                } catch (e) {
+                    testResult('Priority ordering', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 9: Preloading for icons/media (Real Preload Hints)
+                logToConsole('\n📋 TEST 9: Preloading for icons/media');
+                try {
+                    const beforePreloads = document.querySelectorAll('link[rel="preload"]').length;
+
+                    // Test image preloading
+                    const imageAsset = {
+                        name: 'test-image',
+                        url: '/img/test.jpg',
+                        type: 'image',
+                        imagesrcset: '/img/test.jpg 1x, /img/test@2x.jpg 2x'
+                    };
+
+                    handler.registerPreloadHint(imageAsset);
+
+                    // Test font preloading
+                    const fontAsset = {
+                        name: 'test-font',
+                        url: '/fonts/test.woff2',
+                        type: 'font'
+                    };
+
+                    handler.registerPreloadHint(fontAsset);
+
+                    const afterPreloads = document.querySelectorAll('link[rel="preload"]').length;
+                    const imagePreload = document.querySelector('link[rel="preload"][href="/img/test.jpg"]');
+                    const fontPreload = document.querySelector('link[rel="preload"][href="/fonts/test.woff2"]');
+
+                    const preloadsAdded = afterPreloads > beforePreloads;
+                    const imageCorrect = imagePreload && imagePreload.as === 'image';
+                    const fontCorrect = fontPreload && fontPreload.as === 'font';
+
+                    testResult('Image preloading', imageCorrect, `- image preload created: ${imageCorrect}`);
+                    testResult('Font preloading', fontCorrect, `- font preload created: ${fontCorrect}`);
+                    testResult('Media preloading', preloadsAdded, `- preloads before: ${beforePreloads}, after: ${afterPreloads}`);
+
+                } catch (e) {
+                    testResult('Media preloading', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 10: Fast cached retrieval (Real Preloading by Flag)
+                logToConsole('\n📋 TEST 10: Fast cached retrieval (preloading by flag)');
+                try {
+                    const beforePreloads = document.querySelectorAll('link[rel="preload"]').length;
+
+                    // Preload all 'init' flagged assets
+                    const result = await handler.preloadAssetsByFlag('init');
+
+                    const afterPreloads = document.querySelectorAll('link[rel="preload"]').length;
+                    const initAssets = handler.getAssetsByFlags(['init']);
+
+                    const preloadsCreated = afterPreloads > beforePreloads;
+                    const assetsReturned = result.length > 0;
+
+                    testResult('Preload by flag', preloadsCreated && assetsReturned,
+                        `- init assets: ${initAssets.length}, preloads created: ${afterPreloads - beforePreloads}, result count: ${result.length}`);
+
+                } catch (e) {
+                    testResult('Preload by flag', false, `- ERROR: ${e.message}`);
+                }
+
+                // COMPREHENSIVE ADDITIONAL TESTS FROM AssetHandler.test.js
+
+                // TEST 11: Element Creation for Different Types (Real Element Creation)
+                logToConsole('\n📋 TEST 11: Element Creation for Different Types');
+                try {
+                    // Test script element
+                    const scriptAsset = testConfig.find(a => a.name === 'vendor-js');
+                    const scriptEl = handler.createElementForAsset(scriptAsset);
+                    const scriptCorrect = scriptEl.tagName === 'SCRIPT' && scriptEl.src.includes(scriptAsset.url);
+
+                    // Test CSS element
+                    const cssAsset = testConfig.find(a => a.name === 'critical-css');
+                    const cssEl = handler.createElementForAsset(cssAsset);
+                    const cssCorrect = cssEl.tagName === 'LINK' && cssEl.rel === 'stylesheet';
+
+                    // Test image element
+                    const imageAsset = testConfig.find(a => a.name === 'hero-image');
+                    const imageEl = handler.createElementForAsset(imageAsset);
+                    const imageCorrect = imageEl.tagName === 'IMG' && imageEl.srcset === imageAsset.imagesrcset;
+
+                    // Test font element
+                    const fontAsset = { name: 'test-font', url: '/fonts/test.woff2', type: 'font' };
+                    const fontEl = handler.createElementForAsset(fontAsset);
+                    const fontCorrect = fontEl.tagName === 'LINK' && fontEl.rel === 'preload' && fontEl.as === 'font';
+
+                    testResult('Script element creation', scriptCorrect, `- tag: ${scriptEl.tagName}, src set: ${!!scriptEl.src}`);
+                    testResult('CSS element creation', cssCorrect, `- tag: ${cssEl.tagName}, rel: ${cssEl.rel}`);
+                    testResult('Image element creation', imageCorrect, `- tag: ${imageEl.tagName}, srcset: ${!!imageEl.srcset}`);
+                    testResult('Font element creation', fontCorrect, `- tag: ${fontEl.tagName}, rel: ${fontEl.rel}, as: ${fontEl.as}`);
+
+                } catch (e) {
+                    testResult('Element creation', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 12: Flag-based Asset Filtering (Real Config Filtering)
+                logToConsole('\n📋 TEST 12: Flag-based Asset Filtering');
+                try {
+                    const initAssets = handler.getAssetsByFlags(['init']);
+                    const dashboardAssets = handler.getAssetsByFlags(['dashboard']);
+                    const multipleFlags = handler.getAssetsByFlags(['init', 'dashboard']);
+                    const nonExistent = handler.getAssetsByFlags(['non-existent']);
+
+                    const initCorrect = initAssets.length > 0 && initAssets.some(a => a.name === 'critical-css');
+                    const dashboardCorrect = dashboardAssets.length > 0 && dashboardAssets.some(a => a.name === 'hero-image');
+                    const multipleCorrect = multipleFlags.length >= initAssets.length;
+                    const nonExistentCorrect = nonExistent.length === 0;
+
+                    testResult('Init flag filtering', initCorrect, `- found ${initAssets.length} init assets`);
+                    testResult('Dashboard flag filtering', dashboardCorrect, `- found ${dashboardAssets.length} dashboard assets`);
+                    testResult('Multiple flag filtering', multipleCorrect, `- found ${multipleFlags.length} combined assets`);
+                    testResult('Non-existent flag filtering', nonExistentCorrect, `- found ${nonExistent.length} non-existent assets`);
+
+                } catch (e) {
+                    testResult('Flag filtering', false, `- ERROR: ${e.message}`);
+                }
+
+                // TEST 13: After Selector Insertion (Real DOM Selector)
+                logToConsole('\n📋 TEST 13: After Selector Insertion');
+                try {
+                    const appContainer = document.getElementById('app-container');
+                    if (appContainer) {
+                        const result = await handler.loadAsset({
+                            name: 'after-test',
+                            url: '/js/after-test.js',
+                            type: 'script',
+                            after: '#app-container'
+                        });
+
+                        const insertedEl = document.querySelector('[data-asset-name="after-test"]');
+                        const isAfterContainer = appContainer.nextElementSibling === insertedEl;
+
+                        testResult('After selector insertion', isAfterContainer, `- inserted after app-container: ${isAfterContainer}`);
+                    } else {
+                        testResult('After selector insertion', false, '- app-container not found');
+                    }
+                } catch (e) {
+                    testResult('After selector insertion', false, `- ERROR: ${e.message}`);
+                }
+
+                // FINAL RESULTS
+                logToConsole('\n================================================');
+                logToConsole(`🎯 FINAL RESULTS: ${passedTests}/${totalTests} tests passed`);
+                logToConsole('================================================');
+
+                if (passedTests === totalTests) {
+                    logToConsole('🎉 ALL TESTS PASSED!');
+                    logToConsole('✅ AssetHandler APIs working correctly in real browser environment');
+                    logToConsole('✅ All client requirements validated with real DOM manipulation');
+                    logToConsole('✅ No Jest, no mocking - pure browser API testing');
+                } else {
+                    logToConsole('⚠️  Some tests failed. Review individual test results above.');
+                    logToConsole(`📊 Success rate: ${Math.round((passedTests / totalTests) * 100)}%`);
+                }
+
+                logToConsole('\n💡 INSPECTION TIPS:');
+                logToConsole('   → Open DevTools Elements tab to see actual DOM changes');
+                logToConsole('   → Check Network tab to see any actual asset requests');
+                logToConsole('   → All elements have data-asset-name attributes for identification');
+                logToConsole('   → Preload hints are visible as <link rel="preload"> elements');
+
+                logToConsole('\n📋 CLIENT REQUIREMENTS VALIDATION COMPLETE');
+                logToConsole('   All specified requirements tested with real browser APIs');
+                logToConsole('   Using actual AssetHandler implementation - no simplified version');
+
+                return {
+                    passed: passedTests,
+                    total: totalTests,
+                    success: passedTests === totalTests
+                };
+            };
+
+            window.clearConsole = function () {
+                console.clear();
+                const preview = document.getElementById('console-preview');
+                if (preview) {
+                    preview.textContent = 'Console cleared. Click "Run All Tests" to start testing...\n';
+                }
+            };
+
+            // Attach event listeners to buttons (module scripts run after DOM is parsed)
+            console.log('🔧 Setting up event listeners...');
+            const runTestsBtn = document.getElementById('run-tests-btn');
+            const clearConsoleBtn = document.getElementById('clear-console-btn');
+
+            console.log('Run tests button found:', !!runTestsBtn);
+            console.log('Clear console button found:', !!clearConsoleBtn);
+            console.log('runAllTests function available:', typeof window.runAllTests);
+            console.log('clearConsole function available:', typeof window.clearConsole);
+
+            if (runTestsBtn) {
+                runTestsBtn.addEventListener('click', () => {
+                    console.log('Run Tests button clicked!');
+                    if (window.runAllTests) {
+                        window.runAllTests();
+                    } else {
+                        console.error('❌ runAllTests function not yet loaded. Please wait a moment and try again.');
+                        alert('runAllTests function not yet loaded. Please check the console for errors.');
+                    }
+                });
+                console.log('✅ Run Tests event listener attached');
+            } else {
+                console.error('❌ Run Tests button not found!');
+            }
+
+            if (clearConsoleBtn) {
+                clearConsoleBtn.addEventListener('click', () => {
+                    console.log('Clear Console button clicked!');
+                    if (window.clearConsole) {
+                        window.clearConsole();
+                    } else {
+                        console.error('❌ clearConsole function not yet loaded. Please wait a moment and try again.');
+                        alert('clearConsole function not yet loaded. Please check the console for errors.');
+                    }
+                });
+                console.log('✅ Clear Console event listener attached');
+            } else {
+                console.error('❌ Clear Console button not found!');
+            }
+
+            console.log('✅ Event listeners setup complete');
+        })(); // End of async IIFE
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telegram Login</title>
+    <link rel="stylesheet" href="/css/auth.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+        overflow: hidden;
+      }
+      .bg-container {
+        width: 100%;
+        height: 100vh;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+      }
+      .content-wrapper {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow-y: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(50px);
+      }
+      .content-wrapper::-webkit-scrollbar {
+        display: none;
+      }
+      .content-card {
+        width: 100%;
+        max-width: 520px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        position: relative;
+        z-index: 20;
+      }
+      .heading {
+        font-size: 24px;
+        font-weight: 600;
+        color: #ffffff;
+        text-align: center;
+        line-height: 1.2;
+      }
+      .widget-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60px;
+        width: 100%;
+        padding: 12px 0;
+      }
+      .help-text {
+        font-size: 12px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      .error-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        max-width: 520px;
+      }
+      .error-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: linear-gradient(to right, #5d1906, #0e0401);
+        border-left: 4px solid #e8723e;
+        padding: 12px 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        position: relative;
+      }
+      .error-icon {
+        position: relative;
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .error-icon-bg {
+        position: absolute;
+        inset: 0;
+        background: #6b1d06;
+        border-radius: 12px;
+      }
+      .error-icon-blur {
+        position: absolute;
+        inset: 0;
+        background: rgba(232, 114, 62, 0.2);
+        border-radius: 50%;
+        filter: blur(12px);
+      }
+      .error-icon-svg {
+        width: 24px;
+        height: 24px;
+        color: #ff6535;
+        position: relative;
+        z-index: 10;
+      }
+      .error-message {
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: normal;
+        line-height: 1.5;
+        flex: 1;
+      }
+      .error-help {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 14px;
+        text-align: center;
+      }
+      .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        width: 100%;
+        max-width: 520px;
+      }
+      .spinner {
+        width: 48px;
+        height: 48px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .loading-text {
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-container" id="bgContainer">
+      <div class="content-wrapper">
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-container" style="display: none;">
+          <div class="spinner"></div>
+          <p class="loading-text" id="loadingText">Loading Telegram login…</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="error-container" style="display: none;">
+          <div class="error-box">
+            <div class="error-icon">
+              <div class="error-icon-bg"></div>
+              <div class="error-icon-blur"></div>
+              <svg class="error-icon-svg" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+            </div>
+            <p class="error-message" id="errorMessage"></p>
+          </div>
+          <p class="error-help">You can close this window and try again.</p>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainState" class="content-card">
+          <h1 class="heading">Continue with Telegram</h1>
+          <div class="widget-container" id="widget"></div>
+          <p class="help-text">
+            If you don't see the Telegram button, ensure your domain is set in BotFather and that the bot username is configured.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const qs = new URLSearchParams(window.location.search);
+        const state = qs.get("state") || "";
+        const bot = qs.get("bot") || "";
+        const v = qs.get("v") || "22";
+
+        const bgContainer = document.getElementById("bgContainer");
+        const loadingState = document.getElementById("loadingState");
+        const errorState = document.getElementById("errorState");
+        const mainState = document.getElementById("mainState");
+        const errorMessage = document.getElementById("errorMessage");
+        const loadingText = document.getElementById("loadingText");
+        const widgetEl = document.getElementById("widget");
+
+        // Try to load background image from auth.css or asset map
+        // Fallback to a dark gradient if image fails
+        function setBackground() {
+          const bgUrl = "https://i.ibb.co/jPw7ChWb/auth-bg.webp";
+          bgContainer.style.backgroundImage = `url(${bgUrl})`;
+          bgContainer.style.backgroundImage = bgContainer.style.backgroundImage + ", linear-gradient(135deg, #0b0b10 0%, #1a1a2e 100%)";
+        }
+        setBackground();
+
+        function showLoading(text) {
+          loadingText.textContent = text || "Loading Telegram login…";
+          loadingState.style.display = "flex";
+          errorState.style.display = "none";
+          mainState.style.display = "none";
+        }
+
+        function showError(msg) {
+          errorMessage.textContent = msg;
+          errorState.style.display = "flex";
+          loadingState.style.display = "none";
+          mainState.style.display = "none";
+        }
+
+        function showMain() {
+          mainState.style.display = "flex";
+          loadingState.style.display = "none";
+          errorState.style.display = "none";
+        }
+
+        if (!bot) {
+          showError("Missing bot username. Expected ?bot=YOUR_BOT_USERNAME");
+          return;
+        }
+
+        if (!window.opener || window.opener.closed) {
+          showError("Parent window not available. Please close this window and try again.");
+          return;
+        }
+
+        // Telegram widget calls `onTelegramAuth(user)`
+        window.onTelegramAuth = function (user) {
+          try {
+            showLoading("Sending authorization to parent window…");
+
+            window.opener.postMessage(
+              { type: "TELEGRAM_AUTH_SUCCESS", state, user, source: "telegram-widget", v: 1 },
+              "*"
+            );
+
+            // Wait for ACK then close; fallback close in 3s
+            let acknowledged = false;
+            const ackListener = (event) => {
+              const data = event && event.data;
+              if (data && data.type === "TELEGRAM_AUTH_ACK" && data.state === state) {
+                acknowledged = true;
+                window.removeEventListener("message", ackListener);
+                showLoading("Success! Closing window…");
+                setTimeout(() => window.close(), 500);
+              }
+            };
+            window.addEventListener("message", ackListener);
+
+            setTimeout(() => {
+              if (!acknowledged) {
+                window.removeEventListener("message", ackListener);
+                window.close();
+              }
+            }, 3000);
+          } catch (e) {
+            window.opener.postMessage(
+              { type: "TELEGRAM_AUTH_ERROR", state, error: (e && e.message) || String(e) },
+              "*"
+            );
+            showError((e && e.message) || String(e));
+          }
+        };
+
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "https://telegram.org/js/telegram-widget.js?" + encodeURIComponent(v);
+        script.setAttribute("data-telegram-login", bot);
+        script.setAttribute("data-size", "large");
+        script.setAttribute("data-userpic", "false");
+        script.setAttribute("data-radius", "8");
+        script.setAttribute("data-request-access", "write");
+        script.setAttribute("data-onauth", "onTelegramAuth(user)");
+        script.onerror = () => {
+          showError("Failed to load Telegram widget script.");
+        };
+
+        widgetEl.appendChild(script);
+        showMain();
+      })();
+    </script>
+  </body>
+</html>
+
+

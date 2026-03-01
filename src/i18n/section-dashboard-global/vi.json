@@ -1,0 +1,36 @@
+{
+  "dashboard": {
+    "title": "Bảng Điều Khiển",
+    "welcome": "Chào mừng trở lại!",
+    "overview": "Tổng Quan",
+    "settings": "Cài Đặt",
+    "profile": "Hồ Sơ",
+    "logout": "Đăng Xuất",
+    "more": "Thêm",
+    "menu": {
+      "analytics": "Phân Tích",
+      "payout": "Thanh Toán",
+      "orders": "Đơn Hàng",
+      "media": "Phương Tiện",
+      "chats": "Trò Chuyện",
+      "subscriptions": "Đăng Ký",
+      "shops": "Cửa Hàng",
+      "xrepost": "X Repost",
+      "blog": "Blog",
+      "ordersReceived": "Đơn Hàng Đã Nhận",
+      "customProductRequest": "Yêu Cầu Sản Phẩm Tùy Chỉnh",
+      "itemPurchased": "Mục Đã Mua",
+      "editProfile": "Chỉnh Sửa Hồ Sơ",
+      "subscribersFollowers": "Người Đăng Ký & Người Theo Dõi",
+      "yourPosts": "Bài Đăng Của Bạn",
+      "referrals": "Giới Thiệu"
+    }
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "edit": "Chỉnh Sửa",
+    "delete": "Xóa"
+  }
+}

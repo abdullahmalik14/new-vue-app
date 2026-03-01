@@ -1,0 +1,75 @@
+/**
+ * Main Application Styles
+ * 
+ * Development: Contains all Tailwind layers for HMR support
+ * Production: Only base/components; utilities loaded per-section
+ * 
+ * The Tailwind sectioned build system:
+ * - Generates one CSS file per section (dashboard, profile, etc.)
+ * - Loads CSS dynamically based on active route in production
+ * - Excluded components get their own co-located CSS files
+ */
+
+/* Import Tailwind layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom global styles (non-Tailwind) */
+:root {
+  --color-primary: #939393;
+  --color-primary-dark: #181a1b;
+  --color-accent-pink: #fb5ba2;
+  --color-accent-green: #07f468;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+@media only screen and (max-width: 1399px) {
+  html {
+      font-size: 13px;
+  }
+}
+
+/* Selection styles */
+::selection {
+  background-color: var(--color-accent-pink);
+  color: white;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/**
+ * NOTE: Tailwind utilities (@tailwind utilities) are NOT included here.
+ * They are loaded per-section by the sectioned build system:
+ * 
+ * 1. Each section gets its own CSS file (e.g., section-dashboard.css)
+ * 2. The sectionCssLoader loads CSS dynamically when navigating
+ * 3. Components marked with "tailwind-ignore" get co-located CSS files
+ * 
+ * This ensures:
+ * - Minimal initial bundle size
+ * - No unused CSS shipped to users
+ * - Fast section switching with lazy-loaded CSS
+ */
+

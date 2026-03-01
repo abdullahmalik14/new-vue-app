@@ -1,0 +1,15 @@
+{
+  "shop": {
+    "title": "Cửa Hàng",
+    "cart": "Giỏ Hàng",
+    "checkout": "Thanh Toán",
+    "products": "Sản Phẩm",
+    "categories": "Danh Mục",
+    "search": "Tìm Kiếm Sản Phẩm",
+    "addToCart": "Thêm Vào Giỏ Hàng",
+    "viewCart": "Xem Giỏ Hàng",
+    "total": "Tổng Cộng",
+    "proceed": "Tiến Hành Thanh Toán"
+  }
+}
+

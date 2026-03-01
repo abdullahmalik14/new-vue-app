@@ -1,0 +1,120 @@
+
+We are focusing on template loading.
+See routeConfg in routes
+Understand it.
+Pay atetntion to section and preloadSection
+
+Logic is we lazy laod on entry to a route first time, then we preload current section (e.g. log-in is "auth" section therefore we preload auth section).. Then we also preload auth section always (so if we were in dashboard we preload auth secton even if not in route config. THEN, we preload any sections stated in the preloadSection for that route.
+
+Vue in prod mode (not dev), compiles in dist the sections and a manifest.
+
+Those are fully compiled sections, for examlple, entire dashboard (100+ pages) will be in one file, meaning, once dowloaded = instant nav
+
+The way to test is console logs but more accurantely see network activity for what is downloaded
+
+As far as I know it is mostly working but there are some bugs
+
+Your job is to understand and test this logic and confirm it works. You will need to test multiple routes and navigate accross them watching network activity.
+
+Some known bugs were double manifest files downloaded
+
+New updates are: we want pinia persistance with TTL of 1 day for these routes unless we redeploy in which case we would flush and reuse new templates.
+
+Part 2: we also have a manifest created (or should be) that scans on build all those tempaltes and detects what assets should be preloaded. This manifest is used to preload assets (img icon script ect). Do this testing 30mb images. Again network activity would reveal this. And also for exmple add to about us page an image that is 30mb and add this to the preload assets config json at top (see links to come to explain more). If we go to "contact" route and assume this route preloads "about" section, then we would be preloading that 30mb image - see network tab. Then navigate to that route = no network activity and image in almost instantly seen.
+
+Now, this prelaod assets is apparently done by another dev I will send code soon. But he had duplicate assets being loaded.
+
+This code is quite complex, it is better you understand the code before just asking to blindly fix, meaning if there is a bug, ensure it is 100% diagnosed, only then can you get the right solution. So if you see double asset find the lines responsible and diagnose it THEN prompt to fix it.
+
+After this there is quite a lot to do. Translation, assetLibrary, pinia persistnace and more
+
+
+
+
+Manifest section names collapse on hyphen – the regex in build/vite/manifestGenerator.js captures only the substring before the first -, so section-dashboard-global-*.js and section-dashboard-creator-*.js both register as dashboard, overwriting each other and breaking role-specific bundles, which can explain missing/duplicated loads.
+
+manifestGenerator.jsLines 42-52
+const match = file.match(/^section-([^-]+)-.+\.(js|css)$/);
+
+Preload caching is session-only and TTL mismatched – sectionPreloader keeps state in in-memory Sets and writes a 2 hour TTL entry to cacheHandler, but nothing ever reads that cache. There’s no Pinia store or persisted TTL, so reopening the app forces all bundles to re-download.
+
+sectionPreloader.jsLines 14-23
+const PRELOAD_CACHE_KEY_PREFIX = 'section_preload_';const PRELOAD_CACHE_TTL = 7200000; // 2 hours
+sectionPreloader.jsLines 101-105
+const cacheKey = PRELOAD_CACHE_KEY_PREFIX + sectionName;setValueWithExpiration(cacheKey, { loaded: true, timestamp: Date.now() }, PRELOAD_CACHE_TTL);
+
+No redeploy/version invalidation – requirements call for flushing cached templates on new deployments, but there’s no version stamp stored alongside preload state. A manifest timestamp exists, yet the runtime never compares or reacts to it.
+
+loadSectionManifest can issue duplicate network calls – simultaneous preloadSection requests before the first fetch resolves each hit /section-manifest.json because there’s no “in-flight” promise cache; this matches the “double manifest download” symptom.
+manifestLoader.jsLines 19-61
+const manifest = await response.json();cachedManifest = manifest;
+
+Perf tracker access is unchecked – manifestLoader calls window.performanceTracker.step(...) without guarding for undefined, so any context (tests, SSR, very early bootstrap) without the global set will throw.
+manifestLoader.jsLines 20-41
+
+// why we seeing preleaded on network tab
+What you’re seeing there is stil the preloaded bundle being reused. Because npm run preview serves everything with Cache-Control: max-age=0, the browser re-validates the cached files when you navigate. That shows up as a 304 “Not Modified” entry in the Network panel, even though the payload isn’t downloaded again (transfer size stays tiny—just the headers). On the very first visit to /log-in you’ll have seen the same chunk with a 200 status as it was preloaded; when you switch to /shop, the loader just re-checks the cached copy and the server replies 304.
+
+
+=== Change Log Summary ===
+- src/utils/build/manifestLoader.js – Added in-flight promise guard and safer logging to eliminate duplicate manifest fetches.
+- src/utils/translation/translationLoader.js – Removed eager:true from import.meta.glob to prevent loading all translation files at startup; files now load lazily only when requested (fixes bug where all locales loaded immediately with ?import&url queries).
+- src/utils/translation/localeManager.js – Switched to path-based locale handling, synced i18n/document state, exposed console stats, resolved route-based preload identifiers, and reloaded current/preloaded sections on locale changes.
+- src/utils/translation/i18nInstance.js – Introduced registry helpers so other modules can access the singleton Vue I18n instance.
+- src/router/index.js – Generated locale-prefixed routes, injected locales via guard, and resolved preload identifiers before warming sections/translations.
+- src/utils/section/sectionResolver.js – Added resolveSectionIdentifier to map section names or slugs to actual section keys.
+- src/utils/common/jsonConfigLoader.js – Created global JSON config loader for browser runtime with validation, caching, and performance tracking; supports both URL fetching and static imports.
+- src/utils/common/jsonConfigLoaderNode.js – Created Node.js version for build scripts with synchronous file reading and validation.
+- src/utils/route/routeConfigLoader.js – Refactored to use global JSON config loader; fixed variable shadowing bug that was breaking route loading.
+- src/components/layout/AppFooter.vue – Updated to use global JSON config loader with validation for route config imports.
+- build/vite/sectionBundler.js – Updated to use Node.js JSON config loader for route config reading during build.
+- build/vite/manifestGenerator.js – Updated to use Node.js JSON config loader for enriching manifest with route metadata.
+- tailwind.config.js – Updated to use Node.js JSON config loader for dynamic content path generation.
+- src/utils/common/jsonConfigLoader.js (fixes) – Fixed clearConfigCache to actually remove entries using removeFromCache; added auto-cleanup of loadedConfigs Map after 1s to prevent unbounded memory growth.
+- Verified behaviour in both `npm run dev` and `npm run preview`: locale switching triggers correct translation reloads and preloads respect role-aware section names.
+- Console API now exposes `window.APP.getTranslationStatistics()` so QA/devs can confirm translation cache state matches expectations.
+- Locale switching pipeline clears translation caches, resolves user role via Pinia, and rehydrates both the active section and every configured preload section.
+- JSON config loading is centralized: all JSON configs (routes, translations manifests) now use the same validation and caching infrastructure.
+- Remaining TODOs from the brief (manifest hyphen regex, persisted preload TTL/versioning, asset preload dedupe) are documented above for future iterations.
+- Test focus: watch Network for `i18n-*.js` chunk swaps, section bundle reuse (200 vs 304), and large asset preloads when moving across routes.
+
+
+* When we login and return from congito the user ID, we ALSO send api to mock endpoint called /users/new-sign-up/ which runs silently in background (no UI), which also needs IP,. So we send to /users/new-sign-up/ IP address, browser (make this also a utiity same as IP),  user ID, email address, and action = signUp.
+
+Login FLow
+Check the console for:
+[LOGIN] Tracking new sign-up: { userId: "...", ip: "..." }
+🔌 [ApiWrapper] Request: POST /users/new-sign-up ...
+[LOGIN] Tracking success: ...
+The redirect logic should still work.
+
+* After we confirm we run endpoint /users/confirm-email/ we use userID and action = confirmEmail. While we run this we show spinner. So we would confirm with cognito and then send our endpoint confirm - sowing one spinner. On both return true promiseAll, we can proceed to next step onboarding.
+
+Email Confirmation Flow
+Expectation:
+Console: [CONFIRM_EMAIL] Confirming email: ...
+Console: 🔌 [ApiWrapper] Request: POST /users/confirm-email with action: "confirmEmail".
+Console: [CONFIRM_EMAIL] Email confirmed and tracked successfully.
+Redirects to Onboarding (if auto-login works) or Login.
+
+* After we complete onboarding details we submit to cognito and our api /users/sign-up/onboarding/ with user id, i think by now we have jw token, role, username and action = signUpOnboarding.
+
+Onboarding Flow
+* username as we type we check an api /users/username-exists/ if username exists partial matched, so we need to add that as well.
+Action A (Username): Type in the username field.
+Expectation: After a short delay (~500ms), check console/network for GET /users/username-exists?username=....
+If username exists (e.g. "admin", "testuser"), you might see a warning log (currently just logging, UI feedback can be added if needed).
+
+
+Action B (Submit): Submit the onboarding form.
+Expectation:
+Console: [ONBOARDING] Updating user attributes...
+Console: 🔌 [ApiWrapper] Request: POST /users/sign-up/onboarding with action: "signUpOnboarding", role, username.
+Console: [ONBOARDING] Role saved...
+Redirects to Dashboard (or KYC if Creator).
+
+* IF creator we go to KYC, on completion we run congnito and /users/sign-up/kyc/ which passes array of kyc payload returned and the user id and action kycSuccess, we can also run for fail
+
+Action: Click "Complete KYC" (or whatever the button says).
+Expectation:
+Console: 🔌 [ApiWrapper] Request: POST /users/sign-up/kyc with action: "kycSuccess", kycPayload.

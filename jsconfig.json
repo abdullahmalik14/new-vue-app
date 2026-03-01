@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "preserve"
+  },
+  "include": [
+    "src/**/*",
+    "build/**/*"
+, "mock-api-demo"  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
+

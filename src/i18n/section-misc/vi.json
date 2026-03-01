@@ -1,0 +1,13 @@
+{
+  "notFound": {
+    "title": "Không Tìm Thấy Trang",
+    "message": "Trang bạn đang tìm kiếm không tồn tại.",
+    "backToHome": "Quay Lại Trang Chủ"
+  },
+  "error": {
+    "title": "Lỗi",
+    "message": "Đã xảy ra sự cố.",
+    "tryAgain": "Thử Lại"
+  }
+}
+

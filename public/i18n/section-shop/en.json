@@ -1,0 +1,15 @@
+{
+  "shop": {
+    "title": "Shop",
+    "cart": "Shopping Cart",
+    "checkout": "Checkout",
+    "products": "Products",
+    "categories": "Categories",
+    "search": "Search Products",
+    "addToCart": "Add to Cart",
+    "viewCart": "View Cart",
+    "total": "Total",
+    "proceed": "Proceed to Checkout"
+  }
+}
+

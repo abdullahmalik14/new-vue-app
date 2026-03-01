@@ -1,0 +1,11 @@
+{
+  "fan": {
+    "dashboard": "Fan Dashboard",
+    "following": "Following",
+    "favorites": "Favorites",
+    "purchases": "My Purchases",
+    "subscriptions": "Subscriptions",
+    "discover": "Discover Creators"
+  }
+}
+
