@@ -1,12 +1,11 @@
 <template>
-  <DashboardWrapperTwoColContainer>
-    <!-- <BookingForm /> -->
+  <!-- <DashboardWrapperTwoColContainer>
 
     <Cookies />
 
-    <!-- <ButtonComponent text="Cancel" variant="hoverBgWhite" size="lg" /> -->
+    <ButtonComponent text="Cancel" variant="hoverBgWhite" size="lg" />
 
-    <!-- <ButtonComponent text="Save" variant="greyBg" size="lg" /> -->
+    <ButtonComponent text="Save" variant="greyBg" size="lg" />
 
     <ButtonComponent text="Save" variant="polygonRight"
       :leftIcon="'https://i.ibb.co/Sw3WhF1p/svgviewer-png-output-9.webp'" :leftIconClass="`
@@ -18,18 +17,16 @@
     <ButtonComponent text="Next" variant="polygonLeft"
       :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'" :rightIconClass="`
   w-6 h-6 transition duration-200
-  filter brightness-0 invert-0   /* Default: black */
+  filter brightness-0 invert-0   
   group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]
 `" btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468" />
 
-    <!-- <OrderReceived /> -->
 
     <LoadingTest />
     <PageDataTest />
     <br />
     <br />
     <Cart />
-    <!-- <OrderReceived /> -->
     <br />
     <br />
 
@@ -183,7 +180,7 @@
     <ProfileLoginPopup v-model="profileLoginPopupOpen" />
     <ProfileMerchPopup v-model="profileMerchPopupOpen" />
     <TopUpPopup v-model="topUpPopupOpen" />
-  </DashboardWrapperTwoColContainer>
+  </DashboardWrapperTwoColContainer> -->
 </template>
 
 <script setup>
