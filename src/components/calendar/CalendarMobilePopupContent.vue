@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-import ButtonComponent from '../dev/button/ButtonComponent.vue';
+import ButtonComponent from '@/components/button/ButtonComponent.vue';
 import EventsWidget from './EventsWidget.vue';
 
 defineProps({

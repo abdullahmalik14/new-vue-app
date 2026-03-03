@@ -1,13 +1,13 @@
 <script setup>
-import NotificationCard from '@/components/dev/card/notification/NotificationCard.vue';
-import CheckboxSwitch from '@/components/dev/checkbox/CheckboxSwitch.vue';
-import BaseInput from '@/components/dev/input/BaseInput.vue';
+import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vue';
+import CheckboxSwitch from '@/components/checkbox/CheckboxSwitch.vue';
+import BaseInput from '@/components/input/BaseInput.vue';
 import { computed, onMounted, ref } from 'vue';
 import BasePlanDropdown from './HelperComponents/BasePlanDropdown.vue';
 import BaseTooltip from './HelperComponents/BaseTooltip.vue';
-import CheckboxGroup from '../../form/checkbox/CheckboxGroup.vue';
-import InputDefaultComponent from '@/components/dev/input/InputDefaultComponent.vue';
-import QuillEditor from '@/components/dev/input/QuillEditor.vue';
+import CheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
+import InputDefaultComponent from '@/components/input/InputComponentDashboard.vue';
+import QuillEditor from '@/components/input/QuillEditor.vue';
 
 const props = defineProps({
   publishFlow: {

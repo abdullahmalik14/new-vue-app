@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted } from "vue";
-import CheckboxSwitch from "@/components/dev/checkbox/CheckboxSwitch.vue";
+import CheckboxSwitch from "@/components/checkbox/CheckboxSwitch.vue";
 import { preloadIcons } from "@/utils/preload.js";
 
 // Props

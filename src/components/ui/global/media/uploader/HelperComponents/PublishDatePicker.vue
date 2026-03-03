@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import Paragraph from '@/components/dev/default/Paragraph.vue';
+import Paragraph from '@/components/default/Paragraph.vue';
 
 export default {
   name: "PublishDatePicker",

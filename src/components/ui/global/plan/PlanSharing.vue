@@ -1,11 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue'; 
-import CheckboxSwitch from '@/components/dev/checkbox/CheckboxSwitch.vue';
-import BaseInput from '@/components/dev/input/BaseInput.vue';
-import RadioGroup from '@/components/dev/RadioGroup.vue';
+import CheckboxSwitch from '@/components/checkbox/CheckboxSwitch.vue';
+import BaseInput from '@/components/input/BaseInput.vue';
+import RadioGroup from '@/components/ui/form/radio/dashboard/RadioGroup.vue';
 import ReusableSearchInput from '../media/uploader/HelperComponents/ReusableSearchInput.vue';
-import ButtonComponent from '@/components/dev/button/ButtonComponent.vue';
-import CheckboxGroup from '../../form/checkbox/CheckboxGroup.vue';
+import ButtonComponent from '@/components/button/ButtonComponent.vue';
+import CheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
 import { defineProps } from 'vue';
 
 const props = defineProps(['publishFlow']);

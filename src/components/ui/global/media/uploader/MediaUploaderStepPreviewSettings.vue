@@ -187,7 +187,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import ButtonComponent from "@/components/dev/button/ButtonComponent.vue";
+import ButtonComponent from "@/components/button/ButtonComponent.vue";
 import TrailerSetting from "./HelperComponents/TrailerSetting.vue";
 import VideoThumbnailSelector from "./HelperComponents/VideoThumbnailSelector.vue";
 import FileUploadPlaceholder from "./HelperComponents/FileUploadPlaceholder.vue";
@@ -195,7 +195,7 @@ import ThumbnailUploader from "./HelperComponents/ThumbnailUploader.vue";
 import UploadThumbnailPreview from "./HelperComponents/UploadThumbnailPreview.vue";
 import SystemGeneratedImage from "./HelperComponents/SystemGeneratedImage.vue";
 import UploadYourOwnTrailer from "./HelperComponents/UploadYourOwnTrailer.vue";
-import NotificationCard from "@/components/dev/card/notification/NotificationCard.vue";
+import NotificationCard from "@/components/ui/card/dashboard/NotificationCard.vue";
 
 const props = defineProps({
   uploader: {

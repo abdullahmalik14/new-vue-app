@@ -83,9 +83,9 @@
 <script setup>
 import { ref, computed } from "vue"; // 'computed' import karna zaroori hai
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
-import ButtonComponent from "@/components/dev/button/ButtonComponent.vue";
-import BaseInput from "@/components/dev/input/BaseInput.vue";
-import InputComponentDashbaord from "../../../../../components/dev/input/InputComponentDashboard.vue";
+import ButtonComponent from "@/components/button/ButtonComponent.vue";
+import BaseInput from "@/components/input/BaseInput.vue";
+import InputComponentDashbaord from "../../../../../components/input/InputComponentDashboard.vue";
 import ReusableSearchInput from "./HelperComponents/ReusableSearchInput.vue";
 
 // Props

@@ -99,9 +99,9 @@
 
 <script setup>
 import { computed } from "vue";
-import ButtonComponent from "@/components/dev/button/ButtonComponent.vue";
-import NotificationCard from "@/components/dev/card/notification/NotificationCard.vue";
-import CheckboxGroup from "@/components/ui/form/checkbox/CheckboxGroup.vue";
+import ButtonComponent from "@/components/button/ButtonComponent.vue";
+import NotificationCard from "@/components/ui/card/dashboard/NotificationCard.vue";
+import CheckboxGroup from "@/components/checkbox/CheckboxGroup.vue";
 import { ExclamationTriangleIcon } from "@heroicons/vue/24/solid";
 
 const props = defineProps({

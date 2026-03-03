@@ -534,12 +534,12 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { SOD, addDays, addMonths, startOfWeek, endOfWeek, startOfMonth, endOfMonth, timeToMinutes, overlaps, monthNames } from '@/utils/calendarHelpers.js';
-import CheckboxGroup from '../ui/form/checkbox/CheckboxGroup.vue';
+import CheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
 import { onUnmounted } from 'vue';
 import EventDropdownContent from './EventDropdownContent.vue';
 import PopupHandler from '../ui/popup/PopupHandler.vue';
 import EventsWidget from './EventsWidget.vue';
-import ButtonComponent from '../dev/button/ButtonComponent.vue';
+import ButtonComponent from '@/components/button/ButtonComponent.vue';
 import NewEventsPopup from './NewEventsPopup.vue';
 import CalendarMobilePopupContent from './CalendarMobilePopupContent.vue';
 import CalendarEventDetailsPopup from './CalendarEventDetailsPopup.vue';

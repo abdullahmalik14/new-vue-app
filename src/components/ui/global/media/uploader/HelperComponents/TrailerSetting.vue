@@ -1,13 +1,12 @@
 <script setup>
 import { computed } from "vue";
-import CheckboxSwitch from "@/components/dev/checkbox/CheckboxSwitch.vue";
+import CheckboxSwitch from "@/components/checkbox/CheckboxSwitch.vue";
 
 const props = defineProps({
   uploader: {
     type: Object,
     required: true,
   },
-  // 👇 Naya Prop: Batayega ke state mein konsi key update karni hai
   stateKey: {
     type: String,
     required: true, // Zaroori hai

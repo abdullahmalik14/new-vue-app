@@ -184,16 +184,16 @@
 <script setup>
 import { ref, computed } from "vue";
 
-import NotificationCard from "@/components/dev/card/notification/NotificationCard.vue";
-import CheckboxSwitch from "@/components/dev/checkbox/CheckboxSwitch.vue";
+import NotificationCard from "@/components/ui/card/dashboard/NotificationCard.vue";
+import CheckboxSwitch from "@/components/checkbox/CheckboxSwitch.vue";
 import PublishDatePicker from "./HelperComponents/PublishDatePicker.vue";
-import CheckboxGroup from "@/components/ui/form/checkbox/CheckboxGroup.vue";
-import ButtonComponent from "@/components/dev/button/ButtonComponent.vue";
-import BaseInput from "@/components/dev/input/BaseInput.vue";
-import RadioGroup from "@/components/dev/RadioGroup.vue";
+import CheckboxGroup from "@/components/checkbox/CheckboxGroup.vue";
+import ButtonComponent from "@/components/button/ButtonComponent.vue";
+import BaseInput from "@/components/input/BaseInput.vue";
+import RadioGroup from "@/components/ui/form/radio/dashboard/RadioGroup.vue";
 import PostPreview from "./HelperComponents/PostPreview.vue";
-import Paragraph from "@/components/dev/default/Paragraph.vue";
-import InputDefaultComponent from "@/components/dev/input/InputDefaultComponent.vue";
+import Paragraph from "@/components/default/Paragraph.vue";
+import InputDefaultComponent from "@/components/input/InputDefaultComponent.vue";
 import ThumbnailUploader from "./HelperComponents/ThumbnailUploader.vue";
 import UploadThumbnailPreview from "./HelperComponents/UploadThumbnailPreview.vue";
 

@@ -50,7 +50,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import CheckboxSwitch from "@/components/dev/checkbox/CheckboxSwitch.vue";
+import CheckboxSwitch from "@/components/checkbox/CheckboxSwitch.vue";
 import ThumbnailSelector from "./ThumbnailSelector.vue";
 import BlurEffect from './BlurEffect.vue';
 

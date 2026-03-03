@@ -88,10 +88,10 @@
 
 <script setup>
 import { computed } from "vue";
-import ButtonComponent from "@/components/dev/button/ButtonComponent.vue";
-import CheckboxSwitch from "@/components/dev/checkbox/CheckboxSwitch.vue";
-import CheckboxGroup from "@/components/ui/form/checkbox/CheckboxGroup.vue";
-import InputComponentDashbaord from "../../../../../components/dev/input/InputComponentDashboard.vue";
+import ButtonComponent from "@/components/button/ButtonComponent.vue";
+import CheckboxSwitch from "@/components/checkbox/CheckboxSwitch.vue";
+import CheckboxGroup from "@/components/checkbox/CheckboxGroup.vue";
+import InputComponentDashbaord from "../../../../../components/input/InputComponentDashboard.vue";
 
 const props = defineProps({
   uploader: {
