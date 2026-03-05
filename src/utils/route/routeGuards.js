@@ -735,6 +735,23 @@ export function guardCheckDependencies(route, context) {
     return result;
   }
 
+  // If route doesn't require auth and user is a guest, skip dependencies
+  if (route.requiresAuth === false && !context.isAuthenticated) {
+    const result = {
+      allow: true,
+      redirectTo: null,
+      reason: "Guest on public route",
+    };
+    log(
+      "routeGuards.js",
+      "guardCheckDependencies",
+      "return",
+      "Skipping dependencies for guest on public route",
+      result,
+    );
+    return result;
+  }
+
   const userProfile = context.userProfile || {};
 
   // Use role from userProfile if available, fallback to context.userRole
