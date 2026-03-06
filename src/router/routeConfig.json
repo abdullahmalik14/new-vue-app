@@ -1123,6 +1123,10 @@
     "componentPath": "@/components/datePicker/DatePickerShowcase.vue"
   },
   {
+    "slug": "/dev/bookingform",
+    "componentPath": "@/components/ui/form/BookingForm/UnifiedBookingForm.vue"
+  },
+  {
     "slug": "/:pathMatch(.*)*",
     "redirect": "/404"
   }

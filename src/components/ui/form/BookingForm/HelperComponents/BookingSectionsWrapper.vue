@@ -1,16 +1,16 @@
 <template>
   <div class="flex gap-4 relative">
     <!-- Left Icon -->
-    <div v-if="leftIcon">
+    <div v-if="leftIcon" :class="leftIconClass">
       <img :src="leftIcon" alt="left icon" />
     </div>
 
     <!-- Title + Body + Optional Accordion Icon -->
-    <div class="flex w-full">
+    <div class="flex w-full relative">
       <div class='w-full'>
         <div class="flex gap-2">
           <div
-            class="justify-start text-slate-700 text-base font-medium font-['Poppins'] leading-normal"
+            class="justify-start text-slate-700 text-base font-medium leading-normal"
           >
             {{ title }}
           </div>
@@ -24,7 +24,8 @@
       </div>
 
       <!-- Optional Accordion Icon -->
-      <div v-if="accordionIcon" class="absolute right-0 top-0">
+      <div v-if="accordionIcon" class="cursor-pointer absolute top-0 right-0"
+      @click="$emit('toggle')">
         <img :src="accordionIcon" alt="accordion icon" />
       </div>
     </div>
@@ -51,6 +52,10 @@ export default {
       type: String,
       default: null, // optional icon next to title
     },
+    leftIconClass:{
+       type: String,
+      default: null,
+    }
   },
 };
 </script>
