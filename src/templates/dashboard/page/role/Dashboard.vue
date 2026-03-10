@@ -275,7 +275,7 @@ onMounted(() => {
       <div class="w-96 h-[623px] shadow-2xl rounded-tl rounded-tr overflow-hidden shadow-zinc-400/50">
         <FlexChat :messages="modelMessages" currentUserId="jenny" :isGroupChat="false"
           :variantForMessage="msg => msg.type === 'system' ? 'system' : null" :theme="chatTheme" :hasMore="modelHasMore"
-          :loading="modelLoading" @load-more="fetchMoreModelMessages">
+          :loading="modelLoading" @load-more="fetchMoreModelMessages" :infinite="true">
           <template #header>
             <div>
               <div class="flex items-center justify-between">
@@ -305,40 +305,11 @@ onMounted(() => {
 
           <template #message.system="{ message }">
             <div class="w-full flex mb-2 mt-4 px-1">
-
-
-              <div className="w-full py-2 inline-flex flex-col justify-start items-start gap-2">
-    <div className="w-full text-center justify-start text-slate-700 text-sm font-normal font-['Poppins'] leading-5">{{ message.senderName }} has just sent you a live call request:</div>
-    <div className="w-full pr-2 relative bg-white rounded inline-flex justify-start items-start gap-1.5 overflow-hidden">
-        <div className="w-1 self-stretch relative bg-indigo-600/25" />
-        <div className="w-full flex-1 py-2 inline-flex flex-col justify-start items-start gap-3">
-            <div className="w-full flex flex-col justify-start items-start gap-2">
-                <div className="w-full inline-flex justify-between items-center">
-                    <div className="justify-center text-slate-700 text-base font-semibold font-['Poppins'] leading-6">{{ message.text }}</div>
-                  <img src="/images/exp-icon.png" alt="">
-                  </div>
-                <div className=" inline-flex justify-start items-start gap-1">
-                    <div className="justify-center text-slate-700 text-sm font-medium font-['Poppins'] leading-5">April 24, 2025</div>
-                    <div className="justify-center text-slate-700 text-sm font-medium font-['Poppins'] leading-5">2:15pm-9:30pm</div>
-                </div>
-            </div>
-            <div className="w-full inline-flex justify-between items-center">
-                <div className="flex-1 flex justify-start items-center gap-1">
-                    <div className="px-2 py-[3px] bg-green-500 rounded flex justify-start items-center gap-1">
-                        <div className="justify-start text-gray-900 text-sm font-semibold font-['Poppins'] leading-5">Accept</div>
-                    </div>
-                    <div className="px-2 py-[3px] rounded outline outline-1 outline-offset-[-1px] outline-orange-600 flex justify-start items-center gap-1">
-                        <div className="justify-start text-orange-600 text-sm font-semibold font-['Poppins'] leading-5">Decline</div>
-                    </div>
-                </div>
-                <div className=" flex justify-start items-center gap-1">
-                      <img src="/images/edit-icon.png" alt="">
-                    <div className="justify-start text-indigo-600 text-xs font-medium font-['Poppins'] leading-4">Adjust Request and Price</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+              <LiveCallRequest v-if="message.systemType === 'call_request'" :message="message" :isFanView="false" />
+              <div v-else
+                class="text-[12px] text-zinc-400 font-medium py-1 px-3 bg-zinc-100 rounded-full w-full text-center">
+                {{ message.text }}
+              </div>
             </div>
           </template>
 
@@ -363,12 +334,15 @@ onMounted(() => {
             <div class="flex items-center gap-3 my-1">
               <img src="https://i.pravatar.cc/150?img=5"
                 class="w-8 h-8 rounded-full object-cover shadow-sm bg-blue-500 p-[1px]" />
-              <input type="text" placeholder="Write a reply..."
+              <input type="text" placeholder="Write a reply..." v-model="modelComposeText"
+                @keyup.enter="sendMessage('shared-chat', 'jenny', modelComposeText)"
                 class="flex-1 text-[14px] bg-transparent outline-none text-zinc-700 placeholder:text-zinc-400 font-semibold" />
               <div class="flex gap-3 text-zinc-600">
-                <svg class="w-6 h-6 cursor-pointer hover:text-zinc-900" fill="none" stroke="currentColor"
+                <svg @click="sendMessage('shared-chat', 'jenny', modelComposeText)"
+                  class="w-6 h-6 cursor-pointer hover:text-indigo-600" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                 </svg>
                 <svg class="w-6 h-6 cursor-pointer hover:text-zinc-900" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
@@ -388,7 +362,7 @@ onMounted(() => {
       <div class="w-96 h-[623px] shadow-2xl rounded-tl rounded-tr overflow-hidden shadow-zinc-400/50">
         <FlexChat :messages="fanMessages" currentUserId="fan" :isGroupChat="false"
           :variantForMessage="msg => msg.type === 'system' ? 'system' : null" :theme="chatTheme" :hasMore="fanHasMore"
-          :loading="fanLoading" @load-more="fetchMoreFanMessages">
+          :loading="fanLoading" @load-more="fetchMoreFanMessages" :infinite="true">
           <template #header>
             <div>
               <div class="flex items-center justify-between">
@@ -416,38 +390,13 @@ onMounted(() => {
           </template>
 
           <template #message.system="{ message }">
-            <div className="w-full py-2 inline-flex flex-col justify-start items-start gap-2">
-    <div className="w-full text-center justify-start text-slate-700 text-sm font-normal font-['Poppins'] leading-5">{{ message.senderName }} has just sent you a live call request:</div>
-    <div className="w-full pr-2 relative bg-white rounded inline-flex justify-start items-start gap-1.5 overflow-hidden">
-        <div className="w-1 self-stretch relative bg-indigo-600/25" />
-        <div className="flex-1 py-2 inline-flex flex-col justify-start items-start gap-3">
-            <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                <div className="self-stretch inline-flex justify-between items-center">
-                    <div className="flex-1 justify-center text-slate-700 text-base font-semibold font-['Poppins'] leading-6">{{ message.text }}</div>
-                </div>
-                <div className="self-stretch inline-flex justify-start items-start gap-1">
-                    <div className="justify-center text-slate-700 text-sm font-medium font-['Poppins'] leading-5">April 24, 2025</div>
-                    <div className="justify-center text-slate-700 text-sm font-medium font-['Poppins'] leading-5">2:15pm-9:30pm</div>
-                </div>
+            <div class="w-full flex mb-2 mt-4 px-1">
+              <LiveCallRequest v-if="message.systemType === 'call_request'" :message="message" :isFanView="true" />
+              <div v-else
+                class="text-[12px] text-zinc-400 font-medium py-1 px-3 bg-zinc-100 rounded-full w-full text-center">
+                {{ message.text }}
+              </div>
             </div>
-            <div className="self-stretch inline-flex justify-start items-center gap-1">
-                <div className=" flex items-center gap-1">
-                    <img src="/images/hourglass.png" alt="" class="w-2.5 h-3.5">
-                    <div className="w-44 justify-start text-gray-500 text-xs font-normal font-['Poppins'] leading-4">waiting for response</div>
-                </div>
-                <div data-color="dark" data-leading-icon="false" data-property-1="hover" data-size="sm" data-trailing-icon="true" className="flex-1 flex justify-end items-center gap-0.5">
-                    <div className="justify-start text-indigo-600 text-xs font-medium font-['Poppins'] leading-4">View Details</div>
-                    <div className="w-4 h-4 relative overflow-hidden">
-                        <div className="w-1.5 h-1.5 left-[4.67px] top-[4.67px] absolute outline outline-[1.25px] outline-offset-[-0.63px] outline-indigo-600" />
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div className="w-4 h-4 left-[303px] top-[8px] absolute overflow-hidden">
-            <div className="w-[1.33px] h-2.5 left-[7.33px] top-[2.67px] absolute outline outline-[1.25px] outline-offset-[-0.63px] outline-gray-400" />
-        </div>
-    </div>
-</div>
           </template>
 
           <template #message.content="{ message }">
@@ -471,12 +420,22 @@ onMounted(() => {
             <div class="flex items-center gap-3 my-1">
               <img src="https://ui-avatars.com/api/?name=Grape&background=22c55e&color=fff&rounded=true"
                 class="w-8 h-8 rounded-full object-cover shadow-sm bg-green-500 p-[1px]" />
-              <input type="text" placeholder="Write a reply..."
+              <input type="text" placeholder="Write a reply..." v-model="fanComposeText"
+                @keyup.enter="sendMessage('shared-chat', 'fan', fanComposeText)"
                 class="flex-1 text-[14px] bg-transparent outline-none text-zinc-700 placeholder:text-zinc-400 font-semibold" />
               <div class="flex gap-3 text-zinc-600">
-                <svg class="w-6 h-6 cursor-pointer hover:text-zinc-900" fill="none" stroke="currentColor"
+                <svg @click="sendMessage('shared-chat', 'fan', fanComposeText)"
+                  class="w-6 h-6 cursor-pointer hover:text-indigo-600" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                </svg>
+                <!-- Send Live Call Request Button -->
+                <svg @click="sendCallRequest" class="w-6 h-6 cursor-pointer hover:text-rose-500" fill="none"
+                  stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                  </path>
                 </svg>
                 <svg class="w-6 h-6 cursor-pointer hover:text-zinc-900" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
@@ -557,12 +516,15 @@ onMounted(() => {
             <div class="flex items-center gap-3 my-1">
               <img src="https://ui-avatars.com/api/?name=Jenny&background=22c55e&color=fff&rounded=true"
                 class="w-8 h-8 rounded-full object-cover shadow-sm bg-green-500 p-[1px]" />
-              <input type="text" placeholder="Write a reply..."
+              <input type="text" placeholder="Write a reply..." v-model="groupComposeText"
+                @keyup.enter="sendMessage('group-chat', 'jenny', groupComposeText)"
                 class="flex-1 text-[14px] bg-transparent outline-none text-zinc-700 placeholder:text-zinc-400 font-semibold" />
               <div class="flex gap-3 text-zinc-600">
-                <svg class="w-6 h-6 cursor-pointer hover:text-zinc-900" fill="none" stroke="currentColor"
+                <svg @click="sendMessage('group-chat', 'jenny', groupComposeText)"
+                  class="w-6 h-6 cursor-pointer hover:text-indigo-600" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                 </svg>
                 <svg class="w-6 h-6 cursor-pointer hover:text-zinc-900" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
@@ -580,8 +542,12 @@ onMounted(() => {
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import FlexChat from '@/components/ui/chat/FlexChat.vue'
+import LiveCallRequest from '@/components/ui/chat/LiveCallRequest.vue'
+import { useChatStore } from '@/stores/useChatStore.js'
+import { chatPipeline } from '@/pipelines/chatPipeline.js'
+import { chatFlowHandler } from '@/flows/chatFlowHandler.js'
 
 const chatTheme = {
   container: 'relative bg-[#f4f4f5] rounded-tl rounded-tr flex flex-col h-full overflow-hidden border border-zinc-200/50 container-shadow',
@@ -603,116 +569,93 @@ const chatTheme = {
   avatarImg: 'w-5 h-5 rounded-full object-cover',
 }
 
-const fanMessages = ref([
-  { id: 1, type: 'system', systemType: 'call_request', text: 'Call me and i will sing with you', senderName: '@grape' },
-  { id: 2, senderId: 'fan', text: 'Please accept my booking' },
-  { id: 3, senderId: 'fan', text: 'It\'s my birthday that day', time: '2:30pm' },
-  { id: 4, senderId: 'jenny', text: 'Let me check my schedule', time: '2:30pm' },
-  { id: 5, senderId: 'fan', text: 'Thank you so much! By the way, how are you today?', time: '2:31pm' },
-  { id: 6, senderId: 'jenny', text: 'I am doing great, just finishing up some work. Busy day!', time: '2:32pm' },
-  { id: 7, senderId: 'fan', text: 'Don\'t overwork yourself. I can\'t wait for the call.', time: '2:33pm' },
-  { id: 8, senderId: 'fan', text: 'Should I prepare any specific song requests? I have a few in mind but I don\'t want to overwhelm you.', time: '2:34pm' },
-  { id: 9, senderId: 'jenny', text: 'Sure! You can send me a list of your top 3 choices and I\'ll see which one fits best for the session.', time: '2:35pm' },
-  { id: 10, senderId: 'fan', text: 'Awesome! 1. Perfect by Ed Sheeran, 2. A Thousand Years, 3. Anyone by Justin Bieber', time: '2:36pm' },
-  { id: 11, senderId: 'jenny', text: 'Great choices. Let\'s go with Perfect!', time: '2:38pm' },
-  { id: 12, senderId: 'fan', text: 'Yess! Thank you! So excited for this. I will practice singing along.', time: '2:40pm' },
-  { id: 13, senderId: 'fan', text: 'Does 2:15pm work perfectly for you or should we shift to 2:30?', time: '2:42pm' },
-  { id: 14, senderId: 'jenny', text: '2:15 works fine, no worries.', time: '2:45pm' }
-])
+const modelComposeText = ref('')
+const fanComposeText = ref('')
+const groupComposeText = ref('')
 
-const modelMessages = ref([
-  { id: 1, type: 'system', systemType: 'call_request', text: 'Call me and i will sing with you', senderName: '@grape' },
-  { id: 2, senderId: 'fan', text: 'Please accept my booking' },
-  { id: 3, senderId: 'fan', text: 'It\'s my birthday that day', time: '2:30pm' },
-  { id: 4, senderId: 'jenny', text: 'Let me check my schedule', time: '2:30pm' },
-  { id: 5, senderId: 'fan', text: 'Thank you so much! By the way, how are you today?', time: '2:31pm' },
-  { id: 6, senderId: 'jenny', text: 'I am doing great, just finishing up some work. Busy day!', time: '2:32pm' },
-  { id: 7, senderId: 'fan', text: 'Don\'t overwork yourself. I can\'t wait for the call.', time: '2:33pm' },
-  { id: 8, senderId: 'fan', text: 'Should I prepare any specific song requests? I have a few in mind but I don\'t want to overwhelm you.', time: '2:34pm' },
-  { id: 9, senderId: 'jenny', text: 'Sure! You can send me a list of your top 3 choices and I\'ll see which one fits best for the session.', time: '2:35pm' },
-  { id: 10, senderId: 'fan', text: 'Awesome! 1. Perfect by Ed Sheeran, 2. A Thousand Years, 3. Anyone by Justin Bieber', time: '2:36pm' },
-  { id: 11, senderId: 'jenny', text: 'Great choices. Let\'s go with Perfect!', time: '2:38pm' },
-  { id: 12, senderId: 'fan', text: 'Yess! Thank you! So excited for this. I will practice singing along.', time: '2:40pm' },
-  { id: 13, senderId: 'fan', text: 'Does 2:15pm work perfectly for you or should we shift to 2:30?', time: '2:42pm' },
-  { id: 14, senderId: 'jenny', text: '2:15 works fine, no worries.', time: '2:45pm' }
-])
+// Initialize Pinia store
+const chatStore = useChatStore()
 
-const groupMessages = ref([
-  { id: 1, type: 'system', text: 'Alice created the group "Project Awesome"' },
-  { id: 2, senderId: 'alice', senderName: 'Alice', avatar: 'https://i.pravatar.cc/150?img=11', text: 'Hey team! Let\'s use this group for project updates.', time: '10:00am' },
-  { id: 3, senderId: 'jenny', text: 'Sounds good to me!', time: '10:05am' },
-  { id: 4, senderId: 'bob', senderName: 'Bob', avatar: 'https://i.pravatar.cc/150?img=33', text: 'Im in! Who is taking the lead on the design?', time: '10:15am' },
-  { id: 5, senderId: 'bob', senderName: 'Bob', avatar: 'https://i.pravatar.cc/150?img=33', text: 'I can start researching some references.', time: '10:16am' },
-  { id: 6, senderId: 'jenny', text: 'I will handle the initial Figma mockups.', time: '10:20am' },
-  { id: 7, senderId: 'jenny', text: 'Can someone pull up the color palette?', time: '10:21am' },
-  { id: 8, senderId: 'alice', senderName: 'Alice', avatar: 'https://i.pravatar.cc/150?img=11', text: 'Sending it over right now.', time: '10:25am' }
-])
+// Computed reactives mapping to Pinia state
+const modelMessages = computed(() => chatStore.getMessagesByChatId('shared-chat'))
+const fanMessages = computed(() => chatStore.getMessagesByChatId('shared-chat'))
+const groupMessages = computed(() => chatStore.getMessagesByChatId('group-chat'))
 
-// Pagination states for Model Chat
+// Pagination states
 const modelHasMore = ref(true)
 const modelLoading = ref(false)
-
-// Pagination states for Fan Chat
 const fanHasMore = ref(true)
 const fanLoading = ref(false)
-
-// Pagination states for Group Chat
 const groupHasMore = ref(true)
 const groupLoading = ref(false)
 
-// Dummy Fetch for Model Chat
-const fetchMoreModelMessages = () => {
+// Data Pipeline Fetches (Load Initial + Pagination)
+const fetchMoreModelMessages = async () => {
   if (modelLoading.value || !modelHasMore.value) return
   modelLoading.value = true
-
-  setTimeout(() => {
-    // Prepend older dummy messages
-    const olderMessages = [
-      { id: 'old1', senderId: 'jenny', text: 'Hi Grass! Welcome to my fan club!', time: '1:00pm' },
-      { id: 'old2', senderId: 'fan', text: 'Thank you Jenny! Honored to be here.', time: '1:05pm' },
-      { id: 'old3', senderId: 'jenny', text: 'I see you\'ve been an active subscriber. Are you free for a call?', time: '1:10pm' },
-      { id: 'old4', senderId: 'fan', text: 'Yes, definitely! Let\'s plan it for next week.', time: '1:15pm' }
-    ]
-    modelMessages.value = [...olderMessages, ...modelMessages.value]
-    modelHasMore.value = false // Stop after 1 dummy fetch
-    modelLoading.value = false
-  }, 1500)
+  const res = await chatPipeline.fetchChatMessagesPipeline('shared-chat', 20, modelMessages.value.length)
+  if (res.success && res.count === 0) modelHasMore.value = false
+  modelLoading.value = false
 }
 
-// Dummy Fetch for Fan Chat
-const fetchMoreFanMessages = () => {
+const fetchMoreFanMessages = async () => {
+  // We remove the duplicate check so both windows independently trigger their spinner delay on load.
   if (fanLoading.value || !fanHasMore.value) return
   fanLoading.value = true
-
-  setTimeout(() => {
-    // Prepend older dummy messages
-    const olderMessages = [
-      { id: 'old1', senderId: 'jenny', text: 'Hi Grass! Welcome to my fan club!', time: '1:00pm' },
-      { id: 'old2', senderId: 'fan', text: 'Thank you Jenny! Honored to be here.', time: '1:05pm' },
-      { id: 'old3', senderId: 'jenny', text: 'I see you\'ve been an active subscriber. Are you free for a call?', time: '1:10pm' },
-      { id: 'old4', senderId: 'fan', text: 'Yes, definitely! Let\'s plan it for next week.', time: '1:15pm' }
-    ]
-    fanMessages.value = [...olderMessages, ...fanMessages.value]
-    fanHasMore.value = false // Stop after 1 dummy fetch
-    fanLoading.value = false
-  }, 1500)
+  const res = await chatPipeline.fetchChatMessagesPipeline('shared-chat', 20, fanMessages.value.length)
+  if (res.success && res.count === 0) fanHasMore.value = false
+  fanLoading.value = false
 }
 
-// Dummy Fetch for Group Chat
-const fetchMoreGroupMessages = () => {
+const fetchMoreGroupMessages = async () => {
   if (groupLoading.value || !groupHasMore.value) return
   groupLoading.value = true
-
-  setTimeout(() => {
-    const olderMessages = [
-      { id: 'old1', type: 'system', text: 'Yesterday' }
-    ]
-    groupMessages.value = [...olderMessages, ...groupMessages.value]
-    groupHasMore.value = false
-    groupLoading.value = false
-  }, 1500)
+  const res = await chatPipeline.fetchChatMessagesPipeline('group-chat', 20, groupMessages.value.length)
+  if (res.success && res.count === 0) groupHasMore.value = false
+  groupLoading.value = false
 }
 
+// Flow Handler for Sending messages
+const sendMessage = async (chatId, senderId, text, type = 'text') => {
+  if (!text || typeof text !== 'string' || !text.trim()) return
+
+  // Clear immediately for optimistic feeling
+  if (chatId === 'shared-chat') {
+    if (senderId === 'jenny') modelComposeText.value = ''
+    else if (senderId === 'fan') fanComposeText.value = ''
+  }
+  else if (chatId === 'group-chat') groupComposeText.value = ''
+
+  await chatFlowHandler.sendMessageFlow({
+    chatId,
+    senderId,
+    text,
+    type
+  })
+}
+
+// Helper to manually trigger a call request for testing
+const sendCallRequest = async () => {
+  await chatFlowHandler.sendMessageFlow({
+    chatId: 'shared-chat',
+    senderId: 'fan',
+    text: 'Call me and i will sing with you', // Mock text
+    type: 'system',
+    systemType: 'call_request',
+    senderName: 'Jenny Honey~'
+  })
+}
+
+// Initialize on Dashboard Load
+onMounted(() => {
+  // 1. Init mock socket listeners
+  chatFlowHandler.initListeners()
+
+  // 2. Initial fetch queries via Pipeline
+  if (modelMessages.value.length === 0) fetchMoreModelMessages()
+  if (fanMessages.value.length === 0) fetchMoreFanMessages()
+  if (groupMessages.value.length === 0) fetchMoreGroupMessages()
+})
 </script>
 
 <style scoped>

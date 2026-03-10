@@ -88,13 +88,21 @@ function attachScroll() {
     const el = bodyEl.value
     if (!el) return
 
+    let lastScrollTop = el.scrollTop
+
     const onScroll = () => {
         // For chat, user scrolls UP to see older messages (load more)
-        // Distance from top:
         const d = el.scrollTop
-        nearTop.value = d <= toPx(props.threshold, el)
+        const isScrollingUp = d < lastScrollTop
+        lastScrollTop = d
 
-        if (props.infinite && nearTop.value) {
+        // Only trigger "nearTop" if the chat has actually overflowed and is scrollable.
+        // If scrollHeight == clientHeight, it means there are only a few messages and no scrollbar exists yet.
+        const isScrollable = el.scrollHeight > el.clientHeight
+
+        nearTop.value = isScrollable && d <= toPx(props.threshold, el)
+
+        if (props.infinite && nearTop.value && isScrollingUp) {
             maybeEmitLoad()
         }
     }
@@ -202,90 +210,110 @@ watch(() => props.messages, async (newVal, oldVal) => {
         <!-- MAIN CHAT BODY -->
         <div ref="bodyEl" :class="[theme.body, 'no-scrollbar']">
 
-            <!-- TOP LOADER (Historical Messages) -->
-            <div v-if="alwaysShowLoadMore || loading || hasMore" :class="theme.loaderWrapper">
-                <slot name="loader">
-                    <button v-if="hasMore"
-                        class="inline-flex  justify-center items-center gap-2 border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 rounded hover:bg-zinc-50 transition-colors"
-                        :disabled="loading" @click="maybeEmitLoad">
-                        <span v-if="loading">Loading...</span>
-                        <span v-else>Load earlier messages</span>
-                    </button>
-                    <div v-else-if="!hasMore && messages.length > 0" class="text-xs text-zinc-400">No more messages
-                    </div>
+            <!-- INITIAL CENTERED LOADER (For empty state) -->
+            <div v-if="loading && messages.length === 0" class="flex-1 flex justify-center items-center h-full w-full">
+                <slot name="initial-loader">
+                    <svg class="animate-spin h-10 w-10 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
                 </slot>
             </div>
 
-            <!-- MESSAGES LOOP -->
-            <template v-for="(msg, rIdx) in messages" :key="msg[rowKey] ?? rIdx">
+            <template v-else>
+                <!-- TOP LOADER (Historical Messages) -->
+                <div v-if="alwaysShowLoadMore || loading || hasMore" :class="theme.loaderWrapper">
+                    <slot name="loader">
+                        <div v-if="loading" class="flex justify-center items-center py-2 w-full">
+                            <svg class="animate-spin h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="3">
+                                </circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                        </div>
+                    </slot>
+                </div>
 
-                <!-- ENTIRE MESSAGE ROW OVERRIDE SLOT -->
-                <slot name="message" :message="msg" :index="rIdx" :isMe="isMe(msg)" :isSystem="isSystem(msg, rIdx)">
+                <!-- MESSAGES LOOP -->
+                <template v-for="(msg, rIdx) in messages" :key="msg[rowKey] ?? rIdx">
 
-                    <!-- SYSTEM MESSAGE -->
-                    <div v-if="isSystem(msg, rIdx)" :class="theme.systemMessageRow"
-                        v-bind="messageAttrs ? messageAttrs(msg, rIdx) : {}" @click="$emit('message-click', msg)"
-                        @contextmenu.prevent="$emit('message-context', msg)">
-                        <slot name="message.system" :message="msg">
-                            <div :class="theme.systemBubble">
-                                <slot name="message.content" :message="msg">{{ msg.text }}</slot>
-                            </div>
-                        </slot>
-                    </div>
+                    <!-- ENTIRE MESSAGE ROW OVERRIDE SLOT -->
+                    <slot name="message" :message="msg" :index="rIdx" :isMe="isMe(msg)" :isSystem="isSystem(msg, rIdx)">
 
-                    <!-- USER MESSAGE (ME OR OTHER) -->
-                    <div v-else :class="isMe(msg) ? theme.myMessageRow : theme.otherMessageRow"
-                        v-bind="messageAttrs ? messageAttrs(msg, rIdx) : {}" @click="$emit('message-click', msg)"
-                        @contextmenu.prevent="$emit('message-context', msg)">
+                        <!-- SYSTEM MESSAGE -->
+                        <div v-if="isSystem(msg, rIdx)" :class="theme.systemMessageRow"
+                            v-bind="messageAttrs ? messageAttrs(msg, rIdx) : {}" @click="$emit('message-click', msg)"
+                            @contextmenu.prevent="$emit('message-context', msg)">
+                            <slot name="message.system" :message="msg">
+                                <div :class="theme.systemBubble">
+                                    <slot name="message.content" :message="msg">{{ msg.text }}</slot>
+                                </div>
+                            </slot>
+                        </div>
 
-                        <!-- WRAPPER -->
-                        <div class="flex flex-col" :class="isMe(msg) ? 'items-end' : 'items-start'">
+                        <!-- USER MESSAGE (ME OR OTHER) -->
+                        <div v-else :class="isMe(msg) ? theme.myMessageRow : theme.otherMessageRow"
+                            v-bind="messageAttrs ? messageAttrs(msg, rIdx) : {}" @click="$emit('message-click', msg)"
+                            @contextmenu.prevent="$emit('message-context', msg)">
 
-                            <!-- NAME (FOR OTHERS) -->
-                            <span v-if="!isMe(msg) && msg.senderName" :class="[theme.otherNameMeta, 'mb-1 ml-1']">{{
-                                msg.senderName }}</span>
+                            <!-- WRAPPER -->
+                            <div class="flex flex-col" :class="isMe(msg) ? 'items-end' : 'items-start'">
 
-                            <!-- BUBBLE -->
-                            <div :class="isMe(msg) ? theme.myBubble : theme.otherBubble"
-                                :style="!isLastInGroup(msg, rIdx) ? 'margin-bottom: 2px;' : ''">
-                                <slot name="message.content" :message="msg">
-                                    <div class="whitespace-pre-wrap break-words text-sm">{{ msg.text }}</div>
-                                </slot>
-                            </div>
+                                <!-- NAME (FOR OTHERS) -->
+                                <span v-if="!isMe(msg) && msg.senderName" :class="[theme.otherNameMeta, 'mb-1 ml-1']">{{
+                                    msg.senderName }}</span>
 
-                            <!-- FOOTER (AVATAR & TIME) -->
-                            <div v-if="isLastInGroup(msg, rIdx)" class="flex items-center gap-2 mt-1.5 px-0.5 w-full"
-                                :class="isMe(msg) ? 'justify-end' : 'justify-start'">
+                                <!-- BUBBLE -->
+                                <div :class="isMe(msg) ? theme.myBubble : theme.otherBubble"
+                                    :style="!isLastInGroup(msg, rIdx) ? 'margin-bottom: 2px;' : ''">
+                                    <slot name="message.content" :message="msg">
+                                        <div class="whitespace-pre-wrap break-words text-sm">{{ msg.text }}</div>
+                                    </slot>
+                                </div>
 
-                                <!-- OTHER SIDE: Avatar then Time -->
-                                <template v-if="!isMe(msg)">
-                                    <div :class="theme.avatarWrapper">
-                                        <slot name="message.avatar" :message="msg">
-                                            <img v-if="msg.avatar" :src="msg.avatar" :class="theme.avatarImg"
-                                                alt="Avatar" />
+                                <!-- FOOTER (AVATAR & TIME) -->
+                                <div v-if="isLastInGroup(msg, rIdx)"
+                                    class="flex items-center gap-2 mt-1.5 px-0.5 w-full"
+                                    :class="isMe(msg) ? 'justify-end' : 'justify-start'">
+
+                                    <!-- OTHER SIDE: Avatar then Time -->
+                                    <template v-if="!isMe(msg)">
+                                        <div :class="theme.avatarWrapper">
+                                            <slot name="message.avatar" :message="msg">
+                                                <img v-if="msg.avatar" :src="msg.avatar" :class="theme.avatarImg"
+                                                    alt="Avatar" />
+                                            </slot>
+                                        </div>
+                                        <slot name="message.meta" :message="msg" :isMe="isMe(msg)">
+                                            <span v-if="msg.time" :class="theme.otherTimeMeta">{{ msg.time }}</span>
                                         </slot>
-                                    </div>
-                                    <slot name="message.meta" :message="msg" :isMe="isMe(msg)">
-                                        <span v-if="msg.time" :class="theme.otherTimeMeta">{{ msg.time }}</span>
-                                    </slot>
-                                </template>
+                                    </template>
 
-                                <!-- MY SIDE: Time then Avatar -->
-                                <template v-if="isMe(msg)">
-                                    <slot name="message.meta" :message="msg" :isMe="isMe(msg)">
-                                        <span v-if="msg.time" :class="theme.myTimeMeta">{{ msg.time }}</span>
-                                    </slot>
-                                    <div :class="[theme.avatarWrapper, 'ml-1.5']">
-                                        <slot name="message.avatar.me" :message="msg"></slot>
-                                    </div>
-                                </template>
+                                    <!-- MY SIDE: Time then Avatar -->
+                                    <template v-if="isMe(msg)">
+                                        <slot name="message.meta" :message="msg" :isMe="isMe(msg)">
+                                            <span v-if="msg.time" :class="theme.myTimeMeta">{{ msg.time }}</span>
+                                        </slot>
+                                        <div :class="[theme.avatarWrapper, 'ml-1.5']">
+                                            <slot name="message.avatar.me" :message="msg"></slot>
+                                        </div>
+                                    </template>
+
+                                </div>
 
                             </div>
 
                         </div>
-
-                    </div>
-                </slot>
+                    </slot>
+                </template>
             </template>
         </div>
 

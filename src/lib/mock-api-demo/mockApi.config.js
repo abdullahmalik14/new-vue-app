@@ -10,7 +10,7 @@
 const mockApiConfig = {
   meta: {
     configVersion: "1.0.0",
-    description: "Global mock API configuration for testing."
+    description: "Global mock API configuration for testing.",
   },
 
   defaults: {
@@ -19,8 +19,8 @@ const mockApiConfig = {
     successOnAttempt: null,
     characterLimits: {
       defaultMin: 0,
-      defaultMax: 1000
-    }
+      defaultMax: 1000,
+    },
   },
 
   /**
@@ -35,36 +35,60 @@ const mockApiConfig = {
         name: "Alice Tester",
         age: 29,
         country: "AU",
-        role: "tester"
+        role: "tester",
       },
       {
         id: "user-2",
         name: "Bob Developer",
         age: 34,
         country: "US",
-        role: "developer"
+        role: "developer",
       },
       {
         id: "user-3",
         name: "Charlie Manager",
         age: 41,
         country: "UK",
-        role: "manager"
-      }
+        role: "manager",
+      },
     ],
 
     // Larger dataset example (pretend this is 200+ rows in a real file)
     largeProfiles: [
       { id: "p-001", name: "User 001", age: 22, country: "AU", role: "member" },
       { id: "p-002", name: "User 002", age: 25, country: "US", role: "member" },
-      { id: "p-003", name: "User 003", age: 30, country: "CA", role: "creator" },
-      { id: "p-004", name: "User 004", age: 27, country: "AU", role: "creator" },
+      {
+        id: "p-003",
+        name: "User 003",
+        age: 30,
+        country: "CA",
+        role: "creator",
+      },
+      {
+        id: "p-004",
+        name: "User 004",
+        age: 27,
+        country: "AU",
+        role: "creator",
+      },
       { id: "p-005", name: "User 005", age: 33, country: "UK", role: "member" },
       { id: "p-006", name: "User 006", age: 29, country: "DE", role: "member" },
-      { id: "p-007", name: "User 007", age: 31, country: "AU", role: "moderator" },
+      {
+        id: "p-007",
+        name: "User 007",
+        age: 31,
+        country: "AU",
+        role: "moderator",
+      },
       { id: "p-008", name: "User 008", age: 24, country: "US", role: "member" },
-      { id: "p-009", name: "User 009", age: 26, country: "CA", role: "creator" },
-      { id: "p-010", name: "User 010", age: 38, country: "AU", role: "member" }
+      {
+        id: "p-009",
+        name: "User 009",
+        age: 26,
+        country: "CA",
+        role: "creator",
+      },
+      { id: "p-010", name: "User 010", age: 38, country: "AU", role: "member" },
       // ...extend to 200+ entries in a real test setup
     ],
 
@@ -84,8 +108,11 @@ const mockApiConfig = {
       "admin",
       "demo",
       "user123",
-      "coolguy"
-    ]
+      "coolguy",
+    ],
+
+    // Chat History dataset for testing mock fetch
+    chatHistory: [],
   },
 
   /**
@@ -104,14 +131,14 @@ const mockApiConfig = {
 
           characterLimits: {
             email: { min: 5, max: 120 },
-            password: { min: 8, max: 128 }
+            password: { min: 8, max: 128 },
           },
 
           retryLogic: {
             maxAttempts: 3,
             successOnAttempt: 2,
             failureScenario: "invalidCredentials",
-            resetAfterSuccess: true
+            resetAfterSuccess: true,
           },
 
           scenarios: [
@@ -121,16 +148,16 @@ const mockApiConfig = {
               body: {
                 userId: "user-123",
                 email: "{{request.body.email}}",
-                token: "mock-token-abc"
-              }
+                token: "mock-token-abc",
+              },
             },
             {
               name: "invalidCredentials",
               status: 401,
               body: {
                 error: "INVALID_CREDENTIALS",
-                message: "Email or password is incorrect."
-              }
+                message: "Email or password is incorrect.",
+              },
             },
             {
               name: "validationError",
@@ -138,15 +165,15 @@ const mockApiConfig = {
               body: {
                 errors: {
                   email: "Email is required.",
-                  password: "Password is required."
-                }
-              }
-            }
+                  password: "Password is required.",
+                },
+              },
+            },
           ],
 
-          defaultScenario: "success"
-        }
-      }
+          defaultScenario: "success",
+        },
+      },
     },
 
     "/profile/simple": {
@@ -162,7 +189,7 @@ const mockApiConfig = {
             maxAttempts: 1,
             successOnAttempt: 1,
             failureScenario: "serverError",
-            resetAfterSuccess: true
+            resetAfterSuccess: true,
           },
 
           dataSource: {
@@ -172,10 +199,10 @@ const mockApiConfig = {
               queryLimitKey: "limit",
               queryOffsetKey: "offset",
               defaultLimit: 10,
-              maxLimit: 50
+              maxLimit: 50,
             },
             allowQueryFilter: false,
-            allowedFilterFields: []
+            allowedFilterFields: [],
           },
 
           scenarios: [
@@ -184,26 +211,27 @@ const mockApiConfig = {
               status: 200,
               body: {
                 items: "{{datasetSlice}}",
-                total: "{{datasetTotal}}"
-              }
+                total: "{{datasetTotal}}",
+              },
             },
             {
               name: "serverError",
               status: 500,
               body: {
                 error: "INTERNAL_SERVER_ERROR",
-                message: "Mocked failure for simple profiles."
-              }
-            }
+                message: "Mocked failure for simple profiles.",
+              },
+            },
           ],
 
-          defaultScenario: "success"
-        }
-      }
+          defaultScenario: "success",
+        },
+      },
     },
 
     "/profiles": {
-      description: "Fetch a list of user profiles (large dataset) with filters and paging.",
+      description:
+        "Fetch a list of user profiles (large dataset) with filters and paging.",
       methods: {
         GET: {
           description: "Return profiles, supports query filters and paging.",
@@ -215,7 +243,7 @@ const mockApiConfig = {
             maxAttempts: 3,
             successOnAttempt: 1,
             failureScenario: "temporaryError",
-            resetAfterSuccess: false
+            resetAfterSuccess: false,
           },
 
           dataSource: {
@@ -225,10 +253,10 @@ const mockApiConfig = {
               queryLimitKey: "limit",
               queryOffsetKey: "offset",
               defaultLimit: 5,
-              maxLimit: 50
+              maxLimit: 50,
             },
             allowQueryFilter: true,
-            allowedFilterFields: ["country", "role"]
+            allowedFilterFields: ["country", "role"],
           },
 
           scenarios: [
@@ -237,22 +265,22 @@ const mockApiConfig = {
               status: 200,
               body: {
                 items: "{{datasetSlice}}",
-                total: "{{datasetTotal}}"
-              }
+                total: "{{datasetTotal}}",
+              },
             },
             {
               name: "temporaryError",
               status: 503,
               body: {
                 error: "TEMPORARY_UNAVAILABLE",
-                message: "Upstream profile service is temporarily unavailable."
-              }
-            }
+                message: "Upstream profile service is temporarily unavailable.",
+              },
+            },
           ],
 
-          defaultScenario: "success"
-        }
-      }
+          defaultScenario: "success",
+        },
+      },
     },
 
     "/profiles/delete": {
@@ -267,59 +295,61 @@ const mockApiConfig = {
           requiredFields: ["id"],
 
           characterLimits: {
-            id: { min: 1, max: 64 }
+            id: { min: 1, max: 64 },
           },
 
           retryLogic: {
             maxAttempts: 3,
             successOnAttempt: 3,
             failureScenario: "serverError",
-            resetAfterSuccess: true
+            resetAfterSuccess: true,
           },
 
           scenarios: [
             {
               name: "success",
               status: 204,
-              body: null
+              body: null,
             },
             {
               name: "forbidden",
               status: 403,
               body: {
                 error: "FORBIDDEN",
-                message: "You are not allowed to delete this profile."
-              }
+                message: "You are not allowed to delete this profile.",
+              },
             },
             {
               name: "serverError",
               status: 500,
               body: {
                 error: "INTERNAL_SERVER_ERROR",
-                message: "Unexpected error while deleting profile."
-              }
+                message: "Unexpected error while deleting profile.",
+              },
             },
             {
               name: "validationError",
               status: 422,
               body: {
                 errors: {
-                  id: "Profile id is required."
-                }
-              }
-            }
+                  id: "Profile id is required.",
+                },
+              },
+            },
           ],
 
-          defaultScenario: "success"
-        }
-      }
+          defaultScenario: "success",
+        },
+      },
     },
 
     "/users/new-sign-up": {
-      description: "Track new user sign-up after Cognito login (silent background call).",
+      description:
+        "Track new user sign-up after Cognito login (silent background call).",
       methods: {
         POST: {
-          description: "Record new sign-up with IP, browser, userID, email, and action.",
+          description:
+            "Record new sign-up with IP, browser, userID, email, and action.",
           enabled: true,
           delayMs: 250,
           requiresAuth: false,
@@ -331,14 +361,14 @@ const mockApiConfig = {
             email: { min: 5, max: 255 },
             action: { min: 1, max: 50 },
             ip: { min: 7, max: 45 },
-            browser: { min: 1, max: 500 }
+            browser: { min: 1, max: 500 },
           },
 
           retryLogic: {
             maxAttempts: 2,
             successOnAttempt: 1,
             failureScenario: "serverError",
-            resetAfterSuccess: true
+            resetAfterSuccess: true,
           },
 
           scenarios: [
@@ -352,16 +382,16 @@ const mockApiConfig = {
                 email: "{{request.body.email}}",
                 action: "{{request.body.action}}",
                 ip: "{{request.body.ip}}",
-                browser: "{{request.body.browser}}"
-              }
+                browser: "{{request.body.browser}}",
+              },
             },
             {
               name: "serverError",
               status: 500,
               body: {
                 error: "INTERNAL_SERVER_ERROR",
-                message: "Failed to track sign-up."
-              }
+                message: "Failed to track sign-up.",
+              },
             },
             {
               name: "validationError",
@@ -370,22 +400,23 @@ const mockApiConfig = {
                 errors: {
                   userId: "User ID is required.",
                   email: "Email is required.",
-                  action: "Action must be 'signUp'."
-                }
-              }
-            }
+                  action: "Action must be 'signUp'.",
+                },
+              },
+            },
           ],
 
-          defaultScenario: "success"
-        }
-      }
+          defaultScenario: "success",
+        },
+      },
     },
 
     "/users/confirm-email": {
       description: "Confirm user email after Cognito confirmation.",
       methods: {
         POST: {
-          description: "Confirm email with userID and action, used with Promise.all alongside Cognito.",
+          description:
+            "Confirm email with userID and action, used with Promise.all alongside Cognito.",
           enabled: true,
           delayMs: 400,
           requiresAuth: false,
@@ -394,14 +425,14 @@ const mockApiConfig = {
 
           characterLimits: {
             userId: { min: 1, max: 128 },
-            action: { min: 1, max: 50 }
+            action: { min: 1, max: 50 },
           },
 
           retryLogic: {
             maxAttempts: 3,
             successOnAttempt: 1,
             failureScenario: "serverError",
-            resetAfterSuccess: true
+            resetAfterSuccess: true,
           },
 
           scenarios: [
@@ -413,16 +444,16 @@ const mockApiConfig = {
                 message: "Email confirmed successfully",
                 userId: "{{request.body.userId}}",
                 action: "{{request.body.action}}",
-                confirmed: true
-              }
+                confirmed: true,
+              },
             },
             {
               name: "serverError",
               status: 500,
               body: {
                 error: "INTERNAL_SERVER_ERROR",
-                message: "Failed to confirm email."
-              }
+                message: "Failed to confirm email.",
+              },
             },
             {
               name: "validationError",
@@ -430,22 +461,24 @@ const mockApiConfig = {
               body: {
                 errors: {
                   userId: "User ID is required.",
-                  action: "Action must be 'confirmEmail'."
-                }
-              }
-            }
+                  action: "Action must be 'confirmEmail'.",
+                },
+              },
+            },
           ],
 
-          defaultScenario: "success"
-        }
-      }
+          defaultScenario: "success",
+        },
+      },
     },
 
     "/users/sign-up/onboarding": {
-      description: "Submit onboarding details after user completes onboarding form.",
+      description:
+        "Submit onboarding details after user completes onboarding form.",
       methods: {
         POST: {
-          description: "Submit onboarding with userID, jwt token, role, username, and action.",
+          description:
+            "Submit onboarding with userID, jwt token, role, username, and action.",
           enabled: true,
           delayMs: 350,
           requiresAuth: false,
@@ -457,14 +490,14 @@ const mockApiConfig = {
             jwtToken: { min: 10, max: 2000 },
             role: { min: 1, max: 50 },
             username: { min: 3, max: 50 },
-            action: { min: 1, max: 50 }
+            action: { min: 1, max: 50 },
           },
 
           retryLogic: {
             maxAttempts: 2,
             successOnAttempt: 1,
             failureScenario: "serverError",
-            resetAfterSuccess: true
+            resetAfterSuccess: true,
           },
 
           scenarios: [
@@ -477,16 +510,16 @@ const mockApiConfig = {
                 userId: "{{request.body.userId}}",
                 username: "{{request.body.username}}",
                 role: "{{request.body.role}}",
-                action: "{{request.body.action}}"
-              }
+                action: "{{request.body.action}}",
+              },
             },
             {
               name: "serverError",
               status: 500,
               body: {
                 error: "INTERNAL_SERVER_ERROR",
-                message: "Failed to save onboarding details."
-              }
+                message: "Failed to save onboarding details.",
+              },
             },
             {
               name: "validationError",
@@ -495,15 +528,15 @@ const mockApiConfig = {
                 errors: {
                   userId: "User ID is required.",
                   username: "Username must be between 3 and 50 characters.",
-                  action: "Action must be 'signUpOnboarding'."
-                }
-              }
-            }
+                  action: "Action must be 'signUpOnboarding'.",
+                },
+              },
+            },
           ],
 
-          defaultScenario: "success"
-        }
-      }
+          defaultScenario: "success",
+        },
+      },
     },
 
     "/users/username-exists": {
@@ -518,17 +551,17 @@ const mockApiConfig = {
           dataSource: {
             dataSourceKey: "existingUsernames",
             paging: {
-              enabled: false
+              enabled: false,
             },
             allowQueryFilter: false,
-            allowedFilterFields: []
+            allowedFilterFields: [],
           },
 
           retryLogic: {
             maxAttempts: 1,
             successOnAttempt: 1,
             failureScenario: "serverError",
-            resetAfterSuccess: true
+            resetAfterSuccess: true,
           },
 
           scenarios: [
@@ -539,8 +572,9 @@ const mockApiConfig = {
                 exists: true,
                 matches: "{{datasetSlice}}",
                 username: "{{request.query.username}}",
-                message: "Username check completed. Returns dataset for matching."
-              }
+                message:
+                  "Username check completed. Returns dataset for matching.",
+              },
             },
             {
               name: "notFound",
@@ -549,38 +583,39 @@ const mockApiConfig = {
                 exists: false,
                 matches: [],
                 username: "{{request.query.username}}",
-                message: "Username is available"
-              }
+                message: "Username is available",
+              },
             },
             {
               name: "serverError",
               status: 500,
               body: {
                 error: "INTERNAL_SERVER_ERROR",
-                message: "Failed to check username availability."
-              }
+                message: "Failed to check username availability.",
+              },
             },
             {
               name: "validationError",
               status: 422,
               body: {
                 errors: {
-                  username: "Username parameter is required."
-                }
-              }
-            }
+                  username: "Username parameter is required.",
+                },
+              },
+            },
           ],
 
-          defaultScenario: "success"
-        }
-      }
+          defaultScenario: "success",
+        },
+      },
     },
 
     "/users/sign-up/kyc": {
       description: "Submit KYC completion for creators after KYC process.",
       methods: {
         POST: {
-          description: "Submit KYC data with userID, kyc payload array, and action (kycSuccess or kycFail).",
+          description:
+            "Submit KYC data with userID, kyc payload array, and action (kycSuccess or kycFail).",
           enabled: true,
           delayMs: 450,
           requiresAuth: false,
@@ -589,14 +624,14 @@ const mockApiConfig = {
 
           characterLimits: {
             userId: { min: 1, max: 128 },
-            action: { min: 1, max: 50 }
+            action: { min: 1, max: 50 },
           },
 
           retryLogic: {
             maxAttempts: 2,
             successOnAttempt: 1,
             failureScenario: "serverError",
-            resetAfterSuccess: true
+            resetAfterSuccess: true,
           },
 
           scenarios: [
@@ -608,8 +643,8 @@ const mockApiConfig = {
                 message: "KYC data processed successfully",
                 userId: "{{request.body.userId}}",
                 action: "{{request.body.action}}",
-                kycStatus: "{{request.body.action}}"
-              }
+                kycStatus: "{{request.body.action}}",
+              },
             },
             {
               name: "kycFail",
@@ -619,16 +654,16 @@ const mockApiConfig = {
                 message: "KYC verification failed",
                 userId: "{{request.body.userId}}",
                 action: "{{request.body.action}}",
-                kycStatus: "failed"
-              }
+                kycStatus: "failed",
+              },
             },
             {
               name: "serverError",
               status: 500,
               body: {
                 error: "INTERNAL_SERVER_ERROR",
-                message: "Failed to process KYC data."
-              }
+                message: "Failed to process KYC data.",
+              },
             },
             {
               name: "validationError",
@@ -637,17 +672,100 @@ const mockApiConfig = {
                 errors: {
                   userId: "User ID is required.",
                   kycPayload: "KYC payload array is required.",
-                  action: "Action must be 'kycSuccess' or 'kycFail'."
-                }
-              }
-            }
+                  action: "Action must be 'kycSuccess' or 'kycFail'.",
+                },
+              },
+            },
           ],
 
-          defaultScenario: "success"
-        }
-      }
-    }
-  }
+          defaultScenario: "success",
+        },
+      },
+    },
+
+    "/chat/messages": {
+      description: "Fetch chat history for a given chatId.",
+      methods: {
+        GET: {
+          description: "Returns an array of messages.",
+          enabled: true,
+          delayMs: 300,
+          requiresAuth: false,
+
+          dataSource: {
+            dataSourceKey: "chatHistory",
+            paging: {
+              enabled: true,
+              queryLimitKey: "limit",
+              queryOffsetKey: "offset",
+              defaultLimit: 20,
+              maxLimit: 50,
+            },
+            allowQueryFilter: true,
+            allowedFilterFields: ["chatId"],
+          },
+
+          scenarios: [
+            {
+              name: "success",
+              status: 200,
+              body: {
+                success: true,
+                messages: "{{datasetSlice}}",
+                total: "{{datasetTotal}}",
+              },
+            },
+          ],
+          defaultScenario: "success",
+        },
+      },
+    },
+
+    "/chat/send": {
+      description: "Send a new chat message.",
+      methods: {
+        POST: {
+          description: "Receives a message, validates it, and 'saves' it.",
+          enabled: true,
+          delayMs: 200,
+          requiresAuth: false,
+
+          requiredFields: ["chatId", "senderId", "text"],
+
+          scenarios: [
+            {
+              name: "success",
+              status: 200,
+              body: {
+                success: true,
+                message: "Message sent successfully",
+                data: {
+                  id: "{{request.body.id}}",
+                  chatId: "{{request.body.chatId}}",
+                  senderId: "{{request.body.senderId}}",
+                  text: "{{request.body.text}}",
+                  time: "{{request.body.time}}",
+                  type: "{{request.body.type}}",
+                  systemType: "{{request.body.systemType}}",
+                  senderName: "{{request.body.senderName}}",
+                },
+              },
+            },
+            {
+              name: "validationError",
+              status: 422,
+              body: {
+                errors: {
+                  text: "Message text cannot be empty.",
+                },
+              },
+            },
+          ],
+          defaultScenario: "success",
+        },
+      },
+    },
+  },
 };
 
 export default mockApiConfig;
