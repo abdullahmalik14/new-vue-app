@@ -89,10 +89,15 @@ function attachScroll() {
     if (!el) return
 
     let lastScrollTop = el.scrollTop
+    let hasUserScrolled = false // Lock pagination until actual human interaction
 
     const onScroll = () => {
         // For chat, user scrolls UP to see older messages (load more)
         const d = el.scrollTop
+
+        // Unlock once the user has definitively scrolled down away from 0
+        if (d > 10) hasUserScrolled = true
+
         const isScrollingUp = d < lastScrollTop
         lastScrollTop = d
 
@@ -102,7 +107,8 @@ function attachScroll() {
 
         nearTop.value = isScrollable && d <= toPx(props.threshold, el)
 
-        if (props.infinite && nearTop.value && isScrollingUp) {
+        // Only emit if the user has genuinely scrolled around, avoiding initial layout-shift false positives
+        if (props.infinite && nearTop.value && isScrollingUp && hasUserScrolled) {
             maybeEmitLoad()
         }
     }
@@ -168,21 +174,46 @@ watch(() => props.infinite, async () => {
     attachScroll()
 })
 
-watch(() => props.messages, async (newVal, oldVal) => {
+const cachedLength = ref(0)
+const cachedFirstId = ref(null)
+
+watch(() => props.messages, async (newVal) => {
     const el = bodyEl.value
     if (!el) return
 
-    const oldFirstId = oldVal?.[0]?.[props.rowKey]
-    const newFirstId = newVal?.[0]?.[props.rowKey]
+    const currentLength = newVal?.length || 0
+    const currentFirstId = newVal?.[0]?.[props.rowKey]
 
-    // Detect if messages were prepended (loaded history) vs appended (new message)
-    if (oldFirstId !== newFirstId) {
+    // Initialization check on first set of messages
+    if (cachedLength.value === 0 && currentLength > 0) {
+        cachedLength.value = currentLength
+        cachedFirstId.value = currentFirstId
+        // Force scroll to bottom on initial hydrated page load
         await nextTick()
-        maintainScrollPosition()
-    } else {
-        await scrollToBottom()
-        previousScrollHeight = el.scrollHeight
+        await scrollToBottom(true)
+        if (el) previousScrollHeight = el.scrollHeight
+        return
     }
+
+    // Only react if the number of messages actually increased
+    if (currentLength > cachedLength.value) {
+        if (currentFirstId !== cachedFirstId.value) {
+            // Prepended historical chunk
+            await nextTick()
+            maintainScrollPosition()
+        } else {
+            // Appended single new message at bottom
+            const newestMsg = newVal?.[currentLength - 1]
+            const isFromMe = newestMsg && (newestMsg.senderId === props.currentUserId || newestMsg.senderId === 'me')
+
+            await scrollToBottom(isFromMe)
+            previousScrollHeight = el.scrollHeight
+        }
+    }
+
+    // Update Cache
+    cachedLength.value = currentLength
+    cachedFirstId.value = currentFirstId
 }, { deep: true })
 
 </script>
@@ -215,11 +246,8 @@ watch(() => props.messages, async (newVal, oldVal) => {
                 <slot name="initial-loader">
                     <svg class="animate-spin h-10 w-10 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3">
-                        </circle>
-                        <path class="opacity-75" fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                        </path>
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-dasharray="45 20"></circle>
                     </svg>
                 </slot>
             </div>
@@ -231,12 +259,8 @@ watch(() => props.messages, async (newVal, oldVal) => {
                         <div v-if="loading" class="flex justify-center items-center py-2 w-full">
                             <svg class="animate-spin h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg"
                                 fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                    stroke-width="3">
-                                </circle>
-                                <path class="opacity-75" fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                </path>
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2.5"
+                                    stroke-linecap="round" stroke-dasharray="45 20"></circle>
                             </svg>
                         </div>
                     </slot>

@@ -65,10 +65,8 @@
                             class="flex-1 flex justify-end items-center gap-0.5 cursor-pointer hover:opacity-80 transition-opacity">
                             <div class="justify-start text-indigo-600 text-xs font-medium font-['Poppins'] leading-4">
                                 View Details</div>
-                            <svg class="w-3 h-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
-                                </path>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="#4640FF" class="size-2 mt-0.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
                             </svg>
                         </div>
                     </template>
@@ -78,7 +76,7 @@
 
             <!-- Three dots menu (top right for both) -->
             <div
-                class="w-4 h-4 absolute top-2 right-2 cursor-pointer hover:bg-zinc-100 rounded flex items-center justify-center">
+                class="w-4 h-4 absolute top-2 right-2 cursor-pointer hover:bg-zinc-100 rounded flex items-center justify-center" v-if="isFanView">
                 <svg class="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                     <path
                         d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z">

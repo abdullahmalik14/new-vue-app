@@ -22,8 +22,8 @@ const saveState = (key, state) => {
 
 export const useChatStore = defineStore("chat", {
   state: () => ({
-    // We initialize with empty arrays, but they will be persistent
-    messages: loadState("chat_messages", {}),
+    // Initialize with empty arrays to trigger the UI spinner
+    messages: {},
   }),
 
   getters: {
@@ -33,6 +33,18 @@ export const useChatStore = defineStore("chat", {
   },
 
   actions: {
+    // Manually trigger hydration to simulate latency on persisted data
+    async hydrate() {
+      // Artificially delay loading from local storage to display the center spinner
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      const persistedMessages = loadState("chat_messages", {});
+
+      // Merge persisted messages into the reactive state
+      for (const [chatId, messages] of Object.entries(persistedMessages)) {
+        this.messages[chatId] = messages;
+      }
+    },
+
     setMessages(chatId, messagesList) {
       this.messages[chatId] = messagesList;
       saveState("chat_messages", this.messages);
