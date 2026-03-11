@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+import Spinner from '@/components/ui/spinner/Spinner.vue'
 
 /* PROPS */
 const props = defineProps({
@@ -244,11 +245,7 @@ watch(() => props.messages, async (newVal) => {
             <!-- INITIAL CENTERED LOADER (For empty state) -->
             <div v-if="loading && messages.length === 0" class="flex-1 flex justify-center items-center h-full w-full">
                 <slot name="initial-loader">
-                    <svg class="animate-spin h-10 w-10 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                            stroke-dasharray="45 20"></circle>
-                    </svg>
+                    <Spinner thickness="2.5" size="lg" color="text-green-500" :showTrack="false" />
                 </slot>
             </div>
 
@@ -257,11 +254,7 @@ watch(() => props.messages, async (newVal) => {
                 <div v-if="alwaysShowLoadMore || loading || hasMore" :class="theme.loaderWrapper">
                     <slot name="loader">
                         <div v-if="loading" class="flex justify-center items-center py-2 w-full">
-                            <svg class="animate-spin h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2.5"
-                                    stroke-linecap="round" stroke-dasharray="45 20"></circle>
-                            </svg>
+                            <Spinner thickness="2.5" size="md" color="text-green-500" :showTrack="false" />
                         </div>
                     </slot>
                 </div>

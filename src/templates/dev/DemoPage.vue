@@ -1194,6 +1194,102 @@
                 </div>
             </section>
 
+            <!-- ===== SECTION: Spinner ===== -->
+            <section class="flex flex-col gap-6">
+                <DemoSectionHeader title="Spinner (Global)" />
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <!-- 1. Default -->
+                    <DemoCard label="Default (md, indigo)">
+                        <Spinner />
+                    </DemoCard>
+                    <!-- 2. Extra Small -->
+                    <DemoCard label="Extra Small (xs)">
+                        <Spinner size="xs" />
+                    </DemoCard>
+                    <!-- 3. Small -->
+                    <DemoCard label="Small (sm)">
+                        <Spinner size="sm" />
+                    </DemoCard>
+                    <!-- 4. Large -->
+                    <DemoCard label="Large (lg)">
+                        <Spinner size="lg" />
+                    </DemoCard>
+                    <!-- 5. Extra Large -->
+                    <DemoCard label="Extra Large (xl)">
+                        <Spinner size="xl" />
+                    </DemoCard>
+                    <!-- 6. 2XL -->
+                    <DemoCard label="Huge (2xl)">
+                        <Spinner size="2xl" />
+                    </DemoCard>
+                    <!-- 7. Custom Color (Green) -->
+                    <DemoCard label="Color (Green)">
+                        <Spinner color="text-green-500" />
+                    </DemoCard>
+                    <!-- 8. Custom Color (Red) -->
+                    <DemoCard label="Color (Red)">
+                        <Spinner color="text-red-500" />
+                    </DemoCard>
+                    <!-- 9. Custom Track -->
+                    <DemoCard label="Track (Gray-800)">
+                        <Spinner color="text-blue-500" trackColor="text-gray-800" />
+                    </DemoCard>
+                    <!-- 10. Hide Track -->
+                    <DemoCard label="No Track">
+                        <Spinner :showTrack="false" color="text-indigo-600" size="lg" />
+                    </DemoCard>
+                    <!-- 11. Thin -->
+                    <DemoCard label="Thin stroke">
+                        <Spinner thickness="2" size="lg" />
+                    </DemoCard>
+                    <!-- 12. Thick -->
+                    <DemoCard label="Thick stroke">
+                        <Spinner thickness="6" size="lg" />
+                    </DemoCard>
+                    <!-- 12. Fast -->
+                    <DemoCard label="Speed: Fast">
+                        <Spinner speed="fast" color="text-pink-500" />
+                    </DemoCard>
+                    <!-- 13. Slow -->
+                    <DemoCard label="Speed: Slow">
+                        <Spinner speed="slow" color="text-orange-500" />
+                    </DemoCard>
+                    <!-- 14. Very Fast -->
+                    <DemoCard label="Speed: Very Fast">
+                        <Spinner speed="very-fast" color="text-purple-500" />
+                    </DemoCard>
+                    <!-- 15. With Text -->
+                    <DemoCard label="With Text">
+                        <Spinner text="Loading..." color="text-teal-500" />
+                    </DemoCard>
+                    <!-- 16. Custom Text Styling -->
+                    <DemoCard label="Text Styling">
+                        <Spinner text="Wait" textClass="text-lg font-bold text-blue-600 ml-3" />
+                    </DemoCard>
+                    <!-- 17. Button Integration -->
+                    <DemoCard label="Inside Button">
+                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-medium inline-flex items-center">
+                            <Spinner size="sm" color="text-white" trackColor="text-indigo-400" customClass="mr-2" />
+                            Wait
+                        </button>
+                    </DemoCard>
+                    <!-- 18. Image Src Base -->
+                    <DemoCard label="Using Img Src">
+                        <Spinner src="https://api.iconify.design/svg-spinners:ring-resize.svg" size="lg" />
+                    </DemoCard>
+                    <!-- 19. Image CSS Filter -->
+                    <DemoCard label="Img with Filter">
+                        <Spinner src="https://api.iconify.design/svg-spinners:ring-resize.svg" size="lg" imgFilter="hue-rotate(90deg) sepia(1)" />
+                    </DemoCard>
+                    <!-- 20. Dark mode integration -->
+                    <DemoCard label="Dark Mode Container" dark>
+                        <div class="bg-gray-800 p-4 rounded-xl flex items-center justify-center w-full">
+                            <Spinner color="text-yellow-400" trackColor="text-gray-600" size="lg" text="Syncing..." textClass="text-yellow-400 text-sm ml-2.5" />
+                        </div>
+                    </DemoCard>
+                </div>
+            </section>
+
         </div>
     </div>
 </template>
@@ -1210,6 +1306,7 @@ import CodeInputAuthComponent from '@/components/input/CodeInputAuthComponent.vu
 import CheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
 import CheckboxSwitch from '@/components/checkbox/CheckboxSwitch.vue';
 import ButtonComponent from '@/components/button/ButtonComponent.vue';
+import Spinner from '@/components/ui/spinner/Spinner.vue';
 import MediaCardV1 from '@/components/mediaCardsVariations/MediaCardV1.vue';
 import MediaCardV2 from '@/components/mediaCardsVariations/MediaCardV2.vue';
 import Heading from '@/components/default/Heading.vue';

@@ -569,7 +569,8 @@
       "creator",
       "fan",
       "agent",
-      "vendor"
+      "vendor",
+      "guest"
     ],
     "customComponentPath": {
       "creator": {
@@ -583,6 +584,9 @@
       },
       "vendor": {
         "componentPath": "@/templates/dashboard/page/vendor/DashboardChatsVendor.vue"
+      },
+      "guest": {
+        "componentPath": "@/templates/dashboard/page/demo/DemoChats.vue"
       }
     }
   },

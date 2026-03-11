@@ -74,10 +74,10 @@ export const menuItems = [
     title: "Chats", // Fallback text
     translationKey: "dashboard.menu.chats", // Translation key
     image: "dashboard.menu.chats", // Asset flag instead of hardcoded URL
-    route: "/chats",
+    route: "/dashboard/chats",
     parent: false,
     children: [],
-    enabled: false // Disabled as in original
+    enabled: true // Disabled as in original
   },
   {
     id: 6,
