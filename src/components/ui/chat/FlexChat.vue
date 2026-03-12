@@ -73,6 +73,15 @@ const isLastInGroup = (msg, index) => {
     return false
 }
 
+const isFirstInGroup = (msg, index) => {
+    if (index === 0) return true
+    const prevMsg = props.messages[index - 1]
+    if (isSystem(prevMsg, index - 1)) return true
+    if (isSystem(msg, index)) return true
+    if (msg.senderId !== prevMsg.senderId) return true
+    return false
+}
+
 /* SCROLL LOGIC FOR CHAT (Reverse of FlexTable - we load more when scrolling UP) */
 function toPx(raw, el) {
     try { const v = window.ScrollEvents?.toPixelThreshold?.(raw, el); if (typeof v === 'number') return v } catch (e) { }
@@ -284,21 +293,9 @@ watch(() => props.messages, async (newVal) => {
                             <!-- WRAPPER -->
                             <div class="flex flex-col" :class="isMe(msg) ? 'items-end' : 'items-start'">
 
-                                <!-- NAME (FOR OTHERS) -->
-                                <span v-if="!isMe(msg) && msg.senderName" :class="[theme.otherNameMeta, 'mb-1 ml-1']">{{
-                                    msg.senderName }}</span>
-
-                                <!-- BUBBLE -->
-                                <div :class="isMe(msg) ? theme.myBubble : theme.otherBubble"
-                                    :style="!isLastInGroup(msg, rIdx) ? 'margin-bottom: 2px;' : ''">
-                                    <slot name="message.content" :message="msg">
-                                        <div class="whitespace-pre-wrap break-words text-sm">{{ msg.text }}</div>
-                                    </slot>
-                                </div>
-
-                                <!-- FOOTER (AVATAR & TIME) -->
-                                <div v-if="isLastInGroup(msg, rIdx)"
-                                    class="flex items-center gap-2 mt-1.5 px-0.5 w-full"
+                                <!-- HEADER (AVATAR & TIME) -->
+                                <div v-if="isFirstInGroup(msg, rIdx)"
+                                    class="flex items-center gap-2 mb-1.5 px-0.5 w-full"
                                     :class="isMe(msg) ? 'justify-end' : 'justify-start'">
 
                                     <!-- OTHER SIDE: Avatar then Time -->
@@ -319,11 +316,23 @@ watch(() => props.messages, async (newVal) => {
                                         <slot name="message.meta" :message="msg" :isMe="isMe(msg)">
                                             <span v-if="msg.time" :class="theme.myTimeMeta">{{ msg.time }}</span>
                                         </slot>
-                                        <div :class="[theme.avatarWrapper, 'ml-1.5']">
+                                        <div :class="[theme.avatarWrapper, '']">
                                             <slot name="message.avatar.me" :message="msg"></slot>
                                         </div>
                                     </template>
 
+                                </div>
+
+                                <!-- NAME (FOR OTHERS) -->
+                                <span v-if="!isMe(msg) && msg.senderName" :class="[theme.otherNameMeta, 'mb-1 ml-1']">{{
+                                    msg.senderName }}</span>
+
+                                <!-- BUBBLE -->
+                                <div :class="isMe(msg) ? theme.myBubble : theme.otherBubble"
+                                    :style="!isLastInGroup(msg, rIdx) ? 'margin-bottom: 2px;' : ''">
+                                    <slot name="message.content" :message="msg">
+                                        <div class="whitespace-pre-wrap break-words text-sm">{{ msg.text }}</div>
+                                    </slot>
                                 </div>
 
                             </div>

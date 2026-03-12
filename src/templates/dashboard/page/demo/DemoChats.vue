@@ -73,20 +73,12 @@
                 @keyup.enter="sendMessage('shared-chat', 'jenny', modelComposeText)"
                 class="text-[16px] bg-transparent outline-none text-[#667085] placeholder:[#667085] font-[400]" />
               </div>
-              <div class="flex items-center gap-1.5 text-zinc-500 justify-end w-full">
-                <img src="/images/package-plus.png" alt="" class="size-6 cursor-pointer">
+              <div class="flex items-center gap-[10px] text-zinc-500 justify-end w-full">
+                <img src="/images/package-plus.png" alt="" class="w-[20px] h-[20px] cursor-pointer">
+                <img src="/images/plus-square.png" alt="" class="w-[18px] h-[18px] cursor-pointer">
+                <img src="/images/face-smile.png" alt="" class="w-[18px] h-[18px] cursor-pointer">
                 <!-- <svg @click="sendMessage('shared-chat', 'jenny', modelComposeText)" ... -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                  stroke="#000000" class="size-6">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-
-                <svg class="size-6" fill="none" stroke="#000000"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                    d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+              
               </div>
             </div>
           </template>
@@ -170,32 +162,27 @@
                     d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                 </svg> -->
                 <!-- Send Live Call Request Button -->
-                <svg @click="sendCallRequest" class="size-6" fill="none"
+                <!-- <svg @click="sendCallRequest" class="size-6" fill="none"
                   stroke="#000000" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
                   </path>
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                  stroke="#000000" class="size-6">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-                <svg class="size-6" fill="none" stroke="#000000"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                </svg> -->
+                   <img src="/images/plus-square.png" alt="" class="w-[18px] h-[18px] cursor-pointer">
+                <img src="/images/face-smile.png" alt="" class="w-[18px] h-[18px] cursor-pointer">
               </div>
             </div>
           </template>
         </FlexChat>
       </div>
     </div>
+  </div>
 
-    <!-- GROUP CHAT PREVIEW -->
+  <div class=" flex justify-center flex-wrap gap-12 font-sans mt-[100px]">
+
+    <!-- GROUP CHAT PREVIEW (CREATOR) -->
     <div>
-      <div class="text-[11px] text-zinc-500 font-bold mb-3 uppercase tracking-wider">GROUP chat</div>
+      <div class="text-[11px] text-zinc-500 font-bold mb-3 uppercase tracking-wider">GROUP chat (CREATOR)</div>
       <div class="w-100 h-[623px] shadow-2xl rounded-tl rounded-tr overflow-hidden shadow-zinc-400/50">
         <FlexChat :messages="groupMessages" currentUserId="jenny" :isGroupChat="true"
           :variantForMessage="msg => msg.type === 'system' ? 'system' : null" :theme="chatTheme" :hasMore="groupHasMore"
@@ -262,9 +249,11 @@
           <template #message.avatar="{ message }">
             <img v-if="message.time" :src="message.avatar"
               class="w-[18px] h-[18px] rounded-full object-cover shadow-sm bg-blue-500 p-[1px]" />
+
             <div v-else class="w-[18px] h-[18px]"></div>
           </template>
 
+                
           <template #compose>
             <div class="flex items-center gap-3 my-1 w-full">
               <img src="https://ui-avatars.com/api/?name=Jenny&background=22c55e&color=fff&rounded=true"
@@ -273,17 +262,195 @@
                 @keyup.enter="sendMessage('group-chat', 'jenny', groupComposeText)"
                 class=" text-[16px] bg-transparent outline-none text-[#667085] placeholder:[#667085] font-[400]" />
               <div class="flex gap-3 text-zinc-600 justify-end w-full">
-                <svg @click="sendMessage('group-chat', 'jenny', groupComposeText)"
-                  class="w-6 h-6 cursor-pointer hover:text-indigo-600" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                </svg>
-                <svg class="w-6 h-6 cursor-pointer hover:text-zinc-900" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <img src="/images/package-plus.png" alt="" class="w-[20px] h-[20px] cursor-pointer">
+                <img src="/images/plus-square.png" alt="" class="w-[18px] h-[18px] cursor-pointer">
+                <img src="/images/face-smile.png" alt="" class="w-[18px] h-[18px] cursor-pointer">
+              </div>
+            </div>
+          </template>
+        </FlexChat>
+      </div>
+    </div>
+
+    <!-- GROUP CHAT PREVIEW (FAN 1) -->
+    <div>
+      <div class="text-[11px] text-zinc-500 font-bold mb-3 uppercase tracking-wider">GROUP chat (FAN 1)</div>
+      <div class="w-100 h-[623px] shadow-2xl rounded-tl rounded-tr overflow-hidden shadow-zinc-400/50">
+        <FlexChat :messages="groupMessages" currentUserId="fan1" :isGroupChat="true"
+          :variantForMessage="msg => msg.type === 'system' ? 'system' : null" :theme="chatTheme" :hasMore="groupFan1HasMore"
+          :loading="groupFan1Loading" @load-more="fetchMoreGroupFan1Messages">
+          <template #header>
+            <div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="flex -space-x-6">
+                    <img src="https://i.pravatar.cc/150?img=11"
+                      class="w-10 h-10 rounded-full object-cover shadow-sm border-2 border-white" />
+                    <img src="https://i.pravatar.cc/150?img=33"
+                      class="w-10 h-10 rounded-full object-cover shadow-sm border-2 border-white" />
+                    <img src="https://i.pravatar.cc/150?img=47"
+                      class="w-10 h-10 rounded-full object-cover shadow-sm border-2 border-white" />
+                  </div>
+                  <div class="flex flex-col ml-1">
+                    <div class="flex items-center gap-2">
+                      <div class=" text-[#0C111D] font-semibold text-[14px]">
+                        VVIP TIER
+                      </div>
+                      <div class="flex items-center text-slate-700">
+                        <img src="/images/users.png" alt="" class="size-3  brightness-0">
+                        <span class="text-xs font-[400] text-[#0C111D] ml-0.5">88</span>
+                      </div>
+                      <span class="text-zinc-500 font-bold ml-0.5 mt-0.5 text-xs">•••</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3 text-zinc-600">
+                  <img class='w-4 h-4' src="/images/share-icon.png" alt="">
+                  <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M20 12H4"></path>
+                  </svg>
+                  <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <template #message.system="{ message }">
+            <div class="w-full flex justify-center mb-2 mt-4 px-1">
+              <div class="text-[12px] text-zinc-400 font-medium py-1 px-3 bg-zinc-100 rounded-full">{{ message.text }}
+              </div>
+            </div>
+          </template>
+
+          <template #message.content="{ message }">
+            <div class="">{{ message.text }}</div>
+          </template>
+
+          <template #message.avatar.me="{ message }">
+            <img v-if="message.time"
+              src="https://ui-avatars.com/api/?name=Grape&background=22c55e&color=fff&rounded=true"
+              class="w-[18px] h-[18px] rounded-full object-cover shadow-sm bg-green-500 p-[1px]" />
+            <div v-else class="w-[18px] h-[18px]"></div>
+          </template>
+
+          <template #message.avatar="{ message }">
+            <img v-if="message.time && message.senderId === 'jenny'" src="https://ui-avatars.com/api/?name=Jenny&background=22c55e&color=fff&rounded=true"
+              class="w-[18px] h-[18px] rounded-full object-cover shadow-sm bg-green-500 p-[1px]" />
+            <img v-else-if="message.time && message.senderId === 'fan2'" src="https://ui-avatars.com/api/?name=Apple&background=f43f5e&color=fff&rounded=true"
+              class="w-[18px] h-[18px] rounded-full object-cover shadow-sm bg-rose-500 p-[1px]" />
+            <img v-else-if="message.time" :src="message.avatar || 'https://i.pravatar.cc/150?img=5'"
+              class="w-[18px] h-[18px] rounded-full object-cover shadow-sm bg-blue-500 p-[1px]" />
+            <div v-else class="w-[18px] h-[18px]"></div>
+          </template>
+
+          <template #compose>
+            <div class="flex items-center gap-3 my-1 w-full">
+              <img src="https://ui-avatars.com/api/?name=Grape&background=22c55e&color=fff&rounded=true"
+                class="w-8 h-8 rounded-full object-cover shadow-sm bg-green-500 p-[1px]" />
+              <input type="text" placeholder="Write a reply..." v-model="groupFan1ComposeText"
+                @keyup.enter="sendMessage('group-chat', 'fan1', groupFan1ComposeText)"
+                class=" text-[16px] bg-transparent outline-none text-[#667085] placeholder:[#667085] font-[400]" />
+              <div class="flex gap-3 text-zinc-600 justify-end w-full">
+                <!-- Fan controls -->
+                <img src="/images/package-plus.png" alt="" class="w-[20px] h-[20px] cursor-pointer">
+                <img src="/images/plus-square.png" alt="" class="w-[18px] h-[18px] cursor-pointer">
+                <img src="/images/face-smile.png" alt="" class="w-[18px] h-[18px] cursor-pointer">
+              </div>
+            </div>
+          </template>
+        </FlexChat>
+      </div>
+    </div>
+
+    <!-- GROUP CHAT PREVIEW (FAN 2) -->
+    <div>
+      <div class="text-[11px] text-zinc-500 font-bold mb-3 uppercase tracking-wider">GROUP chat (FAN 2)</div>
+      <div class="w-100 h-[623px] shadow-2xl rounded-tl rounded-tr overflow-hidden shadow-zinc-400/50">
+        <FlexChat :messages="groupMessages" currentUserId="fan2" :isGroupChat="true"
+          :variantForMessage="msg => msg.type === 'system' ? 'system' : null" :theme="chatTheme" :hasMore="groupFan2HasMore"
+          :loading="groupFan2Loading" @load-more="fetchMoreGroupFan2Messages">
+          <template #header>
+            <div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="flex -space-x-6">
+                    <img src="https://i.pravatar.cc/150?img=11"
+                      class="w-10 h-10 rounded-full object-cover shadow-sm border-2 border-white" />
+                    <img src="https://i.pravatar.cc/150?img=33"
+                      class="w-10 h-10 rounded-full object-cover shadow-sm border-2 border-white" />
+                    <img src="https://i.pravatar.cc/150?img=47"
+                      class="w-10 h-10 rounded-full object-cover shadow-sm border-2 border-white" />
+                  </div>
+                  <div class="flex flex-col ml-1">
+                    <div class="flex items-center gap-2">
+                      <div class=" text-[#0C111D] font-semibold text-[14px]">
+                        VVIP TIER
+                      </div>
+                      <div class="flex items-center text-slate-700">
+                        <img src="/images/users.png" alt="" class="size-3  brightness-0">
+                        <span class="text-xs font-[400] text-[#0C111D] ml-0.5">88</span>
+                      </div>
+                      <span class="text-zinc-500 font-bold ml-0.5 mt-0.5 text-xs">•••</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3 text-zinc-600">
+                  <img class='w-4 h-4' src="/images/share-icon.png" alt="">
+                  <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M20 12H4"></path>
+                  </svg>
+                  <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <template #message.system="{ message }">
+            <div class="w-full flex justify-center mb-2 mt-4 px-1">
+              <div class="text-[12px] text-zinc-400 font-medium py-1 px-3 bg-zinc-100 rounded-full">{{ message.text }}
+              </div>
+            </div>
+          </template>
+
+          <template #message.content="{ message }">
+            <div class="">{{ message.text }}</div>
+          </template>
+
+          <template #message.avatar.me="{ message }">
+            <img v-if="message.time"
+              src="https://ui-avatars.com/api/?name=Apple&background=f43f5e&color=fff&rounded=true"
+              class="w-[18px] h-[18px] rounded-full object-cover shadow-sm bg-rose-500 p-[1px]" />
+            <div v-else class="w-[18px] h-[18px]"></div>
+          </template>
+
+          <template #message.avatar="{ message }">
+            <img v-if="message.time && message.senderId === 'jenny'" src="https://ui-avatars.com/api/?name=Jenny&background=22c55e&color=fff&rounded=true"
+              class="w-[18px] h-[18px] rounded-full object-cover shadow-sm bg-green-500 p-[1px]" />
+            <img v-else-if="message.time && message.senderId === 'fan1'" src="https://ui-avatars.com/api/?name=Grape&background=22c55e&color=fff&rounded=true"
+              class="w-[18px] h-[18px] rounded-full object-cover shadow-sm bg-green-500 p-[1px]" />
+            <img v-else-if="message.time" :src="message.avatar || 'https://i.pravatar.cc/150?img=5'"
+              class="w-[18px] h-[18px] rounded-full object-cover shadow-sm bg-blue-500 p-[1px]" />
+            <div v-else class="w-[18px] h-[18px]"></div>
+          </template>
+
+          <template #compose>
+            <div class="flex items-center gap-3 my-1 w-full">
+              <img src="https://ui-avatars.com/api/?name=Apple&background=f43f5e&color=fff&rounded=true"
+                class="w-8 h-8 rounded-full object-cover shadow-sm bg-rose-500 p-[1px]" />
+              <input type="text" placeholder="Write a reply..." v-model="groupFan2ComposeText"
+                @keyup.enter="sendMessage('group-chat', 'fan2', groupFan2ComposeText)"
+                class=" text-[16px] bg-transparent outline-none text-[#667085] placeholder:[#667085] font-[400]" />
+              <div class="flex gap-3 text-zinc-600 justify-end w-full">
+                <!-- Fan controls -->
+                <img src="/images/package-plus.png" alt="" class="w-[20px] h-[20px] cursor-pointer">
+                <img src="/images/plus-square.png" alt="" class="w-[18px] h-[18px] cursor-pointer">
+                <img src="/images/face-smile.png" alt="" class="w-[18px] h-[18px] cursor-pointer">
               </div>
             </div>
           </template>
@@ -327,6 +494,8 @@ const chatTheme = {
 const modelComposeText = ref('')
 const fanComposeText = ref('')
 const groupComposeText = ref('')
+const groupFan1ComposeText = ref('')
+const groupFan2ComposeText = ref('')
 
 // Initialize Pinia store
 const chatStore = useChatStore()
@@ -348,6 +517,10 @@ const fanHasMore = ref(true)
 const fanLoading = ref(false)
 const groupHasMore = ref(true)
 const groupLoading = ref(false)
+const groupFan1HasMore = ref(true)
+const groupFan1Loading = ref(false)
+const groupFan2HasMore = ref(true)
+const groupFan2Loading = ref(false)
 
 // Data Pipeline Fetches (Load Initial + Pagination)
 const fetchMoreModelMessages = async () => {
@@ -375,6 +548,22 @@ const fetchMoreGroupMessages = async () => {
   groupLoading.value = false
 }
 
+const fetchMoreGroupFan1Messages = async () => {
+  if (groupFan1Loading.value || !groupFan1HasMore.value) return
+  groupFan1Loading.value = true
+  const res = await chatPipeline.fetchChatMessagesPipeline('group-chat', 20, groupMessages.value.length)
+  if (res.success && res.count === 0) groupFan1HasMore.value = false
+  groupFan1Loading.value = false
+}
+
+const fetchMoreGroupFan2Messages = async () => {
+  if (groupFan2Loading.value || !groupFan2HasMore.value) return
+  groupFan2Loading.value = true
+  const res = await chatPipeline.fetchChatMessagesPipeline('group-chat', 20, groupMessages.value.length)
+  if (res.success && res.count === 0) groupFan2HasMore.value = false
+  groupFan2Loading.value = false
+}
+
 // Flow Handler for Sending messages
 const sendMessage = async (chatId, senderId, text, type = 'text') => {
   if (!text || typeof text !== 'string' || !text.trim()) return
@@ -384,7 +573,11 @@ const sendMessage = async (chatId, senderId, text, type = 'text') => {
     if (senderId === 'jenny') modelComposeText.value = ''
     else if (senderId === 'fan') fanComposeText.value = ''
   }
-  else if (chatId === 'group-chat') groupComposeText.value = ''
+  else if (chatId === 'group-chat') {
+    if (senderId === 'jenny') groupComposeText.value = ''
+    else if (senderId === 'fan1') groupFan1ComposeText.value = ''
+    else if (senderId === 'fan2') groupFan2ComposeText.value = ''
+  }
 
   await chatFlowHandler.sendMessageFlow({
     chatId,
@@ -415,6 +608,8 @@ onMounted(async () => {
   modelLoading.value = true
   fanLoading.value = true
   groupLoading.value = true
+  groupFan1Loading.value = true
+  groupFan2Loading.value = true
 
   // 3. Artificially delay loading persisted local storage to show the center spinner
   await chatStore.hydrate()
@@ -422,12 +617,18 @@ onMounted(async () => {
   modelLoading.value = false
   fanLoading.value = false
   groupLoading.value = false
+  groupFan1Loading.value = false
+  groupFan2Loading.value = false
 
   // 4. Initial fetch queries via Pipeline (for any new messages since last session)
   // If the store is still empty after hydration, the pipeline will fetch the initial batch.
   if (modelMessages.value.length === 0) fetchMoreModelMessages()
   if (fanMessages.value.length === 0) fetchMoreFanMessages()
-  if (groupMessages.value.length === 0) fetchMoreGroupMessages()
+  if (groupMessages.value.length === 0) {
+    fetchMoreGroupMessages()
+    fetchMoreGroupFan1Messages()
+    fetchMoreGroupFan2Messages()
+  }
 })
 </script>
 
