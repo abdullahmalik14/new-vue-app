@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Xush kelibsiz",
+      "subtitle": "Davom etish uchun hisob maʼlumotlaringizni kiriting.",
+      "button": "Kirish",
+      "emailLabel": "Elektron pochta",
+      "emailPlaceholder": "Elektron pochta manzili",
+      "passwordLabel": "Parol",
+      "passwordPlaceholder": "Parol",
+      "forgotPassword": "Parolingizni unutdingizmi?",
+      "rememberMe": "Meni esla",
+      "noAccount": "Hisobingiz yo'qmi?",
+      "continueWithX": "X bilan davom eting (twitter)",
+      "continueWithTelegram": "Telegramda davom eting",
+      "welcome": "Salom, {0}!",
+      "error": "Yaroqsiz elektron pochta yoki parol."
+    },
+    "register": {
+      "title": "Hisob yaratish",
+      "subtitle": "Davom etish uchun hisobingizni yarating.",
+      "button": "Roʻyxatdan oʻtish",
+      "firstName": "Ism",
+      "firstNameLabel": "Ism",
+      "emailLabel": "Elektron pochta",
+      "emailAddress": "Elektron pochta manzili",
+      "emailPlaceholder": "Elektron pochta manzili",
+      "passwordLabel": "Parol",
+      "passwordPlaceholder": "Parol",
+      "confirmPasswordLabel": "Parolni tasdiqlang",
+      "confirmPasswordPlaceholder": "Parol",
+      "haveAccount": "Hisobingiz bormi?",
+      "Onboarding": {
+        "title": "Profilingizni toʻldiring",
+        "description": "Davom etish uchun rolingiz va foydalanuvchi nomingizni tanlang.",
+        "usernameLabel": "Foydalanuvchi nomi",
+        "usernamePlaceholder": "Foydalanuvchi nomini kiriting",
+        "roleLabel": "Rol",
+        "rolePlaceholder": "Rolingizni tanlang",
+        "roles": {
+          "creator": "Yaratuvchi",
+          "fan": "Muxlis",
+          "vendor": "Sotuvchi",
+          "agent": "Agent"
+        },
+        "button": "Davom eting"
+      },
+      "KYC": {
+        "title": "Shaxsingizni tasdiqlang",
+        "description": "Boshqaruv paneliga kirish uchun yaratuvchini toʻliq tekshirish.",
+        "button": "Tasdiqlang va davom eting",
+        "logout": "Chiqish va chiqish"
+      }
+    },
+    "confirmEmail": {
+      "title": "Elektron pochtani tasdiqlang",
+      "subtitle": "Foydalanilgan elektron pochta manzilini va biz sizga yuborgan tasdiqlash kodini kiriting.",
+      "button": "Tasdiqlang",
+      "buttonLoading": "Tasdiqlanmoqda...",
+      "emailLabel": "Elektron pochta",
+      "emailPlaceholder": "Elektron pochta",
+      "codeLabel": "Tasdiqlash kodi",
+      "codePlaceholder": "6 xonali kod",
+      "error": "Tasdiqlash amalga oshmadi",
+      "autoLoginError": "Email tasdiqlandi, lekin avtomatik kirish amalga oshmadi. Iltimos, qo'lda tizimga kiring."
+    },
+    "reset": {
+      "title": "Parolni tiklash",
+      "subtitle": "Qayta tiklash kodini olish uchun elektron pochtangizni kiriting.",
+      "subtitleConfirm": "Olingan kodni va yangi parolni kiriting.",
+      "sendCode": "Qayta tiklash kodini yuboring",
+      "codeLabel": "Kodni tiklash",
+      "codePlaceholder": "Qayta tiklash kodini kiriting",
+      "resetButton": "Parolni tiklash",
+      "codeSent": "E-pochtangizga yuborilgan kodni tiklash.",
+      "sendCodeError": "Kod yuborilmadi",
+      "success": "Parolni tiklash muvaffaqiyatli. Iltimos, tizimga kiring.",
+      "error": "Qayta tiklash amalga oshmadi"
+    },
+    "validation": {
+      "emailRequired": "Elektron pochta kerak",
+      "emailInvalid": "Yaroqli elektron pochta manzilini kiriting",
+      "passwordRequired": "Parol talab qilinadi",
+      "passwordMinLength": "Kamida 8 ta belgidan iborat",
+      "passwordHasUpper": "Kamida 1 ta bosh harfdan iborat",
+      "passwordHasLower": "Kamida 1 ta kichik harfdan iborat",
+      "passwordHasNumber": "Kamida 1 ta raqamdan iborat",
+      "passwordHasSpecial": "Kamida 1 ta maxsus belgidan iborat",
+      "confirmPasswordRequired": "Parolingizni tasdiqlang",
+      "confirmPasswordMatch": "Parollar mos kelmaydi",
+      "confirmPasswordMatchSuccess": "Parol mos keladi",
+      "codeRequired": "Kod talab qilinadi",
+      "roleRequired": "Rol talab qilinadi",
+      "roleSelect": "Rol tanlang",
+      "usernameRequired": "Foydalanuvchi nomi talab qilinadi",
+      "usernameMinLength": "Foydalanuvchi nomi kamida 4 ta belgidan iborat boʻlishi kerak",
+      "usernameMaxLength": "Foydalanuvchi nomi 100 ta belgidan oshmasligi kerak",
+      "usernameTaken": "Foydalanuvchi nomi allaqachon olingan"
+    },
+    "common": {
+      "logout": "Chiqish",
+      "loading": "Yuklanmoqda...",
+      "user": "Foydalanuvchi",
+      "admin": "Admin",
+      "guest": "Mehmon",
+      "showPassword": "Parolni ko'rsatish",
+      "hidePassword": "Parolni yashirish"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Profilingizni to‘ldirishda xatolik yuz berdi"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Boshqaruv paneli",
+      "description": "Hisobingizning umumiy ko'rinishi"
+    },
+    "actions": {
+      "editProfile": "Profilni tahrirlash",
+      "editSettings": "Sozlamalarni tahrirlash",
+      "myMedia": "Mening ommaviy axborot vositalarim",
+      "viewStats": "Statistikani ko'rish"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Profilni tahrirlash",
+        "description": "Shaxsiy ma'lumotlaringizni yangilang"
+      },
+      "editSettings": {
+        "title": "Hisob sozlamalari",
+        "description": "Hisobingiz sozlamalarini boshqaring"
+      },
+      "myMedia": {
+        "title": "Mening ommaviy axborot vositalarim",
+        "description": "Yuklangan kontentingizni boshqaring"
+      }
+    },
+    "messages": {
+      "welcome": "Xush kelibsiz, {0}!",
+      "stats": "Sizda {0} ta element bor"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Profil ma'lumotlarini boshqaring"
+    },
+    "form": {
+      "firstName": "Ism",
+      "lastName": "Familiya",
+      "email": "Elektron pochta manzili",
+      "phone": "Telefon raqami",
+      "bio": "Biografiya",
+      "save": "O'zgarishlarni saqlash"
+    },
+    "messages": {
+      "updated": "Profil muvaffaqiyatli yangilandi",
+      "error": "Profilni yangilab bo‘lmadi"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Kashf qiling",
+      "description": "Yangi tarkib va xususiyatlarni o'rganing"
+    },
+    "sections": {
+      "featured": "Tavsiya etilgan kontent"
+    },
+    "messages": {
+      "explore": "Bizning platformamizni o'rganishni boshlang"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Do'kon",
+      "description": "Mahsulotlarni ko'rib chiqing va sotib oling"
+    },
+    "sections": {
+      "products": "Mahsulotlar"
+    },
+    "messages": {
+      "comingSoon": "Tez orada boshqa mahsulotlar!"
+    }
+  },
+  "common": {
+    "loading": "Yuklanmoqda...",
+    "error": "Xatolik yuz berdi",
+    "success": "Operatsiya tugallandi",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "delete": "Oʻchirish",
+    "edit": "Tahrirlash",
+    "create": "Yaratish",
+    "update": "Yangilash",
+    "submit": "Yuborish",
+    "reset": "Qayta tiklash",
+    "back": "Orqaga qaytish",
+    "next": "Keyingi",
+    "previous": "Oldingi"
+  }
+}

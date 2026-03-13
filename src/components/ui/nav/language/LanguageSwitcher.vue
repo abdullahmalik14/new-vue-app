@@ -6,12 +6,10 @@
       :value="currentLocale" @change="onChange" aria-live="polite">
       <option v-for="opt in localeOptions" :key="opt.code" :value="opt.code">
         {{ opt.label }} ({{ opt.traditionalName }})
-      </option>
+      </option> 
     </select>
   </form>
 </template>
-
-
 
 <script setup>
 /**

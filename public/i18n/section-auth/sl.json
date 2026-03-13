@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Dobrodošli nazaj",
+      "subtitle": "Za nadaljevanje vnesite svoje poverilnice.",
+      "button": "Prijavite se",
+      "emailLabel": "E-pošta",
+      "emailPlaceholder": "E-poštni naslov",
+      "passwordLabel": "Geslo",
+      "passwordPlaceholder": "Geslo",
+      "forgotPassword": "Ste pozabili geslo?",
+      "rememberMe": "Zapomni si me",
+      "noAccount": "Nimate računa?",
+      "continueWithX": "Nadaljuj z X (twitter)",
+      "continueWithTelegram": "Nadaljujte s Telegramom",
+      "welcome": "Pozdravljeni, {0}!",
+      "error": "Neveljaven e-poštni naslov ali geslo."
+    },
+    "register": {
+      "title": "Ustvari račun",
+      "subtitle": "Za nadaljevanje ustvarite svoj račun.",
+      "button": "Prijavite se",
+      "firstName": "Ime",
+      "firstNameLabel": "Ime",
+      "emailLabel": "E-pošta",
+      "emailAddress": "E-poštni naslov",
+      "emailPlaceholder": "E-poštni naslov",
+      "passwordLabel": "Geslo",
+      "passwordPlaceholder": "Geslo",
+      "confirmPasswordLabel": "Potrdite geslo",
+      "confirmPasswordPlaceholder": "Geslo",
+      "haveAccount": "Že imate račun?",
+      "Onboarding": {
+        "title": "Izpolnite svoj profil",
+        "description": "Za nadaljevanje izberite svojo vlogo in uporabniško ime.",
+        "usernameLabel": "Uporabniško ime",
+        "usernamePlaceholder": "Vnesite uporabniško ime",
+        "roleLabel": "Vloga",
+        "rolePlaceholder": "Izberite svojo vlogo",
+        "roles": {
+          "creator": "Ustvarjalec",
+          "fan": "ventilator",
+          "vendor": "Prodajalec",
+          "agent": "Agent"
+        },
+        "button": "Nadaljuj"
+      },
+      "KYC": {
+        "title": "Preverite svojo identiteto",
+        "description": "Dokončajte preverjanje ustvarjalca za dostop do nadzorne plošče.",
+        "button": "Potrdi in nadaljuj",
+        "logout": "Odjava in izhod"
+      }
+    },
+    "confirmEmail": {
+      "title": "Potrdite e-pošto",
+      "subtitle": "Vnesite e-poštni naslov, ki ste ga uporabili, in potrditveno kodo, ki smo vam jo poslali.",
+      "button": "Potrdi",
+      "buttonLoading": "Potrjujem ...",
+      "emailLabel": "E-pošta",
+      "emailPlaceholder": "E-pošta",
+      "codeLabel": "Potrditvena koda",
+      "codePlaceholder": "6-mestna koda",
+      "error": "Potrditev ni uspela",
+      "autoLoginError": "E-poštni naslov je potrjen, vendar samodejna prijava ni uspela. Prijavite se ročno."
+    },
+    "reset": {
+      "title": "Ponastavi geslo",
+      "subtitle": "Vnesite svoj e-poštni naslov, da prejmete kodo za ponastavitev.",
+      "subtitleConfirm": "Vnesite kodo, ki ste jo prejeli, in novo geslo.",
+      "sendCode": "Pošlji kodo za ponastavitev",
+      "codeLabel": "Ponastavi kodo",
+      "codePlaceholder": "Vnesite kodo za ponastavitev",
+      "resetButton": "Ponastavi geslo",
+      "codeSent": "Ponastavitev kode, poslane na vaš e-poštni naslov.",
+      "sendCodeError": "Kode ni bilo mogoče poslati",
+      "success": "Ponastavitev gesla je uspela. prosim prijavite se",
+      "error": "Ponastavitev ni uspela"
+    },
+    "validation": {
+      "emailRequired": "E-pošta je obvezna",
+      "emailInvalid": "Vnesite veljaven e-poštni naslov",
+      "passwordRequired": "Zahtevano je geslo",
+      "passwordMinLength": "Najmanj 8 znakov",
+      "passwordHasUpper": "Vsebuje vsaj 1 veliko črko",
+      "passwordHasLower": "Vsebuje vsaj 1 malo črko",
+      "passwordHasNumber": "Vsebuje vsaj 1 številko",
+      "passwordHasSpecial": "Vsebuje vsaj 1 poseben znak",
+      "confirmPasswordRequired": "Prosim potrdite svoje geslo",
+      "confirmPasswordMatch": "Gesli se ne ujemata",
+      "confirmPasswordMatchSuccess": "Gesla se ujemajo",
+      "codeRequired": "Koda je obvezna",
+      "roleRequired": "Zahtevana je vloga",
+      "roleSelect": "Izberite vlogo",
+      "usernameRequired": "Zahtevano je uporabniško ime",
+      "usernameMinLength": "Uporabniško ime mora vsebovati vsaj 4 znake",
+      "usernameMaxLength": "Uporabniško ime mora biti krajše od 100 znakov",
+      "usernameTaken": "Uporabniško ime je že zasedeno"
+    },
+    "common": {
+      "logout": "Odjava",
+      "loading": "Nalaganje...",
+      "user": "Uporabnik",
+      "admin": "skrbnik",
+      "guest": "Gost",
+      "showPassword": "Pokaži geslo",
+      "hidePassword": "Skrij geslo"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Med izpolnjevanjem profila je prišlo do napake"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Nadzorna plošča",
+      "description": "Pregled vašega računa"
+    },
+    "actions": {
+      "editProfile": "Uredi profil",
+      "editSettings": "Uredi nastavitve",
+      "myMedia": "Moji mediji",
+      "viewStats": "Ogled statistike"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Uredi profil",
+        "description": "Posodobite svoje osebne podatke"
+      },
+      "editSettings": {
+        "title": "Nastavitve računa",
+        "description": "Upravljajte nastavitve računa"
+      },
+      "myMedia": {
+        "title": "Moji mediji",
+        "description": "Upravljajte svojo naloženo vsebino"
+      }
+    },
+    "messages": {
+      "welcome": "Dobrodošel nazaj, {0}!",
+      "stats": "Imate {0} predmetov"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Upravljajte podatke o svojem profilu"
+    },
+    "form": {
+      "firstName": "Ime",
+      "lastName": "Priimek",
+      "email": "E-poštni naslov",
+      "phone": "Telefonska številka",
+      "bio": "Biografija",
+      "save": "Shrani spremembe"
+    },
+    "messages": {
+      "updated": "Profil je bil uspešno posodobljen",
+      "error": "Profila ni bilo mogoče posodobiti"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Odkrij",
+      "description": "Raziščite nove vsebine in funkcije"
+    },
+    "sections": {
+      "featured": "Predstavljena vsebina"
+    },
+    "messages": {
+      "explore": "Začnite raziskovati našo platformo"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Trgovina",
+      "description": "Prebrskajte in kupite izdelke"
+    },
+    "sections": {
+      "products": "Izdelki"
+    },
+    "messages": {
+      "comingSoon": "Več izdelkov kmalu!"
+    }
+  },
+  "common": {
+    "loading": "Nalaganje...",
+    "error": "Prišlo je do napake",
+    "success": "Operacija končana",
+    "save": "Shrani",
+    "cancel": "Prekliči",
+    "delete": "Izbriši",
+    "edit": "Uredi",
+    "create": "Ustvari",
+    "update": "posodobitev",
+    "submit": "Predloži",
+    "reset": "Ponastavi",
+    "back": "Pojdi nazaj",
+    "next": "Naprej",
+    "previous": "Prejšnja"
+  }
+}

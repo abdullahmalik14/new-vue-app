@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "স্বাগত ফিরে",
+      "subtitle": "চালিয়ে যেতে আপনার শংসাপত্র লিখুন.",
+      "button": "লগ ইন করুন",
+      "emailLabel": "ইমেইল",
+      "emailPlaceholder": "ইমেইল ঠিকানা",
+      "passwordLabel": "পাসওয়ার্ড",
+      "passwordPlaceholder": "পাসওয়ার্ড",
+      "forgotPassword": "আপনার পাসওয়ার্ড ভুলে গেছেন?",
+      "rememberMe": "আমাকে মনে রেখো",
+      "noAccount": "একটি অ্যাকাউন্ট নেই?",
+      "continueWithX": "X দিয়ে চালিয়ে যান (টুইটার)",
+      "continueWithTelegram": "টেলিগ্রামের সাথে চালিয়ে যান",
+      "welcome": "হ্যালো, {0}!",
+      "error": "অবৈধ ইমেল বা পাসওয়ার্ড।"
+    },
+    "register": {
+      "title": "অ্যাকাউন্ট তৈরি করুন",
+      "subtitle": "চালিয়ে যেতে আপনার অ্যাকাউন্ট তৈরি করুন।",
+      "button": "সাইন আপ করুন",
+      "firstName": "প্রথম নাম",
+      "firstNameLabel": "নাম",
+      "emailLabel": "ইমেইল",
+      "emailAddress": "ইমেইল ঠিকানা",
+      "emailPlaceholder": "ইমেইল ঠিকানা",
+      "passwordLabel": "পাসওয়ার্ড",
+      "passwordPlaceholder": "পাসওয়ার্ড",
+      "confirmPasswordLabel": "পাসওয়ার্ড নিশ্চিত করুন",
+      "confirmPasswordPlaceholder": "পাসওয়ার্ড",
+      "haveAccount": "ইতিমধ্যে একটি অ্যাকাউন্ট আছে?",
+      "Onboarding": {
+        "title": "আপনার প্রোফাইল সম্পূর্ণ করুন",
+        "description": "চালিয়ে যেতে আপনার ভূমিকা এবং ব্যবহারকারীর নাম চয়ন করুন৷",
+        "usernameLabel": "ব্যবহারকারীর নাম",
+        "usernamePlaceholder": "একটি ব্যবহারকারীর নাম লিখুন",
+        "roleLabel": "ভূমিকা",
+        "rolePlaceholder": "আপনার ভূমিকা নির্বাচন করুন",
+        "roles": {
+          "creator": "সৃষ্টিকর্তা",
+          "fan": "পাখা",
+          "vendor": "বিক্রেতা",
+          "agent": "এজেন্ট"
+        },
+        "button": "চালিয়ে যান"
+      },
+      "KYC": {
+        "title": "আপনার পরিচয় যাচাই করুন",
+        "description": "ড্যাশবোর্ড অ্যাক্সেস করতে সম্পূর্ণ নির্মাতার যাচাইকরণ।",
+        "button": "নিশ্চিত করুন এবং এগিয়ে যান",
+        "logout": "লগআউট এবং প্রস্থান করুন"
+      }
+    },
+    "confirmEmail": {
+      "title": "ইমেল নিশ্চিত করুন",
+      "subtitle": "আপনি যে ইমেলটি ব্যবহার করেছেন এবং আমরা আপনাকে যে যাচাইকরণ কোডটি পাঠিয়েছি তা লিখুন।",
+      "button": "নিশ্চিত করুন",
+      "buttonLoading": "নিশ্চিত করা হচ্ছে...",
+      "emailLabel": "ইমেইল",
+      "emailPlaceholder": "ইমেইল",
+      "codeLabel": "নিশ্চিতকরণ কোড",
+      "codePlaceholder": "6-সংখ্যার কোড",
+      "error": "নিশ্চিতকরণ ব্যর্থ হয়েছে৷",
+      "autoLoginError": "ইমেল নিশ্চিত করা হয়েছে, কিন্তু স্বয়ংক্রিয় লগইন ব্যর্থ হয়েছে. ম্যানুয়ালি লগ ইন করুন."
+    },
+    "reset": {
+      "title": "পাসওয়ার্ড রিসেট করুন",
+      "subtitle": "একটি রিসেট কোড পেতে আপনার ইমেল লিখুন.",
+      "subtitleConfirm": "আপনার প্রাপ্ত কোড এবং একটি নতুন পাসওয়ার্ড লিখুন।",
+      "sendCode": "রিসেট কোড পাঠান",
+      "codeLabel": "কোড রিসেট করুন",
+      "codePlaceholder": "রিসেট কোড লিখুন",
+      "resetButton": "পাসওয়ার্ড রিসেট করুন",
+      "codeSent": "আপনার ইমেলে পাঠানো কোড রিসেট করুন।",
+      "sendCodeError": "কোড পাঠাতে ব্যর্থ হয়েছে",
+      "success": "পাসওয়ার্ড রিসেট সফল হয়েছে। লগ ইন করুন.",
+      "error": "রিসেট ব্যর্থ হয়েছে"
+    },
+    "validation": {
+      "emailRequired": "ইমেল প্রয়োজন",
+      "emailInvalid": "একটি বৈধ ইমেল ঠিকানা লিখুন",
+      "passwordRequired": "পাসওয়ার্ড প্রয়োজন",
+      "passwordMinLength": "কমপক্ষে 8 অক্ষর দীর্ঘ",
+      "passwordHasUpper": "কমপক্ষে 1টি বড় হাতের অক্ষর রয়েছে৷",
+      "passwordHasLower": "কমপক্ষে 1টি ছোট হাতের অক্ষর রয়েছে৷",
+      "passwordHasNumber": "কমপক্ষে 1 নম্বর ধারণ করুন",
+      "passwordHasSpecial": "কমপক্ষে 1টি বিশেষ অক্ষর রয়েছে৷",
+      "confirmPasswordRequired": "আপনার পাসওয়ার্ড নিশ্চিত করুন",
+      "confirmPasswordMatch": "পাসওয়ার্ড মেলে না",
+      "confirmPasswordMatchSuccess": "পাসওয়ার্ড মেলে",
+      "codeRequired": "কোড প্রয়োজন",
+      "roleRequired": "ভূমিকা প্রয়োজন",
+      "roleSelect": "একটি ভূমিকা নির্বাচন করুন",
+      "usernameRequired": "ব্যবহারকারীর নাম প্রয়োজন",
+      "usernameMinLength": "ব্যবহারকারীর নাম কমপক্ষে 4 অক্ষরের হতে হবে",
+      "usernameMaxLength": "ব্যবহারকারীর নাম 100 অক্ষরের কম হতে হবে",
+      "usernameTaken": "ব্যবহারকারীর নাম ইতিমধ্যে নেওয়া হয়েছে"
+    },
+    "common": {
+      "logout": "সাইন আউট",
+      "loading": "লোড হচ্ছে...",
+      "user": "ব্যবহারকারী",
+      "admin": "অ্যাডমিন",
+      "guest": "অতিথি",
+      "showPassword": "পাসওয়ার্ড দেখান",
+      "hidePassword": "পাসওয়ার্ড লুকান"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "আপনার প্রোফাইল সম্পূর্ণ করার সময় একটি ত্রুটি ঘটেছে৷"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "ড্যাশবোর্ড",
+      "description": "আপনার অ্যাকাউন্টের ওভারভিউ"
+    },
+    "actions": {
+      "editProfile": "প্রোফাইল সম্পাদনা করুন",
+      "editSettings": "সেটিংস সম্পাদনা করুন",
+      "myMedia": "আমার মিডিয়া",
+      "viewStats": "পরিসংখ্যান দেখুন"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "প্রোফাইল সম্পাদনা করুন",
+        "description": "আপনার ব্যক্তিগত তথ্য আপডেট করুন"
+      },
+      "editSettings": {
+        "title": "অ্যাকাউন্ট সেটিংস",
+        "description": "আপনার অ্যাকাউন্ট পছন্দগুলি পরিচালনা করুন"
+      },
+      "myMedia": {
+        "title": "আমার মিডিয়া",
+        "description": "আপনার আপলোড করা সামগ্রী পরিচালনা করুন"
+      }
+    },
+    "messages": {
+      "welcome": "আবার স্বাগতম, {0}!",
+      "stats": "আপনার {0}টি আইটেম আছে"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "প্রোফাইল",
+      "description": "আপনার প্রোফাইল তথ্য পরিচালনা করুন"
+    },
+    "form": {
+      "firstName": "প্রথম নাম",
+      "lastName": "পদবি",
+      "email": "ইমেইল ঠিকানা",
+      "phone": "ফোন নম্বর",
+      "bio": "জীবনী",
+      "save": "পরিবর্তনগুলি সংরক্ষণ করুন"
+    },
+    "messages": {
+      "updated": "প্রোফাইল সফলভাবে আপডেট করা হয়েছে৷",
+      "error": "প্রোফাইল আপডেট করতে ব্যর্থ হয়েছে"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "আবিষ্কার করুন",
+      "description": "নতুন বিষয়বস্তু এবং বৈশিষ্ট্য অন্বেষণ করুন"
+    },
+    "sections": {
+      "featured": "বৈশিষ্ট্যযুক্ত বিষয়বস্তু"
+    },
+    "messages": {
+      "explore": "আমাদের প্ল্যাটফর্ম অন্বেষণ শুরু"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "দোকান",
+      "description": "ব্রাউজ এবং ক্রয় পণ্য"
+    },
+    "sections": {
+      "products": "পণ্য"
+    },
+    "messages": {
+      "comingSoon": "আরো পণ্য শীঘ্রই আসছে!"
+    }
+  },
+  "common": {
+    "loading": "লোড হচ্ছে...",
+    "error": "একটি ত্রুটি ঘটেছে",
+    "success": "অপারেশন সম্পন্ন হয়েছে",
+    "save": "সংরক্ষণ করুন",
+    "cancel": "বাতিল করুন",
+    "delete": "মুছে দিন",
+    "edit": "সম্পাদনা করুন",
+    "create": "তৈরি করুন",
+    "update": "আপডেট",
+    "submit": "জমা দিন",
+    "reset": "রিসেট করুন",
+    "back": "ফিরে যান",
+    "next": "পরবর্তী",
+    "previous": "আগের"
+  }
+}

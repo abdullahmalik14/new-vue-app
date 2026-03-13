@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "欢迎回来",
+      "subtitle": "请输入您的凭据以继续。",
+      "button": "登录",
+      "emailLabel": "电子邮件",
+      "emailPlaceholder": "电子邮件地址",
+      "passwordLabel": "密码",
+      "passwordPlaceholder": "密码",
+      "forgotPassword": "忘记密码？",
+      "rememberMe": "记住我",
+      "noAccount": "没有帐户？",
+      "continueWithX": "继续 X（推特）",
+      "continueWithTelegram": "继续电报",
+      "welcome": "你好，{0}！",
+      "error": "电子邮件或密码无效。"
+    },
+    "register": {
+      "title": "创建帐户",
+      "subtitle": "创建您的帐户以继续。",
+      "button": "注册",
+      "firstName": "名字",
+      "firstNameLabel": "名称",
+      "emailLabel": "电子邮件",
+      "emailAddress": "电子邮件地址",
+      "emailPlaceholder": "电子邮件地址",
+      "passwordLabel": "密码",
+      "passwordPlaceholder": "密码",
+      "confirmPasswordLabel": "确认密码",
+      "confirmPasswordPlaceholder": "密码",
+      "haveAccount": "已经有帐户？",
+      "Onboarding": {
+        "title": "填写您的个人资料",
+        "description": "选择您的角色和用户名以继续。",
+        "usernameLabel": "用户名",
+        "usernamePlaceholder": "输入用户名",
+        "roleLabel": "角色",
+        "rolePlaceholder": "选择您的角色",
+        "roles": {
+          "creator": "创作者",
+          "fan": "风扇",
+          "vendor": "供应商",
+          "agent": "代理"
+        },
+        "button": "继续"
+      },
+      "KYC": {
+        "title": "验证您的身份",
+        "description": "完成创建者验证以访问仪表板。",
+        "button": "确认并继续",
+        "logout": "注销并退出"
+      }
+    },
+    "confirmEmail": {
+      "title": "确认邮件",
+      "subtitle": "输入您使用的电子邮件和我们发送给您的验证码。",
+      "button": "确认",
+      "buttonLoading": "确认...",
+      "emailLabel": "电子邮件",
+      "emailPlaceholder": "电子邮件",
+      "codeLabel": "确认码",
+      "codePlaceholder": "6位数字代码",
+      "error": "确认失败",
+      "autoLoginError": "电子邮件已确认，但自动登录失败。请手动登录。"
+    },
+    "reset": {
+      "title": "重置密码",
+      "subtitle": "输入您的电子邮件以接收重置代码。",
+      "subtitleConfirm": "输入您收到的代码和新密码。",
+      "sendCode": "发送重置代码",
+      "codeLabel": "重置代码",
+      "codePlaceholder": "输入重置代码",
+      "resetButton": "重置密码",
+      "codeSent": "重置代码已发送到您的电子邮件。",
+      "sendCodeError": "发送代码失败",
+      "success": "密码重置成功。请登录。",
+      "error": "重置失败"
+    },
+    "validation": {
+      "emailRequired": "电子邮件为必填项",
+      "emailInvalid": "请输入有效的电子邮件地址",
+      "passwordRequired": "需要密码",
+      "passwordMinLength": "至少 8 个字符长",
+      "passwordHasUpper": "至少包含 1 个大写字母",
+      "passwordHasLower": "至少包含 1 个小写字母",
+      "passwordHasNumber": "至少包含1个数字",
+      "passwordHasSpecial": "至少包含 1 个特殊字符",
+      "confirmPasswordRequired": "请确认您的密码",
+      "confirmPasswordMatch": "密码不匹配",
+      "confirmPasswordMatchSuccess": "密码匹配",
+      "codeRequired": "需要代码",
+      "roleRequired": "角色为必填项",
+      "roleSelect": "请选择角色",
+      "usernameRequired": "用户名是必需的",
+      "usernameMinLength": "用户名必须至少 4 个字符",
+      "usernameMaxLength": "用户名必须少于 100 个字符",
+      "usernameTaken": "用户名已被占用"
+    },
+    "common": {
+      "logout": "退出",
+      "loading": "正在加载...",
+      "user": "用户",
+      "admin": "管理员",
+      "guest": "嘉宾",
+      "showPassword": "显示密码",
+      "hidePassword": "隐藏密码"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "填写您的个人资料时出错"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "仪表板",
+      "description": "您的帐户概览"
+    },
+    "actions": {
+      "editProfile": "编辑个人资料",
+      "editSettings": "编辑设置",
+      "myMedia": "我的媒体",
+      "viewStats": "查看统计数据"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "编辑个人资料",
+        "description": "更新您的个人信息"
+      },
+      "editSettings": {
+        "title": "账户设置",
+        "description": "管理您的帐户首选项"
+      },
+      "myMedia": {
+        "title": "我的媒体",
+        "description": "管理您上传的内容"
+      }
+    },
+    "messages": {
+      "welcome": "欢迎回来，{0}！",
+      "stats": "您有 {0} 件商品"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "公司简介",
+      "description": "管理您的个人资料信息"
+    },
+    "form": {
+      "firstName": "名字",
+      "lastName": "姓氏",
+      "email": "电子邮件地址",
+      "phone": "电话号码",
+      "bio": "传记",
+      "save": "保存更改"
+    },
+    "messages": {
+      "updated": "个人资料更新成功",
+      "error": "更新个人资料失败"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "发现",
+      "description": "探索新内容和功能"
+    },
+    "sections": {
+      "featured": "特色内容"
+    },
+    "messages": {
+      "explore": "开始探索我们的平台"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "商店",
+      "description": "浏览并购买产品"
+    },
+    "sections": {
+      "products": "产品展示"
+    },
+    "messages": {
+      "comingSoon": "更多产品即将推出！"
+    }
+  },
+  "common": {
+    "loading": "正在加载...",
+    "error": "发生错误",
+    "success": "操作完成",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "update": "更新",
+    "submit": "提交",
+    "reset": "重置",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一页"
+  }
+}

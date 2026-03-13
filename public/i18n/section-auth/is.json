@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Velkominn aftur",
+      "subtitle": "Vinsamlegast sláðu inn skilríkin þín til að halda áfram.",
+      "button": "Skráðu þig inn",
+      "emailLabel": "Tölvupóstur",
+      "emailPlaceholder": "Netfang",
+      "passwordLabel": "Lykilorð",
+      "passwordPlaceholder": "Lykilorð",
+      "forgotPassword": "Gleymt lykilorðinu þínu?",
+      "rememberMe": "Mundu eftir mér",
+      "noAccount": "Ertu ekki með reikning?",
+      "continueWithX": "Halda áfram með X (twitter)",
+      "continueWithTelegram": "Haltu áfram með Telegram",
+      "welcome": "Halló, {0}!",
+      "error": "Ógilt netfang eða lykilorð."
+    },
+    "register": {
+      "title": "Búðu til reikning",
+      "subtitle": "Búðu til reikninginn þinn til að halda áfram.",
+      "button": "Skráðu þig",
+      "firstName": "Fornafn",
+      "firstNameLabel": "Nafn",
+      "emailLabel": "Tölvupóstur",
+      "emailAddress": "Netfang",
+      "emailPlaceholder": "Netfang",
+      "passwordLabel": "Lykilorð",
+      "passwordPlaceholder": "Lykilorð",
+      "confirmPasswordLabel": "Staðfestu lykilorð",
+      "confirmPasswordPlaceholder": "Lykilorð",
+      "haveAccount": "Ertu nú þegar með reikning?",
+      "Onboarding": {
+        "title": "Ljúktu við prófílinn þinn",
+        "description": "Veldu hlutverk þitt og notendanafn til að halda áfram.",
+        "usernameLabel": "Notendanafn",
+        "usernamePlaceholder": "Sláðu inn notandanafn",
+        "roleLabel": "Hlutverk",
+        "rolePlaceholder": "Veldu hlutverk þitt",
+        "roles": {
+          "creator": "Skapari",
+          "fan": "Vifta",
+          "vendor": "Seljandi",
+          "agent": "Umboðsmaður"
+        },
+        "button": "Halda áfram"
+      },
+      "KYC": {
+        "title": "Staðfestu auðkenni þitt",
+        "description": "Ljúktu við höfundarstaðfestingu til að fá aðgang að mælaborðinu.",
+        "button": "Staðfestu og haltu áfram",
+        "logout": "Útskrá og hætta"
+      }
+    },
+    "confirmEmail": {
+      "title": "Staðfestu tölvupóst",
+      "subtitle": "Sláðu inn tölvupóstinn sem þú notaðir og staðfestingarkóðann sem við sendum þér.",
+      "button": "Staðfesta",
+      "buttonLoading": "Staðfestir...",
+      "emailLabel": "Tölvupóstur",
+      "emailPlaceholder": "Tölvupóstur",
+      "codeLabel": "Staðfestingarkóði",
+      "codePlaceholder": "6 stafa kóða",
+      "error": "Staðfesting mistókst",
+      "autoLoginError": "Tölvupóstur staðfestur en sjálfvirk innskráning mistókst. Vinsamlegast skráðu þig inn handvirkt."
+    },
+    "reset": {
+      "title": "Endurstilla lykilorð",
+      "subtitle": "Sláðu inn netfangið þitt til að fá endurstillingarkóða.",
+      "subtitleConfirm": "Sláðu inn kóðann sem þú fékkst og nýtt lykilorð.",
+      "sendCode": "Sendu endurstillingarkóða",
+      "codeLabel": "Endurstilla kóða",
+      "codePlaceholder": "Sláðu inn endurstillingarkóða",
+      "resetButton": "Endurstilla lykilorð",
+      "codeSent": "Endurstilla kóðann sem sendur var á netfangið þitt.",
+      "sendCodeError": "Mistókst að senda kóða",
+      "success": "Endurstilling lykilorðs tókst. Vinsamlegast skráðu þig inn.",
+      "error": "Endurstilling mistókst"
+    },
+    "validation": {
+      "emailRequired": "Tölvupóstur er nauðsynlegur",
+      "emailInvalid": "Vinsamlegast sláðu inn gilt netfang",
+      "passwordRequired": "Lykilorð er krafist",
+      "passwordMinLength": "Að minnsta kosti 8 stafir að lengd",
+      "passwordHasUpper": "Inniheldur að minnsta kosti einn hástaf",
+      "passwordHasLower": "Inniheldur að minnsta kosti einn lágstaf",
+      "passwordHasNumber": "Inniheldur að minnsta kosti 1 tölu",
+      "passwordHasSpecial": "Inniheldur að minnsta kosti 1 sérstaf",
+      "confirmPasswordRequired": "Vinsamlegast staðfestu lykilorðið þitt",
+      "confirmPasswordMatch": "Lykilorð passa ekki saman",
+      "confirmPasswordMatchSuccess": "Lykilorð passa",
+      "codeRequired": "Kóði er krafist",
+      "roleRequired": "Hlutverk er áskilið",
+      "roleSelect": "Vinsamlegast veldu hlutverk",
+      "usernameRequired": "Notandanafn er áskilið",
+      "usernameMinLength": "Notandanafn verður að vera að minnsta kosti 4 stafir",
+      "usernameMaxLength": "Notandanafn verður að vera minna en 100 stafir",
+      "usernameTaken": "Notandanafn er þegar tekið"
+    },
+    "common": {
+      "logout": "Skráðu þig út",
+      "loading": "Hleður...",
+      "user": "Notandi",
+      "admin": "Admin",
+      "guest": "Gestur",
+      "showPassword": "Sýna lykilorð",
+      "hidePassword": "Fela lykilorð"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Villa kom upp við að klára prófílinn þinn"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Mælaborð",
+      "description": "Yfirlit yfir reikninginn þinn"
+    },
+    "actions": {
+      "editProfile": "Breyta prófíl",
+      "editSettings": "Breyta stillingum",
+      "myMedia": "Fjölmiðillinn minn",
+      "viewStats": "Skoða tölfræði"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Breyta prófíl",
+        "description": "Uppfærðu persónulegar upplýsingar þínar"
+      },
+      "editSettings": {
+        "title": "Reikningsstillingar",
+        "description": "Stjórnaðu reikningsstillingum þínum"
+      },
+      "myMedia": {
+        "title": "Fjölmiðillinn minn",
+        "description": "Hafa umsjón með efni sem þú hefur hlaðið upp"
+      }
+    },
+    "messages": {
+      "welcome": "Velkominn aftur, {0}!",
+      "stats": "Þú ert með {0} atriði"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Prófíll",
+      "description": "Hafðu umsjón með prófílupplýsingunum þínum"
+    },
+    "form": {
+      "firstName": "Fornafn",
+      "lastName": "Eftirnafn",
+      "email": "Netfang",
+      "phone": "Símanúmer",
+      "bio": "Ævisaga",
+      "save": "Vista breytingar"
+    },
+    "messages": {
+      "updated": "Prófíll uppfærður",
+      "error": "Mistókst að uppfæra prófíl"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Uppgötvaðu",
+      "description": "Skoðaðu nýtt efni og eiginleika"
+    },
+    "sections": {
+      "featured": "Valið efni"
+    },
+    "messages": {
+      "explore": "Byrjaðu að kanna vettvang okkar"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Verslun",
+      "description": "Skoðaðu og keyptu vörur"
+    },
+    "sections": {
+      "products": "Vörur"
+    },
+    "messages": {
+      "comingSoon": "Fleiri vörur væntanlegar!"
+    }
+  },
+  "common": {
+    "loading": "Hleður...",
+    "error": "Villa kom upp",
+    "success": "Aðgerð lokið",
+    "save": "Vista",
+    "cancel": "Hætta við",
+    "delete": "Eyða",
+    "edit": "Breyta",
+    "create": "Búa til",
+    "update": "Uppfærsla",
+    "submit": "Sendu inn",
+    "reset": "Endurstilla",
+    "back": "Farðu til baka",
+    "next": "Næst",
+    "previous": "Fyrri"
+  }
+}

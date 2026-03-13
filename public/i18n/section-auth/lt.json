@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Sveiki sugrįžę",
+      "subtitle": "Norėdami tęsti, įveskite savo kredencialus.",
+      "button": "Prisijungti",
+      "emailLabel": "El. paštas",
+      "emailPlaceholder": "El. pašto adresas",
+      "passwordLabel": "Slaptažodis",
+      "passwordPlaceholder": "Slaptažodis",
+      "forgotPassword": "Pamiršote slaptažodį?",
+      "rememberMe": "Prisimink mane",
+      "noAccount": "Neturite paskyros?",
+      "continueWithX": "Tęsti su X („Twitter“)",
+      "continueWithTelegram": "Tęskite su Telegram",
+      "welcome": "Sveiki, {0}!",
+      "error": "Neteisingas el. pašto adresas arba slaptažodis."
+    },
+    "register": {
+      "title": "Sukurti paskyrą",
+      "subtitle": "Norėdami tęsti, susikurkite paskyrą.",
+      "button": "Registruotis",
+      "firstName": "Vardas",
+      "firstNameLabel": "Vardas",
+      "emailLabel": "El. paštas",
+      "emailAddress": "El. pašto adresas",
+      "emailPlaceholder": "El. pašto adresas",
+      "passwordLabel": "Slaptažodis",
+      "passwordPlaceholder": "Slaptažodis",
+      "confirmPasswordLabel": "Patvirtinkite slaptažodį",
+      "confirmPasswordPlaceholder": "Slaptažodis",
+      "haveAccount": "Jau turite paskyrą?",
+      "Onboarding": {
+        "title": "Užpildykite savo profilį",
+        "description": "Norėdami tęsti, pasirinkite savo vaidmenį ir vartotojo vardą.",
+        "usernameLabel": "Vartotojo vardas",
+        "usernamePlaceholder": "Įveskite vartotojo vardą",
+        "roleLabel": "Vaidmuo",
+        "rolePlaceholder": "Pasirinkite savo vaidmenį",
+        "roles": {
+          "creator": "Kūrėjas",
+          "fan": "Ventiliatorius",
+          "vendor": "Pardavėjas",
+          "agent": "Agentas"
+        },
+        "button": "Tęsti"
+      },
+      "KYC": {
+        "title": "Patvirtinkite savo tapatybę",
+        "description": "Norėdami pasiekti prietaisų skydelį, užbaikite kūrėjo patvirtinimą.",
+        "button": "Patvirtinkite ir tęskite",
+        "logout": "Atsijungti ir išeiti"
+      }
+    },
+    "confirmEmail": {
+      "title": "Patvirtinkite el",
+      "subtitle": "Įveskite naudotą el. pašto adresą ir patvirtinimo kodą, kurį jums atsiųsime.",
+      "button": "Patvirtinti",
+      "buttonLoading": "Patvirtinama...",
+      "emailLabel": "El. paštas",
+      "emailPlaceholder": "El. paštas",
+      "codeLabel": "Patvirtinimo kodas",
+      "codePlaceholder": "6 skaitmenų kodas",
+      "error": "Patvirtinti nepavyko",
+      "autoLoginError": "El. paštas patvirtintas, tačiau automatinis prisijungimas nepavyko. Prisijunkite rankiniu būdu."
+    },
+    "reset": {
+      "title": "Iš naujo nustatyti slaptažodį",
+      "subtitle": "Įveskite savo el. pašto adresą, kad gautumėte atstatymo kodą.",
+      "subtitleConfirm": "Įveskite gautą kodą ir naują slaptažodį.",
+      "sendCode": "Siųsti atkūrimo kodą",
+      "codeLabel": "Iš naujo nustatyti kodą",
+      "codePlaceholder": "Įveskite atstatymo kodą",
+      "resetButton": "Iš naujo nustatyti slaptažodį",
+      "codeSent": "Iš naujo nustatyti kodą, išsiųstą jūsų el. paštu.",
+      "sendCodeError": "Nepavyko išsiųsti kodo",
+      "success": "Slaptažodžio nustatymas iš naujo sėkmingas. Prašome prisijungti.",
+      "error": "Nustatyti iš naujo nepavyko"
+    },
+    "validation": {
+      "emailRequired": "Būtinas el",
+      "emailInvalid": "Įveskite galiojantį el. pašto adresą",
+      "passwordRequired": "Reikalingas slaptažodis",
+      "passwordMinLength": "Mažiausiai 8 simbolių ilgio",
+      "passwordHasUpper": "Turi būti bent 1 didžioji raidė",
+      "passwordHasLower": "Turi būti bent 1 mažoji raidė",
+      "passwordHasNumber": "Turi būti bent 1 skaičius",
+      "passwordHasSpecial": "Turi būti bent 1 specialusis simbolis",
+      "confirmPasswordRequired": "Patvirtinkite slaptažodį",
+      "confirmPasswordMatch": "Slaptažodžiai nesutampa",
+      "confirmPasswordMatchSuccess": "Slaptažodis atitinka",
+      "codeRequired": "Būtinas kodas",
+      "roleRequired": "Reikalingas vaidmuo",
+      "roleSelect": "Pasirinkite vaidmenį",
+      "usernameRequired": "Reikalingas vartotojo vardas",
+      "usernameMinLength": "Vartotojo vardą turi sudaryti bent 4 simboliai",
+      "usernameMaxLength": "Vartotojo vardas turi būti trumpesnis nei 100 simbolių",
+      "usernameTaken": "Vartotojo vardas jau užimtas"
+    },
+    "common": {
+      "logout": "Atsijungti",
+      "loading": "Įkeliama...",
+      "user": "Vartotojas",
+      "admin": "Admin",
+      "guest": "Svečias",
+      "showPassword": "Rodyti slaptažodį",
+      "hidePassword": "Slėpti slaptažodį"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Užpildant profilį įvyko klaida"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Prietaisų skydelis",
+      "description": "Jūsų paskyros apžvalga"
+    },
+    "actions": {
+      "editProfile": "Redaguoti profilį",
+      "editSettings": "Redaguoti nustatymus",
+      "myMedia": "Mano žiniasklaida",
+      "viewStats": "Žiūrėti statistiką"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Redaguoti profilį",
+        "description": "Atnaujinkite savo asmeninę informaciją"
+      },
+      "editSettings": {
+        "title": "Paskyros nustatymai",
+        "description": "Tvarkykite paskyros nuostatas"
+      },
+      "myMedia": {
+        "title": "Mano žiniasklaida",
+        "description": "Tvarkykite įkeltą turinį"
+      }
+    },
+    "messages": {
+      "welcome": "Sveiki sugrįžę, {0}!",
+      "stats": "Turite {0} elementus"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profilis",
+      "description": "Tvarkykite savo profilio informaciją"
+    },
+    "form": {
+      "firstName": "Vardas",
+      "lastName": "Pavardė",
+      "email": "El. pašto adresas",
+      "phone": "Telefono numeris",
+      "bio": "Biografija",
+      "save": "Išsaugoti pakeitimus"
+    },
+    "messages": {
+      "updated": "Profilis sėkmingai atnaujintas",
+      "error": "Nepavyko atnaujinti profilio"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Atrask",
+      "description": "Naršykite naują turinį ir funkcijas"
+    },
+    "sections": {
+      "featured": "Teminis turinys"
+    },
+    "messages": {
+      "explore": "Pradėkite tyrinėti mūsų platformą"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Parduotuvė",
+      "description": "Naršykite ir įsigykite produktus"
+    },
+    "sections": {
+      "products": "Produktai"
+    },
+    "messages": {
+      "comingSoon": "Daugiau produktų netrukus!"
+    }
+  },
+  "common": {
+    "loading": "Įkeliama...",
+    "error": "Įvyko klaida",
+    "success": "Operacija baigta",
+    "save": "Išsaugoti",
+    "cancel": "Atšaukti",
+    "delete": "Ištrinti",
+    "edit": "Redaguoti",
+    "create": "Sukurti",
+    "update": "Atnaujinti",
+    "submit": "Pateikti",
+    "reset": "Nustatyti iš naujo",
+    "back": "Grįžti atgal",
+    "next": "Kitas",
+    "previous": "Ankstesnis"
+  }
+}

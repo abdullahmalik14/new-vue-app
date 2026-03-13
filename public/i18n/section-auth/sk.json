@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Vitajte späť",
+      "subtitle": "Ak chcete pokračovať, zadajte svoje poverenia.",
+      "button": "Prihláste sa",
+      "emailLabel": "Email",
+      "emailPlaceholder": "E-mailová adresa",
+      "passwordLabel": "heslo",
+      "passwordPlaceholder": "heslo",
+      "forgotPassword": "Zabudli ste heslo?",
+      "rememberMe": "Pamätaj si ma",
+      "noAccount": "Nemáte účet?",
+      "continueWithX": "Pokračovať s X (twitter)",
+      "continueWithTelegram": "Pokračujte v telegrame",
+      "welcome": "Dobrý deň, {0}!",
+      "error": "Neplatný e-mail alebo heslo."
+    },
+    "register": {
+      "title": "Vytvoriť účet",
+      "subtitle": "Ak chcete pokračovať, vytvorte si účet.",
+      "button": "Zaregistrujte sa",
+      "firstName": "Krstné meno",
+      "firstNameLabel": "Meno",
+      "emailLabel": "Email",
+      "emailAddress": "E-mailová adresa",
+      "emailPlaceholder": "E-mailová adresa",
+      "passwordLabel": "heslo",
+      "passwordPlaceholder": "heslo",
+      "confirmPasswordLabel": "Potvrďte heslo",
+      "confirmPasswordPlaceholder": "heslo",
+      "haveAccount": "Už máte účet?",
+      "Onboarding": {
+        "title": "Vyplňte svoj profil",
+        "description": "Ak chcete pokračovať, vyberte svoju rolu a používateľské meno.",
+        "usernameLabel": "Používateľské meno",
+        "usernamePlaceholder": "Zadajte používateľské meno",
+        "roleLabel": "Role",
+        "rolePlaceholder": "Vyberte svoju rolu",
+        "roles": {
+          "creator": "Tvorca",
+          "fan": "Ventilátor",
+          "vendor": "Predajca",
+          "agent": "agent"
+        },
+        "button": "Pokračovať"
+      },
+      "KYC": {
+        "title": "Overte svoju totožnosť",
+        "description": "Ak chcete získať prístup k hlavnému panelu, dokončite overenie autora.",
+        "button": "Potvrdiť a pokračovať",
+        "logout": "Odhlásiť sa a ukončiť"
+      }
+    },
+    "confirmEmail": {
+      "title": "Potvrďte e-mail",
+      "subtitle": "Zadajte e-mail, ktorý ste použili, a overovací kód, ktorý sme vám poslali.",
+      "button": "Potvrďte",
+      "buttonLoading": "Potvrdzuje sa...",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "codeLabel": "Potvrdzovací kód",
+      "codePlaceholder": "6-miestny kód",
+      "error": "Potvrdenie zlyhalo",
+      "autoLoginError": "E-mail bol potvrdený, ale automatické prihlásenie zlyhalo. Prosím prihláste sa ručne."
+    },
+    "reset": {
+      "title": "Obnoviť heslo",
+      "subtitle": "Zadajte svoj e-mail, aby ste dostali kód na obnovenie.",
+      "subtitleConfirm": "Zadajte kód, ktorý ste dostali, a nové heslo.",
+      "sendCode": "Odoslať resetovací kód",
+      "codeLabel": "Resetovať kód",
+      "codePlaceholder": "Zadajte resetovací kód",
+      "resetButton": "Obnoviť heslo",
+      "codeSent": "Obnoviť kód odoslaný na váš e-mail.",
+      "sendCodeError": "Odoslanie kódu zlyhalo",
+      "success": "Obnovenie hesla bolo úspešné. Prosím prihláste sa.",
+      "error": "Obnovenie zlyhalo"
+    },
+    "validation": {
+      "emailRequired": "Vyžaduje sa e-mail",
+      "emailInvalid": "Zadajte platnú e-mailovú adresu",
+      "passwordRequired": "Vyžaduje sa heslo",
+      "passwordMinLength": "Minimálne 8 znakov",
+      "passwordHasUpper": "Obsahuje aspoň 1 veľké písmeno",
+      "passwordHasLower": "Obsahuje aspoň 1 malé písmeno",
+      "passwordHasNumber": "Obsahuje aspoň 1 číslo",
+      "passwordHasSpecial": "Obsahuje aspoň 1 špeciálny znak",
+      "confirmPasswordRequired": "Potvrďte svoje heslo",
+      "confirmPasswordMatch": "Heslá sa nezhodujú",
+      "confirmPasswordMatchSuccess": "Heslo sa zhoduje",
+      "codeRequired": "Vyžaduje sa kód",
+      "roleRequired": "Vyžaduje sa rola",
+      "roleSelect": "Vyberte rolu",
+      "usernameRequired": "Vyžaduje sa používateľské meno",
+      "usernameMinLength": "Používateľské meno musí mať aspoň 4 znaky",
+      "usernameMaxLength": "Používateľské meno musí mať menej ako 100 znakov",
+      "usernameTaken": "Používateľské meno je už obsadené"
+    },
+    "common": {
+      "logout": "Odhlásiť sa",
+      "loading": "Načítava sa...",
+      "user": "Používateľ",
+      "admin": "Admin",
+      "guest": "hosť",
+      "showPassword": "Zobraziť heslo",
+      "hidePassword": "Skryť heslo"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Pri dokončovaní vášho profilu sa vyskytla chyba"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard",
+      "description": "Prehľad vášho účtu"
+    },
+    "actions": {
+      "editProfile": "Upraviť profil",
+      "editSettings": "Upraviť nastavenia",
+      "myMedia": "Moje médiá",
+      "viewStats": "Zobraziť štatistiku"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Upraviť profil",
+        "description": "Aktualizujte svoje osobné údaje"
+      },
+      "editSettings": {
+        "title": "Nastavenia účtu",
+        "description": "Spravujte predvoľby účtu"
+      },
+      "myMedia": {
+        "title": "Moje médiá",
+        "description": "Spravujte svoj nahraný obsah"
+      }
+    },
+    "messages": {
+      "welcome": "Vitajte späť, {0}!",
+      "stats": "Máte {0} položiek"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Spravujte informácie o svojom profile"
+    },
+    "form": {
+      "firstName": "Krstné meno",
+      "lastName": "Priezvisko",
+      "email": "E-mailová adresa",
+      "phone": "Telefónne číslo",
+      "bio": "Životopis",
+      "save": "Uložiť zmeny"
+    },
+    "messages": {
+      "updated": "Profil bol úspešne aktualizovaný",
+      "error": "Aktualizácia profilu zlyhala"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Objavte",
+      "description": "Preskúmajte nový obsah a funkcie"
+    },
+    "sections": {
+      "featured": "Odporúčaný obsah"
+    },
+    "messages": {
+      "explore": "Začnite skúmať našu platformu"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Obchod",
+      "description": "Prehliadajte a nakupujte produkty"
+    },
+    "sections": {
+      "products": "Produkty"
+    },
+    "messages": {
+      "comingSoon": "Ďalšie produkty už čoskoro!"
+    }
+  },
+  "common": {
+    "loading": "Načítava sa...",
+    "error": "Vyskytla sa chyba",
+    "success": "Operácia dokončená",
+    "save": "Uložiť",
+    "cancel": "Zrušiť",
+    "delete": "Odstrániť",
+    "edit": "Upraviť",
+    "create": "Vytvorte",
+    "update": "Aktualizovať",
+    "submit": "Odoslať",
+    "reset": "Resetovať",
+    "back": "Choď späť",
+    "next": "Ďalej",
+    "previous": "Predchádzajúce"
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "دوبارہ خوش آمدید",
+      "subtitle": "جاری رکھنے کے لیے براہ کرم اپنی اسناد درج کریں۔",
+      "button": "لاگ ان کریں۔",
+      "emailLabel": "ای میل",
+      "emailPlaceholder": "ای میل ایڈریس",
+      "passwordLabel": "پاس ورڈ",
+      "passwordPlaceholder": "پاس ورڈ",
+      "forgotPassword": "اپنا پاس ورڈ بھول گئے؟",
+      "rememberMe": "مجھے یاد رکھنا",
+      "noAccount": "اکاؤنٹ نہیں ہے؟",
+      "continueWithX": "ایکس کے ساتھ جاری رکھیں (ٹویٹر)",
+      "continueWithTelegram": "ٹیلیگرام کے ساتھ جاری رکھیں",
+      "welcome": "ہیلو، {0}!",
+      "error": "غلط ای میل یا پاس ورڈ۔"
+    },
+    "register": {
+      "title": "اکاؤنٹ بنائیں",
+      "subtitle": "جاری رکھنے کے لیے اپنا اکاؤنٹ بنائیں۔",
+      "button": "سائن اپ کریں۔",
+      "firstName": "پہلا نام",
+      "firstNameLabel": "نام",
+      "emailLabel": "ای میل",
+      "emailAddress": "ای میل ایڈریس",
+      "emailPlaceholder": "ای میل ایڈریس",
+      "passwordLabel": "پاس ورڈ",
+      "passwordPlaceholder": "پاس ورڈ",
+      "confirmPasswordLabel": "پاس ورڈ کی تصدیق کریں۔",
+      "confirmPasswordPlaceholder": "پاس ورڈ",
+      "haveAccount": "پہلے سے ہی ایک اکاؤنٹ ہے؟",
+      "Onboarding": {
+        "title": "اپنا پروفائل مکمل کریں۔",
+        "description": "جاری رکھنے کے لیے اپنا کردار اور صارف نام منتخب کریں۔",
+        "usernameLabel": "صارف نام",
+        "usernamePlaceholder": "ایک صارف نام درج کریں۔",
+        "roleLabel": "کردار",
+        "rolePlaceholder": "اپنا کردار منتخب کریں۔",
+        "roles": {
+          "creator": "خالق",
+          "fan": "پنکھا",
+          "vendor": "فروش",
+          "agent": "ایجنٹ"
+        },
+        "button": "جاری رکھیں"
+      },
+      "KYC": {
+        "title": "اپنی شناخت کی تصدیق کریں۔",
+        "description": "ڈیش بورڈ تک رسائی کے لیے تخلیق کار کی توثیق مکمل کریں۔",
+        "button": "تصدیق کریں اور آگے بڑھیں۔",
+        "logout": "لاگ آؤٹ اور باہر نکلیں۔"
+      }
+    },
+    "confirmEmail": {
+      "title": "ای میل کی تصدیق کریں۔",
+      "subtitle": "وہ ای میل درج کریں جو آپ نے استعمال کیا ہے اور جو تصدیقی کوڈ ہم نے آپ کو بھیجا ہے۔",
+      "button": "تصدیق کریں۔",
+      "buttonLoading": "تصدیق کر رہا ہے...",
+      "emailLabel": "ای میل",
+      "emailPlaceholder": "ای میل",
+      "codeLabel": "تصدیقی کوڈ",
+      "codePlaceholder": "6 ہندسوں کا کوڈ",
+      "error": "تصدیق ناکام ہوگئی",
+      "autoLoginError": "ای میل کی تصدیق ہوگئی، لیکن خودکار لاگ ان ناکام ہوگیا۔ براہ کرم دستی طور پر لاگ ان کریں۔"
+    },
+    "reset": {
+      "title": "پاس ورڈ ری سیٹ کریں۔",
+      "subtitle": "ری سیٹ کوڈ حاصل کرنے کے لیے اپنا ای میل درج کریں۔",
+      "subtitleConfirm": "آپ کو موصول ہونے والا کوڈ اور نیا پاس ورڈ درج کریں۔",
+      "sendCode": "ری سیٹ کوڈ بھیجیں۔",
+      "codeLabel": "کوڈ کو دوبارہ ترتیب دیں۔",
+      "codePlaceholder": "ری سیٹ کوڈ درج کریں۔",
+      "resetButton": "پاس ورڈ ری سیٹ کریں۔",
+      "codeSent": "آپ کے ای میل پر بھیجے گئے کوڈ کو ری سیٹ کریں۔",
+      "sendCodeError": "کوڈ بھیجنے میں ناکام",
+      "success": "پاس ورڈ ری سیٹ کامیاب ہو گیا۔ براہ کرم لاگ ان کریں۔",
+      "error": "ری سیٹ ناکام ہو گیا۔"
+    },
+    "validation": {
+      "emailRequired": "ای میل درکار ہے۔",
+      "emailInvalid": "براہ کرم ایک درست ای میل ایڈریس درج کریں۔",
+      "passwordRequired": "پاس ورڈ درکار ہے۔",
+      "passwordMinLength": "کم از کم 8 حروف طویل",
+      "passwordHasUpper": "کم از کم 1 بڑے حروف پر مشتمل ہو۔",
+      "passwordHasLower": "کم از کم 1 چھوٹے حروف پر مشتمل ہو۔",
+      "passwordHasNumber": "کم از کم 1 نمبر پر مشتمل ہو۔",
+      "passwordHasSpecial": "کم از کم 1 خصوصی کردار پر مشتمل ہو۔",
+      "confirmPasswordRequired": "براہ کرم اپنے پاس ورڈ کی تصدیق کریں۔",
+      "confirmPasswordMatch": "پاس ورڈز مماثل نہیں ہیں۔",
+      "confirmPasswordMatchSuccess": "پاس ورڈ مماثل ہے۔",
+      "codeRequired": "کوڈ درکار ہے۔",
+      "roleRequired": "کردار کی ضرورت ہے۔",
+      "roleSelect": "براہ کرم ایک کردار منتخب کریں۔",
+      "usernameRequired": "صارف نام درکار ہے۔",
+      "usernameMinLength": "صارف نام کم از کم 4 حروف کا ہونا چاہیے۔",
+      "usernameMaxLength": "صارف کا نام 100 حروف سے کم ہونا چاہیے۔",
+      "usernameTaken": "صارف نام پہلے ہی لے لیا گیا ہے۔"
+    },
+    "common": {
+      "logout": "سائن آؤٹ کریں۔",
+      "loading": "لوڈ ہو رہا ہے...",
+      "user": "صارف",
+      "admin": "ایڈمن",
+      "guest": "مہمان",
+      "showPassword": "پاس ورڈ دکھائیں۔",
+      "hidePassword": "پاس ورڈ چھپائیں۔"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "آپ کا پروفائل مکمل کرتے وقت ایک خرابی پیش آگئی"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "ڈیش بورڈ",
+      "description": "آپ کے اکاؤنٹ کا جائزہ"
+    },
+    "actions": {
+      "editProfile": "پروفائل میں ترمیم کریں۔",
+      "editSettings": "ترتیبات میں ترمیم کریں۔",
+      "myMedia": "میرا میڈیا",
+      "viewStats": "اعدادوشمار دیکھیں"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "پروفائل میں ترمیم کریں۔",
+        "description": "اپنی ذاتی معلومات کو اپ ڈیٹ کریں۔"
+      },
+      "editSettings": {
+        "title": "اکاؤنٹ کی ترتیبات",
+        "description": "اپنے اکاؤنٹ کی ترجیحات کا نظم کریں۔"
+      },
+      "myMedia": {
+        "title": "میرا میڈیا",
+        "description": "اپنے اپ لوڈ کردہ مواد کا نظم کریں۔"
+      }
+    },
+    "messages": {
+      "welcome": "دوبارہ خوش آمدید، {0}!",
+      "stats": "آپ کے پاس {0} آئٹمز ہیں۔"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "پروفائل",
+      "description": "اپنی پروفائل کی معلومات کا نظم کریں۔"
+    },
+    "form": {
+      "firstName": "پہلا نام",
+      "lastName": "آخری نام",
+      "email": "ای میل ایڈریس",
+      "phone": "فون نمبر",
+      "bio": "سیرت",
+      "save": "تبدیلیاں محفوظ کریں۔"
+    },
+    "messages": {
+      "updated": "پروفائل کامیابی کے ساتھ اپ ڈیٹ ہو گیا۔",
+      "error": "پروفائل اپ ڈیٹ کرنے میں ناکام"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "دریافت کریں۔",
+      "description": "نئے مواد اور خصوصیات کو دریافت کریں۔"
+    },
+    "sections": {
+      "featured": "نمایاں مواد"
+    },
+    "messages": {
+      "explore": "ہمارے پلیٹ فارم کو تلاش کرنا شروع کریں۔"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "دکان",
+      "description": "براؤز کریں اور مصنوعات خریدیں۔"
+    },
+    "sections": {
+      "products": "مصنوعات"
+    },
+    "messages": {
+      "comingSoon": "مزید مصنوعات جلد آرہی ہیں!"
+    }
+  },
+  "common": {
+    "loading": "لوڈ ہو رہا ہے...",
+    "error": "ایک خرابی پیش آ گئی۔",
+    "success": "آپریشن مکمل ہو گیا۔",
+    "save": "محفوظ کریں۔",
+    "cancel": "منسوخ کریں۔",
+    "delete": "حذف کریں۔",
+    "edit": "ترمیم کریں۔",
+    "create": "بنائیں",
+    "update": "اپڈیٹ کریں۔",
+    "submit": "جمع کروائیں۔",
+    "reset": "دوبارہ ترتیب دیں۔",
+    "back": "واپس جاؤ",
+    "next": "اگلا",
+    "previous": "پچھلا"
+  }
+}

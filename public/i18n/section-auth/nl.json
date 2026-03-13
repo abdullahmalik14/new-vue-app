@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Welkom terug",
+      "subtitle": "Voer uw inloggegevens in om door te gaan.",
+      "button": "Inloggen",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "E-mailadres",
+      "passwordLabel": "Wachtwoord",
+      "passwordPlaceholder": "Wachtwoord",
+      "forgotPassword": "Wachtwoord vergeten?",
+      "rememberMe": "Onthoud mij",
+      "noAccount": "Heeft u geen account?",
+      "continueWithX": "Ga verder met X (twitter)",
+      "continueWithTelegram": "Ga verder met Telegram",
+      "welcome": "Hallo, {0}!",
+      "error": "Ongeldig e-mailadres of wachtwoord."
+    },
+    "register": {
+      "title": "Account aanmaken",
+      "subtitle": "Maak uw account aan om door te gaan.",
+      "button": "Aanmelden",
+      "firstName": "Voornaam",
+      "firstNameLabel": "Naam",
+      "emailLabel": "E-mail",
+      "emailAddress": "E-mailadres",
+      "emailPlaceholder": "E-mailadres",
+      "passwordLabel": "Wachtwoord",
+      "passwordPlaceholder": "Wachtwoord",
+      "confirmPasswordLabel": "Bevestig wachtwoord",
+      "confirmPasswordPlaceholder": "Wachtwoord",
+      "haveAccount": "Heeft u al een account?",
+      "Onboarding": {
+        "title": "Voltooi uw profiel",
+        "description": "Kies uw rol en gebruikersnaam om door te gaan.",
+        "usernameLabel": "Gebruikersnaam",
+        "usernamePlaceholder": "Voer een gebruikersnaam in",
+        "roleLabel": "Rol",
+        "rolePlaceholder": "Selecteer uw rol",
+        "roles": {
+          "creator": "Schepper",
+          "fan": "Ventilator",
+          "vendor": "Verkoper",
+          "agent": "Agent"
+        },
+        "button": "Ga door"
+      },
+      "KYC": {
+        "title": "Controleer uw identiteit",
+        "description": "Voltooi de verificatie van de maker om toegang te krijgen tot het dashboard.",
+        "button": "Bevestig en ga verder",
+        "logout": "Uitloggen en afsluiten"
+      }
+    },
+    "confirmEmail": {
+      "title": "Bevestig e-mail",
+      "subtitle": "Voer het e-mailadres in dat u heeft gebruikt en de verificatiecode die we u hebben gestuurd.",
+      "button": "Bevestig",
+      "buttonLoading": "Bevestigen...",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "E-mail",
+      "codeLabel": "Bevestigingscode",
+      "codePlaceholder": "6-cijferige code",
+      "error": "Bevestiging mislukt",
+      "autoLoginError": "E-mail bevestigd, maar automatisch inloggen mislukt. Gelieve handmatig in te loggen."
+    },
+    "reset": {
+      "title": "Wachtwoord opnieuw instellen",
+      "subtitle": "Voer uw e-mailadres in om een resetcode te ontvangen.",
+      "subtitleConfirm": "Voer de ontvangen code en een nieuw wachtwoord in.",
+      "sendCode": "Resetcode verzenden",
+      "codeLabel": "Code opnieuw instellen",
+      "codePlaceholder": "Voer de resetcode in",
+      "resetButton": "Wachtwoord opnieuw instellen",
+      "codeSent": "Reset de code die naar uw e-mail is verzonden.",
+      "sendCodeError": "Kan code niet verzenden",
+      "success": "Wachtwoord opnieuw instellen gelukt. Gelieve in te loggen.",
+      "error": "Resetten mislukt"
+    },
+    "validation": {
+      "emailRequired": "E-mail is vereist",
+      "emailInvalid": "Voer een geldig e-mailadres in",
+      "passwordRequired": "Wachtwoord is vereist",
+      "passwordMinLength": "Minimaal 8 tekens lang",
+      "passwordHasUpper": "Bevat minimaal 1 hoofdletter",
+      "passwordHasLower": "Bevat minimaal 1 kleine letter",
+      "passwordHasNumber": "Bevat minimaal 1 nummer",
+      "passwordHasSpecial": "Bevat minimaal 1 speciaal teken",
+      "confirmPasswordRequired": "Bevestig uw wachtwoord",
+      "confirmPasswordMatch": "Wachtwoorden komen niet overeen",
+      "confirmPasswordMatchSuccess": "Wachtwoord komt overeen",
+      "codeRequired": "Code is vereist",
+      "roleRequired": "Rol is vereist",
+      "roleSelect": "Selecteer een rol",
+      "usernameRequired": "Gebruikersnaam is vereist",
+      "usernameMinLength": "De gebruikersnaam moet minimaal 4 tekens lang zijn",
+      "usernameMaxLength": "De gebruikersnaam moet minder dan 100 tekens bevatten",
+      "usernameTaken": "Gebruikersnaam is al in gebruik"
+    },
+    "common": {
+      "logout": "Uitloggen",
+      "loading": "Laden...",
+      "user": "Gebruiker",
+      "admin": "Beheerder",
+      "guest": "Gast",
+      "showPassword": "Wachtwoord tonen",
+      "hidePassword": "Wachtwoord verbergen"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Er is een fout opgetreden bij het invullen van uw profiel"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard",
+      "description": "Overzicht van uw rekening"
+    },
+    "actions": {
+      "editProfile": "Profiel bewerken",
+      "editSettings": "Instellingen bewerken",
+      "myMedia": "Mijn media",
+      "viewStats": "Statistieken bekijken"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Profiel bewerken",
+        "description": "Update uw persoonlijke gegevens"
+      },
+      "editSettings": {
+        "title": "Accountinstellingen",
+        "description": "Beheer uw accountvoorkeuren"
+      },
+      "myMedia": {
+        "title": "Mijn media",
+        "description": "Beheer uw geüploade inhoud"
+      }
+    },
+    "messages": {
+      "welcome": "Welkom terug, {0}!",
+      "stats": "U heeft {0} artikelen"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profiel",
+      "description": "Beheer uw profielinformatie"
+    },
+    "form": {
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "email": "E-mailadres",
+      "phone": "Telefoonnummer",
+      "bio": "Biografie",
+      "save": "Wijzigingen opslaan"
+    },
+    "messages": {
+      "updated": "Profiel is succesvol bijgewerkt",
+      "error": "Kan profiel niet updaten"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Ontdek",
+      "description": "Ontdek nieuwe inhoud en functies"
+    },
+    "sections": {
+      "featured": "Uitgelichte inhoud"
+    },
+    "messages": {
+      "explore": "Begin met het verkennen van ons platform"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Winkel",
+      "description": "Bekijk en koop producten"
+    },
+    "sections": {
+      "products": "Producten"
+    },
+    "messages": {
+      "comingSoon": "Binnenkort meer producten!"
+    }
+  },
+  "common": {
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "success": "Operatie voltooid",
+    "save": "Opslaan",
+    "cancel": "Annuleer",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "create": "Creëer",
+    "update": "Bijwerken",
+    "submit": "Verzenden",
+    "reset": "Opnieuw instellen",
+    "back": "Ga terug",
+    "next": "Volgende",
+    "previous": "Vorige"
+  }
+}

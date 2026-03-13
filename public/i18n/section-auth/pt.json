@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Bem-vindo de volta",
+      "subtitle": "Por favor, insira suas credenciais para continuar.",
+      "button": "Faça login",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "Endereço de e-mail",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "Senha",
+      "forgotPassword": "Esqueceu sua senha?",
+      "rememberMe": "Lembre-se de mim",
+      "noAccount": "Não tem uma conta?",
+      "continueWithX": "Continue com X (twitter)",
+      "continueWithTelegram": "Continuar com Telegrama",
+      "welcome": "Olá, {0}!",
+      "error": "E-mail ou senha inválidos."
+    },
+    "register": {
+      "title": "Criar conta",
+      "subtitle": "Crie sua conta para continuar.",
+      "button": "Inscreva-se",
+      "firstName": "Primeiro nome",
+      "firstNameLabel": "Nome",
+      "emailLabel": "E-mail",
+      "emailAddress": "Endereço de e-mail",
+      "emailPlaceholder": "Endereço de e-mail",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "Senha",
+      "confirmPasswordLabel": "Confirmar senha",
+      "confirmPasswordPlaceholder": "Senha",
+      "haveAccount": "Já tem uma conta?",
+      "Onboarding": {
+        "title": "Complete seu perfil",
+        "description": "Escolha sua função e nome de usuário para continuar.",
+        "usernameLabel": "Nome de usuário",
+        "usernamePlaceholder": "Digite um nome de usuário",
+        "roleLabel": "Função",
+        "rolePlaceholder": "Selecione sua função",
+        "roles": {
+          "creator": "Criador",
+          "fan": "Ventilador",
+          "vendor": "Fornecedor",
+          "agent": "Agente"
+        },
+        "button": "Continuar"
+      },
+      "KYC": {
+        "title": "Verifique sua identidade",
+        "description": "Conclua a verificação do criador para acessar o painel.",
+        "button": "Confirmar e prosseguir",
+        "logout": "Sair e sair"
+      }
+    },
+    "confirmEmail": {
+      "title": "Confirmar e-mail",
+      "subtitle": "Digite o e-mail que você usou e o código de verificação que lhe enviamos.",
+      "button": "Confirmar",
+      "buttonLoading": "Confirmando...",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "E-mail",
+      "codeLabel": "Código de confirmação",
+      "codePlaceholder": "Código de 6 dígitos",
+      "error": "Falha na confirmação",
+      "autoLoginError": "E-mail confirmado, mas o login automático falhou. Faça login manualmente."
+    },
+    "reset": {
+      "title": "Redefinir senha",
+      "subtitle": "Digite seu e-mail para receber um código de redefinição.",
+      "subtitleConfirm": "Digite o código que você recebeu e uma nova senha.",
+      "sendCode": "Enviar código de redefinição",
+      "codeLabel": "Redefinir código",
+      "codePlaceholder": "Digite o código de redefinição",
+      "resetButton": "Redefinir senha",
+      "codeSent": "Código de redefinição enviado para seu e-mail.",
+      "sendCodeError": "Falha ao enviar código",
+      "success": "Redefinição de senha bem-sucedida. Faça login.",
+      "error": "Falha na redefinição"
+    },
+    "validation": {
+      "emailRequired": "O e-mail é obrigatório",
+      "emailInvalid": "Por favor insira um endereço de e-mail válido",
+      "passwordRequired": "A senha é obrigatória",
+      "passwordMinLength": "Pelo menos 8 caracteres",
+      "passwordHasUpper": "Conter pelo menos 1 letra maiúscula",
+      "passwordHasLower": "Conter pelo menos 1 letra minúscula",
+      "passwordHasNumber": "Conter pelo menos 1 número",
+      "passwordHasSpecial": "Conter pelo menos 1 caractere especial",
+      "confirmPasswordRequired": "Por favor confirme sua senha",
+      "confirmPasswordMatch": "As senhas não coincidem",
+      "confirmPasswordMatchSuccess": "Correspondências de senha",
+      "codeRequired": "O código é obrigatório",
+      "roleRequired": "A função é obrigatória",
+      "roleSelect": "Selecione uma função",
+      "usernameRequired": "O nome de usuário é obrigatório",
+      "usernameMinLength": "O nome de usuário deve ter pelo menos 4 caracteres",
+      "usernameMaxLength": "O nome de usuário deve ter menos de 100 caracteres",
+      "usernameTaken": "O nome de usuário já está em uso"
+    },
+    "common": {
+      "logout": "Sair",
+      "loading": "Carregando...",
+      "user": "Usuário",
+      "admin": "Administrador",
+      "guest": "Convidado",
+      "showPassword": "Mostrar senha",
+      "hidePassword": "Ocultar senha"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Ocorreu um erro ao preencher seu perfil"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Painel",
+      "description": "Visão geral da sua conta"
+    },
+    "actions": {
+      "editProfile": "Editar perfil",
+      "editSettings": "Editar configurações",
+      "myMedia": "Minha mídia",
+      "viewStats": "Ver estatísticas"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Editar perfil",
+        "description": "Atualize suas informações pessoais"
+      },
+      "editSettings": {
+        "title": "Configurações da conta",
+        "description": "Gerencie as preferências da sua conta"
+      },
+      "myMedia": {
+        "title": "Minha mídia",
+        "description": "Gerencie seu conteúdo enviado"
+      }
+    },
+    "messages": {
+      "welcome": "Bem-vindo de volta, {0}!",
+      "stats": "Você tem {0} itens"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Perfil",
+      "description": "Gerencie as informações do seu perfil"
+    },
+    "form": {
+      "firstName": "Primeiro nome",
+      "lastName": "Sobrenome",
+      "email": "Endereço de e-mail",
+      "phone": "Número de telefone",
+      "bio": "Biografia",
+      "save": "Salvar alterações"
+    },
+    "messages": {
+      "updated": "Perfil atualizado com sucesso",
+      "error": "Falha ao atualizar o perfil"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Descubra",
+      "description": "Explore novos conteúdos e recursos"
+    },
+    "sections": {
+      "featured": "Conteúdo em destaque"
+    },
+    "messages": {
+      "explore": "Comece a explorar nossa plataforma"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Loja",
+      "description": "Navegue e compre produtos"
+    },
+    "sections": {
+      "products": "Produtos"
+    },
+    "messages": {
+      "comingSoon": "Mais produtos em breve!"
+    }
+  },
+  "common": {
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "success": "Operação concluída",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "update": "Atualizar",
+    "submit": "Enviar",
+    "reset": "Redefinir",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior"
+  }
+}

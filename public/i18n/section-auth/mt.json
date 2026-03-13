@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Merħba Lura",
+      "subtitle": "Jekk jogħġbok daħħal il-kredenzjali tiegħek biex tkompli.",
+      "button": "Idħol",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Indirizz elettroniku",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password",
+      "forgotPassword": "Insejt il-password tiegħek?",
+      "rememberMe": "Ftakar fija",
+      "noAccount": "M'għandekx kont?",
+      "continueWithX": "Kompli b'X (twitter)",
+      "continueWithTelegram": "Kompli bit-Telegram",
+      "welcome": "Hello, {0}!",
+      "error": "Email jew password invalida."
+    },
+    "register": {
+      "title": "Oħloq Kont",
+      "subtitle": "Oħloq il-kont tiegħek biex tkompli.",
+      "button": "Sign Up",
+      "firstName": "L-Isem",
+      "firstNameLabel": "Isem",
+      "emailLabel": "Email",
+      "emailAddress": "Indirizz elettroniku",
+      "emailPlaceholder": "Indirizz elettroniku",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password",
+      "confirmPasswordLabel": "Ikkonferma l-Password",
+      "confirmPasswordPlaceholder": "Password",
+      "haveAccount": "Diġà għandek kont?",
+      "Onboarding": {
+        "title": "Imla l-Profil Tiegħek",
+        "description": "Agħżel ir-rwol u l-isem tal-utent tiegħek biex tkompli.",
+        "usernameLabel": "Isem tal-utent",
+        "usernamePlaceholder": "Daħħal username",
+        "roleLabel": "Rwol",
+        "rolePlaceholder": "Agħżel ir-rwol tiegħek",
+        "roles": {
+          "creator": "Ħallieq",
+          "fan": "Fan",
+          "vendor": "Bejjiegh",
+          "agent": "Aġent"
+        },
+        "button": "Kompli"
+      },
+      "KYC": {
+        "title": "Ivverifika l-Identità Tiegħek",
+        "description": "Imla l-verifika tal-kreatur biex taċċessa d-dashboard.",
+        "button": "Ikkonferma & Ipproċedi",
+        "logout": "Logout & Ħruġ"
+      }
+    },
+    "confirmEmail": {
+      "title": "Ikkonferma l-Email",
+      "subtitle": "Daħħal l-email li użajt u l-kodiċi ta' verifika li bgħattilek.",
+      "button": "Ikkonferma",
+      "buttonLoading": "Qed tikkonferma...",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "codeLabel": "Kodiċi ta' Konferma",
+      "codePlaceholder": "Kodiċi b'6 ċifri",
+      "error": "Il-konferma falliet",
+      "autoLoginError": "Email ikkonfermata, iżda l-login awtomatiku falla. Jekk jogħġbok idħol manwalment."
+    },
+    "reset": {
+      "title": "Irrisettja l-Password",
+      "subtitle": "Daħħal l-email tiegħek biex tirċievi kodiċi reset.",
+      "subtitleConfirm": "Daħħal il-kodiċi li rċevejt u password ġdida.",
+      "sendCode": "Ibgħat Irrisettja Kodiċi",
+      "codeLabel": "Irrisettja l-Kodiċi",
+      "codePlaceholder": "Daħħal il-kodiċi reset",
+      "resetButton": "Irrisettja l-Password",
+      "codeSent": "Irrisettja l-kodiċi mibgħut lill-email tiegħek.",
+      "sendCodeError": "Naqas milli jibgħat il-kodiċi",
+      "success": "Irrisettja l-password b'suċċess. Jekk jogħġbok idħol.",
+      "error": "Irrisettja falla"
+    },
+    "validation": {
+      "emailRequired": "L-email hija meħtieġa",
+      "emailInvalid": "Jekk jogħġbok daħħal indirizz elettroniku validu",
+      "passwordRequired": "Password hija meħtieġa",
+      "passwordMinLength": "Mill-inqas 8 karattri twal",
+      "passwordHasUpper": "Fihom mill-inqas ittra kbira",
+      "passwordHasLower": "Fihom mill-inqas ittra żgħira waħda",
+      "passwordHasNumber": "Fihom mill-inqas numru 1",
+      "passwordHasSpecial": "Fihom mill-inqas karattru speċjali 1",
+      "confirmPasswordRequired": "Jekk jogħġbok ikkonferma l-password tiegħek",
+      "confirmPasswordMatch": "Il-passwords ma jaqblux",
+      "confirmPasswordMatchSuccess": "Il-password taqbel",
+      "codeRequired": "Il-kodiċi huwa meħtieġ",
+      "roleRequired": "Ir-rwol huwa meħtieġ",
+      "roleSelect": "Jekk jogħġbok agħżel rwol",
+      "usernameRequired": "L-isem tal-utent huwa meħtieġ",
+      "usernameMinLength": "L-isem tal-utent għandu jkun tal-inqas 4 karattri",
+      "usernameMaxLength": "L-isem tal-utent għandu jkun inqas minn 100 karattru",
+      "usernameTaken": "Username huwa diġà meħud"
+    },
+    "common": {
+      "logout": "Sign Out",
+      "loading": "Tagħbija...",
+      "user": "Utent",
+      "admin": "Amministratur",
+      "guest": "Mistieden",
+      "showPassword": "Uri password",
+      "hidePassword": "Aħbi l-password"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Sar żball waqt li tlesti l-profil tiegħek"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard",
+      "description": "Ħarsa ġenerali tal-kont tiegħek"
+    },
+    "actions": {
+      "editProfile": "Editja Profil",
+      "editSettings": "Editja Settings",
+      "myMedia": "Il-Midja Tiegħi",
+      "viewStats": "Ara l-Istatistika"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Editja Profil",
+        "description": "Aġġorna l-informazzjoni personali tiegħek"
+      },
+      "editSettings": {
+        "title": "Settings tal-Kont",
+        "description": "Immaniġġja l-preferenzi tal-kont tiegħek"
+      },
+      "myMedia": {
+        "title": "Il-Midja Tiegħi",
+        "description": "Immaniġġja l-kontenut imtella' tiegħek"
+      }
+    },
+    "messages": {
+      "welcome": "Merħba lura, {0}!",
+      "stats": "Għandek {0} oġġetti"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Immaniġġja l-informazzjoni tal-profil tiegħek"
+    },
+    "form": {
+      "firstName": "L-Isem",
+      "lastName": "Kunjom",
+      "email": "Indirizz elettroniku",
+      "phone": "Numru tat-Telefon",
+      "bio": "Bijografija",
+      "save": "Ħlief Bidliet"
+    },
+    "messages": {
+      "updated": "Profil aġġornat b'suċċess",
+      "error": "Naqas milli jaġġorna l-profil"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Skopri",
+      "description": "Esplora kontenut u karatteristiċi ġodda"
+    },
+    "sections": {
+      "featured": "Kontenut Dehru"
+    },
+    "messages": {
+      "explore": "Ibda tesplora l-pjattaforma tagħna"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Ħanut",
+      "description": "Fittex u tixtri prodotti"
+    },
+    "sections": {
+      "products": "Prodotti"
+    },
+    "messages": {
+      "comingSoon": "Aktar prodotti dalwaqt!"
+    }
+  },
+  "common": {
+    "loading": "Tagħbija...",
+    "error": "Sar żball",
+    "success": "Operazzjoni mitmuma",
+    "save": "Ħlief",
+    "cancel": "Ikkanċella",
+    "delete": "Ħassar",
+    "edit": "Editja",
+    "create": "Oħloq",
+    "update": "Aġġornament",
+    "submit": "Issottometti",
+    "reset": "Irrisettja",
+    "back": "Mur Lura",
+    "next": "Li jmiss",
+    "previous": "Preċedenti"
+  }
+}

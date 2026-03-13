@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Bienvenue à nouveau",
+      "subtitle": "Veuillez saisir vos informations d'identification pour continuer.",
+      "button": "Connectez-vous",
+      "emailLabel": "Courriel",
+      "emailPlaceholder": "Adresse e-mail",
+      "passwordLabel": "Mot de passe",
+      "passwordPlaceholder": "Mot de passe",
+      "forgotPassword": "Mot de passe oublié ?",
+      "rememberMe": "Souviens-toi de moi",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "continueWithX": "Continuez avec X (twitter)",
+      "continueWithTelegram": "Continuer avec Telegram",
+      "welcome": "Bonjour, {0} !",
+      "error": "Email ou mot de passe invalide."
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Créez votre compte pour continuer.",
+      "button": "S'inscrire",
+      "firstName": "Prénom",
+      "firstNameLabel": "Nom",
+      "emailLabel": "Courriel",
+      "emailAddress": "Adresse e-mail",
+      "emailPlaceholder": "Adresse e-mail",
+      "passwordLabel": "Mot de passe",
+      "passwordPlaceholder": "Mot de passe",
+      "confirmPasswordLabel": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Mot de passe",
+      "haveAccount": "Vous avez déjà un compte ?",
+      "Onboarding": {
+        "title": "Complétez votre profil",
+        "description": "Choisissez votre rôle et votre nom d'utilisateur pour continuer.",
+        "usernameLabel": "Nom d'utilisateur",
+        "usernamePlaceholder": "Entrez un nom d'utilisateur",
+        "roleLabel": "Rôle",
+        "rolePlaceholder": "Sélectionnez votre rôle",
+        "roles": {
+          "creator": "Créateur",
+          "fan": "Ventilateur",
+          "vendor": "Vendeur",
+          "agent": "Agent"
+        },
+        "button": "Continuer"
+      },
+      "KYC": {
+        "title": "Vérifiez votre identité",
+        "description": "Effectuez la vérification du créateur pour accéder au tableau de bord.",
+        "button": "Confirmer et continuer",
+        "logout": "Déconnexion et sortie"
+      }
+    },
+    "confirmEmail": {
+      "title": "Confirmer l'e-mail",
+      "subtitle": "Entrez l'e-mail que vous avez utilisé et le code de vérification que nous vous avons envoyé.",
+      "button": "Confirmer",
+      "buttonLoading": "Confirmation...",
+      "emailLabel": "Courriel",
+      "emailPlaceholder": "Courriel",
+      "codeLabel": "Code de confirmation",
+      "codePlaceholder": "Code à 6 chiffres",
+      "error": "Échec de la confirmation",
+      "autoLoginError": "E-mail confirmé, mais la connexion automatique a échoué. Veuillez vous connecter manuellement."
+    },
+    "reset": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Entrez votre email pour recevoir un code de réinitialisation.",
+      "subtitleConfirm": "Entrez le code que vous avez reçu et un nouveau mot de passe.",
+      "sendCode": "Envoyer le code de réinitialisation",
+      "codeLabel": "Réinitialiser le code",
+      "codePlaceholder": "Entrez le code de réinitialisation",
+      "resetButton": "Réinitialiser le mot de passe",
+      "codeSent": "Réinitialisez le code envoyé à votre e-mail.",
+      "sendCodeError": "Échec de l'envoi du code",
+      "success": "Réinitialisation du mot de passe réussie. Veuillez vous connecter.",
+      "error": "Échec de la réinitialisation"
+    },
+    "validation": {
+      "emailRequired": "L'e-mail est requis",
+      "emailInvalid": "Veuillez saisir une adresse e-mail valide",
+      "passwordRequired": "Le mot de passe est requis",
+      "passwordMinLength": "Au moins 8 caractères",
+      "passwordHasUpper": "Contenir au moins 1 lettre majuscule",
+      "passwordHasLower": "Contenir au moins 1 lettre minuscule",
+      "passwordHasNumber": "Contenir au moins 1 chiffre",
+      "passwordHasSpecial": "Contenir au moins 1 caractère spécial",
+      "confirmPasswordRequired": "Veuillez confirmer votre mot de passe",
+      "confirmPasswordMatch": "Les mots de passe ne correspondent pas",
+      "confirmPasswordMatchSuccess": "Correspondances de mot de passe",
+      "codeRequired": "Le code est requis",
+      "roleRequired": "Le rôle est requis",
+      "roleSelect": "Veuillez sélectionner un rôle",
+      "usernameRequired": "Le nom d'utilisateur est requis",
+      "usernameMinLength": "Le nom d'utilisateur doit comporter au moins 4 caractères",
+      "usernameMaxLength": "Le nom d'utilisateur doit comporter moins de 100 caractères",
+      "usernameTaken": "Le nom d'utilisateur est déjà pris"
+    },
+    "common": {
+      "logout": "Se déconnecter",
+      "loading": "Chargement...",
+      "user": "Utilisateur",
+      "admin": "Administrateur",
+      "guest": "Invité",
+      "showPassword": "Afficher le mot de passe",
+      "hidePassword": "Masquer le mot de passe"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Une erreur s'est produite lors de la complétion de votre profil"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Tableau de bord",
+      "description": "Aperçu de votre compte"
+    },
+    "actions": {
+      "editProfile": "Modifier le profil",
+      "editSettings": "Modifier les paramètres",
+      "myMedia": "Mes médias",
+      "viewStats": "Afficher les statistiques"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Modifier le profil",
+        "description": "Mettez à jour vos informations personnelles"
+      },
+      "editSettings": {
+        "title": "Paramètres du compte",
+        "description": "Gérer les préférences de votre compte"
+      },
+      "myMedia": {
+        "title": "Mes médias",
+        "description": "Gérez votre contenu téléchargé"
+      }
+    },
+    "messages": {
+      "welcome": "Bon retour, {0} !",
+      "stats": "Vous avez {0} éléments"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Gérer les informations de votre profil"
+    },
+    "form": {
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "Adresse e-mail",
+      "phone": "Numéro de téléphone",
+      "bio": "Biographie",
+      "save": "Enregistrer les modifications"
+    },
+    "messages": {
+      "updated": "Profil mis à jour avec succès",
+      "error": "Échec de la mise à jour du profil"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Découvrez",
+      "description": "Explorez de nouveaux contenus et fonctionnalités"
+    },
+    "sections": {
+      "featured": "Contenu en vedette"
+    },
+    "messages": {
+      "explore": "Commencez à explorer notre plateforme"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Boutique",
+      "description": "Parcourir et acheter des produits"
+    },
+    "sections": {
+      "products": "Produits"
+    },
+    "messages": {
+      "comingSoon": "Plus de produits à venir !"
+    }
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "success": "Opération terminée",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "update": "Mise à jour",
+    "submit": "Soumettre",
+    "reset": "Réinitialiser",
+    "back": "Retourner",
+    "next": "Suivant",
+    "previous": "Précédent"
+  }
+}

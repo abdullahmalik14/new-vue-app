@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "ਵਾਪਸ ਸੁਆਗਤ ਹੈ",
+      "subtitle": "ਜਾਰੀ ਰੱਖਣ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਪ੍ਰਮਾਣ ਪੱਤਰ ਦਾਖਲ ਕਰੋ।",
+      "button": "ਲੌਗ ਇਨ ਕਰੋ",
+      "emailLabel": "ਈਮੇਲ",
+      "emailPlaceholder": "ਈਮੇਲ ਪਤਾ",
+      "passwordLabel": "ਪਾਸਵਰਡ",
+      "passwordPlaceholder": "ਪਾਸਵਰਡ",
+      "forgotPassword": "ਆਪਣਾ ਪਾਸਵਰਡ ਭੁੱਲ ਗਏ ਹੋ?",
+      "rememberMe": "ਮੈਨੂੰ ਯਾਦ ਰੱਖੋ",
+      "noAccount": "ਕੀ ਤੁਹਾਡੇ ਕੋਲ ਖਾਤਾ ਨਹੀਂ ਹੈ?",
+      "continueWithX": "X (ਟਵਿੱਟਰ) ਨਾਲ ਜਾਰੀ ਰੱਖੋ",
+      "continueWithTelegram": "ਟੈਲੀਗ੍ਰਾਮ ਨਾਲ ਜਾਰੀ ਰੱਖੋ",
+      "welcome": "ਹੈਲੋ, {0}!",
+      "error": "ਅਵੈਧ ਈਮੇਲ ਜਾਂ ਪਾਸਵਰਡ।"
+    },
+    "register": {
+      "title": "ਖਾਤਾ ਬਣਾਓ",
+      "subtitle": "ਜਾਰੀ ਰੱਖਣ ਲਈ ਆਪਣਾ ਖਾਤਾ ਬਣਾਓ।",
+      "button": "ਸਾਈਨ ਅੱਪ ਕਰੋ",
+      "firstName": "ਪਹਿਲਾ ਨਾਮ",
+      "firstNameLabel": "ਨਾਮ",
+      "emailLabel": "ਈਮੇਲ",
+      "emailAddress": "ਈਮੇਲ ਪਤਾ",
+      "emailPlaceholder": "ਈਮੇਲ ਪਤਾ",
+      "passwordLabel": "ਪਾਸਵਰਡ",
+      "passwordPlaceholder": "ਪਾਸਵਰਡ",
+      "confirmPasswordLabel": "ਪਾਸਵਰਡ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+      "confirmPasswordPlaceholder": "ਪਾਸਵਰਡ",
+      "haveAccount": "ਪਹਿਲਾਂ ਹੀ ਇੱਕ ਖਾਤਾ ਹੈ?",
+      "Onboarding": {
+        "title": "ਆਪਣਾ ਪ੍ਰੋਫਾਈਲ ਪੂਰਾ ਕਰੋ",
+        "description": "ਜਾਰੀ ਰੱਖਣ ਲਈ ਆਪਣੀ ਭੂਮਿਕਾ ਅਤੇ ਉਪਭੋਗਤਾ ਨਾਮ ਚੁਣੋ।",
+        "usernameLabel": "ਯੂਜ਼ਰਨੇਮ",
+        "usernamePlaceholder": "ਇੱਕ ਉਪਭੋਗਤਾ ਨਾਮ ਦਰਜ ਕਰੋ",
+        "roleLabel": "ਭੂਮਿਕਾ",
+        "rolePlaceholder": "ਆਪਣੀ ਭੂਮਿਕਾ ਚੁਣੋ",
+        "roles": {
+          "creator": "ਸਿਰਜਣਹਾਰ",
+          "fan": "ਪੱਖਾ",
+          "vendor": "ਵਿਕਰੇਤਾ",
+          "agent": "ਏਜੰਟ"
+        },
+        "button": "ਜਾਰੀ ਰੱਖੋ"
+      },
+      "KYC": {
+        "title": "ਆਪਣੀ ਪਛਾਣ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+        "description": "ਡੈਸ਼ਬੋਰਡ ਤੱਕ ਪਹੁੰਚ ਕਰਨ ਲਈ ਸਿਰਜਣਹਾਰ ਪੁਸ਼ਟੀਕਰਨ ਨੂੰ ਪੂਰਾ ਕਰੋ।",
+        "button": "ਪੁਸ਼ਟੀ ਕਰੋ ਅਤੇ ਅੱਗੇ ਵਧੋ",
+        "logout": "ਲੌਗਆਉਟ ਅਤੇ ਬਾਹਰ ਨਿਕਲੋ"
+      }
+    },
+    "confirmEmail": {
+      "title": "ਈਮੇਲ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+      "subtitle": "ਤੁਹਾਡੇ ਵੱਲੋਂ ਵਰਤੀ ਗਈ ਈਮੇਲ ਅਤੇ ਸਾਡੇ ਵੱਲੋਂ ਤੁਹਾਨੂੰ ਭੇਜਿਆ ਗਿਆ ਪੁਸ਼ਟੀਕਰਨ ਕੋਡ ਦਾਖਲ ਕਰੋ।",
+      "button": "ਪੁਸ਼ਟੀ ਕਰੋ",
+      "buttonLoading": "ਪੁਸ਼ਟੀ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ...",
+      "emailLabel": "ਈਮੇਲ",
+      "emailPlaceholder": "ਈਮੇਲ",
+      "codeLabel": "ਪੁਸ਼ਟੀਕਰਨ ਕੋਡ",
+      "codePlaceholder": "6-ਅੰਕੀ ਕੋਡ",
+      "error": "ਪੁਸ਼ਟੀ ਕਰਨਾ ਅਸਫਲ ਰਿਹਾ",
+      "autoLoginError": "ਈਮੇਲ ਦੀ ਪੁਸ਼ਟੀ ਹੋਈ, ਪਰ ਆਟੋ-ਲੌਗਇਨ ਅਸਫਲ ਰਿਹਾ। ਕਿਰਪਾ ਕਰਕੇ ਹੱਥੀਂ ਲੌਗ ਇਨ ਕਰੋ।"
+    },
+    "reset": {
+      "title": "ਪਾਸਵਰਡ ਰੀਸੈਟ ਕਰੋ",
+      "subtitle": "ਰੀਸੈਟ ਕੋਡ ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ ਆਪਣੀ ਈਮੇਲ ਦਰਜ ਕਰੋ।",
+      "subtitleConfirm": "ਤੁਹਾਨੂੰ ਪ੍ਰਾਪਤ ਹੋਇਆ ਕੋਡ ਅਤੇ ਇੱਕ ਨਵਾਂ ਪਾਸਵਰਡ ਦਰਜ ਕਰੋ।",
+      "sendCode": "ਰੀਸੈਟ ਕੋਡ ਭੇਜੋ",
+      "codeLabel": "ਕੋਡ ਰੀਸੈਟ ਕਰੋ",
+      "codePlaceholder": "ਰੀਸੈਟ ਕੋਡ ਦਰਜ ਕਰੋ",
+      "resetButton": "ਪਾਸਵਰਡ ਰੀਸੈਟ ਕਰੋ",
+      "codeSent": "ਤੁਹਾਡੀ ਈਮੇਲ 'ਤੇ ਭੇਜਿਆ ਕੋਡ ਰੀਸੈਟ ਕਰੋ।",
+      "sendCodeError": "ਕੋਡ ਭੇਜਣਾ ਅਸਫਲ ਰਿਹਾ",
+      "success": "ਪਾਸਵਰਡ ਰੀਸੈਟ ਸਫਲ ਰਿਹਾ। ਕਿਰਪਾ ਕਰਕੇ ਲਾਗਇਨ ਕਰੋ।",
+      "error": "ਰੀਸੈਟ ਅਸਫਲ ਰਿਹਾ"
+    },
+    "validation": {
+      "emailRequired": "ਈਮੇਲ ਦੀ ਲੋੜ ਹੈ",
+      "emailInvalid": "ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵੈਧ ਈਮੇਲ ਪਤਾ ਦਾਖਲ ਕਰੋ",
+      "passwordRequired": "ਪਾਸਵਰਡ ਲੋੜੀਂਦਾ ਹੈ",
+      "passwordMinLength": "ਘੱਟੋ-ਘੱਟ 8 ਅੱਖਰ ਲੰਬੇ",
+      "passwordHasUpper": "ਘੱਟੋ-ਘੱਟ 1 ਵੱਡੇ ਅੱਖਰ ਸ਼ਾਮਲ ਕਰੋ",
+      "passwordHasLower": "ਘੱਟੋ-ਘੱਟ 1 ਛੋਟੇ ਅੱਖਰ ਸ਼ਾਮਲ ਕਰੋ",
+      "passwordHasNumber": "ਘੱਟੋ-ਘੱਟ 1 ਨੰਬਰ ਸ਼ਾਮਲ ਕਰੋ",
+      "passwordHasSpecial": "ਘੱਟੋ-ਘੱਟ 1 ਵਿਸ਼ੇਸ਼ ਅੱਖਰ ਸ਼ਾਮਲ ਕਰੋ",
+      "confirmPasswordRequired": "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਪਾਸਵਰਡ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+      "confirmPasswordMatch": "ਪਾਸਵਰਡ ਮੇਲ ਨਹੀਂ ਖਾਂਦੇ",
+      "confirmPasswordMatchSuccess": "ਪਾਸਵਰਡ ਮੇਲ ਖਾਂਦਾ ਹੈ",
+      "codeRequired": "ਕੋਡ ਲੋੜੀਂਦਾ ਹੈ",
+      "roleRequired": "ਭੂਮਿਕਾ ਦੀ ਲੋੜ ਹੈ",
+      "roleSelect": "ਕਿਰਪਾ ਕਰਕੇ ਕੋਈ ਭੂਮਿਕਾ ਚੁਣੋ",
+      "usernameRequired": "ਯੂਜ਼ਰਨਾਮ ਲੋੜੀਂਦਾ ਹੈ",
+      "usernameMinLength": "ਉਪਭੋਗਤਾ ਨਾਮ ਘੱਟੋ-ਘੱਟ 4 ਅੱਖਰਾਂ ਦਾ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ",
+      "usernameMaxLength": "ਉਪਭੋਗਤਾ ਨਾਮ 100 ਅੱਖਰਾਂ ਤੋਂ ਘੱਟ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ",
+      "usernameTaken": "ਯੂਜ਼ਰਨੇਮ ਪਹਿਲਾਂ ਹੀ ਲਿਆ ਗਿਆ ਹੈ"
+    },
+    "common": {
+      "logout": "ਸਾਈਨ ਆਉਟ ਕਰੋ",
+      "loading": "ਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+      "user": "ਉਪਭੋਗਤਾ",
+      "admin": "ਐਡਮਿਨ",
+      "guest": "ਮਹਿਮਾਨ",
+      "showPassword": "ਪਾਸਵਰਡ ਦਿਖਾਓ",
+      "hidePassword": "ਪਾਸਵਰਡ ਲੁਕਾਓ"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "ਤੁਹਾਡੀ ਪ੍ਰੋਫਾਈਲ ਨੂੰ ਪੂਰਾ ਕਰਨ ਦੌਰਾਨ ਇੱਕ ਤਰੁੱਟੀ ਉਤਪੰਨ ਹੋਈ"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "ਡੈਸ਼ਬੋਰਡ",
+      "description": "ਤੁਹਾਡੇ ਖਾਤੇ ਦੀ ਸੰਖੇਪ ਜਾਣਕਾਰੀ"
+    },
+    "actions": {
+      "editProfile": "ਪ੍ਰੋਫਾਈਲ ਦਾ ਸੰਪਾਦਨ ਕਰੋ",
+      "editSettings": "ਸੈਟਿੰਗਾਂ ਦਾ ਸੰਪਾਦਨ ਕਰੋ",
+      "myMedia": "ਮੇਰਾ ਮੀਡੀਆ",
+      "viewStats": "ਅੰਕੜੇ ਵੇਖੋ"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "ਪ੍ਰੋਫਾਈਲ ਦਾ ਸੰਪਾਦਨ ਕਰੋ",
+        "description": "ਆਪਣੀ ਨਿੱਜੀ ਜਾਣਕਾਰੀ ਨੂੰ ਅੱਪਡੇਟ ਕਰੋ"
+      },
+      "editSettings": {
+        "title": "ਖਾਤਾ ਸੈਟਿੰਗਾਂ",
+        "description": "ਆਪਣੀਆਂ ਖਾਤਾ ਤਰਜੀਹਾਂ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ"
+      },
+      "myMedia": {
+        "title": "ਮੇਰਾ ਮੀਡੀਆ",
+        "description": "ਆਪਣੀ ਅਪਲੋਡ ਕੀਤੀ ਸਮੱਗਰੀ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ"
+      }
+    },
+    "messages": {
+      "welcome": "ਦੁਬਾਰਾ ਸੁਆਗਤ ਹੈ, {0}!",
+      "stats": "ਤੁਹਾਡੇ ਕੋਲ {0} ਆਈਟਮਾਂ ਹਨ"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "ਪ੍ਰੋਫਾਈਲ",
+      "description": "ਆਪਣੀ ਪ੍ਰੋਫਾਈਲ ਜਾਣਕਾਰੀ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ"
+    },
+    "form": {
+      "firstName": "ਪਹਿਲਾ ਨਾਮ",
+      "lastName": "ਆਖਰੀ ਨਾਮ",
+      "email": "ਈਮੇਲ ਪਤਾ",
+      "phone": "ਫ਼ੋਨ ਨੰਬਰ",
+      "bio": "ਜੀਵਨੀ",
+      "save": "ਤਬਦੀਲੀਆਂ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰੋ"
+    },
+    "messages": {
+      "updated": "ਪ੍ਰੋਫਾਈਲ ਸਫਲਤਾਪੂਰਵਕ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ",
+      "error": "ਪ੍ਰੋਫਾਈਲ ਅੱਪਡੇਟ ਕਰਨ ਵਿੱਚ ਅਸਫਲ"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "ਖੋਜੋ",
+      "description": "ਨਵੀਂ ਸਮੱਗਰੀ ਅਤੇ ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ ਦੀ ਪੜਚੋਲ ਕਰੋ"
+    },
+    "sections": {
+      "featured": "ਫੀਚਰਡ ਸਮੱਗਰੀ"
+    },
+    "messages": {
+      "explore": "ਸਾਡੇ ਪਲੇਟਫਾਰਮ ਦੀ ਪੜਚੋਲ ਕਰਨਾ ਸ਼ੁਰੂ ਕਰੋ"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "ਦੁਕਾਨ",
+      "description": "ਬ੍ਰਾਊਜ਼ ਕਰੋ ਅਤੇ ਉਤਪਾਦ ਖਰੀਦੋ"
+    },
+    "sections": {
+      "products": "ਉਤਪਾਦ"
+    },
+    "messages": {
+      "comingSoon": "ਹੋਰ ਉਤਪਾਦ ਜਲਦੀ ਆ ਰਹੇ ਹਨ!"
+    }
+  },
+  "common": {
+    "loading": "ਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+    "error": "ਇੱਕ ਤਰੁੱਟੀ ਉਤਪੰਨ ਹੋਈ",
+    "success": "ਓਪਰੇਸ਼ਨ ਪੂਰਾ ਹੋਇਆ",
+    "save": "ਸੇਵ ਕਰੋ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "delete": "ਮਿਟਾਓ",
+    "edit": "ਸੰਪਾਦਿਤ ਕਰੋ",
+    "create": "ਬਣਾਓ",
+    "update": "ਅੱਪਡੇਟ ਕਰੋ",
+    "submit": "ਜਮ੍ਹਾਂ ਕਰੋ",
+    "reset": "ਰੀਸੈਟ ਕਰੋ",
+    "back": "ਵਾਪਸ ਜਾਓ",
+    "next": "ਅੱਗੇ",
+    "previous": "ਪਿਛਲਾ"
+  }
+}

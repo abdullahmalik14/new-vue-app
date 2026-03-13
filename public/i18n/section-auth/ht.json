@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Byenvini tounen",
+      "subtitle": "Tanpri antre kalifikasyon ou pou kontinye.",
+      "button": "Konekte",
+      "emailLabel": "Imèl",
+      "emailPlaceholder": "Adrès imel",
+      "passwordLabel": "Modpas",
+      "passwordPlaceholder": "Modpas",
+      "forgotPassword": "Ou bliye modpas ou a?",
+      "rememberMe": "Sonje mwen",
+      "noAccount": "Ou pa gen yon kont?",
+      "continueWithX": "Kontinye ak X (twitter)",
+      "continueWithTelegram": "Kontinye ak Telegram",
+      "welcome": "Bonjou, {0}!",
+      "error": "Imèl oswa modpas ki pa valab."
+    },
+    "register": {
+      "title": "Kreye Kont",
+      "subtitle": "Kreye kont ou pou kontinye.",
+      "button": "Enskri",
+      "firstName": "Premye Non",
+      "firstNameLabel": "Non",
+      "emailLabel": "Imèl",
+      "emailAddress": "Adrès imel",
+      "emailPlaceholder": "Adrès imel",
+      "passwordLabel": "Modpas",
+      "passwordPlaceholder": "Modpas",
+      "confirmPasswordLabel": "Konfime Modpas",
+      "confirmPasswordPlaceholder": "Modpas",
+      "haveAccount": "Ou deja gen yon kont?",
+      "Onboarding": {
+        "title": "Ranpli pwofil ou a",
+        "description": "Chwazi wòl ou ak non itilizatè pou kontinye.",
+        "usernameLabel": "Non itilizatè",
+        "usernamePlaceholder": "Antre yon non itilizatè",
+        "roleLabel": "Wòl",
+        "rolePlaceholder": "Chwazi wòl ou",
+        "roles": {
+          "creator": "Kreyatè",
+          "fan": "Fanatik",
+          "vendor": "Vandè",
+          "agent": "Ajan"
+        },
+        "button": "Kontinye"
+      },
+      "KYC": {
+        "title": "Verifye idantite w",
+        "description": "Ranpli verifikasyon kreyatè pou jwenn aksè nan tablodbò a.",
+        "button": "Konfime & Kontinye",
+        "logout": "Dekonekte ak Sòti"
+      }
+    },
+    "confirmEmail": {
+      "title": "Konfime Imèl",
+      "subtitle": "Antre imel ou te itilize a ak kòd verifikasyon nou te voye ba ou a.",
+      "button": "Konfime",
+      "buttonLoading": "Konfime...",
+      "emailLabel": "Imèl",
+      "emailPlaceholder": "Imèl",
+      "codeLabel": "Kòd konfimasyon",
+      "codePlaceholder": "Kòd 6 chif",
+      "error": "Konfimasyon echwe",
+      "autoLoginError": "Imèl konfime, men oto-konekte echwe. Tanpri konekte manyèlman."
+    },
+    "reset": {
+      "title": "Reyajiste Modpas",
+      "subtitle": "Antre imel ou pou resevwa yon kòd reset.",
+      "subtitleConfirm": "Antre kòd ou te resevwa a ak yon nouvo modpas.",
+      "sendCode": "Voye Reyajiste Kòd",
+      "codeLabel": "Reyajiste Kòd",
+      "codePlaceholder": "Antre kòd reset",
+      "resetButton": "Reyajiste Modpas",
+      "codeSent": "Reyajiste kòd voye nan imel ou.",
+      "sendCodeError": "Echwe pou voye kòd",
+      "success": "Reyajiste modpas siksè. Tanpri konekte.",
+      "error": "Reyajiste echwe"
+    },
+    "validation": {
+      "emailRequired": "Imèl obligatwa",
+      "emailInvalid": "Tanpri antre yon adrès imel ki valab",
+      "passwordRequired": "Modpas obligatwa",
+      "passwordMinLength": "Omwen 8 karaktè longè",
+      "passwordHasUpper": "Genyen omwen 1 lèt majiskil",
+      "passwordHasLower": "Genyen omwen 1 lèt miniskil",
+      "passwordHasNumber": "Genyen omwen 1 nimewo",
+      "passwordHasSpecial": "Genyen omwen 1 karaktè espesyal",
+      "confirmPasswordRequired": "Tanpri konfime modpas ou",
+      "confirmPasswordMatch": "Modpas pa koresponn",
+      "confirmPasswordMatchSuccess": "Modpas matche",
+      "codeRequired": "Kòd obligatwa",
+      "roleRequired": "Wòl obligatwa",
+      "roleSelect": "Tanpri chwazi yon wòl",
+      "usernameRequired": "Non itilizatè obligatwa",
+      "usernameMinLength": "Non itilizatè a dwe gen omwen 4 karaktè",
+      "usernameMaxLength": "Non itilizatè a dwe gen mwens pase 100 karaktè",
+      "usernameTaken": "Non itilizatè a deja pran"
+    },
+    "common": {
+      "logout": "Sign Out",
+      "loading": "Chaje...",
+      "user": "Itilizatè",
+      "admin": "Admin",
+      "guest": "Envite",
+      "showPassword": "Montre modpas",
+      "hidePassword": "Kache modpas"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Yon erè te fèt pandan w ap ranpli pwofil ou a"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dach",
+      "description": "Apèsi sou kont ou"
+    },
+    "actions": {
+      "editProfile": "Edit Profile",
+      "editSettings": "Edit Anviwònman",
+      "myMedia": "Medya mwen yo",
+      "viewStats": "Gade Estatistik"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Edit Profile",
+        "description": "Mete ajou enfòmasyon pèsonèl ou"
+      },
+      "editSettings": {
+        "title": "Anviwònman kont",
+        "description": "Jere preferans kont ou"
+      },
+      "myMedia": {
+        "title": "Medya mwen yo",
+        "description": "Jere kontni ou telechaje"
+      }
+    },
+    "messages": {
+      "welcome": "Byenvini tounen, {0}!",
+      "stats": "Ou gen {0} atik"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profile",
+      "description": "Jere enfòmasyon pwofil ou"
+    },
+    "form": {
+      "firstName": "Premye Non",
+      "lastName": "Siyati",
+      "email": "Adrès Imèl",
+      "phone": "Nimewo Telefòn",
+      "bio": "Biyografi",
+      "save": "Sove Chanjman yo"
+    },
+    "messages": {
+      "updated": "Pwofil mete ajou avèk siksè",
+      "error": "Echwe pou mete ajou pwofil la"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Dekouvri",
+      "description": "Eksplore nouvo kontni ak karakteristik"
+    },
+    "sections": {
+      "featured": "Kontni prezante"
+    },
+    "messages": {
+      "explore": "Kòmanse eksplore platfòm nou an"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Boutik",
+      "description": "Browse ak achte pwodwi yo"
+    },
+    "sections": {
+      "products": "Pwodwi yo"
+    },
+    "messages": {
+      "comingSoon": "Plis pwodwi ap vini byento!"
+    }
+  },
+  "common": {
+    "loading": "Chaje...",
+    "error": "Yon erè te fèt",
+    "success": "Operasyon fini",
+    "save": "Sove",
+    "cancel": "Anile",
+    "delete": "Efase",
+    "edit": "Edit",
+    "create": "Kreye",
+    "update": "Mizajou",
+    "submit": "Soumèt",
+    "reset": "Reyajiste",
+    "back": "Ale tounen",
+    "next": "Next",
+    "previous": "Previous"
+  }
+}

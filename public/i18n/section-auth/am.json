@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "እንኳን ደህና መጣችሁ",
+      "subtitle": "ለመቀጠል እባክዎ ምስክርነቶችዎን ያስገቡ።",
+      "button": "ግባ",
+      "emailLabel": "ኢሜይል",
+      "emailPlaceholder": "የኢሜል አድራሻ",
+      "passwordLabel": "የይለፍ ቃል",
+      "passwordPlaceholder": "የይለፍ ቃል",
+      "forgotPassword": "የይለፍ ቃልህን ረሳህ?",
+      "rememberMe": "አስታውሰኝ",
+      "noAccount": "መለያ የለህም?",
+      "continueWithX": "በ X (ትዊተር) ይቀጥሉ",
+      "continueWithTelegram": "በቴሌግራም ይቀጥሉ",
+      "welcome": "ሰላም፣ {0}!",
+      "error": "ልክ ያልሆነ ኢሜይል ወይም የይለፍ ቃል።"
+    },
+    "register": {
+      "title": "መለያ ፍጠር",
+      "subtitle": "ለመቀጠል መለያዎን ይፍጠሩ።",
+      "button": "ይመዝገቡ",
+      "firstName": "የመጀመሪያ ስም",
+      "firstNameLabel": "ስም",
+      "emailLabel": "ኢሜይል",
+      "emailAddress": "የኢሜል አድራሻ",
+      "emailPlaceholder": "የኢሜል አድራሻ",
+      "passwordLabel": "የይለፍ ቃል",
+      "passwordPlaceholder": "የይለፍ ቃል",
+      "confirmPasswordLabel": "የይለፍ ቃል ያረጋግጡ",
+      "confirmPasswordPlaceholder": "የይለፍ ቃል",
+      "haveAccount": "መለያ አለህ?",
+      "Onboarding": {
+        "title": "መገለጫዎን ያጠናቅቁ",
+        "description": "ለመቀጠል የእርስዎን ሚና እና የተጠቃሚ ስም ይምረጡ።",
+        "usernameLabel": "የተጠቃሚ ስም",
+        "usernamePlaceholder": "የተጠቃሚ ስም አስገባ",
+        "roleLabel": "ሚና",
+        "rolePlaceholder": "ሚናዎን ይምረጡ",
+        "roles": {
+          "creator": "ፈጣሪ",
+          "fan": "አድናቂ",
+          "vendor": "ሻጭ",
+          "agent": "ወኪል"
+        },
+        "button": "ቀጥል"
+      },
+      "KYC": {
+        "title": "ማንነትዎን ያረጋግጡ",
+        "description": "ዳሽቦርዱን ለመድረስ የፈጣሪ ማረጋገጫን ያጠናቅቁ።",
+        "button": "ያረጋግጡ እና ይቀጥሉ",
+        "logout": "ውጣ እና ውጣ"
+      }
+    },
+    "confirmEmail": {
+      "title": "ኢሜይል አረጋግጥ",
+      "subtitle": "የተጠቀምክበትን ኢሜይል እና የላክንልህን የማረጋገጫ ኮድ አስገባ።",
+      "button": "አረጋግጥ",
+      "buttonLoading": "በማረጋገጥ ላይ...",
+      "emailLabel": "ኢሜይል",
+      "emailPlaceholder": "ኢሜይል",
+      "codeLabel": "የማረጋገጫ ኮድ",
+      "codePlaceholder": "ባለ 6-አሃዝ ኮድ",
+      "error": "ማረጋገጥ አልተሳካም።",
+      "autoLoginError": "ኢሜይል ተረጋግጧል፣ ግን በራስ-ሰር መግባት አልተሳካም። እባክዎ በእጅ ይግቡ።"
+    },
+    "reset": {
+      "title": "የይለፍ ቃል ዳግም አስጀምር",
+      "subtitle": "ዳግም ማስጀመሪያ ኮድ ለመቀበል ኢሜልዎን ያስገቡ።",
+      "subtitleConfirm": "የተቀበልከውን ኮድ እና አዲስ የይለፍ ቃል አስገባ።",
+      "sendCode": "የዳግም ማስጀመሪያ ኮድ ላክ",
+      "codeLabel": "ኮድ ዳግም አስጀምር",
+      "codePlaceholder": "ዳግም ማስጀመሪያ ኮድ ያስገቡ",
+      "resetButton": "የይለፍ ቃል ዳግም አስጀምር",
+      "codeSent": "ዳግም ማስጀመሪያ ኮድ ወደ ኢሜልዎ ተልኳል።",
+      "sendCodeError": "ኮድ መላክ አልተሳካም።",
+      "success": "የይለፍ ቃል ዳግም ማስጀመር ተሳክቷል። እባክዎ ይግቡ።",
+      "error": "ዳግም ማስጀመር አልተሳካም።"
+    },
+    "validation": {
+      "emailRequired": "ኢሜል ያስፈልጋል",
+      "emailInvalid": "እባክህ የሚሰራ የኢሜይል አድራሻ አስገባ",
+      "passwordRequired": "የይለፍ ቃል ያስፈልጋል",
+      "passwordMinLength": "ቢያንስ 8 ቁምፊዎች ይረዝማሉ።",
+      "passwordHasUpper": "ቢያንስ 1 አቢይ ሆሄ ይይዛል",
+      "passwordHasLower": "ቢያንስ 1 ትንሽ ሆሄ ይይዛል",
+      "passwordHasNumber": "ቢያንስ 1 ቁጥር ይይዛል",
+      "passwordHasSpecial": "ቢያንስ 1 ልዩ ቁምፊ ይይዛል",
+      "confirmPasswordRequired": "እባክህ የይለፍ ቃልህን አረጋግጥ",
+      "confirmPasswordMatch": "የይለፍ ቃሎች አይዛመዱም።",
+      "confirmPasswordMatchSuccess": "የይለፍ ቃል ይዛመዳል",
+      "codeRequired": "ኮድ ያስፈልጋል",
+      "roleRequired": "ሚና ያስፈልጋል",
+      "roleSelect": "እባክዎ ሚና ይምረጡ",
+      "usernameRequired": "የተጠቃሚ ስም ያስፈልጋል",
+      "usernameMinLength": "የተጠቃሚ ስም ቢያንስ 4 ቁምፊዎች መሆን አለበት።",
+      "usernameMaxLength": "የተጠቃሚ ስም ከ100 ቁምፊዎች ያነሰ መሆን አለበት።",
+      "usernameTaken": "የተጠቃሚ ስም አስቀድሞ ተወስዷል"
+    },
+    "common": {
+      "logout": "ዘግተህ ውጣ",
+      "loading": "በመጫን ላይ...",
+      "user": "ተጠቃሚ",
+      "admin": "አስተዳዳሪ",
+      "guest": "እንግዳ",
+      "showPassword": "የይለፍ ቃል አሳይ",
+      "hidePassword": "የይለፍ ቃል ደብቅ"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "መገለጫዎን በማጠናቀቅ ላይ ስህተት አጋጥሟል"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "ዳሽቦርድ",
+      "description": "የመለያዎ አጠቃላይ እይታ"
+    },
+    "actions": {
+      "editProfile": "መገለጫ አርትዕ",
+      "editSettings": "ቅንብሮችን ያርትዑ",
+      "myMedia": "የእኔ ሚዲያ",
+      "viewStats": "ስታቲስቲክስን ይመልከቱ"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "መገለጫ አርትዕ",
+        "description": "የግል መረጃዎን ያዘምኑ"
+      },
+      "editSettings": {
+        "title": "የመለያ ቅንብሮች",
+        "description": "የመለያ ምርጫዎችዎን ያስተዳድሩ"
+      },
+      "myMedia": {
+        "title": "የእኔ ሚዲያ",
+        "description": "የተሰቀለውን ይዘት አስተዳድር"
+      }
+    },
+    "messages": {
+      "welcome": "እንኳን በደህና ተመለሱ፣ {0}!",
+      "stats": "{0} ንጥሎች አሉዎት"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "መገለጫ",
+      "description": "የመገለጫ መረጃዎን ያስተዳድሩ"
+    },
+    "form": {
+      "firstName": "የመጀመሪያ ስም",
+      "lastName": "የአያት ስም",
+      "email": "ኢሜል አድራሻ",
+      "phone": "ስልክ ቁጥር",
+      "bio": "የህይወት ታሪክ",
+      "save": "ለውጦችን ያስቀምጡ"
+    },
+    "messages": {
+      "updated": "መገለጫ በተሳካ ሁኔታ ተዘምኗል",
+      "error": "መገለጫን ማዘመን አልተሳካም።"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "አግኝ",
+      "description": "አዲስ ይዘት እና ባህሪያትን ያስሱ"
+    },
+    "sections": {
+      "featured": "ተለይቶ የቀረበ ይዘት"
+    },
+    "messages": {
+      "explore": "የእኛን መድረክ ማሰስ ይጀምሩ"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "ይግዙ",
+      "description": "ምርቶችን ያስሱ እና ይግዙ"
+    },
+    "sections": {
+      "products": "ምርቶች"
+    },
+    "messages": {
+      "comingSoon": "ተጨማሪ ምርቶች በቅርቡ ይመጣሉ!"
+    }
+  },
+  "common": {
+    "loading": "በመጫን ላይ...",
+    "error": "ስህተት ተከስቷል።",
+    "success": "ክዋኔው ተጠናቀቀ",
+    "save": "አስቀምጥ",
+    "cancel": "ሰርዝ",
+    "delete": "ሰርዝ",
+    "edit": "አርትዕ",
+    "create": "ፍጠር",
+    "update": "አዘምን",
+    "submit": "አስገባ",
+    "reset": "ዳግም አስጀምር",
+    "back": "ተመለስ",
+    "next": "ቀጥሎ",
+    "previous": "ቀዳሚ"
+  }
+}

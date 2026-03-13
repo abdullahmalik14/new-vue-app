@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Välkommen tillbaka",
+      "subtitle": "Ange dina uppgifter för att fortsätta.",
+      "button": "Logga in",
+      "emailLabel": "E-post",
+      "emailPlaceholder": "E-postadress",
+      "passwordLabel": "Lösenord",
+      "passwordPlaceholder": "Lösenord",
+      "forgotPassword": "Glömt ditt lösenord?",
+      "rememberMe": "Kom ihåg mig",
+      "noAccount": "Har du inget konto?",
+      "continueWithX": "Fortsätt med X (twitter)",
+      "continueWithTelegram": "Fortsätt med Telegram",
+      "welcome": "Hej, {0}!",
+      "error": "Ogiltig e-postadress eller lösenord."
+    },
+    "register": {
+      "title": "Skapa konto",
+      "subtitle": "Skapa ditt konto för att fortsätta.",
+      "button": "Registrera dig",
+      "firstName": "Förnamn",
+      "firstNameLabel": "Namn",
+      "emailLabel": "E-post",
+      "emailAddress": "E-postadress",
+      "emailPlaceholder": "E-postadress",
+      "passwordLabel": "Lösenord",
+      "passwordPlaceholder": "Lösenord",
+      "confirmPasswordLabel": "Bekräfta lösenord",
+      "confirmPasswordPlaceholder": "Lösenord",
+      "haveAccount": "Har du redan ett konto?",
+      "Onboarding": {
+        "title": "Komplettera din profil",
+        "description": "Välj din roll och användarnamn för att fortsätta.",
+        "usernameLabel": "Användarnamn",
+        "usernamePlaceholder": "Ange ett användarnamn",
+        "roleLabel": "Roll",
+        "rolePlaceholder": "Välj din roll",
+        "roles": {
+          "creator": "Skapare",
+          "fan": "Fläkt",
+          "vendor": "Försäljare",
+          "agent": "Agent"
+        },
+        "button": "Fortsätt"
+      },
+      "KYC": {
+        "title": "Verifiera din identitet",
+        "description": "Slutför skaparverifieringen för att komma åt instrumentpanelen.",
+        "button": "Bekräfta och fortsätt",
+        "logout": "Logga ut och avsluta"
+      }
+    },
+    "confirmEmail": {
+      "title": "Bekräfta e-post",
+      "subtitle": "Ange e-postadressen du använde och verifieringskoden vi skickade till dig.",
+      "button": "Bekräfta",
+      "buttonLoading": "Bekräftar...",
+      "emailLabel": "E-post",
+      "emailPlaceholder": "E-post",
+      "codeLabel": "Bekräftelsekod",
+      "codePlaceholder": "6-siffrig kod",
+      "error": "Bekräftelsen misslyckades",
+      "autoLoginError": "E-post bekräftad, men automatisk inloggning misslyckades. Logga in manuellt."
+    },
+    "reset": {
+      "title": "Återställ lösenord",
+      "subtitle": "Ange din e-postadress för att få en återställningskod.",
+      "subtitleConfirm": "Ange koden du fick och ett nytt lösenord.",
+      "sendCode": "Skicka återställningskod",
+      "codeLabel": "Återställ koden",
+      "codePlaceholder": "Ange återställningskod",
+      "resetButton": "Återställ lösenord",
+      "codeSent": "Återställ koden skickad till din e-post.",
+      "sendCodeError": "Det gick inte att skicka koden",
+      "success": "Lösenordsåterställningen lyckades. Logga in.",
+      "error": "Återställningen misslyckades"
+    },
+    "validation": {
+      "emailRequired": "E-post krävs",
+      "emailInvalid": "Vänligen ange en giltig e-postadress",
+      "passwordRequired": "Lösenord krävs",
+      "passwordMinLength": "Minst 8 tecken lång",
+      "passwordHasUpper": "Innehålla minst 1 stor bokstav",
+      "passwordHasLower": "Innehålla minst 1 liten bokstav",
+      "passwordHasNumber": "Innehåller minst 1 nummer",
+      "passwordHasSpecial": "Innehålla minst 1 specialtecken",
+      "confirmPasswordRequired": "Vänligen bekräfta ditt lösenord",
+      "confirmPasswordMatch": "Lösenord stämmer inte överens",
+      "confirmPasswordMatchSuccess": "Lösenord matchar",
+      "codeRequired": "Kod krävs",
+      "roleRequired": "Roll krävs",
+      "roleSelect": "Välj en roll",
+      "usernameRequired": "Användarnamn krävs",
+      "usernameMinLength": "Användarnamn måste bestå av minst 4 tecken",
+      "usernameMaxLength": "Användarnamnet måste vara mindre än 100 tecken",
+      "usernameTaken": "Användarnamnet är redan upptaget"
+    },
+    "common": {
+      "logout": "Logga ut",
+      "loading": "Laddar...",
+      "user": "Användare",
+      "admin": "Admin",
+      "guest": "Gäst",
+      "showPassword": "Visa lösenord",
+      "hidePassword": "Dölj lösenord"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Ett fel uppstod när din profil fylldes i"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Instrumentbräda",
+      "description": "Översikt över ditt konto"
+    },
+    "actions": {
+      "editProfile": "Redigera profil",
+      "editSettings": "Redigera inställningar",
+      "myMedia": "Mina media",
+      "viewStats": "Visa statistik"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Redigera profil",
+        "description": "Uppdatera din personliga information"
+      },
+      "editSettings": {
+        "title": "Kontoinställningar",
+        "description": "Hantera dina kontoinställningar"
+      },
+      "myMedia": {
+        "title": "Mina media",
+        "description": "Hantera ditt uppladdade innehåll"
+      }
+    },
+    "messages": {
+      "welcome": "Välkommen tillbaka, {0}!",
+      "stats": "Du har {0} objekt"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Hantera din profilinformation"
+    },
+    "form": {
+      "firstName": "Förnamn",
+      "lastName": "Efternamn",
+      "email": "E-postadress",
+      "phone": "Telefonnummer",
+      "bio": "Biografi",
+      "save": "Spara ändringar"
+    },
+    "messages": {
+      "updated": "Profilen har uppdaterats",
+      "error": "Det gick inte att uppdatera profilen"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Upptäck",
+      "description": "Utforska nytt innehåll och nya funktioner"
+    },
+    "sections": {
+      "featured": "Utvalt innehåll"
+    },
+    "messages": {
+      "explore": "Börja utforska vår plattform"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Handla",
+      "description": "Bläddra och köp produkter"
+    },
+    "sections": {
+      "products": "Produkter"
+    },
+    "messages": {
+      "comingSoon": "Fler produkter kommer snart!"
+    }
+  },
+  "common": {
+    "loading": "Laddar...",
+    "error": "Ett fel uppstod",
+    "success": "Operation avslutad",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "delete": "Ta bort",
+    "edit": "Redigera",
+    "create": "Skapa",
+    "update": "Uppdatering",
+    "submit": "Skicka in",
+    "reset": "Återställ",
+    "back": "Gå tillbaka",
+    "next": "Nästa",
+    "previous": "Föregående"
+  }
+}

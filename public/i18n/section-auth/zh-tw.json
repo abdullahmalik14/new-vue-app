@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "歡迎回來",
+      "subtitle": "請輸入您的憑證以繼續。",
+      "button": "登入",
+      "emailLabel": "電子郵件",
+      "emailPlaceholder": "電子郵件地址",
+      "passwordLabel": "密碼",
+      "passwordPlaceholder": "密碼",
+      "forgotPassword": "忘記密碼？",
+      "rememberMe": "記住我",
+      "noAccount": "沒有帳戶？",
+      "continueWithX": "繼續 X（推特）",
+      "continueWithTelegram": "繼續電報",
+      "welcome": "你好，{0}！",
+      "error": "電子郵件或密碼無效。"
+    },
+    "register": {
+      "title": "建立帳戶",
+      "subtitle": "建立您的帳戶以繼續。",
+      "button": "註冊",
+      "firstName": "名字",
+      "firstNameLabel": "名稱",
+      "emailLabel": "電子郵件",
+      "emailAddress": "電子郵件地址",
+      "emailPlaceholder": "電子郵件地址",
+      "passwordLabel": "密碼",
+      "passwordPlaceholder": "密碼",
+      "confirmPasswordLabel": "確認密碼",
+      "confirmPasswordPlaceholder": "密碼",
+      "haveAccount": "已經有帳戶？",
+      "Onboarding": {
+        "title": "填寫您的個人資料",
+        "description": "選擇您的角色和用戶名以繼續。",
+        "usernameLabel": "使用者名稱",
+        "usernamePlaceholder": "輸入使用者名稱",
+        "roleLabel": "角色",
+        "rolePlaceholder": "選擇您的角色",
+        "roles": {
+          "creator": "創作者",
+          "fan": "風扇",
+          "vendor": "供應商",
+          "agent": "代理商"
+        },
+        "button": "繼續"
+      },
+      "KYC": {
+        "title": "驗證您的身份",
+        "description": "完成創建者驗證以存取儀表板。",
+        "button": "確認並繼續",
+        "logout": "登出並退出"
+      }
+    },
+    "confirmEmail": {
+      "title": "確認郵件",
+      "subtitle": "輸入您使用的電子郵件和我們發送給您的驗證碼。",
+      "button": "確認",
+      "buttonLoading": "確認...",
+      "emailLabel": "電子郵件",
+      "emailPlaceholder": "電子郵件",
+      "codeLabel": "確認碼",
+      "codePlaceholder": "6位數字代碼",
+      "error": "確認失敗",
+      "autoLoginError": "電子郵件已確認，但自動登入失敗。請手動登入。"
+    },
+    "reset": {
+      "title": "重設密碼",
+      "subtitle": "輸入您的電子郵件以接收重設代碼。",
+      "subtitleConfirm": "輸入您收到的代碼和新密碼。",
+      "sendCode": "發送重置代碼",
+      "codeLabel": "重置程式碼",
+      "codePlaceholder": "輸入重置代碼",
+      "resetButton": "重設密碼",
+      "codeSent": "重置代碼已傳送到您的電子郵件。",
+      "sendCodeError": "發送程式碼失敗",
+      "success": "密碼重置成功。請登入。",
+      "error": "重置失敗"
+    },
+    "validation": {
+      "emailRequired": "電子郵件為必填項",
+      "emailInvalid": "請輸入有效的電子郵件地址",
+      "passwordRequired": "需要密碼",
+      "passwordMinLength": "至少 8 個字元長",
+      "passwordHasUpper": "至少包含 1 個大寫字母",
+      "passwordHasLower": "至少包含 1 個小寫字母",
+      "passwordHasNumber": "至少包含1個數字",
+      "passwordHasSpecial": "至少包含 1 個特殊字符",
+      "confirmPasswordRequired": "請確認您的密碼",
+      "confirmPasswordMatch": "密碼不匹配",
+      "confirmPasswordMatchSuccess": "密碼匹配",
+      "codeRequired": "需要程式碼",
+      "roleRequired": "角色為必填項",
+      "roleSelect": "請選擇角色",
+      "usernameRequired": "使用者名稱是必需的",
+      "usernameMinLength": "使用者名稱必須至少 4 個字符",
+      "usernameMaxLength": "使用者名稱必須少於 100 個字符",
+      "usernameTaken": "使用者名稱已被佔用"
+    },
+    "common": {
+      "logout": "退出",
+      "loading": "正在加載...",
+      "user": "使用者",
+      "admin": "管理員",
+      "guest": "嘉賓",
+      "showPassword": "顯示密碼",
+      "hidePassword": "隱藏密碼"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "填寫您的個人資料時出錯"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "儀表板",
+      "description": "您的帳戶概覽"
+    },
+    "actions": {
+      "editProfile": "編輯個人資料",
+      "editSettings": "編輯設定",
+      "myMedia": "我的媒體",
+      "viewStats": "查看統計數據"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "編輯個人資料",
+        "description": "更新您的個人資訊"
+      },
+      "editSettings": {
+        "title": "帳戶設定",
+        "description": "管理您的帳戶首選項"
+      },
+      "myMedia": {
+        "title": "我的媒體",
+        "description": "管理您上傳的內容"
+      }
+    },
+    "messages": {
+      "welcome": "歡迎回來，{0}！",
+      "stats": "您有 {0} 件商品"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "公司簡介",
+      "description": "管理您的個人資料訊息"
+    },
+    "form": {
+      "firstName": "名字",
+      "lastName": "姓氏",
+      "email": "電子郵件地址",
+      "phone": "電話號碼",
+      "bio": "傳記",
+      "save": "儲存變更"
+    },
+    "messages": {
+      "updated": "個人資料更新成功",
+      "error": "更新個人資料失敗"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "發現",
+      "description": "探索新內容和功能"
+    },
+    "sections": {
+      "featured": "特色內容"
+    },
+    "messages": {
+      "explore": "開始探索我們的平台"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "商店",
+      "description": "瀏覽並購買商品"
+    },
+    "sections": {
+      "products": "產品展示"
+    },
+    "messages": {
+      "comingSoon": "更多產品即將推出！"
+    }
+  },
+  "common": {
+    "loading": "正在加載...",
+    "error": "發生錯誤",
+    "success": "操作完成",
+    "save": "儲存",
+    "cancel": "取消",
+    "delete": "刪除",
+    "edit": "編輯",
+    "create": "創建",
+    "update": "更新",
+    "submit": "提交",
+    "reset": "重置",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一頁"
+  }
+}

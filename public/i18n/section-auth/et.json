@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Tere tulemast tagasi",
+      "subtitle": "Jätkamiseks sisestage oma mandaadid.",
+      "button": "Logi sisse",
+      "emailLabel": "Meil",
+      "emailPlaceholder": "E-posti aadress",
+      "passwordLabel": "Parool",
+      "passwordPlaceholder": "Parool",
+      "forgotPassword": "Unustasid oma parooli?",
+      "rememberMe": "Pea mind meeles",
+      "noAccount": "Kas teil pole kontot?",
+      "continueWithX": "Jätka X-ga (twitter)",
+      "continueWithTelegram": "Jätkake Telegramiga",
+      "welcome": "Tere, {0}!",
+      "error": "Kehtetu e-posti aadress või parool."
+    },
+    "register": {
+      "title": "Loo konto",
+      "subtitle": "Jätkamiseks looge oma konto.",
+      "button": "Registreeru",
+      "firstName": "Eesnimi",
+      "firstNameLabel": "Nimi",
+      "emailLabel": "Meil",
+      "emailAddress": "E-posti aadress",
+      "emailPlaceholder": "E-posti aadress",
+      "passwordLabel": "Parool",
+      "passwordPlaceholder": "Parool",
+      "confirmPasswordLabel": "Kinnitage parool",
+      "confirmPasswordPlaceholder": "Parool",
+      "haveAccount": "Kas teil on juba konto?",
+      "Onboarding": {
+        "title": "Täitke oma profiil",
+        "description": "Jätkamiseks valige oma roll ja kasutajanimi.",
+        "usernameLabel": "Kasutajanimi",
+        "usernamePlaceholder": "Sisestage kasutajanimi",
+        "roleLabel": "Roll",
+        "rolePlaceholder": "Valige oma roll",
+        "roles": {
+          "creator": "Looja",
+          "fan": "Fänn",
+          "vendor": "Müüja",
+          "agent": "Agent"
+        },
+        "button": "Jätka"
+      },
+      "KYC": {
+        "title": "Kinnitage oma identiteet",
+        "description": "Juhtpaneelile juurdepääsu saamiseks viige looja kinnitus lõpule.",
+        "button": "Kinnitage ja jätkake",
+        "logout": "Logi välja ja välju"
+      }
+    },
+    "confirmEmail": {
+      "title": "Kinnitage meil",
+      "subtitle": "Sisestage kasutatud meiliaadress ja kinnituskood, mille teile saatsime.",
+      "button": "Kinnita",
+      "buttonLoading": "Kinnitamine...",
+      "emailLabel": "Meil",
+      "emailPlaceholder": "Meil",
+      "codeLabel": "Kinnituskood",
+      "codePlaceholder": "6-kohaline kood",
+      "error": "Kinnitamine ebaõnnestus",
+      "autoLoginError": "E-post on kinnitatud, kuid automaatne sisselogimine ebaõnnestus. Logige sisse käsitsi."
+    },
+    "reset": {
+      "title": "Lähtestage parool",
+      "subtitle": "Lähtestamiskoodi saamiseks sisestage oma e-posti aadress.",
+      "subtitleConfirm": "Sisestage saadud kood ja uus parool.",
+      "sendCode": "Saatke lähtestuskood",
+      "codeLabel": "Lähtestage kood",
+      "codePlaceholder": "Sisestage lähtestamiskood",
+      "resetButton": "Lähtestage parool",
+      "codeSent": "Lähtestage teie meilile saadetud kood.",
+      "sendCodeError": "Koodi saatmine ebaõnnestus",
+      "success": "Parooli lähtestamine õnnestus. Palun logi sisse.",
+      "error": "Lähtestamine ebaõnnestus"
+    },
+    "validation": {
+      "emailRequired": "E-post on kohustuslik",
+      "emailInvalid": "Sisestage kehtiv e-posti aadress",
+      "passwordRequired": "Parool on nõutav",
+      "passwordMinLength": "Vähemalt 8 tähemärki pikk",
+      "passwordHasUpper": "Sisaldab vähemalt ühte suurtähte",
+      "passwordHasLower": "Sisaldab vähemalt ühte väiketähte",
+      "passwordHasNumber": "Sisaldab vähemalt 1 numbrit",
+      "passwordHasSpecial": "Sisaldab vähemalt 1 erimärki",
+      "confirmPasswordRequired": "Palun kinnitage oma parool",
+      "confirmPasswordMatch": "Paroolid ei ühti",
+      "confirmPasswordMatchSuccess": "Parooli vasted",
+      "codeRequired": "Kood on nõutav",
+      "roleRequired": "Roll on nõutav",
+      "roleSelect": "Valige roll",
+      "usernameRequired": "Kasutajanimi on nõutav",
+      "usernameMinLength": "Kasutajanimi peab koosnema vähemalt 4 tähemärgist",
+      "usernameMaxLength": "Kasutajanimi peab olema lühem kui 100 tähemärki",
+      "usernameTaken": "Kasutajanimi on juba hõivatud"
+    },
+    "common": {
+      "logout": "Logi välja",
+      "loading": "Laadimine...",
+      "user": "Kasutaja",
+      "admin": "Admin",
+      "guest": "Külaline",
+      "showPassword": "Näita parooli",
+      "hidePassword": "Peida parool"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Teie profiili täitmisel ilmnes viga"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Armatuurlaud",
+      "description": "Teie konto ülevaade"
+    },
+    "actions": {
+      "editProfile": "Redigeeri profiili",
+      "editSettings": "Redigeeri sätteid",
+      "myMedia": "Minu meedia",
+      "viewStats": "Vaata statistikat"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Redigeeri profiili",
+        "description": "Värskendage oma isikuandmeid"
+      },
+      "editSettings": {
+        "title": "Konto seaded",
+        "description": "Hallake oma kontoeelistusi"
+      },
+      "myMedia": {
+        "title": "Minu meedia",
+        "description": "Hallake oma üleslaaditud sisu"
+      }
+    },
+    "messages": {
+      "welcome": "Tere tulemast tagasi, {0}!",
+      "stats": "Teil on {0} üksust"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profiil",
+      "description": "Hallake oma profiiliteavet"
+    },
+    "form": {
+      "firstName": "Eesnimi",
+      "lastName": "Perekonnanimi",
+      "email": "E-posti aadress",
+      "phone": "Telefoninumber",
+      "bio": "Biograafia",
+      "save": "Salvesta muudatused"
+    },
+    "messages": {
+      "updated": "Profiili värskendamine õnnestus",
+      "error": "Profiili värskendamine ebaõnnestus"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Avastage",
+      "description": "Avastage uut sisu ja funktsioone"
+    },
+    "sections": {
+      "featured": "Esiletõstetud sisu"
+    },
+    "messages": {
+      "explore": "Alustage meie platvormi uurimist"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Pood",
+      "description": "Sirvige ja ostke tooteid"
+    },
+    "sections": {
+      "products": "Tooted"
+    },
+    "messages": {
+      "comingSoon": "Varsti rohkem tooteid!"
+    }
+  },
+  "common": {
+    "loading": "Laadimine...",
+    "error": "Ilmnes viga",
+    "success": "Operatsioon lõpetatud",
+    "save": "Salvesta",
+    "cancel": "Tühista",
+    "delete": "Kustuta",
+    "edit": "Muuda",
+    "create": "Loo",
+    "update": "Värskenda",
+    "submit": "Esita",
+    "reset": "Lähtesta",
+    "back": "Mine tagasi",
+    "next": "Edasi",
+    "previous": "Eelmine"
+  }
+}

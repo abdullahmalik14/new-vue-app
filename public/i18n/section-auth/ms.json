@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Selamat Kembali",
+      "subtitle": "Sila masukkan kelayakan anda untuk meneruskan.",
+      "button": "Log Masuk",
+      "emailLabel": "E-mel",
+      "emailPlaceholder": "Alamat e-mel",
+      "passwordLabel": "Kata laluan",
+      "passwordPlaceholder": "Kata laluan",
+      "forgotPassword": "Terlupa kata laluan anda?",
+      "rememberMe": "Ingat saya",
+      "noAccount": "Tiada akaun?",
+      "continueWithX": "Teruskan dengan X (twitter)",
+      "continueWithTelegram": "Teruskan dengan Telegram",
+      "welcome": "Helo, {0}!",
+      "error": "E-mel atau kata laluan tidak sah."
+    },
+    "register": {
+      "title": "Buat Akaun",
+      "subtitle": "Buat akaun anda untuk meneruskan.",
+      "button": "Daftar",
+      "firstName": "Nama Pertama",
+      "firstNameLabel": "Nama",
+      "emailLabel": "E-mel",
+      "emailAddress": "Alamat e-mel",
+      "emailPlaceholder": "Alamat e-mel",
+      "passwordLabel": "Kata laluan",
+      "passwordPlaceholder": "Kata laluan",
+      "confirmPasswordLabel": "Sahkan Kata Laluan",
+      "confirmPasswordPlaceholder": "Kata laluan",
+      "haveAccount": "Sudah mempunyai akaun?",
+      "Onboarding": {
+        "title": "Lengkapkan Profil Anda",
+        "description": "Pilih peranan dan nama pengguna anda untuk meneruskan.",
+        "usernameLabel": "Nama pengguna",
+        "usernamePlaceholder": "Masukkan nama pengguna",
+        "roleLabel": "Peranan",
+        "rolePlaceholder": "Pilih peranan anda",
+        "roles": {
+          "creator": "Pencipta",
+          "fan": "kipas",
+          "vendor": "Penjual",
+          "agent": "ejen"
+        },
+        "button": "teruskan"
+      },
+      "KYC": {
+        "title": "Sahkan Identiti Anda",
+        "description": "Lengkapkan pengesahan pencipta untuk mengakses papan pemuka.",
+        "button": "Sahkan & Teruskan",
+        "logout": "Log Keluar & Keluar"
+      }
+    },
+    "confirmEmail": {
+      "title": "Sahkan E-mel",
+      "subtitle": "Masukkan e-mel yang anda gunakan dan kod pengesahan yang kami hantar kepada anda.",
+      "button": "sahkan",
+      "buttonLoading": "Mengesahkan...",
+      "emailLabel": "E-mel",
+      "emailPlaceholder": "E-mel",
+      "codeLabel": "Kod Pengesahan",
+      "codePlaceholder": "kod 6 digit",
+      "error": "Pengesahan gagal",
+      "autoLoginError": "E-mel disahkan, tetapi log masuk automatik gagal. Sila log masuk secara manual."
+    },
+    "reset": {
+      "title": "Tetapkan Semula Kata Laluan",
+      "subtitle": "Masukkan e-mel anda untuk menerima kod tetapan semula.",
+      "subtitleConfirm": "Masukkan kod yang anda terima dan kata laluan baharu.",
+      "sendCode": "Hantar Kod Tetapan Semula",
+      "codeLabel": "Tetapkan Semula Kod",
+      "codePlaceholder": "Masukkan kod set semula",
+      "resetButton": "Tetapkan Semula Kata Laluan",
+      "codeSent": "Tetapkan semula kod yang dihantar ke e-mel anda.",
+      "sendCodeError": "Gagal menghantar kod",
+      "success": "Penetapan semula kata laluan berjaya. Sila log masuk.",
+      "error": "Tetapan semula gagal"
+    },
+    "validation": {
+      "emailRequired": "E-mel diperlukan",
+      "emailInvalid": "Sila masukkan alamat e-mel yang sah",
+      "passwordRequired": "Kata laluan diperlukan",
+      "passwordMinLength": "Sekurang-kurangnya 8 aksara panjang",
+      "passwordHasUpper": "Mengandungi sekurang-kurangnya 1 huruf besar",
+      "passwordHasLower": "Mengandungi sekurang-kurangnya 1 huruf kecil",
+      "passwordHasNumber": "Mengandungi sekurang-kurangnya 1 nombor",
+      "passwordHasSpecial": "Mengandungi sekurang-kurangnya 1 aksara khas",
+      "confirmPasswordRequired": "Sila sahkan kata laluan anda",
+      "confirmPasswordMatch": "Kata laluan tidak sepadan",
+      "confirmPasswordMatchSuccess": "Kata laluan sepadan",
+      "codeRequired": "Kod diperlukan",
+      "roleRequired": "Peranan diperlukan",
+      "roleSelect": "Sila pilih peranan",
+      "usernameRequired": "Nama pengguna diperlukan",
+      "usernameMinLength": "Nama pengguna mestilah sekurang-kurangnya 4 aksara",
+      "usernameMaxLength": "Nama pengguna mestilah kurang daripada 100 aksara",
+      "usernameTaken": "Nama pengguna sudah diambil"
+    },
+    "common": {
+      "logout": "Log Keluar",
+      "loading": "Memuatkan...",
+      "user": "pengguna",
+      "admin": "Admin",
+      "guest": "tetamu",
+      "showPassword": "Tunjukkan kata laluan",
+      "hidePassword": "Sembunyikan kata laluan"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Ralat berlaku semasa melengkapkan profil anda"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Papan pemuka",
+      "description": "Gambaran keseluruhan akaun anda"
+    },
+    "actions": {
+      "editProfile": "Edit Profil",
+      "editSettings": "Edit Tetapan",
+      "myMedia": "Media Saya",
+      "viewStats": "Lihat Statistik"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Edit Profil",
+        "description": "Kemas kini maklumat peribadi anda"
+      },
+      "editSettings": {
+        "title": "Tetapan Akaun",
+        "description": "Urus pilihan akaun anda"
+      },
+      "myMedia": {
+        "title": "Media Saya",
+        "description": "Urus kandungan anda yang dimuat naik"
+      }
+    },
+    "messages": {
+      "welcome": "Selamat kembali, {0}!",
+      "stats": "Anda mempunyai {0} item"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Urus maklumat profil anda"
+    },
+    "form": {
+      "firstName": "Nama Pertama",
+      "lastName": "Nama Akhir",
+      "email": "Alamat E-mel",
+      "phone": "Nombor Telefon",
+      "bio": "Biografi",
+      "save": "Simpan Perubahan"
+    },
+    "messages": {
+      "updated": "Profil berjaya dikemas kini",
+      "error": "Gagal mengemas kini profil"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Temui",
+      "description": "Teroka kandungan dan ciri baharu"
+    },
+    "sections": {
+      "featured": "Kandungan Pilihan"
+    },
+    "messages": {
+      "explore": "Mula meneroka platform kami"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "kedai",
+      "description": "Semak imbas dan beli produk"
+    },
+    "sections": {
+      "products": "Produk"
+    },
+    "messages": {
+      "comingSoon": "Lebih banyak produk akan datang tidak lama lagi!"
+    }
+  },
+  "common": {
+    "loading": "Memuatkan...",
+    "error": "Ralat berlaku",
+    "success": "Operasi selesai",
+    "save": "Jimat",
+    "cancel": "Batal",
+    "delete": "Padam",
+    "edit": "Sunting",
+    "create": "Buat",
+    "update": "Kemas kini",
+    "submit": "Hantar",
+    "reset": "Tetapkan semula",
+    "back": "Pergi Balik",
+    "next": "Seterusnya",
+    "previous": "Sebelumnya"
+  }
+}

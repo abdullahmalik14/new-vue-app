@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Добре дошъл обратно",
+      "subtitle": "Моля, въведете вашите идентификационни данни, за да продължите.",
+      "button": "влезте",
+      "emailLabel": "Имейл",
+      "emailPlaceholder": "Имейл адрес",
+      "passwordLabel": "Парола",
+      "passwordPlaceholder": "Парола",
+      "forgotPassword": "Забравена парола?",
+      "rememberMe": "запомни ме",
+      "noAccount": "Нямате акаунт?",
+      "continueWithX": "Продължете с X (twitter)",
+      "continueWithTelegram": "Продължете с Telegram",
+      "welcome": "Здравей, {0}!",
+      "error": "Невалиден имейл или парола."
+    },
+    "register": {
+      "title": "Създаване на акаунт",
+      "subtitle": "Създайте своя акаунт, за да продължите.",
+      "button": "Регистрирайте се",
+      "firstName": "Първо име",
+      "firstNameLabel": "Име",
+      "emailLabel": "Имейл",
+      "emailAddress": "Имейл адрес",
+      "emailPlaceholder": "Имейл адрес",
+      "passwordLabel": "Парола",
+      "passwordPlaceholder": "Парола",
+      "confirmPasswordLabel": "Потвърдете паролата",
+      "confirmPasswordPlaceholder": "Парола",
+      "haveAccount": "Вече имате акаунт?",
+      "Onboarding": {
+        "title": "Попълнете своя профил",
+        "description": "Изберете вашата роля и потребителско име, за да продължите.",
+        "usernameLabel": "Потребителско име",
+        "usernamePlaceholder": "Въведете потребителско име",
+        "roleLabel": "Роля",
+        "rolePlaceholder": "Изберете своята роля",
+        "roles": {
+          "creator": "Създател",
+          "fan": "Вентилатор",
+          "vendor": "Доставчик",
+          "agent": "агент"
+        },
+        "button": "Продължи"
+      },
+      "KYC": {
+        "title": "Потвърдете вашата самоличност",
+        "description": "Завършете проверката на създателя за достъп до таблото за управление.",
+        "button": "Потвърдете и продължете",
+        "logout": "Излезте и излезте"
+      }
+    },
+    "confirmEmail": {
+      "title": "Потвърдете имейл",
+      "subtitle": "Въведете имейла, който сте използвали, и кода за потвърждение, който ви изпратихме.",
+      "button": "Потвърдете",
+      "buttonLoading": "Потвърждава се...",
+      "emailLabel": "Имейл",
+      "emailPlaceholder": "Имейл",
+      "codeLabel": "Код за потвърждение",
+      "codePlaceholder": "6-цифрен код",
+      "error": "Неуспешно потвърждение",
+      "autoLoginError": "Имейлът е потвърден, но автоматичното влизане е неуспешно. Моля, влезте ръчно."
+    },
+    "reset": {
+      "title": "Нулиране на парола",
+      "subtitle": "Въведете своя имейл, за да получите код за нулиране.",
+      "subtitleConfirm": "Въведете получения код и нова парола.",
+      "sendCode": "Изпратете код за нулиране",
+      "codeLabel": "Нулиране на кода",
+      "codePlaceholder": "Въведете кода за нулиране",
+      "resetButton": "Нулиране на парола",
+      "codeSent": "Кодът за нулиране, изпратен на вашия имейл.",
+      "sendCodeError": "Неуспешно изпращане на код",
+      "success": "Успешно нулиране на паролата. моля влезте",
+      "error": "Неуспешно нулиране"
+    },
+    "validation": {
+      "emailRequired": "Изисква се имейл",
+      "emailInvalid": "Моля, въведете валиден имейл адрес",
+      "passwordRequired": "Изисква се парола",
+      "passwordMinLength": "Най-малко 8 символа",
+      "passwordHasUpper": "Съдържа поне 1 главна буква",
+      "passwordHasLower": "Съдържа поне 1 малка буква",
+      "passwordHasNumber": "Съдържа поне 1 число",
+      "passwordHasSpecial": "Съдържа поне 1 специален знак",
+      "confirmPasswordRequired": "Моля, потвърдете паролата си",
+      "confirmPasswordMatch": "Паролите не съвпадат",
+      "confirmPasswordMatchSuccess": "Паролата съвпада",
+      "codeRequired": "Изисква се код",
+      "roleRequired": "Изисква се роля",
+      "roleSelect": "Моля, изберете роля",
+      "usernameRequired": "Изисква се потребителско име",
+      "usernameMinLength": "Потребителското име трябва да е поне 4 знака",
+      "usernameMaxLength": "Потребителското име трябва да е по-малко от 100 знака",
+      "usernameTaken": "Потребителското име вече е заето"
+    },
+    "common": {
+      "logout": "Излезте",
+      "loading": "Зареждане...",
+      "user": "Потребител",
+      "admin": "Админ",
+      "guest": "Гост",
+      "showPassword": "Покажи парола",
+      "hidePassword": "Скриване на паролата"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Възникна грешка при попълването на вашия профил"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Табло",
+      "description": "Преглед на вашия акаунт"
+    },
+    "actions": {
+      "editProfile": "Редактиране на профил",
+      "editSettings": "Редактиране на настройките",
+      "myMedia": "Моите медии",
+      "viewStats": "Преглед на статистиката"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Редактиране на профил",
+        "description": "Актуализирайте личната си информация"
+      },
+      "editSettings": {
+        "title": "Настройки на акаунта",
+        "description": "Управлявайте предпочитанията на вашия акаунт"
+      },
+      "myMedia": {
+        "title": "Моите медии",
+        "description": "Управлявайте вашето качено съдържание"
+      }
+    },
+    "messages": {
+      "welcome": "Добре дошъл отново, {0}!",
+      "stats": "Имате {0} елемента"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Профил",
+      "description": "Управлявайте информацията за вашия профил"
+    },
+    "form": {
+      "firstName": "Първо име",
+      "lastName": "Фамилия",
+      "email": "Имейл адрес",
+      "phone": "Телефонен номер",
+      "bio": "Биография",
+      "save": "Запазване на промените"
+    },
+    "messages": {
+      "updated": "Профилът е актуализиран успешно",
+      "error": "Неуспешно актуализиране на профила"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Открийте",
+      "description": "Разгледайте ново съдържание и функции"
+    },
+    "sections": {
+      "featured": "Препоръчано съдържание"
+    },
+    "messages": {
+      "explore": "Започнете да изследвате нашата платформа"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Магазин",
+      "description": "Разглеждайте и купувайте продукти"
+    },
+    "sections": {
+      "products": "Продукти"
+    },
+    "messages": {
+      "comingSoon": "Очаквайте скоро още продукти!"
+    }
+  },
+  "common": {
+    "loading": "Зареждане...",
+    "error": "Възникна грешка",
+    "success": "Операцията е завършена",
+    "save": "Запазване",
+    "cancel": "Отказ",
+    "delete": "Изтриване",
+    "edit": "Редактиране",
+    "create": "Създавайте",
+    "update": "Актуализация",
+    "submit": "Изпратете",
+    "reset": "Нулиране",
+    "back": "Върни се назад",
+    "next": "Следваща",
+    "previous": "Предишен"
+  }
+}

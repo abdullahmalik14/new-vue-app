@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Velkommen tilbage",
+      "subtitle": "Indtast venligst dine legitimationsoplysninger for at fortsætte.",
+      "button": "Log ind",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "E-mailadresse",
+      "passwordLabel": "Adgangskode",
+      "passwordPlaceholder": "Adgangskode",
+      "forgotPassword": "Har du glemt din adgangskode?",
+      "rememberMe": "Husk mig",
+      "noAccount": "Har du ikke en konto?",
+      "continueWithX": "Fortsæt med X (twitter)",
+      "continueWithTelegram": "Fortsæt med Telegram",
+      "welcome": "Hej {0}!",
+      "error": "Ugyldig e-mail eller adgangskode."
+    },
+    "register": {
+      "title": "Opret konto",
+      "subtitle": "Opret din konto for at fortsætte.",
+      "button": "Tilmeld dig",
+      "firstName": "Fornavn",
+      "firstNameLabel": "Navn",
+      "emailLabel": "E-mail",
+      "emailAddress": "E-mailadresse",
+      "emailPlaceholder": "E-mailadresse",
+      "passwordLabel": "Adgangskode",
+      "passwordPlaceholder": "Adgangskode",
+      "confirmPasswordLabel": "Bekræft adgangskode",
+      "confirmPasswordPlaceholder": "Adgangskode",
+      "haveAccount": "Har du allerede en konto?",
+      "Onboarding": {
+        "title": "Fuldfør din profil",
+        "description": "Vælg din rolle og brugernavn for at fortsætte.",
+        "usernameLabel": "Brugernavn",
+        "usernamePlaceholder": "Indtast et brugernavn",
+        "roleLabel": "Rolle",
+        "rolePlaceholder": "Vælg din rolle",
+        "roles": {
+          "creator": "Skaber",
+          "fan": "Fan",
+          "vendor": "Sælger",
+          "agent": "Agent"
+        },
+        "button": "Fortsæt"
+      },
+      "KYC": {
+        "title": "Bekræft din identitet",
+        "description": "Fuldfør skaberbekræftelse for at få adgang til betjeningspanelet.",
+        "button": "Bekræft og fortsæt",
+        "logout": "Log ud og afslut"
+      }
+    },
+    "confirmEmail": {
+      "title": "Bekræft e-mail",
+      "subtitle": "Indtast den e-mail, du brugte, og den bekræftelseskode, vi sendte dig.",
+      "button": "Bekræft",
+      "buttonLoading": "Bekræfter...",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "E-mail",
+      "codeLabel": "Bekræftelseskode",
+      "codePlaceholder": "6-cifret kode",
+      "error": "Bekræftelsen mislykkedes",
+      "autoLoginError": "E-mail bekræftet, men automatisk login mislykkedes. Log venligst ind manuelt."
+    },
+    "reset": {
+      "title": "Nulstil adgangskode",
+      "subtitle": "Indtast din e-mail for at modtage en nulstillingskode.",
+      "subtitleConfirm": "Indtast den kode, du har modtaget, og en ny adgangskode.",
+      "sendCode": "Send nulstillingskode",
+      "codeLabel": "Nulstil kode",
+      "codePlaceholder": "Indtast nulstillingskode",
+      "resetButton": "Nulstil adgangskode",
+      "codeSent": "Nulstil kode sendt til din e-mail.",
+      "sendCodeError": "Kunne ikke sende koden",
+      "success": "Nulstilling af adgangskode lykkedes. Log venligst ind.",
+      "error": "Nulstilling mislykkedes"
+    },
+    "validation": {
+      "emailRequired": "E-mail er påkrævet",
+      "emailInvalid": "Indtast venligst en gyldig e-mailadresse",
+      "passwordRequired": "Adgangskode er påkrævet",
+      "passwordMinLength": "Mindst 8 tegn lang",
+      "passwordHasUpper": "Indeholder mindst 1 stort bogstav",
+      "passwordHasLower": "Indeholder mindst 1 lille bogstav",
+      "passwordHasNumber": "Indeholder mindst 1 tal",
+      "passwordHasSpecial": "Indeholder mindst 1 specialtegn",
+      "confirmPasswordRequired": "Bekræft venligst din adgangskode",
+      "confirmPasswordMatch": "Adgangskoder stemmer ikke overens",
+      "confirmPasswordMatchSuccess": "Adgangskode matcher",
+      "codeRequired": "Kode er påkrævet",
+      "roleRequired": "Rolle er påkrævet",
+      "roleSelect": "Vælg venligst en rolle",
+      "usernameRequired": "Brugernavn er påkrævet",
+      "usernameMinLength": "Brugernavn skal være på mindst 4 tegn",
+      "usernameMaxLength": "Brugernavnet skal være mindre end 100 tegn",
+      "usernameTaken": "Brugernavnet er allerede taget"
+    },
+    "common": {
+      "logout": "Log ud",
+      "loading": "Indlæser...",
+      "user": "Bruger",
+      "admin": "Admin",
+      "guest": "Gæst",
+      "showPassword": "Vis adgangskode",
+      "hidePassword": "Skjul adgangskode"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Der opstod en fejl under færdiggørelsen af din profil"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard",
+      "description": "Oversigt over din konto"
+    },
+    "actions": {
+      "editProfile": "Rediger profil",
+      "editSettings": "Rediger indstillinger",
+      "myMedia": "Mine medier",
+      "viewStats": "Se statistik"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Rediger profil",
+        "description": "Opdater dine personlige oplysninger"
+      },
+      "editSettings": {
+        "title": "Kontoindstillinger",
+        "description": "Administrer dine kontopræferencer"
+      },
+      "myMedia": {
+        "title": "Mine medier",
+        "description": "Administrer dit uploadede indhold"
+      }
+    },
+    "messages": {
+      "welcome": "Velkommen tilbage, {0}!",
+      "stats": "Du har {0} elementer"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Administrer dine profiloplysninger"
+    },
+    "form": {
+      "firstName": "Fornavn",
+      "lastName": "Efternavn",
+      "email": "Email adresse",
+      "phone": "Telefonnummer",
+      "bio": "Biografi",
+      "save": "Gem ændringer"
+    },
+    "messages": {
+      "updated": "Profilen blev opdateret",
+      "error": "Profilen kunne ikke opdateres"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Opdag",
+      "description": "Udforsk nyt indhold og funktioner"
+    },
+    "sections": {
+      "featured": "Udvalgt indhold"
+    },
+    "messages": {
+      "explore": "Begynd at udforske vores platform"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Butik",
+      "description": "Gennemse og køb produkter"
+    },
+    "sections": {
+      "products": "Produkter"
+    },
+    "messages": {
+      "comingSoon": "Flere produkter kommer snart!"
+    }
+  },
+  "common": {
+    "loading": "Indlæser...",
+    "error": "Der opstod en fejl",
+    "success": "Operation afsluttet",
+    "save": "Gem",
+    "cancel": "Annuller",
+    "delete": "Slet",
+    "edit": "Rediger",
+    "create": "Opret",
+    "update": "Opdatering",
+    "submit": "Indsend",
+    "reset": "Nulstil",
+    "back": "Gå tilbage",
+    "next": "Næste",
+    "previous": "Forrige"
+  }
+}

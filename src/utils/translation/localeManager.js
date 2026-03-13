@@ -21,7 +21,7 @@ import {
 import { getI18nInstance } from "./i18nInstance.js";
 
 // Supported locales - exported as the single source of truth
-export const SUPPORTED_LOCALES = ["en", "vi"];
+export const SUPPORTED_LOCALES = [ "af", "sq", "am", "ar", "hy", "az", "bn", "bs", "bg", "ca", "zh", "zh-tw", "hr", "cs", "da", "fa-af", "nl", "en", "et", "fa", "tl", "fi", "fr", "fr-ca", "ka", "de", "el", "gu", "ht", "ha", "he", "hi", "hu", "is", "id", "ga", "it", "ja", "kn", "kk", "ko", "lv", "lt", "mk", "ms", "ml", "mt", "mr", "mn", "no", "ps", "pl", "pt", "pt-pt", "pa", "ro", "ru", "sr", "si", "sk", "sl", "so", "es", "es-mx", "sw", "sv", "ta", "te", "th", "tr", "uk", "ur", "uz", "vi", "cy" ];
 const DEFAULT_LOCALE = "en";
 
 // Current active locale

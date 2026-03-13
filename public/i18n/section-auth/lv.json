@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Laipni lūdzam atpakaļ",
+      "subtitle": "Lai turpinātu, lūdzu, ievadiet savus akreditācijas datus.",
+      "button": "Pieteikties",
+      "emailLabel": "E-pasts",
+      "emailPlaceholder": "E-pasta adrese",
+      "passwordLabel": "Parole",
+      "passwordPlaceholder": "Parole",
+      "forgotPassword": "Aizmirsāt savu paroli?",
+      "rememberMe": "Atcerieties mani",
+      "noAccount": "Vai jums nav konta?",
+      "continueWithX": "Turpināt ar X (twitter)",
+      "continueWithTelegram": "Turpiniet ar Telegram",
+      "welcome": "Labdien, {0}!",
+      "error": "Nederīgs e-pasts vai parole."
+    },
+    "register": {
+      "title": "Izveidot kontu",
+      "subtitle": "Lai turpinātu, izveidojiet savu kontu.",
+      "button": "Reģistrēties",
+      "firstName": "Vārds",
+      "firstNameLabel": "Vārds",
+      "emailLabel": "E-pasts",
+      "emailAddress": "E-pasta adrese",
+      "emailPlaceholder": "E-pasta adrese",
+      "passwordLabel": "Parole",
+      "passwordPlaceholder": "Parole",
+      "confirmPasswordLabel": "Apstipriniet paroli",
+      "confirmPasswordPlaceholder": "Parole",
+      "haveAccount": "Vai jums jau ir konts?",
+      "Onboarding": {
+        "title": "Pabeidziet savu profilu",
+        "description": "Lai turpinātu, izvēlieties savu lomu un lietotājvārdu.",
+        "usernameLabel": "Lietotājvārds",
+        "usernamePlaceholder": "Ievadiet lietotājvārdu",
+        "roleLabel": "Loma",
+        "rolePlaceholder": "Izvēlieties savu lomu",
+        "roles": {
+          "creator": "Radītājs",
+          "fan": "Ventilators",
+          "vendor": "Pārdevējs",
+          "agent": "Aģents"
+        },
+        "button": "Turpināt"
+      },
+      "KYC": {
+        "title": "Apstipriniet savu identitāti",
+        "description": "Pabeidziet satura veidotāja verifikāciju, lai piekļūtu informācijas panelim.",
+        "button": "Apstipriniet un turpiniet",
+        "logout": "Atteikties un iziet"
+      }
+    },
+    "confirmEmail": {
+      "title": "Apstipriniet e-pastu",
+      "subtitle": "Ievadiet izmantoto e-pasta adresi un verifikācijas kodu, ko jums nosūtījām.",
+      "button": "Apstiprināt",
+      "buttonLoading": "Notiek apstiprināšana...",
+      "emailLabel": "E-pasts",
+      "emailPlaceholder": "E-pasts",
+      "codeLabel": "Apstiprinājuma kods",
+      "codePlaceholder": "6 ciparu kods",
+      "error": "Apstiprināšana neizdevās",
+      "autoLoginError": "E-pasts apstiprināts, taču automātiskā pieteikšanās neizdevās. Lūdzu, piesakieties manuāli."
+    },
+    "reset": {
+      "title": "Atiestatīt paroli",
+      "subtitle": "Ievadiet savu e-pastu, lai saņemtu atiestatīšanas kodu.",
+      "subtitleConfirm": "Ievadiet saņemto kodu un jaunu paroli.",
+      "sendCode": "Nosūtiet atiestatīšanas kodu",
+      "codeLabel": "Atiestatīt kodu",
+      "codePlaceholder": "Ievadiet atiestatīšanas kodu",
+      "resetButton": "Atiestatīt paroli",
+      "codeSent": "Atiestatīt kodu, kas nosūtīts uz jūsu e-pastu.",
+      "sendCodeError": "Neizdevās nosūtīt kodu",
+      "success": "Paroles atiestatīšana ir veiksmīga. Lūdzu, piesakieties.",
+      "error": "Atiestatīšana neizdevās"
+    },
+    "validation": {
+      "emailRequired": "Nepieciešams e-pasts",
+      "emailInvalid": "Lūdzu, ievadiet derīgu e-pasta adresi",
+      "passwordRequired": "Nepieciešama parole",
+      "passwordMinLength": "Vismaz 8 rakstzīmes garš",
+      "passwordHasUpper": "Satur vismaz 1 lielo burtu",
+      "passwordHasLower": "Satur vismaz 1 mazo burtu",
+      "passwordHasNumber": "Satur vismaz 1 ciparu",
+      "passwordHasSpecial": "Satur vismaz 1 īpašo rakstzīmi",
+      "confirmPasswordRequired": "Lūdzu, apstipriniet savu paroli",
+      "confirmPasswordMatch": "Paroles nesakrīt",
+      "confirmPasswordMatchSuccess": "Paroles atbilst",
+      "codeRequired": "Nepieciešams kods",
+      "roleRequired": "Nepieciešama loma",
+      "roleSelect": "Lūdzu, atlasiet lomu",
+      "usernameRequired": "Nepieciešams lietotājvārds",
+      "usernameMinLength": "Lietotājvārdam ir jābūt vismaz 4 rakstzīmēm",
+      "usernameMaxLength": "Lietotājvārdam ir jābūt mazākam par 100 rakstzīmēm",
+      "usernameTaken": "Lietotājvārds jau ir aizņemts"
+    },
+    "common": {
+      "logout": "Izrakstīties",
+      "loading": "Notiek ielāde...",
+      "user": "Lietotājs",
+      "admin": "Administrators",
+      "guest": "Viesis",
+      "showPassword": "Rādīt paroli",
+      "hidePassword": "Slēpt paroli"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Aizpildot jūsu profilu, radās kļūda"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Informācijas panelis",
+      "description": "Jūsu konta pārskats"
+    },
+    "actions": {
+      "editProfile": "Rediģēt profilu",
+      "editSettings": "Rediģēt iestatījumus",
+      "myMedia": "Mani mediji",
+      "viewStats": "Skatīt statistiku"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Rediģēt profilu",
+        "description": "Atjauniniet savu personisko informāciju"
+      },
+      "editSettings": {
+        "title": "Konta iestatījumi",
+        "description": "Pārvaldiet sava konta preferences"
+      },
+      "myMedia": {
+        "title": "Mani mediji",
+        "description": "Pārvaldiet savu augšupielādēto saturu"
+      }
+    },
+    "messages": {
+      "welcome": "Laipni lūdzam atpakaļ, {0}!",
+      "stats": "Jums ir {0} vienumi"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profils",
+      "description": "Pārvaldiet sava profila informāciju"
+    },
+    "form": {
+      "firstName": "Vārds",
+      "lastName": "Uzvārds",
+      "email": "E-pasta adrese",
+      "phone": "Tālruņa numurs",
+      "bio": "Biogrāfija",
+      "save": "Saglabāt izmaiņas"
+    },
+    "messages": {
+      "updated": "Profils ir veiksmīgi atjaunināts",
+      "error": "Neizdevās atjaunināt profilu"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Atklājiet",
+      "description": "Izpētiet jaunu saturu un funkcijas"
+    },
+    "sections": {
+      "featured": "Piedāvātais saturs"
+    },
+    "messages": {
+      "explore": "Sāciet izpētīt mūsu platformu"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Veikals",
+      "description": "Pārlūkojiet un iegādājieties produktus"
+    },
+    "sections": {
+      "products": "Produkti"
+    },
+    "messages": {
+      "comingSoon": "Vairāk produktu drīzumā!"
+    }
+  },
+  "common": {
+    "loading": "Notiek ielāde...",
+    "error": "Radās kļūda",
+    "success": "Operācija pabeigta",
+    "save": "Saglabāt",
+    "cancel": "Atcelt",
+    "delete": "Dzēst",
+    "edit": "Rediģēt",
+    "create": "Izveidot",
+    "update": "Atjaunināt",
+    "submit": "Iesniegt",
+    "reset": "Atiestatīt",
+    "back": "Iet atpakaļ",
+    "next": "Tālāk",
+    "previous": "Iepriekšējais"
+  }
+}

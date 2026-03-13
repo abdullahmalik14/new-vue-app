@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Croeso Nôl",
+      "subtitle": "Rhowch eich manylion adnabod i barhau.",
+      "button": "Mewngofnodi",
+      "emailLabel": "Ebost",
+      "emailPlaceholder": "Cyfeiriad e-bost",
+      "passwordLabel": "Cyfrinair",
+      "passwordPlaceholder": "Cyfrinair",
+      "forgotPassword": "Wedi anghofio eich cyfrinair?",
+      "rememberMe": "Cofiwch fi",
+      "noAccount": "Dim cyfrif?",
+      "continueWithX": "Parhewch gyda X (twitter)",
+      "continueWithTelegram": "Parhewch gyda Telegram",
+      "welcome": "Helo, {0}!",
+      "error": "E-bost neu gyfrinair annilys."
+    },
+    "register": {
+      "title": "Creu Cyfrif",
+      "subtitle": "Creu eich cyfrif i barhau.",
+      "button": "Cofrestrwch",
+      "firstName": "Enw Cyntaf",
+      "firstNameLabel": "Enw",
+      "emailLabel": "Ebost",
+      "emailAddress": "Cyfeiriad e-bost",
+      "emailPlaceholder": "Cyfeiriad e-bost",
+      "passwordLabel": "Cyfrinair",
+      "passwordPlaceholder": "Cyfrinair",
+      "confirmPasswordLabel": "Cadarnhau Cyfrinair",
+      "confirmPasswordPlaceholder": "Cyfrinair",
+      "haveAccount": "Oes gennych chi gyfrif yn barod?",
+      "Onboarding": {
+        "title": "Cwblhewch Eich Proffil",
+        "description": "Dewiswch eich rôl a'ch enw defnyddiwr i barhau.",
+        "usernameLabel": "Enw defnyddiwr",
+        "usernamePlaceholder": "Rhowch enw defnyddiwr",
+        "roleLabel": "Rôl",
+        "rolePlaceholder": "Dewiswch eich rôl",
+        "roles": {
+          "creator": "Creawdwr",
+          "fan": "Fan",
+          "vendor": "Gwerthwr",
+          "agent": "Asiant"
+        },
+        "button": "Parhewch"
+      },
+      "KYC": {
+        "title": "Gwiriwch Eich Hunaniaeth",
+        "description": "Cwblhewch ddilysiad crëwr i gael mynediad i'r dangosfwrdd.",
+        "button": "Cadarnhau ac Ymlaen",
+        "logout": "Allgofnodi ac Ymadael"
+      }
+    },
+    "confirmEmail": {
+      "title": "Cadarnhau E-bost",
+      "subtitle": "Rhowch yr e-bost a ddefnyddiwyd gennych a'r cod dilysu a anfonwyd atoch.",
+      "button": "Cadarnhau",
+      "buttonLoading": "Wrthi'n cadarnhau...",
+      "emailLabel": "Ebost",
+      "emailPlaceholder": "Ebost",
+      "codeLabel": "Cod Cadarnhau",
+      "codePlaceholder": "cod 6 digid",
+      "error": "Methodd y cadarnhad",
+      "autoLoginError": "E-bost wedi'i gadarnhau, ond methodd â mewngofnodi'n awtomatig. Mewngofnodwch â llaw."
+    },
+    "reset": {
+      "title": "Ailosod Cyfrinair",
+      "subtitle": "Rhowch eich e-bost i dderbyn cod ailosod.",
+      "subtitleConfirm": "Rhowch y cod a gawsoch a chyfrinair newydd.",
+      "sendCode": "Anfon Cod Ailosod",
+      "codeLabel": "Cod Ailosod",
+      "codePlaceholder": "Rhowch y cod ailosod",
+      "resetButton": "Ailosod Cyfrinair",
+      "codeSent": "Ailosod y cod a anfonwyd i'ch e-bost.",
+      "sendCodeError": "Wedi methu ag anfon y cod",
+      "success": "Ailosod cyfrinair yn llwyddiannus. Mewngofnodwch os gwelwch yn dda.",
+      "error": "Methodd ailosod"
+    },
+    "validation": {
+      "emailRequired": "Mae angen e-bost",
+      "emailInvalid": "Rhowch gyfeiriad e-bost dilys",
+      "passwordRequired": "Mae angen cyfrinair",
+      "passwordMinLength": "O leiaf 8 nod",
+      "passwordHasUpper": "Cynnwys o leiaf 1 llythyren fawr",
+      "passwordHasLower": "Cynnwys o leiaf 1 llythyren fach",
+      "passwordHasNumber": "Cynhwyswch o leiaf 1 rhif",
+      "passwordHasSpecial": "Cynnwys o leiaf 1 cymeriad arbennig",
+      "confirmPasswordRequired": "Cadarnhewch eich cyfrinair",
+      "confirmPasswordMatch": "Nid yw cyfrineiriau yn cyfateb",
+      "confirmPasswordMatchSuccess": "Cyfrinair yn cyfateb",
+      "codeRequired": "Mae angen cod",
+      "roleRequired": "Mae angen rôl",
+      "roleSelect": "Dewiswch rôl",
+      "usernameRequired": "Mae angen enw defnyddiwr",
+      "usernameMinLength": "Rhaid i'r enw defnyddiwr fod o leiaf 4 nod",
+      "usernameMaxLength": "Rhaid i'r enw defnyddiwr fod yn llai na 100 nod",
+      "usernameTaken": "Mae'r enw defnyddiwr eisoes wedi'i gymryd"
+    },
+    "common": {
+      "logout": "Arwyddo Allan",
+      "loading": "Wrthi'n llwytho...",
+      "user": "Defnyddiwr",
+      "admin": "Gweinyddol",
+      "guest": "Gwestai",
+      "showPassword": "Dangos cyfrinair",
+      "hidePassword": "Cuddio cyfrinair"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Bu gwall wrth gwblhau eich proffil"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dangosfwrdd",
+      "description": "Trosolwg o'ch cyfrif"
+    },
+    "actions": {
+      "editProfile": "Golygu Proffil",
+      "editSettings": "Golygu Gosodiadau",
+      "myMedia": "Fy Cyfryngau",
+      "viewStats": "Gweld Ystadegau"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Golygu Proffil",
+        "description": "Diweddarwch eich gwybodaeth bersonol"
+      },
+      "editSettings": {
+        "title": "Gosodiadau Cyfrif",
+        "description": "Rheoli eich dewisiadau cyfrif"
+      },
+      "myMedia": {
+        "title": "Fy Cyfryngau",
+        "description": "Rheoli eich cynnwys wedi'i uwchlwytho"
+      }
+    },
+    "messages": {
+      "welcome": "Croeso nôl, {0}!",
+      "stats": "Mae gennych {0} eitem"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Proffil",
+      "description": "Rheoli gwybodaeth eich proffil"
+    },
+    "form": {
+      "firstName": "Enw Cyntaf",
+      "lastName": "Enw olaf",
+      "email": "Cyfeiriad Ebost",
+      "phone": "Rhif Ffôn",
+      "bio": "Bywgraffiad Biography I thank Mr",
+      "save": "Cadw Newidiadau"
+    },
+    "messages": {
+      "updated": "Diweddarwyd y proffil yn llwyddiannus",
+      "error": "Wedi methu diweddaru'r proffil"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Darganfod",
+      "description": "Archwiliwch gynnwys a nodweddion newydd"
+    },
+    "sections": {
+      "featured": "Cynnwys Sylw"
+    },
+    "messages": {
+      "explore": "Dechreuwch archwilio ein platfform"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Siop",
+      "description": "Pori a phrynu cynhyrchion"
+    },
+    "sections": {
+      "products": "Cynhyrchion"
+    },
+    "messages": {
+      "comingSoon": "Mwy o gynhyrchion yn dod yn fuan!"
+    }
+  },
+  "common": {
+    "loading": "Wrthi'n llwytho...",
+    "error": "Digwyddodd gwall",
+    "success": "Gweithrediad wedi'i gwblhau",
+    "save": "Arbed",
+    "cancel": "Canslo",
+    "delete": "Dileu",
+    "edit": "Golygu",
+    "create": "Creu",
+    "update": "Diweddariad",
+    "submit": "Cyflwyno",
+    "reset": "Ailosod",
+    "back": "Ewch yn ôl",
+    "next": "Nesaf",
+    "previous": "Blaenorol"
+  }
+}

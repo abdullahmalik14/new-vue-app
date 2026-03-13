@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "خوش آمدید بازگشت",
+      "subtitle": "لطفا اعتبار خود را برای ادامه وارد کنید.",
+      "button": "وارد شوید",
+      "emailLabel": "ایمیل",
+      "emailPlaceholder": "آدرس ایمیل",
+      "passwordLabel": "رمز عبور",
+      "passwordPlaceholder": "رمز عبور",
+      "forgotPassword": "رمز عبور خود را فراموش کرده اید؟",
+      "rememberMe": "مرا به خاطر بسپار",
+      "noAccount": "حساب کاربری ندارید؟",
+      "continueWithX": "با X (توئیتر) ادامه دهید",
+      "continueWithTelegram": "با تلگرام ادامه دهید",
+      "welcome": "سلام، {0}!",
+      "error": "ایمیل یا رمز عبور نامعتبر است."
+    },
+    "register": {
+      "title": "ایجاد حساب کاربری",
+      "subtitle": "برای ادامه حساب کاربری خود را ایجاد کنید.",
+      "button": "ثبت نام کنید",
+      "firstName": "نام",
+      "firstNameLabel": "نام",
+      "emailLabel": "ایمیل",
+      "emailAddress": "آدرس ایمیل",
+      "emailPlaceholder": "آدرس ایمیل",
+      "passwordLabel": "رمز عبور",
+      "passwordPlaceholder": "رمز عبور",
+      "confirmPasswordLabel": "رمز عبور را تایید کنید",
+      "confirmPasswordPlaceholder": "رمز عبور",
+      "haveAccount": "از قبل حساب کاربری دارید؟",
+      "Onboarding": {
+        "title": "نمایه خود را تکمیل کنید",
+        "description": "برای ادامه نقش و نام کاربری خود را انتخاب کنید.",
+        "usernameLabel": "نام کاربری",
+        "usernamePlaceholder": "یک نام کاربری وارد کنید",
+        "roleLabel": "نقش",
+        "rolePlaceholder": "نقش خود را انتخاب کنید",
+        "roles": {
+          "creator": "خالق",
+          "fan": "فن",
+          "vendor": "فروشنده",
+          "agent": "عامل"
+        },
+        "button": "ادامه دهید"
+      },
+      "KYC": {
+        "title": "هویت خود را تأیید کنید",
+        "description": "برای دسترسی به داشبورد، تأیید سازنده را کامل کنید.",
+        "button": "تایید و ادامه",
+        "logout": "خروج و خروج"
+      }
+    },
+    "confirmEmail": {
+      "title": "تایید ایمیل",
+      "subtitle": "ایمیلی که استفاده کردید و کد تأییدی که برایتان فرستادیم را وارد کنید.",
+      "button": "تایید کنید",
+      "buttonLoading": "در حال تایید...",
+      "emailLabel": "ایمیل",
+      "emailPlaceholder": "ایمیل",
+      "codeLabel": "کد تایید",
+      "codePlaceholder": "کد 6 رقمی",
+      "error": "تأیید ناموفق بود",
+      "autoLoginError": "ایمیل تأیید شد، اما ورود خودکار انجام نشد. لطفا به صورت دستی وارد شوید"
+    },
+    "reset": {
+      "title": "بازنشانی رمز عبور",
+      "subtitle": "برای دریافت کد ریست ایمیل خود را وارد کنید.",
+      "subtitleConfirm": "کد دریافتی و رمز عبور جدید را وارد کنید.",
+      "sendCode": "ارسال کد بازنشانی",
+      "codeLabel": "کد را بازنشانی کنید",
+      "codePlaceholder": "کد ریست را وارد کنید",
+      "resetButton": "بازنشانی رمز عبور",
+      "codeSent": "کد ارسال شده به ایمیل شما را بازنشانی کنید.",
+      "sendCodeError": "کد ارسال نشد",
+      "success": "بازنشانی رمز عبور با موفقیت انجام شد. لطفا وارد شوید",
+      "error": "بازنشانی انجام نشد"
+    },
+    "validation": {
+      "emailRequired": "ایمیل مورد نیاز است",
+      "emailInvalid": "لطفا یک آدرس ایمیل معتبر وارد کنید",
+      "passwordRequired": "رمز عبور لازم است",
+      "passwordMinLength": "حداقل 8 کاراکتر",
+      "passwordHasUpper": "حداقل دارای 1 حرف بزرگ باشد",
+      "passwordHasLower": "حداقل دارای 1 حرف کوچک باشد",
+      "passwordHasNumber": "حداقل شامل 1 عدد باشد",
+      "passwordHasSpecial": "حداقل دارای 1 نویسه خاص باشد",
+      "confirmPasswordRequired": "لطفا رمز عبور خود را تایید کنید",
+      "confirmPasswordMatch": "گذرواژه ها مطابقت ندارند",
+      "confirmPasswordMatchSuccess": "رمز عبور مطابقت دارد",
+      "codeRequired": "کد مورد نیاز است",
+      "roleRequired": "نقش مورد نیاز است",
+      "roleSelect": "لطفا یک نقش را انتخاب کنید",
+      "usernameRequired": "نام کاربری مورد نیاز است",
+      "usernameMinLength": "نام کاربری باید حداقل 4 کاراکتر باشد",
+      "usernameMaxLength": "نام کاربری باید کمتر از 100 کاراکتر باشد",
+      "usernameTaken": "نام کاربری قبلاً گرفته شده است"
+    },
+    "common": {
+      "logout": "از سیستم خارج شوید",
+      "loading": "در حال بارگیری...",
+      "user": "کاربر",
+      "admin": "مدیر",
+      "guest": "مهمان",
+      "showPassword": "نمایش رمز عبور",
+      "hidePassword": "پنهان کردن رمز عبور"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "هنگام تکمیل نمایه شما خطایی روی داد"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "داشبورد",
+      "description": "نمای کلی حساب شما"
+    },
+    "actions": {
+      "editProfile": "ویرایش نمایه",
+      "editSettings": "ویرایش تنظیمات",
+      "myMedia": "رسانه من",
+      "viewStats": "مشاهده آمار"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "ویرایش نمایه",
+        "description": "اطلاعات شخصی خود را به روز کنید"
+      },
+      "editSettings": {
+        "title": "تنظیمات حساب",
+        "description": "تنظیمات برگزیده حساب خود را مدیریت کنید"
+      },
+      "myMedia": {
+        "title": "رسانه من",
+        "description": "محتوای آپلود شده خود را مدیریت کنید"
+      }
+    },
+    "messages": {
+      "welcome": "خوش آمدید، {0}!",
+      "stats": "شما {0} مورد دارید"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "نمایه",
+      "description": "اطلاعات پروفایل خود را مدیریت کنید"
+    },
+    "form": {
+      "firstName": "نام",
+      "lastName": "نام خانوادگی",
+      "email": "آدرس ایمیل",
+      "phone": "شماره تلفن",
+      "bio": "بیوگرافی",
+      "save": "ذخیره تغییرات"
+    },
+    "messages": {
+      "updated": "نمایه با موفقیت به روز شد",
+      "error": "نمایه به‌روزرسانی نشد"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "کشف کنید",
+      "description": "مطالب و ویژگی های جدید را کاوش کنید"
+    },
+    "sections": {
+      "featured": "محتوای ویژه"
+    },
+    "messages": {
+      "explore": "شروع به کاوش در پلت فرم ما کنید"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "خرید کنید",
+      "description": "مرور و خرید محصولات"
+    },
+    "sections": {
+      "products": "محصولات"
+    },
+    "messages": {
+      "comingSoon": "محصولات بیشتر به زودی!"
+    }
+  },
+  "common": {
+    "loading": "در حال بارگیری...",
+    "error": "خطایی رخ داد",
+    "success": "عملیات تکمیل شد",
+    "save": "ذخیره کنید",
+    "cancel": "لغو کنید",
+    "delete": "حذف کنید",
+    "edit": "ویرایش کنید",
+    "create": "ایجاد کنید",
+    "update": "به روز رسانی",
+    "submit": "ارسال کنید",
+    "reset": "بازنشانی کنید",
+    "back": "به عقب برگرد",
+    "next": "بعدی",
+    "previous": "قبلی"
+  }
+}

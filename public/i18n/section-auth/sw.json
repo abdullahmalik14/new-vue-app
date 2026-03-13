@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Karibu tena",
+      "subtitle": "Tafadhali weka kitambulisho chako ili kuendelea.",
+      "button": "Ingia",
+      "emailLabel": "Barua pepe",
+      "emailPlaceholder": "Anwani ya barua pepe",
+      "passwordLabel": "Nenosiri",
+      "passwordPlaceholder": "Nenosiri",
+      "forgotPassword": "Umesahau nenosiri lako?",
+      "rememberMe": "Nikumbuke",
+      "noAccount": "Je, huna akaunti?",
+      "continueWithX": "Endelea na X (twitter)",
+      "continueWithTelegram": "Endelea na Telegram",
+      "welcome": "Hujambo, {0}!",
+      "error": "Barua pepe au nenosiri batili."
+    },
+    "register": {
+      "title": "Fungua Akaunti",
+      "subtitle": "Fungua akaunti yako ili kuendelea.",
+      "button": "Jisajili",
+      "firstName": "Jina la kwanza",
+      "firstNameLabel": "Jina",
+      "emailLabel": "Barua pepe",
+      "emailAddress": "Anwani ya barua pepe",
+      "emailPlaceholder": "Anwani ya barua pepe",
+      "passwordLabel": "Nenosiri",
+      "passwordPlaceholder": "Nenosiri",
+      "confirmPasswordLabel": "Thibitisha Nenosiri",
+      "confirmPasswordPlaceholder": "Nenosiri",
+      "haveAccount": "Je, tayari una akaunti?",
+      "Onboarding": {
+        "title": "Kamilisha Wasifu Wako",
+        "description": "Chagua jukumu lako na jina la mtumiaji ili kuendelea.",
+        "usernameLabel": "Jina la mtumiaji",
+        "usernamePlaceholder": "Weka jina la mtumiaji",
+        "roleLabel": "Jukumu",
+        "rolePlaceholder": "Chagua jukumu lako",
+        "roles": {
+          "creator": "Muumba",
+          "fan": "Shabiki",
+          "vendor": "Mchuuzi",
+          "agent": "Wakala"
+        },
+        "button": "Endelea"
+      },
+      "KYC": {
+        "title": "Thibitisha Utambulisho Wako",
+        "description": "Kamilisha uthibitishaji wa mtayarishi ili kufikia dashibodi.",
+        "button": "Thibitisha na Uendelee",
+        "logout": "Ondoka na Uondoke"
+      }
+    },
+    "confirmEmail": {
+      "title": "Thibitisha Barua pepe",
+      "subtitle": "Weka barua pepe uliyotumia na nambari ya kuthibitisha tuliyokutumia.",
+      "button": "Thibitisha",
+      "buttonLoading": "Inathibitisha...",
+      "emailLabel": "Barua pepe",
+      "emailPlaceholder": "Barua pepe",
+      "codeLabel": "Msimbo wa Uthibitishaji",
+      "codePlaceholder": "Msimbo wa tarakimu 6",
+      "error": "Imeshindwa kuthibitisha",
+      "autoLoginError": "Barua pepe imethibitishwa, lakini kuingia kiotomatiki kumeshindwa. Tafadhali ingia wewe mwenyewe."
+    },
+    "reset": {
+      "title": "Weka upya Nenosiri",
+      "subtitle": "Weka barua pepe yako ili kupokea msimbo wa kuweka upya.",
+      "subtitleConfirm": "Ingiza msimbo uliopokea na nenosiri mpya.",
+      "sendCode": "Tuma Msimbo wa Kuweka Upya",
+      "codeLabel": "Weka upya Msimbo",
+      "codePlaceholder": "Weka msimbo wa kuweka upya",
+      "resetButton": "Weka upya Nenosiri",
+      "codeSent": "Weka upya msimbo uliotumwa kwa barua pepe yako.",
+      "sendCodeError": "Imeshindwa kutuma msimbo",
+      "success": "Uwekaji upya nenosiri umefaulu. Tafadhali ingia.",
+      "error": "Imeshindwa kuweka upya"
+    },
+    "validation": {
+      "emailRequired": "Barua pepe inahitajika",
+      "emailInvalid": "Tafadhali weka barua pepe halali",
+      "passwordRequired": "Nenosiri linahitajika",
+      "passwordMinLength": "Angalau urefu wa vibambo 8",
+      "passwordHasUpper": "Ina angalau herufi 1 kubwa",
+      "passwordHasLower": "Ina angalau herufi 1 ndogo",
+      "passwordHasNumber": "Ina angalau nambari 1",
+      "passwordHasSpecial": "Ina angalau herufi 1 maalum",
+      "confirmPasswordRequired": "Tafadhali thibitisha nenosiri lako",
+      "confirmPasswordMatch": "Manenosiri hayalingani",
+      "confirmPasswordMatchSuccess": "Nenosiri linalingana",
+      "codeRequired": "Msimbo unahitajika",
+      "roleRequired": "Jukumu linahitajika",
+      "roleSelect": "Tafadhali chagua jukumu",
+      "usernameRequired": "Jina la mtumiaji linahitajika",
+      "usernameMinLength": "Jina la mtumiaji lazima liwe na angalau vibambo 4",
+      "usernameMaxLength": "Jina la mtumiaji lazima liwe chini ya herufi 100",
+      "usernameTaken": "Jina la mtumiaji tayari limechukuliwa"
+    },
+    "common": {
+      "logout": "Ondoka",
+      "loading": "Inapakia...",
+      "user": "Mtumiaji",
+      "admin": "Msimamizi",
+      "guest": "Mgeni",
+      "showPassword": "Onyesha nenosiri",
+      "hidePassword": "Ficha nenosiri"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Hitilafu ilitokea wakati wa kukamilisha wasifu wako"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashibodi",
+      "description": "Muhtasari wa akaunti yako"
+    },
+    "actions": {
+      "editProfile": "Badilisha Wasifu",
+      "editSettings": "Badilisha Mipangilio",
+      "myMedia": "Vyombo vya Habari Vyangu",
+      "viewStats": "Tazama Takwimu"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Badilisha Wasifu",
+        "description": "Sasisha maelezo yako ya kibinafsi"
+      },
+      "editSettings": {
+        "title": "Mipangilio ya Akaunti",
+        "description": "Dhibiti mapendeleo ya akaunti yako"
+      },
+      "myMedia": {
+        "title": "Vyombo vya Habari Vyangu",
+        "description": "Dhibiti maudhui yako uliyopakia"
+      }
+    },
+    "messages": {
+      "welcome": "Karibu tena, {0}!",
+      "stats": "Una vipengee {0}"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Wasifu",
+      "description": "Dhibiti maelezo yako ya wasifu"
+    },
+    "form": {
+      "firstName": "Jina la kwanza",
+      "lastName": "Jina la mwisho",
+      "email": "Anwani ya Barua Pepe",
+      "phone": "Nambari ya Simu",
+      "bio": "Wasifu",
+      "save": "Hifadhi Mabadiliko"
+    },
+    "messages": {
+      "updated": "Wasifu umesasishwa",
+      "error": "Imeshindwa kusasisha wasifu"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Gundua",
+      "description": "Gundua maudhui na vipengele vipya"
+    },
+    "sections": {
+      "featured": "Maudhui Yaliyoangaziwa"
+    },
+    "messages": {
+      "explore": "Anza kuvinjari jukwaa letu"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Duka",
+      "description": "Vinjari na ununue bidhaa"
+    },
+    "sections": {
+      "products": "Bidhaa"
+    },
+    "messages": {
+      "comingSoon": "Bidhaa zaidi zinakuja hivi karibuni!"
+    }
+  },
+  "common": {
+    "loading": "Inapakia...",
+    "error": "Hitilafu imetokea",
+    "success": "Operesheni imekamilika",
+    "save": "Hifadhi",
+    "cancel": "Ghairi",
+    "delete": "Futa",
+    "edit": "Hariri",
+    "create": "Unda",
+    "update": "Sasisha",
+    "submit": "Wasilisha",
+    "reset": "Weka upya",
+    "back": "Rudi Nyuma",
+    "next": "Inayofuata",
+    "previous": "Iliyotangulia"
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Maligayang Pagbabalik",
+      "subtitle": "Mangyaring ipasok ang iyong mga kredensyal upang magpatuloy.",
+      "button": "Mag-log In",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email address",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password",
+      "forgotPassword": "Nakalimutan mo ang iyong password?",
+      "rememberMe": "Tandaan mo ako",
+      "noAccount": "Walang account?",
+      "continueWithX": "Magpatuloy sa X (twitter)",
+      "continueWithTelegram": "Magpatuloy sa Telegram",
+      "welcome": "Kumusta, {0}!",
+      "error": "Di-wastong email o password."
+    },
+    "register": {
+      "title": "Lumikha ng Account",
+      "subtitle": "Lumikha ng iyong account upang magpatuloy.",
+      "button": "Mag-sign Up",
+      "firstName": "Unang Pangalan",
+      "firstNameLabel": "Pangalan",
+      "emailLabel": "Email",
+      "emailAddress": "Email address",
+      "emailPlaceholder": "Email address",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password",
+      "confirmPasswordLabel": "Kumpirmahin ang Password",
+      "confirmPasswordPlaceholder": "Password",
+      "haveAccount": "Mayroon ka nang account?",
+      "Onboarding": {
+        "title": "Kumpletuhin ang Iyong Profile",
+        "description": "Piliin ang iyong tungkulin at username upang magpatuloy.",
+        "usernameLabel": "Username",
+        "usernamePlaceholder": "Maglagay ng username",
+        "roleLabel": "Tungkulin",
+        "rolePlaceholder": "Piliin ang iyong tungkulin",
+        "roles": {
+          "creator": "Tagapaglikha",
+          "fan": "Fan",
+          "vendor": "Nagtitinda",
+          "agent": "Ahente"
+        },
+        "button": "Magpatuloy"
+      },
+      "KYC": {
+        "title": "I-verify ang Iyong Pagkakakilanlan",
+        "description": "Kumpletuhin ang pag-verify ng creator para ma-access ang dashboard.",
+        "button": "Kumpirmahin at Magpatuloy",
+        "logout": "Mag-logout at Lumabas"
+      }
+    },
+    "confirmEmail": {
+      "title": "Kumpirmahin ang Email",
+      "subtitle": "Ilagay ang email na ginamit mo at ang verification code na ipinadala namin sa iyo.",
+      "button": "Kumpirmahin",
+      "buttonLoading": "Kinukumpirma...",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "codeLabel": "Code ng Pagkumpirma",
+      "codePlaceholder": "6-digit na code",
+      "error": "Nabigo ang pagkumpirma",
+      "autoLoginError": "Nakumpirma ang email, ngunit nabigo ang auto-login. Mangyaring mag-log in nang manu-mano."
+    },
+    "reset": {
+      "title": "I-reset ang Password",
+      "subtitle": "Ilagay ang iyong email para makatanggap ng reset code.",
+      "subtitleConfirm": "Ilagay ang code na iyong natanggap at isang bagong password.",
+      "sendCode": "Ipadala ang Reset Code",
+      "codeLabel": "I-reset ang Code",
+      "codePlaceholder": "Ilagay ang reset code",
+      "resetButton": "I-reset ang Password",
+      "codeSent": "I-reset ang code na ipinadala sa iyong email.",
+      "sendCodeError": "Nabigong magpadala ng code",
+      "success": "Matagumpay ang pag-reset ng password. Mangyaring mag-log in.",
+      "error": "Nabigo ang pag-reset"
+    },
+    "validation": {
+      "emailRequired": "Kinakailangan ang email",
+      "emailInvalid": "Mangyaring magpasok ng wastong email address",
+      "passwordRequired": "Kinakailangan ang password",
+      "passwordMinLength": "Hindi bababa sa 8 character ang haba",
+      "passwordHasUpper": "Maglaman ng hindi bababa sa 1 malaking titik",
+      "passwordHasLower": "Naglalaman ng hindi bababa sa 1 maliit na titik",
+      "passwordHasNumber": "Naglalaman ng hindi bababa sa 1 numero",
+      "passwordHasSpecial": "Naglalaman ng hindi bababa sa 1 espesyal na character",
+      "confirmPasswordRequired": "Pakikumpirma ang iyong password",
+      "confirmPasswordMatch": "Hindi tugma ang mga password",
+      "confirmPasswordMatchSuccess": "Mga tugma ng password",
+      "codeRequired": "Kinakailangan ang code",
+      "roleRequired": "Kinakailangan ang tungkulin",
+      "roleSelect": "Mangyaring pumili ng isang tungkulin",
+      "usernameRequired": "Kinakailangan ang username",
+      "usernameMinLength": "Dapat na hindi bababa sa 4 na character ang username",
+      "usernameMaxLength": "Dapat mas mababa sa 100 character ang username",
+      "usernameTaken": "Nakuha na ang username"
+    },
+    "common": {
+      "logout": "Mag-sign Out",
+      "loading": "Naglo-load...",
+      "user": "Gumagamit",
+      "admin": "Admin",
+      "guest": "panauhin",
+      "showPassword": "Ipakita ang password",
+      "hidePassword": "Itago ang password"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "May naganap na error habang kinukumpleto ang iyong profile"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard",
+      "description": "Pangkalahatang-ideya ng iyong account"
+    },
+    "actions": {
+      "editProfile": "I-edit ang Profile",
+      "editSettings": "I-edit ang Mga Setting",
+      "myMedia": "Aking Media",
+      "viewStats": "Tingnan ang Istatistika"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "I-edit ang Profile",
+        "description": "I-update ang iyong personal na impormasyon"
+      },
+      "editSettings": {
+        "title": "Mga Setting ng Account",
+        "description": "Pamahalaan ang iyong mga kagustuhan sa account"
+      },
+      "myMedia": {
+        "title": "Aking Media",
+        "description": "Pamahalaan ang iyong na-upload na nilalaman"
+      }
+    },
+    "messages": {
+      "welcome": "Maligayang pagbabalik, {0}!",
+      "stats": "Mayroon kang {0} (na) item"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profile",
+      "description": "Pamahalaan ang iyong impormasyon sa profile"
+    },
+    "form": {
+      "firstName": "Unang Pangalan",
+      "lastName": "Apelyido",
+      "email": "Email Address",
+      "phone": "Numero ng Telepono",
+      "bio": "Talambuhay",
+      "save": "I-save ang Mga Pagbabago"
+    },
+    "messages": {
+      "updated": "Matagumpay na na-update ang profile",
+      "error": "Nabigong i-update ang profile"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Tuklasin",
+      "description": "Mag-explore ng bagong content at feature"
+    },
+    "sections": {
+      "featured": "Itinatampok na Nilalaman"
+    },
+    "messages": {
+      "explore": "Simulan ang paggalugad sa aming platform"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Mamili",
+      "description": "Mag-browse at bumili ng mga produkto"
+    },
+    "sections": {
+      "products": "Mga produkto"
+    },
+    "messages": {
+      "comingSoon": "Higit pang mga produkto na paparating na!"
+    }
+  },
+  "common": {
+    "loading": "Naglo-load...",
+    "error": "May naganap na error",
+    "success": "Nakumpleto ang operasyon",
+    "save": "I-save",
+    "cancel": "Kanselahin",
+    "delete": "Tanggalin",
+    "edit": "I-edit",
+    "create": "Lumikha",
+    "update": "Update",
+    "submit": "Isumite",
+    "reset": "I-reset",
+    "back": "Bumalik ka",
+    "next": "Susunod",
+    "previous": "Nakaraang"
+  }
+}

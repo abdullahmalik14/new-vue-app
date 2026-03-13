@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "ยินดีต้อนรับกลับ",
+      "subtitle": "กรุณาป้อนข้อมูลประจำตัวของคุณเพื่อดำเนินการต่อ",
+      "button": "เข้าสู่ระบบ",
+      "emailLabel": "อีเมล",
+      "emailPlaceholder": "ที่อยู่อีเมล",
+      "passwordLabel": "รหัสผ่าน",
+      "passwordPlaceholder": "รหัสผ่าน",
+      "forgotPassword": "ลืมรหัสผ่าน?",
+      "rememberMe": "จำฉันไว้",
+      "noAccount": "ยังไม่มีบัญชี?",
+      "continueWithX": "ต่อด้วย X (ทวิตเตอร์)",
+      "continueWithTelegram": "ดำเนินการต่อด้วยโทรเลข",
+      "welcome": "สวัสดี {0}!",
+      "error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
+    },
+    "register": {
+      "title": "สร้างบัญชี",
+      "subtitle": "สร้างบัญชีของคุณเพื่อดำเนินการต่อ",
+      "button": "ลงทะเบียน",
+      "firstName": "ชื่อ",
+      "firstNameLabel": "ชื่อ",
+      "emailLabel": "อีเมล",
+      "emailAddress": "ที่อยู่อีเมล",
+      "emailPlaceholder": "ที่อยู่อีเมล",
+      "passwordLabel": "รหัสผ่าน",
+      "passwordPlaceholder": "รหัสผ่าน",
+      "confirmPasswordLabel": "ยืนยันรหัสผ่าน",
+      "confirmPasswordPlaceholder": "รหัสผ่าน",
+      "haveAccount": "มีบัญชีอยู่แล้ว?",
+      "Onboarding": {
+        "title": "กรอกโปรไฟล์ของคุณให้สมบูรณ์",
+        "description": "เลือกบทบาทและชื่อผู้ใช้ของคุณเพื่อดำเนินการต่อ",
+        "usernameLabel": "ชื่อผู้ใช้",
+        "usernamePlaceholder": "ป้อนชื่อผู้ใช้",
+        "roleLabel": "บทบาท",
+        "rolePlaceholder": "เลือกบทบาทของคุณ",
+        "roles": {
+          "creator": "ผู้สร้าง",
+          "fan": "พัดลม",
+          "vendor": "ผู้ขาย",
+          "agent": "ตัวแทน"
+        },
+        "button": "ดำเนินการต่อ"
+      },
+      "KYC": {
+        "title": "ยืนยันตัวตนของคุณ",
+        "description": "ยืนยันผู้สร้างให้เสร็จสิ้นเพื่อเข้าถึงแดชบอร์ด",
+        "button": "ยืนยันและดำเนินการต่อ",
+        "logout": "ออกจากระบบและออก"
+      }
+    },
+    "confirmEmail": {
+      "title": "ยืนยันอีเมล",
+      "subtitle": "กรอกอีเมลที่คุณใช้และรหัสยืนยันที่เราส่งให้คุณ",
+      "button": "ยืนยัน",
+      "buttonLoading": "กำลังยืนยัน...",
+      "emailLabel": "อีเมล",
+      "emailPlaceholder": "อีเมล",
+      "codeLabel": "รหัสยืนยัน",
+      "codePlaceholder": "รหัส 6 หลัก",
+      "error": "การยืนยันล้มเหลว",
+      "autoLoginError": "ยืนยันอีเมลแล้ว แต่การเข้าสู่ระบบอัตโนมัติล้มเหลว กรุณาเข้าสู่ระบบด้วยตนเอง"
+    },
+    "reset": {
+      "title": "รีเซ็ตรหัสผ่าน",
+      "subtitle": "กรอกอีเมลของคุณเพื่อรับรหัสรีเซ็ต",
+      "subtitleConfirm": "ป้อนรหัสที่คุณได้รับและรหัสผ่านใหม่",
+      "sendCode": "ส่งรหัสรีเซ็ต",
+      "codeLabel": "รีเซ็ตรหัส",
+      "codePlaceholder": "ป้อนรหัสรีเซ็ต",
+      "resetButton": "รีเซ็ตรหัสผ่าน",
+      "codeSent": "รีเซ็ตรหัสที่ส่งไปยังอีเมลของคุณ",
+      "sendCodeError": "ไม่สามารถส่งรหัสได้",
+      "success": "รีเซ็ตรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบ.",
+      "error": "การรีเซ็ตล้มเหลว"
+    },
+    "validation": {
+      "emailRequired": "จำเป็นต้องระบุอีเมล",
+      "emailInvalid": "กรุณากรอกที่อยู่อีเมลที่ถูกต้อง",
+      "passwordRequired": "ต้องใช้รหัสผ่าน",
+      "passwordMinLength": "มีความยาวอย่างน้อย 8 ตัวอักษร",
+      "passwordHasUpper": "มีอักษรตัวพิมพ์ใหญ่อย่างน้อย 1 ตัว",
+      "passwordHasLower": "มีตัวอักษรพิมพ์เล็กอย่างน้อย 1 ตัว",
+      "passwordHasNumber": "มีอย่างน้อย 1 หมายเลข",
+      "passwordHasSpecial": "มีอักขระพิเศษอย่างน้อย 1 ตัว",
+      "confirmPasswordRequired": "กรุณายืนยันรหัสผ่านของคุณ",
+      "confirmPasswordMatch": "รหัสผ่านไม่ตรงกัน",
+      "confirmPasswordMatchSuccess": "รหัสผ่านตรงกัน",
+      "codeRequired": "จำเป็นต้องระบุรหัส",
+      "roleRequired": "ต้องระบุบทบาท",
+      "roleSelect": "โปรดเลือกบทบาท",
+      "usernameRequired": "ชื่อผู้ใช้ เป็นสิ่งจำเป็น",
+      "usernameMinLength": "ชื่อผู้ใช้ต้องมีอย่างน้อย 4 ตัวอักษร",
+      "usernameMaxLength": "ชื่อผู้ใช้ต้องมีอักขระน้อยกว่า 100 ตัว",
+      "usernameTaken": "ชื่อผู้ใช้ถูกใช้ไปแล้ว"
+    },
+    "common": {
+      "logout": "ออกจากระบบ",
+      "loading": "กำลังโหลด...",
+      "user": "ผู้ใช้",
+      "admin": "ผู้ดูแลระบบ",
+      "guest": "แขก",
+      "showPassword": "แสดงรหัสผ่าน",
+      "hidePassword": "ซ่อนรหัสผ่าน"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "เกิดข้อผิดพลาดขณะกรอกโปรไฟล์ของคุณ"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "แดชบอร์ด",
+      "description": "ภาพรวมบัญชีของคุณ"
+    },
+    "actions": {
+      "editProfile": "แก้ไขโปรไฟล์",
+      "editSettings": "แก้ไขการตั้งค่า",
+      "myMedia": "สื่อของฉัน",
+      "viewStats": "ดูสถิติ"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "แก้ไขโปรไฟล์",
+        "description": "อัปเดตข้อมูลส่วนบุคคลของคุณ"
+      },
+      "editSettings": {
+        "title": "การตั้งค่าบัญชี",
+        "description": "จัดการการตั้งค่าบัญชีของคุณ"
+      },
+      "myMedia": {
+        "title": "สื่อของฉัน",
+        "description": "จัดการเนื้อหาที่คุณอัปโหลด"
+      }
+    },
+    "messages": {
+      "welcome": "ยินดีต้อนรับกลับมา {0}!",
+      "stats": "คุณมี {0} รายการ"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "โปรไฟล์",
+      "description": "จัดการข้อมูลโปรไฟล์ของคุณ"
+    },
+    "form": {
+      "firstName": "ชื่อ",
+      "lastName": "นามสกุล",
+      "email": "ที่อยู่อีเมล",
+      "phone": "หมายเลขโทรศัพท์",
+      "bio": "ชีวประวัติ",
+      "save": "บันทึกการเปลี่ยนแปลง"
+    },
+    "messages": {
+      "updated": "อัปเดตโปรไฟล์สำเร็จแล้ว",
+      "error": "ไม่สามารถอัปเดตโปรไฟล์ได้"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "ค้นพบ",
+      "description": "สำรวจเนื้อหาและคุณสมบัติใหม่"
+    },
+    "sections": {
+      "featured": "เนื้อหาเด่น"
+    },
+    "messages": {
+      "explore": "เริ่มสำรวจแพลตฟอร์มของเรา"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "ร้านค้า",
+      "description": "เรียกดูและซื้อผลิตภัณฑ์"
+    },
+    "sections": {
+      "products": "สินค้า"
+    },
+    "messages": {
+      "comingSoon": "สินค้าเพิ่มเติมเร็ว ๆ นี้!"
+    }
+  },
+  "common": {
+    "loading": "กำลังโหลด...",
+    "error": "เกิดข้อผิดพลาด",
+    "success": "การดำเนินการเสร็จสมบูรณ์",
+    "save": "บันทึก",
+    "cancel": "ยกเลิก",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "create": "สร้าง",
+    "update": "อัปเดต",
+    "submit": "ส่ง",
+    "reset": "รีเซ็ต",
+    "back": "กลับไป",
+    "next": "ถัดไป",
+    "previous": "ก่อนหน้า"
+  }
+}

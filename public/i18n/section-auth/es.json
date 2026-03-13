@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Por favor ingrese sus credenciales para continuar.",
+      "button": "Iniciar sesión",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "Dirección de correo electrónico",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Contraseña",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "rememberMe": "Recuérdame",
+      "noAccount": "¿No tienes una cuenta?",
+      "continueWithX": "Continuar con X (twitter)",
+      "continueWithTelegram": "Continuar con Telegrama",
+      "welcome": "¡Hola, {0}!",
+      "error": "Correo electrónico o contraseña no válidos."
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "subtitle": "Crea tu cuenta para continuar.",
+      "button": "Regístrate",
+      "firstName": "Nombre",
+      "firstNameLabel": "Nombre",
+      "emailLabel": "Correo electrónico",
+      "emailAddress": "Dirección de correo electrónico",
+      "emailPlaceholder": "Dirección de correo electrónico",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Contraseña",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Contraseña",
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "Onboarding": {
+        "title": "Completa tu perfil",
+        "description": "Elija su rol y nombre de usuario para continuar.",
+        "usernameLabel": "Nombre de usuario",
+        "usernamePlaceholder": "Introduzca un nombre de usuario",
+        "roleLabel": "Rol",
+        "rolePlaceholder": "Selecciona tu rol",
+        "roles": {
+          "creator": "Creador",
+          "fan": "ventilador",
+          "vendor": "vendedor",
+          "agent": "Agente"
+        },
+        "button": "Continuar"
+      },
+      "KYC": {
+        "title": "Verifique su identidad",
+        "description": "Complete la verificación del creador para acceder al panel.",
+        "button": "Confirmar y continuar",
+        "logout": "Cerrar sesión y salir"
+      }
+    },
+    "confirmEmail": {
+      "title": "Confirmar correo electrónico",
+      "subtitle": "Ingresa el correo electrónico que utilizaste y el código de verificación que te enviamos.",
+      "button": "Confirmar",
+      "buttonLoading": "Confirmando...",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "Correo electrónico",
+      "codeLabel": "Código de confirmación",
+      "codePlaceholder": "código de 6 dígitos",
+      "error": "Error de confirmación",
+      "autoLoginError": "Correo electrónico confirmado, pero falló el inicio de sesión automático. Por favor inicie sesión manualmente."
+    },
+    "reset": {
+      "title": "Restablecer contraseña",
+      "subtitle": "Ingrese su correo electrónico para recibir un código de reinicio.",
+      "subtitleConfirm": "Ingrese el código que recibió y una nueva contraseña.",
+      "sendCode": "Enviar código de reinicio",
+      "codeLabel": "Restablecer código",
+      "codePlaceholder": "Ingrese el código de reinicio",
+      "resetButton": "Restablecer contraseña",
+      "codeSent": "Código de reinicio enviado a su correo electrónico.",
+      "sendCodeError": "No se pudo enviar el código",
+      "success": "Restablecimiento de contraseña exitoso. Por favor inicia sesión.",
+      "error": "Error al restablecer"
+    },
+    "validation": {
+      "emailRequired": "Se requiere correo electrónico",
+      "emailInvalid": "Por favor introduce una dirección de correo electrónico válida",
+      "passwordRequired": "Se requiere contraseña",
+      "passwordMinLength": "Al menos 8 caracteres",
+      "passwordHasUpper": "Contener al menos 1 letra mayúscula",
+      "passwordHasLower": "Contener al menos 1 letra minúscula",
+      "passwordHasNumber": "Contiene al menos 1 número",
+      "passwordHasSpecial": "Contener al menos 1 carácter especial",
+      "confirmPasswordRequired": "Por favor confirma tu contraseña",
+      "confirmPasswordMatch": "Las contraseñas no coinciden",
+      "confirmPasswordMatchSuccess": "Coincidencias de contraseña",
+      "codeRequired": "Se requiere código",
+      "roleRequired": "Se requiere rol",
+      "roleSelect": "Por favor seleccione un rol",
+      "usernameRequired": "El nombre de usuario es obligatorio",
+      "usernameMinLength": "El nombre de usuario debe tener al menos 4 caracteres.",
+      "usernameMaxLength": "El nombre de usuario debe tener menos de 100 caracteres.",
+      "usernameTaken": "El nombre de usuario ya está en uso"
+    },
+    "common": {
+      "logout": "Cerrar sesión",
+      "loading": "Cargando...",
+      "user": "Usuario",
+      "admin": "administrador",
+      "guest": "Invitado",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Se produjo un error al completar su perfil."
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Panel de control",
+      "description": "Resumen de su cuenta"
+    },
+    "actions": {
+      "editProfile": "Editar perfil",
+      "editSettings": "Editar configuración",
+      "myMedia": "Mis medios",
+      "viewStats": "Ver estadísticas"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Editar perfil",
+        "description": "Actualiza tu información personal"
+      },
+      "editSettings": {
+        "title": "Configuración de cuenta",
+        "description": "Administre las preferencias de su cuenta"
+      },
+      "myMedia": {
+        "title": "Mis medios",
+        "description": "Administra tu contenido subido"
+      }
+    },
+    "messages": {
+      "welcome": "¡Bienvenido de nuevo, {0}!",
+      "stats": "Tienes {0} artículos"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Perfil",
+      "description": "Gestiona la información de tu perfil"
+    },
+    "form": {
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Dirección de correo electrónico",
+      "phone": "Número de teléfono",
+      "bio": "Biografía",
+      "save": "Guardar cambios"
+    },
+    "messages": {
+      "updated": "Perfil actualizado exitosamente",
+      "error": "No se pudo actualizar el perfil"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Descubrir",
+      "description": "Explora nuevos contenidos y funciones"
+    },
+    "sections": {
+      "featured": "Contenido destacado"
+    },
+    "messages": {
+      "explore": "Comience a explorar nuestra plataforma"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Tienda",
+      "description": "Explorar y comprar productos"
+    },
+    "sections": {
+      "products": "Productos"
+    },
+    "messages": {
+      "comingSoon": "¡Más productos próximamente!"
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Se produjo un error",
+    "success": "Operación completada",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "crear",
+    "update": "Actualizar",
+    "submit": "Enviar",
+    "reset": "Reiniciar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior"
+  }
+}

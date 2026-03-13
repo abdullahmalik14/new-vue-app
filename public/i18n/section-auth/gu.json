@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "ફરી સ્વાગત છે",
+      "subtitle": "ચાલુ રાખવા માટે કૃપા કરીને તમારા ઓળખપત્રો દાખલ કરો.",
+      "button": "લોગ ઇન કરો",
+      "emailLabel": "ઈમેલ",
+      "emailPlaceholder": "ઇમેઇલ સરનામું",
+      "passwordLabel": "પાસવર્ડ",
+      "passwordPlaceholder": "પાસવર્ડ",
+      "forgotPassword": "તમારો પાસવર્ડ ભૂલી ગયા છો?",
+      "rememberMe": "મને યાદ રાખો",
+      "noAccount": "ખાતું નથી?",
+      "continueWithX": "X (twitter) સાથે ચાલુ રાખો",
+      "continueWithTelegram": "ટેલિગ્રામ સાથે ચાલુ રાખો",
+      "welcome": "હેલો, {0}!",
+      "error": "અમાન્ય ઇમેઇલ અથવા પાસવર્ડ."
+    },
+    "register": {
+      "title": "એકાઉન્ટ બનાવો",
+      "subtitle": "ચાલુ રાખવા માટે તમારું એકાઉન્ટ બનાવો.",
+      "button": "સાઇન અપ કરો",
+      "firstName": "પ્રથમ નામ",
+      "firstNameLabel": "નામ",
+      "emailLabel": "ઈમેલ",
+      "emailAddress": "ઇમેઇલ સરનામું",
+      "emailPlaceholder": "ઇમેઇલ સરનામું",
+      "passwordLabel": "પાસવર્ડ",
+      "passwordPlaceholder": "પાસવર્ડ",
+      "confirmPasswordLabel": "પાસવર્ડની પુષ્ટિ કરો",
+      "confirmPasswordPlaceholder": "પાસવર્ડ",
+      "haveAccount": "પહેલેથી જ એકાઉન્ટ છે?",
+      "Onboarding": {
+        "title": "તમારી પ્રોફાઇલ પૂર્ણ કરો",
+        "description": "ચાલુ રાખવા માટે તમારી ભૂમિકા અને વપરાશકર્તા નામ પસંદ કરો.",
+        "usernameLabel": "વપરાશકર્તા નામ",
+        "usernamePlaceholder": "વપરાશકર્તા નામ દાખલ કરો",
+        "roleLabel": "ભૂમિકા",
+        "rolePlaceholder": "તમારી ભૂમિકા પસંદ કરો",
+        "roles": {
+          "creator": "સર્જક",
+          "fan": "પંખો",
+          "vendor": "વિક્રેતા",
+          "agent": "એજન્ટ"
+        },
+        "button": "ચાલુ રાખો"
+      },
+      "KYC": {
+        "title": "તમારી ઓળખ ચકાસો",
+        "description": "ડેશબોર્ડને ઍક્સેસ કરવા માટે સર્જકની ચકાસણી પૂર્ણ કરો.",
+        "button": "પુષ્ટિ કરો અને આગળ વધો",
+        "logout": "લોગઆઉટ અને બહાર નીકળો"
+      }
+    },
+    "confirmEmail": {
+      "title": "ઇમેઇલની પુષ્ટિ કરો",
+      "subtitle": "તમે ઉપયોગમાં લીધેલ ઇમેઇલ અને અમે તમને મોકલેલ ચકાસણી કોડ દાખલ કરો.",
+      "button": "પુષ્ટિ કરો",
+      "buttonLoading": "પુષ્ટિ કરી રહ્યું છે...",
+      "emailLabel": "ઈમેલ",
+      "emailPlaceholder": "ઈમેલ",
+      "codeLabel": "પુષ્ટિકરણ કોડ",
+      "codePlaceholder": "6-અંકનો કોડ",
+      "error": "પુષ્ટિકરણ નિષ્ફળ થયું",
+      "autoLoginError": "ઈમેઈલની પુષ્ટિ થઈ, પરંતુ ઓટો-લોગિન નિષ્ફળ થયું. કૃપા કરીને મેન્યુઅલી લોગ ઇન કરો."
+    },
+    "reset": {
+      "title": "પાસવર્ડ રીસેટ કરો",
+      "subtitle": "રીસેટ કોડ મેળવવા માટે તમારો ઈમેલ દાખલ કરો.",
+      "subtitleConfirm": "તમને પ્રાપ્ત થયેલ કોડ અને નવો પાસવર્ડ દાખલ કરો.",
+      "sendCode": "રીસેટ કોડ મોકલો",
+      "codeLabel": "કોડ રીસેટ કરો",
+      "codePlaceholder": "રીસેટ કોડ દાખલ કરો",
+      "resetButton": "પાસવર્ડ રીસેટ કરો",
+      "codeSent": "તમારા ઇમેઇલ પર મોકલવામાં આવેલ કોડ રીસેટ કરો.",
+      "sendCodeError": "કોડ મોકલવામાં નિષ્ફળ",
+      "success": "પાસવર્ડ રીસેટ સફળ. કૃપા કરીને લૉગ ઇન કરો.",
+      "error": "રીસેટ નિષ્ફળ થયું"
+    },
+    "validation": {
+      "emailRequired": "ઇમેઇલ આવશ્યક છે",
+      "emailInvalid": "કૃપા કરીને માન્ય ઇમેઇલ સરનામું દાખલ કરો",
+      "passwordRequired": "પાસવર્ડ જરૂરી છે",
+      "passwordMinLength": "ઓછામાં ઓછા 8 અક્ષર લાંબા",
+      "passwordHasUpper": "ઓછામાં ઓછા 1 મોટા અક્ષરનો સમાવેશ થાય છે",
+      "passwordHasLower": "ઓછામાં ઓછો 1 લોઅરકેસ અક્ષર શામેલ છે",
+      "passwordHasNumber": "ઓછામાં ઓછો 1 નંબર શામેલ છે",
+      "passwordHasSpecial": "ઓછામાં ઓછું 1 વિશેષ પાત્ર શામેલ છે",
+      "confirmPasswordRequired": "કૃપા કરીને તમારા પાસવર્ડની પુષ્ટિ કરો",
+      "confirmPasswordMatch": "પાસવર્ડ મેળ ખાતા નથી",
+      "confirmPasswordMatchSuccess": "પાસવર્ડ મેળ ખાય છે",
+      "codeRequired": "કોડ જરૂરી છે",
+      "roleRequired": "ભૂમિકા જરૂરી છે",
+      "roleSelect": "કૃપા કરીને ભૂમિકા પસંદ કરો",
+      "usernameRequired": "વપરાશકર્તા નામ જરૂરી છે",
+      "usernameMinLength": "વપરાશકર્તાનામ ઓછામાં ઓછા 4 અક્ષરોનું હોવું જોઈએ",
+      "usernameMaxLength": "વપરાશકર્તાનામ 100 અક્ષરો કરતાં ઓછું હોવું જોઈએ",
+      "usernameTaken": "વપરાશકર્તા નામ પહેલેથી જ લેવામાં આવ્યું છે"
+    },
+    "common": {
+      "logout": "સાઇન આઉટ કરો",
+      "loading": "લોડ કરી રહ્યું છે...",
+      "user": "વપરાશકર્તા",
+      "admin": "એડમિન",
+      "guest": "મહેમાન",
+      "showPassword": "પાસવર્ડ બતાવો",
+      "hidePassword": "પાસવર્ડ છુપાવો"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "તમારી પ્રોફાઇલ પૂર્ણ કરતી વખતે એક ભૂલ આવી"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "ડેશબોર્ડ",
+      "description": "તમારા એકાઉન્ટની ઝાંખી"
+    },
+    "actions": {
+      "editProfile": "પ્રોફાઇલ સંપાદિત કરો",
+      "editSettings": "સેટિંગ્સ સંપાદિત કરો",
+      "myMedia": "મારું મીડિયા",
+      "viewStats": "આંકડા જુઓ"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "પ્રોફાઇલ સંપાદિત કરો",
+        "description": "તમારી વ્યક્તિગત માહિતી અપડેટ કરો"
+      },
+      "editSettings": {
+        "title": "એકાઉન્ટ સેટિંગ્સ",
+        "description": "તમારી એકાઉન્ટ પસંદગીઓ મેનેજ કરો"
+      },
+      "myMedia": {
+        "title": "મારું મીડિયા",
+        "description": "તમારી અપલોડ કરેલી સામગ્રી મેનેજ કરો"
+      }
+    },
+    "messages": {
+      "welcome": "ફરી સ્વાગત છે, {0}!",
+      "stats": "તમારી પાસે {0} વસ્તુઓ છે"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "પ્રોફાઇલ",
+      "description": "તમારી પ્રોફાઇલ માહિતી મેનેજ કરો"
+    },
+    "form": {
+      "firstName": "પ્રથમ નામ",
+      "lastName": "છેલ્લું નામ",
+      "email": "ઇમેઇલ સરનામું",
+      "phone": "ફોન નંબર",
+      "bio": "જીવનચરિત્ર",
+      "save": "ફેરફારો સાચવો"
+    },
+    "messages": {
+      "updated": "પ્રોફાઇલ સફળતાપૂર્વક અપડેટ થઈ",
+      "error": "પ્રોફાઇલ અપડેટ કરવામાં નિષ્ફળ"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "શોધો",
+      "description": "નવી સામગ્રી અને સુવિધાઓનું અન્વેષણ કરો"
+    },
+    "sections": {
+      "featured": "ફીચર્ડ સામગ્રી"
+    },
+    "messages": {
+      "explore": "અમારા પ્લેટફોર્મની શોધખોળ શરૂ કરો"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "દુકાન",
+      "description": "બ્રાઉઝ કરો અને ઉત્પાદનો ખરીદો"
+    },
+    "sections": {
+      "products": "ઉત્પાદનો"
+    },
+    "messages": {
+      "comingSoon": "વધુ ઉત્પાદનો ટૂંક સમયમાં આવી રહ્યા છે!"
+    }
+  },
+  "common": {
+    "loading": "લોડ કરી રહ્યું છે...",
+    "error": "એક ભૂલ આવી",
+    "success": "ઓપરેશન પૂર્ણ થયું",
+    "save": "સાચવો",
+    "cancel": "રદ કરો",
+    "delete": "કાઢી નાખો",
+    "edit": "સંપાદિત કરો",
+    "create": "બનાવો",
+    "update": "અપડેટ કરો",
+    "submit": "સબમિટ કરો",
+    "reset": "રીસેટ કરો",
+    "back": "પાછા જાઓ",
+    "next": "આગળ",
+    "previous": "ગત"
+  }
+}

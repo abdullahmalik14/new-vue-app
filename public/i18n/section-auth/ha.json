@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Barka da Dawo",
+      "subtitle": "Da fatan za a shigar da takaddun shaidar ku don ci gaba.",
+      "button": "Shiga",
+      "emailLabel": "Imel",
+      "emailPlaceholder": "Adireshin imel",
+      "passwordLabel": "Kalmar wucewa",
+      "passwordPlaceholder": "Kalmar wucewa",
+      "forgotPassword": "Ka manta kalmar sirrinka?",
+      "rememberMe": "Ka tuna da ni",
+      "noAccount": "Ba ku da asusu?",
+      "continueWithX": "Ci gaba da X (twitter)",
+      "continueWithTelegram": "Ci gaba da Telegram",
+      "welcome": "Sannu, {0}!",
+      "error": "Imel ko kalmar sirri mara inganci."
+    },
+    "register": {
+      "title": "Ƙirƙiri Account",
+      "subtitle": "Ƙirƙiri asusun ku don ci gaba.",
+      "button": "Shiga",
+      "firstName": "Sunan Farko",
+      "firstNameLabel": "Suna",
+      "emailLabel": "Imel",
+      "emailAddress": "Adireshin imel",
+      "emailPlaceholder": "Adireshin imel",
+      "passwordLabel": "Kalmar wucewa",
+      "passwordPlaceholder": "Kalmar wucewa",
+      "confirmPasswordLabel": "Tabbatar da Kalmar wucewa",
+      "confirmPasswordPlaceholder": "Kalmar wucewa",
+      "haveAccount": "Kuna da asusu?",
+      "Onboarding": {
+        "title": "Cika Bayanan Bayananku",
+        "description": "Zaɓi rawar ku da sunan mai amfani don ci gaba.",
+        "usernameLabel": "Sunan mai amfani",
+        "usernamePlaceholder": "Shigar da sunan mai amfani",
+        "roleLabel": "Matsayi",
+        "rolePlaceholder": "Zaɓi rawar ku",
+        "roles": {
+          "creator": "Mahalicci",
+          "fan": "Masoyi",
+          "vendor": "Mai sayarwa",
+          "agent": "Wakili"
+        },
+        "button": "Ci gaba"
+      },
+      "KYC": {
+        "title": "Tabbatar da Shaida",
+        "description": "Cikakken tabbacin mahalicci don isa ga dashboard.",
+        "button": "Tabbatar & Ci gaba",
+        "logout": "Fita & Fita"
+      }
+    },
+    "confirmEmail": {
+      "title": "Tabbatar da Imel",
+      "subtitle": "Shigar da imel ɗin da kuka yi amfani da shi da lambar tabbatarwa da muka aiko muku.",
+      "button": "Tabbatar",
+      "buttonLoading": "Tabbatarwa...",
+      "emailLabel": "Imel",
+      "emailPlaceholder": "Imel",
+      "codeLabel": "Lambar Tabbatarwa",
+      "codePlaceholder": "6-lamba code",
+      "error": "Tabbacin ya kasa",
+      "autoLoginError": "An tabbatar da imel, amma shiga ta atomatik ya kasa. Da fatan za a shiga da hannu."
+    },
+    "reset": {
+      "title": "Sake saita kalmar wucewa",
+      "subtitle": "Shigar da imel ɗin ku don karɓar lambar sake saiti.",
+      "subtitleConfirm": "Shigar da lambar da kuka karɓa da sabon kalmar sirri.",
+      "sendCode": "Aika Lambar Sake saitin",
+      "codeLabel": "Sake saitin Code",
+      "codePlaceholder": "Shigar da lambar sake saiti",
+      "resetButton": "Sake saita kalmar wucewa",
+      "codeSent": "Sake saitin lambar da aka aika zuwa imel ɗin ku.",
+      "sendCodeError": "An kasa aika lamba",
+      "success": "Sake saitin kalmar wucewa yayi nasara. Da fatan za a shiga",
+      "error": "An kasa sake saiti"
+    },
+    "validation": {
+      "emailRequired": "Ana buƙatar imel",
+      "emailInvalid": "Da fatan za a shigar da ingantaccen adireshin imel",
+      "passwordRequired": "Ana buƙatar kalmar sirri",
+      "passwordMinLength": "Akalla tsayin haruffa 8",
+      "passwordHasUpper": "Ya ƙunshi aƙalla babban harafi 1",
+      "passwordHasLower": "Ya ƙunshi aƙalla ƙananan harafi 1",
+      "passwordHasNumber": "Ya ƙunshi aƙalla lamba 1",
+      "passwordHasSpecial": "Ya ƙunshi aƙalla hali na musamman 1",
+      "confirmPasswordRequired": "Da fatan za a tabbatar da kalmar sirrinku",
+      "confirmPasswordMatch": "Kalmomin sirri ba su daidaita ba",
+      "confirmPasswordMatchSuccess": "Madaidaicin kalmar wucewa",
+      "codeRequired": "Ana buƙatar lamba",
+      "roleRequired": "Ana buƙatar rawar",
+      "roleSelect": "Da fatan za a zaɓi rawar",
+      "usernameRequired": "Ana buƙatar sunan mai amfani",
+      "usernameMinLength": "Dole ne sunan mai amfani ya zama aƙalla haruffa 4",
+      "usernameMaxLength": "Dole ne sunan mai amfani ya kasance ƙasa da haruffa 100",
+      "usernameTaken": "An riga an ɗauki sunan mai amfani"
+    },
+    "common": {
+      "logout": "Fita",
+      "loading": "Ana lodawa...",
+      "user": "Mai amfani",
+      "admin": "Admin",
+      "guest": "Bako",
+      "showPassword": "Nuna kalmar sirri",
+      "hidePassword": "Ɓoye kalmar sirri"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "An sami kuskure yayin kammala bayanin martabar ku"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard",
+      "description": "Bayanin asusun ku"
+    },
+    "actions": {
+      "editProfile": "Shirya Bayanan martaba",
+      "editSettings": "Gyara Saituna",
+      "myMedia": "Kafofin watsa labarai na",
+      "viewStats": "Duba Kididdigar"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Shirya Bayanan martaba",
+        "description": "Sabunta keɓaɓɓen bayaninka"
+      },
+      "editSettings": {
+        "title": "Saitunan Asusu",
+        "description": "Sarrafa abubuwan da ake so asusu"
+      },
+      "myMedia": {
+        "title": "Kafofin watsa labarai na",
+        "description": "Sarrafa abubuwan da aka ɗorawa"
+      }
+    },
+    "messages": {
+      "welcome": "Barka da dawowa, {0}!",
+      "stats": "Kuna da abubuwa {0}"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Bayanan martaba",
+      "description": "Sarrafa bayanin martabarku"
+    },
+    "form": {
+      "firstName": "Sunan Farko",
+      "lastName": "Sunan Ƙarshe",
+      "email": "Adireshin Imel",
+      "phone": "Lambar Waya",
+      "bio": "Tarihin Rayuwa",
+      "save": "Ajiye Canje-canje"
+    },
+    "messages": {
+      "updated": "An sabunta bayanin martaba cikin nasara",
+      "error": "An kasa sabunta bayanan martaba"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Gano",
+      "description": "Bincika sabon abun ciki da fasali"
+    },
+    "sections": {
+      "featured": "Abubuwan da aka Fitar"
+    },
+    "messages": {
+      "explore": "Fara bincika dandalinmu"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Shago",
+      "description": "Bincika kuma siyan samfuran"
+    },
+    "sections": {
+      "products": "Kayayyaki"
+    },
+    "messages": {
+      "comingSoon": "Ƙarin samfuran suna zuwa nan ba da jimawa ba!"
+    }
+  },
+  "common": {
+    "loading": "Ana lodawa...",
+    "error": "An sami kuskure",
+    "success": "An kammala aiki",
+    "save": "Ajiye",
+    "cancel": "Soke",
+    "delete": "Share",
+    "edit": "Gyara",
+    "create": "Ƙirƙiri",
+    "update": "Sabuntawa",
+    "submit": "Sallama",
+    "reset": "Sake saiti",
+    "back": "Komawa",
+    "next": "Na gaba",
+    "previous": "A baya"
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Xoş gəlmisiniz",
+      "subtitle": "Davam etmək üçün etimadnaməsini daxil edin.",
+      "button": "Daxil ol",
+      "emailLabel": "E-poçt",
+      "emailPlaceholder": "E-poçt ünvanı",
+      "passwordLabel": "parol",
+      "passwordPlaceholder": "parol",
+      "forgotPassword": "Parolunuzu unutmusunuz?",
+      "rememberMe": "Məni xatırla",
+      "noAccount": "Hesabınız yoxdur?",
+      "continueWithX": "X ilə davam edin (twitter)",
+      "continueWithTelegram": "Telegram ilə davam edin",
+      "welcome": "Salam, {0}!",
+      "error": "Yanlış e-poçt və ya parol."
+    },
+    "register": {
+      "title": "Hesab yaradın",
+      "subtitle": "Davam etmək üçün hesabınızı yaradın.",
+      "button": "Qeydiyyatdan keçin",
+      "firstName": "Ad",
+      "firstNameLabel": "ad",
+      "emailLabel": "E-poçt",
+      "emailAddress": "E-poçt ünvanı",
+      "emailPlaceholder": "E-poçt ünvanı",
+      "passwordLabel": "parol",
+      "passwordPlaceholder": "parol",
+      "confirmPasswordLabel": "Şifrəni təsdiqləyin",
+      "confirmPasswordPlaceholder": "parol",
+      "haveAccount": "Artıq hesabınız var?",
+      "Onboarding": {
+        "title": "Profilinizi tamamlayın",
+        "description": "Davam etmək üçün rolunuzu və istifadəçi adınızı seçin.",
+        "usernameLabel": "İstifadəçi adı",
+        "usernamePlaceholder": "İstifadəçi adı daxil edin",
+        "roleLabel": "Rol",
+        "rolePlaceholder": "Rolunuzu seçin",
+        "roles": {
+          "creator": "Yaradan",
+          "fan": "Azarkeş",
+          "vendor": "Satıcı",
+          "agent": "Agent"
+        },
+        "button": "Davam et"
+      },
+      "KYC": {
+        "title": "Şəxsiyyətinizi Doğrulayın",
+        "description": "İdarə panelinə daxil olmaq üçün yaradıcı yoxlanışını tamamlayın.",
+        "button": "Təsdiq et və Davam et",
+        "logout": "Çıxın və Çıxın"
+      }
+    },
+    "confirmEmail": {
+      "title": "E-poçtu təsdiqləyin",
+      "subtitle": "İstifadə etdiyiniz e-poçtu və sizə göndərdiyimiz doğrulama kodunu daxil edin.",
+      "button": "Təsdiq edin",
+      "buttonLoading": "Təsdiqlənir...",
+      "emailLabel": "E-poçt",
+      "emailPlaceholder": "E-poçt",
+      "codeLabel": "Təsdiq kodu",
+      "codePlaceholder": "6 rəqəmli kod",
+      "error": "Təsdiq alınmadı",
+      "autoLoginError": "E-poçt təsdiqləndi, lakin avtomatik giriş uğursuz oldu. Zəhmət olmasa əl ilə daxil olun."
+    },
+    "reset": {
+      "title": "Şifrəni sıfırla",
+      "subtitle": "Sıfırlama kodunu almaq üçün e-poçtunuzu daxil edin.",
+      "subtitleConfirm": "Aldığınız kodu və yeni parolu daxil edin.",
+      "sendCode": "Sıfırlama kodunu göndərin",
+      "codeLabel": "Kodu sıfırlayın",
+      "codePlaceholder": "Sıfırlama kodunu daxil edin",
+      "resetButton": "Şifrəni sıfırla",
+      "codeSent": "E-poçtunuza göndərilən sıfırlama kodu.",
+      "sendCodeError": "Kodu göndərmək alınmadı",
+      "success": "Parolun sıfırlanması uğurlu oldu. Zəhmət olmasa daxil olun.",
+      "error": "Sıfırlama uğursuz oldu"
+    },
+    "validation": {
+      "emailRequired": "E-poçt tələb olunur",
+      "emailInvalid": "Etibarlı e-poçt ünvanı daxil edin",
+      "passwordRequired": "Parol tələb olunur",
+      "passwordMinLength": "Ən azı 8 simvol uzunluğunda",
+      "passwordHasUpper": "Ən azı 1 böyük hərfdən ibarət olmalıdır",
+      "passwordHasLower": "Ən azı 1 kiçik hərfdən ibarət olmalıdır",
+      "passwordHasNumber": "Ən azı 1 nömrə ehtiva edir",
+      "passwordHasSpecial": "Ən azı 1 xüsusi simvol ehtiva edir",
+      "confirmPasswordRequired": "Zəhmət olmasa parolunuzu təsdiqləyin",
+      "confirmPasswordMatch": "Parollar uyğun gəlmir",
+      "confirmPasswordMatchSuccess": "Parol uyğun gəlir",
+      "codeRequired": "Kod tələb olunur",
+      "roleRequired": "Rol tələb olunur",
+      "roleSelect": "Lütfən, rol seçin",
+      "usernameRequired": "İstifadəçi adı tələb olunur",
+      "usernameMinLength": "İstifadəçi adı ən azı 4 simvoldan ibarət olmalıdır",
+      "usernameMaxLength": "İstifadəçi adı 100 simvoldan az olmalıdır",
+      "usernameTaken": "İstifadəçi adı artıq götürülüb"
+    },
+    "common": {
+      "logout": "Çıxın",
+      "loading": "Yüklənir...",
+      "user": "İstifadəçi",
+      "admin": "Admin",
+      "guest": "Qonaq",
+      "showPassword": "Parol göstərin",
+      "hidePassword": "Parolu gizlədin"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Profilinizi tamamlayarkən xəta baş verdi"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "İdarə paneli",
+      "description": "Hesabınıza ümumi baxış"
+    },
+    "actions": {
+      "editProfile": "Profili redaktə edin",
+      "editSettings": "Parametrləri redaktə edin",
+      "myMedia": "Mənim Mediam",
+      "viewStats": "Statistikaya baxın"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Profili redaktə edin",
+        "description": "Şəxsi məlumatlarınızı yeniləyin"
+      },
+      "editSettings": {
+        "title": "Hesab Parametrləri",
+        "description": "Hesab seçimlərinizi idarə edin"
+      },
+      "myMedia": {
+        "title": "Mənim Mediam",
+        "description": "Yüklədiyiniz məzmunu idarə edin"
+      }
+    },
+    "messages": {
+      "welcome": "Yenidən xoş gəlmisiniz, {0}!",
+      "stats": "{0} elementiniz var"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Profil məlumatlarınızı idarə edin"
+    },
+    "form": {
+      "firstName": "Ad",
+      "lastName": "Soyadı",
+      "email": "E-poçt ünvanı",
+      "phone": "Telefon nömrəsi",
+      "bio": "Bioqrafiya",
+      "save": "Dəyişiklikləri Saxla"
+    },
+    "messages": {
+      "updated": "Profil uğurla yeniləndi",
+      "error": "Profili yeniləmək alınmadı"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "kəşf edin",
+      "description": "Yeni məzmun və xüsusiyyətləri kəşf edin"
+    },
+    "sections": {
+      "featured": "Seçilmiş Məzmun"
+    },
+    "messages": {
+      "explore": "Platformamızı araşdırmağa başlayın"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Mağaza",
+      "description": "Məhsulları nəzərdən keçirin və satın alın"
+    },
+    "sections": {
+      "products": "Məhsullar"
+    },
+    "messages": {
+      "comingSoon": "Tezliklə daha çox məhsul gələcək!"
+    }
+  },
+  "common": {
+    "loading": "Yüklənir...",
+    "error": "Xəta baş verdi",
+    "success": "Əməliyyat tamamlandı",
+    "save": "Saxla",
+    "cancel": "Ləğv et",
+    "delete": "Sil",
+    "edit": "Redaktə et",
+    "create": "Yaradın",
+    "update": "Yeniləyin",
+    "submit": "Təqdim et",
+    "reset": "Sıfırlayın",
+    "back": "Geri qayıt",
+    "next": "Sonrakı",
+    "previous": "Əvvəlki"
+  }
+}

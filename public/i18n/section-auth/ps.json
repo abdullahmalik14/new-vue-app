@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "بیرته ښه راغلاست",
+      "subtitle": "مهرباني وکړئ د دوام لپاره خپل اسناد دننه کړئ.",
+      "button": "ننوتل",
+      "emailLabel": "ایمیل",
+      "emailPlaceholder": "د بریښنالیک پته",
+      "passwordLabel": "پټنوم",
+      "passwordPlaceholder": "پټنوم",
+      "forgotPassword": "پاسورډ مو هېر شوی؟",
+      "rememberMe": "ما یاد کړه",
+      "noAccount": "حساب نه لرئ؟",
+      "continueWithX": "د ایکس (ټویټر) سره دوام ورکړئ",
+      "continueWithTelegram": "د ټیلیګرام سره دوام ورکړئ",
+      "welcome": "سلام، {0}!",
+      "error": "ناسم بریښنالیک یا پټنوم."
+    },
+    "register": {
+      "title": "حساب جوړ کړئ",
+      "subtitle": "د دوام لپاره خپل حساب جوړ کړئ.",
+      "button": "نوم لیکنه",
+      "firstName": "لومړی نوم",
+      "firstNameLabel": "نوم",
+      "emailLabel": "ایمیل",
+      "emailAddress": "د بریښنالیک پته",
+      "emailPlaceholder": "د بریښنالیک پته",
+      "passwordLabel": "پټنوم",
+      "passwordPlaceholder": "پټنوم",
+      "confirmPasswordLabel": "پاسورډ تایید کړئ",
+      "confirmPasswordPlaceholder": "پټنوم",
+      "haveAccount": "لا دمخه یو حساب لرئ؟",
+      "Onboarding": {
+        "title": "خپل پروفایل بشپړ کړئ",
+        "description": "د دوام لپاره خپل رول او کارن نوم غوره کړئ.",
+        "usernameLabel": "کارن نوم",
+        "usernamePlaceholder": "یو کارن نوم دننه کړئ",
+        "roleLabel": "رول",
+        "rolePlaceholder": "خپل رول وټاکئ",
+        "roles": {
+          "creator": "خالق",
+          "fan": "فین",
+          "vendor": "پلورونکی",
+          "agent": "اجنټ"
+        },
+        "button": "ادامه ورکړئ"
+      },
+      "KYC": {
+        "title": "خپل هویت تایید کړئ",
+        "description": "ډشبورډ ته د لاسرسي لپاره د جوړونکي تایید بشپړ کړئ.",
+        "button": "تایید کړئ او پرمخ لاړشئ",
+        "logout": "ننوتل او وتل"
+      }
+    },
+    "confirmEmail": {
+      "title": "بریښنالیک تایید کړئ",
+      "subtitle": "هغه بریښنالیک دننه کړئ چې تاسو یې کارولی او د تایید کوډ چې موږ تاسو ته لیږلی.",
+      "button": "تایید کړه",
+      "buttonLoading": "تایید کول...",
+      "emailLabel": "ایمیل",
+      "emailPlaceholder": "ایمیل",
+      "codeLabel": "د تایید کوډ",
+      "codePlaceholder": "۶ عدده کوډ",
+      "error": "تایید ناکام شو",
+      "autoLoginError": "بریښنالیک تایید شو، مګر اتوماتیک ننوتل ناکام شو. مهرباني وکړئ په لاسي ډول ننوتل."
+    },
+    "reset": {
+      "title": "پټنوم بیا تنظیم کړئ",
+      "subtitle": "د ری سیٹ کوډ ترلاسه کولو لپاره خپل بریښنالیک دننه کړئ.",
+      "subtitleConfirm": "هغه کوډ چې تاسو یې ترلاسه کړی او نوی پټنوم دننه کړئ.",
+      "sendCode": "د ری سیٹ کوډ واستوئ",
+      "codeLabel": "کوډ بیا تنظیم کړئ",
+      "codePlaceholder": "د ری سیٹ کوډ دننه کړئ",
+      "resetButton": "پټنوم بیا تنظیم کړئ",
+      "codeSent": "ستاسو بریښنالیک ته لیږل شوی کوډ بیا تنظیم کړئ.",
+      "sendCodeError": "د کوډ لیږلو کې پاتې راغلی",
+      "success": "د پټنوم بیا تنظیم په بریالیتوب سره. مهرباني وکړئ ننوتل.",
+      "error": "بیا تنظیم ناکام شو"
+    },
+    "validation": {
+      "emailRequired": "بریښنالیک اړین دی",
+      "emailInvalid": "مهرباني وکړئ یو باوري بریښنالیک آدرس دننه کړئ",
+      "passwordRequired": "پاسورډ اړین دی",
+      "passwordMinLength": "لږترلږه 8 حروف اوږد",
+      "passwordHasUpper": "لږترلږه 1 لوی توری ولري",
+      "passwordHasLower": "لږترلږه 1 کوچني توری ولري",
+      "passwordHasNumber": "لږترلږه 1 شمیره ولري",
+      "passwordHasSpecial": "لږترلږه 1 ځانګړی کرکټر ولري",
+      "confirmPasswordRequired": "مهرباني وکړئ خپل پټنوم تایید کړئ",
+      "confirmPasswordMatch": "پاسورډونه سمون نه خوري",
+      "confirmPasswordMatchSuccess": "د رمز سره سمون لري",
+      "codeRequired": "کوډ ته اړتیا ده",
+      "roleRequired": "رول ته اړتیا ده",
+      "roleSelect": "مهرباني وکړئ یو رول وټاکئ",
+      "usernameRequired": "کارن نوم اړین دی",
+      "usernameMinLength": "د کارن نوم باید لږ تر لږه 4 حروف وي",
+      "usernameMaxLength": "د کارن نوم باید د 100 حروف څخه کم وي",
+      "usernameTaken": "کارن نوم لا دمخه اخیستل شوی"
+    },
+    "common": {
+      "logout": "لاسلیک کول",
+      "loading": "بار کول...",
+      "user": "کارن",
+      "admin": "اډمین",
+      "guest": "مېلمه",
+      "showPassword": "پټنوم ښکاره کړئ",
+      "hidePassword": "پټنوم پټ کړئ"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "ستاسو د پروفایل بشپړولو په وخت کې یوه تېروتنه رامنځته شوه"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "ډشبورډ",
+      "description": "ستاسو د حساب کتنه"
+    },
+    "actions": {
+      "editProfile": "پروفایل سمول",
+      "editSettings": "د ترتیباتو سمون",
+      "myMedia": "زما میډیا",
+      "viewStats": "احصایې وګورئ"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "پروفایل سمول",
+        "description": "خپل شخصي معلومات تازه کړئ"
+      },
+      "editSettings": {
+        "title": "د حساب ترتیبات",
+        "description": "د خپل حساب غوره توبونه اداره کړئ"
+      },
+      "myMedia": {
+        "title": "زما میډیا",
+        "description": "خپل اپلوډ شوي مینځپانګې اداره کړئ"
+      }
+    },
+    "messages": {
+      "welcome": "بیرته ښه راغلاست، {0}!",
+      "stats": "تاسو {0} توکي لرئ"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "پروفایل",
+      "description": "د خپل پروفایل معلومات اداره کړئ"
+    },
+    "form": {
+      "firstName": "لومړی نوم",
+      "lastName": "وروستی نوم",
+      "email": "د بریښنالیک پته",
+      "phone": "د تلیفون شمیره",
+      "bio": "ژوندلیک",
+      "save": "بدلونونه خوندي کړئ"
+    },
+    "messages": {
+      "updated": "پروفایل په بریالیتوب سره تازه شو",
+      "error": "د پروفایل تازه کولو کې پاتې راغلی"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "کشف",
+      "description": "نوي منځپانګې او ځانګړتیاوې وپلټئ"
+    },
+    "sections": {
+      "featured": "ځانګړي شوي مواد"
+    },
+    "messages": {
+      "explore": "زموږ پلیټ فارم سپړنه پیل کړئ"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "هټۍ",
+      "description": "محصولات وپلټئ او پیرود وکړئ"
+    },
+    "sections": {
+      "products": "محصولات"
+    },
+    "messages": {
+      "comingSoon": "نور محصولات ژر راځي!"
+    }
+  },
+  "common": {
+    "loading": "بار کول...",
+    "error": "یوه تېروتنه رامنځته شوه",
+    "success": "عملیات بشپړ شول",
+    "save": "خوندي کړئ",
+    "cancel": "لغوه کړئ",
+    "delete": "ړنګول",
+    "edit": "سمون",
+    "create": "جوړ کړئ",
+    "update": "تازه کول",
+    "submit": "سپارل",
+    "reset": "بیا تنظیم کړئ",
+    "back": "بیرته لاړ شه",
+    "next": "بل",
+    "previous": "مخکینی"
+  }
+}

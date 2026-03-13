@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Mirë se vini përsëri",
+      "subtitle": "Ju lutemi shkruani kredencialet tuaja për të vazhduar.",
+      "button": "Identifikohu",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Adresa e emailit",
+      "passwordLabel": "Fjalëkalimi",
+      "passwordPlaceholder": "Fjalëkalimi",
+      "forgotPassword": "Keni harruar fjalëkalimin tuaj?",
+      "rememberMe": "Më kujto mua",
+      "noAccount": "Nuk keni një llogari?",
+      "continueWithX": "Vazhdo me X (Twitter)",
+      "continueWithTelegram": "Vazhdoni me Telegram",
+      "welcome": "Përshëndetje, {0}!",
+      "error": "Email ose fjalëkalim i pavlefshëm."
+    },
+    "register": {
+      "title": "Krijo llogari",
+      "subtitle": "Krijo llogarinë tënde për të vazhduar.",
+      "button": "Regjistrohu",
+      "firstName": "Emri",
+      "firstNameLabel": "Emri",
+      "emailLabel": "Email",
+      "emailAddress": "Adresa e emailit",
+      "emailPlaceholder": "Adresa e emailit",
+      "passwordLabel": "Fjalëkalimi",
+      "passwordPlaceholder": "Fjalëkalimi",
+      "confirmPasswordLabel": "Konfirmo fjalëkalimin",
+      "confirmPasswordPlaceholder": "Fjalëkalimi",
+      "haveAccount": "Keni tashmë një llogari?",
+      "Onboarding": {
+        "title": "Plotësoni profilin tuaj",
+        "description": "Zgjidhni rolin tuaj dhe emrin e përdoruesit për të vazhduar.",
+        "usernameLabel": "Emri i përdoruesit",
+        "usernamePlaceholder": "Futni një emër përdoruesi",
+        "roleLabel": "Roli",
+        "rolePlaceholder": "Zgjidhni rolin tuaj",
+        "roles": {
+          "creator": "Krijuesi",
+          "fan": "Tifoz",
+          "vendor": "Shitësi",
+          "agent": "Agjenti"
+        },
+        "button": "Vazhdoni"
+      },
+      "KYC": {
+        "title": "Verifikoni identitetin tuaj",
+        "description": "Përfundoni verifikimin e krijuesit për të hyrë në panelin e kontrollit.",
+        "button": "Konfirmo dhe vazhdo",
+        "logout": "Dil & Dil"
+      }
+    },
+    "confirmEmail": {
+      "title": "Konfirmo emailin",
+      "subtitle": "Fut emailin që ke përdorur dhe kodin e verifikimit që të kemi dërguar.",
+      "button": "Konfirmo",
+      "buttonLoading": "Po konfirmon...",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "codeLabel": "Kodi i konfirmimit",
+      "codePlaceholder": "Kodi 6-shifror",
+      "error": "Konfirmimi dështoi",
+      "autoLoginError": "Email-i u konfirmua, por identifikimi automatik dështoi. Ju lutemi identifikohuni manualisht."
+    },
+    "reset": {
+      "title": "Rivendos fjalëkalimin",
+      "subtitle": "Futni emailin tuaj për të marrë një kod rivendosjeje.",
+      "subtitleConfirm": "Futni kodin që keni marrë dhe një fjalëkalim të ri.",
+      "sendCode": "Dërgo kodin e rivendosjes",
+      "codeLabel": "Rivendos kodin",
+      "codePlaceholder": "Fut kodin e rivendosjes",
+      "resetButton": "Rivendos fjalëkalimin",
+      "codeSent": "Rivendos kodin e dërguar në emailin tuaj.",
+      "sendCodeError": "Dërgimi i kodit dështoi",
+      "success": "Rivendosja e fjalëkalimit me sukses. Ju lutemi identifikohuni.",
+      "error": "Rivendosja dështoi"
+    },
+    "validation": {
+      "emailRequired": "Kërkohet email",
+      "emailInvalid": "Ju lutemi shkruani një adresë të vlefshme emaili",
+      "passwordRequired": "Kërkohet fjalëkalimi",
+      "passwordMinLength": "Të paktën 8 karaktere të gjata",
+      "passwordHasUpper": "Përmbajë të paktën 1 shkronjë të madhe",
+      "passwordHasLower": "Përmbajë të paktën 1 shkronjë të vogël",
+      "passwordHasNumber": "Përmbajë të paktën 1 numër",
+      "passwordHasSpecial": "Përmbajë të paktën 1 karakter të veçantë",
+      "confirmPasswordRequired": "Ju lutemi konfirmoni fjalëkalimin tuaj",
+      "confirmPasswordMatch": "Fjalëkalimet nuk përputhen",
+      "confirmPasswordMatchSuccess": "Fjalëkalimi përputhet",
+      "codeRequired": "Kërkohet kodi",
+      "roleRequired": "Kërkohet roli",
+      "roleSelect": "Ju lutemi zgjidhni një rol",
+      "usernameRequired": "Kërkohet emri i përdoruesit",
+      "usernameMinLength": "Emri i përdoruesit duhet të jetë së paku 4 karaktere",
+      "usernameMaxLength": "Emri i përdoruesit duhet të jetë më pak se 100 karaktere",
+      "usernameTaken": "Emri i përdoruesit është marrë tashmë"
+    },
+    "common": {
+      "logout": "Dilni",
+      "loading": "Po ngarkohet...",
+      "user": "Përdoruesi",
+      "admin": "Admin",
+      "guest": "I ftuar",
+      "showPassword": "Shfaq fjalëkalimin",
+      "hidePassword": "Fshih fjalëkalimin"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Ndodhi një gabim gjatë plotësimit të profilit tuaj"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Paneli",
+      "description": "Pasqyrë e llogarisë tuaj"
+    },
+    "actions": {
+      "editProfile": "Redakto profilin",
+      "editSettings": "Redakto cilësimet",
+      "myMedia": "Media ime",
+      "viewStats": "Shiko Statistikat"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Redakto profilin",
+        "description": "Përditësoni informacionin tuaj personal"
+      },
+      "editSettings": {
+        "title": "Cilësimet e llogarisë",
+        "description": "Menaxhoni preferencat e llogarisë tuaj"
+      },
+      "myMedia": {
+        "title": "Media ime",
+        "description": "Menaxhoni përmbajtjen tuaj të ngarkuar"
+      }
+    },
+    "messages": {
+      "welcome": "Mirë se erdhe, {0}!",
+      "stats": "Ju keni {0} artikuj"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profili",
+      "description": "Menaxhoni informacionin e profilit tuaj"
+    },
+    "form": {
+      "firstName": "Emri",
+      "lastName": "Mbiemri",
+      "email": "Adresa e emailit",
+      "phone": "Numri i telefonit",
+      "bio": "Biografia",
+      "save": "Ruaj Ndryshimet"
+    },
+    "messages": {
+      "updated": "Profili u përditësua me sukses",
+      "error": "Përditësimi i profilit dështoi"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Zbuloni",
+      "description": "Eksploroni përmbajtje dhe veçori të reja"
+    },
+    "sections": {
+      "featured": "Përmbajtja e veçuar"
+    },
+    "messages": {
+      "explore": "Filloni të eksploroni platformën tonë"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Dyqan",
+      "description": "Shfletoni dhe blini produkte"
+    },
+    "sections": {
+      "products": "Produktet"
+    },
+    "messages": {
+      "comingSoon": "Më shumë produkte vijnë së shpejti!"
+    }
+  },
+  "common": {
+    "loading": "Po ngarkohet...",
+    "error": "Ndodhi një gabim",
+    "success": "Operacioni përfundoi",
+    "save": "Ruaj",
+    "cancel": "Anulo",
+    "delete": "Fshije",
+    "edit": "Redakto",
+    "create": "Krijo",
+    "update": "Përditëso",
+    "submit": "Paraqisni",
+    "reset": "Rivendos",
+    "back": "Kthehu prapa",
+    "next": "Tjetra",
+    "previous": "E mëparshme"
+  }
+}

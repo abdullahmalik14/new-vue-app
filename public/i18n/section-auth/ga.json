@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Fáilte Ar Ais",
+      "subtitle": "Cuir isteach do dhintiúir chun leanúint ar aghaidh.",
+      "button": "Logáil Isteach",
+      "emailLabel": "Ríomhphost",
+      "emailPlaceholder": "Seoladh ríomhphoist",
+      "passwordLabel": "Pasfhocal",
+      "passwordPlaceholder": "Pasfhocal",
+      "forgotPassword": "Dearmad déanta agat ar do phasfhocal?",
+      "rememberMe": "Cuimhnigh orm",
+      "noAccount": "Nach bhfuil cuntas agat?",
+      "continueWithX": "Lean ar aghaidh le X (twitter)",
+      "continueWithTelegram": "Lean ar aghaidh le Telegram",
+      "welcome": "Dia duit, {0}!",
+      "error": "Ríomhphost nó pasfhocal neamhbhailí."
+    },
+    "register": {
+      "title": "Cruthaigh Cuntas",
+      "subtitle": "Cruthaigh do chuntas chun leanúint ar aghaidh.",
+      "button": "Cláraigh",
+      "firstName": "Céad Ainm",
+      "firstNameLabel": "Ainm",
+      "emailLabel": "Ríomhphost",
+      "emailAddress": "Seoladh ríomhphoist",
+      "emailPlaceholder": "Seoladh ríomhphoist",
+      "passwordLabel": "Pasfhocal",
+      "passwordPlaceholder": "Pasfhocal",
+      "confirmPasswordLabel": "Deimhnigh Pasfhocal",
+      "confirmPasswordPlaceholder": "Pasfhocal",
+      "haveAccount": "An bhfuil cuntas agat cheana féin?",
+      "Onboarding": {
+        "title": "Críochnaigh Do Phróifíl",
+        "description": "Roghnaigh do ról agus ainm úsáideora chun leanúint ar aghaidh.",
+        "usernameLabel": "Ainm úsáideora",
+        "usernamePlaceholder": "Cuir isteach ainm úsáideora",
+        "roleLabel": "Ról",
+        "rolePlaceholder": "Roghnaigh do ról",
+        "roles": {
+          "creator": "Cruthaitheoir",
+          "fan": "Fan",
+          "vendor": "Díoltóir",
+          "agent": "Gníomhaire"
+        },
+        "button": "Lean ort"
+      },
+      "KYC": {
+        "title": "Fíoraigh D'Aitheantas",
+        "description": "Críochnaigh fíorú cruthaitheora chun rochtain a fháil ar an deais.",
+        "button": "Deimhnigh & Lean ar aghaidh",
+        "logout": "Logáil Amach & Scoir"
+      }
+    },
+    "confirmEmail": {
+      "title": "Deimhnigh Ríomhphost",
+      "subtitle": "Cuir isteach an ríomhphost a d’úsáid tú agus an cód fíorúcháin a sheolamar chugat.",
+      "button": "Deimhnigh",
+      "buttonLoading": "Ag deimhniú...",
+      "emailLabel": "Ríomhphost",
+      "emailPlaceholder": "Ríomhphost",
+      "codeLabel": "Cód Daingnithe",
+      "codePlaceholder": "Cód 6 dhigit",
+      "error": "Theip ar an deimhniú",
+      "autoLoginError": "Deimhníodh an ríomhphost, ach theip ar uath-logáil isteach. Logáil isteach de láimh le do thoil."
+    },
+    "reset": {
+      "title": "Athshocraigh Pasfhocal",
+      "subtitle": "Cuir isteach do r-phost chun cód athshocraithe a fháil.",
+      "subtitleConfirm": "Cuir isteach an cód a fuair tú agus pasfhocal nua.",
+      "sendCode": "Seol Cód Athshocraigh",
+      "codeLabel": "Cód Athshocraigh",
+      "codePlaceholder": "Cuir isteach cód athshocraithe",
+      "resetButton": "Athshocraigh Pasfhocal",
+      "codeSent": "Athshocraigh an cód a seoladh chuig do ríomhphost.",
+      "sendCodeError": "Theip ar an gcód a sheoladh",
+      "success": "D'éirigh le hathshocrú pasfhocail. Logáil isteach le do thoil.",
+      "error": "Theip ar an athshocrú"
+    },
+    "validation": {
+      "emailRequired": "Tá ríomhphost ag teastáil",
+      "emailInvalid": "Cuir isteach seoladh ríomhphoist bailí",
+      "passwordRequired": "Tá pasfhocal ag teastáil",
+      "passwordMinLength": "8 gcarachtar ar a laghad ar fad",
+      "passwordHasUpper": "Bíodh ar a laghad 1 litir ann",
+      "passwordHasLower": "Bíodh ar a laghad 1 litir ann",
+      "passwordHasNumber": "Bíodh uimhir 1 ar a laghad ann",
+      "passwordHasSpecial": "Tá ar a laghad 1 charachtar speisialta",
+      "confirmPasswordRequired": "Deimhnigh do phasfhocal",
+      "confirmPasswordMatch": "Ní hionann pasfhocail",
+      "confirmPasswordMatchSuccess": "Meaitseálann pasfhocal",
+      "codeRequired": "Tá cód ag teastáil",
+      "roleRequired": "Tá ról ag teastáil",
+      "roleSelect": "Roghnaigh ról le do thoil",
+      "usernameRequired": "Tá ainm úsáideora ag teastáil",
+      "usernameMinLength": "Caithfidh 4 charachtar ar a laghad a bheith san ainm úsáideora",
+      "usernameMaxLength": "Ní mór don ainm úsáideora a bheith níos lú ná 100 carachtar",
+      "usernameTaken": "Tá an t-ainm úsáideora tógtha cheana féin"
+    },
+    "common": {
+      "logout": "Sínigh Amach",
+      "loading": "Á lódáil...",
+      "user": "Úsáideoir",
+      "admin": "Riarachán",
+      "guest": "Aoi",
+      "showPassword": "Taispeáin pasfhocal",
+      "hidePassword": "Folaigh pasfhocal"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Tharla earráid agus do phróifíl á comhlánú"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Deais",
+      "description": "Forbhreathnú ar do chuntas"
+    },
+    "actions": {
+      "editProfile": "Cuir Próifíl in Eagar",
+      "editSettings": "Cuir Socruithe in Eagar",
+      "myMedia": "Mo Mheáin",
+      "viewStats": "Féach ar Staitisticí"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Cuir Próifíl in Eagar",
+        "description": "Nuashonraigh d'fhaisnéis phearsanta"
+      },
+      "editSettings": {
+        "title": "Socruithe Cuntais",
+        "description": "Bainistigh do shainroghanna cuntais"
+      },
+      "myMedia": {
+        "title": "Mo Mheáin",
+        "description": "Bainistigh d'inneachar uaslódáilte"
+      }
+    },
+    "messages": {
+      "welcome": "Fáilte ar ais, {0}!",
+      "stats": "Tá {0} mír agat"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Próifíl",
+      "description": "Bainistigh do chuid faisnéise próifíle"
+    },
+    "form": {
+      "firstName": "Céad Ainm",
+      "lastName": "Sloinne",
+      "email": "Seoladh Ríomhphoist",
+      "phone": "Uimhir Theileafóin",
+      "bio": "Beathaisnéis",
+      "save": "Sábháil Athruithe"
+    },
+    "messages": {
+      "updated": "D'éirigh leis an bpróifíl a nuashonrú",
+      "error": "Theip ar an bpróifíl a nuashonrú"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Faigh amach",
+      "description": "Déan iniúchadh ar ábhar agus gnéithe nua"
+    },
+    "sections": {
+      "featured": "Ábhar Réadmhaoin"
+    },
+    "messages": {
+      "explore": "Tosaigh ag iniúchadh ár n-ardán"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Siopa",
+      "description": "Déan táirgí a bhrabhsáil agus a cheannach"
+    },
+    "sections": {
+      "products": "Táirgí"
+    },
+    "messages": {
+      "comingSoon": "Tuilleadh táirgí ag teacht go luath!"
+    }
+  },
+  "common": {
+    "loading": "Á lódáil...",
+    "error": "Tharla earráid",
+    "success": "Oibríocht críochnaithe",
+    "save": "Sábháil",
+    "cancel": "Cealaigh",
+    "delete": "Scrios",
+    "edit": "Cuir in eagar",
+    "create": "Cruthaigh",
+    "update": "Nuashonrú",
+    "submit": "Cuir isteach",
+    "reset": "Athshocraigh",
+    "back": "Téigh Ar Ais",
+    "next": "Ar aghaidh",
+    "previous": "Roimhe Seo"
+  }
+}

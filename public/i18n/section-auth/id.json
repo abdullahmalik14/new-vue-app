@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Selamat Datang Kembali",
+      "subtitle": "Silakan masukkan kredensial Anda untuk melanjutkan.",
+      "button": "Masuk",
+      "emailLabel": "Surel",
+      "emailPlaceholder": "Alamat email",
+      "passwordLabel": "Kata sandi",
+      "passwordPlaceholder": "Kata sandi",
+      "forgotPassword": "Lupa kata sandi Anda?",
+      "rememberMe": "Ingat saya",
+      "noAccount": "Belum punya akun?",
+      "continueWithX": "Lanjutkan dengan X (twitter)",
+      "continueWithTelegram": "Lanjutkan dengan Telegram",
+      "welcome": "Halo, {0}!",
+      "error": "Email atau kata sandi tidak valid."
+    },
+    "register": {
+      "title": "Buat Akun",
+      "subtitle": "Buat akun Anda untuk melanjutkan.",
+      "button": "Daftar",
+      "firstName": "Nama Depan",
+      "firstNameLabel": "Nama",
+      "emailLabel": "Surel",
+      "emailAddress": "Alamat email",
+      "emailPlaceholder": "Alamat email",
+      "passwordLabel": "Kata sandi",
+      "passwordPlaceholder": "Kata sandi",
+      "confirmPasswordLabel": "Konfirmasi Kata Sandi",
+      "confirmPasswordPlaceholder": "Kata sandi",
+      "haveAccount": "Sudah punya akun?",
+      "Onboarding": {
+        "title": "Lengkapi Profil Anda",
+        "description": "Pilih peran dan nama pengguna Anda untuk melanjutkan.",
+        "usernameLabel": "Nama pengguna",
+        "usernamePlaceholder": "Masukkan nama pengguna",
+        "roleLabel": "Peran",
+        "rolePlaceholder": "Pilih peran Anda",
+        "roles": {
+          "creator": "Pencipta",
+          "fan": "Penggemar",
+          "vendor": "Penjual",
+          "agent": "Agen"
+        },
+        "button": "Lanjutkan"
+      },
+      "KYC": {
+        "title": "Verifikasi Identitas Anda",
+        "description": "Selesaikan verifikasi kreator untuk mengakses dasbor.",
+        "button": "Konfirmasi & Lanjutkan",
+        "logout": "Keluar & Keluar"
+      }
+    },
+    "confirmEmail": {
+      "title": "Konfirmasi Email",
+      "subtitle": "Masukkan email yang Anda gunakan dan kode verifikasi yang kami kirimkan kepada Anda.",
+      "button": "Konfirmasikan",
+      "buttonLoading": "Mengonfirmasi...",
+      "emailLabel": "Surel",
+      "emailPlaceholder": "Surel",
+      "codeLabel": "Kode Konfirmasi",
+      "codePlaceholder": "kode 6 digit",
+      "error": "Konfirmasi gagal",
+      "autoLoginError": "Email dikonfirmasi, tetapi login otomatis gagal. Silakan masuk secara manual."
+    },
+    "reset": {
+      "title": "Atur Ulang Kata Sandi",
+      "subtitle": "Masukkan email Anda untuk menerima kode reset.",
+      "subtitleConfirm": "Masukkan kode yang Anda terima dan kata sandi baru.",
+      "sendCode": "Kirim Kode Reset",
+      "codeLabel": "Atur Ulang Kode",
+      "codePlaceholder": "Masukkan kode setel ulang",
+      "resetButton": "Atur Ulang Kata Sandi",
+      "codeSent": "Reset kode yang dikirim ke email Anda.",
+      "sendCodeError": "Gagal mengirim kode",
+      "success": "Penyetelan ulang kata sandi berhasil. Silakan masuk.",
+      "error": "Penyetelan ulang gagal"
+    },
+    "validation": {
+      "emailRequired": "Email diperlukan",
+      "emailInvalid": "Silakan masukkan alamat email yang valid",
+      "passwordRequired": "Kata sandi diperlukan",
+      "passwordMinLength": "Panjangnya minimal 8 karakter",
+      "passwordHasUpper": "Berisi minimal 1 huruf besar",
+      "passwordHasLower": "Berisi minimal 1 huruf kecil",
+      "passwordHasNumber": "Berisi minimal 1 nomor",
+      "passwordHasSpecial": "Berisi setidaknya 1 karakter khusus",
+      "confirmPasswordRequired": "Harap konfirmasi kata sandi Anda",
+      "confirmPasswordMatch": "Kata sandi tidak cocok",
+      "confirmPasswordMatchSuccess": "Kata sandi cocok",
+      "codeRequired": "Kode diperlukan",
+      "roleRequired": "Peran diperlukan",
+      "roleSelect": "Silakan pilih peran",
+      "usernameRequired": "Nama pengguna diperlukan",
+      "usernameMinLength": "Nama pengguna minimal harus 4 karakter",
+      "usernameMaxLength": "Nama pengguna harus kurang dari 100 karakter",
+      "usernameTaken": "Nama pengguna sudah dipakai"
+    },
+    "common": {
+      "logout": "Keluar",
+      "loading": "Memuat...",
+      "user": "Pengguna",
+      "admin": "Admin",
+      "guest": "Tamu",
+      "showPassword": "Tampilkan kata sandi",
+      "hidePassword": "Sembunyikan kata sandi"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Terjadi kesalahan saat melengkapi profil Anda"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dasbor",
+      "description": "Ikhtisar akun Anda"
+    },
+    "actions": {
+      "editProfile": "Sunting Profil",
+      "editSettings": "Sunting Pengaturan",
+      "myMedia": "Media Saya",
+      "viewStats": "Lihat Statistik"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Sunting Profil",
+        "description": "Perbarui informasi pribadi Anda"
+      },
+      "editSettings": {
+        "title": "Pengaturan Akun",
+        "description": "Kelola preferensi akun Anda"
+      },
+      "myMedia": {
+        "title": "Media Saya",
+        "description": "Kelola konten yang Anda unggah"
+      }
+    },
+    "messages": {
+      "welcome": "Selamat datang kembali, {0}!",
+      "stats": "Anda memiliki {0} item"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Kelola informasi profil Anda"
+    },
+    "form": {
+      "firstName": "Nama Depan",
+      "lastName": "Nama Belakang",
+      "email": "Alamat Surel",
+      "phone": "Nomor Telepon",
+      "bio": "Biografi",
+      "save": "Simpan Perubahan"
+    },
+    "messages": {
+      "updated": "Profil berhasil diperbarui",
+      "error": "Gagal memperbarui profil"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Temukan",
+      "description": "Jelajahi konten dan fitur baru"
+    },
+    "sections": {
+      "featured": "Konten Unggulan"
+    },
+    "messages": {
+      "explore": "Mulailah menjelajahi platform kami"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Berbelanja",
+      "description": "Telusuri dan beli produk"
+    },
+    "sections": {
+      "products": "Produk"
+    },
+    "messages": {
+      "comingSoon": "Lebih banyak produk segera hadir!"
+    }
+  },
+  "common": {
+    "loading": "Memuat...",
+    "error": "Terjadi kesalahan",
+    "success": "Operasi selesai",
+    "save": "Simpan",
+    "cancel": "Batalkan",
+    "delete": "Hapus",
+    "edit": "Sunting",
+    "create": "Buat",
+    "update": "Pembaruan",
+    "submit": "Kirim",
+    "reset": "Setel ulang",
+    "back": "Kembali",
+    "next": "Selanjutnya",
+    "previous": "Sebelumnya"
+  }
+}

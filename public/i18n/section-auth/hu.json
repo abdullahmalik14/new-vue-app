@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Üdvözöljük Vissza",
+      "subtitle": "Kérjük, adja meg hitelesítő adatait a folytatáshoz.",
+      "button": "Bejelentkezés",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "E-mail cím",
+      "passwordLabel": "Jelszó",
+      "passwordPlaceholder": "Jelszó",
+      "forgotPassword": "Elfelejtette jelszavát?",
+      "rememberMe": "Emlékezz rám",
+      "noAccount": "Nincs fiókod?",
+      "continueWithX": "Folytatás X-el (twitter)",
+      "continueWithTelegram": "Folytassa a Telegrammal",
+      "welcome": "Szia, {0}!",
+      "error": "Érvénytelen e-mail cím vagy jelszó."
+    },
+    "register": {
+      "title": "Fiók létrehozása",
+      "subtitle": "A folytatáshoz hozza létre fiókját.",
+      "button": "Regisztráljon",
+      "firstName": "Keresztnév",
+      "firstNameLabel": "Név",
+      "emailLabel": "E-mail",
+      "emailAddress": "E-mail cím",
+      "emailPlaceholder": "E-mail cím",
+      "passwordLabel": "Jelszó",
+      "passwordPlaceholder": "Jelszó",
+      "confirmPasswordLabel": "Jelszó megerősítése",
+      "confirmPasswordPlaceholder": "Jelszó",
+      "haveAccount": "Már van fiókja?",
+      "Onboarding": {
+        "title": "Töltse ki profilját",
+        "description": "A folytatáshoz válassza ki szerepét és felhasználónevét.",
+        "usernameLabel": "Felhasználónév",
+        "usernamePlaceholder": "Adjon meg egy felhasználónevet",
+        "roleLabel": "Szerep",
+        "rolePlaceholder": "Válassza ki a szerepét",
+        "roles": {
+          "creator": "Alkotó",
+          "fan": "Fan",
+          "vendor": "Eladó",
+          "agent": "ügynök"
+        },
+        "button": "Folytatás"
+      },
+      "KYC": {
+        "title": "Igazolja személyazonosságát",
+        "description": "Az irányítópult eléréséhez hajtsa végre az alkotói igazolást.",
+        "button": "Erősítse meg és folytassa",
+        "logout": "Kijelentkezés és kilépés"
+      }
+    },
+    "confirmEmail": {
+      "title": "E-mail megerősítése",
+      "subtitle": "Adja meg a használt e-mail címet és az ellenőrző kódot, amelyet elküldtünk Önnek.",
+      "button": "Erősítse meg",
+      "buttonLoading": "Megerősítés...",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "E-mail",
+      "codeLabel": "Megerősítő kód",
+      "codePlaceholder": "6 számjegyű kód",
+      "error": "A megerősítés sikertelen",
+      "autoLoginError": "E-mail megerősítve, de az automatikus bejelentkezés nem sikerült. Kérjük, jelentkezzen be manuálisan."
+    },
+    "reset": {
+      "title": "Jelszó visszaállítása",
+      "subtitle": "Adja meg e-mail címét, hogy megkapja a visszaállítási kódot.",
+      "subtitleConfirm": "Írja be a kapott kódot és az új jelszót.",
+      "sendCode": "Reset Code küldése",
+      "codeLabel": "Reset Code",
+      "codePlaceholder": "Írja be a reset kódot",
+      "resetButton": "Jelszó visszaállítása",
+      "codeSent": "Az e-mailre küldött kód visszaállítása.",
+      "sendCodeError": "Nem sikerült elküldeni a kódot",
+      "success": "A jelszó visszaállítása sikeres volt. Kérjük, jelentkezzen be.",
+      "error": "A visszaállítás nem sikerült"
+    },
+    "validation": {
+      "emailRequired": "E-mail megadása kötelező",
+      "emailInvalid": "Kérjük, adjon meg egy érvényes e-mail címet",
+      "passwordRequired": "Jelszó szükséges",
+      "passwordMinLength": "Legalább 8 karakter hosszú",
+      "passwordHasUpper": "Tartalmazzon legalább 1 nagybetűt",
+      "passwordHasLower": "Tartalmazzon legalább 1 kisbetűt",
+      "passwordHasNumber": "Legalább 1 számot tartalmazzon",
+      "passwordHasSpecial": "Tartalmazzon legalább 1 speciális karaktert",
+      "confirmPasswordRequired": "Kérjük, erősítse meg jelszavát",
+      "confirmPasswordMatch": "A jelszavak nem egyeznek",
+      "confirmPasswordMatchSuccess": "Jelszó egyezik",
+      "codeRequired": "A kód megadása kötelező",
+      "roleRequired": "Szerep szükséges",
+      "roleSelect": "Kérjük, válasszon szerepet",
+      "usernameRequired": "Felhasználónév megadása kötelező",
+      "usernameMinLength": "A felhasználónévnek legalább 4 karakterből kell állnia",
+      "usernameMaxLength": "A felhasználónévnek 100 karakternél rövidebbnek kell lennie",
+      "usernameTaken": "A felhasználónév már foglalt"
+    },
+    "common": {
+      "logout": "Jelentkezzen ki",
+      "loading": "Betöltés...",
+      "user": "Felhasználó",
+      "admin": "Admin",
+      "guest": "Vendég",
+      "showPassword": "Jelszó megjelenítése",
+      "hidePassword": "Jelszó elrejtése"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Hiba történt a profil kitöltése közben"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Irányítópult",
+      "description": "A fiók áttekintése"
+    },
+    "actions": {
+      "editProfile": "Profil szerkesztése",
+      "editSettings": "Beállítások szerkesztése",
+      "myMedia": "Saját médiám",
+      "viewStats": "Statisztika megtekintése"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Profil szerkesztése",
+        "description": "Frissítse személyes adatait"
+      },
+      "editSettings": {
+        "title": "Fiókbeállítások",
+        "description": "Kezelje fiókbeállításait"
+      },
+      "myMedia": {
+        "title": "Saját médiám",
+        "description": "Kezelje feltöltött tartalmait"
+      }
+    },
+    "messages": {
+      "welcome": "Üdv újra, {0}!",
+      "stats": "{0} eleme van"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Kezelje profiladatait"
+    },
+    "form": {
+      "firstName": "Keresztnév",
+      "lastName": "Vezetéknév",
+      "email": "E-mail cím",
+      "phone": "Telefonszám",
+      "bio": "Életrajz",
+      "save": "Módosítások mentése"
+    },
+    "messages": {
+      "updated": "A profil sikeresen frissítve",
+      "error": "Nem sikerült frissíteni a profilt"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Fedezze fel",
+      "description": "Fedezzen fel új tartalmakat és funkciókat"
+    },
+    "sections": {
+      "featured": "Kiemelt tartalom"
+    },
+    "messages": {
+      "explore": "Kezdje el felfedezni platformunkat"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Bolt",
+      "description": "Böngésszen és vásároljon termékeket"
+    },
+    "sections": {
+      "products": "Termékek"
+    },
+    "messages": {
+      "comingSoon": "További termékek hamarosan!"
+    }
+  },
+  "common": {
+    "loading": "Betöltés...",
+    "error": "Hiba történt",
+    "success": "A művelet befejeződött",
+    "save": "Mentés",
+    "cancel": "Mégse",
+    "delete": "Törölje",
+    "edit": "Szerkesztés",
+    "create": "Létrehozása",
+    "update": "Frissítés",
+    "submit": "Beküld",
+    "reset": "Reset",
+    "back": "Menj vissza",
+    "next": "Következő",
+    "previous": "Előző"
+  }
+}

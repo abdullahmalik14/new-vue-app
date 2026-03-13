@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "ברוך הבא בחזרה",
+      "subtitle": "אנא הזן את האישורים שלך כדי להמשיך.",
+      "button": "התחבר",
+      "emailLabel": "דוא\"ל",
+      "emailPlaceholder": "כתובת אימייל",
+      "passwordLabel": "סיסמה",
+      "passwordPlaceholder": "סיסמה",
+      "forgotPassword": "שכחת את הסיסמה שלך?",
+      "rememberMe": "תזכור אותי",
+      "noAccount": "אין לך חשבון?",
+      "continueWithX": "המשך עם X (טוויטר)",
+      "continueWithTelegram": "המשך עם טלגרם",
+      "welcome": "שלום, {0}!",
+      "error": "אימייל או סיסמה לא חוקיים."
+    },
+    "register": {
+      "title": "צור חשבון",
+      "subtitle": "צור את החשבון שלך כדי להמשיך.",
+      "button": "הירשם",
+      "firstName": "שם פרטי",
+      "firstNameLabel": "שם",
+      "emailLabel": "דוא\"ל",
+      "emailAddress": "כתובת אימייל",
+      "emailPlaceholder": "כתובת אימייל",
+      "passwordLabel": "סיסמה",
+      "passwordPlaceholder": "סיסמה",
+      "confirmPasswordLabel": "אשר את הסיסמה",
+      "confirmPasswordPlaceholder": "סיסמה",
+      "haveAccount": "יש לך כבר חשבון?",
+      "Onboarding": {
+        "title": "השלם את הפרופיל שלך",
+        "description": "בחר את התפקיד ואת שם המשתמש שלך כדי להמשיך.",
+        "usernameLabel": "שם משתמש",
+        "usernamePlaceholder": "הזן שם משתמש",
+        "roleLabel": "תפקיד",
+        "rolePlaceholder": "בחר את התפקיד שלך",
+        "roles": {
+          "creator": "יוצר",
+          "fan": "מאוורר",
+          "vendor": "ספק",
+          "agent": "סוכן"
+        },
+        "button": "המשך"
+      },
+      "KYC": {
+        "title": "אמת את זהותך",
+        "description": "השלם את אימות היוצר כדי לגשת ללוח המחוונים.",
+        "button": "אשר והמשך",
+        "logout": "התנתק ויציאה"
+      }
+    },
+    "confirmEmail": {
+      "title": "אשר אימייל",
+      "subtitle": "הזן את האימייל שבו השתמשת ואת קוד האימות ששלחנו לך.",
+      "button": "אשר",
+      "buttonLoading": "מאשר...",
+      "emailLabel": "דוא\"ל",
+      "emailPlaceholder": "דוא\"ל",
+      "codeLabel": "קוד אישור",
+      "codePlaceholder": "קוד בן 6 ספרות",
+      "error": "האישור נכשל",
+      "autoLoginError": "האימייל אושר, אך הכניסה האוטומטית נכשלה. נא להיכנס באופן ידני."
+    },
+    "reset": {
+      "title": "אפס סיסמה",
+      "subtitle": "הזן את האימייל שלך כדי לקבל קוד איפוס.",
+      "subtitleConfirm": "הזן את הקוד שקיבלת וסיסמה חדשה.",
+      "sendCode": "שלח קוד איפוס",
+      "codeLabel": "אפס את הקוד",
+      "codePlaceholder": "הזן קוד איפוס",
+      "resetButton": "אפס סיסמה",
+      "codeSent": "אפס את הקוד שנשלח למייל שלך.",
+      "sendCodeError": "שליחת הקוד נכשלה",
+      "success": "איפוס הסיסמה הצליח. נא להיכנס.",
+      "error": "האיפוס נכשל"
+    },
+    "validation": {
+      "emailRequired": "נדרש אימייל",
+      "emailInvalid": "נא להזין כתובת אימייל חוקית",
+      "passwordRequired": "נדרשת סיסמה",
+      "passwordMinLength": "אורך 8 תווים לפחות",
+      "passwordHasUpper": "מכיל לפחות אות אחת גדולה",
+      "passwordHasLower": "מכיל לפחות אות קטנה אחת",
+      "passwordHasNumber": "מכיל מספר אחד לפחות",
+      "passwordHasSpecial": "מכיל לפחות תו מיוחד אחד",
+      "confirmPasswordRequired": "אנא אשר את הסיסמה שלך",
+      "confirmPasswordMatch": "הסיסמאות אינן תואמות",
+      "confirmPasswordMatchSuccess": "סיסמה תואמת",
+      "codeRequired": "קוד נדרש",
+      "roleRequired": "נדרש תפקיד",
+      "roleSelect": "אנא בחר תפקיד",
+      "usernameRequired": "שם משתמש נדרש",
+      "usernameMinLength": "שם המשתמש חייב להיות בן 4 תווים לפחות",
+      "usernameMaxLength": "שם המשתמש חייב להכיל פחות מ-100 תווים",
+      "usernameTaken": "שם המשתמש כבר תפוס"
+    },
+    "common": {
+      "logout": "צא",
+      "loading": "טוען...",
+      "user": "משתמש",
+      "admin": "מנהל מערכת",
+      "guest": "אורח",
+      "showPassword": "הצג סיסמה",
+      "hidePassword": "הסתר את הסיסמה"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "אירעה שגיאה בעת השלמת הפרופיל שלך"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "לוח מחוונים",
+      "description": "סקירה כללית של החשבון שלך"
+    },
+    "actions": {
+      "editProfile": "ערוך פרופיל",
+      "editSettings": "ערוך הגדרות",
+      "myMedia": "המדיה שלי",
+      "viewStats": "צפה בסטטיסטיקה"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "ערוך פרופיל",
+        "description": "עדכן את המידע האישי שלך"
+      },
+      "editSettings": {
+        "title": "הגדרות חשבון",
+        "description": "נהל את העדפות החשבון שלך"
+      },
+      "myMedia": {
+        "title": "המדיה שלי",
+        "description": "נהל את התוכן שהעלית"
+      }
+    },
+    "messages": {
+      "welcome": "ברוך הבא, {0}!",
+      "stats": "יש לך {0} פריטים"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "פרופיל",
+      "description": "נהל את פרטי הפרופיל שלך"
+    },
+    "form": {
+      "firstName": "שם פרטי",
+      "lastName": "שם משפחה",
+      "email": "כתובת אימייל",
+      "phone": "מספר טלפון",
+      "bio": "ביוגרפיה",
+      "save": "שמור שינויים"
+    },
+    "messages": {
+      "updated": "הפרופיל עודכן בהצלחה",
+      "error": "עדכון הפרופיל נכשל"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "גלה",
+      "description": "חקור תוכן ותכונות חדשות"
+    },
+    "sections": {
+      "featured": "תוכן מומלץ"
+    },
+    "messages": {
+      "explore": "התחל לחקור את הפלטפורמה שלנו"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "חנות",
+      "description": "עיינו ורכשו מוצרים"
+    },
+    "sections": {
+      "products": "מוצרים"
+    },
+    "messages": {
+      "comingSoon": "מוצרים נוספים בקרוב!"
+    }
+  },
+  "common": {
+    "loading": "טוען...",
+    "error": "אירעה שגיאה",
+    "success": "הפעולה הושלמה",
+    "save": "שמור",
+    "cancel": "בטל",
+    "delete": "מחק",
+    "edit": "ערוך",
+    "create": "צור",
+    "update": "עדכון",
+    "submit": "שלח",
+    "reset": "אפס",
+    "back": "חזור אחורה",
+    "next": "הבא",
+    "previous": "הקודם"
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Vítejte zpět",
+      "subtitle": "Chcete-li pokračovat, zadejte své přihlašovací údaje.",
+      "button": "Přihlaste se",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Emailová adresa",
+      "passwordLabel": "Heslo",
+      "passwordPlaceholder": "Heslo",
+      "forgotPassword": "Zapomněli jste heslo?",
+      "rememberMe": "Pamatuj si mě",
+      "noAccount": "Nemáte účet?",
+      "continueWithX": "Pokračovat s X (twitter)",
+      "continueWithTelegram": "Pokračujte telegramem",
+      "welcome": "Dobrý den, {0}!",
+      "error": "Neplatný e-mail nebo heslo."
+    },
+    "register": {
+      "title": "Vytvořit účet",
+      "subtitle": "Chcete-li pokračovat, vytvořte si účet.",
+      "button": "Zaregistrujte se",
+      "firstName": "Křestní jméno",
+      "firstNameLabel": "Jméno",
+      "emailLabel": "Email",
+      "emailAddress": "Emailová adresa",
+      "emailPlaceholder": "Emailová adresa",
+      "passwordLabel": "Heslo",
+      "passwordPlaceholder": "Heslo",
+      "confirmPasswordLabel": "Potvrďte heslo",
+      "confirmPasswordPlaceholder": "Heslo",
+      "haveAccount": "Už máte účet?",
+      "Onboarding": {
+        "title": "Vyplňte svůj profil",
+        "description": "Chcete-li pokračovat, vyberte svou roli a uživatelské jméno.",
+        "usernameLabel": "Uživatelské jméno",
+        "usernamePlaceholder": "Zadejte uživatelské jméno",
+        "roleLabel": "Role",
+        "rolePlaceholder": "Vyberte svou roli",
+        "roles": {
+          "creator": "Tvůrce",
+          "fan": "Fan",
+          "vendor": "Prodejce",
+          "agent": "Agent"
+        },
+        "button": "Pokračovat"
+      },
+      "KYC": {
+        "title": "Ověřte svou identitu",
+        "description": "Pro přístup k řídicímu panelu dokončete ověření tvůrce.",
+        "button": "Potvrdit a pokračovat",
+        "logout": "Odhlášení a ukončení"
+      }
+    },
+    "confirmEmail": {
+      "title": "Potvrďte e-mail",
+      "subtitle": "Zadejte e-mail, který jste použili, a ověřovací kód, který jsme vám zaslali.",
+      "button": "Potvrďte",
+      "buttonLoading": "Potvrzuje se...",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "codeLabel": "Potvrzovací kód",
+      "codePlaceholder": "6místný kód",
+      "error": "Potvrzení se nezdařilo",
+      "autoLoginError": "E-mail byl potvrzen, ale automatické přihlášení se nezdařilo. Přihlaste se prosím ručně."
+    },
+    "reset": {
+      "title": "Obnovit heslo",
+      "subtitle": "Zadejte svůj e-mail a obdržíte resetovací kód.",
+      "subtitleConfirm": "Zadejte kód, který jste obdrželi, a nové heslo.",
+      "sendCode": "Odeslat resetovací kód",
+      "codeLabel": "Resetovat kód",
+      "codePlaceholder": "Zadejte resetovací kód",
+      "resetButton": "Obnovit heslo",
+      "codeSent": "Resetujte kód zaslaný na váš e-mail.",
+      "sendCodeError": "Kód se nepodařilo odeslat",
+      "success": "Resetování hesla bylo úspěšné. Přihlaste se prosím.",
+      "error": "Resetování se nezdařilo"
+    },
+    "validation": {
+      "emailRequired": "E-mail je povinný",
+      "emailInvalid": "Zadejte prosím platnou e-mailovou adresu",
+      "passwordRequired": "Je vyžadováno heslo",
+      "passwordMinLength": "Minimálně 8 znaků",
+      "passwordHasUpper": "Obsahuje alespoň 1 velké písmeno",
+      "passwordHasLower": "Obsahuje alespoň 1 malé písmeno",
+      "passwordHasNumber": "Obsahuje alespoň 1 číslo",
+      "passwordHasSpecial": "Obsahuje alespoň 1 speciální znak",
+      "confirmPasswordRequired": "Potvrďte prosím své heslo",
+      "confirmPasswordMatch": "Hesla se neshodují",
+      "confirmPasswordMatchSuccess": "Heslo se shoduje",
+      "codeRequired": "Kód je povinný",
+      "roleRequired": "Role je povinná",
+      "roleSelect": "Vyberte prosím roli",
+      "usernameRequired": "Uživatelské jméno je povinné",
+      "usernameMinLength": "Uživatelské jméno musí mít alespoň 4 znaky",
+      "usernameMaxLength": "Uživatelské jméno musí mít méně než 100 znaků",
+      "usernameTaken": "Uživatelské jméno je již obsazeno"
+    },
+    "common": {
+      "logout": "Odhlásit se",
+      "loading": "Načítání...",
+      "user": "Uživatel",
+      "admin": "Admin",
+      "guest": "Host",
+      "showPassword": "Zobrazit heslo",
+      "hidePassword": "Skrýt heslo"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Při vyplňování vašeho profilu došlo k chybě"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard",
+      "description": "Přehled vašeho účtu"
+    },
+    "actions": {
+      "editProfile": "Upravit profil",
+      "editSettings": "Upravit nastavení",
+      "myMedia": "Moje média",
+      "viewStats": "Zobrazit statistiky"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Upravit profil",
+        "description": "Aktualizujte své osobní údaje"
+      },
+      "editSettings": {
+        "title": "Nastavení účtu",
+        "description": "Spravujte předvolby účtu"
+      },
+      "myMedia": {
+        "title": "Moje média",
+        "description": "Spravujte svůj nahraný obsah"
+      }
+    },
+    "messages": {
+      "welcome": "Vítejte zpět, {0}!",
+      "stats": "Máte {0} položek"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Spravujte informace ve svém profilu"
+    },
+    "form": {
+      "firstName": "Křestní jméno",
+      "lastName": "Příjmení",
+      "email": "E-mailová adresa",
+      "phone": "Telefonní číslo",
+      "bio": "Životopis",
+      "save": "Uložit změny"
+    },
+    "messages": {
+      "updated": "Profil byl úspěšně aktualizován",
+      "error": "Aktualizace profilu se nezdařila"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Objevte",
+      "description": "Prozkoumejte nový obsah a funkce"
+    },
+    "sections": {
+      "featured": "Doporučený obsah"
+    },
+    "messages": {
+      "explore": "Začněte prozkoumávat naši platformu"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Obchod",
+      "description": "Procházejte a nakupujte produkty"
+    },
+    "sections": {
+      "products": "Produkty"
+    },
+    "messages": {
+      "comingSoon": "Další produkty již brzy!"
+    }
+  },
+  "common": {
+    "loading": "Načítání...",
+    "error": "Došlo k chybě",
+    "success": "Operace dokončena",
+    "save": "Uložit",
+    "cancel": "Zrušit",
+    "delete": "Smazat",
+    "edit": "Upravit",
+    "create": "Vytvořit",
+    "update": "Aktualizovat",
+    "submit": "Odeslat",
+    "reset": "Resetovat",
+    "back": "Vraťte se zpět",
+    "next": "Další",
+    "previous": "Předchozí"
+  }
+}

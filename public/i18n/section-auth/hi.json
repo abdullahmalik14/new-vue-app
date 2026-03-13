@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "पुनः स्वागत है",
+      "subtitle": "जारी रखने के लिए कृपया अपने क्रेडेंशियल दर्ज करें।",
+      "button": "लॉग इन करें",
+      "emailLabel": "ईमेल",
+      "emailPlaceholder": "ईमेल पता",
+      "passwordLabel": "पासवर्ड",
+      "passwordPlaceholder": "पासवर्ड",
+      "forgotPassword": "अपना पासवर्ड भूल गये?",
+      "rememberMe": "मुझे याद करो",
+      "noAccount": "कोई खाता नहीं है?",
+      "continueWithX": "एक्स के साथ जारी रखें (ट्विटर)",
+      "continueWithTelegram": "टेलीग्राम के साथ जारी रखें",
+      "welcome": "नमस्ते, {0}!",
+      "error": "अमान्य ईमेल या पासवर्ड."
+    },
+    "register": {
+      "title": "खाता बनाएँ",
+      "subtitle": "जारी रखने के लिए अपना खाता बनाएं.",
+      "button": "साइन अप करें",
+      "firstName": "प्रथम नाम",
+      "firstNameLabel": "नाम",
+      "emailLabel": "ईमेल",
+      "emailAddress": "ईमेल पता",
+      "emailPlaceholder": "ईमेल पता",
+      "passwordLabel": "पासवर्ड",
+      "passwordPlaceholder": "पासवर्ड",
+      "confirmPasswordLabel": "पासवर्ड की पुष्टि करें",
+      "confirmPasswordPlaceholder": "पासवर्ड",
+      "haveAccount": "क्या आपके पास पहले से ही एक खाता है?",
+      "Onboarding": {
+        "title": "अपना प्रोफ़ाइल पूरा करें",
+        "description": "जारी रखने के लिए अपनी भूमिका और उपयोगकर्ता नाम चुनें।",
+        "usernameLabel": "उपयोगकर्ता नाम",
+        "usernamePlaceholder": "एक उपयोक्तानाम दर्ज करें",
+        "roleLabel": "भूमिका",
+        "rolePlaceholder": "अपनी भूमिका चुनें",
+        "roles": {
+          "creator": "रचयिता",
+          "fan": "पंखा",
+          "vendor": "विक्रेता",
+          "agent": "एजेंट"
+        },
+        "button": "जारी रखें"
+      },
+      "KYC": {
+        "title": "अपनी पहचान सत्यापित करें",
+        "description": "डैशबोर्ड तक पहुंचने के लिए निर्माता सत्यापन पूरा करें।",
+        "button": "पुष्टि करें और आगे बढ़ें",
+        "logout": "लॉगआउट करें और बाहर निकलें"
+      }
+    },
+    "confirmEmail": {
+      "title": "ईमेल की पुष्टि करें",
+      "subtitle": "आपके द्वारा उपयोग किया गया ईमेल और हमारे द्वारा आपको भेजा गया सत्यापन कोड दर्ज करें।",
+      "button": "पुष्टि करें",
+      "buttonLoading": "पुष्टि की जा रही है...",
+      "emailLabel": "ईमेल",
+      "emailPlaceholder": "ईमेल",
+      "codeLabel": "पुष्टिकरण कोड",
+      "codePlaceholder": "6 अंकीय कोड",
+      "error": "पुष्टिकरण विफल रहा",
+      "autoLoginError": "ईमेल की पुष्टि की गई, लेकिन ऑटो-लॉगिन विफल रहा। कृपया मैन्युअल रूप से लॉग इन करें."
+    },
+    "reset": {
+      "title": "पासवर्ड रीसेट करें",
+      "subtitle": "रीसेट कोड प्राप्त करने के लिए अपना ईमेल दर्ज करें।",
+      "subtitleConfirm": "आपको प्राप्त कोड और नया पासवर्ड दर्ज करें।",
+      "sendCode": "रीसेट कोड भेजें",
+      "codeLabel": "कोड रीसेट करें",
+      "codePlaceholder": "रीसेट कोड दर्ज करें",
+      "resetButton": "पासवर्ड रीसेट करें",
+      "codeSent": "आपके ईमेल पर भेजा गया रीसेट कोड.",
+      "sendCodeError": "कोड भेजने में विफल",
+      "success": "पासवर्ड रीसेट सफल. कृपया लॉग इन करें.",
+      "error": "रीसेट विफल रहा"
+    },
+    "validation": {
+      "emailRequired": "ईमेल आवश्यक है",
+      "emailInvalid": "कृपया एक वैध ईमेल पता दर्ज करें",
+      "passwordRequired": "पासवर्ड आवश्यक है",
+      "passwordMinLength": "कम से कम 8 अक्षर लंबा",
+      "passwordHasUpper": "कम से कम 1 बड़ा अक्षर रखें",
+      "passwordHasLower": "कम से कम 1 लोअरकेस अक्षर रखें",
+      "passwordHasNumber": "कम से कम 1 नंबर शामिल करें",
+      "passwordHasSpecial": "कम से कम 1 विशेष वर्ण शामिल करें",
+      "confirmPasswordRequired": "कृपया अपने पासवर्ड की पुष्टि करें",
+      "confirmPasswordMatch": "पासवर्ड मेल नहीं खाते",
+      "confirmPasswordMatchSuccess": "पासवर्ड मेल खाता है",
+      "codeRequired": "कोड आवश्यक है",
+      "roleRequired": "भूमिका आवश्यक है",
+      "roleSelect": "कृपया एक भूमिका चुनें",
+      "usernameRequired": "उपयोगकर्ता नाम आवश्यक है",
+      "usernameMinLength": "उपयोगकर्ता नाम कम से कम 4 अक्षर का होना चाहिए",
+      "usernameMaxLength": "उपयोगकर्ता नाम 100 अक्षरों से कम होना चाहिए",
+      "usernameTaken": "उपयोगकर्ता नाम पहले ही लिया जा चुका है"
+    },
+    "common": {
+      "logout": "साइन आउट करें",
+      "loading": "लोड हो रहा है...",
+      "user": "उपयोगकर्ता",
+      "admin": "व्यवस्थापक",
+      "guest": "अतिथि",
+      "showPassword": "पासवर्ड दिखाएँ",
+      "hidePassword": "पासवर्ड छिपाएँ"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "आपकी प्रोफ़ाइल पूर्ण करते समय एक त्रुटि उत्पन्न हुई"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "डैशबोर्ड",
+      "description": "आपके खाते का अवलोकन"
+    },
+    "actions": {
+      "editProfile": "प्रोफ़ाइल संपादित करें",
+      "editSettings": "सेटिंग्स संपादित करें",
+      "myMedia": "मेरा मीडिया",
+      "viewStats": "सांख्यिकी देखें"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "प्रोफ़ाइल संपादित करें",
+        "description": "अपनी व्यक्तिगत जानकारी अपडेट करें"
+      },
+      "editSettings": {
+        "title": "खाता सेटिंग",
+        "description": "अपनी खाता प्राथमिकताएँ प्रबंधित करें"
+      },
+      "myMedia": {
+        "title": "मेरा मीडिया",
+        "description": "अपनी अपलोड की गई सामग्री प्रबंधित करें"
+      }
+    },
+    "messages": {
+      "welcome": "पुनः स्वागत है, {0}!",
+      "stats": "आपके पास {0} आइटम हैं"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "प्रोफाइल",
+      "description": "अपनी प्रोफ़ाइल जानकारी प्रबंधित करें"
+    },
+    "form": {
+      "firstName": "प्रथम नाम",
+      "lastName": "अंतिम नाम",
+      "email": "ईमेल पता",
+      "phone": "फ़ोन नंबर",
+      "bio": "जीवनी",
+      "save": "परिवर्तन सहेजें"
+    },
+    "messages": {
+      "updated": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+      "error": "प्रोफ़ाइल अपडेट करने में विफल"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "खोजें",
+      "description": "नई सामग्री और सुविधाओं का अन्वेषण करें"
+    },
+    "sections": {
+      "featured": "विशेष रुप से प्रदर्शित सामग्री"
+    },
+    "messages": {
+      "explore": "हमारे प्लेटफ़ॉर्म की खोज शुरू करें"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "दुकान",
+      "description": "उत्पाद ब्राउज़ करें और खरीदें"
+    },
+    "sections": {
+      "products": "उत्पाद"
+    },
+    "messages": {
+      "comingSoon": "अधिक उत्पाद जल्द ही आ रहे हैं!"
+    }
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "एक त्रुटि हुई",
+    "success": "ऑपरेशन पूरा हुआ",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएँ",
+    "edit": "संपादित करें",
+    "create": "बनाएँ",
+    "update": "अद्यतन करें",
+    "submit": "सबमिट करें",
+    "reset": "रीसेट करें",
+    "back": "वापस जाओ",
+    "next": "अगला",
+    "previous": "पिछला"
+  }
+}

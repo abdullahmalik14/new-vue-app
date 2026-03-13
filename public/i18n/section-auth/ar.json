@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "مرحبا بكم مرة أخرى",
+      "subtitle": "الرجاء إدخال بيانات الاعتماد الخاصة بك للمتابعة.",
+      "button": "تسجيل الدخول",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "عنوان البريد الإلكتروني",
+      "passwordLabel": "كلمة المرور",
+      "passwordPlaceholder": "كلمة المرور",
+      "forgotPassword": "هل نسيت كلمة المرور الخاصة بك؟",
+      "rememberMe": "تذكرني",
+      "noAccount": "ليس لديك حساب؟",
+      "continueWithX": "تواصل مع X (تويتر)",
+      "continueWithTelegram": "تواصل مع برقية",
+      "welcome": "مرحبًا، {0}!",
+      "error": "البريد الإلكتروني أو كلمة المرور غير صالحة."
+    },
+    "register": {
+      "title": "إنشاء حساب",
+      "subtitle": "قم بإنشاء حسابك للمتابعة.",
+      "button": "قم بالتسجيل",
+      "firstName": "الاسم الأول",
+      "firstNameLabel": "الاسم",
+      "emailLabel": "البريد الإلكتروني",
+      "emailAddress": "عنوان البريد الإلكتروني",
+      "emailPlaceholder": "عنوان البريد الإلكتروني",
+      "passwordLabel": "كلمة المرور",
+      "passwordPlaceholder": "كلمة المرور",
+      "confirmPasswordLabel": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "كلمة المرور",
+      "haveAccount": "هل لديك حساب بالفعل؟",
+      "Onboarding": {
+        "title": "أكمل ملفك الشخصي",
+        "description": "اختر دورك واسم المستخدم للمتابعة.",
+        "usernameLabel": "اسم المستخدم",
+        "usernamePlaceholder": "أدخل اسم المستخدم",
+        "roleLabel": "الدور",
+        "rolePlaceholder": "حدد دورك",
+        "roles": {
+          "creator": "الخالق",
+          "fan": "مروحة",
+          "vendor": "بائع",
+          "agent": "وكيل"
+        },
+        "button": "متابعة"
+      },
+      "KYC": {
+        "title": "التحقق من هويتك",
+        "description": "أكمل عملية التحقق من المنشئ للوصول إلى لوحة التحكم.",
+        "button": "تأكيد والمضي قدما",
+        "logout": "تسجيل الخروج والخروج"
+      }
+    },
+    "confirmEmail": {
+      "title": "تأكيد البريد الإلكتروني",
+      "subtitle": "أدخل البريد الإلكتروني الذي استخدمته ورمز التحقق الذي أرسلناه إليك.",
+      "button": "تأكيد",
+      "buttonLoading": "جارٍ التأكيد...",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "البريد الإلكتروني",
+      "codeLabel": "رمز التأكيد",
+      "codePlaceholder": "رمز مكون من 6 أرقام",
+      "error": "فشل التأكيد",
+      "autoLoginError": "تم تأكيد البريد الإلكتروني، ولكن فشل تسجيل الدخول التلقائي. الرجاء تسجيل الدخول يدويا."
+    },
+    "reset": {
+      "title": "إعادة تعيين كلمة المرور",
+      "subtitle": "أدخل بريدك الإلكتروني لتلقي رمز إعادة التعيين.",
+      "subtitleConfirm": "أدخل الرمز الذي تلقيته وكلمة المرور الجديدة.",
+      "sendCode": "أرسل رمز إعادة الضبط",
+      "codeLabel": "إعادة تعيين الرمز",
+      "codePlaceholder": "أدخل رمز إعادة الضبط",
+      "resetButton": "إعادة تعيين كلمة المرور",
+      "codeSent": "إعادة تعيين الرمز المرسل إلى بريدك الإلكتروني.",
+      "sendCodeError": "فشل في إرسال الرمز",
+      "success": "تمت إعادة تعيين كلمة المرور بنجاح. الرجاء تسجيل الدخول.",
+      "error": "فشلت إعادة التعيين"
+    },
+    "validation": {
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "الرجاء إدخال عنوان بريد إلكتروني صالح",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "passwordMinLength": "ما لا يقل عن 8 أحرف طويلة",
+      "passwordHasUpper": "تحتوي على حرف واحد كبير على الأقل",
+      "passwordHasLower": "تحتوي على حرف واحد صغير على الأقل",
+      "passwordHasNumber": "تحتوي على رقم واحد على الأقل",
+      "passwordHasSpecial": "تحتوي على حرف خاص واحد على الأقل",
+      "confirmPasswordRequired": "يرجى تأكيد كلمة المرور الخاصة بك",
+      "confirmPasswordMatch": "كلمات المرور غير متطابقة",
+      "confirmPasswordMatchSuccess": "تطابقات كلمة المرور",
+      "codeRequired": "الكود مطلوب",
+      "roleRequired": "الدور مطلوب",
+      "roleSelect": "الرجاء تحديد دور",
+      "usernameRequired": "اسم المستخدم مطلوب",
+      "usernameMinLength": "يجب أن يكون اسم المستخدم 4 أحرف على الأقل",
+      "usernameMaxLength": "يجب أن يكون اسم المستخدم أقل من 100 حرف",
+      "usernameTaken": "اسم المستخدم مأخوذ بالفعل"
+    },
+    "common": {
+      "logout": "تسجيل الخروج",
+      "loading": "جار التحميل...",
+      "user": "المستخدم",
+      "admin": "المشرف",
+      "guest": "ضيف",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "حدث خطأ أثناء إكمال ملف التعريف الخاص بك"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "لوحة القيادة",
+      "description": "نظرة عامة على حسابك"
+    },
+    "actions": {
+      "editProfile": "تحرير الملف الشخصي",
+      "editSettings": "تحرير الإعدادات",
+      "myMedia": "وسائل الإعلام الخاصة بي",
+      "viewStats": "عرض الإحصائيات"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "تحرير الملف الشخصي",
+        "description": "قم بتحديث معلوماتك الشخصية"
+      },
+      "editSettings": {
+        "title": "إعدادات الحساب",
+        "description": "إدارة تفضيلات حسابك"
+      },
+      "myMedia": {
+        "title": "وسائل الإعلام الخاصة بي",
+        "description": "إدارة المحتوى الذي تم تحميله"
+      }
+    },
+    "messages": {
+      "welcome": "مرحبًا بك مرة أخرى، {0}!",
+      "stats": "لديك {0} عنصر"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "الملف الشخصي",
+      "description": "إدارة معلومات ملفك الشخصي"
+    },
+    "form": {
+      "firstName": "الاسم الأول",
+      "lastName": "الاسم الأخير",
+      "email": "عنوان البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "bio": "سيرة ذاتية",
+      "save": "حفظ التغييرات"
+    },
+    "messages": {
+      "updated": "تم تحديث الملف الشخصي بنجاح",
+      "error": "فشل في تحديث الملف الشخصي"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "اكتشف",
+      "description": "استكشاف المحتوى والميزات الجديدة"
+    },
+    "sections": {
+      "featured": "محتوى مميز"
+    },
+    "messages": {
+      "explore": "ابدأ باستكشاف منصتنا"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "تسوق",
+      "description": "تصفح وشراء المنتجات"
+    },
+    "sections": {
+      "products": "المنتجات"
+    },
+    "messages": {
+      "comingSoon": "المزيد من المنتجات قريبا!"
+    }
+  },
+  "common": {
+    "loading": "جار التحميل...",
+    "error": "حدث خطأ",
+    "success": "اكتملت العملية",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تحرير",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "submit": "إرسال",
+    "reset": "إعادة تعيين",
+    "back": "العودة",
+    "next": "التالي",
+    "previous": "السابق"
+  }
+}

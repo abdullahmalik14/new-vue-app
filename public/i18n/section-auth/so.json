@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Soo Dhawoow Soo Noqo",
+      "subtitle": "Fadlan geli shahaadooyinkaaga si aad u sii waddo.",
+      "button": "Soo gal",
+      "emailLabel": "iimaylka",
+      "emailPlaceholder": "Ciwaanka iimaylka",
+      "passwordLabel": "Furaha",
+      "passwordPlaceholder": "Furaha",
+      "forgotPassword": "ma ilawday eraygaaga sirta ah?",
+      "rememberMe": "I xasuuso",
+      "noAccount": "Xisaab ma lihid?",
+      "continueWithX": "Ku sii wad X (twitter)",
+      "continueWithTelegram": "Ku sii wad Telegram",
+      "welcome": "Hello, {0}!",
+      "error": "iimaylka ama erayga sirta ah ee aan sax ahayn"
+    },
+    "register": {
+      "title": "Abuur Account",
+      "subtitle": "Abuur akoonkaaga si aad u sii wado",
+      "button": "Isdiiwaangeli",
+      "firstName": "Magaca Hore",
+      "firstNameLabel": "Magaca",
+      "emailLabel": "iimaylka",
+      "emailAddress": "Ciwaanka iimaylka",
+      "emailPlaceholder": "Ciwaanka iimaylka",
+      "passwordLabel": "Furaha",
+      "passwordPlaceholder": "Furaha",
+      "confirmPasswordLabel": "Xaqiiji erayga sirta ah",
+      "confirmPasswordPlaceholder": "Furaha",
+      "haveAccount": "Horeba akoon u yeeshay ?",
+      "Onboarding": {
+        "title": "Buuxi Profile-kaaga",
+        "description": "Dooro doorkaaga iyo magacaaga isticmaale si aad u sii wadato.",
+        "usernameLabel": "Magaca isticmaale",
+        "usernamePlaceholder": "Geli magaca isticmaale",
+        "roleLabel": "Doorka",
+        "rolePlaceholder": "Dooro doorkaada",
+        "roles": {
+          "creator": "Abuuray",
+          "fan": "Taageere",
+          "vendor": "Iibiyaha",
+          "agent": "Wakiil"
+        },
+        "button": "Sii wad"
+      },
+      "KYC": {
+        "title": "Xaqiiji aqoonsigaaga",
+        "description": "Xaqiijinta abuuraha oo dhammaystiran si aad u gasho dashboard-ka.",
+        "button": "Xaqiiji & sii wad",
+        "logout": "Ka bax & Ka bax"
+      }
+    },
+    "confirmEmail": {
+      "title": "Xaqiiji iimaylka",
+      "subtitle": "Geli iimaylka aad isticmaashay iyo koodka xaqiijinta ee aanu kuu soo dirnay.",
+      "button": "Xaqiiji",
+      "buttonLoading": "Xaqiijinaya...",
+      "emailLabel": "iimaylka",
+      "emailPlaceholder": "iimaylka",
+      "codeLabel": "Xeerka Xaqiijinta",
+      "codePlaceholder": "6-code code",
+      "error": "Xaqiijinta waa guul dareystay",
+      "autoLoginError": "Iimaylku waa la xaqiijiyay, laakiin si toos ah u geli waa fashilmay. Fadlan gacanta ku gal"
+    },
+    "reset": {
+      "title": "Dib u deji erayga sirta ah",
+      "subtitle": "Geli iimaylkaga si aad u hesho koodka dib u dejinta",
+      "subtitleConfirm": "Geli koodka aad heshay iyo erayga sirta ah ee cusub.",
+      "sendCode": "Dir code dib u dajin",
+      "codeLabel": "Dib u deji code",
+      "codePlaceholder": "Geli summada dib u dejinta",
+      "resetButton": "Dib u deji erayga sirta ah",
+      "codeSent": "Summada dib u dajinta ayaa lagu soo diray iimaylkaaga.",
+      "sendCodeError": "Ku guuldareystay inuu soo diro koodka",
+      "success": "Dib u dejintii erayga sirta ahaa waa lagu guulaystay Fadlan gal",
+      "error": "Dib u dajin waa guul daraystay"
+    },
+    "validation": {
+      "emailRequired": "Iimayl ayaa loo baahan yahay",
+      "emailInvalid": "Fadlan geli ciwaan email sax ah",
+      "passwordRequired": "Furaha sirta ah ayaa loo baahan yahay",
+      "passwordMinLength": "Ugu yaraan 8 xaraf ayaa dheer",
+      "passwordHasUpper": "Ka kooban ugu yaraan 1 xaraf weyn",
+      "passwordHasLower": "Ka kooban ugu yaraan 1 xaraf yar",
+      "passwordHasNumber": "Ka kooban ugu yaraan 1 lambar",
+      "passwordHasSpecial": "Ka kooban ugu yaraan 1 dabeecad gaar ah",
+      "confirmPasswordRequired": "Fadlan xaqiiji eraygaaga sirta ah",
+      "confirmPasswordMatch": "Erayada sirta ah isma dhigmaan",
+      "confirmPasswordMatchSuccess": "Password is dhigma",
+      "codeRequired": "Koodhka ayaa loo baahan yahay",
+      "roleRequired": "Door ayaa loo baahan yahay",
+      "roleSelect": "Fadlan door door",
+      "usernameRequired": "Magaca isticmaale ayaa loo baahan yahay",
+      "usernameMinLength": "Magaca isticmaaluhu waa inuu noqdaa ugu yaraan 4 xaraf",
+      "usernameMaxLength": "Magaca isticmaaluhu waa inuu ka yaraa 100 xaraf",
+      "usernameTaken": "Magaca isticmaalaha waa la qaatay"
+    },
+    "common": {
+      "logout": "Saxiix",
+      "loading": "Soodejinaya...",
+      "user": "Isticmaale",
+      "admin": "Admin",
+      "guest": "Martida",
+      "showPassword": "Muuji erayga sirta ah",
+      "hidePassword": "Qari erayga sirta ah"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Khalad ayaa dhacay markii la dhammaystirayay astaantaada"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard-ka",
+      "description": "Dulmarka akoonkaaga"
+    },
+    "actions": {
+      "editProfile": "Wax ka beddel xogta",
+      "editSettings": "Wax ka beddel Settings",
+      "myMedia": "Warbaahintayda",
+      "viewStats": "Daawo Tirakoobka"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Wax ka beddel xogta",
+        "description": "Cusbooneysii macluumaadkaaga shakhsiyeed"
+      },
+      "editSettings": {
+        "title": "Dejinta Akoonka",
+        "description": "Maamul dookhyada akoonkaaga"
+      },
+      "myMedia": {
+        "title": "Warbaahintayda",
+        "description": "Maamul macluumaadkaaga la soo geliyay"
+      }
+    },
+    "messages": {
+      "welcome": "Soo dhawoow, {0}!",
+      "stats": "Waxaad haysaa {0} walxo"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profile",
+      "description": "Maamul macluumaadka boggaaga"
+    },
+    "form": {
+      "firstName": "Magaca Hore",
+      "lastName": "Magaca Dambe",
+      "email": "Ciwaanka iimaylka",
+      "phone": "Lambarka Taleefanka",
+      "bio": "Taariikh nololeedka",
+      "save": "Badbaadada isbedelada"
+    },
+    "messages": {
+      "updated": "Xogta si guul leh ayaa loo cusboonaysiiyay",
+      "error": "Ku guuldareystay in la cusboonaysiiyo astaanta guud"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Soo ogow",
+      "description": "Baadh nuxurka cusub iyo sifooyinka"
+    },
+    "sections": {
+      "featured": "Nuxurka sifada"
+    },
+    "messages": {
+      "explore": "Bilow sahaminta goobtayada"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Dukaan",
+      "description": "Baadh oo iibso alaabta"
+    },
+    "sections": {
+      "products": "Alaabta"
+    },
+    "messages": {
+      "comingSoon": "Alaabooyin badan ayaa iman doona dhawaan!"
+    }
+  },
+  "common": {
+    "loading": "Soodejinaya...",
+    "error": "Khalad ayaa dhacay",
+    "success": "Hawlgalkii wuu dhamaaday",
+    "save": "Badbaadin",
+    "cancel": "Jooji",
+    "delete": "Tirtir",
+    "edit": "Wax ka beddel",
+    "create": "Abuur",
+    "update": "Cusbooneysii",
+    "submit": "Gudbi",
+    "reset": "Dib u dajin",
+    "back": "Dib u laabo",
+    "next": "Xiga",
+    "previous": "Hore"
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Добродошли назад",
+      "subtitle": "Унесите своје акредитиве да бисте наставили.",
+      "button": "Пријавите се",
+      "emailLabel": "Емаил",
+      "emailPlaceholder": "Адреса е-поште",
+      "passwordLabel": "Лозинка",
+      "passwordPlaceholder": "Лозинка",
+      "forgotPassword": "Заборавили сте лозинку?",
+      "rememberMe": "Запамти ме",
+      "noAccount": "Немате налог?",
+      "continueWithX": "Наставите са Кс (твитер)",
+      "continueWithTelegram": "Наставите са Телеграмом",
+      "welcome": "Здраво, {0}!",
+      "error": "Неважећа адреса е-поште или лозинка."
+    },
+    "register": {
+      "title": "Креирајте налог",
+      "subtitle": "Креирајте свој налог да бисте наставили.",
+      "button": "Пријавите се",
+      "firstName": "Име",
+      "firstNameLabel": "Име",
+      "emailLabel": "Емаил",
+      "emailAddress": "Адреса е-поште",
+      "emailPlaceholder": "Адреса е-поште",
+      "passwordLabel": "Лозинка",
+      "passwordPlaceholder": "Лозинка",
+      "confirmPasswordLabel": "Потврдите лозинку",
+      "confirmPasswordPlaceholder": "Лозинка",
+      "haveAccount": "Већ имате налог?",
+      "Onboarding": {
+        "title": "Попуните свој профил",
+        "description": "Изаберите своју улогу и корисничко име да бисте наставили.",
+        "usernameLabel": "Корисничко име",
+        "usernamePlaceholder": "Унесите корисничко име",
+        "roleLabel": "Улога",
+        "rolePlaceholder": "Изаберите своју улогу",
+        "roles": {
+          "creator": "Креатор",
+          "fan": "Фан",
+          "vendor": "Вендор",
+          "agent": "Агент"
+        },
+        "button": "Настави"
+      },
+      "KYC": {
+        "title": "Потврдите свој идентитет",
+        "description": "Завршите верификацију аутора да бисте приступили контролној табли.",
+        "button": "Потврди и настави",
+        "logout": "Одјава и излаз"
+      }
+    },
+    "confirmEmail": {
+      "title": "Потврдите е-пошту",
+      "subtitle": "Унесите имејл који сте користили и верификациони код који смо вам послали.",
+      "button": "Потврди",
+      "buttonLoading": "Потврђивање...",
+      "emailLabel": "Емаил",
+      "emailPlaceholder": "Емаил",
+      "codeLabel": "Потврдни код",
+      "codePlaceholder": "6-цифрени код",
+      "error": "Потврда није успела",
+      "autoLoginError": "Имејл је потврђен, али аутоматско пријављивање није успело. Молимо пријавите се ручно."
+    },
+    "reset": {
+      "title": "Ресет Пассворд",
+      "subtitle": "Унесите своју е-пошту да бисте добили код за ресетовање.",
+      "subtitleConfirm": "Унесите код који сте добили и нову лозинку.",
+      "sendCode": "Пошаљи код за ресетовање",
+      "codeLabel": "Ресетујте код",
+      "codePlaceholder": "Унесите код за ресетовање",
+      "resetButton": "Ресет Пассворд",
+      "codeSent": "Ресет код је послат на вашу е-пошту.",
+      "sendCodeError": "Слање кода није успело",
+      "success": "Ресетовање лозинке је успешно. Молимо пријавите се.",
+      "error": "Ресетовање није успело"
+    },
+    "validation": {
+      "emailRequired": "Емаил је обавезан",
+      "emailInvalid": "Унесите важећу адресу е-поште",
+      "passwordRequired": "Лозинка је обавезна",
+      "passwordMinLength": "Најмање 8 знакова",
+      "passwordHasUpper": "Садржи најмање 1 велико слово",
+      "passwordHasLower": "Садржи најмање 1 мало слово",
+      "passwordHasNumber": "Садржи најмање 1 број",
+      "passwordHasSpecial": "Садржи најмање 1 посебан знак",
+      "confirmPasswordRequired": "Молимо потврдите своју лозинку",
+      "confirmPasswordMatch": "Лозинке се не поклапају",
+      "confirmPasswordMatchSuccess": "Лозинка се подудара",
+      "codeRequired": "Шифра је обавезна",
+      "roleRequired": "Улога је обавезна",
+      "roleSelect": "Молимо изаберите улогу",
+      "usernameRequired": "Корисничко име је обавезно",
+      "usernameMinLength": "Корисничко име мора да има најмање 4 знака",
+      "usernameMaxLength": "Корисничко име мора бити мање од 100 знакова",
+      "usernameTaken": "Корисничко име је већ заузето"
+    },
+    "common": {
+      "logout": "Одјави се",
+      "loading": "Учитавање...",
+      "user": "Корисник",
+      "admin": "Админ",
+      "guest": "Гост",
+      "showPassword": "Прикажи лозинку",
+      "hidePassword": "Сакриј лозинку"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Дошло је до грешке при попуњавању вашег профила"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Дасхбоард",
+      "description": "Преглед вашег налога"
+    },
+    "actions": {
+      "editProfile": "Уреди профил",
+      "editSettings": "Уреди подешавања",
+      "myMedia": "Моји медији",
+      "viewStats": "Прикажи статистику"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Уреди профил",
+        "description": "Ажурирајте своје личне податке"
+      },
+      "editSettings": {
+        "title": "Подешавања налога",
+        "description": "Управљајте подешавањима налога"
+      },
+      "myMedia": {
+        "title": "Моји медији",
+        "description": "Управљајте отпремљеним садржајем"
+      }
+    },
+    "messages": {
+      "welcome": "Добро дошли назад, {0}!",
+      "stats": "Имате {0} ставки"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Профиле",
+      "description": "Управљајте информацијама о свом профилу"
+    },
+    "form": {
+      "firstName": "Име",
+      "lastName": "Презиме",
+      "email": "Адреса е-поште",
+      "phone": "Број телефона",
+      "bio": "Биографија",
+      "save": "Сачувај промене"
+    },
+    "messages": {
+      "updated": "Профил је успешно ажуриран",
+      "error": "Ажурирање профила није успело"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Откријте",
+      "description": "Истражите нове садржаје и функције"
+    },
+    "sections": {
+      "featured": "Истакнути садржај"
+    },
+    "messages": {
+      "explore": "Почните да истражујете нашу платформу"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Схоп",
+      "description": "Прегледајте и купујте производе"
+    },
+    "sections": {
+      "products": "Производи"
+    },
+    "messages": {
+      "comingSoon": "Ускоро више производа!"
+    }
+  },
+  "common": {
+    "loading": "Учитавање...",
+    "error": "Дошло је до грешке",
+    "success": "Операција завршена",
+    "save": "Сачувај",
+    "cancel": "Откажи",
+    "delete": "Избриши",
+    "edit": "Уреди",
+    "create": "Креирај",
+    "update": "Ажурирај",
+    "submit": "Субмит",
+    "reset": "Ресетуј",
+    "back": "Иди назад",
+    "next": "Следеће",
+    "previous": "Претходно"
+  }
+}

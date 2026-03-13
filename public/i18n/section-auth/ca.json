@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Benvingut de nou",
+      "subtitle": "Introduïu les vostres credencials per continuar.",
+      "button": "Inicieu sessió",
+      "emailLabel": "Correu electrònic",
+      "emailPlaceholder": "Adreça de correu electrònic",
+      "passwordLabel": "Contrasenya",
+      "passwordPlaceholder": "Contrasenya",
+      "forgotPassword": "Has oblidat la teva contrasenya?",
+      "rememberMe": "Recorda'm",
+      "noAccount": "No tens un compte?",
+      "continueWithX": "Continuar amb X (twitter)",
+      "continueWithTelegram": "Continua amb Telegram",
+      "welcome": "Hola, {0}!",
+      "error": "Correu electrònic o contrasenya no vàlids."
+    },
+    "register": {
+      "title": "Crea un compte",
+      "subtitle": "Creeu el vostre compte per continuar.",
+      "button": "Registra't",
+      "firstName": "Nom",
+      "firstNameLabel": "Nom",
+      "emailLabel": "Correu electrònic",
+      "emailAddress": "Adreça de correu electrònic",
+      "emailPlaceholder": "Adreça de correu electrònic",
+      "passwordLabel": "Contrasenya",
+      "passwordPlaceholder": "Contrasenya",
+      "confirmPasswordLabel": "Confirmeu la contrasenya",
+      "confirmPasswordPlaceholder": "Contrasenya",
+      "haveAccount": "Ja tens un compte?",
+      "Onboarding": {
+        "title": "Completa el teu perfil",
+        "description": "Trieu la vostra funció i nom d'usuari per continuar.",
+        "usernameLabel": "Nom d'usuari",
+        "usernamePlaceholder": "Introduïu un nom d'usuari",
+        "roleLabel": "Rol",
+        "rolePlaceholder": "Seleccioneu el vostre rol",
+        "roles": {
+          "creator": "Creador",
+          "fan": "Ventilador",
+          "vendor": "Venedor",
+          "agent": "Agent"
+        },
+        "button": "Continua"
+      },
+      "KYC": {
+        "title": "Verifiqueu la vostra identitat",
+        "description": "Completa la verificació del creador per accedir al tauler.",
+        "button": "Confirmeu i continueu",
+        "logout": "Tancar la sessió i sortir"
+      }
+    },
+    "confirmEmail": {
+      "title": "Confirmeu el correu electrònic",
+      "subtitle": "Introduïu el correu electrònic que heu utilitzat i el codi de verificació que us hem enviat.",
+      "button": "Confirmeu",
+      "buttonLoading": "S'està confirmant...",
+      "emailLabel": "Correu electrònic",
+      "emailPlaceholder": "Correu electrònic",
+      "codeLabel": "Codi de confirmació",
+      "codePlaceholder": "codi de 6 dígits",
+      "error": "La confirmació ha fallat",
+      "autoLoginError": "S'ha confirmat el correu electrònic, però l'inici de sessió automàtic ha fallat. Si us plau, inicieu sessió manualment."
+    },
+    "reset": {
+      "title": "Restableix la contrasenya",
+      "subtitle": "Introduïu el vostre correu electrònic per rebre un codi de restabliment.",
+      "subtitleConfirm": "Introduïu el codi que heu rebut i una nova contrasenya.",
+      "sendCode": "Envia el codi de restabliment",
+      "codeLabel": "Restableix el codi",
+      "codePlaceholder": "Introduïu el codi de restabliment",
+      "resetButton": "Restableix la contrasenya",
+      "codeSent": "Restableix el codi enviat al teu correu electrònic.",
+      "sendCodeError": "No s'ha pogut enviar el codi",
+      "success": "Restabliment de la contrasenya correctament. Si us plau, inicieu sessió.",
+      "error": "No s'ha pogut restablir"
+    },
+    "validation": {
+      "emailRequired": "El correu electrònic és obligatori",
+      "emailInvalid": "Introduïu una adreça de correu electrònic vàlida",
+      "passwordRequired": "La contrasenya és necessària",
+      "passwordMinLength": "Com a mínim 8 caràcters",
+      "passwordHasUpper": "Conté almenys 1 lletra majúscula",
+      "passwordHasLower": "Conté almenys 1 lletra minúscula",
+      "passwordHasNumber": "Conté com a mínim 1 número",
+      "passwordHasSpecial": "Conté almenys 1 caràcter especial",
+      "confirmPasswordRequired": "Si us plau, confirmeu la vostra contrasenya",
+      "confirmPasswordMatch": "Les contrasenyes no coincideixen",
+      "confirmPasswordMatchSuccess": "La contrasenya coincideix",
+      "codeRequired": "El codi és obligatori",
+      "roleRequired": "Es requereix un paper",
+      "roleSelect": "Seleccioneu una funció",
+      "usernameRequired": "El nom d'usuari és obligatori",
+      "usernameMinLength": "El nom d'usuari ha de tenir almenys 4 caràcters",
+      "usernameMaxLength": "El nom d'usuari ha de tenir menys de 100 caràcters",
+      "usernameTaken": "El nom d'usuari ja està pres"
+    },
+    "common": {
+      "logout": "Tanca la sessió",
+      "loading": "Carregant...",
+      "user": "Usuari",
+      "admin": "Admin",
+      "guest": "Convidat",
+      "showPassword": "Mostra la contrasenya",
+      "hidePassword": "Amaga la contrasenya"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "S'ha produït un error en completar el vostre perfil"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Tauler de control",
+      "description": "Visió general del vostre compte"
+    },
+    "actions": {
+      "editProfile": "Edita el perfil",
+      "editSettings": "Edita la configuració",
+      "myMedia": "Els meus mitjans",
+      "viewStats": "Veure estadístiques"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Edita el perfil",
+        "description": "Actualitza la teva informació personal"
+      },
+      "editSettings": {
+        "title": "Configuració del compte",
+        "description": "Gestioneu les preferències del vostre compte"
+      },
+      "myMedia": {
+        "title": "Els meus mitjans",
+        "description": "Gestiona el contingut que has penjat"
+      }
+    },
+    "messages": {
+      "welcome": "Benvingut de nou, {0}!",
+      "stats": "Tens {0} elements"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Perfil",
+      "description": "Gestioneu la informació del vostre perfil"
+    },
+    "form": {
+      "firstName": "Nom",
+      "lastName": "Cognoms",
+      "email": "Adreça de correu electrònic",
+      "phone": "Número de telèfon",
+      "bio": "Biografia",
+      "save": "Desa els canvis"
+    },
+    "messages": {
+      "updated": "El perfil s'ha actualitzat correctament",
+      "error": "No s'ha pogut actualitzar el perfil"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Descobreix",
+      "description": "Exploreu contingut i funcions noves"
+    },
+    "sections": {
+      "featured": "Contingut destacat"
+    },
+    "messages": {
+      "explore": "Comenceu a explorar la nostra plataforma"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Botiga",
+      "description": "Consulta i compra productes"
+    },
+    "sections": {
+      "products": "Productes"
+    },
+    "messages": {
+      "comingSoon": "Aviat més productes!"
+    }
+  },
+  "common": {
+    "loading": "Carregant...",
+    "error": "S'ha produït un error",
+    "success": "Operació completada",
+    "save": "Desa",
+    "cancel": "Cancel·la",
+    "delete": "Suprimeix",
+    "edit": "Edita",
+    "create": "Crear",
+    "update": "Actualització",
+    "submit": "Envia",
+    "reset": "Restableix",
+    "back": "Torna enrere",
+    "next": "A continuació",
+    "previous": "Anterior"
+  }
+}

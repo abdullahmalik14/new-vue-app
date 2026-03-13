@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Tervetuloa Takaisin",
+      "subtitle": "Anna kirjautumistietosi jatkaaksesi.",
+      "button": "Kirjaudu sisään",
+      "emailLabel": "Sähköposti",
+      "emailPlaceholder": "Sähköpostiosoite",
+      "passwordLabel": "Salasana",
+      "passwordPlaceholder": "Salasana",
+      "forgotPassword": "Unohditko salasanasi?",
+      "rememberMe": "Muista minut",
+      "noAccount": "Eikö sinulla ole tiliä?",
+      "continueWithX": "Jatka X:llä (twitter)",
+      "continueWithTelegram": "Jatka Telegramilla",
+      "welcome": "Hei {0}!",
+      "error": "Virheellinen sähköpostiosoite tai salasana."
+    },
+    "register": {
+      "title": "Luo tili",
+      "subtitle": "Luo tili jatkaaksesi.",
+      "button": "Rekisteröidy",
+      "firstName": "Etunimi",
+      "firstNameLabel": "Nimi",
+      "emailLabel": "Sähköposti",
+      "emailAddress": "Sähköpostiosoite",
+      "emailPlaceholder": "Sähköpostiosoite",
+      "passwordLabel": "Salasana",
+      "passwordPlaceholder": "Salasana",
+      "confirmPasswordLabel": "Vahvista salasana",
+      "confirmPasswordPlaceholder": "Salasana",
+      "haveAccount": "Onko sinulla jo tili?",
+      "Onboarding": {
+        "title": "Täydennä profiilisi",
+        "description": "Valitse roolisi ja käyttäjänimesi jatkaaksesi.",
+        "usernameLabel": "Käyttäjätunnus",
+        "usernamePlaceholder": "Anna käyttäjänimi",
+        "roleLabel": "Rooli",
+        "rolePlaceholder": "Valitse roolisi",
+        "roles": {
+          "creator": "Luoja",
+          "fan": "Tuuletin",
+          "vendor": "Myyjä",
+          "agent": "Agentti"
+        },
+        "button": "Jatka"
+      },
+      "KYC": {
+        "title": "Vahvista henkilöllisyytesi",
+        "description": "Suorita sisällöntuottajan vahvistus päästäksesi hallintapaneeliin.",
+        "button": "Vahvista ja jatka",
+        "logout": "Kirjaudu ulos ja poistu"
+      }
+    },
+    "confirmEmail": {
+      "title": "Vahvista sähköposti",
+      "subtitle": "Anna käyttämäsi sähköpostiosoite ja sinulle lähettämämme vahvistuskoodi.",
+      "button": "Vahvista",
+      "buttonLoading": "Vahvistetaan...",
+      "emailLabel": "Sähköposti",
+      "emailPlaceholder": "Sähköposti",
+      "codeLabel": "Vahvistuskoodi",
+      "codePlaceholder": "6-numeroinen koodi",
+      "error": "Vahvistus epäonnistui",
+      "autoLoginError": "Sähköposti vahvistettu, mutta automaattinen sisäänkirjautuminen epäonnistui. Kirjaudu sisään manuaalisesti."
+    },
+    "reset": {
+      "title": "Palauta salasana",
+      "subtitle": "Kirjoita sähköpostiosoitteesi saadaksesi palautuskoodin.",
+      "subtitleConfirm": "Syötä saamasi koodi ja uusi salasana.",
+      "sendCode": "Lähetä nollauskoodi",
+      "codeLabel": "Nollaa koodi",
+      "codePlaceholder": "Syötä nollauskoodi",
+      "resetButton": "Palauta salasana",
+      "codeSent": "Nollaa sähköpostiisi lähetetty koodi.",
+      "sendCodeError": "Koodin lähettäminen epäonnistui",
+      "success": "Salasanan palautus onnistui. Ole hyvä ja kirjaudu sisään.",
+      "error": "Nollaus epäonnistui"
+    },
+    "validation": {
+      "emailRequired": "Sähköposti vaaditaan",
+      "emailInvalid": "Anna kelvollinen sähköpostiosoite",
+      "passwordRequired": "Salasana vaaditaan",
+      "passwordMinLength": "Vähintään 8 merkkiä pitkä",
+      "passwordHasUpper": "Sisältää vähintään yhden ison kirjaimen",
+      "passwordHasLower": "Sisältää vähintään yhden pienen kirjaimen",
+      "passwordHasNumber": "Sisällytä vähintään 1 numero",
+      "passwordHasSpecial": "Sisältää vähintään yhden erikoismerkin",
+      "confirmPasswordRequired": "Vahvista salasanasi",
+      "confirmPasswordMatch": "Salasanat eivät täsmää",
+      "confirmPasswordMatchSuccess": "Salasana vastaa",
+      "codeRequired": "Koodi vaaditaan",
+      "roleRequired": "Rooli vaaditaan",
+      "roleSelect": "Valitse rooli",
+      "usernameRequired": "Käyttäjätunnus vaaditaan",
+      "usernameMinLength": "Käyttäjätunnuksessa on oltava vähintään 4 merkkiä",
+      "usernameMaxLength": "Käyttäjätunnuksen tulee olla alle 100 merkkiä pitkä",
+      "usernameTaken": "Käyttäjätunnus on jo varattu"
+    },
+    "common": {
+      "logout": "Kirjaudu ulos",
+      "loading": "Ladataan...",
+      "user": "Käyttäjä",
+      "admin": "Admin",
+      "guest": "Vieras",
+      "showPassword": "Näytä salasana",
+      "hidePassword": "Piilota salasana"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Profiilisi viimeistelyssä tapahtui virhe"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Kojelauta",
+      "description": "Yleiskatsaus tiliisi"
+    },
+    "actions": {
+      "editProfile": "Muokkaa profiilia",
+      "editSettings": "Muokkaa asetuksia",
+      "myMedia": "Oma Media",
+      "viewStats": "Näytä tilastot"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Muokkaa profiilia",
+        "description": "Päivitä henkilötietosi"
+      },
+      "editSettings": {
+        "title": "Tilin asetukset",
+        "description": "Hallinnoi tiliasetuksiasi"
+      },
+      "myMedia": {
+        "title": "Oma Media",
+        "description": "Hallinnoi lataamaasi sisältöä"
+      }
+    },
+    "messages": {
+      "welcome": "Tervetuloa takaisin, {0}!",
+      "stats": "Sinulla on {0} kohdetta"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profiili",
+      "description": "Hallinnoi profiilitietojasi"
+    },
+    "form": {
+      "firstName": "Etunimi",
+      "lastName": "Sukunimi",
+      "email": "Sähköpostiosoite",
+      "phone": "Puhelinnumero",
+      "bio": "Elämäkerta",
+      "save": "Tallenna muutokset"
+    },
+    "messages": {
+      "updated": "Profiilin päivitys onnistui",
+      "error": "Profiilin päivitys epäonnistui"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Tutustu",
+      "description": "Tutustu uuteen sisältöön ja ominaisuuksiin"
+    },
+    "sections": {
+      "featured": "Suositeltu sisältö"
+    },
+    "messages": {
+      "explore": "Aloita alustamme tutkiminen"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Kauppa",
+      "description": "Selaa ja osta tuotteita"
+    },
+    "sections": {
+      "products": "Tuotteet"
+    },
+    "messages": {
+      "comingSoon": "Lisää tuotteita tulossa pian!"
+    }
+  },
+  "common": {
+    "loading": "Ladataan...",
+    "error": "Tapahtui virhe",
+    "success": "Operaatio valmis",
+    "save": "Tallenna",
+    "cancel": "Peruuta",
+    "delete": "Poista",
+    "edit": "Muokkaa",
+    "create": "Luo",
+    "update": "Päivitä",
+    "submit": "Lähetä",
+    "reset": "Nollaa",
+    "back": "Mene takaisin",
+    "next": "Seuraavaksi",
+    "previous": "Edellinen"
+  }
+}

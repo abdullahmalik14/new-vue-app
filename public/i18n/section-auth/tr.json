@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Tekrar hoş geldiniz",
+      "subtitle": "Devam etmek için lütfen kimlik bilgilerinizi girin.",
+      "button": "Giriş Yap",
+      "emailLabel": "E-posta",
+      "emailPlaceholder": "E-posta adresi",
+      "passwordLabel": "Şifre",
+      "passwordPlaceholder": "Şifre",
+      "forgotPassword": "Şifrenizi mi unuttunuz?",
+      "rememberMe": "Beni hatırla",
+      "noAccount": "Hesabınız yok mu?",
+      "continueWithX": "X ile devam et (twitter)",
+      "continueWithTelegram": "Telegram'a devam edin",
+      "welcome": "Merhaba {0}!",
+      "error": "Geçersiz e-posta veya şifre."
+    },
+    "register": {
+      "title": "Hesap Oluştur",
+      "subtitle": "Devam etmek için hesabınızı oluşturun.",
+      "button": "Kaydol",
+      "firstName": "Ad",
+      "firstNameLabel": "İsim",
+      "emailLabel": "E-posta",
+      "emailAddress": "E-posta adresi",
+      "emailPlaceholder": "E-posta adresi",
+      "passwordLabel": "Şifre",
+      "passwordPlaceholder": "Şifre",
+      "confirmPasswordLabel": "Şifreyi Onayla",
+      "confirmPasswordPlaceholder": "Şifre",
+      "haveAccount": "Zaten bir hesabınız var mı?",
+      "Onboarding": {
+        "title": "Profilinizi Tamamlayın",
+        "description": "Devam etmek için rolünüzü ve kullanıcı adınızı seçin.",
+        "usernameLabel": "Kullanıcı adı",
+        "usernamePlaceholder": "Bir kullanıcı adı girin",
+        "roleLabel": "Rol",
+        "rolePlaceholder": "Rolünüzü seçin",
+        "roles": {
+          "creator": "Yaratıcı",
+          "fan": "hayran",
+          "vendor": "Satıcı",
+          "agent": "Temsilci"
+        },
+        "button": "Devam et"
+      },
+      "KYC": {
+        "title": "Kimliğinizi Doğrulayın",
+        "description": "Kontrol paneline erişmek için yaratıcı doğrulamasını tamamlayın.",
+        "button": "Onayla ve Devam Et",
+        "logout": "Oturumu Kapat ve Çıkış"
+      }
+    },
+    "confirmEmail": {
+      "title": "E-postayı Onayla",
+      "subtitle": "Kullandığınız e-postayı ve size gönderdiğimiz doğrulama kodunu girin.",
+      "button": "Onayla",
+      "buttonLoading": "Onaylanıyor...",
+      "emailLabel": "E-posta",
+      "emailPlaceholder": "E-posta",
+      "codeLabel": "Onay Kodu",
+      "codePlaceholder": "6 haneli kod",
+      "error": "Onay başarısız oldu",
+      "autoLoginError": "E-posta onaylandı ancak otomatik giriş başarısız oldu. Lütfen manuel olarak giriş yapın."
+    },
+    "reset": {
+      "title": "Şifreyi Sıfırla",
+      "subtitle": "Sıfırlama kodunu almak için e-postanızı girin.",
+      "subtitleConfirm": "Aldığınız kodu ve yeni şifreyi girin.",
+      "sendCode": "Sıfırlama Kodunu Gönder",
+      "codeLabel": "Kodu Sıfırla",
+      "codePlaceholder": "Sıfırlama kodunu girin",
+      "resetButton": "Şifreyi Sıfırla",
+      "codeSent": "E-postanıza gönderilen kodu sıfırlayın.",
+      "sendCodeError": "Kod gönderilemedi",
+      "success": "Şifre sıfırlama başarılı. Lütfen giriş yapın.",
+      "error": "Sıfırlama başarısız oldu"
+    },
+    "validation": {
+      "emailRequired": "E-posta gerekli",
+      "emailInvalid": "Lütfen geçerli bir e-posta adresi girin",
+      "passwordRequired": "Şifre gerekli",
+      "passwordMinLength": "En az 8 karakter uzunluğunda",
+      "passwordHasUpper": "En az 1 büyük harf içermelidir",
+      "passwordHasLower": "En az 1 küçük harf içermelidir",
+      "passwordHasNumber": "En az 1 sayı içermelidir",
+      "passwordHasSpecial": "En az 1 özel karakter içermelidir",
+      "confirmPasswordRequired": "Lütfen şifrenizi onaylayın",
+      "confirmPasswordMatch": "Şifreler eşleşmiyor",
+      "confirmPasswordMatchSuccess": "Şifre eşleşmeleri",
+      "codeRequired": "Kod gerekli",
+      "roleRequired": "Rol gerekli",
+      "roleSelect": "Lütfen bir rol seçin",
+      "usernameRequired": "Kullanıcı adı gerekli",
+      "usernameMinLength": "Kullanıcı adı en az 4 karakter olmalıdır",
+      "usernameMaxLength": "Kullanıcı adı 100 karakterden az olmalıdır",
+      "usernameTaken": "Kullanıcı adı zaten alınmış"
+    },
+    "common": {
+      "logout": "Oturumu Kapat",
+      "loading": "Yükleniyor...",
+      "user": "Kullanıcı",
+      "admin": "Yönetici",
+      "guest": "Misafir",
+      "showPassword": "Şifreyi göster",
+      "hidePassword": "Şifreyi gizle"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Profiliniz tamamlanırken bir hata oluştu"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Kontrol Paneli",
+      "description": "Hesabınıza genel bakış"
+    },
+    "actions": {
+      "editProfile": "Profili Düzenle",
+      "editSettings": "Ayarları Düzenle",
+      "myMedia": "Medyam",
+      "viewStats": "İstatistikleri Görüntüle"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Profili Düzenle",
+        "description": "Kişisel bilgilerinizi güncelleyin"
+      },
+      "editSettings": {
+        "title": "Hesap Ayarları",
+        "description": "Hesap tercihlerinizi yönetin"
+      },
+      "myMedia": {
+        "title": "Medyam",
+        "description": "Yüklenen içeriğinizi yönetin"
+      }
+    },
+    "messages": {
+      "welcome": "Tekrar hoş geldiniz {0}!",
+      "stats": "{0} öğeniz var"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Profil bilgilerinizi yönetin"
+    },
+    "form": {
+      "firstName": "Ad",
+      "lastName": "Soyadı",
+      "email": "E-posta Adresi",
+      "phone": "Telefon Numarası",
+      "bio": "Biyografi",
+      "save": "Değişiklikleri Kaydet"
+    },
+    "messages": {
+      "updated": "Profil başarıyla güncellendi",
+      "error": "Profil güncellenemedi"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Keşfet",
+      "description": "Yeni içerik ve özellikleri keşfedin"
+    },
+    "sections": {
+      "featured": "Öne Çıkan İçerik"
+    },
+    "messages": {
+      "explore": "Platformumuzu keşfetmeye başlayın"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Mağaza",
+      "description": "Ürünlere göz atın ve satın alın"
+    },
+    "sections": {
+      "products": "Ürünler"
+    },
+    "messages": {
+      "comingSoon": "Daha fazla ürün yakında gelecek!"
+    }
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "success": "İşlem tamamlandı",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "create": "Oluştur",
+    "update": "Güncelleme",
+    "submit": "Gönder",
+    "reset": "Sıfırla",
+    "back": "Geri Dön",
+    "next": "Sonraki",
+    "previous": "Önceki"
+  }
+}

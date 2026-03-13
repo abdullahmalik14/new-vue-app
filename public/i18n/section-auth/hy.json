@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Բարի վերադարձ",
+      "subtitle": "Շարունակելու համար խնդրում ենք մուտքագրել ձեր հավատարմագրերը:",
+      "button": "Մուտք գործեք",
+      "emailLabel": "Էլ",
+      "emailPlaceholder": "Էլփոստի հասցե",
+      "passwordLabel": "Գաղտնաբառ",
+      "passwordPlaceholder": "Գաղտնաբառ",
+      "forgotPassword": "Մոռացել եք ձեր գաղտնաբառը?",
+      "rememberMe": "Հիշիր ինձ",
+      "noAccount": "Չունե՞ք հաշիվ:",
+      "continueWithX": "Շարունակել X-ով (twitter)",
+      "continueWithTelegram": "Շարունակեք Telegram-ով",
+      "welcome": "Բարև, {0}:",
+      "error": "Անվավեր էլփոստ կամ գաղտնաբառ:"
+    },
+    "register": {
+      "title": "Ստեղծել հաշիվ",
+      "subtitle": "Շարունակելու համար ստեղծեք ձեր հաշիվը:",
+      "button": "Գրանցվել",
+      "firstName": "Անուն",
+      "firstNameLabel": "Անուն",
+      "emailLabel": "Էլ",
+      "emailAddress": "Էլփոստի հասցե",
+      "emailPlaceholder": "Էլփոստի հասցե",
+      "passwordLabel": "Գաղտնաբառ",
+      "passwordPlaceholder": "Գաղտնաբառ",
+      "confirmPasswordLabel": "Հաստատեք գաղտնաբառը",
+      "confirmPasswordPlaceholder": "Գաղտնաբառ",
+      "haveAccount": "Արդեն ունե՞ք հաշիվ:",
+      "Onboarding": {
+        "title": "Լրացրեք ձեր պրոֆիլը",
+        "description": "Շարունակելու համար ընտրեք ձեր դերը և օգտվողի անունը:",
+        "usernameLabel": "Օգտվողի անունը",
+        "usernamePlaceholder": "Մուտքագրեք օգտվողի անուն",
+        "roleLabel": "Դեր",
+        "rolePlaceholder": "Ընտրեք ձեր դերը",
+        "roles": {
+          "creator": "Ստեղծող",
+          "fan": "Երկրպագու",
+          "vendor": "Վաճառող",
+          "agent": "Գործակալ"
+        },
+        "button": "Շարունակեք"
+      },
+      "KYC": {
+        "title": "Ստուգեք Ձեր ինքնությունը",
+        "description": "Վահանակ մուտք գործելու համար ավարտեք հեղինակի հաստատումը:",
+        "button": "Հաստատել և շարունակել",
+        "logout": "Դուրս գալ և դուրս գալ"
+      }
+    },
+    "confirmEmail": {
+      "title": "Հաստատեք էլ",
+      "subtitle": "Մուտքագրեք ձեր օգտագործած էլ․ հասցեն և հաստատման կոդը, որը մենք ուղարկել ենք ձեզ։",
+      "button": "Հաստատել",
+      "buttonLoading": "Հաստատվում է...",
+      "emailLabel": "Էլ",
+      "emailPlaceholder": "Էլ",
+      "codeLabel": "Հաստատման ծածկագիր",
+      "codePlaceholder": "6 նիշանոց ծածկագիր",
+      "error": "Չհաջողվեց հաստատել",
+      "autoLoginError": "Էլփոստը հաստատվեց, բայց ավտոմատ մուտքը ձախողվեց: Խնդրում ենք մուտք գործել ձեռքով:"
+    },
+    "reset": {
+      "title": "Վերականգնել գաղտնաբառը",
+      "subtitle": "Մուտքագրեք ձեր էլ․ հասցեն՝ վերակայման կոդը ստանալու համար։",
+      "subtitleConfirm": "Մուտքագրեք ստացված կոդը և նոր գաղտնաբառ:",
+      "sendCode": "Ուղարկեք վերակայման կոդը",
+      "codeLabel": "Վերականգնել կոդը",
+      "codePlaceholder": "Մուտքագրեք վերակայման կոդը",
+      "resetButton": "Վերականգնել գաղտնաբառը",
+      "codeSent": "Վերականգնել կոդը ուղարկված ձեր էլ.",
+      "sendCodeError": "Չհաջողվեց ուղարկել կոդը",
+      "success": "Գաղտնաբառի վերականգնումը հաջողվեց: Խնդրում ենք մուտք գործել:",
+      "error": "Չհաջողվեց վերականգնել"
+    },
+    "validation": {
+      "emailRequired": "Էլ.փոստը պարտադիր է",
+      "emailInvalid": "Խնդրում ենք մուտքագրել վավեր էլփոստի հասցե",
+      "passwordRequired": "Գաղտնաբառը պարտադիր է",
+      "passwordMinLength": "Առնվազն 8 նիշ երկարություն",
+      "passwordHasUpper": "Պարունակեք առնվազն 1 մեծատառ",
+      "passwordHasLower": "Պարունակեք առնվազն 1 փոքրատառ",
+      "passwordHasNumber": "Պարունակեք առնվազն 1 համար",
+      "passwordHasSpecial": "Պարունակում է առնվազն 1 հատուկ նիշ",
+      "confirmPasswordRequired": "Խնդրում ենք հաստատել ձեր գաղտնաբառը",
+      "confirmPasswordMatch": "Գաղտնաբառերը չեն համընկնում",
+      "confirmPasswordMatchSuccess": "Գաղտնաբառը համընկնում է",
+      "codeRequired": "Կոդը պարտադիր է",
+      "roleRequired": "Պահանջվում է դեր",
+      "roleSelect": "Խնդրում ենք ընտրել դեր",
+      "usernameRequired": "Օգտվողի անունը պարտադիր է",
+      "usernameMinLength": "Օգտվողի անունը պետք է լինի առնվազն 4 նիշ",
+      "usernameMaxLength": "Օգտանունը պետք է լինի 100 նիշից պակաս",
+      "usernameTaken": "Օգտանունն արդեն վերցված է"
+    },
+    "common": {
+      "logout": "Դուրս գալ",
+      "loading": "Բեռնվում է...",
+      "user": "Օգտագործող",
+      "admin": "Ադմին",
+      "guest": "Հյուր",
+      "showPassword": "Ցույց տալ գաղտնաբառը",
+      "hidePassword": "Թաքցնել գաղտնաբառը"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Ձեր պրոֆիլը լրացնելիս սխալ տեղի ունեցավ"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Վահանակ",
+      "description": "Ձեր հաշվի ակնարկ"
+    },
+    "actions": {
+      "editProfile": "Խմբագրել պրոֆիլը",
+      "editSettings": "Խմբագրել կարգավորումները",
+      "myMedia": "Իմ մեդիան",
+      "viewStats": "Դիտել վիճակագրությունը"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Խմբագրել պրոֆիլը",
+        "description": "Թարմացրեք ձեր անձնական տվյալները"
+      },
+      "editSettings": {
+        "title": "Հաշվի կարգավորումներ",
+        "description": "Կառավարեք ձեր հաշվի նախապատվությունները"
+      },
+      "myMedia": {
+        "title": "Իմ մեդիան",
+        "description": "Կառավարեք ձեր վերբեռնված բովանդակությունը"
+      }
+    },
+    "messages": {
+      "welcome": "Բարի վերադարձ, {0}:",
+      "stats": "Դուք ունեք {0} տարր"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Անձնագիր",
+      "description": "Կառավարեք ձեր պրոֆիլի տվյալները"
+    },
+    "form": {
+      "firstName": "Անուն",
+      "lastName": "Ազգանուն",
+      "email": "Էլփոստի հասցե",
+      "phone": "Հեռախոսահամար",
+      "bio": "Կենսագրություն",
+      "save": "Պահպանել փոփոխությունները"
+    },
+    "messages": {
+      "updated": "Պրոֆիլը հաջողությամբ թարմացվեց",
+      "error": "Չհաջողվեց թարմացնել պրոֆիլը"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Բացահայտեք",
+      "description": "Բացահայտեք նոր բովանդակություն և հնարավորություններ"
+    },
+    "sections": {
+      "featured": "Առաջարկվող բովանդակություն"
+    },
+    "messages": {
+      "explore": "Սկսեք ուսումնասիրել մեր հարթակը"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Խանութ",
+      "description": "Զննեք և գնեք ապրանքներ"
+    },
+    "sections": {
+      "products": "Ապրանքներ"
+    },
+    "messages": {
+      "comingSoon": "Ավելի շատ ապրանքներ շուտով!"
+    }
+  },
+  "common": {
+    "loading": "Բեռնվում է...",
+    "error": "Սխալ է տեղի ունեցել",
+    "success": "Գործողությունն ավարտված է",
+    "save": "Պահպանել",
+    "cancel": "Չեղարկել",
+    "delete": "Ջնջել",
+    "edit": "Խմբագրել",
+    "create": "Ստեղծել",
+    "update": "Թարմացնել",
+    "submit": "Ներկայացրե՛ք",
+    "reset": "Վերականգնել",
+    "back": "Վերադարձեք",
+    "next": "Հաջորդը",
+    "previous": "Նախորդ"
+  }
+}

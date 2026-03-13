@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Dobrodošli nazad",
+      "subtitle": "Unesite svoje akreditive da nastavite.",
+      "button": "Prijavite se",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email adresa",
+      "passwordLabel": "Lozinka",
+      "passwordPlaceholder": "Lozinka",
+      "forgotPassword": "Zaboravili ste lozinku?",
+      "rememberMe": "Zapamti me",
+      "noAccount": "Nemate račun?",
+      "continueWithX": "Nastavite sa X (twitter)",
+      "continueWithTelegram": "Nastavite sa Telegramom",
+      "welcome": "Zdravo, {0}!",
+      "error": "Nevažeći email ili lozinka."
+    },
+    "register": {
+      "title": "Kreirajte nalog",
+      "subtitle": "Kreirajte svoj račun da nastavite.",
+      "button": "Prijavite se",
+      "firstName": "Ime",
+      "firstNameLabel": "Ime",
+      "emailLabel": "Email",
+      "emailAddress": "Email adresa",
+      "emailPlaceholder": "Email adresa",
+      "passwordLabel": "Lozinka",
+      "passwordPlaceholder": "Lozinka",
+      "confirmPasswordLabel": "Potvrdite lozinku",
+      "confirmPasswordPlaceholder": "Lozinka",
+      "haveAccount": "Već imate račun?",
+      "Onboarding": {
+        "title": "Popunite svoj profil",
+        "description": "Odaberite svoju ulogu i korisničko ime da nastavite.",
+        "usernameLabel": "Korisničko ime",
+        "usernamePlaceholder": "Unesite korisničko ime",
+        "roleLabel": "Uloga",
+        "rolePlaceholder": "Odaberite svoju ulogu",
+        "roles": {
+          "creator": "Kreator",
+          "fan": "Fan",
+          "vendor": "Vendor",
+          "agent": "Agent"
+        },
+        "button": "Nastavi"
+      },
+      "KYC": {
+        "title": "Potvrdite svoj identitet",
+        "description": "Dovršite verifikaciju kreatora da pristupite kontrolnoj tabli.",
+        "button": "Potvrdi i nastavi",
+        "logout": "Odjava i izlaz"
+      }
+    },
+    "confirmEmail": {
+      "title": "Potvrdite e-poštu",
+      "subtitle": "Unesite email koji ste koristili i verifikacioni kod koji smo vam poslali.",
+      "button": "Potvrdi",
+      "buttonLoading": "Potvrđivanje...",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "codeLabel": "Potvrdni kod",
+      "codePlaceholder": "6-cifreni kod",
+      "error": "Potvrda nije uspjela",
+      "autoLoginError": "E-pošta je potvrđena, ali automatska prijava nije uspjela. Molimo prijavite se ručno."
+    },
+    "reset": {
+      "title": "Poništi lozinku",
+      "subtitle": "Unesite svoju e-poštu da dobijete kod za resetiranje.",
+      "subtitleConfirm": "Unesite kod koji ste dobili i novu lozinku.",
+      "sendCode": "Pošalji kod za resetovanje",
+      "codeLabel": "Resetujte kod",
+      "codePlaceholder": "Unesite kod za resetovanje",
+      "resetButton": "Poništi lozinku",
+      "codeSent": "Reset kod je poslan na Vašu e-poštu.",
+      "sendCodeError": "Slanje koda nije uspjelo",
+      "success": "Resetiranje lozinke uspješno. Molimo prijavite se.",
+      "error": "Resetiranje nije uspjelo"
+    },
+    "validation": {
+      "emailRequired": "Email je obavezan",
+      "emailInvalid": "Unesite ispravnu adresu e-pošte",
+      "passwordRequired": "Lozinka je obavezna",
+      "passwordMinLength": "Najmanje 8 znakova",
+      "passwordHasUpper": "Sadrži najmanje 1 veliko slovo",
+      "passwordHasLower": "Sadrži najmanje 1 malo slovo",
+      "passwordHasNumber": "Sadrži najmanje 1 broj",
+      "passwordHasSpecial": "Sadrži najmanje 1 poseban znak",
+      "confirmPasswordRequired": "Molimo potvrdite svoju lozinku",
+      "confirmPasswordMatch": "Lozinke se ne podudaraju",
+      "confirmPasswordMatchSuccess": "Lozinka se podudara",
+      "codeRequired": "Kod je obavezan",
+      "roleRequired": "Uloga je obavezna",
+      "roleSelect": "Molimo odaberite ulogu",
+      "usernameRequired": "Korisničko ime je obavezno",
+      "usernameMinLength": "Korisničko ime mora imati najmanje 4 znaka",
+      "usernameMaxLength": "Korisničko ime mora biti manje od 100 znakova",
+      "usernameTaken": "Korisničko ime je već zauzeto"
+    },
+    "common": {
+      "logout": "Odjava",
+      "loading": "Učitavanje...",
+      "user": "Korisnik",
+      "admin": "Admin",
+      "guest": "Gost",
+      "showPassword": "Prikaži lozinku",
+      "hidePassword": "Sakrij lozinku"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Došlo je do greške prilikom popunjavanja vašeg profila"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard",
+      "description": "Pregled vašeg računa"
+    },
+    "actions": {
+      "editProfile": "Uredi profil",
+      "editSettings": "Uredi postavke",
+      "myMedia": "My Media",
+      "viewStats": "Pogledaj statistiku"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Uredi profil",
+        "description": "Ažurirajte svoje lične podatke"
+      },
+      "editSettings": {
+        "title": "Postavke računa",
+        "description": "Upravljajte postavkama vašeg računa"
+      },
+      "myMedia": {
+        "title": "My Media",
+        "description": "Upravljajte svojim prenesenim sadržajem"
+      }
+    },
+    "messages": {
+      "welcome": "Dobrodošli nazad, {0}!",
+      "stats": "Imate {0} stavki"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Upravljajte informacijama o svom profilu"
+    },
+    "form": {
+      "firstName": "Ime",
+      "lastName": "Prezime",
+      "email": "Email adresa",
+      "phone": "Broj telefona",
+      "bio": "Biografija",
+      "save": "Sačuvaj promjene"
+    },
+    "messages": {
+      "updated": "Profil je uspješno ažuriran",
+      "error": "Ažuriranje profila nije uspjelo"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Otkrijte",
+      "description": "Istražite nove sadržaje i funkcije"
+    },
+    "sections": {
+      "featured": "Istaknuti sadržaj"
+    },
+    "messages": {
+      "explore": "Počnite istraživati našu platformu"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Shop",
+      "description": "Pregledajte i kupujte proizvode"
+    },
+    "sections": {
+      "products": "Proizvodi"
+    },
+    "messages": {
+      "comingSoon": "Uskoro više proizvoda!"
+    }
+  },
+  "common": {
+    "loading": "Učitavanje...",
+    "error": "Došlo je do greške",
+    "success": "Operacija je završena",
+    "save": "Sačuvaj",
+    "cancel": "Otkaži",
+    "delete": "Izbriši",
+    "edit": "Uredi",
+    "create": "Kreiraj",
+    "update": "Ažuriraj",
+    "submit": "Submit",
+    "reset": "Reset",
+    "back": "Idi nazad",
+    "next": "Sledeći",
+    "previous": "Prethodno"
+  }
+}

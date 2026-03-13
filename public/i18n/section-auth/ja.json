@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "おかえりなさい",
+      "subtitle": "続行するには資格情報を入力してください。",
+      "button": "ログイン",
+      "emailLabel": "電子メール",
+      "emailPlaceholder": "メールアドレス",
+      "passwordLabel": "パスワード",
+      "passwordPlaceholder": "パスワード",
+      "forgotPassword": "パスワードをお忘れですか?",
+      "rememberMe": "私を覚えていてください",
+      "noAccount": "アカウントをお持ちでない場合は、",
+      "continueWithX": "続けてX（ツイッター）",
+      "continueWithTelegram": "テレグラムを続ける",
+      "welcome": "こんにちは、{0}!",
+      "error": "メールアドレスまたはパスワードが無効です。"
+    },
+    "register": {
+      "title": "アカウントの作成",
+      "subtitle": "続行するにはアカウントを作成してください。",
+      "button": "サインアップ",
+      "firstName": "名",
+      "firstNameLabel": "名前",
+      "emailLabel": "電子メール",
+      "emailAddress": "メールアドレス",
+      "emailPlaceholder": "メールアドレス",
+      "passwordLabel": "パスワード",
+      "passwordPlaceholder": "パスワード",
+      "confirmPasswordLabel": "パスワードの確認",
+      "confirmPasswordPlaceholder": "パスワード",
+      "haveAccount": "すでにアカウントをお持ちですか?",
+      "Onboarding": {
+        "title": "プロフィールを完成させましょう",
+        "description": "続行するには、ロールとユーザー名を選択してください。",
+        "usernameLabel": "ユーザー名",
+        "usernamePlaceholder": "ユーザー名を入力してください",
+        "roleLabel": "役割",
+        "rolePlaceholder": "役割を選択してください",
+        "roles": {
+          "creator": "クリエイター",
+          "fan": "ファン",
+          "vendor": "ベンダー",
+          "agent": "エージェント"
+        },
+        "button": "続ける"
+      },
+      "KYC": {
+        "title": "身元を確認する",
+        "description": "作成者認証を完了してダッシュボードにアクセスします。",
+        "button": "確認して続行",
+        "logout": "ログアウトして終了"
+      }
+    },
+    "confirmEmail": {
+      "title": "メールの確認",
+      "subtitle": "使用した電子メールと送信された確認コードを入力します。",
+      "button": "確認する",
+      "buttonLoading": "確認中...",
+      "emailLabel": "電子メール",
+      "emailPlaceholder": "電子メール",
+      "codeLabel": "確認コード",
+      "codePlaceholder": "6桁のコード",
+      "error": "確認に失敗しました",
+      "autoLoginError": "メールアドレスは確認されましたが、自動ログインに失敗しました。手動でログインしてください。"
+    },
+    "reset": {
+      "title": "パスワードのリセット",
+      "subtitle": "メールアドレスを入力してリセット コードを受け取ります。",
+      "subtitleConfirm": "受け取ったコードと新しいパスワードを入力します。",
+      "sendCode": "リセットコードを送信する",
+      "codeLabel": "リセットコード",
+      "codePlaceholder": "リセットコードを入力してください",
+      "resetButton": "パスワードのリセット",
+      "codeSent": "リセット コードがメールに送信されます。",
+      "sendCodeError": "コードの送信に失敗しました",
+      "success": "パスワードのリセットが成功しました。ログインしてください。",
+      "error": "リセットに失敗しました"
+    },
+    "validation": {
+      "emailRequired": "メールアドレスは必須です",
+      "emailInvalid": "有効なメールアドレスを入力してください",
+      "passwordRequired": "パスワードが必要です",
+      "passwordMinLength": "少なくとも 8 文字の長さ",
+      "passwordHasUpper": "少なくとも 1 つの大文字が含まれる",
+      "passwordHasLower": "少なくとも 1 つの小文字を含む",
+      "passwordHasNumber": "少なくとも 1 つの数字を含む",
+      "passwordHasSpecial": "少なくとも 1 つの特殊文字を含む",
+      "confirmPasswordRequired": "パスワードを確認してください",
+      "confirmPasswordMatch": "パスワードが一致しません",
+      "confirmPasswordMatchSuccess": "パスワードの一致",
+      "codeRequired": "コードは必須です",
+      "roleRequired": "役割は必須です",
+      "roleSelect": "役割を選択してください",
+      "usernameRequired": "ユーザー名は必須です",
+      "usernameMinLength": "ユーザー名は少なくとも 4 文字である必要があります",
+      "usernameMaxLength": "ユーザー名は 100 文字未満である必要があります",
+      "usernameTaken": "ユーザー名はすでに使用されています"
+    },
+    "common": {
+      "logout": "サインアウト",
+      "loading": "読み込み中...",
+      "user": "ユーザー",
+      "admin": "管理者",
+      "guest": "ゲスト",
+      "showPassword": "パスワードを表示",
+      "hidePassword": "パスワードを隠す"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "プロフィールの入力中にエラーが発生しました"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "ダッシュボード",
+      "description": "アカウントの概要"
+    },
+    "actions": {
+      "editProfile": "プロフィールの編集",
+      "editSettings": "設定の編集",
+      "myMedia": "私のメディア",
+      "viewStats": "統計の表示"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "プロフィールの編集",
+        "description": "個人情報を更新する"
+      },
+      "editSettings": {
+        "title": "アカウント設定",
+        "description": "アカウント設定を管理する"
+      },
+      "myMedia": {
+        "title": "私のメディア",
+        "description": "アップロードしたコンテンツを管理する"
+      }
+    },
+    "messages": {
+      "welcome": "おかえりなさい、{0}!",
+      "stats": "{0} 個のアイテムがあります"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "プロフィール",
+      "description": "プロフィール情報を管理する"
+    },
+    "form": {
+      "firstName": "名",
+      "lastName": "姓",
+      "email": "メールアドレス",
+      "phone": "電話番号",
+      "bio": "略歴",
+      "save": "変更を保存"
+    },
+    "messages": {
+      "updated": "プロファイルが正常に更新されました",
+      "error": "プロフィールの更新に失敗しました"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "発見する",
+      "description": "新しいコンテンツと機能を探索する"
+    },
+    "sections": {
+      "featured": "注目のコンテンツ"
+    },
+    "messages": {
+      "explore": "私たちのプラットフォームの探索を始めましょう"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "ショップ",
+      "description": "製品を閲覧して購入する"
+    },
+    "sections": {
+      "products": "製品"
+    },
+    "messages": {
+      "comingSoon": "さらに多くの製品が近日公開予定です。"
+    }
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "success": "操作が完了しました",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "update": "アップデート",
+    "submit": "送信する",
+    "reset": "リセット",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ"
+  }
+}

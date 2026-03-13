@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Witamy z powrotem",
+      "subtitle": "Wprowadź swoje dane uwierzytelniające, aby kontynuować.",
+      "button": "Zaloguj się",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "Adres e-mail",
+      "passwordLabel": "Hasło",
+      "passwordPlaceholder": "Hasło",
+      "forgotPassword": "Zapomniałeś hasła?",
+      "rememberMe": "Pamiętaj mnie",
+      "noAccount": "Nie masz konta?",
+      "continueWithX": "Kontynuuj za pomocą X (twitter)",
+      "continueWithTelegram": "Kontynuuj korzystanie z Telegramu",
+      "welcome": "Witaj, {0}!",
+      "error": "Nieprawidłowy adres e-mail lub hasło."
+    },
+    "register": {
+      "title": "Utwórz konto",
+      "subtitle": "Utwórz konto, aby kontynuować.",
+      "button": "Zarejestruj się",
+      "firstName": "Imię",
+      "firstNameLabel": "Imię",
+      "emailLabel": "E-mail",
+      "emailAddress": "Adres e-mail",
+      "emailPlaceholder": "Adres e-mail",
+      "passwordLabel": "Hasło",
+      "passwordPlaceholder": "Hasło",
+      "confirmPasswordLabel": "Potwierdź hasło",
+      "confirmPasswordPlaceholder": "Hasło",
+      "haveAccount": "Masz już konto?",
+      "Onboarding": {
+        "title": "Uzupełnij swój profil",
+        "description": "Wybierz swoją rolę i nazwę użytkownika, aby kontynuować.",
+        "usernameLabel": "Nazwa użytkownika",
+        "usernamePlaceholder": "Wprowadź nazwę użytkownika",
+        "roleLabel": "Rola",
+        "rolePlaceholder": "Wybierz swoją rolę",
+        "roles": {
+          "creator": "Twórca",
+          "fan": "Wentylator",
+          "vendor": "Sprzedawca",
+          "agent": "Agent"
+        },
+        "button": "Kontynuuj"
+      },
+      "KYC": {
+        "title": "Zweryfikuj swoją tożsamość",
+        "description": "Dokończ weryfikację twórcy, aby uzyskać dostęp do panelu.",
+        "button": "Potwierdź i kontynuuj",
+        "logout": "Wyloguj się i wyjdź"
+      }
+    },
+    "confirmEmail": {
+      "title": "Potwierdź e-mail",
+      "subtitle": "Wpisz użyty adres e-mail i kod weryfikacyjny, który Ci wysłaliśmy.",
+      "button": "Potwierdź",
+      "buttonLoading": "Potwierdzam...",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "E-mail",
+      "codeLabel": "Kod potwierdzający",
+      "codePlaceholder": "6-cyfrowy kod",
+      "error": "Potwierdzenie nie powiodło się",
+      "autoLoginError": "E-mail potwierdzony, ale automatyczne logowanie nie powiodło się. Proszę zalogować się ręcznie."
+    },
+    "reset": {
+      "title": "Zresetuj hasło",
+      "subtitle": "Wpisz swój adres e-mail, aby otrzymać kod resetujący.",
+      "subtitleConfirm": "Wpisz otrzymany kod i nowe hasło.",
+      "sendCode": "Wyślij kod resetowania",
+      "codeLabel": "Zresetuj kod",
+      "codePlaceholder": "Wprowadź kod resetowania",
+      "resetButton": "Zresetuj hasło",
+      "codeSent": "Zresetuj kod wysłany na Twój adres e-mail.",
+      "sendCodeError": "Nie udało się wysłać kodu",
+      "success": "Resetowanie hasła powiodło się. Proszę się zalogować.",
+      "error": "Resetowanie nie powiodło się"
+    },
+    "validation": {
+      "emailRequired": "Adres e-mail jest wymagany",
+      "emailInvalid": "Proszę podać prawidłowy adres e-mail",
+      "passwordRequired": "Hasło jest wymagane",
+      "passwordMinLength": "Długość co najmniej 8 znaków",
+      "passwordHasUpper": "Zawiera co najmniej 1 dużą literę",
+      "passwordHasLower": "Zawiera co najmniej 1 małą literę",
+      "passwordHasNumber": "Zawiera co najmniej 1 cyfrę",
+      "passwordHasSpecial": "Zawiera co najmniej 1 znak specjalny",
+      "confirmPasswordRequired": "Proszę potwierdzić swoje hasło",
+      "confirmPasswordMatch": "Hasła nie pasują",
+      "confirmPasswordMatchSuccess": "Hasło pasuje",
+      "codeRequired": "Kod jest wymagany",
+      "roleRequired": "Rola jest wymagana",
+      "roleSelect": "Wybierz rolę",
+      "usernameRequired": "Nazwa użytkownika jest wymagana",
+      "usernameMinLength": "Nazwa użytkownika musi mieć co najmniej 4 znaki",
+      "usernameMaxLength": "Nazwa użytkownika musi mieć mniej niż 100 znaków",
+      "usernameTaken": "Nazwa użytkownika jest już zajęta"
+    },
+    "common": {
+      "logout": "Wyloguj się",
+      "loading": "Ładowanie...",
+      "user": "Użytkownik",
+      "admin": "Administrator",
+      "guest": "Gość",
+      "showPassword": "Pokaż hasło",
+      "hidePassword": "Ukryj hasło"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Wystąpił błąd podczas uzupełniania profilu"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Pulpit nawigacyjny",
+      "description": "Przegląd Twojego konta"
+    },
+    "actions": {
+      "editProfile": "Edytuj profil",
+      "editSettings": "Edytuj ustawienia",
+      "myMedia": "Moje media",
+      "viewStats": "Zobacz statystyki"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Edytuj profil",
+        "description": "Zaktualizuj swoje dane osobowe"
+      },
+      "editSettings": {
+        "title": "Ustawienia konta",
+        "description": "Zarządzaj preferencjami swojego konta"
+      },
+      "myMedia": {
+        "title": "Moje media",
+        "description": "Zarządzaj przesłanymi treściami"
+      }
+    },
+    "messages": {
+      "welcome": "Witamy ponownie, {0}!",
+      "stats": "Masz {0} elementów"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Zarządzaj informacjami w swoim profilu"
+    },
+    "form": {
+      "firstName": "Imię",
+      "lastName": "Nazwisko",
+      "email": "Adres e-mail",
+      "phone": "Numer telefonu",
+      "bio": "Biografia",
+      "save": "Zapisz zmiany"
+    },
+    "messages": {
+      "updated": "Profil został pomyślnie zaktualizowany",
+      "error": "Nie udało się zaktualizować profilu"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Odkryj",
+      "description": "Poznaj nową zawartość i funkcje"
+    },
+    "sections": {
+      "featured": "Polecana treść"
+    },
+    "messages": {
+      "explore": "Zacznij odkrywać naszą platformę"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Sklep",
+      "description": "Przeglądaj i kupuj produkty"
+    },
+    "sections": {
+      "products": "Produkty"
+    },
+    "messages": {
+      "comingSoon": "Więcej produktów już wkrótce!"
+    }
+  },
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Wystąpił błąd",
+    "success": "Operacja zakończona",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "create": "Utwórz",
+    "update": "Aktualizacja",
+    "submit": "Prześlij",
+    "reset": "Zresetuj",
+    "back": "Wróć",
+    "next": "Następny",
+    "previous": "Poprzedni"
+  }
+}

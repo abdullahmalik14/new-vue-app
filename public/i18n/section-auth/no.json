@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Velkommen tilbake",
+      "subtitle": "Vennligst skriv inn legitimasjonen din for å fortsette.",
+      "button": "Logg inn",
+      "emailLabel": "E-post",
+      "emailPlaceholder": "E-postadresse",
+      "passwordLabel": "Passord",
+      "passwordPlaceholder": "Passord",
+      "forgotPassword": "Glemt passordet ditt?",
+      "rememberMe": "Husk meg",
+      "noAccount": "Har du ikke en konto?",
+      "continueWithX": "Fortsett med X (twitter)",
+      "continueWithTelegram": "Fortsett med Telegram",
+      "welcome": "Hei, {0}!",
+      "error": "Ugyldig e-postadresse eller passord."
+    },
+    "register": {
+      "title": "Opprett konto",
+      "subtitle": "Opprett kontoen din for å fortsette.",
+      "button": "Registrer deg",
+      "firstName": "Fornavn",
+      "firstNameLabel": "Navn",
+      "emailLabel": "E-post",
+      "emailAddress": "E-postadresse",
+      "emailPlaceholder": "E-postadresse",
+      "passwordLabel": "Passord",
+      "passwordPlaceholder": "Passord",
+      "confirmPasswordLabel": "Bekreft passord",
+      "confirmPasswordPlaceholder": "Passord",
+      "haveAccount": "Har du allerede en konto?",
+      "Onboarding": {
+        "title": "Fullfør profilen din",
+        "description": "Velg din rolle og brukernavn for å fortsette.",
+        "usernameLabel": "Brukernavn",
+        "usernamePlaceholder": "Skriv inn et brukernavn",
+        "roleLabel": "Rolle",
+        "rolePlaceholder": "Velg din rolle",
+        "roles": {
+          "creator": "Skaper",
+          "fan": "Vifte",
+          "vendor": "Leverandør",
+          "agent": "Agent"
+        },
+        "button": "Fortsett"
+      },
+      "KYC": {
+        "title": "Bekreft identiteten din",
+        "description": "Fullfør skaperbekreftelsen for å få tilgang til dashbordet.",
+        "button": "Bekreft og fortsett",
+        "logout": "Logg ut og avslutt"
+      }
+    },
+    "confirmEmail": {
+      "title": "Bekreft e-post",
+      "subtitle": "Skriv inn e-postadressen du brukte og bekreftelseskoden vi sendte deg.",
+      "button": "Bekreft",
+      "buttonLoading": "Bekrefter...",
+      "emailLabel": "E-post",
+      "emailPlaceholder": "E-post",
+      "codeLabel": "Bekreftelseskode",
+      "codePlaceholder": "6-sifret kode",
+      "error": "Bekreftelsen mislyktes",
+      "autoLoginError": "E-post bekreftet, men automatisk pålogging mislyktes. Vennligst logg inn manuelt."
+    },
+    "reset": {
+      "title": "Tilbakestill passord",
+      "subtitle": "Skriv inn e-posten din for å motta en tilbakestillingskode.",
+      "subtitleConfirm": "Skriv inn koden du har mottatt og et nytt passord.",
+      "sendCode": "Send tilbakestillingskode",
+      "codeLabel": "Tilbakestill kode",
+      "codePlaceholder": "Skriv inn tilbakestillingskode",
+      "resetButton": "Tilbakestill passord",
+      "codeSent": "Tilbakestill koden sendt til e-posten din.",
+      "sendCodeError": "Kunne ikke sende koden",
+      "success": "Tilbakestilling av passord var vellykket. Vennligst logg inn.",
+      "error": "Tilbakestilling mislyktes"
+    },
+    "validation": {
+      "emailRequired": "E-post er påkrevd",
+      "emailInvalid": "Vennligst skriv inn en gyldig e-postadresse",
+      "passwordRequired": "Passord kreves",
+      "passwordMinLength": "Minst 8 tegn lang",
+      "passwordHasUpper": "Inneholder minst 1 stor bokstav",
+      "passwordHasLower": "Inneholder minst 1 liten bokstav",
+      "passwordHasNumber": "Inneholder minst 1 tall",
+      "passwordHasSpecial": "Inneholder minst 1 spesialtegn",
+      "confirmPasswordRequired": "Vennligst bekreft passordet ditt",
+      "confirmPasswordMatch": "Passord stemmer ikke",
+      "confirmPasswordMatchSuccess": "Passord samsvarer",
+      "codeRequired": "Kode kreves",
+      "roleRequired": "Rolle er påkrevd",
+      "roleSelect": "Velg en rolle",
+      "usernameRequired": "Brukernavn er påkrevd",
+      "usernameMinLength": "Brukernavnet må være på minst 4 tegn",
+      "usernameMaxLength": "Brukernavnet må være mindre enn 100 tegn",
+      "usernameTaken": "Brukernavnet er allerede tatt"
+    },
+    "common": {
+      "logout": "Logg ut",
+      "loading": "Laster inn...",
+      "user": "Bruker",
+      "admin": "Admin",
+      "guest": "Gjest",
+      "showPassword": "Vis passord",
+      "hidePassword": "Skjul passord"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "Det oppsto en feil under fullføring av profilen din"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashbord",
+      "description": "Oversikt over kontoen din"
+    },
+    "actions": {
+      "editProfile": "Rediger profil",
+      "editSettings": "Rediger innstillinger",
+      "myMedia": "Mine medier",
+      "viewStats": "Se statistikk"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Rediger profil",
+        "description": "Oppdater din personlige informasjon"
+      },
+      "editSettings": {
+        "title": "Kontoinnstillinger",
+        "description": "Administrer kontopreferansene dine"
+      },
+      "myMedia": {
+        "title": "Mine medier",
+        "description": "Administrer det opplastede innholdet ditt"
+      }
+    },
+    "messages": {
+      "welcome": "Velkommen tilbake, {0}!",
+      "stats": "Du har {0} elementer"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profil",
+      "description": "Administrer profilinformasjonen din"
+    },
+    "form": {
+      "firstName": "Fornavn",
+      "lastName": "Etternavn",
+      "email": "E-postadresse",
+      "phone": "Telefonnummer",
+      "bio": "Biografi",
+      "save": "Lagre endringer"
+    },
+    "messages": {
+      "updated": "Profilen ble oppdatert",
+      "error": "Kunne ikke oppdatere profilen"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Oppdag",
+      "description": "Utforsk nytt innhold og funksjoner"
+    },
+    "sections": {
+      "featured": "Utvalgt innhold"
+    },
+    "messages": {
+      "explore": "Begynn å utforske plattformen vår"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Handle",
+      "description": "Bla gjennom og kjøp produkter"
+    },
+    "sections": {
+      "products": "Produkter"
+    },
+    "messages": {
+      "comingSoon": "Flere produkter kommer snart!"
+    }
+  },
+  "common": {
+    "loading": "Laster inn...",
+    "error": "Det oppsto en feil",
+    "success": "Operasjonen fullført",
+    "save": "Lagre",
+    "cancel": "Avbryt",
+    "delete": "Slett",
+    "edit": "Rediger",
+    "create": "Opprett",
+    "update": "Oppdater",
+    "submit": "Send inn",
+    "reset": "Tilbakestill",
+    "back": "Gå tilbake",
+    "next": "Neste",
+    "previous": "Forrige"
+  }
+}

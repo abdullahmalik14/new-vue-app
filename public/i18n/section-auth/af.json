@@ -1,0 +1,203 @@
+{
+  "auth": {
+    "login": {
+      "title": "Welkom Terug",
+      "subtitle": "Voer asseblief jou eiebewyse in om voort te gaan.",
+      "button": "Meld aan",
+      "emailLabel": "E-pos",
+      "emailPlaceholder": "E-pos adres",
+      "passwordLabel": "Wagwoord",
+      "passwordPlaceholder": "Wagwoord",
+      "forgotPassword": "Jou wagwoord vergeet?",
+      "rememberMe": "Onthou my",
+      "noAccount": "Het jy nie 'n rekening nie?",
+      "continueWithX": "Gaan voort met X (twitter)",
+      "continueWithTelegram": "Gaan voort met Telegram",
+      "welcome": "Hallo, {0}!",
+      "error": "Ongeldige e-posadres of wagwoord."
+    },
+    "register": {
+      "title": "Skep rekening",
+      "subtitle": "Skep jou rekening om voort te gaan.",
+      "button": "Teken in",
+      "firstName": "Voornaam",
+      "firstNameLabel": "Naam",
+      "emailLabel": "E-pos",
+      "emailAddress": "E-pos adres",
+      "emailPlaceholder": "E-pos adres",
+      "passwordLabel": "Wagwoord",
+      "passwordPlaceholder": "Wagwoord",
+      "confirmPasswordLabel": "Bevestig wagwoord",
+      "confirmPasswordPlaceholder": "Wagwoord",
+      "haveAccount": "Het jy reeds 'n rekening?",
+      "Onboarding": {
+        "title": "Voltooi jou profiel",
+        "description": "Kies jou rol en gebruikersnaam om voort te gaan.",
+        "usernameLabel": "Gebruikersnaam",
+        "usernamePlaceholder": "Voer 'n gebruikernaam in",
+        "roleLabel": "Rol",
+        "rolePlaceholder": "Kies jou rol",
+        "roles": {
+          "creator": "Skepper",
+          "fan": "Fan",
+          "vendor": "Verkoper",
+          "agent": "Agent"
+        },
+        "button": "Gaan voort"
+      },
+      "KYC": {
+        "title": "Verifieer jou identiteit",
+        "description": "Voltooi skepperverifikasie om toegang tot die kontroleskerm te kry.",
+        "button": "Bevestig en gaan voort",
+        "logout": "Teken uit en verlaat"
+      }
+    },
+    "confirmEmail": {
+      "title": "Bevestig e-pos",
+      "subtitle": "Voer die e-posadres in wat jy gebruik het en die verifikasiekode wat ons vir jou gestuur het.",
+      "button": "Bevestig",
+      "buttonLoading": "Bevestig tans …",
+      "emailLabel": "E-pos",
+      "emailPlaceholder": "E-pos",
+      "codeLabel": "Bevestigingskode",
+      "codePlaceholder": "6-syfer kode",
+      "error": "Bevestiging het misluk",
+      "autoLoginError": "E-pos is bevestig, maar outo-aanmelding het misluk. Meld asseblief handmatig aan."
+    },
+    "reset": {
+      "title": "Stel wagwoord terug",
+      "subtitle": "Voer jou e-pos in om 'n terugstelkode te ontvang.",
+      "subtitleConfirm": "Voer die kode in wat jy ontvang het en 'n nuwe wagwoord.",
+      "sendCode": "Stuur terugstelkode",
+      "codeLabel": "Stel kode terug",
+      "codePlaceholder": "Voer terugstelkode in",
+      "resetButton": "Stel wagwoord terug",
+      "codeSent": "Stel kode terug wat na jou e-pos gestuur is.",
+      "sendCodeError": "Kon nie kode stuur nie",
+      "success": "Wagwoordherstelling suksesvol. Meld asseblief aan.",
+      "error": "Kon nie terugstel nie"
+    },
+    "validation": {
+      "emailRequired": "E-pos word vereis",
+      "emailInvalid": "Voer asseblief 'n geldige e-posadres in",
+      "passwordRequired": "Wagwoord word vereis",
+      "passwordMinLength": "Ten minste 8 karakters lank",
+      "passwordHasUpper": "Bevat ten minste 1 hoofletter",
+      "passwordHasLower": "Bevat ten minste 1 kleinletter",
+      "passwordHasNumber": "Bevat ten minste 1 nommer",
+      "passwordHasSpecial": "Bevat ten minste 1 spesiale karakter",
+      "confirmPasswordRequired": "Bevestig asseblief jou wagwoord",
+      "confirmPasswordMatch": "Wagwoorde stem nie ooreen nie",
+      "confirmPasswordMatchSuccess": "Wagwoord pas",
+      "codeRequired": "Kode word vereis",
+      "roleRequired": "Rol word vereis",
+      "roleSelect": "Kies asseblief 'n rol",
+      "usernameRequired": "Gebruikersnaam word vereis",
+      "usernameMinLength": "Gebruikersnaam moet ten minste 4 karakters wees",
+      "usernameMaxLength": "Gebruikersnaam moet minder as 100 karakters wees",
+      "usernameTaken": "Gebruikersnaam is reeds geneem"
+    },
+    "common": {
+      "logout": "Teken uit",
+      "loading": "Laai tans...",
+      "user": "Gebruiker",
+      "admin": "Admin",
+      "guest": "Gas",
+      "showPassword": "Wys wagwoord",
+      "hidePassword": "Versteek wagwoord"
+    },
+    "messages": {
+      "Onboarding": {
+        "error": "'n Fout het voorgekom tydens die voltooiing van jou profiel"
+      }
+    }
+  },
+  "dashboard": {
+    "page": {
+      "title": "Dashboard",
+      "description": "Oorsig van jou rekening"
+    },
+    "actions": {
+      "editProfile": "Wysig profiel",
+      "editSettings": "Wysig instellings",
+      "myMedia": "My Media",
+      "viewStats": "Bekyk statistieke"
+    },
+    "sections": {
+      "editProfile": {
+        "title": "Wysig profiel",
+        "description": "Dateer jou persoonlike inligting op"
+      },
+      "editSettings": {
+        "title": "Rekeninginstellings",
+        "description": "Bestuur jou rekeningvoorkeure"
+      },
+      "myMedia": {
+        "title": "My Media",
+        "description": "Bestuur jou opgelaaide inhoud"
+      }
+    },
+    "messages": {
+      "welcome": "Welkom terug, {0}!",
+      "stats": "Jy het {0} items"
+    }
+  },
+  "profile": {
+    "page": {
+      "title": "Profiel",
+      "description": "Bestuur jou profielinligting"
+    },
+    "form": {
+      "firstName": "Voornaam",
+      "lastName": "Van",
+      "email": "E-posadres",
+      "phone": "Telefoonnommer",
+      "bio": "Biografie",
+      "save": "Stoor veranderinge"
+    },
+    "messages": {
+      "updated": "Profiel suksesvol opgedateer",
+      "error": "Kon nie profiel opdateer nie"
+    }
+  },
+  "discover": {
+    "page": {
+      "title": "Ontdek",
+      "description": "Verken nuwe inhoud en kenmerke"
+    },
+    "sections": {
+      "featured": "Uitgestalte inhoud"
+    },
+    "messages": {
+      "explore": "Begin om ons platform te verken"
+    }
+  },
+  "shop": {
+    "page": {
+      "title": "Winkel",
+      "description": "Blaai deur en koop produkte"
+    },
+    "sections": {
+      "products": "Produkte"
+    },
+    "messages": {
+      "comingSoon": "Meer produkte kom binnekort!"
+    }
+  },
+  "common": {
+    "loading": "Laai tans...",
+    "error": "'n Fout het voorgekom",
+    "success": "Operasie voltooi",
+    "save": "Stoor",
+    "cancel": "Kanselleer",
+    "delete": "Vee uit",
+    "edit": "Wysig",
+    "create": "Skep",
+    "update": "Dateer op",
+    "submit": "Dien in",
+    "reset": "Stel terug",
+    "back": "Gaan Terug",
+    "next": "Volgende",
+    "previous": "Vorige"
+  }
+}
