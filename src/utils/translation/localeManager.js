@@ -12,8 +12,11 @@
 
 import { log } from "../common/logHandler.js";
 import { logError } from "../common/errorHandler.js";
+
 import { useLocaleStore } from "../../stores/useLocaleStore.js";
+
 import { useAuthStore } from "../../stores/useAuthStore.js";
+
 import {
   resolveSectionIdentifier,
   resolveRoleSectionVariant,
