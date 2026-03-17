@@ -750,7 +750,7 @@
   {
     "slug": "/sign-up/onboarding",
     "section": "auth",
-    "requiresAuth": true,
+    "requiresAuth": false,
     "redirectIfNotAuth": "/log-in",
     "supportedRoles": [
       "all"
@@ -795,7 +795,7 @@
   {
     "slug": "/sign-up/onboarding/kyc",
     "section": "auth",
-    "requiresAuth": true,
+    "requiresAuth": false,
     "redirectIfNotAuth": "/log-in",
     "supportedRoles": [
       "creator"
