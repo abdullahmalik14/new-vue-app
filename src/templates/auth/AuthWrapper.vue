@@ -16,6 +16,7 @@
       </div>
 
       <!-- Main Content Slot -->
+       
       <slot />
 
       <!-- Footer Slot (optional) -->

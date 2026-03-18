@@ -15,6 +15,7 @@
             <div class="absolute inset-0 bg-[#e8723e]/20 rounded-full blur-md"></div>
             <ExclamationCircleIcon class="w-6 h-6 text-[#ff6535] relative z-10" />
           </div>
+          
           <p class="text-white text-[15px] font-normal leading-relaxed flex-1">
             {{ error }}
           </p>
