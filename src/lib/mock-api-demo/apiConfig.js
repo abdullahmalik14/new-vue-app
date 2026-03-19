@@ -7,7 +7,7 @@ export const apiConfig = {
     // 'auto' = checks navigator.onLine
     // 'offline' = forces MockApi
     // 'online' = forces APIHandler
-    mode: 'offline', 
+    mode: 'online', 
 
     // APIHandler settings (for online mode)
     apiHandler: {

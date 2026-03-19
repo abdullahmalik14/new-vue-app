@@ -54,7 +54,7 @@ class ApiWrapper {
             // For offline mode, we pass the endpoint directly (MockApi uses route keys)
             // For online mode, we append to baseUrl
             apiBaseUrl: useRealApi
-                ? `${apiConfig.apiHandler.defaultBaseUrl}${endpoint}`
+                ? (endpoint.startsWith('http') ? endpoint : `${apiConfig.apiHandler.defaultBaseUrl}${endpoint}`)
                 : endpoint, // MockApi uses endpoint as route key
             httpMethod: method,
             requestData: data,

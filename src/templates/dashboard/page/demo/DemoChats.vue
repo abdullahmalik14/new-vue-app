@@ -466,10 +466,9 @@
 import { ref, computed, onMounted } from 'vue'
 import FlexChat from '@/components/ui/chat/FlexChat.vue'
 import LiveCallRequest from '@/components/ui/chat/LiveCallRequest.vue'
-import { useChatStore } from '@/stores/useChatStore.js'
-import { chatPipeline } from '@/pipelines/chatPipeline.js'
-import { chatFlowHandler } from '@/flows/chatFlowHandler.js'
 import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWrapperTwoColContainer.vue'
+import { useChatStore } from '@/stores/useChatStore.js'
+import { FlowHandler } from '@/services/flow-system/FlowHandler.js'
 
 const chatTheme = {
   container: 'relative bg-[#f4f4f5] rounded-tl rounded-tr flex flex-col h-full overflow-hidden border border-zinc-200/50 container-shadow',
@@ -522,50 +521,33 @@ const groupFan1Loading = ref(false)
 const groupFan2HasMore = ref(true)
 const groupFan2Loading = ref(false)
 
+// Universal fetch wrapper
+const fetchMessages = async (chatId, loadingRef, hasMoreRef) => {
+  if (loadingRef.value || !hasMoreRef.value) return
+  loadingRef.value = true
+  
+  const pagingState = chatStore.pagingStates[chatId] || null;
+  const res = await FlowHandler.run('chat.fetchMessages', { chatId, limit: 20, pagingState });
+  
+  if (res.ok) {
+    if (!res.data.items || res.data.items.length === 0 || !res.data.pagingState) {
+      hasMoreRef.value = false;
+    }
+  } else {
+    hasMoreRef.value = false;
+  }
+  loadingRef.value = false
+}
+
 // Data Pipeline Fetches (Load Initial + Pagination)
-const fetchMoreModelMessages = async () => {
-  if (modelLoading.value || !modelHasMore.value) return
-  modelLoading.value = true
-  const res = await chatPipeline.fetchChatMessagesPipeline('shared-chat', 20, modelMessages.value.length)
-  if (res.success && res.count === 0) modelHasMore.value = false
-  modelLoading.value = false
-}
-
-const fetchMoreFanMessages = async () => {
-  // We remove the duplicate check so both windows independently trigger their spinner delay on load.
-  if (fanLoading.value || !fanHasMore.value) return
-  fanLoading.value = true
-  const res = await chatPipeline.fetchChatMessagesPipeline('shared-chat', 20, fanMessages.value.length)
-  if (res.success && res.count === 0) fanHasMore.value = false
-  fanLoading.value = false
-}
-
-const fetchMoreGroupMessages = async () => {
-  if (groupLoading.value || !groupHasMore.value) return
-  groupLoading.value = true
-  const res = await chatPipeline.fetchChatMessagesPipeline('group-chat', 20, groupMessages.value.length)
-  if (res.success && res.count === 0) groupHasMore.value = false
-  groupLoading.value = false
-}
-
-const fetchMoreGroupFan1Messages = async () => {
-  if (groupFan1Loading.value || !groupFan1HasMore.value) return
-  groupFan1Loading.value = true
-  const res = await chatPipeline.fetchChatMessagesPipeline('group-chat', 20, groupMessages.value.length)
-  if (res.success && res.count === 0) groupFan1HasMore.value = false
-  groupFan1Loading.value = false
-}
-
-const fetchMoreGroupFan2Messages = async () => {
-  if (groupFan2Loading.value || !groupFan2HasMore.value) return
-  groupFan2Loading.value = true
-  const res = await chatPipeline.fetchChatMessagesPipeline('group-chat', 20, groupMessages.value.length)
-  if (res.success && res.count === 0) groupFan2HasMore.value = false
-  groupFan2Loading.value = false
-}
+const fetchMoreModelMessages = () => fetchMessages('shared-chat', modelLoading, modelHasMore)
+const fetchMoreFanMessages = () => fetchMessages('shared-chat', fanLoading, fanHasMore)
+const fetchMoreGroupMessages = () => fetchMessages('group-chat', groupLoading, groupHasMore)
+const fetchMoreGroupFan1Messages = () => fetchMessages('group-chat', groupFan1Loading, groupFan1HasMore)
+const fetchMoreGroupFan2Messages = () => fetchMessages('group-chat', groupFan2Loading, groupFan2HasMore)
 
 // Flow Handler for Sending messages
-const sendMessage = async (chatId, senderId, text, type = 'text') => {
+const sendMessage = async (chatId, senderId, text, type = 'text', systemType = null, senderName = null) => {
   if (!text || typeof text !== 'string' || !text.trim()) return
 
   // Clear immediately for optimistic feeling
@@ -579,30 +561,31 @@ const sendMessage = async (chatId, senderId, text, type = 'text') => {
     else if (senderId === 'fan2') groupFan2ComposeText.value = ''
   }
 
-  await chatFlowHandler.sendMessageFlow({
+  const tempMsg = {
+    id: 'temp-' + Date.now(),
+    message_id: 'temp-' + Date.now(),
     chatId,
     senderId,
     text,
-    type
-  })
+    type,
+    systemType,
+    senderName,
+    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }).toLowerCase().replace(" ", "")
+  };
+  chatStore.addMessage(chatId, tempMsg);
+
+  await FlowHandler.run('chat.sendMessage', { chatId, senderId, text, type, systemType, senderName, id: tempMsg.id });
 }
 
 // Helper to manually trigger a call request for testing
 const sendCallRequest = async () => {
-  await chatFlowHandler.sendMessageFlow({
-    chatId: 'shared-chat',
-    senderId: 'fan',
-    text: 'Call me and i will sing with you', // Mock text
-    type: 'system',
-    systemType: 'call_request',
-    senderName: 'Jenny Honey~'
-  })
+  await sendMessage('shared-chat', 'fan', 'Call me and i will sing with you', 'system', 'call_request', 'Jenny Honey~')
 }
 
 // Initialize on Dashboard Load
 onMounted(async () => {
-  // 1. Init mock socket listeners
-  chatFlowHandler.initListeners()
+  // 1. Placeholder for real socket init later
+  // initSocketListeners()
 
   // 2. Trigger UI loaders immediately
   modelLoading.value = true

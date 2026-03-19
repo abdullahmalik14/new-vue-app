@@ -1131,6 +1131,54 @@
     "componentPath": "@/components/ui/form/BookingForm/UnifiedBookingForm.vue"
   },
   {
+    "slug": "/demo/audit/base-input",
+    "componentPath": "@/components/demoAuditComponents/BaseInputDemo.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
+    "slug": "/demo/audit/input-dashboard",
+    "componentPath": "@/components/demoAuditComponents/InputComponentDashboardDemo.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
+    "slug": "/demo/audit/input-auth",
+    "componentPath": "@/components/demoAuditComponents/InputAuthComponentDemo.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
+    "slug": "/demo/audit/input-default",
+    "componentPath": "@/components/demoAuditComponents/InputDefaultComponentDemo.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
+    "slug": "/demo/audit/code-input",
+    "componentPath": "@/components/demoAuditComponents/CodeInputAuthComponentDemo.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
+    "slug": "/demo/audit/checkbox-group",
+    "componentPath": "@/components/demoAuditComponents/CheckboxGroupDemo.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
+    "slug": "/demo/audit/checkbox-switch",
+    "componentPath": "@/components/demoAuditComponents/CheckboxSwitchDemo.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
+    "slug": "/demo/audit/button",
+    "componentPath": "@/components/demoAuditComponents/ButtonComponentDemo.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
     "slug": "/:pathMatch(.*)*",
     "redirect": "/404"
   }
