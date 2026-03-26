@@ -104,7 +104,7 @@ const requiredDisplayValues = computed(() => {
 
       <input :id="id" :type="type" :value="modelValue" :placeholder="activePlaceholder" :required="required"
         :data-required="$attrs['data-required']" :disabled="disabled"
-        class="w-full bg-transparent outline-none focus:outline-none focus:ring-0 focus:border-none poppins-medium transition-all placeholder:font-[400]"
+        class="w-full bg-transparent outline-none focus:outline-none focus:ring-0 focus:border-none poppins-medium placeholder:font-[400]"
         :class="[textColor, placeholderColor, leftIcon ? 'pl-8' : 'pl-1', rightIcon ? (rightIconText ? 'pr-16' : 'pr-8') : '']" @input="$emit('update:modelValue', $event.target.value)"
         @focus="handleFocus" @blur="handleBlur" />
 
@@ -173,17 +173,25 @@ input[type="password"]::-ms-clear {
   visibility: hidden !important;
 }
 
-/* Remove all focus borders and outlines - override global pink focus style */
+/* Remove all focus borders, outlines and transitions - prevent 50ms flash on blur */
+input,
 input:focus,
 input:focus-visible,
-input:active {
+input:active,
+input:focus-within {
   outline: none !important;
   border: none !important;
   box-shadow: none !important;
+  transition: none !important;
 }
 
-/* Ensure wrapper doesn't change border on input focus */
+/* Wrapper: lock border at all times, no transition */
+div:has(input) {
+  transition: none !important;
+}
 div:has(input:focus) {
-  border-color: inherit !important;
+  border-color: rgb(222 229 236) !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 </style>

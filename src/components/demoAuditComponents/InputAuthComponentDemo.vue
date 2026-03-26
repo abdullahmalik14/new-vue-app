@@ -12,39 +12,36 @@
             <h3 class="text-xl text-white font-semibold border-b border-white/10 pb-3">Login</h3>
 
             <form @submit.prevent="handleLoginSubmit" class="flex flex-col gap-4 w-full">
+
               <!-- Email -->
-              <InputAuthComponent
-                :model-value="loginEmail"
-                @update:model-value="handleLoginEmailInput"
-                placeholder="Enter your email"
-                id="login-email"
-                show-label
-                label-text="Email Address"
-                data-required="true"
-                required-display="italic-text"
-                type="text"
-                :show-errors="loginEmailErrors.length > 0"
-                :errors="loginEmailErrors"
-              />
+              <div class="flex flex-col gap-1">
+                <InputAuthComponent :model-value="loginEmail" @update:model-value="handleLoginEmailInput"
+                  placeholder="linden@codelinden.com" id="login-email" show-label label-text="Email Address"
+                  data-required="true" required-display="italic-text" type="text"
+                  :show-errors="loginEmailErrors.length > 0" :errors="loginEmailErrors" />
+                <ShowCodeToggle :code="codeSnippets.loginEmail" />
+              </div>
 
               <!-- Password -->
-              <InputAuthComponent
-                :model-value="loginPassword"
-                @update:model-value="handleLoginPasswordInput"
-                placeholder="••••••••"
-                id="login-password"
-                show-label
-                label-text="Password"
-                data-required="true"
-                required-display="italic-text"
-                :type="loginPasswordInputType"
-                :right-icon="loginPasswordIcon"
-                :show-errors="loginPasswordErrors.length > 0"
-                :errors="loginPasswordErrors"
-                @click:right-icon="toggleLoginPasswordVisibility"
-              />
+              <div class="flex flex-col gap-1">
+                <InputAuthComponent :model-value="loginPassword" @update:model-value="handleLoginPasswordInput"
+                  placeholder="********" id="login-password" show-label label-text="Password" data-required="true"
+                  required-display="italic-text" :type="loginPasswordInputType" :right-icon="loginPasswordIcon"
+                  :show-errors="loginPasswordErrors.length > 0" :errors="loginPasswordErrors"
+                  @click:right-icon="toggleLoginPasswordVisibility" />
+                <ShowCodeToggle :code="codeSnippets.loginPassword" />
+              </div>
 
-              <div class="mt-2">
+              <!-- Remember Me checkbox -->
+              <div class="flex flex-col gap-1">
+                <Checkbox v-model="loginRememberMe" label="Remember me"
+                  checkboxClass="m-0 border border-checkboxBorder [appearance:none] w-[0.75rem] h-[0.75rem] rounded-[2px] bg-transparent relative cursor-pointer checked:bg-checkbox checked:border-checkbox checked:[&::after]:content-[''] checked:[&::after]:absolute checked:[&::after]:left-[0.2rem] checked:[&::after]:w-[0.25rem] checked:[&::after]:h-[0.5rem] checked:[&::after]:border checked:[&::after]:border-solid checked:[&::after]:border-white checked:[&::after]:border-r-[2px] checked:[&::after]:border-b-[2px] checked:[&::after]:border-t-0 checked:[&::after]:border-l-0 checked:[&::after]:rotate-45"
+                  labelClass="text-[0.875rem] leading-6 text-text cursor-pointer"
+                  wrapperClass="flex items-center gap-2" />
+                <ShowCodeToggle :code="codeSnippets.loginCheckbox" />
+              </div>
+
+              <div>
                 <ButtonComponent text="Log In" variant="authPink" size="lg" type="submit" />
               </div>
             </form>
@@ -58,77 +55,44 @@
             <h3 class="text-xl text-white font-semibold border-b border-white/10 pb-3">Sign Up</h3>
 
             <form @submit.prevent="handleSignupSubmit" class="flex flex-col gap-4 w-full">
+
               <!-- Email -->
-              <InputAuthComponent
-                :model-value="signupEmail"
-                @update:model-value="handleSignupEmailInput"
-                placeholder="Enter your email"
-                id="signup-email"
-                show-label
-                label-text="Email Address"
-                data-required="true"
-                required-display="italic-text"
-                type="text"
-                :show-errors="signupEmailErrors.length > 0"
-                :errors="signupEmailErrors"
-              />
+              <div class="flex flex-col gap-1">
+                <InputAuthComponent :model-value="signupEmail" @update:model-value="handleSignupEmailInput"
+                  placeholder="linden@codelinden.com" id="signup-email" show-label label-text="Email Address"
+                  data-required="true" required-display="italic-text" type="text"
+                  :show-errors="signupEmailErrors.length > 0" :errors="signupEmailErrors" />
+                <ShowCodeToggle :code="codeSnippets.signupEmail" />
+              </div>
 
               <!-- Password -->
-              <InputAuthComponent
-                :model-value="signupPassword"
-                @update:model-value="handleSignupPasswordInput"
-                placeholder="••••••••"
-                id="signup-password"
-                show-label
-                label-text="Password"
-                data-required="true"
-                required-display="italic-text"
-                :type="signupPasswordInputType"
-                :right-icon="signupPasswordIcon"
-                :show-errors="signupPasswordErrors.length > 0"
-                :errors="signupPasswordErrors"
-                :on-success="signupPasswordSuccess.length > 0"
-                :success="signupPasswordSuccess"
-                @click:right-icon="toggleSignupPasswordVisibility"
-              />
+              <div class="flex flex-col gap-1">
+                <InputAuthComponent :model-value="signupPassword" @update:model-value="handleSignupPasswordInput"
+                  placeholder="********" id="signup-password" show-label label-text="Password" data-required="true"
+                  required-display="italic-text" :type="signupPasswordInputType" :right-icon="signupPasswordIcon"
+                  :show-errors="signupPasswordErrors.length > 0" :errors="signupPasswordErrors"
+                  :on-success="signupPasswordSuccess.length > 0" :success="signupPasswordSuccess"
+                  @click:right-icon="toggleSignupPasswordVisibility" />
+                <ShowCodeToggle :code="codeSnippets.signupPassword" />
+              </div>
 
               <!-- Confirm Password -->
-              <InputAuthComponent
-                :model-value="signupConfirmPassword"
-                @update:model-value="handleSignupConfirmPasswordInput"
-                placeholder="••••••••"
-                id="signup-confirmPassword"
-                show-label
-                label-text="Confirm Password"
-                data-required="true"
-                required-display="italic-text"
-                :type="signupConfirmPasswordInputType"
-                :right-icon="signupConfirmPasswordIcon"
-                :show-errors="signupConfirmPasswordErrors.length > 0"
-                :errors="signupConfirmPasswordErrors"
-                :on-success="signupConfirmPasswordSuccess.length > 0"
-                :success="signupConfirmPasswordSuccess"
-                @click:right-icon="toggleSignupConfirmPasswordVisibility"
-              />
+              <div class="flex flex-col gap-1">
+                <InputAuthComponent :model-value="signupConfirmPassword"
+                  @update:model-value="handleSignupConfirmPasswordInput" placeholder="********"
+                  id="signup-confirmPassword" show-label label-text="Confirm Password" data-required="true"
+                  required-display="italic-text" :type="signupConfirmPasswordInputType"
+                  :right-icon="signupConfirmPasswordIcon" :show-errors="signupConfirmPasswordErrors.length > 0"
+                  :errors="signupConfirmPasswordErrors" :on-success="signupConfirmPasswordSuccess.length > 0"
+                  :success="signupConfirmPasswordSuccess" @click:right-icon="toggleSignupConfirmPasswordVisibility" />
+                <ShowCodeToggle :code="codeSnippets.signupConfirmPassword" />
+              </div>
 
-              <div class="mt-2">
+              <div>
                 <ButtonComponent text="Create Account" variant="authPink" size="lg" type="submit" />
               </div>
             </form>
           </div>
-        </div>
-
-        <!-- Code Reference Sections -->
-        <div class="bg-[#1e1e1e] rounded-xl border border-white/10 p-6 flex flex-col gap-4">
-          <h3 class="text-xl text-white font-semibold">1. Template Usage</h3>
-          <p class="text-white/70 text-sm">Drop inputs in a <code>flex flex-col gap-4</code> form. No DemoCard wrappers needed.</p>
-          <pre class="bg-black/50 p-4 rounded-lg overflow-x-auto text-sm text-green-400"><code>{{ templateCode }}</code></pre>
-        </div>
-
-        <div class="bg-[#1e1e1e] rounded-xl border border-white/10 p-6 flex flex-col gap-4">
-          <h3 class="text-xl text-white font-semibold">2. Script — Interactions & Validation Wiring</h3>
-          <p class="text-white/70 text-sm">Full script pattern to register fields with the engine, handle inputs, show/hide errors and success messages.</p>
-          <pre class="bg-black/50 p-4 rounded-lg overflow-x-auto text-sm text-[#ce9178]"><code>{{ scriptCode }}</code></pre>
         </div>
 
       </section>
@@ -137,10 +101,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, defineComponent, h } from 'vue';
 import InputAuthComponent from '@/components/input/InputAuthComponent.vue';
 import DemoSectionHeader from '@/templates/dev/DemoSectionHeader.vue';
 import ButtonComponent from '@/components/button/ButtonComponent.vue';
+import Checkbox from '@/components/checkbox/CheckboxGroup.vue';
 import { interactionsEngine } from '@/utils/validation/interactionsEngine.js';
 import {
   InformationCircleIcon,
@@ -150,12 +115,48 @@ import {
 } from '@heroicons/vue/24/outline';
 
 // ─────────────────────────────────────────────
+// Inline ShowCode toggle component (no external file needed)
+// ─────────────────────────────────────────────
+const ShowCodeToggle = defineComponent({
+  props: { code: { type: String, default: '' } },
+  setup(props) {
+    const open = ref(false);
+    const copied = ref(false);
+    const copy = async () => {
+      await navigator.clipboard.writeText(props.code).catch(() => {});
+      copied.value = true;
+      setTimeout(() => (copied.value = false), 2000);
+    };
+    return () => h('div', { class: 'flex flex-col gap-0' }, [
+      h('button', {
+        type: 'button',
+        onClick: () => (open.value = !open.value),
+        class: 'self-start flex items-center gap-1.5 text-[0.7rem] font-medium text-white/50 hover:text-white/80 transition-colors mt-1 px-0 py-0',
+      }, [
+        h('svg', { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', 'stroke-width': '1.8', stroke: 'currentColor', class: 'w-3 h-3' },
+          [h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5' })]),
+        open.value ? 'Hide Code' : 'Show Code',
+      ]),
+      open.value && h('div', { class: 'mt-2 rounded-lg overflow-hidden bg-[#1a1a1a]' }, [
+        h('div', { class: 'flex justify-between items-center px-3 py-1.5 bg-[#252525]' }, [
+          h('span', { class: 'text-[0.6rem] font-mono text-white/30 uppercase tracking-wider' }, 'Vue'),
+          h('button', { type: 'button', onClick: copy, class: 'text-[0.65rem] text-white/40 hover:text-white/70 transition-colors' }, copied.value ? '✓ Copied' : 'Copy'),
+        ]),
+        h('pre', { class: 'p-3 overflow-x-auto text-[0.72rem] leading-relaxed text-[#d4d4d4] font-mono' },
+          h('code', {}, props.code)),
+      ]),
+    ]);
+  },
+});
+
+// ─────────────────────────────────────────────
 // LOGIN scope
 // ─────────────────────────────────────────────
 const LOGIN_SCOPE = "demo-loginScope";
 
 const loginEmail = ref("");
 const loginPassword = ref("");
+const loginRememberMe = ref(false);
 const loginHasAttemptedSubmit = ref(false);
 
 const loginEmailConfig = computed(() => ({
@@ -201,7 +202,7 @@ const loginPasswordInputType = computed(() =>
   interactionsEngine.getInputType(loginPasswordConfig.value, "password")
 );
 const loginPasswordIcon = computed(() =>
-  loginPasswordInputType.value === "text" ? EyeIcon : EyeSlashIcon
+  loginPassword.value ? (loginPasswordInputType.value === "text" ? EyeIcon : EyeSlashIcon) : null
 );
 const toggleLoginPasswordVisibility = () => {
   interactionsEngine.runInteractions(
@@ -293,7 +294,6 @@ const signupEmailState = computed(() => interactionsEngine.getFieldState(signupE
 const signupPasswordState = computed(() => interactionsEngine.getFieldState(signupPasswordConfig.value));
 const signupConfirmPasswordState = computed(() => interactionsEngine.getFieldState(signupConfirmPasswordConfig.value));
 
-// Helper
 const getValidationSuccess = (fieldState, fieldConfig) => {
   if (!fieldState || !fieldConfig) return [];
   const rules = (fieldState.validationConfig || fieldConfig.validation || {}).rules || [];
@@ -341,10 +341,10 @@ const signupConfirmPasswordInputType = computed(() =>
   interactionsEngine.getInputType(signupConfirmPasswordConfig.value, "password")
 );
 const signupPasswordIcon = computed(() =>
-  signupPasswordInputType.value === "text" ? EyeIcon : EyeSlashIcon
+  signupPassword.value ? (signupPasswordInputType.value === "text" ? EyeIcon : EyeSlashIcon) : null
 );
 const signupConfirmPasswordIcon = computed(() =>
-  signupConfirmPasswordInputType.value === "text" ? EyeIcon : EyeSlashIcon
+  signupConfirmPassword.value ? (signupConfirmPasswordInputType.value === "text" ? EyeIcon : EyeSlashIcon) : null
 );
 const toggleSignupPasswordVisibility = () => {
   interactionsEngine.runInteractions(
@@ -406,124 +406,202 @@ onMounted(() => {
 });
 
 // ─────────────────────────────────────────────
-// Code showcase strings
+// Per-input code snippets
 // ─────────────────────────────────────────────
-const templateCode = `<form @submit.prevent="handleSubmit" class="flex flex-col gap-4">
-  <InputAuthComponent
-    :model-value="email"
-    @update:model-value="handleEmailInput"
-    placeholder="Enter your email"
-    id="email"
-    show-label label-text="Email Address"
-    data-required="true" required-display="italic-text"
-    type="text"
-    :show-errors="emailErrors.length > 0" :errors="emailErrors"
-  />
+const codeSnippets = {
+  loginEmail: [
+    '<!-- Template -->',
+    '<InputAuthComponent',
+    '  :model-value="email"',
+    '  @update:model-value="handleEmailInput"',
+    '  placeholder="linden@codelinden.com"',
+    '  id="email" show-label label-text="Email"',
+    '  data-required="true" required-display="italic-text"',
+    '  type="text"',
+    '  :show-errors="emailErrors.length > 0"',
+    '  :errors="emailErrors"',
+    '/>',
+    '',
+    '<!-- Interactions (script) -->',
+    'const emailConfig = computed(() => ({',
+    '  scope: SCOPE_ID, id: "email",',
+    '  validation: {',
+    '    required: true, requiredMessage: "Email is required.",',
+    '    rules: [{ type: "isEmail", message: "Please enter a valid email." }],',
+    '  },',
+    '  validateOnInput: false,',
+    '}));',
+    'const emailState = computed(() => interactionsEngine.getFieldState(emailConfig.value));',
+    'const emailErrors = computed(() => {',
+    '  if (!emailState.value || emailState.value.isValid) return [];',
+    '  return emailState.value.failedRules',
+    '    .filter((r) => r.type !== "required" || hasAttemptedSubmit.value)',
+    '    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));',
+    '});',
+    'const handleEmailInput = (value) => {',
+    '  email.value = value;',
+    '  const state = interactionsEngine.getFieldState(emailConfig.value);',
+    '  if (state) state.value = value;',
+    '  if (hasAttemptedSubmit.value) interactionsEngine.validateField(emailConfig.value);',
+    '};',
+    'onMounted(() => {',
+    '  interactionsEngine.register(emailConfig.value, email.value, document.getElementById("email"));',
+    '});',
+  ].join('\n'),
 
-  <InputAuthComponent
-    :model-value="password"
-    @update:model-value="handlePasswordInput"
-    placeholder="••••••••"
-    id="password"
-    show-label label-text="Password"
-    data-required="true" required-display="italic-text"
-    :type="passwordInputType" :right-icon="passwordIcon"
-    :show-errors="passwordErrors.length > 0" :errors="passwordErrors"
-    :on-success="passwordSuccess.length > 0" :success="passwordSuccess"
-    @click:right-icon="togglePasswordVisibility"
-  />
+  loginPassword: [
+    '<!-- Template -->',
+    '<InputAuthComponent',
+    '  :model-value="password"',
+    '  @update:model-value="handlePasswordInput"',
+    '  placeholder="********"',
+    '  id="password" show-label label-text="Password"',
+    '  data-required="true" required-display="italic-text"',
+    '  :type="passwordInputType"',
+    '  :right-icon="passwordIcon"',
+    '  :show-errors="passwordErrors.length > 0"',
+    '  :errors="passwordErrors"',
+    '  @click:right-icon="togglePasswordVisibility"',
+    '/>',
+    '',
+    '<!-- Interactions (script) -->',
+    'const passwordConfig = computed(() => ({',
+    '  scope: SCOPE_ID, id: "password",',
+    '  validation: { required: true, requiredMessage: "Password is required." },',
+    '  validateOnInput: false,',
+    '  ui: { dynamicType: "password", visibilityMetaKey: "passwordVisible" },',
+    '}));',
+    'const passwordInputType = computed(() =>',
+    '  interactionsEngine.getInputType(passwordConfig.value, "password")',
+    ');',
+    '// Icon only shows when field has content',
+    'const passwordIcon = computed(() =>',
+    '  password.value ? (passwordInputType.value === "text" ? EyeIcon : EyeSlashIcon) : null',
+    ');',
+    'const togglePasswordVisibility = () => {',
+    '  interactionsEngine.runInteractions(',
+    '    [{ type: "toggleFieldMeta", metaKey: "passwordVisible" }],',
+    '    passwordConfig.value',
+    '  );',
+    '};',
+  ].join('\n'),
 
-  <!-- (SignUp only) Confirm Password -->
-  <InputAuthComponent
-    :model-value="confirmPassword"
-    @update:model-value="handleConfirmPasswordInput"
-    placeholder="••••••••"
-    id="confirmPassword"
-    show-label label-text="Confirm Password"
-    data-required="true" required-display="italic-text"
-    :type="confirmPasswordInputType" :right-icon="confirmPasswordIcon"
-    :show-errors="confirmPasswordErrors.length > 0" :errors="confirmPasswordErrors"
-    :on-success="confirmPasswordSuccess.length > 0" :success="confirmPasswordSuccess"
-    @click:right-icon="toggleConfirmPasswordVisibility"
-  />
+  loginCheckbox: [
+    '<!-- Template -->',
+    '<Checkbox',
+    '  v-model="rememberMe"',
+    '  label="Remember me"',
+    '  checkboxClass="m-0 border border-checkboxBorder [appearance:none]',
+    '    w-[0.75rem] h-[0.75rem] rounded-[2px] bg-transparent relative cursor-pointer',
+    '    checked:bg-checkbox checked:border-checkbox',
+    '    checked:[&::after]:content-[\'\'] checked:[&::after]:absolute',
+    '    checked:[&::after]:left-[0.2rem] checked:[&::after]:w-[0.25rem]',
+    '    checked:[&::after]:h-[0.5rem] checked:[&::after]:border',
+    '    checked:[&::after]:border-solid checked:[&::after]:border-white',
+    '    checked:[&::after]:border-r-[2px] checked:[&::after]:border-b-[2px]',
+    '    checked:[&::after]:border-t-0 checked:[&::after]:border-l-0',
+    '    checked:[&::after]:rotate-45"',
+    '  labelClass="text-[0.875rem] leading-6 text-text cursor-pointer"',
+    '  wrapperClass="flex items-center gap-2"',
+    '/>',
+    '',
+    '<!-- Interactions (script) -->',
+    '// Simple boolean — no engine registration needed.',
+    'const rememberMe = ref(false);',
+  ].join('\n'),
 
-  <ButtonComponent text="Submit" variant="authPink" size="lg" type="submit" />
-</form>`;
+  signupEmail: [
+    '<!-- Template (same as Login email, different id/scope) -->',
+    '<InputAuthComponent',
+    '  :model-value="email"',
+    '  @update:model-value="handleEmailInput"',
+    '  placeholder="linden@codelinden.com"',
+    '  id="email" show-label label-text="Email Address"',
+    '  data-required="true" required-display="italic-text"',
+    '  type="text"',
+    '  :show-errors="emailErrors.length > 0"',
+    '  :errors="emailErrors"',
+    '/>',
+    '',
+    '<!-- Interactions: same pattern as Login email above -->',
+  ].join('\n'),
 
-const scriptCode = `import { ref, computed, onMounted } from 'vue';
-import { interactionsEngine } from '@/utils/validation/interactionsEngine.js';
-import { InformationCircleIcon, CheckCircleIcon, EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline';
+  signupPassword: [
+    '<!-- Template -->',
+    '<InputAuthComponent',
+    '  :model-value="password"',
+    '  @update:model-value="handlePasswordInput"',
+    '  placeholder="********"',
+    '  id="password" show-label label-text="Password"',
+    '  data-required="true" required-display="italic-text"',
+    '  :type="passwordInputType" :right-icon="passwordIcon"',
+    '  :show-errors="passwordErrors.length > 0" :errors="passwordErrors"',
+    '  :on-success="passwordSuccess.length > 0" :success="passwordSuccess"',
+    '  @click:right-icon="togglePasswordVisibility"',
+    '/>',
+    '',
+    '<!-- Interactions (script) -->',
+    'const passwordConfig = computed(() => ({',
+    '  scope: SCOPE_ID, id: "password",',
+    '  validation: {',
+    '    required: true, requiredMessage: "Password is required.",',
+    '    rules: [',
+    '      { type: "minLength", param: 8, message: "Use 8 or more characters" },',
+    '      { type: "hasUpper", message: "Use upper case letters" },',
+    '      { type: "hasLower", message: "Use lower case letters" },',
+    '      { type: "hasNumber", message: "Use numbers" },',
+    '    ],',
+    '  },',
+    '  validateOnInput: true, // validates on every keystroke',
+    '  ui: { dynamicType: "password", visibilityMetaKey: "passwordVisible" },',
+    '}));',
+    '',
+    '// Errors: show rule failures live; required only after submit',
+    'const passwordErrors = computed(() => {',
+    '  if (!passwordState.value || passwordState.value.isValid) return [];',
+    '  return passwordState.value.failedRules',
+    '    .filter((r) => r.type !== "required" || hasAttemptedSubmit.value)',
+    '    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));',
+    '});',
+    '',
+    '// Success: show green ticks for passing rules',
+    'const passwordSuccess = computed(() => {',
+    '  if (!password.value?.trim()) return [];',
+    '  const rules = (passwordConfig.value.validation || {}).rules || [];',
+    '  const failed = new Set((passwordState.value?.failedRules || []).map((r) => r.type));',
+    '  return rules.filter((r) => !failed.has(r.type)).map((r) => ({ message: r.message }));',
+    '});',
+  ].join('\n'),
 
-const SCOPE_ID = "authScope";
-
-const email = ref(""); const password = ref(""); const confirmPassword = ref("");
-const hasAttemptedSubmit = ref(false);
-
-// --- 1. Configs ---
-const passwordConfig = computed(() => ({
-  scope: SCOPE_ID, id: "password",
-  validation: {
-    required: true, requiredMessage: "Password is required.",
-    rules: [
-      { type: "minLength", param: 8, message: "Use 8 or more characters" },
-      { type: "hasUpper", message: "Use upper case letters" },
-      { type: "hasLower", message: "Use lower case letters" },
-      { type: "hasNumber", message: "Use numbers" },
-    ],
-  },
-  validateOnInput: true,
-  ui: { dynamicType: "password", visibilityMetaKey: "passwordVisible" },
-}));
-
-const confirmPasswordConfig = computed(() => ({
-  scope: SCOPE_ID, id: "confirmPassword",
-  validation: {
-    required: true, requiredMessage: "Please confirm your password.",
-    rules: [{ type: "matchValue", param: "password", message: "Passwords do not match." }],
-  },
-  validateOnInput: true,
-  ui: { dynamicType: "password", visibilityMetaKey: "confirmPasswordVisible" },
-}));
-
-// --- 2. Field States ---
-const passwordState = computed(() => interactionsEngine.getFieldState(passwordConfig.value));
-
-// --- 3. Register on Mount ---
-onMounted(() => {
-  interactionsEngine.register(passwordConfig.value, password.value, document.getElementById("password"));
-  interactionsEngine.register(confirmPasswordConfig.value, confirmPassword.value, document.getElementById("confirmPassword"));
-});
-
-// --- 4. Input Handlers ---
-const handlePasswordInput = (value) => {
-  password.value = value;
-  const state = interactionsEngine.getFieldState(passwordConfig.value);
-  if (state) state.value = value;
-  if (state?.element) state.element.setCustomValidity?.("");
-  interactionsEngine.validateField(passwordConfig.value); // validateOnInput: true
+  signupConfirmPassword: [
+    '<!-- Template -->',
+    '<InputAuthComponent',
+    '  :model-value="confirmPassword"',
+    '  @update:model-value="handleConfirmPasswordInput"',
+    '  placeholder="********"',
+    '  id="confirmPassword" show-label label-text="Confirm Password"',
+    '  data-required="true" required-display="italic-text"',
+    '  :type="confirmPasswordInputType" :right-icon="confirmPasswordIcon"',
+    '  :show-errors="confirmPasswordErrors.length > 0" :errors="confirmPasswordErrors"',
+    '  :on-success="confirmPasswordSuccess.length > 0" :success="confirmPasswordSuccess"',
+    '  @click:right-icon="toggleConfirmPasswordVisibility"',
+    '/>',
+    '',
+    '<!-- Interactions (script) -->',
+    'const confirmPasswordConfig = computed(() => ({',
+    '  scope: SCOPE_ID, id: "confirmPassword",',
+    '  validation: {',
+    '    required: true, requiredMessage: "Please confirm your password.",',
+    '    rules: [{ type: "matchValue", param: "password", message: "Passwords do not match." }],',
+    '  },',
+    '  validateOnInput: true,',
+    '  ui: { dynamicType: "password", visibilityMetaKey: "confirmPasswordVisible" },',
+    '}));',
+    '',
+    '// "matchValue" compares against the sibling field with id="password"',
+    '// registered in the same scope — no custom logic needed.',
+  ].join('\n'),
 };
-
-// --- 5. Errors / Success ---
-const passwordErrors = computed(() => {
-  if (!passwordState.value || passwordState.value.isValid) return [];
-  return passwordState.value.failedRules
-    .filter((r) => r.type !== "required" || hasAttemptedSubmit.value)
-    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));
-});
-
-// --- 6. Eye Toggle ---
-const passwordInputType = computed(() => interactionsEngine.getInputType(passwordConfig.value, "password"));
-const passwordIcon = computed(() => passwordInputType.value === "text" ? EyeIcon : EyeSlashIcon);
-const togglePasswordVisibility = () => {
-  interactionsEngine.runInteractions([{ type: "toggleFieldMeta", metaKey: "passwordVisible" }], passwordConfig.value);
-};
-
-// --- 7. Form Submit ---
-const handleSubmit = () => {
-  hasAttemptedSubmit.value = true;
-  interactionsEngine.validateScope(SCOPE_ID);
-};`;
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
