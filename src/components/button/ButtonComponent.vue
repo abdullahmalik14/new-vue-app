@@ -2,11 +2,17 @@
   <div v-bind="resolvedAttrs.wrapperAttrs.wrapper1">
     <div v-bind="resolvedAttrs.wrapperAttrs.wrapper2">
       <button :type="type" v-bind="resolvedAttrs.inputAttrs" :disabled="disabled" @click="handleClick">
-        <img v-if="leftIcon" :src="leftIcon" :class="` inline-block ${leftIconClass}`" />
+        <span class="relative z-10 flex items-center justify-center gap-[inherit] pointer-events-none w-full">
+          <slot name="leftIcon">
+            <img v-if="leftIcon" :src="leftIcon" :class="` inline-block ${leftIconClass}`" />
+          </slot>
 
-        <span>{{ text }}</span>
+          <span :class="textClass || ''">{{ text }}</span>
 
-        <img v-if="rightIcon" :src="rightIcon" :class="` inline-block ${rightIconClass}`" />
+          <slot name="rightIcon">
+            <img v-if="rightIcon" :src="rightIcon" :class="` inline-block ${rightIconClass}`" />
+          </slot>
+        </span>
       </button>
     </div>
   </div>
@@ -36,6 +42,7 @@ const props = defineProps({
   },
   leftIconClass: { type: String, default: "w-5 h-5" },
   rightIconClass: { type: String, default: "w-5 h-5" },
+  textClass: { type: String, default: "" },
 
   leftIcon: [String, Object, Function],
   rightIcon: [String, Object, Function],
@@ -84,6 +91,8 @@ const themeClasses = {
     "flex items-center text-[1.125rem] break-words justify-center min-w-[6.25rem] px-2 py-1 font-medium leading-7 text-[#0c111d] bg-transparent border-none outline-none hover:bg-white",
   greyBg:
     "flex items-center justify-center text-[#98a2b3] uppercase font-medium break-words gap-2 leading-7 text-[1.125rem] min-w-[5.3125rem] px-2 py-1 bg-[rgba(52,64,84,0.05)] border-0",
+  "skew-right":
+    "group w-max pl-2 gap-2.5 pr-2.5 h-10 relative flex justify-center items-center appearance-button transition-opacity duration-100 ease-in-out normal-case overflow-visible outline-none border-none bg-[var(--btn-bg)] hover:bg-[var(--btn-hover-bg)] hover:after:bg-[var(--btn-hover-bg)] before:content-[''] before:block before:w-full before:h-full before:absolute before:top-0 before:right-0 before:z-[1] before:shadow-[4px_4px_0_0_#000] before:transition-all before:ease-in-out before:duration-0 after:content-[''] after:block after:w-4 after:h-full after:absolute after:top-0 after:-right-[0.43rem] after:z-[1] after:shadow-[4px_4px_0_0_#000] after:skew-x-[20deg] after:translate-x-0 after:transition-all after:ease-in-out after:duration-0 after:bg-[var(--btn-bg)]",
   polygonLeft:
     "w-max group flex items-center justify-center gap-[0.625rem] py-1 pl-[1.4rem] pr-2 bg-[var(--btn-bg)] hover:bg-[var(--btn-hover-bg)] text-[var(--btn-text)] hover:text-[var(--btn-hover-text)] text-sm sm:text-lg  leading-7 font-medium uppercase transition-colors duration-200 relative cursor-pointer [clip-path:polygon(8%_0,100%_0,105%_105%,0_105%)]",
   polygonRight:

@@ -1179,6 +1179,18 @@
     "supportedRoles": ["all"]
   },
   {
+    "slug": "/settings",
+    "componentPath": "@/templates/settings/Settings.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
+    "slug": "/edit-profile",
+    "componentPath": "@/templates/editProfile/EditProfile.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
     "slug": "/:pathMatch(.*)*",
     "redirect": "/404"
   }

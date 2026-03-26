@@ -1,7 +1,7 @@
 <template>
   <div v-bind="resolvedAttrs.wrapperAttrs.wrapper1">
-    <label v-if="showLabel" v-bind="resolvedAttrs.labelAttrs" class="flex justify-between items-center w-full">
-      <span class="text-left text-[#667085] font-[700] text-[14px]">{{
+    <label v-if="showLabel" v-bind="resolvedAttrs.labelAttrs" class="flex justify-between items-center w-full mb-1.5">
+      <span class="text-left text-white font-[500] text-[14px]">{{
         labelText
       }}</span>
 
@@ -12,8 +12,8 @@
       </span>
     </label>
 
-    <Paragraph v-if="optionalLabel" :text="optionalLabelText" fontSize="text-base" fontWeight="font-normal"
-      fontColor="text-gray-900 " shadow="opacity-70" />
+    <Paragraph v-if="optionalLabel" :text="optionalLabelText" fontSize="text-sm" fontWeight="font-normal"
+      fontColor="text-white " shadow="opacity-70" />
 
     <!-- Input -->
     <div v-bind="resolvedAttrs.wrapperAttrs.wrapper3" class="">
@@ -25,7 +25,7 @@
           <!-- left span -->
 
           <Paragraph v-if="leftSpan" :text="leftSpanText" :class="leftSpanClass" fontSize="text-base"
-            fontWeight="font-bold" fontColor="text-gray-700" layoutClass="whitespace-nowrap" />
+            fontWeight="font-bold" fontColor="text-white" layoutClass="whitespace-nowrap" />
           <input v-bind="resolvedAttrs.inputAttrs" :id="addId || resolvedAttrs.inputAttrs.id" :value="modelValue"
             :type="type" v-if="type !== 'textarea'" @input="
               $emit(
@@ -45,43 +45,49 @@
 
       <div>
         <!-- Right icon -->
-        <component v-if="rightIcon" :is="rightIcon" class="w-5 h-5" />
+        <div v-if="rightIcon" @click="clickableRightIcon ? $emit('rightIconClick') : null" 
+             :class="clickableRightIcon ? 'cursor-pointer text-white/70 hover:text-white transition-colors' : ''">
+          <component :is="rightIcon" class="w-5 h-5" />
+        </div>
 
         <!-- right span -->
         <Paragraph v-if="rightSpan" :text="rightSpanText" :class="rightSpanClass" fontSize="text-base"
-          fontWeight="font-medium" fontColor="text-gray-700 " layoutClass="px-3 whitespace-nowrap" />
+          fontWeight="font-medium" fontColor="text-white" layoutClass="px-3 whitespace-nowrap" />
       </div>
     </div>
 
     <!-- Description -->
 
-    <Paragraph v-if="description" :text="description" fontSize="text-sm" fontColor="text-[#475467] " />
+    <Paragraph v-if="description" :text="description" fontSize="text-sm" fontColor="text-white/80" class="mt-1" />
 
     <!-- required-error-text -->
     <Paragraph v-if="requiredDisplay === 'required-text-error'" text="This field is required." fontSize="text-xs"
       fontColor="text-[#FF4405]" layoutClass="inline-flex items-center leading-loose" />
 
     <!-- error-fields-container -->
-    <div class="flex flex-col items-start self-stretch gap-1 px-2 pt-1 pb-2" v-if="showErrors">
-      <div class="flex flex-col gap-1">
-        <div v-for="(errorObj, index) in errors" :key="index" class="flex w-full gap-[.4375rem]" :class="index === errors.length - 1 ? 'text-[#FF7C1E]' : 'text-[#FF4405]'
-          ">
+    <div class="flex flex-col items-start self-stretch gap-1 pt-1 pb-2" v-if="showErrors && errors.length">
+      <div class="flex flex-col gap-1 w-full">
+        <div v-for="(errorObj, index) in errors" :key="index" class="flex items-center w-full gap-[.4375rem] text-[#ff7c1e]">
           <component v-if="errorObj.icon" :is="errorObj.icon"
-            class="block w-[1.125rem] h-[1.125rem] md:w-[1.25rem] md:h-[1.25rem] Light" :class="index === errors.length - 1 ? 'text-[#FF7C1E]' : 'text-[#FF4405]'
-              " />
-          <Paragraph :text="errorObj.error" fontSize="text-sm" :fontColor="index === errors.length - 1 ? 'text-[#FF7C1E]' : 'text-[#FF4405]'
-            " />
+            class="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
+          <HexagonExclamationIcon v-else class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-[#ff7c1e]" />
+          <p class="text-[12px] sm:text-[14px] font-normal text-[#ff7c1e]">
+            {{ errorObj.error || errorObj.message || errorObj }}
+          </p>
         </div>
       </div>
     </div>
 
     <!-- success-fields-container -->
-    <div class="flex flex-col items-start self-stretch gap-1 px-2 pt-1 pb-2" v-if="onSuccess">
-      <div class="flex flex-col gap-1">
-        <div v-for="(successObj, index) in success" :key="index" class="flex w-full gap-[.4375rem] text-[#07f468]">
+    <div class="flex flex-col items-start self-stretch gap-1 pt-1 pb-2" v-if="onSuccess && success.length">
+      <div class="flex flex-col gap-1 w-full">
+        <div v-for="(successObj, index) in success" :key="index" class="flex items-center w-full gap-[.4375rem] text-white">
           <component v-if="successObj.icon" :is="successObj.icon"
-            class="block w-[1.125rem] h-[1.125rem] md:w-[1.25rem] md:h-[1.25rem] text-[#07f468]Light" />
-          <Paragraph :text="successObj.message" fontSize="text-sm" fontColor="text-[#07f468] " />
+            class="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
+          <CheckIcon v-else class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-white" />
+          <p class="text-[12px] sm:text-[14px] font-normal text-white">
+            {{ successObj.message || successObj.text || successObj }}
+          </p>
         </div>
       </div>
     </div>
@@ -92,6 +98,8 @@
 import { computed, type Component } from "vue";
 import { resolveAllConfigs } from "@/utils/componentRenderingUtils";
 import Paragraph from "../default/Paragraph.vue";
+import HexagonExclamationIcon from "@/components/icons/HexagonExclamationIcon.vue";
+import { CheckIcon } from "@heroicons/vue/24/outline";
 
 const props = defineProps({
   modelValue: [String, Number],
@@ -124,8 +132,9 @@ const props = defineProps({
   showErrors: Boolean,
   errors: {
     type: Array as () => {
-      error: string;
-      icon: String | Object | Function | Component;
+      error?: string;
+      message?: string;
+      icon?: String | Object | Function | Component;
     }[],
     required: false,
     default: () => [],
@@ -134,8 +143,9 @@ const props = defineProps({
   onSuccess: Boolean,
   success: {
     type: Array as () => {
-      message: string;
-      icon: String | Object | Function | Component;
+      message?: string;
+      text?: string;
+      icon?: String | Object | Function | Component;
     }[],
     required: false,
     default: () => [],
@@ -147,6 +157,7 @@ const props = defineProps({
   // Icons
   leftIcon: [String, Object, Function],
   rightIcon: [String, Object, Function],
+  clickableRightIcon: { type: Boolean, default: false },
 
   //spans
   rightSpan: { type: Boolean, default: false },
@@ -182,16 +193,16 @@ const inputConfig = {
       targetAttribute: "wrapper3",
       addClass:
         props.type === "textarea"
-          ? "w-full px-3.5 py-2.5 h-[5.5rem] border-b rounded-xs border-[#D0D5DD] rounded-input rounded-b-none shadow-input shadow-[0px_1px_2px_0px_#1018280D] bg-white/50"
-          : "flex w-full items-center px-3 py-2 h-10 border-b rounded-xs border-[#D0D5DD] rounded-input shadow-input shadow-[0px_1px_2px_0px_#1018280D] bg-white/50 gap-2",
+          ? "w-full px-4 py-3 h-[5.5rem] border rounded-xl border-white/20 bg-white/5 shadow-sm text-white transition-all overflow-hidden"
+          : "flex w-full items-center px-4 py-2 min-h-[3rem] border rounded-xl border-white/20 bg-white/5 shadow-sm gap-2.5 text-white transition-all overflow-hidden",
       addAttributes: { "data-wrapper": "wrapper3" },
     },
   ],
   elm: {
     addClass:
       props.type === "textarea"
-        ? "w-full text-base font-normal text-[#101828]  bg-transparent border-none focus:outline-none placeholder-gray-500 placeholder:text-base placeholder:leading-6 placeholder:font-normal"
-        : "flex-1 w-full text-base font-normal text-[#101828]  bg-transparent border-none focus:outline-none placeholder-gray-500 placeholder:text-base placeholder:leading-6 placeholder:font-normal",
+        ? "w-full text-base font-normal text-white bg-transparent border-none focus:outline-none placeholder-white/50 placeholder:text-base placeholder:leading-6 placeholder:font-normal"
+        : "flex-1 w-full text-base font-normal text-white bg-transparent border-none focus:outline-none placeholder-white/50 placeholder:text-base placeholder:leading-6 placeholder:font-normal",
     addAttributes: {
       type: props.type === "textarea" ? "textarea" : "text",
     },
@@ -200,14 +211,14 @@ const inputConfig = {
     label: {
       addClass:
         props.requiredDisplay === "italic-text"
-          ? "flex items-center justify-between block text-[12px] font-[400] text-[#0C111D] italic"
-          : "block text-[12px] font-[400] text-[#0C111D] ",
+          ? "flex items-center justify-between block text-[14px] font-[400] text-white italic"
+          : "block text-[14px] font-[400] text-white ",
       addAttributes: {
         for: "input-id",
       },
     },
     description: {
-      addClass: "text-sm text-[#475467]",
+      addClass: "text-sm text-white/80",
       addAttributes: {
         "data-description": "true",
       },

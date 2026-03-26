@@ -40,12 +40,37 @@
     <p v-if="maxLength" :class="counterClass">
       {{ modelValue?.length || 0 }}/{{ maxLength }} characters
     </p>
+
+    <!-- Validation Messages -->
+    <div v-if="(showErrors && errors.length) || (onSuccess && success.length)" class="flex flex-col items-start self-stretch mt-1">
+      <div v-if="onSuccess && success.length" class="flex flex-col gap-1 w-full">
+        <div v-for="(successObj, index) in success" :key="`success-${index}`" class="flex items-center w-full gap-[.4375rem] text-white">
+          <component v-if="successObj.icon" :is="successObj.icon" class="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
+          <CheckIcon v-else class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-white" />
+          <p class="text-[12px] sm:text-[14px] font-normal text-white">{{ successObj.message || successObj.text || successObj }}</p>
+        </div>
+      </div>
+      <div v-if="showErrors && errors.length" class="flex flex-col gap-1 w-full" :class="onSuccess && success.length ? 'mt-2' : ''">
+        <div v-for="(errorObj, index) in errors" :key="`error-${index}`" class="flex items-center w-full gap-[.4375rem] text-[#ff7c1e]">
+          <component v-if="errorObj.icon" :is="errorObj.icon" class="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
+          <HexagonExclamationIcon v-else class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-[#ff7c1e]" />
+          <p class="text-[12px] sm:text-[14px] font-normal text-[#ff7c1e]">{{ errorObj.error || errorObj.message || errorObj }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import HexagonExclamationIcon from "@/components/icons/HexagonExclamationIcon.vue";
+import { CheckIcon } from "@heroicons/vue/24/outline";
+
 export default {
   name: "BaseInput",
+  components: {
+    HexagonExclamationIcon,
+    CheckIcon
+  },
   props: {
     type: {
       type: String,
@@ -102,6 +127,16 @@ export default {
       type: Boolean,
       default: true,
     },
+    showErrors: Boolean,
+    errors: {
+      type: Array,
+      default: () => []
+    },
+    onSuccess: Boolean,
+    success: {
+      type: Array,
+      default: () => []
+    }
   },
 
   methods: {

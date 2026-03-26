@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import Paragraph from '../default/Paragraph.vue'
+import HexagonExclamationIcon from "@/components/icons/HexagonExclamationIcon.vue";
+import { CheckIcon } from "@heroicons/vue/24/outline";
 
 const emit = defineEmits(['update:modelValue', 'update:is-valid', 'update:is-submitting', 'auto-submit'])
 
@@ -31,6 +33,11 @@ const props = defineProps({
   },
   showErrors: Boolean,
   errors: {
+    type: Array,
+    default: () => [],
+  },
+  onSuccess: Boolean,
+  success: {
     type: Array,
     default: () => [],
   },
@@ -263,7 +270,7 @@ defineExpose({
     <!-- Code Inputs Wrapper -->
     <div class="flex gap-2 sm:gap-3 justify-start items-center w-full">
       <div v-for="(digit, index) in inputs" :key="index"
-        class="relative rounded-[0.625rem] border border-border bg-input min-h-14 sm:min-h-16 flex justify-center items-center flex-1 max-w-[60px] sm:max-w-[70px]">
+        class="relative rounded-xl border border-white/20 bg-white/5 shadow-sm min-h-14 sm:min-h-16 flex justify-center items-center flex-1 max-w-[60px] sm:max-w-[70px]">
         <input :ref="el => { if (el) inputRefs[index] = el }" type="text" inputmode="numeric" pattern="[0-9]*"
           maxlength="1" :value="digit" :disabled="disabled || isSubmitting"
           class="w-full h-full text-white bg-transparent outline-none text-center text-2xl sm:text-3xl font-semibold focus:outline-none focus:ring-0 focus:border-none disabled:opacity-50 disabled:cursor-not-allowed"
@@ -276,13 +283,29 @@ defineExpose({
     <Paragraph v-if="requiredDisplayValues.includes('required-text-error')" :text="'This field is required.'"
       fontSize="text-xs" fontColor="text-[#FF4405]" />
 
-    <!-- Validation Messages (Errors) -->
-    <div v-if="showErrors && errors.length" class="flex flex-col items-start self-stretch gap-1 px-2 pt-1 pb-2">
-      <div class="flex flex-col gap-1 w-full">
+    <!-- Validation Messages -->
+    <div v-if="(showErrors && errors.length) || (onSuccess && success.length)" class="flex flex-col items-start self-stretch mt-1">
+      <!-- Success List -->
+      <div v-if="onSuccess && success.length" class="flex flex-col gap-1 w-full">
+        <div v-for="(successObj, index) in success" :key="`success-${index}`"
+          class="flex w-full items-center gap-[.4375rem]">
+          <component v-if="successObj.icon" :is="successObj.icon" class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-white" />
+          <CheckIcon v-else class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-white" />
+          <p class="text-white text-[12px] sm:text-[14px] font-normal">
+            {{ successObj.message || successObj.text || successObj }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Errors List -->
+      <div v-if="showErrors && errors.length" class="flex flex-col gap-1 w-full" :class="onSuccess && success.length ? 'mt-2' : ''">
         <div v-for="(errorObj, index) in errors" :key="`error-${index}`"
-          class="flex w-full gap-[.4375rem] text-[#FF4405]">
-          <component v-if="errorObj.icon" :is="errorObj.icon" class="block w-[1.125rem] h-[1.125rem]" />
-          <Paragraph :text="errorObj.error" fontSize="text-[12px] sm:text-[14px]" fontColor="text-[#FF4405]" />
+          class="flex w-full items-center gap-[.4375rem]">
+          <component v-if="errorObj.icon" :is="errorObj.icon" class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-[#ff7c1e]" />
+          <HexagonExclamationIcon v-else class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-[#ff7c1e]" />
+          <p class="text-[#ff7c1e] text-[12px] sm:text-[14px] font-normal">
+            {{ errorObj.error || errorObj.message || errorObj }}
+          </p>
         </div>
       </div>
     </div>
