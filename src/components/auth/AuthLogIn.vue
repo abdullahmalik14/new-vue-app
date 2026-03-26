@@ -200,9 +200,8 @@ const passwordInputType = computed(() => {
 });
 
 // Computed property for dynamic password icon (eye/eye-slash)
-// Only show icon when password field has content
+// Always show the icon even when password field is empty
 const passwordIcon = computed(() => {
-  if (!password.value) return null;
   const isPasswordVisible = passwordInputType.value === "text";
   return isPasswordVisible ? EyeIcon : EyeSlashIcon;
 });

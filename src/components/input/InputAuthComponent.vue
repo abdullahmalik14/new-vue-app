@@ -96,7 +96,7 @@ const requiredDisplayValues = computed(() => {
 
     <!-- Input Wrapper -->
     <div
-      class="relative rounded-xl border border-white/20 bg-white/5 min-h-[3rem] gap-2.5 pt-3 pb-3 px-4 flex justify-center items-center self-stretch shadow-sm"
+      class="relative rounded-xl border border-[#DEE5EC] bg-[rgba(255,255,255,0.20)] min-h-[3rem] gap-2.5 pt-3 pb-3 px-[10px] flex justify-center items-center self-stretch shadow-sm"
       :class="{ 'opacity-50 pointer-events-none': disabled }">
       <component v-if="leftIcon" :is="typeof leftIcon === 'string' ? 'img' : leftIcon"
         :src="typeof leftIcon === 'string' ? leftIcon : undefined" alt="icon"
@@ -104,8 +104,8 @@ const requiredDisplayValues = computed(() => {
 
       <input :id="id" :type="type" :value="modelValue" :placeholder="activePlaceholder" :required="required"
         :data-required="$attrs['data-required']" :disabled="disabled"
-        class="w-full bg-transparent outline-none focus:outline-none focus:ring-0 focus:border-none poppins-medium transition-all"
-        :class="[textColor, placeholderColor, leftIcon ? 'pl-8' : 'pl-1', rightIcon ? (rightIconText ? 'pr-16' : 'pr-8') : 'pr-3']" @input="$emit('update:modelValue', $event.target.value)"
+        class="w-full bg-transparent outline-none focus:outline-none focus:ring-0 focus:border-none poppins-medium transition-all placeholder:font-[400]"
+        :class="[textColor, placeholderColor, leftIcon ? 'pl-8' : 'pl-1', rightIcon ? (rightIconText ? 'pr-16' : 'pr-8') : '']" @input="$emit('update:modelValue', $event.target.value)"
         @focus="handleFocus" @blur="handleBlur" />
 
       <div v-if="rightIcon"
