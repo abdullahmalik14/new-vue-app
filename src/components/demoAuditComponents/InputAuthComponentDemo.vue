@@ -6,7 +6,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10">
           
           <!-- 1. Username Field -->
-          <DemoCard label="Username Validation" dark :code="codeExamples.username">
+          <DemoCard label="Username Validation"  :code="codeExamples.username">
             <InputAuthComponent 
               :model-value="username" 
               @update:model-value="handleUsernameInput"
@@ -25,7 +25,7 @@
           </DemoCard>
           
           <!-- 2. Email Field -->
-          <DemoCard label="Email Validation" dark :code="codeExamples.email">
+          <DemoCard label="Email Validation"  :code="codeExamples.email">
             <InputAuthComponent 
               :model-value="email" 
               @update:model-value="handleEmailInput"
@@ -42,7 +42,7 @@
           </DemoCard>
           
           <!-- 2. Password Field -->
-          <DemoCard label="Password Validation" dark :code="codeExamples.password">
+          <DemoCard label="Password Validation"  :code="codeExamples.password">
             <InputAuthComponent 
               :model-value="password" 
               @update:model-value="handlePasswordInput"
@@ -63,7 +63,7 @@
           </DemoCard>
           
           <!-- 3. Confirm Password -->
-          <DemoCard label="Confirm Password" dark :code="codeExamples.confirmPassword">
+          <DemoCard label="Confirm Password"  :code="codeExamples.confirmPassword">
             <InputAuthComponent 
               :model-value="confirmPassword" 
               @update:model-value="handleConfirmPasswordInput"
@@ -84,7 +84,7 @@
           </DemoCard>
 
           <!-- Submit Button to Trigger Required Errors -->
-          <DemoCard label="Trigger Form Submit" dark code="<ButtonComponent @click='handleSubmit' text='Submit Form' variant='authPink' size='lg' />">
+          <DemoCard label="Trigger Form Submit"  code="<ButtonComponent @click='handleSubmit' text='Submit Form' variant='authPink' size='lg' />">
             <div class="flex flex-col gap-4 h-full justify-center">
                <p class="text-xs text-gray-400">Clicking submit triggers full scope validation ("hasAttemptedSubmit = true").</p>
                <ButtonComponent text="Submit Form" variant="authPink" size="lg" @click="handleSubmit" />
@@ -93,12 +93,12 @@
 
           <!-- Keep simple examples -->
           <!-- 4. Default -->
-          <DemoCard label="Default" dark :code="codeExamples.default">
+          <DemoCard label="Default"  :code="codeExamples.default">
             <InputAuthComponent v-model="vals.ia1" placeholder="Enter text..." />
           </DemoCard>
 
           <!-- 5. Both Icons -->
-          <DemoCard label="Left & Right Icons" dark :code="codeExamples.bothIcons">
+          <DemoCard label="Left & Right Icons"  :code="codeExamples.bothIcons">
             <InputAuthComponent v-model="vals.ia4" placeholder="Username" showLabel labelText="Username"
               :leftIcon="UserIcon" :rightIcon="CheckCircleIcon" />
           </DemoCard>
@@ -397,3 +397,9 @@ const codeExamples = {
 />`
 };
 </script>
+
+<style scoped>
+:deep(.flex.justify-between.items-end button) {
+  color: white !important;
+}
+</style>
