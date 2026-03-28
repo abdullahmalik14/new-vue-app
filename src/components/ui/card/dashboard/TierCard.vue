@@ -176,7 +176,7 @@ onBeforeUnmount(() => {
 
           <div class="flex items-center gap-2 py-2">
             <div
-              class="flex bg-white/15 rounded-[3.125rem] backdrop-blur-[25px] w-1/2 md:w-full dark:bg-[#181a1b26]"
+              class="flex bg-white/15 rounded-[3.125rem] backdrop-blur-[25px] w-1/2 sm:w-full dark:bg-[#181a1b26]"
             >
               <button
                 v-for="plan in tier.plans"
@@ -185,9 +185,9 @@ onBeforeUnmount(() => {
                 :class="
                   activePlan === plan?.id
                     ? '!flex bg-black dark:bg-[#181a1b]'
-                    : 'hidden md:flex'
+                    : 'hidden sm:flex'
                 "
-                class="justify-center items-center gap-0.5 px-2.5 py-1.5 rounded-[3.125rem] w-full cursor-pointer md:grow"
+                class="justify-center items-center gap-0.5 px-2.5 py-1.5 rounded-[3.125rem] w-full cursor-pointer sm:grow"
               >
                 <span
                   class="text-xs leading-normal font-medium whitespace-nowrap text-white dark:text-[#e8e6e3]"
@@ -202,7 +202,7 @@ onBeforeUnmount(() => {
             </div>
             <button
               @click.stop="toggleMorePlans"
-              class="flex justify-center items-center gap-0.5 px-2.5 py-1.5 rounded-[3.125rem] bg-white/15 backdrop-blur-[25px] cursor-pointer w-1/2 md:hidden dark:bg-[#181a1b26]"
+              class="flex justify-center items-center gap-0.5 px-2.5 py-1.5 rounded-[3.125rem] bg-white/15 backdrop-blur-[25px] cursor-pointer w-1/2 sm:hidden dark:bg-[#181a1b26]"
             >
               <span
                 class="text-xs leading-normal font-medium text-white dark:text-[#e8e6e3]"
@@ -264,7 +264,7 @@ onBeforeUnmount(() => {
 
           <div
             data-tier-description
-            class="flex flex-col md:gap-2 drop-shadow-[0px_2px_12px_0px_#000000BF]"
+            class="flex flex-col sm:gap-2 drop-shadow-[0px_2px_12px_0px_#000000BF]"
           >
             <p
               data-tier-description-text
@@ -564,7 +564,7 @@ onBeforeUnmount(() => {
   <div
     data-more-plans-popup
     :class="showMorePlans ? 'flex' : 'hidden'"
-    class="fixed bottom-0 left-0 w-full rounded-t-[0.625rem] bg-white shadow-[0px_0px_12px_0px_#0000001A] backdrop-blur-[50px] z-[5] md:!hidden dark:bg-[#181a1b]"
+    class="fixed bottom-0 left-0 w-full rounded-t-[0.625rem] bg-white shadow-[0px_0px_12px_0px_#0000001A] backdrop-blur-[50px] z-[5] sm:!hidden dark:bg-[#181a1b]"
   >
     <div class="flex flex-col py-1 w-full">
       <div
