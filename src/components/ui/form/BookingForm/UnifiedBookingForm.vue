@@ -1,226 +1,4 @@
-<script setup>
-import { onMounted, reactive, ref, computed } from "vue";
-import { useRoute } from "vue-router";
-import DashboardWrapperTwoColContainer from "@/components/dashboard/DashboardWrapperTwoColContainer.vue";
-import { createStepStateEngine, attachEngineLogging } from "@/utils/stateEngine.js"; // Adjust path if needed
 
-// Import Steps
-import OneOnOneBookinStep1 from "./OneOnOneBookinStep1.vue";
-import OneOnOneBookinStep2 from "./OneOnOneBookinStep2.vue";
-import GroupBookingStep1 from "./GroupBookingStep1.vue";
-import GroupBookingStep2 from "./GroupBookingStep2.vue";
-import MainCalendar from "@/components/calendar/MainCalendar.vue";
-import NotificationCard from "@/components/ui/card/dashboard/NotificationCard.vue";
-// import OneOnOneBookingFlowPopup from "@/components/ui/popup/FanBookingFlow/OneOnOneBookingFlow/OneOnOneBookingFlowPopup.vue";
-
-const props = defineProps({
-    type: {
-        type: String,
-        default: "private",
-        validator: (value) => ["private", "group"].includes(value),
-    }
-});
-
-const route = useRoute();
-
-/**
- * Determine the active type.
- * Priority:
- * 1. props.type (if explicitly passed by a parent wrapper like GroupBookingForm)
- * 2. route.query.type (if accessed directly via URL, e.g. ?type=group)
- * 3. Default to 'private'
- */
-const currentType = computed(() => {
-    // If route query is explicitly present, it takes precedence for direct access
-    if (route.query.type === 'group' || route.query.type === 'private') {
-        return route.query.type;
-    }
-    return props.type;
-});
-
-// Initialize State Engine
-const bookingFlow = createStepStateEngine({
-    flowId: 'booking-schedule-flow',
-    initialStep: 1,
-    urlSync: 'none', // Changed to none to avoid URL clutter for this modal/form
-    defaults: {
-        eventTitle: "",
-        eventDescription: "",
-        duration: "",
-        maxSessionDuration: "",
-        basePrice: "",
-        sessionMinimum: "",
-        discountPercentage: "",
-        bookingFee: "",
-        waitlistSpots: "",
-        advanceVoid: "",
-        offHourSurcharge: "",
-        calendarDuration: "",
-        remindMeTime: "",
-        bufferTime: "",
-        maxBookingsPerDay: "",
-        waitlistSlots: "",
-        rescheduleFee: "",
-        cancellationFee: "",
-        extendSessionMax: "",
-        allowLongerSessions: false,
-        enableLongerDiscount: false,
-        enableBookingFee: false,
-        allowInstantBooking: false,
-        disableChatBeforeCall: false,
-        enableRescheduleFee: false,
-        enableCancellationFee: false,
-        allowAdvanceCancellation: false,
-        addOffHourSurcharge: false,
-        disableChatDuringCall: false,
-        requestExtendSession: false,
-        setBufferTime: false,
-        setMaxBookings: false,
-        allowWaitlist: false,
-
-        // Step 2 & Group Defaults
-        allowRecording: false,
-        recordingPrice: "",
-        allowPersonalRequest: false,
-        blockedUserSearch: "",
-        coPerformerSearch: "",
-        xPostLive: false,
-        xPostBooked: false,
-        xPostInSession: false,
-        xPostTipped: false,
-        xPostPurchase: false,
-        discountEventsCount: "",
-        spendingRequirement: "",
-        setMaxUsers: false,
-        maxUsers: "",
-        setReminders: false
-    }
-});
-
-attachEngineLogging(bookingFlow);
-
-// Sync engine with component to make it reactive for the template
-const currentStep = ref(1);
-// const oneOnOneBookingFlowPopupOpen = ref(false);
-
-// --- VALIDATION LOGIC ---
-
-// Step 1 Validation
-bookingFlow.addFieldRequirement(1, 'eventTitle', { required: true, requiredMessage: "Event Title is required." });
-bookingFlow.addFieldRequirement(1, 'basePrice', { required: true, requiredMessage: "Price is required." });
-
-bookingFlow.addValidator(1, (state) => {
-    // 1. Conditional Validations (One-on-One)
-    if (state.enableLongerDiscount) {
-        if (!state.sessionMinimum) return "Minimum session duration for discount is required.";
-        if (!state.discountPercentage) return "Discount percentage is required.";
-    }
-    if (state.enableBookingFee && !state.bookingFee) return "Booking fee amount is required.";
-    if (state.enableRescheduleFee && !state.rescheduleFee) return "Reschedule fee amount is required.";
-    if (state.enableCancellationFee && !state.cancellationFee) return "Cancellation fee amount is required.";
-    if (state.allowAdvanceCancellation && !state.advanceVoid) return "Advance cancellation time limit is required.";
-    // if (state.addOffHourSurcharge && !state.offHourSurcharge) return "Off-hour surcharge amount is required.";
-    if (state.setBufferTime && !state.bufferTime) return "Buffer time is required.";
-    if (state.setMaxBookings && !state.maxBookingsPerDay) return "Maximum booking limit is required.";
-    if (state.allowWaitlist && !state.waitlistSpots) return "Waitlist spots count is required.";
-
-// Step 2 Validation
-bookingFlow.addFieldRequirement(2, 'recordingPrice', {
-    rules: [{
-        type: 'bypassValidation', // Just demonstrating bridge usage
-    }],
-    required: true,
-    requiredMessage: "Recording price is required.",
-    // Note: In a real scenario, we'd check state.allowRecording here too.
-    // For now, we'll keep the conditional one below for accuracy.
-});
-
-bookingFlow.addValidator(2, (state) => {
-    // 1. One-on-One Specific
-    if (state.allowRecording && !state.recordingPrice) return "Recording price is required.";
-
-    // 2. Group Specific (if any unique mandatory fields exist)
-
-    return true;
-});
-
-// Init
-onMounted(() => {
-    bookingFlow.initialize();
-
-    // Listen to engine changes to update UI
-    bookingFlow.on('step:changed', ({ next }) => {
-        currentStep.value = next;
-    });
-});
-
-const now = new Date();
-const y = now.getFullYear();
-const m = now.getMonth();
-
-// CHANGE: Helper to generate ISO Strings (JSON format)
-// Example output: "2026-01-14T10:00:00"
-const getIsoString = (dayOfMonth, hour, minute) => {
-    const pad = (n) => n.toString().padStart(2, '0');
-    return `${y}-${pad(m + 1)}-${pad(dayOfMonth)}T${pad(hour)}:${pad(minute)}:00`;
-};
-
-// --- THEME 2 ---
-const theme2 = {
-    mini: {},
-    main: {
-        wrapper: 'relative flex flex-col gap-[0px] overflow-hidden rounded-xl',
-        title: ' text-[16px] font-semibold text-slate-800 ',
-        xHeader: '',
-        axisXLabel: 'flex flex-col justify-end pb-[0.75rem] w-[4.875rem]',
-        axisXDay: 'py-1 text-center h-[63.92px] text-slate-500 font-medium',
-        axisXToday: 'bg-gray-500 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto',
-        axisYRow: 'h-[62.62px] text-right pr-4 w-[2.4rem] uppercase text-slate-400 text-[11px] font-medium leading-4 pt-1',
-        colBase: 'relative bg-white/20 border-l border-white/50 overflow-hidden',
-        gridRow: 'h-[62.61px] border-b border-white/50',
-        eventBase: 'absolute mx-1 rounded-md p-2 text-xs shadow-sm'
-    },
-    month: {}
-};
-
-// These start/end values are now ISO STRINGS, not Date objects.
-const events2 = ref([
-    { id: 'e1', title: 'High School Life Simulator', start: getIsoString(11, 10, 0), end: getIsoString(11, 21, 0), slot: 'event' },
-    { id: 'e1-dup', title: 'Maid Cafe Simulator', start: getIsoString(11, 0, 0), end: getIsoString(11, 11, 0), slot: 'alt' },
-    { id: 'e2', title: 'Event Title', start: getIsoString(12, 0, 0), end: getIsoString(12, 4, 0), slot: 'custom' },
-    { id: 'e3', title: 'Maid Cafe Simulator', start: getIsoString(12, 1, 0), end: getIsoString(12, 11, 0), slot: 'alt' },
-    { id: 'e4', title: 'Event Title', start: getIsoString(13, 0, 0), end: getIsoString(13, 4, 0), slot: 'custom' },
-    { id: 'e5', title: 'Event Title', start: getIsoString(14, 22, 0), end: getIsoString(14, 23, 0), slot: 'custom' },
-    { id: 'e6', title: 'Maid Cafe Simulator', start: getIsoString(14, 0, 0), end: getIsoString(14, 4, 0), slot: 'alt' },
-    { id: 'e7', title: 'Event Title', start: getIsoString(15, 0, 0), end: getIsoString(15, 8, 0), slot: 'custom' },
-    { id: 'e8', title: 'Event Title', start: getIsoString(16, 2, 0), end: getIsoString(16, 8, 0), slot: 'custom' },
-    { id: 'e9', title: 'Maid Cafe Simulator', start: getIsoString(16, 0, 0), end: getIsoString(16, 21, 0), slot: 'alt' },
-    { id: 'e10', title: 'Event Title', start: getIsoString(17, 0, 0), end: getIsoString(17, 5, 0), slot: 'custom' },
-    { id: 'e11', title: 'Event Title', start: getIsoString(17, 22, 0), end: getIsoString(17, 23, 0), slot: 'custom' },
-    { id: '12', title: 'High School Life Simulator', start: getIsoString(17, 8, 0), end: getIsoString(17, 20, 0), slot: 'event' },
-    { id: 'e13', title: 'J&B’s Cooking show', start: getIsoString(13, 5, 0), end: getIsoString(13, 9, 0), slot: 'custom2' },
-]);
-
-const state = reactive({
-    focus: new Date(y, m, 23),
-    selected: null,
-    view: 'week'
-});
-
-const onSelectFromMain = (date) => {
-    state.selected = new Date(date);
-};
-
-const onDebugSubmit = () => {
-    console.log("Submit Clicked. Current State:", JSON.parse(JSON.stringify(bookingFlow.state)));
-    alert("Submitted! Check console for full state object.");
-};
-
-// Helper for title
-const formTitle = computed(() => {
-    return currentType.value === 'group' ? 'Group Event Settings' : 'Private Booking Settings';
-});
-</script>
 
 <template>
     <DashboardWrapperTwoColContainer>
@@ -371,3 +149,232 @@ const formTitle = computed(() => {
 
     <!-- <OneOnOneBookingFlowPopup v-model="oneOnOneBookingFlowPopupOpen" /> -->
 </template>
+
+<script setup>
+
+import { onMounted, reactive, ref, computed } from "vue";
+import { useRoute } from "vue-router";
+import DashboardWrapperTwoColContainer from "@/components/dashboard/DashboardWrapperTwoColContainer.vue";
+import { createStepStateEngine, attachEngineLogging } from "@/utils/stateEngine.js"; // Adjust path if needed
+
+// Import Steps
+import OneOnOneBookinStep1 from "./OneOnOneBookinStep1.vue";
+import OneOnOneBookinStep2 from "./OneOnOneBookinStep2.vue";
+import GroupBookingStep1 from "./GroupBookingStep1.vue";
+import GroupBookingStep2 from "./GroupBookingStep2.vue";
+import MainCalendar from "@/components/calendar/MainCalendar.vue";
+import NotificationCard from "@/components/ui/card/dashboard/NotificationCard.vue";
+// import OneOnOneBookingFlowPopup from "@/components/ui/popup/FanBookingFlow/OneOnOneBookingFlow/OneOnOneBookingFlowPopup.vue";
+
+const props = defineProps({
+    type: {
+        type: String,
+        default: "private",
+        validator: (value) => ["private", "group"].includes(value),
+    }
+});
+
+const route = useRoute();
+
+/**
+ * Determine the active type.
+ * Priority:
+ * 1. props.type (if explicitly passed by a parent wrapper like GroupBookingForm)
+ * 2. route.query.type (if accessed directly via URL, e.g. ?type=group)
+ * 3. Default to 'private'
+ */
+const currentType = computed(() => {
+    // If route query is explicitly present, it takes precedence for direct access
+    if (route.query.type === 'group' || route.query.type === 'private') {
+        return route.query.type;
+    }
+    return props.type;
+});
+
+// Initialize State Engine
+const bookingFlow = createStepStateEngine({
+    flowId: 'booking-schedule-flow',
+    initialStep: 1,
+    urlSync: 'none', // Changed to none to avoid URL clutter for this modal/form
+    defaults: {
+        eventTitle: "",
+        eventDescription: "",
+        duration: "",
+        maxSessionDuration: "",
+        basePrice: "",
+        sessionMinimum: "",
+        discountPercentage: "",
+        bookingFee: "",
+        waitlistSpots: "",
+        advanceVoid: "",
+        offHourSurcharge: "",
+        calendarDuration: "",
+        remindMeTime: "",
+        bufferTime: "",
+        maxBookingsPerDay: "",
+        waitlistSlots: "",
+        rescheduleFee: "",
+        cancellationFee: "",
+        extendSessionMax: "",
+        allowLongerSessions: false,
+        enableLongerDiscount: false,
+        enableBookingFee: false,
+        allowInstantBooking: false,
+        disableChatBeforeCall: false,
+        enableRescheduleFee: false,
+        enableCancellationFee: false,
+        allowAdvanceCancellation: false,
+        addOffHourSurcharge: false,
+        disableChatDuringCall: false,
+        requestExtendSession: false,
+        setBufferTime: false,
+        setMaxBookings: false,
+        allowWaitlist: false,
+
+        // Step 2 & Group Defaults
+        allowRecording: false,
+        recordingPrice: "",
+        allowPersonalRequest: false,
+        blockedUserSearch: "",
+        coPerformerSearch: "",
+        xPostLive: false,
+        xPostBooked: false,
+        xPostInSession: false,
+        xPostTipped: false,
+        xPostPurchase: false,
+        discountEventsCount: "",
+        spendingRequirement: "",
+        setMaxUsers: false,
+        maxUsers: "",
+        setReminders: false
+    }
+});
+
+attachEngineLogging(bookingFlow);
+
+// Sync engine with component to make it reactive for the template
+const currentStep = ref(1);
+// const oneOnOneBookingFlowPopupOpen = ref(false);
+
+// --- VALIDATION LOGIC ---
+
+// Step 1 Validation
+bookingFlow.addFieldRequirement(1, 'eventTitle', { required: true, requiredMessage: "Event Title is required." });
+bookingFlow.addFieldRequirement(1, 'basePrice', { required: true, requiredMessage: "Price is required." });
+
+bookingFlow.addValidator(1, (state) => {
+    // 1. Conditional Validations (One-on-One)
+    if (state.enableLongerDiscount) {
+        if (!state.sessionMinimum) return "Minimum session duration for discount is required.";
+        if (!state.discountPercentage) return "Discount percentage is required.";
+    }
+    if (state.enableBookingFee && !state.bookingFee) return "Booking fee amount is required.";
+    if (state.enableRescheduleFee && !state.rescheduleFee) return "Reschedule fee amount is required.";
+    if (state.enableCancellationFee && !state.cancellationFee) return "Cancellation fee amount is required.";
+    if (state.allowAdvanceCancellation && !state.advanceVoid) return "Advance cancellation time limit is required.";
+    // if (state.addOffHourSurcharge && !state.offHourSurcharge) return "Off-hour surcharge amount is required.";
+    if (state.setBufferTime && !state.bufferTime) return "Buffer time is required.";
+    if (state.setMaxBookings && !state.maxBookingsPerDay) return "Maximum booking limit is required.";
+    if (state.allowWaitlist && !state.waitlistSpots) return "Waitlist spots count is required.";
+
+    return true;
+});
+
+// Step 2 Validation
+bookingFlow.addFieldRequirement(2, 'recordingPrice', {
+    rules: [{
+        type: 'bypassValidation', // Just demonstrating bridge usage
+    }],
+    required: true,
+    requiredMessage: "Recording price is required.",
+    // Note: In a real scenario, we'd check state.allowRecording here too.
+    // For now, we'll keep the conditional one below for accuracy.
+});
+
+bookingFlow.addValidator(2, (state) => {
+    // 1. One-on-One Specific
+    if (state.allowRecording && !state.recordingPrice) return "Recording price is required.";
+
+    // 2. Group Specific (if any unique mandatory fields exist)
+
+    return true;
+});
+
+// Init
+onMounted(() => {
+    bookingFlow.initialize();
+
+    // Listen to engine changes to update UI
+    bookingFlow.on('step:changed', ({ next }) => {
+        currentStep.value = next;
+    });
+});
+
+const now = new Date();
+const y = now.getFullYear();
+const m = now.getMonth();
+
+// CHANGE: Helper to generate ISO Strings (JSON format)
+// Example output: "2026-01-14T10:00:00"
+const getIsoString = (dayOfMonth, hour, minute) => {
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${y}-${pad(m + 1)}-${pad(dayOfMonth)}T${pad(hour)}:${pad(minute)}:00`;
+};
+
+// --- THEME 2 ---
+const theme2 = {
+    mini: {},
+    main: {
+        wrapper: 'relative flex flex-col gap-[0px] overflow-hidden rounded-xl',
+        title: ' text-[16px] font-semibold text-slate-800 ',
+        xHeader: '',
+        axisXLabel: 'flex flex-col justify-end pb-[0.75rem] w-[4.875rem]',
+        axisXDay: 'py-1 text-center h-[63.92px] text-slate-500 font-medium',
+        axisXToday: 'bg-gray-500 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto',
+        axisYRow: 'h-[62.62px] text-right pr-4 w-[2.4rem] uppercase text-slate-400 text-[11px] font-medium leading-4 pt-1',
+        colBase: 'relative bg-white/20 border-l border-white/50 overflow-hidden',
+        gridRow: 'h-[62.61px] border-b border-white/50',
+        eventBase: 'absolute mx-1 rounded-md p-2 text-xs shadow-sm'
+    },
+    month: {}
+};
+
+// These start/end values are now ISO STRINGS, not Date objects.
+const events2 = ref([
+    { id: 'e1', title: 'High School Life Simulator', start: getIsoString(11, 10, 0), end: getIsoString(11, 21, 0), slot: 'event' },
+    { id: 'e1-dup', title: 'Maid Cafe Simulator', start: getIsoString(11, 0, 0), end: getIsoString(11, 11, 0), slot: 'alt' },
+    { id: 'e2', title: 'Event Title', start: getIsoString(12, 0, 0), end: getIsoString(12, 4, 0), slot: 'custom' },
+    { id: 'e3', title: 'Maid Cafe Simulator', start: getIsoString(12, 1, 0), end: getIsoString(12, 11, 0), slot: 'alt' },
+    { id: 'e4', title: 'Event Title', start: getIsoString(13, 0, 0), end: getIsoString(13, 4, 0), slot: 'custom' },
+    { id: 'e5', title: 'Event Title', start: getIsoString(14, 22, 0), end: getIsoString(14, 23, 0), slot: 'custom' },
+    { id: 'e6', title: 'Maid Cafe Simulator', start: getIsoString(14, 0, 0), end: getIsoString(14, 4, 0), slot: 'alt' },
+    { id: 'e7', title: 'Event Title', start: getIsoString(15, 0, 0), end: getIsoString(15, 8, 0), slot: 'custom' },
+    { id: 'e8', title: 'Event Title', start: getIsoString(16, 2, 0), end: getIsoString(16, 8, 0), slot: 'custom' },
+    { id: 'e9', title: 'Maid Cafe Simulator', start: getIsoString(16, 0, 0), end: getIsoString(16, 21, 0), slot: 'alt' },
+    { id: 'e10', title: 'Event Title', start: getIsoString(17, 0, 0), end: getIsoString(17, 5, 0), slot: 'custom' },
+    { id: 'e11', title: 'Event Title', start: getIsoString(17, 22, 0), end: getIsoString(17, 23, 0), slot: 'custom' },
+    { id: '12', title: 'High School Life Simulator', start: getIsoString(17, 8, 0), end: getIsoString(17, 20, 0), slot: 'event' },
+    { id: 'e13', title: 'J&B’s Cooking show', start: getIsoString(13, 5, 0), end: getIsoString(13, 9, 0), slot: 'custom2' },
+]);
+
+const state = reactive({
+    focus: new Date(y, m, 23),
+    selected: null,
+    view: 'week'
+});
+
+const onSelectFromMain = (date) => {
+    state.selected = new Date(date);
+};
+
+const onDebugSubmit = () => {
+    console.log("Submit Clicked. Current State:", JSON.parse(JSON.stringify(bookingFlow.state)));
+    alert("Submitted! Check console for full state object.");
+};
+
+// Helper for title
+const formTitle = computed(() => {
+    return currentType.value === 'group' ? 'Group Event Settings' : 'Private Booking Settings';
+});
+
+</script>
