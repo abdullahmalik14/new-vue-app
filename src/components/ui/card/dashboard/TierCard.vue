@@ -97,7 +97,7 @@ onBeforeUnmount(() => {
     class=""
   >
     <div
-      class="w-full h-[100svh] rounded-[0.3125rem] sm:max-h-[40.6875rem] sm:w-[24rem] md:h-[37.625rem]"
+      class="mx-auto w-full h-[100svh] rounded-[0.3125rem] sm:max-h-[40.6875rem] max-w-[24rem] md:h-[37.625rem]"
       :class="tier?.theme?.shadow"
       :style="{
         backgroundImage: `linear-gradient(180deg,rgba(0,0,0,0.14) 30%,rgba(0,0,0,0.7) 100%), url('${tier.backgroundImage}')`,
