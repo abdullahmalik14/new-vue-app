@@ -2,7 +2,7 @@
   {
     "slug": "/confirm-email",
     "section": "auth",
-    "requiresAuth": false,
+    "requiresAuth": true,
     "redirectIfLoggedIn": "/dashboard",
     "supportedRoles": [],
     "componentPath": "@/templates/auth/page/role/AuthConfirmEmail.vue",
@@ -32,7 +32,7 @@
     "slug": "/dashboard",
     "section": "dashboard-global",
     "redirectIfLoggedIn": "",
-    "requiresAuth": false,
+    "requiresAuth": true,
     "enabled": true,
     "supportedRoles": [
       "all"
@@ -964,7 +964,7 @@
     "supportedRoles": [
       "any"
     ],
-    "componentPath": "@/templates/profile/ProfileWrapper.vue",
+    "componentPath": "@/templates/profileAbdullah/ProfileWrapper.vue",
     "preLoadSections": []
   },
   {
@@ -1112,7 +1112,7 @@
     "preLoadSections": []
   },
   {
-    "slug": "/dev/demo-page",
+    "slug": "/dashboard/demo-page",
     "requiresAuth": false,
     "section": "dev",
     "supportedRoles": [
@@ -1189,6 +1189,16 @@
     "componentPath": "@/templates/editProfile/EditProfile.vue",
     "requiresAuth": false,
     "supportedRoles": ["all"]
+  },
+  {
+    "slug": "/plan",
+    "componentPath": "@/components/ui/global/plan/Plan.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
+    "slug": "/MediaUploader",
+  "componentPath": "@/components/ui/global/media/uploader/MediaUploader.vue"
   },
   {
     "slug": "/:pathMatch(.*)*",

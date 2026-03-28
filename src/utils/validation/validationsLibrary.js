@@ -1,36 +1,45 @@
 export const validationsLibrary = {
+  bypassValidation() {
+    // Always passes — used with v-interactions for pure show/hide without validation
+    return true;
+  },
+
+  hasContent(value) {
+    return String(value ?? "").trim().length > 0;
+  },
+
   custom(value, param, ctx) {
     // Custom validation function
     // param: function(value, ctx) -> boolean
-    if (typeof param === 'function') {
+    if (typeof param === "function") {
       return param(value, ctx);
     }
     return true;
   },
 
   required(value) {
-    return value !== null && value !== undefined && value !== '';
+    return value !== null && value !== undefined && value !== "";
   },
 
   minLength(value, param) {
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     return value.length >= (param || 0);
   },
 
   maxLength(value, param) {
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     return value.length <= (param || Infinity);
   },
 
   isEmail(value) {
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   },
 
   isSecurePassword(value) {
     // Full password rule: at least 8 chars, with upper, lower, and number
     // Use for: single rule with one error message
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     return (
       /[A-Z]/.test(value) &&
       /[a-z]/.test(value) &&
@@ -42,43 +51,39 @@ export const validationsLibrary = {
 
   hasUpper(value) {
     // Checks there is at least one uppercase letter
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     return /[A-Z]/.test(value);
   },
 
   hasLower(value) {
     // Checks there is at least one lowercase letter
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     return /[a-z]/.test(value);
   },
 
   hasNumber(value) {
     // Checks there is at least one digit
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     return /[0-9]/.test(value);
   },
 
   hasSpecial(value) {
     // Checks there is at least one special character
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     return /[^A-Za-z0-9]/.test(value);
   },
 
   isSecurePasswordComplexityCheck(value) {
     // Checks character mix (upper, lower, number) without enforcing length
     // Use for: when length is enforced separately via minChar/maxChar
-    if (typeof value !== 'string') return false;
-    return (
-      /[A-Z]/.test(value) &&
-      /[a-z]/.test(value) &&
-      /[0-9]/.test(value)
-    );
+    if (typeof value !== "string") return false;
+    return /[A-Z]/.test(value) && /[a-z]/.test(value) && /[0-9]/.test(value);
   },
 
   matchValue(value, param, ctx) {
     if (!ctx || !ctx.getFieldValue || !param) return false;
     // Don't validate if confirm password field is empty
-    if (!value || value === '') return true;
+    if (!value || value === "") return true;
     const otherValue = ctx.getFieldValue(ctx.scope, param);
     return value === otherValue;
   },
@@ -87,7 +92,7 @@ export const validationsLibrary = {
     // For pseudo-required and div content validation
     // Works with both input values and textContent from divs
     if (value === null || value === undefined) return false;
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       return value.trim().length > 0;
     }
     return true;
@@ -95,14 +100,14 @@ export const validationsLibrary = {
 
   minChar(value, param) {
     // Alias to minLength for pseudo-required scenarios
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     return value.length >= (param || 0);
   },
 
   maxChar(value, param) {
     // Maximum character length
     // Use for: username limits, free-text field limits, truncation rules
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     return value.length <= (param || Infinity);
   },
 
@@ -139,16 +144,16 @@ export const validationsLibrary = {
     // Use for: website links, social profiles, webhook URLs
     // Requires proper protocol format: http:// or https://
     // Requires valid hostname (must contain at least one dot for domain structure)
-    if (typeof value !== 'string') return false;
+    if (typeof value !== "string") return false;
     // First check: must start with http:// or https://
     if (!/^https?:\/\//.test(value)) return false;
     try {
       const url = new URL(value);
       // Check protocol
-      if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+      if (url.protocol !== "http:" && url.protocol !== "https:") return false;
       // Check hostname: must have at least one dot (e.g., example.com, sub.example.com)
       // This ensures it's a proper domain structure, not just a single character
-      if (!url.hostname || !url.hostname.includes('.')) return false;
+      if (!url.hostname || !url.hostname.includes(".")) return false;
       // Hostname should have at least 3 characters (e.g., "a.b") and contain valid domain structure
       if (url.hostname.length < 3) return false;
       return true;
@@ -160,9 +165,9 @@ export const validationsLibrary = {
   isNumeric(value) {
     // String must be numeric (int/float), optional minus sign or decimals
     // Use for: age, quantity, price (numeric string without formatting)
-    if (typeof value !== 'string' && typeof value !== 'number') return false;
+    if (typeof value !== "string" && typeof value !== "number") return false;
     const str = String(value).trim();
-    if (str === '') return false;
+    if (str === "") return false;
     // Allow optional minus sign, digits, and optional decimal point with digits
     return /^-?\d+(\.\d+)?$/.test(str);
   },
@@ -170,9 +175,10 @@ export const validationsLibrary = {
   isSelect(value) {
     // For select validation - ensures a selection has been made
     // Empty string, null, undefined, or placeholder values fail
-    if (value === null || value === undefined || value === '') return false;
+    if (value === null || value === undefined || value === "") return false;
     // Common placeholder values
-    if (value === '0' || value === '-1' || value === 'placeholder') return false;
+    if (value === "0" || value === "-1" || value === "placeholder")
+      return false;
     return true;
   },
 
@@ -190,7 +196,9 @@ export const validationsLibrary = {
 
     const container = ctx.element;
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-    const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+    const checkedCount = Array.from(checkboxes).filter(
+      (cb) => cb.checked,
+    ).length;
     const minRequired = param || 1;
 
     return checkedCount >= minRequired;
@@ -204,12 +212,14 @@ export const validationsLibrary = {
 
     // If element is provided, search within document
     if (ctx.element) {
-      const radios = document.querySelectorAll(`input[type="radio"][name="${param}"]`);
-      return Array.from(radios).some(radio => radio.checked);
+      const radios = document.querySelectorAll(
+        `input[type="radio"][name="${param}"]`,
+      );
+      return Array.from(radios).some((radio) => radio.checked);
     }
 
     // Fallback: check if value is truthy (radio was selected)
-    return value !== null && value !== undefined && value !== '';
+    return value !== null && value !== undefined && value !== "";
   },
 
   isMultiCheckExact(value, param, ctx) {
@@ -220,7 +230,9 @@ export const validationsLibrary = {
 
     const container = ctx.element;
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-    const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+    const checkedCount = Array.from(checkboxes).filter(
+      (cb) => cb.checked,
+    ).length;
     const exactRequired = param || 1;
 
     return checkedCount === exactRequired;
@@ -233,7 +245,8 @@ export const validationsLibrary = {
     if (!ctx || !ctx.element) return false;
 
     const selectElement = ctx.element;
-    if (selectElement.tagName !== 'SELECT' || !selectElement.multiple) return false;
+    if (selectElement.tagName !== "SELECT" || !selectElement.multiple)
+      return false;
 
     const selectedCount = Array.from(selectElement.selectedOptions).length;
     const exactRequired = param || 1;
@@ -248,16 +261,22 @@ export const validationsLibrary = {
     if (!ctx || !ctx.element) return false;
 
     const container = ctx.element;
-    const selectBoxes = container.querySelectorAll('select');
-    const filledCount = Array.from(selectBoxes).filter(select => {
+    const selectBoxes = container.querySelectorAll("select");
+    const filledCount = Array.from(selectBoxes).filter((select) => {
       const val = select.value;
       // Consider filled if not empty and not common placeholder values
-      return val !== '' && val !== null && val !== '0' && val !== '-1' && val !== 'placeholder';
+      return (
+        val !== "" &&
+        val !== null &&
+        val !== "0" &&
+        val !== "-1" &&
+        val !== "placeholder"
+      );
     }).length;
     const exactRequired = param || 1;
 
     return filledCount === exactRequired;
-  }
+  },
 };
 
 // Looks fine. Notes:

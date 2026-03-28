@@ -1,818 +1,565 @@
 <template>
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-10 px-4 font-sans">
-        <div class="max-w-6xl mx-auto flex flex-col gap-16">
+    <div class="bg-[#ececec] py-16 px-6 font-sans antialiased text-slate-900">
+        <div class="max-w-7xl mx-auto flex flex-col gap-24">
 
             <!-- PAGE TITLE -->
-            <div class="text-center">
-                <h1 class="text-4xl font-bold text-gray-900 dark:text-white tracking-tight">🧩 Component Showcase</h1>
-                <p class="mt-2 text-gray-500 dark:text-gray-400 text-lg">All components with ~10 variations each</p>
+            <div class="text-center relative py-12">
+                <div class="absolute inset-0 flex items-center justify-center -z-10 opacity-30">
+                    <div class="w-96 h-96 bg-indigo-200 rounded-full blur-[100px] animate-pulse"></div>
+                </div>
+                <h1
+                    class="text-5xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-800 tracking-tighter drop-shadow-sm mb-4">
+                    Dashboard Component Showcase
+                </h1>
+                <p class="text-indigo-900/40 font-bold tracking-[0.3em] uppercase text-xs">
+                    Modular Dashboard System & UI Laboratory
+                </p>
+            </div>
+
+
+
+            <!-- ===== SECTION: MediaCardVariants ===== -->
+            <div class="flex flex-col gap-12">
+                <div class="flex flex-col gap-4">
+                    <Heading text="Media Card Variations (V1)" tag="h1" theme="defaultPrimaryHeading" version="basic"
+                        class="!text-black" />
+                    <Paragraph text="Multiple display logic and layout variants for our primary media card."
+                        class="!text-slate-500" />
+                </div>
+
+                <!-- 1. Creator: My Media -->
+                <section class="flex flex-col gap-6">
+                    <Heading text="1. Creator: My Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                        class="!text-black" />
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                        <MediaCardV1 v-for="item in myMediaList" :key="item.id" :media="item" variant="default"
+                            @menu-action="handleAction" />
+                    </div>
+                    <ShowCodeToggle :code="demoSnippets.mediaV1.myMedia" />
+                </section>
+
+                <!-- 2. Fan: Continue Watching -->
+                <section class="flex flex-col gap-6">
+                    <Heading text="2. Fan: Continue Watching" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                        class="!text-black" />
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                        <MediaCardV1 :media="myMediaList[0]" variant="resume" />
+                    </div>
+                    <ShowCodeToggle :code="demoSnippets.mediaV1.resume" />
+                </section>
+
+                <!-- 3. Fan: Latest Media -->
+                <section class="flex flex-col gap-6">
+                    <Heading text="3. Fan: Latest Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                        class="!text-black" />
+                    <div class="flex items-start gap-4">
+                        <MediaCardV1 :media="latestMediaItem" variant="latest" />
+                    </div>
+                    <ShowCodeToggle :code="demoSnippets.mediaV1.latest" />
+                </section>
+
+                <!-- 4. Fan: Purchased Media -->
+                <section class="flex flex-col gap-6">
+                    <Heading text="4. Fan: Purchased Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                        class="!text-black" />
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                        <MediaCardV1 :media="purchasedMediaItem" variant="purchased" @menu-action="handleAction" />
+                    </div>
+                    <ShowCodeToggle :code="demoSnippets.mediaV1.purchased" />
+                </section>
+
+                <!-- 5. Fan: Grid View (Zoom Effect) -->
+                <section class="flex flex-col gap-6">
+                    <Heading text="5. Fan: Grid View (Zoom Effect)" tag="h2" theme="defaultSecondaryHeading"
+                        version="basic" class="!text-black" />
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-2 xl:gap-4 w-full gap-y-[5.5rem] md:gap-y-[5rem] xl:gap-y-[5.5rem]">
+                        <MediaCardV1 v-for="item in gridMediaList" :key="item.id" :media="item" variant="grid"
+                            @menu-action="handleAction" />
+                    </div>
+                    <ShowCodeToggle :code="demoSnippets.mediaV1.gridView" />
+                </section>
+
+                <div class="">
+                    <Heading text="Media Card Variations (V2)" tag="h1" theme="defaultPrimaryHeading" version="basic"
+                        class="!text-black" />
+                    <Paragraph text="An alternative design language for cards with hover expansion effects."
+                        class="!text-slate-500 mt-2" />
+                </div>
+
+                <div class="flex flex-col gap-8">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-12 gap-x-4">
+                        <div class="flex flex-col gap-3">
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Gallery</span>
+                            <MediaCardV2 :media="galleryCard" />
+                            <ShowCodeToggle :code="demoSnippets.mediaV2.gallery" />
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Image</span>
+                            <MediaCardV2 :media="imageCard" />
+                            <ShowCodeToggle :code="demoSnippets.mediaV2.image" />
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Video</span>
+                            <MediaCardV2 :media="videoCard" />
+                            <ShowCodeToggle :code="demoSnippets.mediaV2.video" />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- ===== SECTION: InputComponentDashboard ===== -->
-            <section class="flex flex-col gap-6">
+            <section class="flex flex-col gap-10">
                 <DemoSectionHeader title="InputComponentDashboard" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                     <!-- 1. Default -->
-                    <DemoCard label="Default">
-                        <InputComponentDashboard v-model="vals.icd1" placeholder="Enter text..." showLabel
-                            labelText="Username" />
-                    </DemoCard>
-                    <!-- 2. With left icon -->
-                    <DemoCard label="With Left Icon">
-                        <InputComponentDashboard v-model="vals.icd2" placeholder="Search..." showLabel
-                            labelText="Search" :leftIcon="MagnifyingGlassIcon" />
-                    </DemoCard>
-                    <!-- 3. With right icon -->
-                    <DemoCard label="With Right Icon">
-                        <InputComponentDashboard v-model="vals.icd3" placeholder="Email..." showLabel labelText="Email"
-                            :rightIcon="EnvelopeIcon" />
-                    </DemoCard>
-                    <!-- 4. Required (*) -->
-                    <DemoCard label="Required (*)">
-                        <InputComponentDashboard v-model="vals.icd4" placeholder="Required field" showLabel
-                            labelText="Full Name" requiredDisplay="*" />
-                    </DemoCard>
-                    <!-- 5. Required italic text -->
-                    <DemoCard label="Required (italic-text)">
-                        <InputComponentDashboard v-model="vals.icd5" placeholder="Enter..." showLabel labelText="Email"
-                            requiredDisplay="italic-text" requiredDisplayText="Required" />
-                    </DemoCard>
-                    <!-- 6. With description -->
-                    <DemoCard label="With Description">
-                        <InputComponentDashboard v-model="vals.icd6" placeholder="your@email.com" showLabel
-                            labelText="Email" description="We'll never share your email." />
-                    </DemoCard>
-                    <!-- 7. With errors -->
-                    <DemoCard label="With Errors">
-                        <InputComponentDashboard v-model="vals.icd7" placeholder="Enter..." showLabel
-                            labelText="Password" showErrors
-                            :errors="[{ error: 'Must be at least 8 characters' }, { error: 'Must contain a number' }]" />
-                    </DemoCard>
-                    <!-- 8. With success -->
-                    <DemoCard label="With Success">
-                        <InputComponentDashboard v-model="vals.icd8" placeholder="Enter..." showLabel
-                            labelText="Username" onSuccess :success="[{ message: 'Username is available!' }]" />
-                    </DemoCard>
-                    <!-- 9. Left span (prefix) -->
-                    <DemoCard label="Left Span (Prefix)">
-                        <InputComponentDashboard v-model="vals.icd9" placeholder="amount" showLabel labelText="Price"
-                            leftSpan leftSpanText="USD" leftSpanClass="text-gray-500" />
-                    </DemoCard>
-                    <!-- 10. Right span (suffix) -->
-                    <DemoCard label="Right Span (Suffix)">
-                        <InputComponentDashboard v-model="vals.icd10" placeholder="0.00" showLabel labelText="Weight"
-                            rightSpan rightSpanText="kg" rightSpanClass="text-gray-500" />
-                    </DemoCard>
-                    <!-- 11. Textarea -->
-                    <DemoCard label="Textarea">
-                        <InputComponentDashboard v-model="vals.icd11" type="textarea" showLabel labelText="Bio"
-                            placeholder="Write something..." />
-                    </DemoCard>
-                    <!-- 12. Required error text -->
-                    <DemoCard label="Required Error Text">
-                        <InputComponentDashboard v-model="vals.icd12" placeholder="Enter..." showLabel labelText="Phone"
-                            requiredDisplay="required-text-error" />
-                    </DemoCard>
-                </div>
-            </section>
-
-            <!-- ===== SECTION: BaseInput ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="BaseInput" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- 1. Default text -->
-                    <DemoCard label="Default Text">
-                        <BaseInput v-model="vals.bi1" placeholder="Enter text..." label="Name"
-                            labelClass="block text-sm font-medium text-gray-700"
-                            inputClass="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    </DemoCard>
-                    <!-- 2. With label -->
-                    <DemoCard label="With Label">
-                        <BaseInput v-model="vals.bi2" placeholder="john@example.com" label="Email Address"
-                            labelFor="email-base"
-                            inputClass="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    </DemoCard>
-                    <!-- 3. Disabled -->
-                    <DemoCard label="Disabled">
-                        <BaseInput v-model="vals.bi3" placeholder="Disabled input" label="Disabled" :disabled="true"
-                            inputClass="w-full border border-gray-200 bg-gray-100 rounded-md px-3 py-2 text-sm text-gray-400 cursor-not-allowed" />
-                    </DemoCard>
-                    <!-- 4. Number with controls -->
-                    <DemoCard label="Number with Controls">
-                        <BaseInput v-model="vals.bi4" type="number" label="Quantity" :showControls="true"
-                            inputClass="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none" />
-                    </DemoCard>
-                    <!-- 5. With max length counter -->
-                    <DemoCard label="With Character Counter">
-                        <BaseInput v-model="vals.bi5" placeholder="Max 50 chars..." label="Title" :maxLength="50"
-                            inputClass="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none" />
-                    </DemoCard>
-                    <!-- 6. Textarea mode -->
-                    <DemoCard label="Textarea Mode">
-                        <BaseInput v-model="vals.bi6" type="textarea" label="Description"
-                            placeholder="Enter description..." :rows="3"
-                            inputClass="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none resize-none" />
-                    </DemoCard>
-                    <!-- 7. Textarea with max length -->
-                    <DemoCard label="Textarea + Counter">
-                        <BaseInput v-model="vals.bi7" type="textarea" label="Bio" placeholder="Your bio..." :rows="3"
-                            :maxLength="200"
-                            inputClass="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none resize-none" />
-                    </DemoCard>
-                    <!-- 8. Error style -->
-                    <DemoCard label="Error State">
-                        <BaseInput v-model="vals.bi8" placeholder="Wrong value" label="Email"
-                            inputClass="w-full border border-red-400 bg-red-50 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400" />
-                    </DemoCard>
-                    <!-- 9. Success style -->
-                    <DemoCard label="Success State">
-                        <BaseInput v-model="vals.bi9" placeholder="valid@email.com" label="Email"
-                            inputClass="w-full border border-green-400 bg-green-50 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400" />
-                    </DemoCard>
-                    <!-- 10. Number no controls -->
-                    <DemoCard label="Number (No Controls)">
-                        <BaseInput v-model="vals.bi10" type="number" label="Age" :showControls="false"
-                            inputClass="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none" />
-                    </DemoCard>
-                </div>
-            </section>
-
-            <!-- ===== SECTION: InputAuthComponent ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="InputAuthComponent" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 bg-gray-800 p-6 rounded-xl">
-                    <!-- 1. Default -->
-                    <DemoCard label="Default" dark>
-                        <InputAuthComponent v-model="vals.ia1" placeholder="Enter text..." />
-                    </DemoCard>
-                    <!-- 2. With label -->
-                    <DemoCard label="With Label" dark>
-                        <InputAuthComponent v-model="vals.ia2" placeholder="Email" showLabel
-                            labelText="Email Address" />
-                    </DemoCard>
-                    <!-- 3. Password type -->
-                    <DemoCard label="Password Type" dark>
-                        <InputAuthComponent v-model="vals.ia3" type="password" placeholder="••••••••" showLabel
-                            labelText="Password" />
-                    </DemoCard>
-                    <!-- 4. With left icon -->
-                    <DemoCard label="With Left Icon" dark>
-                        <InputAuthComponent v-model="vals.ia4" placeholder="Username" showLabel labelText="Username"
-                            :leftIcon="UserIcon" />
-                    </DemoCard>
-                    <!-- 5. With right icon -->
-                    <DemoCard label="With Right Icon" dark>
-                        <InputAuthComponent v-model="vals.ia5" placeholder="Search..."
-                            :rightIcon="MagnifyingGlassIcon" />
-                    </DemoCard>
-                    <!-- 6. Required (*) -->
-                    <DemoCard label="Required (*)" dark>
-                        <InputAuthComponent v-model="vals.ia6" placeholder="Enter..." showLabel labelText="Username"
-                            requiredDisplay="*" />
-                    </DemoCard>
-                    <!-- 7. Disabled -->
-                    <DemoCard label="Disabled" dark>
-                        <InputAuthComponent v-model="vals.ia7" placeholder="Disabled..." showLabel
-                            labelText="Disabled Field" :disabled="true" />
-                    </DemoCard>
-                    <!-- 8. With errors -->
-                    <DemoCard label="With Errors" dark>
-                        <InputAuthComponent v-model="vals.ia8" placeholder="Enter email..." showLabel labelText="Email"
-                            showErrors :errors="[{ error: 'Invalid email format' }]" />
-                    </DemoCard>
-                    <!-- 9. With success -->
-                    <DemoCard label="With Success" dark>
-                        <InputAuthComponent v-model="vals.ia9" placeholder="Username..." showLabel labelText="Username"
-                            onSuccess :success="[{ message: 'Available!' }]" />
-                    </DemoCard>
-                    <!-- 10. Custom label color -->
-                    <DemoCard label="Custom Label Color" dark>
-                        <InputAuthComponent v-model="vals.ia10" placeholder="Enter..." showLabel labelText="Field Label"
-                            labelColor="text-yellow-400" textColor="text-yellow-100"
-                            placeholderColor="placeholder:text-yellow-200" />
-                    </DemoCard>
-                </div>
-            </section>
-
-            <!-- ===== SECTION: InputDefaultComponent ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="InputDefaultComponent" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- 1. Default -->
-                    <DemoCard label="Default">
-                        <InputDefaultComponent v-model="vals.id1" placeholder="Enter text..." showLabel
-                            labelText="Name" />
-                    </DemoCard>
-                    <!-- 2. With left icon -->
-                    <DemoCard label="With Left Icon">
-                        <InputDefaultComponent v-model="vals.id2" placeholder="Search..." showLabel labelText="Search"
-                            :leftIcon="MagnifyingGlassIcon" />
-                    </DemoCard>
-                    <!-- 3. With right icon -->
-                    <DemoCard label="With Right Icon">
-                        <InputDefaultComponent v-model="vals.id3" placeholder="Email..." showLabel labelText="Email"
-                            :rightIcon="EnvelopeIcon" />
-                    </DemoCard>
-                    <!-- 4. Error state -->
-                    <DemoCard label="Error State">
-                        <InputDefaultComponent v-model="vals.id4" placeholder="Enter email" showLabel labelText="Email"
-                            :error="true" errorMessage="Invalid email address." />
-                    </DemoCard>
-                    <!-- 5. Required -->
-                    <DemoCard label="Required (*)">
-                        <InputDefaultComponent v-model="vals.id5" placeholder="Required" showLabel
-                            labelText="Required Field" requiredDisplay="*" />
-                    </DemoCard>
-                    <!-- 6. Optional label -->
-                    <DemoCard label="Optional Label">
-                        <InputDefaultComponent v-model="vals.id6" placeholder="Optional..." showLabel
-                            labelText="Nickname" isOptional />
-                    </DemoCard>
-                    <!-- 7. Textarea -->
-                    <DemoCard label="Textarea">
-                        <InputDefaultComponent v-model="vals.id7" type="textarea" showLabel labelText="Description" />
-                    </DemoCard>
-                    <!-- 8. Number type -->
-                    <DemoCard label="Number Type">
-                        <InputDefaultComponent v-model="vals.id8" type="number" showLabel labelText="Amount"
-                            placeholder="0" />
-                    </DemoCard>
-                    <!-- 9. Left span prefix -->
-                    <DemoCard label="Left Span Prefix">
-                        <InputDefaultComponent v-model="vals.id9" placeholder="0.00" showLabel labelText="Price"
-                            leftSpan leftSpanText="$" />
-                    </DemoCard>
-                    <!-- 10. With description -->
-                    <DemoCard label="With Description">
-                        <InputDefaultComponent v-model="vals.id10" placeholder="username" showLabel labelText="Username"
-                            description="Only letters and numbers allowed." />
-                    </DemoCard>
-                </div>
-            </section>
-
-            <!-- ===== SECTION: CodeInputAuthComponent ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="CodeInputAuthComponent" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-gray-800 p-6 rounded-xl">
-                    <!-- 1. Default -->
-                    <DemoCard label="Default" dark>
-                        <CodeInputAuthComponent v-model="vals.ci1" />
-                    </DemoCard>
-                    <!-- 2. With label -->
-                    <DemoCard label="With Label" dark>
-                        <CodeInputAuthComponent v-model="vals.ci2" showLabel labelText="Enter OTP" />
-                    </DemoCard>
-                    <!-- 3. Required display -->
-                    <DemoCard label="Required (*)" dark>
-                        <CodeInputAuthComponent v-model="vals.ci3" showLabel labelText="Verification Code"
-                            requiredDisplay="*" />
-                    </DemoCard>
-                    <!-- 4. Disabled -->
-                    <DemoCard label="Disabled" dark>
-                        <CodeInputAuthComponent v-model="vals.ci4" showLabel labelText="Disabled" :disabled="true" />
-                    </DemoCard>
-                    <!-- 5. With errors -->
-                    <DemoCard label="With Errors" dark>
-                        <CodeInputAuthComponent v-model="vals.ci5" showLabel labelText="Enter Code" showErrors
-                            :errors="[{ error: 'Invalid OTP code. Please try again.' }]" />
-                    </DemoCard>
-                    <!-- 6. Submitting state -->
-                    <DemoCard label="Submitting State" dark>
-                        <CodeInputAuthComponent v-model="vals.ci6" showLabel labelText="Verifying..."
-                            :isSubmitting="true" />
-                    </DemoCard>
-                </div>
-            </section>
-
-            <!-- ===== SECTION: CheckboxGroup ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="CheckboxGroup" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- 1. Default -->
-                    <DemoCard label="Default">
-                        <CheckboxGroup v-model="vals.cg1" label="Subscribe to newsletter" />
-                    </DemoCard>
-                    <!-- 2. Checked -->
-                    <DemoCard label="Checked">
-                        <CheckboxGroup v-model="vals.cg2" label="I agree to terms" />
-                    </DemoCard>
-                    <!-- 3. Disabled -->
-                    <DemoCard label="Disabled">
-                        <CheckboxGroup v-model="vals.cg3" label="Disabled option" :disabled="true" />
-                    </DemoCard>
-                    <!-- 4. With meta text -->
-                    <DemoCard label="With Meta Text">
-                        <CheckboxGroup v-model="vals.cg4" label="Premium feature" metaText="Pro only" />
-                    </DemoCard>
-                    <!-- 5. With tags -->
-                    <DemoCard label="With Tags">
-                        <CheckboxGroup v-model="vals.cg5" label="New feature"
-                            :tags="[{ text: 'NEW', variant: '#07f468', class: 'text-black' }]" />
-                    </DemoCard>
-                    <!-- 6. Custom styles -->
-                    <DemoCard label="Custom Styles">
-                        <CheckboxGroup v-model="vals.cg6" label="Remember me" checkboxClass="accent-purple-600"
-                            labelClass="text-purple-700 font-medium" />
-                    </DemoCard>
-                    <!-- 7. With image -->
-                    <DemoCard label="With Mid Image">
-                        <CheckboxGroup v-model="vals.cg7" label="Visa"
-                            midImg="https://i.ibb.co.com/nMhY8CpS/svgviewer-png-output-22.webp" />
-                    </DemoCard>
-                    <!-- 8. Multiple items group -->
-                    <DemoCard label="Multiple Checkboxes">
-                        <div class="flex flex-col gap-2">
-                            <CheckboxGroup v-model="vals.cg8a" label="Option A" />
-                            <CheckboxGroup v-model="vals.cg8b" label="Option B" />
-                            <CheckboxGroup v-model="vals.cg8c" label="Option C" />
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Default</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.basic" 
+                                placeholder="Enter text..." 
+                                showLabel
+                                labelText="Username"
+                                v-bind="lightInputProps"
+                            />
                         </div>
-                    </DemoCard>
-                    <!-- 9. Wrapper class (row layout) -->
-                    <DemoCard label="Row Layout">
-                        <CheckboxGroup v-model="vals.cg9" label="Enable notifications"
-                            wrapperClass="flex items-center justify-between p-3 border border-gray-200 rounded-lg" />
-                    </DemoCard>
-                    <!-- 10. Two tags -->
-                    <DemoCard label="Multiple Tags">
-                        <CheckboxGroup v-model="vals.cg10" label="Beta feature"
-                            :tags="[{ text: 'BETA', variant: '#3B82F6', class: 'text-white' }, { text: 'FREE', variant: '#07f468', class: 'text-black' }]" />
-                    </DemoCard>
-                </div>
-            </section>
+                        <ShowCodeToggle :code="demoSnippets.icd.default" />
+                    </div>
 
-            <!-- ===== SECTION: CheckboxSwitch ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="CheckboxSwitch" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- 1. Default OFF -->
-                    <DemoCard label="Default (Off)">
-                        <CheckboxSwitch v-model="vals.cs1" label="Dark mode" id="cs1" version="" />
-                    </DemoCard>
-                    <!-- 2. Default ON -->
-                    <DemoCard label="Default (On)">
-                        <CheckboxSwitch v-model="vals.cs2" label="Notifications" id="cs2" version="" />
-                    </DemoCard>
-                    <!-- 3. With wrapper label -->
-                    <DemoCard label="With Wrapper Label">
-                        <CheckboxSwitch v-model="vals.cs3" label="Enable feature" id="cs3" version="" showWrapperLabel
-                            wrapperLabel="Feature Settings" />
-                    </DemoCard>
-                    <!-- 4. Custom track color -->
-                    <DemoCard label="Custom Track (Green)">
-                        <CheckboxSwitch v-model="vals.cs4" label="Active" id="cs4" version=""
-                            trackClass="top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full peer-checked:bg-green-500"
-                            knobClass="w-3 h-3 left-[0.125rem] rounded-full shadow peer-checked:translate-x-[1rem]" />
-                    </DemoCard>
-                    <!-- 5. Custom track color Blue -->
-                    <DemoCard label="Custom Track (Blue)">
-                        <CheckboxSwitch v-model="vals.cs5" label="Sync" id="cs5" version=""
-                            trackClass="top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full peer-checked:bg-blue-500"
-                            knobClass="w-3 h-3 left-[0.125rem] rounded-full shadow peer-checked:translate-x-[1rem]" />
-                    </DemoCard>
-                    <!-- 6. Custom track color Red -->
-                    <DemoCard label="Custom Track (Red)">
-                        <CheckboxSwitch v-model="vals.cs6" label="Alert mode" id="cs6" version=""
-                            trackClass="top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full peer-checked:bg-red-500"
-                            knobClass="w-3 h-3 left-[0.125rem] rounded-full shadow peer-checked:translate-x-[1rem]" />
-                    </DemoCard>
-                    <!-- 7. Large size -->
-                    <DemoCard label="Large Switch">
-                        <CheckboxSwitch v-model="vals.cs7" label="Large toggle" id="cs7" version=""
-                            switchWrapperClass="w-12 h-6"
-                            trackClass="top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full peer-checked:bg-[#101828]"
-                            knobClass="w-5 h-5 left-[0.125rem] rounded-full shadow peer-checked:translate-x-[1.5rem]" />
-                    </DemoCard>
-                    <!-- 8. Custom label style -->
-                    <DemoCard label="Custom Label Style">
-                        <CheckboxSwitch v-model="vals.cs8" label="Premium feature" id="cs8" version=""
-                            labelClass="text-purple-600 font-semibold text-sm" />
-                    </DemoCard>
-                    <!-- 9. Multiple switches -->
-                    <DemoCard label="Multiple Switches">
-                        <div class="flex flex-col gap-3">
-                            <CheckboxSwitch v-model="vals.cs9a" label="Email alerts" id="cs9a" version="" />
-                            <CheckboxSwitch v-model="vals.cs9b" label="SMS alerts" id="cs9b" version="" />
-                            <CheckboxSwitch v-model="vals.cs9c" label="Push alerts" id="cs9c" version="" />
+                    <!-- 2. Password with Toggle -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Password with Toggle</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.password" 
+                                :type="inputs.showPass ? 'text' : 'password'"
+                                placeholder="••••••••" 
+                                showLabel
+                                labelText="Password"
+                                :rightIcon="inputs.showPass ? EyeSlashIcon : EyeIcon"
+                                clickableRightIcon
+                                @rightIconClick="inputs.showPass = !inputs.showPass"
+                                v-bind="lightInputProps"
+                            />
                         </div>
-                    </DemoCard>
-                    <!-- 10. With bold label -->
-                    <DemoCard label="Bold Label">
-                        <CheckboxSwitch v-model="vals.cs10" label="Auto-renew subscription" id="cs10" version=""
-                            labelClass="text-gray-800 font-bold text-sm" />
-                    </DemoCard>
-                </div>
-            </section>
+                        <ShowCodeToggle :code="demoSnippets.icd.password" />
+                    </div>
 
-            <!-- ===== SECTION: ButtonComponent ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="ButtonComponent" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                    <!-- 1. Primary -->
-                    <DemoCard label="Primary">
-                        <ButtonComponent text="Primary Button" variant="primary" version=""
-                            customClass="px-4 py-2.5 w-full" />
-                    </DemoCard>
-
-                    <!-- 2. Secondary -->
-                    <DemoCard label="Secondary">
-                        <ButtonComponent text="Secondary Button" variant="secondary" version=""
-                            customClass="px-4 py-2.5 w-full" />
-                    </DemoCard>
-
-                    <!-- 3. Success -->
-                    <DemoCard label="Success">
-                        <ButtonComponent text="Confirm" variant="success" version="" customClass="px-4 py-2.5 w-full" />
-                    </DemoCard>
-
-                    <!-- 4. Danger -->
-                    <DemoCard label="Danger">
-                        <ButtonComponent text="Delete" variant="danger" version="" customClass="px-4 py-2.5 w-full" />
-                    </DemoCard>
-
-                    <!-- 5. Warning -->
-                    <DemoCard label="Warning">
-                        <ButtonComponent text="Warning" variant="warning" version="" customClass="px-4 py-2.5 w-full" />
-                    </DemoCard>
-
-                    <!-- 6. Outline -->
-                    <DemoCard label="Outline">
-                        <ButtonComponent text="Cancel" variant="outline" version="" customClass="px-4 py-2.5 w-full" />
-                    </DemoCard>
-
-                    <!-- 7. Disabled -->
-                    <DemoCard label="Disabled">
-                        <ButtonComponent text="Disabled" variant="primary" version="" :disabled="true"
-                            customClass="px-4 py-2.5 w-full" />
-                    </DemoCard>
-
-                    <!-- 8. Small -->
-                    <DemoCard label="Small (sm)">
-                        <ButtonComponent text="Small Button" variant="primary" size="sm" version=""
-                            customClass="px-3 py-1.5 w-full" />
-                    </DemoCard>
-
-                    <!-- 9. Large -->
-                    <DemoCard label="Large (lg)">
-                        <ButtonComponent text="Large Button" variant="primary" size="lg" version=""
-                            customClass="px-6 py-3 w-full" />
-                    </DemoCard>
-
-                    <!-- 10. Left Icon — Primary -->
-                    <DemoCard label="Left Icon (Primary)">
-                        <ButtonComponent text="Download" variant="primary" version="" customClass="px-4 py-2.5 w-full"
-                            leftIcon="https://api.iconify.design/heroicons:arrow-down-tray.svg?color=%23ffffff"
-                            leftIconClass="w-4 h-4 inline-block align-middle" />
-                    </DemoCard>
-
-                    <!-- 11. Right Icon — Primary -->
-                    <DemoCard label="Right Icon (Primary)">
-                        <ButtonComponent text="Next Step" variant="primary" version="" customClass="px-4 py-2.5 w-full"
-                            rightIcon="https://api.iconify.design/heroicons:arrow-right.svg?color=%23ffffff"
-                            rightIconClass="w-4 h-4 inline-block align-middle" />
-                    </DemoCard>
-
-                    <!-- 12. Left + Right Icons — Outline -->
-                    <DemoCard label="Left + Right Icon (Outline)">
-                        <ButtonComponent text="Share" variant="outline" version="" customClass="px-4 py-2.5 w-full"
-                            leftIcon="https://api.iconify.design/heroicons:share.svg?color=%23374151"
-                            leftIconClass="w-4 h-4 inline-block align-middle"
-                            rightIcon="https://api.iconify.design/heroicons:arrow-right.svg?color=%23374151"
-                            rightIconClass="w-4 h-4 inline-block align-middle" />
-                    </DemoCard>
-
-                    <!-- 13. Left Icon — Success -->
-                    <DemoCard label="Left Icon (Success)">
-                        <ButtonComponent text="Save Changes" variant="success" version=""
-                            customClass="px-4 py-2.5 w-full"
-                            leftIcon="https://api.iconify.design/heroicons:check.svg?color=%23ffffff"
-                            leftIconClass="w-4 h-4 inline-block align-middle" />
-                    </DemoCard>
-
-                    <!-- 14. Left Icon — Danger -->
-                    <DemoCard label="Left Icon (Danger)">
-                        <ButtonComponent text="Delete Item" variant="danger" version="" customClass="px-4 py-2.5 w-full"
-                            leftIcon="https://api.iconify.design/heroicons:trash.svg?color=%23ffffff"
-                            leftIconClass="w-4 h-4 inline-block align-middle" />
-                    </DemoCard>
-
-                    <!-- 15. Right Icon — External -->
-                    <DemoCard label="Right Icon (External Link)">
-                        <ButtonComponent text="Open Link" variant="outline" version="" customClass="px-4 py-2.5 w-full"
-                            rightIcon="https://api.iconify.design/heroicons:arrow-top-right-on-square.svg?color=%23374151"
-                            rightIconClass="w-4 h-4 inline-block align-middle" />
-                    </DemoCard>
-
-                    <!-- 16. Left Icon — Warning -->
-                    <DemoCard label="Left Icon (Warning)">
-                        <ButtonComponent text="Report Issue" variant="warning" version=""
-                            customClass="px-4 py-2.5 w-full"
-                            leftIcon="https://api.iconify.design/heroicons:exclamation-triangle.svg?color=%23000000"
-                            leftIconClass="w-4 h-4 inline-block align-middle" />
-                    </DemoCard>
-
-                    <!-- 17. Polygon Left — Green -->
-                    <DemoCard label="Polygon Left (Green)">
-                        <ButtonComponent text="Subscribe" variant="polygonLeft" version="" btnBg="#07f468"
-                            btnHoverBg="#000" btnText="#000" btnHoverText="#07f468" />
-                    </DemoCard>
-
-                    <!-- 18. Polygon Left — Pink -->
-                    <DemoCard label="Polygon Left (Pink)">
-                        <ButtonComponent text="Join Now" variant="polygonLeft" version="" btnBg="#FF0066"
-                            btnHoverBg="#000" btnText="#fff" btnHoverText="#FF0066" />
-                    </DemoCard>
-
-                    <!-- 19. Polygon Right -->
-                    <DemoCard label="Polygon Right">
-                        <ButtonComponent text="Explore" variant="polygonRight" version="" />
-                    </DemoCard>
-
-                    <!-- 20. BG Green -->
-                    <DemoCard label="BG Green (Hover Black)">
-                        <ButtonComponent text="Get Started" variant="bgGreen" version="" />
-                    </DemoCard>
-
-                    <!-- 21. Retry Action -->
-                    <DemoCard label="Retry Action">
-                        <ButtonComponent text="Try Again" variant="retryAction" version=""
-                            leftIcon="https://api.iconify.design/heroicons:arrow-path.svg?color=%2307f468"
-                            leftIconClass="w-4 h-4 inline-block align-middle" />
-                    </DemoCard>
-
-                    <!-- 22. simpleBtn -->
-                    <DemoCard label="Simple Button (Custom Colors)">
-                        <ButtonComponent text="Custom" variant="simpleBtn" version="" btnBg="#6366f1"
-                            btnHoverBg="#4f46e5" btnText="#fff" btnHoverText="#fff" />
-                    </DemoCard>
-
-                </div>
-            </section>
-
-            <!-- ===== SECTION: MediaCardV1 ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="MediaCardV1" />
-                <p class="text-xs text-gray-400 -mt-4">
-                    🖱 Hover over <strong>grid variant</strong> cards to see the <strong>zoom-in effect</strong>
-                </p>
-
-                <!-- Non-zoom variants in DemoCard -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <DemoCard label="Default">
-                        <MediaCardV1 :media="demoMedia.default" variant="default" />
-                    </DemoCard>
-                    <DemoCard label="Resume">
-                        <MediaCardV1 :media="demoMedia.resume" variant="resume" />
-                    </DemoCard>
-                    <DemoCard label="Purchased">
-                        <MediaCardV1 :media="demoMedia.purchased" variant="purchased" />
-                    </DemoCard>
-                    <DemoCard label="Latest">
-                        <div class="w-[19rem]">
-                            <MediaCardV1 :media="demoMedia.latest" variant="latest" />
+                    <!-- 3. With Left Icon -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Left Icon</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.email" 
+                                placeholder="Search..." 
+                                showLabel
+                                labelText="Search" 
+                                :leftIcon="MagnifyingGlassIcon"
+                                v-bind="lightInputProps"
+                            />
                         </div>
-                    </DemoCard>
-                    <DemoCard label="Image Type">
-                        <MediaCardV1 :media="demoMedia.image" variant="default" />
-                    </DemoCard>
-                    <DemoCard label="Custom Title Color">
-                        <MediaCardV1 :media="demoMedia.default" variant="default" titleColor="#6366f1" />
-                    </DemoCard>
-                </div>
-
-                <!-- Grid variant (hover zoom) — needs overflow-visible parent -->
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest">
-                    Grid Variant (Hover for Zoom ✨)
-                </p>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1 relative">
-                    <div class="relative overflow-visible">
-                        <span class="text-[10px] text-gray-400 block mb-1 uppercase tracking-wider font-medium">Grid —
-                            Video</span>
-                        <MediaCardV1 :media="demoMedia.grid" variant="grid" />
+                        <ShowCodeToggle :code="demoSnippets.icd.leftIcon" />
                     </div>
-                    <div class="relative overflow-visible">
-                        <span class="text-[10px] text-gray-400 block mb-1 uppercase tracking-wider font-medium">Grid +
-                            Buy Label</span>
-                        <MediaCardV1 :media="demoMedia.grid2" variant="grid" buyLabel="Buy Now"
-                            actionLabel="Subscribe" />
+
+                    <!-- 4. With Right Icon -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Right Icon</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.email" 
+                                placeholder="Enter email..." 
+                                showLabel
+                                labelText="Email Support" 
+                                :rightIcon="EnvelopeIcon"
+                                v-bind="lightInputProps"
+                            />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.icd.rightIcon" />
                     </div>
-                    <div class="relative overflow-visible">
-                        <span class="text-[10px] text-gray-400 block mb-1 uppercase tracking-wider font-medium">Grid —
-                            Gallery</span>
-                        <MediaCardV1 :media="demoMedia.gallery" variant="grid" />
+
+                    <!-- 5. Required Display -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Required (*)</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.email" 
+                                placeholder="Required field" 
+                                showLabel
+                                labelText="Full Name" 
+                                requiredDisplay="*"
+                                v-bind="lightInputProps"
+                            />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.icd.requiredStar" />
                     </div>
-                    <div class="relative overflow-visible">
-                        <span class="text-[10px] text-gray-400 block mb-1 uppercase tracking-wider font-medium">Grid —
-                            No Footer</span>
-                        <MediaCardV1 :media="demoMedia.grid" variant="grid" :showFooter="false" />
+
+                    <!-- 5. Italic Required -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Required Italic</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.email" 
+                                placeholder="Enter..." 
+                                showLabel 
+                                labelText="Email Address"
+                                requiredDisplay="italic-text" 
+                                requiredDisplayText="Required"
+                                v-bind="lightInputProps"
+                            />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.icd.requiredItalic" />
+                    </div>
+
+                    <!-- 6. With Errors -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Validation Errors</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.error" 
+                                placeholder="Enter..." 
+                                showLabel
+                                labelText="Promo Code" 
+                                showErrors
+                                :errors="[{ error: 'Invalid promo code' }, { error: 'Minimum spend $50' }]"
+                                v-bind="lightInputProps"
+                            />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.icd.errors" />
+                    </div>
+
+                    <!-- 7. On Success -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Success State</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.success" 
+                                placeholder="Enter..." 
+                                showLabel
+                                labelText="Profile Handle" 
+                                onSuccess 
+                                :success="[{ message: 'Handle is available!' }]"
+                                v-bind="lightInputProps"
+                            />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.icd.success" />
+                    </div>
+
+                    <!-- 8. Spans / Suffix (Unit Price) -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Suffix / Spans (Unit Price)</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.price" 
+                                placeholder="0.00" 
+                                showLabel 
+                                labelText="Unit Price"
+                                rightSpan 
+                                rightSpanText="USD" 
+                                v-bind="lightInputProps"
+                            />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.icd.suffixPrice" />
+                    </div>
+
+                    <!-- 9. Prefix and Suffix Icons -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Both Icons (Left & Right)</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.email" 
+                                placeholder="Search with filters..." 
+                                showLabel
+                                labelText="Advanced Search" 
+                                :leftIcon="MagnifyingGlassIcon"
+                                :rightIcon="Bars3Icon"
+                                clickableRightIcon
+                                v-bind="lightInputProps"
+                            />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.icd.bothIcons" />
+                    </div>
+
+                    <!-- 10. Textarea -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Textarea</span>
+                        <div class="min-h-[100px] flex items-center">
+                            <InputComponentDashboard 
+                                v-model="inputs.bio" 
+                                type="textarea" 
+                                showLabel 
+                                labelText="Biography"
+                                placeholder="Tell us about yourself..."
+                                v-bind="lightInputProps"
+                            />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.icd.textarea" />
                     </div>
                 </div>
-            </section>
-
-            <!-- ===== SECTION: MediaCardV2 ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="MediaCardV2" />
-                <p class="text-xs text-gray-400 -mt-4">
-                    🖱 Hover each card to see the <strong>expand / zoom-in effect</strong> (works at xl breakpoint)
-                </p>
-
-                <!-- Labels row -->
-                <div
-                    class="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px] text-gray-400 uppercase tracking-wider font-medium">
-                    <span>Video</span>
-                    <span>Image</span>
-                    <span>Free Tag (Green)</span>
-                    <span>Sub Only (Pink)</span>
-                </div>
-
-                <!-- V2 cards — must be direct children of ul for hover expand to work -->
-                <ul class="grid grid-cols-2 sm:grid-cols-4 gap-1 overflow-visible relative" style="z-index: 0;">
-                    <MediaCardV2 :media="demoMedia.v2_video" />
-                    <MediaCardV2 :media="demoMedia.v2_image" />
-                    <MediaCardV2 :media="demoMedia.v2_tagged_green" />
-                    <MediaCardV2 :media="demoMedia.v2_tagged_pink" />
-                </ul>
-
-                <!-- Second row -->
-                <div
-                    class="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px] text-gray-400 uppercase tracking-wider font-medium">
-                    <span>Gallery</span>
-                    <span>Locked Content</span>
-                    <span>Subscribe Tag</span>
-                    <span>Free Tag</span>
-                </div>
-
-                <ul class="grid grid-cols-2 sm:grid-cols-4 gap-1 overflow-visible relative" style="z-index: 0;">
-                    <MediaCardV2 :media="demoMedia.v2_gallery" />
-                    <MediaCardV2 :media="demoMedia.v2_locked" />
-                    <MediaCardV2
-                        :media="{ ...demoMedia.v2_video, showTag: true, tagText: 'Subscribe', tagColor: 'pink', title: 'Subscribe to Watch' }" />
-                    <MediaCardV2
-                        :media="{ ...demoMedia.v2_image, showTag: true, tagText: 'Free', tagColor: 'green', title: 'Free Content' }" />
-                </ul>
             </section>
 
             <!-- ===== SECTION: Heading ===== -->
             <section class="flex flex-col gap-6">
                 <DemoSectionHeader title="Heading" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- 1. h1 defaultPrimary -->
-                    <DemoCard label="h1 — defaultPrimaryHeading">
-                        <Heading text="Primary H1" tag="h1" theme="defaultPrimaryHeading" version="basic" />
-                    </DemoCard>
-                    <!-- 2. h2 defaultSecondary -->
-                    <DemoCard label="h2 — defaultSecondaryHeading">
-                        <Heading text="Secondary H2" tag="h2" theme="defaultSecondaryHeading" version="basic" />
-                    </DemoCard>
-                    <!-- 3. h3 sectionHeading -->
-                    <DemoCard label="h3 — sectionHeading">
-                        <Heading text="Section H3" tag="h3" theme="sectionHeading" version="basic" />
-                    </DemoCard>
-                    <!-- 4. dashboardHeading -->
-                    <DemoCard label="h2 — dashboardHeading">
-                        <Heading text="Dashboard Title" tag="h2" theme="dashboardHeading" version="basic" />
-                    </DemoCard>
-                    <!-- 5. AuthHeading -->
-                    <DemoCard label="h2 — AuthHeading" dark>
-                        <div class="bg-gray-800 p-4 rounded-lg">
-                            <Heading text="Login" tag="h2" theme="AuthHeading" version="basic" />
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 —
+                            defaultPrimaryHeading</span>
+                        <div class="p-2  flex items-center">
+                            <Heading text="Primary H1" tag="h1" theme="defaultPrimaryHeading" class="!text-black"
+                                version="basic" />
                         </div>
-                    </DemoCard>
+                        <ShowCodeToggle :code="demoSnippets.heading.h1Primary" />
+                    </div>
+
+                    <!-- 2. h2 defaultSecondary -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 —
+                            defaultSecondaryHeading</span>
+                        <div class="p-2  flex items-center">
+                            <Heading text="Secondary H2" tag="h2" theme="defaultSecondaryHeading" class="!text-black"
+                                version="basic" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.heading.h2Secondary" />
+                    </div>
+
+                    <!-- 3. h3 sectionHeading -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h3 — sectionHeading</span>
+                        <div class="p-2  flex items-center">
+                            <Heading text="Section H3" tag="h3" theme="sectionHeading" class="!text-black"
+                                version="basic" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.heading.h3Section" />
+                    </div>
+
+                    <!-- 4. dashboardHeading -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 — dashboardHeading</span>
+                        <div class="p-2  flex items-center">
+                            <Heading text="Dashboard Title" tag="h2" theme="dashboardHeading" version="basic" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.heading.h2Dashboard" />
+                    </div>
+
+                    <!-- 5. AuthHeading -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 — AuthHeading</span>
+                        <div class="p-2  flex items-center">
+                            <Heading text="Login" tag="h2" theme="AuthHeading" class="!text-black" version="basic" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.heading.h2Auth" />
+                    </div>
+
                     <!-- 6. formHeading -->
-                    <DemoCard label="h4 — formHeading">
-                        <Heading text="Profile Settings" tag="h4" theme="formHeading" version="basic" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h4 — formHeading</span>
+                        <div class="p-2  flex items-center">
+                            <Heading text="Profile Settings" tag="h4" theme="formHeading" version="basic" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.heading.h4Form" />
+                    </div>
+
                     <!-- 7. demoHeadings h1 -->
-                    <DemoCard label="h1 — demoHeadings">
-                        <Heading text="Demo H1 Bold" tag="h1" theme="demoHeadings" version="basic" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 — demoHeadings</span>
+                        <div class="p-2  flex items-center">
+                            <Heading text="Demo H1 Bold" tag="h1" theme="demoHeadings" version="basic" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.heading.h1Demo" />
+                    </div>
+
                     <!-- 8. demoHeadings h3 -->
-                    <DemoCard label="h3 — demoHeadings">
-                        <Heading text="Demo H3 Medium" tag="h3" theme="demoHeadings" version="basic" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h3 — demoHeadings</span>
+                        <div class="p-2  flex items-center">
+                            <Heading text="Demo H3 Medium" tag="h3" theme="demoHeadings" version="basic" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.heading.h3Demo" />
+                    </div>
+
                     <!-- 9. With left icon -->
-                    <DemoCard label="With Left Icon">
-                        <Heading text="With Icon" tag="h3" theme="defaultSecondaryHeading" version="basic"
-                            :leftIcon="StarIcon" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Left Icon</span>
+
+                        <Heading text="With Icon" tag="h3" theme="defaultSecondaryHeading" class="!text-black"
+                            version="basic" :leftIcon="StarIcon" />
+
+                        <ShowCodeToggle :code="demoSnippets.heading.withIcon" />
+                    </div>
+
                     <!-- 10. orderHeading -->
-                    <DemoCard label="h1 — orderHeading">
-                        <Heading text="Order #1234" tag="h1" theme="orderHeading" version="basic" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 — orderHeading</span>
+                        <div class="p-2  flex items-center">
+                            <Heading text="Order #1234" tag="h1" theme="orderHeading" version="basic" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.heading.order" />
+                    </div>
                 </div>
             </section>
 
             <!-- ===== SECTION: Paragraph ===== -->
             <section class="flex flex-col gap-6">
                 <DemoSectionHeader title="Paragraph" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- 1. Default -->
-                    <DemoCard label="Default">
-                        <Paragraph text="This is a default paragraph with standard styling." />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Default</span>
+                        <div class="p-2  flex items-center">
+                            <Paragraph text="This is a default paragraph with standard styling." class="!text-black" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.paragraph.default" />
+                    </div>
+
                     <!-- 2. Small font -->
-                    <DemoCard label="Small (text-sm)">
-                        <Paragraph text="Small text paragraph for captions." fontSize="text-sm" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Small (text-sm)</span>
+                        <div class="p-2  flex items-center">
+                            <Paragraph text="Small text paragraph for captions." class="!text-black text-sm" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.paragraph.small" />
+                    </div>
+
                     <!-- 3. Large font -->
-                    <DemoCard label="Large (text-xl)">
-                        <Paragraph text="Large paragraph text." fontSize="text-xl" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Large (text-xl)</span>
+                        <div class="p-2  flex items-center">
+                            <Paragraph text="Large paragraph text." class="!text-black text-xl" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.paragraph.large" />
+                    </div>
+
                     <!-- 4. Bold -->
-                    <DemoCard label="Bold">
-                        <Paragraph text="Bold paragraph text." fontWeight="font-bold" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Bold</span>
+                        <div class="p-2  flex items-center">
+                            <Paragraph text="Bold paragraph text." class="!text-black font-bold" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.paragraph.bold" />
+                    </div>
+
                     <!-- 5. Custom color -->
-                    <DemoCard label="Custom Color (Blue)">
-                        <Paragraph text="Blue paragraph text." fontColor="text-blue-600" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Custom Color (Blue)</span>
+                        <div class="p-2  flex items-center">
+                            <Paragraph text="Blue paragraph text." fontColor="text-blue-600" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.paragraph.blue" />
+                    </div>
+
                     <!-- 6. Error color -->
-                    <DemoCard label="Error Red">
-                        <Paragraph text="This field is required." fontColor="text-red-500" fontSize="text-sm" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Error Red</span>
+                        <div class="p-2  flex items-center">
+                            <Paragraph text="This field is required." fontColor="text-red-500" fontSize="text-sm" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.paragraph.error" />
+                    </div>
+
                     <!-- 7. Success color -->
-                    <DemoCard label="Success Green">
-                        <Paragraph text="Action successful!" fontColor="text-green-600" fontWeight="font-medium" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Success Green</span>
+                        <div class="p-2  flex items-center">
+                            <Paragraph text="Action successful!" fontColor="text-green-600" fontWeight="font-medium" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.paragraph.success" />
+                    </div>
+
                     <!-- 8. Italic -->
-                    <DemoCard label="Italic">
-                        <Paragraph text="Italic paragraph text for notes." fontFamily="italic"
-                            fontColor="text-gray-500" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Italic</span>
+                        <div class="p-2  flex items-center">
+                            <Paragraph text="Italic paragraph text for notes." fontFamily="italic"
+                                fontColor="text-gray-500" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.paragraph.italic" />
+                    </div>
+
                     <!-- 9. With left icon -->
-                    <DemoCard label="With Left Icon">
-                        <Paragraph text="Info message here" :leftIcon="InformationCircleIcon" fontSize="text-sm"
-                            fontColor="text-blue-600" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Left Icon</span>
+                        <div class="p-2  flex items-center">
+                            <Paragraph text="Info message here" :leftIcon="InformationCircleIcon" fontSize="text-sm"
+                                fontColor="text-blue-600" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.paragraph.withIcon" />
+                    </div>
+
                     <!-- 10. Extra small xs -->
-                    <DemoCard label="Extra Small (text-xs)">
-                        <Paragraph text="Helper text displayed below the input field." fontSize="text-xs"
-                            fontColor="text-gray-400" />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Extra Small (text-xs)</span>
+                        <div class="p-2  flex items-center">
+                            <Paragraph text="Helper text displayed below the input field." fontSize="text-xs"
+                                fontColor="text-gray-400" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.paragraph.xs" />
+                    </div>
                 </div>
             </section>
 
             <!-- ===== SECTION: NotificationCard ===== -->
             <section class="flex flex-col gap-6">
                 <DemoSectionHeader title="NotificationCard" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <!-- 1. Notice -->
-                    <DemoCard label="Notice">
-                        <NotificationCard variant="notice" title="Notice"
-                            description="This is a notice notification card." v-model="notifOpen.notice" />
-                    </DemoCard>
-                    <!-- 2. Alert -->
-                    <DemoCard label="Alert">
-                        <NotificationCard variant="alert" title="Alert" description="Something needs your attention."
-                            v-model="notifOpen.alert" />
-                    </DemoCard>
-                    <!-- 3. Success -->
-                    <DemoCard label="Success">
-                        <NotificationCard variant="success" title="Success"
-                            description="Your operation was completed successfully." v-model="notifOpen.success" />
-                    </DemoCard>
-                    <!-- 4. Error -->
-                    <DemoCard label="Error">
-                        <NotificationCard variant="error" title="Error"
-                            description="Something went wrong. Please try again." v-model="notifOpen.error" />
-                    </DemoCard>
-                    <!-- 5. Warning -->
-                    <DemoCard label="Warning">
-                        <NotificationCard variant="warning" title="Warning"
-                            description="Please review before continuing." v-model="notifOpen.warning" />
-                    </DemoCard>
-                    <!-- 6. Info -->
-                    <DemoCard label="Info">
-                        <NotificationCard variant="info" title="Info" description="Here is some useful information."
-                            v-model="notifOpen.info" />
-                    </DemoCard>
-                    <!-- 7. Limit Exceeded -->
-                    <DemoCard label="Limit Exceeded">
-                        <NotificationCard variant="limit-exceeded" title="Limit Exceeded"
-                            description="You have exceeded your monthly upload limit."
-                            v-model="notifOpen.limitExceeded" />
-                    </DemoCard>
-                    <!-- 8. No icon -->
-                    <DemoCard label="No Icon">
-                        <NotificationCard variant="notice" title="Without Icon"
-                            description="This card has no left icon." :showIcon="false" v-model="notifOpen.noIcon" />
-                    </DemoCard>
-                    <!-- 9. Not closable -->
-                    <DemoCard label="Not Closable">
-                        <NotificationCard variant="success" title="Persistent"
-                            description="This notification cannot be dismissed." :closable="false"
-                            v-model="notifOpen.notClosable" />
-                    </DemoCard>
-                    <!-- 10. With link -->
-                    <DemoCard label="With Link">
-                        <NotificationCard variant="info" title="New Update" description="A new version is available."
-                            linkLabel="See what's new" linkHref="#" v-model="notifOpen.withLink" />
-                    </DemoCard>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 1. Media Requirement (Warning) -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Warning Variant (Media
+                            Required)</span>
+                        <div class="p-2 flex items-center">
+                            <NotificationCard variant="warning" title="Media Content Required"
+                                description="Your profile currently has no media. Enhance your profile's visibility by adding at least 5 media items."
+                                timestamp="1w" :icon="FilmIcon" :badgeIcon="ArrowUpTrayIcon" dismissLabel="Dismiss"
+                                actionLabel="Take Action" v-model="notifOpen.warning" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.notification.warning" />
+                    </div>
+
+                    <!-- 2. Media Approved (Success) -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Success Variant
+                            (Approved)</span>
+                        <div class="p-2 flex items-center">
+                            <NotificationCard variant="success" title="Congratulations"
+                                description="Your media 'Audio with placeholder and no preview' has been approved."
+                                timestamp="1m" :icon="PhotoIcon" :badgeIcon="CheckIcon" dismissLabel="Dismiss"
+                                actionLabel="Take Action" v-model="notifOpen.success" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.notification.success" />
+                    </div>
+
+                    <!-- 3. Bank Info Required (Info) -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Info Variant (Bank
+                            Details)</span>
+                        <div class="p-2 flex items-center">
+                            <NotificationCard variant="info" title="Bank Details Required"
+                                description="To ensure seamless transactions, please complete your bank information."
+                                timestamp="3m" :icon="BuildingLibraryIcon" :badgeIcon="InformationCircleIcon"
+                                dismissLabel="Dismiss" actionLabel="Take Action" v-model="notifOpen.info" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.notification.info" />
+                    </div>
+
+                    <!-- 4. Destructive Alert (Error) -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Error Variant
+                            (Destructive)</span>
+                        <div class="p-2 flex items-center">
+                            <NotificationCard variant="error" title="Action Required"
+                                description="Critical update needed for your account security settings."
+                                timestamp="Just now" :icon="BellAlertIcon" :badgeIcon="TrashIcon" dismissLabel="Dismiss"
+                                actionLabel="Finalize" v-model="notifOpen.error" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.notification.error" />
+                    </div>
                 </div>
                 <!-- Reopen buttons -->
                 <div class="flex flex-wrap gap-2 mt-2">
                     <button v-for="key in Object.keys(notifOpen)" :key="key"
-                        class="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-gray-700 capitalize transition"
+                        class="text-[0.65rem] px-4 py-1.5 bg-white hover:bg-slate-50 rounded-full text-slate-600 font-semibold capitalize transition shadow-sm border border-slate-200"
                         @click="notifOpen[key] = true">
                         Reopen {{ key }}
                     </button>
@@ -822,471 +569,368 @@
             <!-- ===== SECTION: QuillEditor ===== -->
             <section class="flex flex-col gap-6">
                 <DemoSectionHeader title="QuillEditor" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                     <!-- 1. Default -->
-                    <DemoCard label="Default">
-                        <QuillEditor v-model="vals.q1" />
-                    </DemoCard>
-                    <!-- 2. Custom placeholder -->
-                    <DemoCard label="Custom Placeholder">
-                        <QuillEditor v-model="vals.q2" placeholder="Write your bio here..." />
-                    </DemoCard>
-                    <!-- 3. With initial content -->
-                    <DemoCard label="With Initial Content">
-                        <QuillEditor v-model="vals.q3" />
-                    </DemoCard>
-                    <!-- 4. Announcement content -->
-                    <DemoCard label="Announcement Draft">
-                        <QuillEditor v-model="vals.q4" placeholder="Write your announcement..." />
-                    </DemoCard>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Default Rich Text Editor</span>
+                        <div class="bg-transparent overflow-hidden">
+                            <QuillEditor v-model="vals.q1" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.quill.default" />
+                    </div>
+
+                    <!-- 2. Placeholder -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Placeholder</span>
+                        <div class="bg-transparent overflow-hidden">
+                            <QuillEditor v-model="vals.q2" placeholder="Start typing your story..." />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.quill.placeholder" />
+                    </div>
+
+                    <!-- 3. Initial Content -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Initial Content</span>
+                        <div class="bg-transparent overflow-hidden">
+                            <QuillEditor v-model="vals.q3" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.quill.initial" />
+                    </div>
+
+                    <!-- 4. Announcement -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Announcement Draft</span>
+                        <div class="bg-transparent overflow-hidden">
+                            <QuillEditor v-model="vals.q4" placeholder="Write your announcement..." />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.quill.announcement" />
+                    </div>
                 </div>
             </section>
 
             <!-- ===== SECTION: SubscriptionCard ===== -->
-            <section class="flex flex-col gap-6">
+            <section class="flex flex-col gap-12">
                 <DemoSectionHeader title="SubscriptionCard" />
-                <p class="text-xs text-gray-400 -mt-4">Each card uses <code>order=3</code> (center position). The card
-                    renders as an absolute-positioned &lt;li&gt; inside a relative &lt;ul&gt;.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-
-                    <!-- 1. Basic / Upgrade -->
-                    <DemoCard label="Basic — Upgrade Action">
-                        <div class="relative w-full overflow-hidden" style="height: 34rem;">
-                            <ul class="relative w-full h-full">
-                                <SubscriptionCard :cardData="subCards[0]" :order="3" :isCurrent="false"
-                                    :currentSubscriptionPrice="4.99" />
+                <p class="text-xs text-slate-500/80 -mt-8">
+                    Modern subscription cards with integrated feature lists and price toggles
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-24 gap-x-12 mt-8">
+                    <div v-for="card in cards" :key="card.id" class="flex flex-col gap-4">
+                        <div class="relative h-[34rem] sm:h-[42.5rem] md:h-[39rem] w-full">
+                            <ul class="relative w-full h-full m-0 p-0 list-none">
+                                <SubscriptionCard :card-data="card" :order="3" :is-current="card.isCurrentSubscription"
+                                    :current-subscription-price="39.99" @trigger-action="handleCardAction" />
                             </ul>
                         </div>
-                    </DemoCard>
-
-                    <!-- 2. Current Subscription -->
-                    <DemoCard label="Current Subscription (Pink Border + Yellow Price)">
-                        <div class="relative w-full overflow-hidden" style="height: 34rem;">
-                            <ul class="relative w-full h-full">
-                                <SubscriptionCard :cardData="subCards[1]" :order="3" :isCurrent="true"
-                                    :currentSubscriptionPrice="19.99" />
-                            </ul>
-                        </div>
-                    </DemoCard>
-
-                    <!-- 3. Featured (gray badge) -->
-                    <DemoCard label="Featured (Gray Badge)">
-                        <div class="relative w-full overflow-hidden" style="height: 34rem;">
-                            <ul class="relative w-full h-full">
-                                <SubscriptionCard :cardData="subCards[2]" :order="3" :isCurrent="false"
-                                    :currentSubscriptionPrice="19.99" />
-                            </ul>
-                        </div>
-                    </DemoCard>
-
-                    <!-- 4. Downgrade -->
-                    <DemoCard label="Downgrade Action (Cheaper than Current)">
-                        <div class="relative w-full overflow-hidden" style="height: 34rem;">
-                            <ul class="relative w-full h-full">
-                                <SubscriptionCard :cardData="subCards[3]" :order="3" :isCurrent="false"
-                                    :currentSubscriptionPrice="19.99" />
-                            </ul>
-                        </div>
-                    </DemoCard>
-
-                    <!-- 5. Free Tier (no features) -->
-                    <DemoCard label="Free Tier (No Features List)">
-                        <div class="relative w-full overflow-hidden" style="height: 34rem;">
-                            <ul class="relative w-full h-full">
-                                <SubscriptionCard :cardData="subCards[4]" :order="3" :isCurrent="false"
-                                    :currentSubscriptionPrice="0" />
-                            </ul>
-                        </div>
-                    </DemoCard>
-
-                    <!-- 6. Premium (long features) -->
-                    <DemoCard label="Premium — Many Features (Featured)">
-                        <div class="relative w-full overflow-hidden" style="height: 34rem;">
-                            <ul class="relative w-full h-full">
-                                <SubscriptionCard :cardData="subCards[5]" :order="3" :isCurrent="false"
-                                    :currentSubscriptionPrice="19.99" />
-                            </ul>
-                        </div>
-                    </DemoCard>
-
-                    <!-- 7. Budget / Lite -->
-                    <DemoCard label="Budget / Lite Plan">
-                        <div class="relative w-full overflow-hidden" style="height: 34rem;">
-                            <ul class="relative w-full h-full">
-                                <SubscriptionCard :cardData="subCards[6]" :order="3" :isCurrent="false"
-                                    :currentSubscriptionPrice="0" />
-                            </ul>
-                        </div>
-                    </DemoCard>
-
-                    <!-- 8. Agency / Business -->
-                    <DemoCard label="Agency / Business Tier (Very High Price)">
-                        <div class="relative w-full overflow-hidden" style="height: 34rem;">
-                            <ul class="relative w-full h-full">
-                                <SubscriptionCard :cardData="subCards[7]" :order="3" :isCurrent="false"
-                                    :currentSubscriptionPrice="19.99" />
-                            </ul>
-                        </div>
-                    </DemoCard>
-
-                    <!-- 9. Featured + Current (edge case) -->
-                    <DemoCard label="Featured + Current Subscription (Edge Case)">
-                        <div class="relative w-full overflow-hidden" style="height: 34rem;">
-                            <ul class="relative w-full h-full">
-                                <SubscriptionCard :cardData="subCards[8]" :order="3" :isCurrent="true"
-                                    :currentSubscriptionPrice="29.99" />
-                            </ul>
-                        </div>
-                    </DemoCard>
-
-                    <!-- 10. Bundle Deal -->
-                    <DemoCard label="Bundle Deal">
-                        <div class="relative w-full overflow-hidden" style="height: 34rem;">
-                            <ul class="relative w-full h-full">
-                                <SubscriptionCard :cardData="subCards[9]" :order="3" :isCurrent="false"
-                                    :currentSubscriptionPrice="19.99" />
-                            </ul>
-                        </div>
-                    </DemoCard>
-
+                        <ShowCodeToggle
+                            :code="`<!-- Template -->\n<SubscriptionCard \n  :card-data='card' \n  :is-current='${card.isCurrentSubscription ? 'true' : 'false'}' \n  @trigger-action='handleCardAction' \n/>\n\n<!-- Script Data (Interaction) -->\nconst card = ${JSON.stringify(card, null, 4)};\n\nconst handleCardAction = (card) => {\n  alert('Action triggered for: ' + card.title);\n};`" />
+                    </div>
                 </div>
             </section>
+
+            <!-- ===== SECTION: TierCard ===== -->
+            <section class="flex flex-col gap-12">
+                <DemoSectionHeader title="Tier Cards" />
+                <p class="text-xs text-slate-500/80 -mt-8">
+                    Modern tier cards with integrated feature lists and price toggles (Data from TierData.js)
+                </p>
+                <div class="flex flex-wrap justify-center gap-12">
+                    <div v-for="tier in tierData" :key="tier.id" class="flex flex-col gap-4">
+                        <TierCard :tier="tier" />
+                        <ShowCodeToggle :code="demoSnippets.tierCard[tier.id]" />
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION: EventCard ===== -->
+            <section class="flex flex-col gap-12">
+                <DemoSectionHeader title="Event Cards" />
+                <p class="text-xs text-slate-500/80 -mt-8">
+                    Modern event cards with integrated feature lists and price toggles
+                </p>
+                <div class="flex flex-wrap gap-8 justify-center">
+                    <div class="flex flex-col gap-4">
+                        <EventCard theme="orange" :hasButton="true" />
+                        <ShowCodeToggle :code="demoSnippets.eventCard.orangeButton" />
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <EventCard theme="orange" :hasButton="false" />
+                        <ShowCodeToggle :code="demoSnippets.eventCard.orangeProgress" />
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <EventCard theme="pink" :hasButton="true" />
+                        <ShowCodeToggle :code="demoSnippets.eventCard.pinkButton" />
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <EventCard theme="pink" :hasButton="false" />
+                        <ShowCodeToggle :code="demoSnippets.eventCard.pinkProgress" />
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECTION: Cart component ===== -->
+            <section class="flex flex-col gap-12">
+                <DemoSectionHeader title="Shopping Cart" />
+                <p class="text-xs text-slate-500/80 -mt-8">
+                    Interactive cart component driven by custom events. Open console to see interaction commands.
+                </p>
+                <Cart />
+
+                <div class="">
+                    <ShowCodeToggle :code="demoSnippets.cart.default" />
+                </div>
+            </section>
+
 
             <!-- ===== SECTION: VueDatePicker ===== -->
-            <section class="flex flex-col gap-6">
+            <section class="flex flex-col gap-6 mb-20">
                 <DemoSectionHeader title="VueDatePicker" />
-                <p class="text-xs text-gray-400 -mt-4">All pickers are always-visible (inline) calendars. Config-driven:
-                    <code>mode</code>, <code>enableTime</code>, <code>blockedDates</code>, <code>minDate/maxDate</code>,
-                    <code>style.theme</code>, <code>style.rounded</code>, <code>startOfWeek</code> and more.
+                <p class="text-xs text-gray-400 -mt-4">
+                    All pickers are always-visible (inline) calendars. Config-driven: <code>mode</code>,
+                    <code>enableTime</code>, <code>blockedDates</code>, <code>minDate/maxDate</code>, etc.
                 </p>
 
-                <!-- === GROUP 1: Basic Modes === -->
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest">Basic Modes</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- GROUP 1: Basic Modes -->
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-4">Basic Modes</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Single Date -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Single Date
+                            (Default)</span>
+                        <div class="p-2">
+                            <VueDatePicker v-model="dp.single" />
+                            <p class="text-[10px] mt-2 text-gray-400 font-mono">{{ dp.single || '—' }}</p>
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.datepicker.single" />
+                    </div>
 
-                    <DemoCard label="Single Date (Default)">
-                        <VueDatePicker v-model="dp.single" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.single || '—' }}</p>
-                    </DemoCard>
+                    <!-- Range Selection -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Range (Max 7
+                            days)</span>
+                        <div class="p-2">
+                            <VueDatePicker v-model="dp.range"
+                                :config="{ mode: 'range', maxRangeDays: 7, style: { theme: 'indigo' } }" />
+                            <p class="text-[10px] mt-2 text-gray-400 font-mono">{{ dp.range?.start || '—' }} → {{
+                                dp.range?.end || '—' }}</p>
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.datepicker.range" />
+                    </div>
 
-                    <DemoCard label="Range Selection (Max 7 days)">
-                        <VueDatePicker v-model="dp.range"
-                            :config="{ mode: 'range', maxRangeDays: 7, style: { theme: 'indigo' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.range?.start || '—' }} → {{ dp.range?.end
-                            || '—' }}</p>
-                    </DemoCard>
+                    <!-- With Time Selection -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">With Time (Dark
+                            Theme)</span>
+                        <div class="p-2">
+                            <VueDatePicker v-model="dp.withTime"
+                                :config="{ enableTime: true, format: 'DD/MM/YYYY HH:mm', style: { theme: 'dark' } }" />
+                            <p class="text-[10px] mt-2 text-gray-400 font-mono">{{ dp.withTime || '—' }}</p>
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.datepicker.withTime" />
+                    </div>
 
-                    <DemoCard label="Green Theme + Circle Today">
-                        <VueDatePicker v-model="dp.green"
-                            :config="{ style: { theme: 'green', todayStyle: 'circle', shadow: 'shadow-2xl' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.green || '—' }}</p>
-                    </DemoCard>
+                    <!-- Blocked Dates -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[14px] text-gray-400 uppercase tracking-widest font-semibold">Blocked
+                            Dates</span>
+                        <div class="p-2">
+                            <VueDatePicker v-model="dp.blocked"
+                                :config="{ style: { theme: 'red' }, blockedDates: [new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0]] }" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.datepicker.blocked" />
+                    </div>
+                </div>
 
-                    <DemoCard label="Blocked Dates (+2 & +5 days)">
-                        <VueDatePicker v-model="dp.blocked" :config="{
-                            style: { theme: 'red' },
-                            blockedDates: [
-                                new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0],
-                                new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0]
-                            ]
-                        }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.blocked || '—' }}</p>
-                    </DemoCard>
+                <!-- GROUP 2: Advanced Styling -->
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-8">Advanced Styling</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Teal Header -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Teal Header +
+                            Blue Theme</span>
+                        <div class="p-2">
+                            <VueDatePicker v-model="dp.tealHeader"
+                                :config="{ style: { headerClass: 'bg-teal-600 text-white', theme: 'blue' } }" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.datepicker.tealHeader" />
+                    </div>
 
-                    <DemoCard label="With Time Picker (Dark Theme)">
-                        <VueDatePicker v-model="dp.withTime"
-                            :config="{ enableTime: true, format: 'DD/MM/YYYY HH:mm', style: { theme: 'dark' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.withTime || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Background Today Style (Blue)">
-                        <VueDatePicker v-model="dp.todayBg"
-                            :config="{ style: { theme: 'blue', todayStyle: 'background' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.todayBg || '—' }}</p>
-                    </DemoCard>
+                    <!-- Square -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Square
+                            (rounded-none)</span>
+                        <div class="p-2">
+                            <VueDatePicker v-model="dp.square"
+                                :config="{ style: { rounded: 'rounded-none', todayStyle: 'background' } }" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.datepicker.square" />
+                    </div>
 
                 </div>
 
-                <!-- === GROUP 2: Advanced Styling === -->
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-4">Advanced Styling</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- GROUP 3: Business Edge Cases -->
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-8">Business & Validation</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Glassmorphism -->
+                    <div class="flex flex-col gap-3 lg:col-span-1">
+                        <span
+                            class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Glassmorphism</span>
+                        <div
+                            class="flex justify-center p-6 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-xl">
+                            <VueDatePicker v-model="dp.glass"
+                                :config="{ style: { customClass: 'bg-white/10 backdrop-blur-md border border-white/20 text-white', headerClass: 'bg-transparent text-white border-white/10', theme: 'indigo' } }" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.datepicker.glass" />
+                    </div>
 
-                    <DemoCard label="Custom Header (Teal) + Blue Theme">
-                        <VueDatePicker v-model="dp.tealHeader"
-                            :config="{ style: { headerClass: 'bg-teal-600 text-white', theme: 'blue' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.tealHeader || '—' }}</p>
-                    </DemoCard>
+                    <!-- Min/Max Date -->
+                    <div class="flex flex-col gap-3 py-4">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Min/Max limits
+                            (2026 only)</span>
+                        <div class="p-2">
+                            <VueDatePicker v-model="dp.minDate"
+                                :config="{ minDate: '2026-01-01', maxDate: '2026-12-31' }" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.datepicker.minMax" />
+                    </div>
 
-                    <DemoCard label="Compact (text-xs, no shadow)">
-                        <VueDatePicker v-model="dp.compact"
-                            :config="{ style: { customClass: 'text-xs', rounded: 'rounded-sm', shadow: 'shadow-none border border-gray-300' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.compact || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Large Rounded + Green + Shadow-2xl">
-                        <VueDatePicker v-model="dp.largeRounded"
-                            :config="{ style: { theme: 'green', rounded: 'rounded-3xl', shadow: 'shadow-2xl' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.largeRounded || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="No Border (Floaty shadow-xl)">
-                        <VueDatePicker v-model="dp.noBorder"
-                            :config="{ style: { border: 'border-0', shadow: 'shadow-xl' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.noBorder || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Square (rounded-none + Background Today)">
-                        <VueDatePicker v-model="dp.square"
-                            :config="{ style: { rounded: 'rounded-none', todayStyle: 'background' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.square || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Error State (Red Border)">
-                        <VueDatePicker v-model="dp.error"
-                            :config="{ style: { border: 'border-2 border-red-500', shadow: 'shadow-red-100', rounded: 'rounded-md' }, placeholder: 'Required Field!' }" />
-                        <p class="text-xs mt-2 text-red-400 font-mono">{{ dp.error || 'No date selected' }}</p>
-                    </DemoCard>
-
-                </div>
-
-                <!-- === GROUP 3: Time Picker Combinations === -->
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-4">Time Picker Combinations
-                </p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                    <DemoCard label="Range + Time (Indigo)">
-                        <VueDatePicker v-model="dp.rangeTime"
-                            :config="{ mode: 'range', enableTime: true, style: { theme: 'indigo' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.rangeTime?.start || '—' }} → {{
-                            dp.rangeTime?.end || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Custom Format: MM/DD/YYYY @ HH:mm">
-                        <VueDatePicker v-model="dp.customFmt"
-                            :config="{ enableTime: true, format: 'MM/DD/YYYY @ HH:mm', style: { theme: 'red' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.customFmt || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Appointment: MMM DD, YYYY at HH:mm">
-                        <VueDatePicker v-model="dp.appt"
-                            :config="{ enableTime: true, format: 'MMM DD, YYYY at HH:mm A', style: { theme: 'blue', rounded: 'rounded-2xl' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.appt || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Time + Blocked Dates">
-                        <VueDatePicker v-model="dp.timeBlocked"
-                            :config="{ enableTime: true, blockedDates: ['2026-03-15', '2026-03-16'], style: { theme: 'dark' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.timeBlocked || '—' }}</p>
-                    </DemoCard>
-
-                </div>
-
-                <!-- === GROUP 4: Edge Cases === -->
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-4">Edge Cases &amp;
-                    Validation</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                    <DemoCard label="Max Range: 1 Day (Strict)">
-                        <VueDatePicker v-model="dp.maxRange1"
-                            :config="{ mode: 'range', maxRangeDays: 1, style: { theme: 'red' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.maxRange1?.start || '—' }} → {{
-                            dp.maxRange1?.end || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Min Date: 2026-01-01 (No past dates)">
-                        <VueDatePicker v-model="dp.minDate"
-                            :config="{ minDate: '2026-01-01', placeholder: 'Try selecting 2025...' }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.minDate || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Max Date: 2026-12-31 (No 2027+)">
-                        <VueDatePicker v-model="dp.maxDate"
-                            :config="{ maxDate: '2026-12-31', placeholder: 'No 2027 allowed' }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.maxDate || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Start of Week: Monday (ISO)">
-                        <VueDatePicker v-model="dp.mondayStart"
-                            :config="{ startOfWeek: 1, style: { theme: 'blue' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.mondayStart || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Past Only (Max = yesterday)">
-                        <VueDatePicker v-model="dp.pastOnly" :config="{
-                            maxDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-                            placeholder: 'Select past date...',
-                            style: { theme: 'dark' }
-                        }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.pastOnly || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Future Only (Min = tomorrow)">
-                        <VueDatePicker v-model="dp.futureOnly" :config="{
-                            minDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-                            placeholder: 'Future dates only'
-                        }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.futureOnly || '—' }}</p>
-                    </DemoCard>
-
-                </div>
-
-                <!-- === GROUP 5: Business Use Cases === -->
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-4">Business Use Cases &amp;
-                    Effects</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                    <DemoCard label="Trip Planner (Tomorrow → +30 days)">
-                        <VueDatePicker v-model="dp.trip" :config="{
-                            mode: 'range',
-                            minDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-                            style: { theme: 'indigo', rounded: 'rounded-xl' }
-                        }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.trip?.start || '—' }} → {{ dp.trip?.end ||
-                            '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Minimalist Mono (Black/White, Sharp)">
-                        <VueDatePicker v-model="dp.mono"
-                            :config="{ style: { theme: 'dark', rounded: 'rounded-none', shadow: 'shadow-none border-2 border-black', headerClass: 'bg-black text-white' } }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.mono || '—' }}</p>
-                    </DemoCard>
-
-                    <DemoCard label="Debug Mode (Hidden Input Visible)">
-                        <VueDatePicker v-model="dp.debug" :config="{ style: { debug: true } }" />
-                    </DemoCard>
-
-                    <DemoCard label="Range (Max 30 Days) + Blocked Weekend">
-                        <VueDatePicker v-model="dp.rangeBlocked" :config="{
-                            mode: 'range',
-                            maxRangeDays: 30,
-                            blockedDates: ['2026-03-07', '2026-03-08', '2026-03-14', '2026-03-15'],
-                            style: { theme: 'green' }
-                        }" />
-                        <p class="text-xs mt-2 text-gray-400 font-mono">{{ dp.rangeBlocked?.start || '—' }} → {{
-                            dp.rangeBlocked?.end || '—' }}</p>
-                    </DemoCard>
-
-                </div>
-
-                <!-- Glassmorphism standalone card -->
-                <div
-                    class="bg-gradient-to-br from-purple-600 to-pink-500 rounded-2xl p-6 flex flex-col gap-4 items-center">
-                    <p class="text-xs font-semibold text-white/80 uppercase tracking-widest">Glassmorphism Effect</p>
-                    <VueDatePicker v-model="dp.glass" :config="{
-                        style: {
-                            customClass: 'bg-white/20 backdrop-blur-lg border border-white/30 text-white',
-                            headerClass: 'bg-transparent text-white border-white/20',
-                            shadow: 'shadow-2xl',
-                            theme: 'blue'
-                        }
-                    }" />
-                    <p class="text-xs text-white/70 font-mono">{{ dp.glass || '—' }}</p>
-                </div>
-
-            </section>
-
-            <!-- ===== SECTION: CountryStateDemo ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="CountryStateDemo (Embedded)" />
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <CountryStateDemo />
+                    <!-- Trip Planner -->
+                    <div class="flex flex-col gap-3 py-4">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Trip Planner
+                            (Tomorrow + 30d)</span>
+                        <div class="p-2">
+                            <VueDatePicker v-model="dp.trip"
+                                :config="{ mode: 'range', minDate: new Date(Date.now() + 86400000).toISOString().split('T')[0], style: { theme: 'indigo' } }" />
+                        </div>
+                        <ShowCodeToggle :code="demoSnippets.datepicker.trip" />
+                    </div>
                 </div>
             </section>
+
+
 
             <!-- ===== SECTION: Spinner ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="Spinner (Global)" />
-                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
+            <section class="flex flex-col gap-6 mb-20">
+                <DemoSectionHeader title="Spinner" />
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
                     <!-- 1. Default -->
-                    <DemoCard label="Default (md, indigo)">
-                        <Spinner />
-                    </DemoCard>
-                    <!-- 2. Extra Small -->
-                    <DemoCard label="Extra Small (xs)">
-                        <Spinner size="xs" />
-                    </DemoCard>
-                    <!-- 3. Small -->
-                    <DemoCard label="Small (sm)">
-                        <Spinner size="sm" />
-                    </DemoCard>
-                    <!-- 4. Large -->
-                    <DemoCard label="Large (lg)">
-                        <Spinner size="lg" />
-                    </DemoCard>
-                    <!-- 5. Extra Large -->
-                    <DemoCard label="Extra Large (xl)">
-                        <Spinner size="xl" />
-                    </DemoCard>
-                    <!-- 6. 2XL -->
-                    <DemoCard label="Huge (2xl)">
-                        <Spinner size="2xl" />
-                    </DemoCard>
-                    <!-- 7. Custom Color (Green) -->
-                    <DemoCard label="Color (Green)">
-                        <Spinner color="text-green-500" />
-                    </DemoCard>
-                    <!-- 8. Custom Color (Red) -->
-                    <DemoCard label="Color (Red)">
-                        <Spinner color="text-red-500" />
-                    </DemoCard>
-                    <!-- 9. Custom Track -->
-                    <DemoCard label="Track (Gray-800)">
-                        <Spinner color="text-blue-500" trackColor="text-gray-800" />
-                    </DemoCard>
-                    <!-- 10. Hide Track -->
-                    <DemoCard label="No Track">
-                        <Spinner :showTrack="false" color="text-indigo-600" size="lg" />
-                    </DemoCard>
-                    <!-- 11. Thin -->
-                    <DemoCard label="Thin stroke">
-                        <Spinner thickness="2" size="lg" />
-                    </DemoCard>
-                    <!-- 12. Thick -->
-                    <DemoCard label="Thick stroke">
-                        <Spinner thickness="6" size="lg" />
-                    </DemoCard>
-                    <!-- 12. Fast -->
-                    <DemoCard label="Speed: Fast">
-                        <Spinner speed="fast" color="text-pink-500" />
-                    </DemoCard>
-                    <!-- 13. Slow -->
-                    <DemoCard label="Speed: Slow">
-                        <Spinner speed="slow" color="text-orange-500" />
-                    </DemoCard>
-                    <!-- 14. Very Fast -->
-                    <DemoCard label="Speed: Very Fast">
-                        <Spinner speed="very-fast" color="text-purple-500" />
-                    </DemoCard>
-                    <!-- 15. With Text -->
-                    <DemoCard label="With Text">
-                        <Spinner text="Loading..." color="text-teal-500" />
-                    </DemoCard>
-                    <!-- 16. Custom Text Styling -->
-                    <DemoCard label="Text Styling">
-                        <Spinner text="Wait" textClass="text-lg font-bold text-blue-600 ml-3" />
-                    </DemoCard>
-                    <!-- 17. Button Integration -->
-                    <DemoCard label="Inside Button">
-                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-medium inline-flex items-center">
-                            <Spinner size="sm" color="text-white" trackColor="text-indigo-400" customClass="mr-2" />
-                            Wait
-                        </button>
-                    </DemoCard>
-                    <!-- 18. Image Src Base -->
-                    <DemoCard label="Using Img Src">
-                        <Spinner src="https://api.iconify.design/svg-spinners:ring-resize.svg" size="lg" />
-                    </DemoCard>
-                    <!-- 19. Image CSS Filter -->
-                    <DemoCard label="Img with Filter">
-                        <Spinner src="https://api.iconify.design/svg-spinners:ring-resize.svg" size="lg" imgFilter="hue-rotate(90deg) sepia(1)" />
-                    </DemoCard>
-                    <!-- 20. Dark mode integration -->
-                    <DemoCard label="Dark Mode Container" dark>
-                        <div class="bg-gray-800 p-4 rounded-xl flex items-center justify-center w-full">
-                            <Spinner color="text-yellow-400" trackColor="text-gray-600" size="lg" text="Syncing..." textClass="text-yellow-400 text-sm ml-2.5" />
+                    <div class="flex flex-col items-center gap-3 p-2">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Default</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner />
                         </div>
-                    </DemoCard>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner />" />
+                    </div>
+
+                    <!-- 2. Extra Small -->
+                    <div class="flex flex-col items-center gap-3 p-2">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Extra
+                            Small</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner size="xs" />
+                        </div>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner size='xs' />" />
+                    </div>
+
+                    <!-- 3. Small -->
+                    <div class="flex flex-col items-center gap-3 p-2">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Small</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner size="sm" />
+                        </div>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner size='sm' />" />
+                    </div>
+
+                    <!-- 4. Large -->
+                    <div class="flex flex-col items-center gap-3 p-2">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Large</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner size="lg" />
+                        </div>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner size='lg' />" />
+                    </div>
+
+                    <!-- 5. 2XL -->
+                    <div class="flex flex-col items-center gap-3 p-2">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Huge
+                            (2xl)</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner size="2xl" />
+                        </div>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner size='2xl' />" />
+                    </div>
+
+                    <!-- 6. Custom Color -->
+                    <div class="flex flex-col items-center gap-3 p-2">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Color
+                            (Pink)</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner color="text-pink-500" />
+                        </div>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner color='text-pink-500' />" />
+                    </div>
+
+                    <!-- 7. No Track -->
+                    <div class="flex flex-col items-center gap-3 p-2">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">No Track</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner :showTrack="false" color="text-indigo-600" />
+                        </div>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner :showTrack='false' />" />
+                    </div>
+
+                    <!-- 8. Thick -->
+                    <div class="flex flex-col items-center gap-3 p-2">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Thick
+                            Stroke</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner thickness="6" size="lg" />
+                        </div>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner thickness='6' />" />
+                    </div>
+
+                    <!-- 9. Fast Speed -->
+                    <div class="flex flex-col items-center gap-3 p-2">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Speed:
+                            Fast</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner speed="fast" color="text-orange-500" />
+                        </div>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner speed='fast' />" />
+                    </div>
+
+                    <!-- 10. With Text -->
+                    <div class="flex flex-col items-center gap-3 p-2 lg:col-span-2">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">With Text</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner text="Loading your data..." color="text-teal-500" />
+                        </div>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner text='Loading...' />" />
+                    </div>
+
+                    <!-- 11. Button Integration -->
+                    <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">In Button</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <button
+                                class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-xs font-medium inline-flex items-center">
+                                <Spinner size="xs" color="text-white" trackColor="text-indigo-400" customClass="mr-2" />
+                                Processing
+                            </button>
+                        </div>
+                        <ShowCodeToggle
+                            code="<!-- Template -->\n<button>\n  <Spinner size='xs' color='text-white' /> \n  Processing\n</button>" />
+                    </div>
+
+                    <!-- 12. Using Img Src -->
+                    <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">SVG
+                            Sprite</span>
+                        <div class="h-12 flex items-center justify-center">
+                            <Spinner src="https://api.iconify.design/svg-spinners:ring-resize.svg" size="lg" />
+                        </div>
+                        <ShowCodeToggle code="<!-- Template -->\n<Spinner src='svg-path.svg' />" />
+                    </div>
                 </div>
             </section>
 
@@ -1295,20 +939,13 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, defineComponent, h } from 'vue';
 
 // Components
-import InputComponentDashboard from '@/components/input/InputComponentDashboard.vue';
-import BaseInput from '@/components/input/BaseInput.vue';
-import InputAuthComponent from '@/components/input/InputAuthComponent.vue';
-import InputDefaultComponent from '@/components/input/InputDefaultComponent.vue';
-import CodeInputAuthComponent from '@/components/input/CodeInputAuthComponent.vue';
-import CheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
-import CheckboxSwitch from '@/components/checkbox/CheckboxSwitch.vue';
-import ButtonComponent from '@/components/button/ButtonComponent.vue';
 import Spinner from '@/components/ui/spinner/Spinner.vue';
 import MediaCardV1 from '@/components/mediaCardsVariations/MediaCardV1.vue';
 import MediaCardV2 from '@/components/mediaCardsVariations/MediaCardV2.vue';
+import InputComponentDashboard from '@/components/input/InputComponentDashboard.vue';
 import Heading from '@/components/default/Heading.vue';
 import Paragraph from '@/components/default/Paragraph.vue';
 import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vue';
@@ -1318,9 +955,54 @@ import CountryStateDemo from '@/templates/dev/CountryStateDemo.vue';
 import VueDatePicker from '@/components/datePicker/VueDatePicker.vue';
 import DemoSectionHeader from '@/templates/dev/DemoSectionHeader.vue';
 import DemoCard from '@/templates/dev/DemoCard.vue';
-
+import { tierData } from "/public/data/TierData.js";
 // Heroicons
-import { MagnifyingGlassIcon, EnvelopeIcon, UserIcon, InformationCircleIcon, StarIcon, ArrowDownTrayIcon, ArrowRightIcon, ShareIcon, CheckIcon, TrashIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/24/outline';
+import {
+    MagnifyingGlassIcon, EnvelopeIcon, UserIcon, InformationCircleIcon, StarIcon,
+    ArrowDownTrayIcon, ArrowRightIcon, ShareIcon, CheckIcon, TrashIcon,
+    ArrowTopRightOnSquareIcon, FilmIcon, PhotoIcon, BuildingLibraryIcon,
+    BellAlertIcon, EyeIcon, EyeSlashIcon
+} from '@heroicons/vue/24/outline';
+import TierCard from '@/components/ui/card/dashboard/TierCard.vue';
+import EventCard from '@/components/ui/card/dashboard/EventCard.vue';
+import Cart from '@/components/Cart.vue';
+
+
+// ─────────────────────────────────────────────
+// Inline ShowCode toggle component (no external file needed)
+// ─────────────────────────────────────────────
+const ShowCodeToggle = defineComponent({
+    props: { code: { type: String, default: '' } },
+    setup(props) {
+        const open = ref(false);
+        const copied = ref(false);
+        const copy = async () => {
+            await navigator.clipboard.writeText(props.code).catch(() => { });
+            copied.value = true;
+            setTimeout(() => (copied.value = false), 2000);
+        };
+        return () => h('div', { class: 'flex flex-col gap-0 mb-4' }, [
+            h('button', {
+                type: 'button',
+                onClick: () => (open.value = !open.value),
+                class: 'self-start flex items-center gap-1.5 text-[0.7rem] font-medium text-gray-500 hover:text-gray-800 dark:text-white/50 dark:hover:text-white/80 transition-colors mt-1 px-0 py-0',
+            }, [
+                h('svg', { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', 'stroke-width': '1.8', stroke: 'currentColor', class: 'w-3 h-3' },
+                    [h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5' })]),
+                open.value ? 'Hide Code' : 'Show Code',
+            ]),
+            open.value && h('div', { class: 'mt-2 rounded-lg overflow-hidden bg-[#1a1a1a]' }, [
+                h('div', { class: 'flex justify-between items-center px-3 py-1.5 bg-[#252525]' }, [
+                    h('span', { class: 'text-[0.6rem] font-mono text-white/30 uppercase tracking-wider' }, 'Vue'),
+                    h('button', { type: 'button', onClick: copy, class: 'text-[0.65rem] text-white/40 hover:text-white/70 transition-colors' }, copied.value ? '✓ Copied' : 'Copy'),
+                ]),
+                h('pre', { class: 'p-3 overflow-x-auto text-[0.72rem] leading-relaxed text-[#d4d4d4] font-mono' },
+                    h('code', {}, props.code)),
+            ]),
+        ]);
+    },
+});
+
 
 // ===== Reactive model values =====
 const vals = reactive({
@@ -1347,16 +1029,10 @@ const vals = reactive({
 
 // ===== NotificationCard open states =====
 const notifOpen = reactive({
-    notice: true,
-    alert: true,
     success: true,
     error: true,
     warning: true,
     info: true,
-    limitExceeded: true,
-    noIcon: true,
-    notClosable: true,
-    withLink: true,
 });
 
 // ===== VueDatePicker refs =====
@@ -1400,12 +1076,12 @@ const AVATAR = 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp';
 const POSTER = 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp';
 
 const demoMedia = {
-    default: { type: 'video', videoUrl: '', poster: POSTER, title: 'Default Media Card Title', duration: '5:23', timeAgo: '2d', likes: '1.2K', views: '8.4K', creatorName: 'Creator Name', avatar: AVATAR },
-    resume: { type: 'video', videoUrl: '', poster: POSTER, title: 'Resume Watching', duration: '12:45', timeAgo: '1w', likes: '3.5K', views: '22K', creatorName: 'Creator Name', avatar: AVATAR },
-    purchased: { type: 'video', videoUrl: '', poster: POSTER, title: 'Purchased Content Title', duration: '45:00', timeAgo: '3d', likes: '900', views: '5K', creatorName: 'Creator Name', avatar: AVATAR },
-    latest: { type: 'video', videoUrl: '', poster: POSTER, title: 'Latest Upload Title', duration: '3:10', timeAgo: '1h', likes: '221', views: '1.1K', creatorName: 'Creator Name', avatar: AVATAR },
-    grid: { type: 'video', videoUrl: '', poster: POSTER, title: 'Grid View Card Title', duration: '7:30', timeAgo: '5d', likes: '450', views: '3.3K', creatorName: 'Creator Name', avatar: AVATAR },
-    grid2: { type: 'video', videoUrl: '', poster: POSTER, title: 'Buy & Subscribe Card', duration: '10:00', timeAgo: '2d', likes: '800', views: '4K', creatorName: 'Creator Name', avatar: AVATAR },
+    default: { type: 'video', videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', poster: POSTER, title: 'Default Media Card Title', duration: '5:23', timeAgo: '2d', likes: '1.2K', views: '8.4K', creatorName: 'Creator Name', avatar: AVATAR },
+    resume: { type: 'video', videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', poster: POSTER, title: 'Resume Watching', duration: '12:45', timeAgo: '1w', likes: '3.5K', views: '22K', creatorName: 'Creator Name', avatar: AVATAR },
+    purchased: { type: 'video', videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', poster: POSTER, title: 'Purchased Content Title', duration: '45:00', timeAgo: '3d', likes: '900', views: '5K', creatorName: 'Creator Name', avatar: AVATAR },
+    latest: { type: 'video', videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', poster: POSTER, title: 'Latest Upload Title', duration: '3:10', timeAgo: '1h', likes: '221', views: '1.1K', creatorName: 'Creator Name', avatar: AVATAR },
+    grid: { type: 'video', videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', poster: POSTER, title: 'Grid View Card Title', duration: '7:30', timeAgo: '5d', likes: '450', views: '3.3K', creatorName: 'Creator Name', avatar: AVATAR },
+    grid2: { type: 'video', videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', poster: POSTER, title: 'Buy & Subscribe Card', duration: '10:00', timeAgo: '2d', likes: '800', views: '4K', creatorName: 'Creator Name', avatar: AVATAR },
     image: { type: 'image', poster: POSTER, title: 'Image Type Card', duration: '', timeAgo: '4d', likes: '300', views: '2K', creatorName: 'Creator Name', avatar: AVATAR },
     gallery: { type: 'gallery', poster: POSTER, title: 'Gallery Type Card', duration: '', timeAgo: '1d', likes: '600', views: '5.5K', creatorName: 'Creator Name', avatar: AVATAR },
     // MediaCardV2
@@ -1418,105 +1094,504 @@ const demoMedia = {
 };
 
 // ===== Subscription card data =====
-const subCards = [
-    // 0 — Basic / Upgrade
+const cards = ref([
     {
-        title: 'Starter', price: '9.99', oldPrice: '49.99', videos: 15, photos: 30, mediaCount: 45,
-        isFeatured: false, isCurrentSubscription: false,
-        image: POSTER,
-        fullDescription: 'Access to basic tier content including weekly posts and exclusive behind-the-scenes footage.',
-        features: ['15 Videos / month', '30 Photos / month', 'HD quality', 'Cancel anytime'],
+        id: 1,
+        title: 'FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.',
+        price: '30.99',
+        oldPrice: '999.99',
+        followers: '30',
+        videos: '12',
+        photos: '45',
+        mediaCount: '5',
+        image: 'https://i.ibb.co.com/5WQ43b48/sample-bg-image-compressed.webp',
+        features: [
+            '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Merchandise',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Custom Request',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Pay to View videos'
+        ],
+        fullDescription: `Watch all of my mango eating content! content update weekly!<br><br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing`,
     },
-    // 1 — Current subscription (pink border + yellow price)
     {
-        title: 'Pro', price: '19.99', oldPrice: '99.99', videos: 50, photos: 100, mediaCount: 150,
-        isFeatured: false, isCurrentSubscription: true,
-        image: POSTER,
-        fullDescription: 'Current plan — Full access to all content including live streams and early releases.',
-        features: ['50 Videos / month', '100 Photos / month', '4K quality', 'Priority support', 'Live streams'],
+        id: 2,
+        title: 'FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.',
+        price: '499.99',
+        oldPrice: '999.99',
+        followers: 'No',
+        videos: '0',
+        photos: '0',
+        mediaCount: '5',
+        isFeatured: true,
+        image: 'https://i.ibb.co.com/Kx9QDc68/auth-bg-compressed.webp',
+        features: [
+            '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Merchandise',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Custom Request',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Pay to View videos'
+        ],
+        fullDescription: `Watch all of my mango eating content! content update weekly!<br><br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing`,
     },
-    // 2 — Featured (gray badge)
     {
-        title: 'Elite', price: '39.99', oldPrice: '199.99', videos: 120, photos: 300, mediaCount: 420,
-        isFeatured: true, isCurrentSubscription: false,
-        image: POSTER,
-        fullDescription: 'Most popular tier with full access, 1-on-1 sessions, and merchandise discounts.',
-        features: ['Unlimited Videos', 'Unlimited Photos', '4K quality', '1-on-1 Sessions', 'Merch discount'],
+        id: 3,
+        title: 'Library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.',
+        price: '99.99',
+        oldPrice: '999.99',
+        followers: '30',
+        videos: '0',
+        photos: '0',
+        mediaCount: '5',
+        isCurrentSubscription: true,
+        image: 'https://i.ibb.co.com/LXPfFX03/profile-slidein-bg.webp',
+        features: [
+            '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Merchandise',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Custom Request',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Pay to View videos'
+        ],
+        fullDescription: `Watch all of my mango eating content! content update weekly!<br><br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing`,
     },
-    // 3 — Downgrade (cheaper than current)
     {
-        title: 'Basic', price: '4.99', oldPrice: '24.99', videos: 5, photos: 10, mediaCount: 15,
-        isFeatured: false, isCurrentSubscription: false,
-        image: POSTER,
-        fullDescription: 'Entry-level plan with limited content access. Perfect for casual fans.',
-        features: ['5 Videos / month', '10 Photos / month', 'SD quality'],
+        id: 4,
+        title: 'FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.',
+        price: '30.99',
+        oldPrice: '999.99',
+        followers: '30',
+        videos: '0',
+        photos: '0',
+        mediaCount: '5',
+        image: 'https://i.ibb.co.com/SwFy98RJ/checkout-header.webp',
+        features: [
+            '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Merchandise',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Custom Request',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Pay to View videos'
+        ],
+        fullDescription: `Watch all of my mango eating content! content update weekly!<br><br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing`,
     },
-    // 4 — No features list (minimal)
     {
-        title: 'Free Tier', price: '0.00', oldPrice: '0.00', videos: 2, photos: 5, mediaCount: 7,
-        isFeatured: false, isCurrentSubscription: false,
-        image: POSTER,
-        fullDescription: 'Free access to limited public content with ads.',
-        features: [],
-    },
-    // 5 — Many features (long list)
-    {
-        title: 'Premium', price: '59.99', oldPrice: '299.99', videos: 500, photos: 1000, mediaCount: 1500,
-        isFeatured: true, isCurrentSubscription: false,
-        image: POSTER,
-        fullDescription: 'Complete VIP access with every benefit available on the platform, plus exclusive creator meetups.',
-        features: ['Unlimited Videos', 'Unlimited Photos', '8K streaming', '1-on-1 monthly call', 'Physical merch', 'Early access', 'Discord VIP'],
-    },
-    // 6 — Budget (very low price)
-    {
-        title: 'Lite', price: '2.99', oldPrice: '14.99', videos: 3, photos: 8, mediaCount: 11,
-        isFeatured: false, isCurrentSubscription: false,
-        image: POSTER,
-        fullDescription: 'Minimum spend to support your favourite creator and get a few exclusives.',
-        features: ['3 Videos / month', '8 Photos / month', 'SD quality'],
-    },
-    // 7 — Agency / Business tier
-    {
-        title: 'Agency', price: '149.99', oldPrice: '749.99', videos: 999, photos: 9999, mediaCount: 9999,
-        isFeatured: false, isCurrentSubscription: false,
-        image: POSTER,
-        fullDescription: 'Business-level access for agencies and brands wanting full commercial licensing and bulk seats.',
-        features: ['Commercial license', 'Bulk seats (10)', 'Dedicated manager', 'API access', 'White-label'],
-    },
-    // 8 — Featured AND current (edge case)
-    {
-        title: 'Champion', price: '29.99', oldPrice: '149.99', videos: 80, photos: 200, mediaCount: 280,
-        isFeatured: true, isCurrentSubscription: true,
-        image: POSTER,
-        fullDescription: 'You are on the most popular plan! Enjoy full creator access with priority support.',
-        features: ['80 Videos / month', '200 Photos / month', '4K quality', 'Priority support'],
-    },
-    // 9 — Bundle deal
-    {
-        title: 'Bundle', price: '34.99', oldPrice: '174.99', videos: 100, photos: 250, mediaCount: 350,
-        isFeatured: false, isCurrentSubscription: false,
-        image: POSTER,
-        fullDescription: 'A bundle deal combining Pro + Elite benefits at a discounted rate for loyal fans.',
-        features: ['100 Videos / month', '250 Photos / month', '4K quality', 'Live stream access', 'Merch 10% off'],
-    },
-];
-</script>
+        id: 5,
+        title: 'FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.',
+        price: '30.99',
+        oldPrice: '999.99',
+        followers: '30',
+        videos: '0',
+        photos: '0',
+        mediaCount: '5',
+        image: 'https://i.ibb.co.com/7sWfvWC/hero-image-blue.webp',
+        features: [
+            '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Merchandise',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Custom Request',
+            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Pay to View videos'
+        ],
+        fullDescription: `Watch all of my mango eating content! content update weekly!<br><br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing<br>
+        • 100% real content<br>
+        • no editing`,
+    }
+]);
 
-<style scoped>
-/* Smooth section transitions */
-section {
-    animation: fadeIn 0.4s ease forwards;
+const handleCardAction = (card) => {
+    alert(`Action triggered for: ${card.title}`);
+};
+
+const demoSnippets = {
+    mediaV1: {
+        myMedia: `<!-- Template -->\n<MediaCardV1 \n  v-for="item in myMediaList" \n  :key="item.id" \n  :media="item" \n  variant="default" \n/>\n\n<!-- Script Data -->\nconst myMediaList = ref([\n  {\n    id: 1,\n    type: 'video',\n    videoUrl: 'http://.../video.mp4',\n    title: 'Took a walk...', ...\n  }\n]);`,
+        resume: `<!-- Template -->\n<MediaCardV1 \n  :media="myMediaList[0]" \n  variant="resume" \n/>`,
+        latest: `<!-- Template -->\n<MediaCardV1 \n  :media="latestMediaItem" \n  variant="latest" \n/>`,
+        purchased: `<!-- Template -->\n<MediaCardV1 \n  :media="purchasedMediaItem" \n  variant="purchased" \n/>`,
+        gridView: `<!-- Template -->\n<MediaCardV1 \n  v-for="item in gridMediaList" \n  :key="item.id" \n  :media="item" \n  variant="grid" \n/>`,
+    },
+    mediaV2: {
+        gallery: `<!-- Template -->\n<MediaCardV2 :media="galleryCard" />\n\n<!-- Script Data -->\nconst galleryCard = ref({\n  type: 'gallery',\n  isLocked: true,\n  showTag: true,\n  tagText: 'Subscriber Exclusive',\n  tagColor: 'green'\n});`,
+        image: `<!-- Template -->\n<MediaCardV2 :media="imageCard" />\n\n<!-- Script Data -->\nconst imageCard = ref({\n  type: 'image',\n  showTag: true,\n  tagText: 'Subscribe or Buy',\n  tagColor: 'pink'\n});`,
+        video: `<!-- Template -->\n<MediaCardV2 :media="videoCard" />\n\n<!-- Script Data -->\nconst videoCard = ref({\n  type: 'video',\n  videoUrl: 'https://.../video.mp4',\n  isLocked: true,\n  showTag: false\n});`,
+    },
+    inputDashboard: {
+        basic: `<!-- Template -->\n<InputComponentDashboard \n  v-model="username" \n  showLabel \n  labelText="Username" \n  requiredDisplay="*" \n  placeholder="Enter username" \n/>`,
+        icons: `<!-- Template -->\n<InputComponentDashboard \n  v-model="email" \n  showLabel \n  labelText="Email" \n  :leftIcon="EnvelopeIcon" \n/>`,
+        password: `<!-- Template -->\n<InputComponentDashboard \n  v-model="password" \n  type="password" \n  :rightIcon="showPass ? EyeIcon : EyeSlashIcon" \n  clickableRightIcon \n  @rightIconClick="showPass = !showPass" \n/>`,
+        error: `<!-- Template -->\n<InputComponentDashboard \n  showErrors \n  :errors="[{ message: 'Invalid format', icon: InformationCircleIcon }]" \n/>`,
+        success: `<!-- Template -->\n<InputComponentDashboard \n  onSuccess \n  :success="[{ message: 'Available!' }]" \n/>`,
+        spans: `<!-- Template -->\n<InputComponentDashboard \n  leftSpan \n  leftSpanText="$" \n  rightSpan \n  rightSpanText="USD" \n/>`,
+        textarea: `<!-- Template -->\n<InputComponentDashboard \n  v-model="bio" \n  type="textarea" \n  description="Brief bio..." \n/>`,
+    },
+    heading: {
+        h1Primary: `<Heading text="Primary H1" tag="h1" theme="defaultPrimaryHeading" class="!text-black" version="basic" />`,
+        h2Secondary: `<Heading text="Secondary H2" tag="h2" theme="defaultSecondaryHeading" class="!text-black" version="basic" />`,
+        h3Section: `<Heading text="Section H3" tag="h3" theme="sectionHeading" class="!text-black" version="basic" />`,
+        h2Dashboard: `<Heading text="Dashboard Title" tag="h2" theme="dashboardHeading" version="basic" />`,
+        h2Auth: `<Heading text="Login" tag="h2" theme="AuthHeading" class="!text-black" version="basic" />`,
+        h4Form: `<Heading text="Profile Settings" tag="h4" theme="formHeading" version="basic" />`,
+        h1Demo: `<Heading text="Demo H1 Bold" tag="h1" theme="demoHeadings" version="basic" />`,
+        h3Demo: `<Heading text="Demo H3 Medium" tag="h3" theme="demoHeadings" version="basic" />`,
+        withIcon: `<Heading text="With Icon" tag="h3" theme="defaultSecondaryHeading" class="!text-black" version="basic" :leftIcon="StarIcon" />`,
+        order: `<Heading text="Order #1234" tag="h1" theme="orderHeading" version="basic" />`,
+    },
+    paragraph: {
+        default: `<Paragraph text="Standard text content..." class="!text-black" />`,
+        small: `<Paragraph text="Small caption text" class="!text-black text-sm" />`,
+        large: `<Paragraph text="Large paragraph text" class="!text-black text-xl" />`,
+        bold: `<Paragraph text="Bold text" class="!text-black font-bold" />`,
+        blue: `<Paragraph text="Blue text" fontColor="text-blue-600" />`,
+        error: `<Paragraph text="Error message" fontColor="text-red-500" fontSize="text-sm" />`,
+        success: `<Paragraph text="Success message" fontColor="text-green-600" />`,
+        italic: `<Paragraph text="Italic note" fontFamily="italic" />`,
+        withIcon: `<Paragraph text="Info message" :leftIcon="InfoIcon" />`,
+        xs: `<Paragraph text="Helper text" fontSize="text-xs" />`,
+    },
+    icd: {
+        default: `<InputComponentDashboard \n  v-model="val" \n  labelText="Username" \n  placeholder="Enter text..." \n  showLabel\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
+        password: `<InputComponentDashboard \n  v-model="password" \n  :type="showPass ? 'text' : 'password'"\n  labelText="Password"\n  :rightIcon="showPass ? EyeSlashIcon : EyeIcon"\n  clickableRightIcon\n  @rightIconClick="showPass = !showPass"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
+        leftIcon: `<InputComponentDashboard \n  v-model="search" \n  labelText="Search" \n  :leftIcon="MagnifyingGlassIcon"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
+        rightIcon: `<InputComponentDashboard \n  v-model="email" \n  labelText="Email" \n  :rightIcon="EnvelopeIcon"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
+        requiredStar: `<InputComponentDashboard \n  v-model="name" \n  labelText="Full Name" \n  requiredDisplay="*"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
+        requiredItalic: `<InputComponentDashboard \n  v-model="email" \n  labelText="Email" \n  requiredDisplay="italic-text" \n  requiredDisplayText="Required"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
+        errors: `<InputComponentDashboard \n  v-model="code" \n  labelText="Promo Code" \n  showErrors\n  :errors="[{ error: 'Invalid code' }]"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n  errorClass="!text-red-500"\n/>`,
+        success: `<InputComponentDashboard \n  v-model="handle" \n  labelText="Username" \n  onSuccess\n  :success="[{ message: 'Available!' }]"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n  successClass="!text-green-600"\n/>`,
+        suffixPrice: `<InputComponentDashboard \n  v-model="price" \n  labelText="Unit Price" \n  rightSpan \n  rightSpanText="USD"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n  rightSpanClass="!text-slate-500"\n/>`,
+        textarea: `<InputComponentDashboard \n  v-model="bio" \n  type="textarea" \n  labelText="Bio"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
+        bothIcons: `<InputComponentDashboard \n  v-model="search" \n  labelText="Advanced Search" \n  :leftIcon="MagnifyingGlassIcon"\n  :rightIcon="Bars3Icon"\n  clickableRightIcon\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n  leftIconClass="!text-slate-500"\n  rightIconClass="!text-slate-400"\n/>`,
+    },
+    notification: {
+        warning: `<!-- Template -->\n<NotificationCard \n  variant="warning" \n  title="Media Content Required"\n  description="Your profile currently has no media..."\n  timestamp="1w"\n  :icon="FilmIcon"\n  :badgeIcon="ArrowUpTrayIcon"\n  dismissLabel="Dismiss"\n  actionLabel="Take Action"\n  v-model="visible" \n/>\n\n<!-- Script Data -->\nconst visible = ref(true);`,
+        success: `<!-- Template -->\n<NotificationCard \n  variant="success" \n  title="Congratulations"\n  description="Your media has been approved."\n  timestamp="1m"\n  :icon="PhotoIcon"\n  :badgeIcon="CheckIcon"\n  dismissLabel="Dismiss"\n  actionLabel="Take Action"\n  v-model="visible" \n/>\n\n<!-- Script Data -->\nconst visible = ref(true);`,
+        error: `<!-- Template -->\n<NotificationCard \n  variant="error" \n  title="Action Required"\n  description="Critical update needed..."\n  timestamp="Just now"\n  :icon="BellAlertIcon"\n  :badgeIcon="TrashIcon"\n  dismissLabel="Dismiss"\n  actionLabel="Finalize"\n  v-model="visible" \n/>\n\n<!-- Script Data -->\nconst visible = ref(true);`,
+        info: `<!-- Template -->\n<NotificationCard \n  variant="info" \n  title="Bank Details Required"\n  description="Please complete your bank information."\n  timestamp="3m"\n  :icon="BuildingLibraryIcon"\n  :badgeIcon="InformationCircleIcon"\n  dismissLabel="Dismiss"\n  actionLabel="Take Action"\n  v-model="visible" \n/>\n\n<!-- Script Data -->\nconst visible = ref(true);`,
+    },
+    quill: {
+        default: `<!-- Template -->\n<QuillEditor v-model="content" />\n\n<!-- Script Data -->\nconst content = ref('');`,
+        placeholder: `<!-- Template -->\n<QuillEditor v-model="content" placeholder="Start typing..." />\n\n<!-- Script Data -->\nconst content = ref('');`,
+        initial: `<!-- Template -->\n<QuillEditor v-model="content" />\n\n<!-- Script Data -->\nconst content = ref('<strong>Initial</strong> content...');`,
+        announcement: `<!-- Template -->\n<QuillEditor v-model="content" placeholder="Announcement title..." />\n\n<!-- Script Data -->\nconst content = ref('');`,
+    },
+    datepicker: {
+        single: `<!-- Template -->\n<VueDatePicker v-model="date" />\n\n<!-- Script Data -->\nconst date = ref(null);`,
+        range: `<!-- Template -->\n<VueDatePicker v-model="range" :config="config" />\n\n<!-- Script Data -->\nconst range = ref({ start: null, end: null });\nconst config = {\n  mode: 'range',\n  maxRangeDays: 7\n};`,
+        withTime: `<!-- Template -->\n<VueDatePicker v-model="dateTime" :config="config" />\n\n<!-- Script Data -->\nconst dateTime = ref(null);\nconst config = {\n  enableTime: true,\n  format: 'DD/MM/YYYY HH:mm'\n};`,
+        blocked: `<!-- Template -->\n<VueDatePicker v-model="date" :config="config" />\n\n<!-- Script Data -->\nconst date = ref(null);\nconst config = {\n  blockedDates: ['2026-03-29']\n};`,
+        tealHeader: `<!-- Template -->\n<VueDatePicker :config="config" />\n\n<!-- Script Data -->\nconst config = {\n  style: {\n    headerClass: 'bg-teal-600 text-white',\n    theme: 'blue'\n  }\n};`,
+        square: `<!-- Template -->\n<VueDatePicker :config="config" />\n\n<!-- Script Data -->\nconst config = {\n  style: {\n    rounded: 'rounded-none',\n    todayStyle: 'background'\n  }\n};`,
+        error: `<!-- Template -->\n<div class="border-2 border-red-500 rounded-xl">\n  <VueDatePicker :config="config" />\n</div>\n\n<!-- Script Data -->\nconst config = {\n  style: {\n    border: 'border-0',\n    shadow: 'shadow-none'\n  },\n  placeholder: 'Required!'\n};`,
+        glass: `<!-- Template -->\n<div class="bg-gradient-to-br from-indigo-600 to-purple-600 p-6 rounded-2xl">\n  <VueDatePicker :config="config" />\n</div>\n\n<!-- Script Data -->\nconst config = {\n  style: {\n    customClass: 'bg-white/10 backdrop-blur-md border border-white/20 text-white',\n    headerClass: 'bg-transparent text-white border-white/10',\n    theme: 'indigo'\n  }\n};`,
+        minMax: `<!-- Template -->\n<VueDatePicker :config="config" />\n\n<!-- Script Data -->\nconst config = {\n  minDate: '2026-01-01',\n  maxDate: '2026-12-31'\n};`,
+        trip: `<!-- Template -->\n<VueDatePicker v-model="range" :config="config" />\n\n<!-- Script Data -->\nconst tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];\nconst config = {\n  mode: 'range',\n  minDate: tomorrow\n};`,
+    },
+    tierCard: {
+        1: `<!-- Template -->\n<TierCard :tier="tierData[0]" />\n\n<!-- Script Data (Source: TierData.js) -->\nconst tier = {\n  title: "My VVIP Lounge ❤️️️",\n  backgroundImage: "...",\n  plans: [{ id: '1m', label: '1 month', price: '55.86' }, ...],\n  theme: { textPrimary: '#FB0464', ... }\n};`,
+        2: `<!-- Template -->\n<TierCard :tier="tierData[1]" />\n\n<!-- Script Data (Spend Mode) -->\nconst tier = {\n  footer: {\n    type: 'spend',\n    progress: { leftText: "Spend $200 more to claim", width: "80%" }\n  }\n};`,
+        3: `<!-- Template -->\n<TierCard :tier="tierData[2]" />\n\n<!-- Script Data -->\nconst tier = { ... };`,
+        4: `<!-- Template -->\n<TierCard :tier="tierData[3]" />\n\n<!-- Script Data (Hidden Progress) -->\nconst tier = {\n  footer: { type: 'hidden' }\n};`,
+        5: `<!-- Template -->\n<TierCard :tier="tierData[4]" />\n\n<!-- Script Data (Subscribe Mode) -->\nconst tier = {\n  footer: { type: 'subscribe', buttonText: 'SUBSCRIBE' }\n};`,
+    },
+    eventCard: {
+        orangeButton: `<!-- Template -->\n<EventCard theme="orange" :hasButton="true" />`,
+        orangeProgress: `<!-- Template -->\n<EventCard theme="orange" :hasButton="false" />`,
+        pinkButton: `<!-- Template -->\n<EventCard theme="pink" :hasButton="true" />`,
+        pinkProgress: `<!-- Template -->\n<EventCard theme="pink" :hasButton="false" />`,
+    },
+    cart: {
+        default: `<!-- Template -->
+<Cart />
+
+<!-- Interaction Logic (Custom Events) -->
+// To add an item via console or script:
+window.dispatchEvent(new CustomEvent('cart:add', {
+  detail: {
+    item: {
+      title: "NBA Hoops Card",
+      productId: "nba123",
+      qty: 1,
+      price: 12.23,
+      originalPrice: 20.00,
+      shipping: 12.23,
+      seller: "Princess Carrot Pop",
+      image: "https://i.ibb.co.com/70sHrpv/featured-media-bg.webp",
+      promoCodes: ["PROMOCODE2025", "MEMBER BENEFIT"]
+    }
+  }
+}));`,
+    }
+};
+
+
+const handleAction = (action) => {
+    console.log("Menu clicked:", action);
 }
 
-@keyframes fadeIn {
+// Global light input props for demo consistency
+const lightInputProps = {
+    labelClass: "!text-slate-900",
+    inputClass: "!text-slate-900 !placeholder-slate-400",
+    wrapperClass: "!border-slate-300 !bg-white",
+    descriptionClass: "!text-slate-500",
+    errorClass: "!text-red-600",
+    successClass: "!text-green-600",
+    leftIconClass: "!text-slate-500",
+    rightIconClass: "!text-slate-400",
+    requiredClass: "!text-slate-500",
+    optionalLabelClass: "!text-slate-700 font-medium",
+    leftSpanClass: "!text-slate-500",
+    rightSpanClass: "!text-slate-500"
+};
+
+// Input Dashboard State
+const inputs = reactive({
+    basic: '',
+    email: '',
+    password: '',
+    showPass: false,
+    error: 'abc-123',
+    success: 'my-profile-slug',
+    price: '99.99',
+    bio: ''
+});
+
+// 1. My Media Data
+const myMediaList = ref([
+    {
+        id: 1,
+        type: 'video',
+        videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        title: 'Took a walk in the park.',
+        duration: '14:55',
+        timeAgo: '5mo',
+        likes: 0,
+        views: 4,
+        creatorName: 'Creator Allen',
+        avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'
+    }
+]);
+
+// 2. Latest Media Data
+const latestMediaItem = ref({
+    id: 3,
+    type: 'video',
+    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    title: 'My 2nd coming soon',
+    duration: '14:55',
+    timeAgo: '5mo',
+    likes: 0,
+    views: 4,
+    creatorName: 'Creator Allen',
+    avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'
+});
+
+// 3. Purchased Media Data
+const purchasedMediaItem = ref({
+    id: 4,
+    type: 'video',
+    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    title: 'Took a walk in the park today.',
+    duration: '14:55',
+    timeAgo: '5mo',
+    likes: 0,
+    views: 4,
+    creatorName: 'Mistress Jessica',
+    avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'
+});
+
+// 4. Grid Media Data (Image, Video, Gallery)
+const gridMediaList = ref([
+    {
+        id: 101,
+        type: 'image',
+        poster: 'https://i.ibb.co.com/bjGQxr5S/sample-bg-image.webp',
+        title: 'Took a walk in the park this morning',
+        duration: '',
+        timeAgo: '5mo',
+        likes: 0,
+        views: 4,
+        creatorName: 'Mistress Jessica',
+        avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'
+    },
+    {
+        id: 102,
+        type: 'video',
+        videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        title: 'Took a walk in the park this morning',
+        duration: '14:55',
+        timeAgo: '5mo',
+        likes: 0,
+        views: 4,
+        creatorName: 'Mistress Jessica',
+        avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'
+    },
+    {
+        id: 103,
+        type: 'gallery',
+        poster: 'https://i.ibb.co.com/bjGQxr5S/sample-bg-image.webp',
+        title: 'Took a walk in the park this morning',
+        duration: '',
+        timeAgo: '5mo',
+        likes: 0,
+        views: 4,
+        creatorName: 'Mistress Jessica',
+        avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'
+    }
+]);
+
+// 1. CARD 1 (Gallery): Locked + Green Tag
+const galleryCard = ref({
+    id: 1,
+    type: 'gallery',
+    poster: 'https://i.ibb.co.com/bjGQxr5S/sample-bg-image.webp',
+    title: 'Took a walk in the park this morning',
+    timeAgo: '5mo',
+    likes: 0,
+    views: 4,
+    galleryCount: 7,
+    // Configuration:
+    isLocked: true,               // Lock Icon: Visible
+    showTag: true,                // Tag: Visible
+    tagText: 'Subscriber Exclusive',
+    tagColor: 'green'
+});
+
+// 2. CARD 2 (Image): Unlocked + Pink Tag
+const imageCard = ref({
+    id: 2,
+    type: 'image',
+    poster: 'https://i.ibb.co.com/bjGQxr5S/sample-bg-image.webp',
+    title: 'Took a walk in the park this morning',
+    timeAgo: '5mo',
+    likes: 0,
+    views: 4,
+    // Configuration:
+    isLocked: false,              // Lock Icon: Hidden
+    showTag: true,                // Tag: Visible
+    tagText: 'Subscribe or Buy',  // Custom Text
+    tagColor: 'pink'              // Pink Color
+});
+
+// 3. CARD 3 (Video): Locked + No Tag
+const videoCard = ref({
+    id: 3,
+    type: 'video',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    title: 'Took a walk in the park this morning',
+    duration: '14:55',
+    timeAgo: '5mo',
+    likes: 0,
+    views: 4,
+    // Configuration:
+    isLocked: true,               // Lock Icon: Visible (Logic ke hisaab se)
+    showTag: false,               // Tag: Hidden
+    tagText: '',                  // Empty
+    tagColor: 'green'             // Irrelevant
+});
+</script>
+
+<style>
+/* Premium Light Theme Showcase Styles */
+.dynamic-premium-bg-light {
+    background-color: #f8fafc;
+    background-image:
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0, transparent 40%),
+        radial-gradient(at 100% 0%, rgba(244, 63, 94, 0.06) 0, transparent 40%),
+        radial-gradient(at 50% 100%, rgba(20, 184, 166, 0.05) 0, transparent 50%);
+    background-attachment: fixed;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.dynamic-premium-bg-light::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.15;
+    pointer-events: none;
+    background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
+}
+
+/* Ensure content stays above background effects */
+.dynamic-premium-bg-light>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* Section entrance animations */
+section {
+    animation: slideUpFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpFadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(30px);
     }
 
     to {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Scrollbar Refinement */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 20px;
+    border: 2px solid #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Glassmorphic containers for sections if needed */
+.glass-container {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    padding: 2rem;
 }
 </style>

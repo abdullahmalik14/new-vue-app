@@ -283,17 +283,17 @@
           </div>
           <div class="flex flex-col">
             <a class="flex items-center gap-1">
-              <span class="text-xs leading-normal font-medium truncate text-[#fff]">{{ media.creatorName }}</span>
+              <span class="text-xs leading-normal font-medium truncate text-[#667085]">{{ media.creatorName }}</span>
               <img src="https://i.ibb.co.com/nMhY8CpS/svgviewer-png-output-22.webp" class="h-[0.625rem]" />
             </a>
             <div class="flex items-start gap-3 flex-grow">
               <div class="flex items-center gap-1">
                 <img src="https://i.ibb.co.com/Kjv16vLZ/eye.webp" alt="eye" class="w-[0.875rem]" />
-                <span class="text-xs leading-normal text-[#fff]">{{ media.views }}</span>
+                <span class="text-xs leading-normal text-[#667085]">{{ media.views }}</span>
               </div>
               <div class="flex items-center gap-1">
                 <img src="https://i.ibb.co.com/7tbwzFsQ/heart.webp" alt="heart" class="w-[0.875rem]" />
-                <span class="text-xs leading-normal text-[#fff]">{{ media.likes }}</span>
+                <span class="text-xs leading-normal text-[#667085]">{{ media.likes }}</span>
               </div>
             </div>
           </div>

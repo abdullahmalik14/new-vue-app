@@ -30,6 +30,7 @@ import { resolveRouteFromPath } from './utils/route/routeResolver.js';
 import { getPreloadSectionsForRoute, resolveRoleSectionVariant } from './utils/section/sectionResolver.js';
 import { registerI18nInstance } from './utils/translation/i18nInstance.js';
 import breakpoints from './utils/breakpoints.js';
+import InteractionsPlugin from './interactions/index.js';
 
 // Import base styles
 import './assets/main.css';
@@ -229,6 +230,7 @@ if (window.performanceTracker) {
 }
 
 app.use(router);
+app.use(InteractionsPlugin);
 
 // Register global breakpoints utility
 app.config.globalProperties.$breakpoints = breakpoints.state;

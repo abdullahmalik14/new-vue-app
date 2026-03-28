@@ -13,6 +13,8 @@ import {
   onActivated,
   onDeactivated,
 } from "vue";
+import { validationEngine } from "./validation/validationEngine.js";
+
 
 // ---------- small helpers ----------
 
@@ -474,6 +476,17 @@ export function createStepStateEngine(config) {
         { onExit: true },
         [["onExitStep", step]],
       );
+    },
+
+    addFieldRequirement(step, path, validationConfig) {
+      this.addValidator(step, async (state) => {
+        const value = deepGet(state, path);
+        const result = validationEngine.validateField(value, validationConfig);
+        if (result.isValid) return true;
+        return {
+          errors: (result.failedRules || []).map((r) => r.message),
+        };
+      });
     },
 
     async validate(step) {

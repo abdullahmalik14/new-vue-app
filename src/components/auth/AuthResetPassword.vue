@@ -34,9 +34,8 @@
         <InputAuthComponent :model-value="newPassword" @update:model-value="handleNewPasswordInput"
           :placeholder="t('auth.register.passwordPlaceholder')" id="newPassword" show-label
           :label-text="t('auth.register.passwordLabel')" data-required="true" required-display="italic-text"
-          :type="passwordInputType" :right-icon="passwordIcon" :show-errors="passwordErrors.length > 0"
-          :errors="passwordErrors" :on-success="passwordSuccess.length > 0" :success="passwordSuccess"
-          @click:right-icon="togglePasswordVisibility" />
+          type="password" :show-errors="passwordErrors.length > 0"
+          :errors="passwordErrors" :on-success="passwordSuccess.length > 0" :success="passwordSuccess" />
 
         <!-- Error message -->
         <p v-if="error" class="text-sm text-red-300 bg-red-900/30 border border-red-500/40 rounded-md px-3 py-2">
@@ -87,7 +86,6 @@ const code = ref("")
 const newPassword = ref("")
 const message = ref("")
 const error = ref("")
-const passwordIcon = ref("")
 const isCognitoScriptReady = ref(false)
 const assetHandler = ref(null)
 const popupNavHandler = inject('popupNavHandler', null)
@@ -136,10 +134,6 @@ const passwordConfig = computed(() => ({
     ]
   },
   validateOnInput: true,
-  ui: {
-    dynamicType: 'password',
-    visibilityMetaKey: 'passwordVisible'
-  }
 }))
 
 // Get field states
@@ -190,10 +184,6 @@ const passwordErrors = computed(() => getValidationMessages(passwordState.value,
 const passwordSuccess = computed(() => {
   if (!newPassword.value?.trim()) return []
   return getValidationMessages(passwordState.value, passwordConfig.value).success
-})
-
-const passwordInputType = computed(() => {
-  return interactionsEngine.getInputType(passwordConfig.value, 'password')
 })
 
 // Computed button text based on loading and script availability
@@ -326,9 +316,6 @@ onMounted(async () => {
     debug: true
   })
 
-  // Load icons independently (dynamic)
-  passwordIcon.value = await getAssetUrl('icon.input.right')
-
   // Load translations for auth section
   try {
     await loadTranslationsForSection('auth', locale.value)
@@ -422,13 +409,6 @@ const handleNewPasswordInput = (value) => {
   if (state?.isValid && state?.element) {
     state.element.classList.remove('first-invalid')
   }
-}
-
-const togglePasswordVisibility = () => {
-  interactionsEngine.runInteractions(
-    [{ type: 'toggleFieldMeta', metaKey: 'passwordVisible' }],
-    passwordConfig.value
-  )
 }
 
 async function handleReset() {

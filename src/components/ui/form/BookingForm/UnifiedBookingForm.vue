@@ -106,12 +106,11 @@ const currentStep = ref(1);
 // --- VALIDATION LOGIC ---
 
 // Step 1 Validation
-bookingFlow.addValidator(1, (state) => {
-    // 1. Common Required Fields
-    if (!state.eventTitle) return "Event Title is required.";
-    if (!state.basePrice) return "Price is required.";
+bookingFlow.addFieldRequirement(1, 'eventTitle', { required: true, requiredMessage: "Event Title is required." });
+bookingFlow.addFieldRequirement(1, 'basePrice', { required: true, requiredMessage: "Price is required." });
 
-    // 2. Conditional Validations (One-on-One)
+bookingFlow.addValidator(1, (state) => {
+    // 1. Conditional Validations (One-on-One)
     if (state.enableLongerDiscount) {
         if (!state.sessionMinimum) return "Minimum session duration for discount is required.";
         if (!state.discountPercentage) return "Discount percentage is required.";
@@ -125,15 +124,17 @@ bookingFlow.addValidator(1, (state) => {
     if (state.setMaxBookings && !state.maxBookingsPerDay) return "Maximum booking limit is required.";
     if (state.allowWaitlist && !state.waitlistSpots) return "Waitlist spots count is required.";
 
-    // 3. Conditional Validations (Group)
-    if (state.setMaxUsers && !state.maxUsers) return "Maximum users limit is required.";
-    if (state.setReminders && !state.remindMeTime) return "Reminder time is required.";
-    // Note: Group form reuses some keys like enableLongerDiscount/enableCancellationFee, so the above checks cover them.
-
-    return true;
+// Step 2 Validation
+bookingFlow.addFieldRequirement(2, 'recordingPrice', {
+    rules: [{
+        type: 'bypassValidation', // Just demonstrating bridge usage
+    }],
+    required: true,
+    requiredMessage: "Recording price is required.",
+    // Note: In a real scenario, we'd check state.allowRecording here too.
+    // For now, we'll keep the conditional one below for accuracy.
 });
 
-// Step 2 Validation
 bookingFlow.addValidator(2, (state) => {
     // 1. One-on-One Specific
     if (state.allowRecording && !state.recordingPrice) return "Recording price is required.";

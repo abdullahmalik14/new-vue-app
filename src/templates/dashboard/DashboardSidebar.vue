@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sidebar-wrapper flex sticky top-0 z-[3] h-screen flex w-max shadow-custom bg-[rgba(249,250,251,0.7)] backdrop-blur-xs [-ms-overflow-style:none] [scrollbar-width:none]">
+    class="sidebar-wrapper flex sticky top-0 z-[3] h-screen w-max shadow-custom bg-[rgba(249,250,251,0.7)] backdrop-blur-xs [-ms-overflow-style:none] [scrollbar-width:none]">
     <div
       class="sidebar-container transition-all duration-150 ease-in-out w-[5.625rem] gap-1.5 pt-3 pb-3 z-[5] relative flex flex-col items-center justify-start">
       <!-- site-logo -->
@@ -47,15 +47,43 @@
       </div>
 
       <!-- main-navigation -->
-      <div class="flex flex-col items-center self-stretch flex-1 gap-1 pt-1 pb-1 pl-2 pr-2" ref="menuContainer">
-        <div class="flex flex-col items-center self-stretch gap-1">
-          <div class="flex flex-col relative z-[5] self-stretch">
+      <div class="flex flex-col items-center self-stretch flex-1 gap-1 pt-1 pb-1 pl-2 pr-2 overflow-hidden" ref="menuContainer">
+        <div class="flex flex-col items-center self-stretch gap-1 w-full">
+          <div class="flex flex-col relative z-[5] self-stretch w-full">
             <div class="flex flex-col items-center self-stretch gap-1">
-              <!-- Main menu items will be rendered here by JavaScript -->
+              <!-- Render visible menu items -->
+              <div v-for="item in visibleItems" :key="item.id || item.title"
+                class="sidebar-menu-item block transition-all duration-200 ease-in-out rounded-md flex-col items-center justify-center self-stretch w-full"
+                :class="{ 'opacity-50 pointer-events-none grayscale': !item.enabled }"
+                :title="item.title">
+                <a href="#" @click.prevent="handleMenuClick(item)"
+                  class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active"
+                  :style="!item.enabled ? { pointerEvents: 'none', opacity: '0.5' } : {}">
+                  <img :src="item.image" :alt="item.title"
+                    class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+                  <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text">
+                    {{ item.title }}
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
 
-          <!-- More button will be rendered here by JavaScript -->
+          <!-- More button -->
+          <div v-if="overflowItems.length > 0"
+            class="flex flex-col items-center justify-center self-stretch rounded-md transition-all duration-200 ease-in-out w-full"
+            ref="moreButtonWrapper"
+            @mouseenter="onMoreEnter"
+            @mouseleave="onMoreLeave">
+            <a data-menu-item=""
+              class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active cursor-pointer">
+              <img :src="assets.more || ''" :alt="moreText"
+                class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+              <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text">
+                {{ moreText }}
+              </span>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -80,23 +108,52 @@
       </div>
     </div>
 
+    <!-- More Flyout (replaces manual data-floating-panel) -->
+    <div v-if="isMoreVisible" class="fixed z-[100]" :style="flyoutWrapperStyle">
+      <div class="hover-bridge absolute" :style="bridgeStyle" @mouseenter="onMoreEnter" @mouseleave="onMoreLeave"></div>
+      <div class="sidebar-flyout bg-white rounded-2xl shadow-custom p-4 flex flex-col min-w-[200px]" 
+           ref="flyoutInner"
+           @mouseenter="onMoreEnter" @mouseleave="onMoreLeave">
+        <div class="grid grid-cols-2 gap-x-6 gap-y-6">
+          <div v-for="item in overflowItems" :key="item.id || item.title"
+            class="flex flex-col items-center justify-center cursor-pointer group"
+            @click="handleMenuClick(item)">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group-hover:bg-sidebar-active">
+              <img :src="item.image" :alt="item.title"
+                class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+            </div>
+            <span class="mt-1 text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] transition-all duration-200 group-hover:text-sidebar-active-text">
+              {{ item.title }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden measurement container -->
+    <div class="fixed top-[-9999px] left-[-9999px] invisible flex flex-col items-center w-[5.625rem] pl-2 pr-2" ref="measureContainer">
+      <div class="sidebar-menu-item block p-2 rounded-md flex-col items-center justify-center self-stretch" ref="measureItem">
+        <div class="flex flex-col items-center h-[52px]"></div>
+      </div>
+      <div class="sidebar-menu-item block p-2 rounded-md flex-col items-center justify-center self-stretch" ref="measureMore">
+        <div class="flex flex-col items-center h-[52px]"></div>
+      </div>
+    </div>
+
     <!-- PopupHandler for submenu -->
     <PopupHandler v-model="showSubmenuPopup" :config="submenuPopupConfig" :is-loading="false">
-      <div
-        class="w-full h-[100vh] flex flex-col items-start gap-4 overflow-hidden bg-submenu-bg px-4 py-2 shadow-md backdrop-blur-lg">
+      <div class="w-full h-[100vh] flex flex-col items-start gap-4 overflow-hidden bg-submenu-bg px-4 py-2 shadow-md backdrop-blur-lg">
         <!-- submenu-header -->
-        <div class="flex jusify-between gap-4 w-full mt-8">
+        <div class="flex justify-between gap-4 w-full mt-8">
           <!-- title -->
           <div class="flex items-center gap-2 w-full">
             <img :src="currentSubmenuImage" :alt="currentSubmenuTitle" class="w-5 h-5" />
-            <span class="text-sm font-semibold text-submenu-title-text">{{
-              currentSubmenuTitle
-            }}</span>
+            <span class="text-sm font-semibold text-submenu-title-text">{{ currentSubmenuTitle }}</span>
           </div>
 
           <!-- back-button -->
           <div class="flex w-full justify-end">
-            <a data-slidein-close
+            <a @click="showSubmenuPopup = false"
               class="flex items-center justify-center w-6 h-6 md:w-auto md:h-auto p-0 md:p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-panel-light-buttonHover cursor-pointer">
               <img v-if="assets.closeDesktop"
                 class="w-6 h-6 pointer-events-none hidden md:block [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)]"
@@ -124,13 +181,7 @@
                 : 'text-gray-400',
             ]">
               {{ child.title }}
-
-              <span v-if="child.count" :class="[
-                `text-[0.625rem] font-medium text-submenu-item-text`,
-                child.enabled
-                  ? `group-hover:text-submenu-item-hover-shadow`
-                  : ``,
-              ]">
+              <span v-if="child.count" class="text-[0.625rem] font-medium" :class="child.enabled ? 'group-hover:text-submenu-item-hover-shadow' : ''">
                 {{ child.count }}
               </span>
             </span>
@@ -149,33 +200,18 @@
       </div>
     </PopupHandler>
 
-    <AvatarProfilePopup :config="avatarPopupconfig" v-model="isProfileOpen" @update:modelValue="
-      (val) => {
-        closeAllPopups();
-        isProfileOpen = val;
-      }
-    " />
-    <NotificationPopup :config="notificationPopupConfig" v-model="isNotificationOpen" @update:modelValue="
-      (val) => {
-        closeAllPopups();
-        isNotificationOpen = val;
-      }
-    " />
+    <AvatarProfilePopup :config="avatarPopupconfig" v-model="isProfileOpen" @update:modelValue="(val) => { closeAllPopups(); isProfileOpen = val; }" />
+    <NotificationPopup :config="notificationPopupConfig" v-model="isNotificationOpen" @update:modelValue="(val) => { closeAllPopups(); isNotificationOpen = val; }" />
   </div>
 </template>
-
 <script>
-import { ref } from "vue";
 import { menuItems, resolveMenuItemsWithAssets } from "../../assets/data/menuItems.js";
 import PopupHandler from "@/components/ui/popup/PopupHandler.vue";
 import AvatarProfilePopup from "@/components/ui/popup/AvatarProfilePopup.vue";
 import NotificationPopup from "@/components/ui/popup/NotificationPopup.vue";
-import { useRouter } from "vue-router";
 import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js";
 import { getActiveLocale } from "@/utils/translation/localeManager.js";
 import { getI18nInstance } from "@/utils/translation/i18nInstance.js";
-// Assets will be loaded dynamically with retry logic
-const router = useRouter();
 
 export default {
   name: "Sidebar",
@@ -186,18 +222,20 @@ export default {
   },
   data() {
     return {
-      flyoutHovered: false,
-      hideTimeout: null,
-      isSidebarAttached: true,
-      showSubmenuPopup: false,
       isProfileOpen: false,
       isNotificationOpen: false,
+      showSubmenuPopup: false,
       currentSubmenuItems: [],
       currentSubmenuTitle: "",
       currentSubmenuImage: "",
-      resolvedMenuItems: [], // Menu items with resolved asset URLs
-      localeWatchInterval: null, // Store interval for cleanup
-      // Asset URLs loaded from assetLibrary
+      resolvedMenuItems: [],
+      visibleItems: [],
+      overflowItems: [],
+      isMoreVisible: false,
+      moreHovered: false,
+      moreButtonHovered: false,
+      hideTimeout: null,
+      resizeObserver: null,
       assets: {
         logo: null,
         avatar: null,
@@ -212,12 +250,12 @@ export default {
       submenuPopupConfig: {
         actionType: "slidein",
         from: "left",
-        offset: "5.625rem", // Sidebar ki actual width (5.625rem = sidebar width, scales with zoom)
+        offset: "5.625rem",
         speed: "250ms",
         effect: "ease-in-out",
-        showOverlay: false, // Overlay nahi chahiye taaki sidebar dikhe
+        showOverlay: false,
         closeOnOutside: true,
-        lockScroll: false, // Scroll lock nahi, kyunki sidebar bhi visible rahna hai
+        lockScroll: false,
         escToClose: true,
         width: { default: "400px", "<640": "100%" },
         height: "100%",
@@ -259,507 +297,248 @@ export default {
       },
     };
   },
+  computed: {
+    moreText() {
+      return this.$t ? this.$t('dashboard.more') : 'More';
+    },
+    flyoutClasses() {
+      return {
+        'opacity-0 invisible pointer-events-none scale-0 translate-y-16': !this.isMoreVisible,
+        'opacity-100 visible pointer-events-auto scale-100 translate-y-0': this.isMoreVisible,
+      };
+    },
+    flyoutWrapperStyle() {
+      if (!this.isMoreVisible || !this.$refs.moreButtonWrapper) return { top: '-9999px', left: '-9999px' };
+      const btnRect = this.$refs.moreButtonWrapper.getBoundingClientRect();
+      
+      // Calculate flyout height dynamically if possible, or use a reasonable estimate
+      let flyoutHeight = 0;
+      if (this.$refs.flyoutInner) {
+        flyoutHeight = this.$refs.flyoutInner.offsetHeight;
+      } else {
+        // Fallback estimate: 2 rows of items (2*52px) + padding (2*16px) + gap (1*24px) = 104 + 32 + 24 = 160px
+        // This is a rough estimate, actual height depends on content and number of items
+        const numRows = Math.ceil(this.overflowItems.length / 2);
+        flyoutHeight = (numRows * 52) + ((numRows - 1) * 24) + (2 * 16); // item height + gap + padding
+        if (this.overflowItems.length === 0) flyoutHeight = 0; // No items, no flyout
+        if (flyoutHeight < 100) flyoutHeight = 100; // Minimum height
+      }
+
+      // Align bottom of flyout with bottom of button and offset it "thora upper"
+      let top = btnRect.bottom - flyoutHeight - 10;
+      
+      // Ensure it doesn't go off screen
+      const windowHeight = window.innerHeight;
+      if (top < 10) top = 10;
+      if (top + flyoutHeight > windowHeight - 10) {
+        top = windowHeight - flyoutHeight - 10;
+      }
+      
+      return {
+        top: `${top}px`,
+        left: `${btnRect.right + 10}px`,
+        pointerEvents: 'auto'
+      };
+    },
+    bridgeStyle() {
+      if (!this.isMoreVisible || !this.$refs.moreButtonWrapper) return { top: '-9999px', left: '-9999px' };
+      // Simplified bridge style - basically covers the gap between button and flyout
+      const btnRect = this.$refs.moreButtonWrapper.getBoundingClientRect();
+      return {
+        top: `${btnRect.top - 10}px`,
+        left: `${btnRect.right - 10}px`,
+        width: '30px',
+        height: `${btnRect.height + 20}px`
+      };
+    }
+  },
+  watch: {
+    '$i18n.locale': {
+      handler: 'handleLocaleChange',
+      immediate: false
+    },
+    isMoreVisible(val) {
+      if (val) {
+        // Force a re-render/re-evaluation of computed styles on next tick
+        this.$nextTick(() => {
+          this.$forceUpdate();
+        });
+      }
+    }
+  },
   async beforeMount() {
-    // Load all asset URLs BEFORE component renders to eliminate time gap
-    // This ensures images are ready when component mounts, matching navbar/footer timing
-    // All assets are loaded equally with no priority distinction
     await this.loadAllAssets();
   },
   async mounted() {
-    // Load translations for dashboard section
     await this.loadTranslations();
-    // Resolve menu items with asset URLs
     await this.resolveMenuItems();
-    this.renderSidebarMenu();
+    
+    // Initial calculation
+    this.$nextTick(() => {
+      this.calculateOverflow();
+    });
 
-    // Watch for locale changes and update menu items
-    this.startLocaleWatching();
-
-    // Handle sidebar visibility and menu recalculation on resize
-    this.handleSidebarVisibility();
-    window.addEventListener("resize", this.handleSidebarVisibility);
+    // Setup ResizeObserver for the container
+    if (this.$refs.menuContainer) {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.calculateOverflow();
+      });
+      this.resizeObserver.observe(this.$el); // Observe the whole sidebar for height changes
+    }
   },
   beforeUnmount() {
-    // Clean up locale watch interval
-    if (this.localeWatchInterval) {
-      clearInterval(this.localeWatchInterval);
-      this.localeWatchInterval = null;
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
     }
-    // Clean up resize event listener
-    window.removeEventListener("resize", this.handleSidebarVisibility);
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+    }
   },
   methods: {
-    /**
-     * Retry logic for asset loading with exponential backoff
-     */
     async loadAssetWithRetry(flag, maxRetries = 2) {
       const { getAssetUrl } = await import("@/utils/assets/assetLibrary.js");
-
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
           const url = await getAssetUrl(flag);
           if (url) return url;
-
-          if (attempt < maxRetries) {
-            const backoff = Math.pow(2, attempt) * 100; // 100ms, 200ms, 400ms
-            await new Promise(resolve => setTimeout(resolve, backoff));
-          }
-        } catch (error) {
-          if (attempt === maxRetries) {
-            console.warn(`[DashboardSidebar] Failed to load asset after ${maxRetries + 1} attempts:`, flag, error);
-            throw error;
-          }
-          const backoff = Math.pow(2, attempt) * 100;
-          await new Promise(resolve => setTimeout(resolve, backoff));
+          if (attempt < maxRetries) await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 100));
+        } catch (e) {
+          if (attempt === maxRetries) throw e;
+          await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 100));
         }
       }
       return null;
     },
-
-    /**
-     * Load translations for dashboard section
-     */
     async loadTranslations() {
       try {
         const locale = getActiveLocale() || 'en';
         await loadTranslationsForSection('dashboard-global', locale);
-      } catch (error) {
-        console.warn('[DashboardSidebar] Failed to load translations', error);
-        // Continue without translations - will use fallback
+      } catch (e) {
+        console.warn('[DashboardSidebar] Translation load failed', e);
       }
     },
-
-    /**
-     * Resolve menu items with asset URLs from assetLibrary
-     */
     async resolveMenuItems() {
       try {
         this.resolvedMenuItems = await resolveMenuItemsWithAssets(menuItems);
-      } catch (error) {
-        console.warn('[DashboardSidebar] Failed to resolve menu items with assets, using original menuItems', error);
-        // Fallback to original menuItems if resolution fails
+      } catch (e) {
         this.resolvedMenuItems = menuItems;
       }
     },
-
-    /**
-     * Start watching for locale changes and update menu items
-     */
-    startLocaleWatching() {
-      const i18nInstance = getI18nInstance();
-      if (!i18nInstance) {
-        console.warn('[DashboardSidebar] i18n instance not available for locale watching');
-        return;
-      }
-
-      // Get initial locale
-      let previousLocale = i18nInstance.global.locale.value;
-
-      // Watch for locale changes using polling
-      const checkInterval = setInterval(async () => {
-        try {
-          const currentLocale = i18nInstance.global.locale.value;
-          if (currentLocale !== previousLocale) {
-            console.log(`[DashboardSidebar] Locale changed from '${previousLocale}' to '${currentLocale}'`);
-            previousLocale = currentLocale;
-
-            // Reload translations and re-resolve menu items
-            await this.loadTranslations();
-            await this.resolveMenuItems();
-
-            // Re-render the sidebar menu with updated translations
-            this.renderSidebarMenu();
-          }
-        } catch (error) {
-          console.warn('[DashboardSidebar] Error checking locale change', error);
-        }
-      }, 300); // Check every 300ms for responsive updates
-
-      // Store interval ID for cleanup
-      this.localeWatchInterval = checkInterval;
+    async handleLocaleChange() {
+      await this.loadTranslations();
+      await this.resolveMenuItems();
+      this.calculateOverflow();
     },
-
-    /**
-     * Load all asset URLs BEFORE component renders to eliminate time gap
-     * All assets are loaded equally with no priority distinction
-     * This ensures images are ready when component mounts, matching navbar/footer timing
-     */
     async loadAllAssets() {
       try {
-        const { getAssetUrl } = await import("@/utils/assets/assetLibrary.js");
         const { preloadAsset } = await import("@/utils/assets/assetPreloader.js");
-
-        // Define all assets - loaded equally with no priority distinction
-        const ALL_ASSETS = [
-          'dashboard.logo',
-          'dashboard.avatar',
-          'dashboard.notification',
-          'dashboard.logout',
-          'dashboard.language',
-          'dashboard.help',
-          'dashboard.close.desktop',
-          'dashboard.close.mobile',
-          'dashboard.more'
-        ];
-
-        // Preload all images equally (using flags, images will be cached)
-        const preloadPromises = ALL_ASSETS.map(flag =>
-          preloadAsset({ flag, type: 'image', priority: 'normal' }).catch(() => null)
-        );
-        await Promise.allSettled(preloadPromises);
-
-        // Load all asset URLs in parallel (images are already preloaded, so this is fast)
-        const assetPromises = ALL_ASSETS.map(flag =>
-          this.loadAssetWithRetry(flag, 2).catch(err => {
-            console.error(`[DashboardSidebar] Asset failed: ${flag}`, err);
-            return null;
-          })
-        );
-
-        const assetResults = await Promise.all(assetPromises);
-        this.assets.logo = assetResults[0];
-        this.assets.avatar = assetResults[1];
-        this.assets.notification = assetResults[2];
-        this.assets.logout = assetResults[3];
-        this.assets.language = assetResults[4];
-        this.assets.help = assetResults[5];
-        this.assets.closeDesktop = assetResults[6];
-        this.assets.closeMobile = assetResults[7];
-        this.assets.more = assetResults[8];
-      } catch (error) {
-        console.error('[DashboardSidebar] Failed to load assets', error);
-        // Continue rendering even if assets fail - graceful degradation
+        const flags = ['dashboard.logo', 'dashboard.avatar', 'dashboard.notification', 'dashboard.logout', 'dashboard.language', 'dashboard.help', 'dashboard.close.desktop', 'dashboard.close.mobile', 'dashboard.more'];
+        await Promise.allSettled(flags.map(flag => preloadAsset({ flag, type: 'image', priority: 'normal' })));
+        const urls = await Promise.all(flags.map(flag => this.loadAssetWithRetry(flag)));
+        this.assets = {
+          logo: urls[0], avatar: urls[1], notification: urls[2], logout: urls[3],
+          language: urls[4], help: urls[5], closeDesktop: urls[6], closeMobile: urls[7], more: urls[8]
+        };
+      } catch (e) {
+        console.error('[DashboardSidebar] Asset load failed', e);
       }
     },
+    calculateOverflow() {
+      if (!this.$refs.menuContainer || !this.$refs.measureItem) return;
+      
+      const sidebarHeight = this.$el.offsetHeight;
+      // Replicating original margin/padding awareness
+      const header = this.$el.querySelector(".flex.flex-col.items-center.self-stretch.gap-2.pt-2.pb-2");
+      const footer = this.$el.querySelector(".flex.flex-col.items-center.self-stretch.gap-2.pt-2.pb-2:last-child");
+      const logo = this.$el.querySelector("div.flex.items-center.gap-2\\.5");
+      
+      const headerH = header ? header.offsetHeight : 0;
+      const footerH = footer ? footer.offsetHeight : 0;
+      const logoH = logo ? logo.offsetHeight : 0;
+      
+      const availableHeight = sidebarHeight - headerH - footerH - logoH - 48;
+      const itemH = 56; // 52px height + 4px gap as per manual measurement
+      const moreBtnH = 56;
 
-    closeAllPopups() {
-      this.showSubmenuPopup = false;
-      this.isProfileOpen = false;
-      this.isNotificationOpen = false;
-    },
+      let usedHeight = 0;
+      const visible = [];
+      const overflow = [];
 
-    createMenuItem(item) {
-      const wrapper = document.createElement("div");
-      wrapper.setAttribute("data-menu-item", "");
-      if (!item.enabled) wrapper.setAttribute("data-disabled", "true");
-      wrapper.title = item.title;
-
-      const content = document.createElement("a");
-      content.innerHTML = `
-        <img
-          src="${item.image}"
-          alt="${item.title}"
-          class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]"
-        />
-        <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text">${item.title}</span>
-      `;
-      content.className =
-        "main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active";
-      content.setAttribute("href", "#");
-
-      content.addEventListener("click", (e) => {
-        e.preventDefault();
-        this.handleMenuClick(item);
+      this.resolvedMenuItems.forEach((item) => {
+        if (usedHeight + itemH + moreBtnH <= availableHeight) {
+          usedHeight += itemH;
+          visible.push(item);
+        } else {
+          overflow.push(item);
+        }
       });
 
-      if (!item.enabled) {
-        content.style.pointerEvents = "none";
-        content.style.opacity = "0.5";
+      // If everything fits without More button, use extra space
+      if (overflow.length === 0 && usedHeight + itemH <= availableHeight + moreBtnH) {
+        // Already handled by the logic above essentially
       }
 
-      wrapper.className =
-        "sidebar-menu-item block transition-all duration-200 ease-in-out rounded-md flex-col items-center justify-center self-stretch";
-      if (!item.enabled) {
-        wrapper.className += " opacity-50 pointer-events-none grayscale";
-      }
-
-      wrapper.appendChild(content);
-      return wrapper;
+      this.visibleItems = visible;
+      this.overflowItems = overflow;
     },
-
     handleMenuClick(item) {
-      this.closeAllPopups(); // ✅ added
+      this.closeAllPopups();
       if (item.children && item.children.length > 0) {
         this.currentSubmenuItems = item.children;
         this.currentSubmenuTitle = item.title;
         this.currentSubmenuImage = item.image;
         this.showSubmenuPopup = true;
       } else if (item.enabled && item.route) {
-        console.log("Navigate to:", item.route);
         this.$router.push(item.route);
       }
     },
-
     handleChildClick(child) {
       if (child.enabled && child.route) {
-        console.log("Navigate to child route:", child.route);
         this.showSubmenuPopup = false;
         this.$router.push(child.route);
       }
     },
-
-    renderSidebarMenu() {
-      // Clear any old flyouts before rerendering
-      document
-        .querySelectorAll("[data-floating-panel-wrapper], .hover-bridge")
-        .forEach((el) => el.remove());
-
-      const menuEl = this.$refs.menuContainer;
-      if (!menuEl) return;
-
-      // Clear existing menu items
-      const existingItems = menuEl.querySelectorAll(
-        ".sidebar-menu-item, [data-more-wrapper]"
-      );
-      existingItems.forEach((item) => item.remove());
-
-      const sidebarHeight = this.$el.offsetHeight;
-      const headerHeight = this.$el.querySelector(
-        ".flex.flex-col.items-center.self-stretch.gap-2.pt-2.pb-2"
-      ).offsetHeight;
-      const footerHeight = this.$el.querySelector(
-        ".flex.flex-col.items-center.self-stretch.gap-2.pt-2.pb-2:last-child"
-      ).offsetHeight;
-      const logoEl = this.$el.querySelector("div.flex.items-center.gap-2\\.5");
-      const logoHeight = logoEl ? logoEl.offsetHeight : 0;
-      const availableHeight =
-        sidebarHeight - headerHeight - footerHeight - logoHeight - 48;
-
-      const testContainer = document.createElement("div");
-      testContainer.style.visibility = "hidden";
-      testContainer.style.position = "absolute";
-      testContainer.style.top = "-9999px";
-      document.body.appendChild(testContainer);
-
-      let usedHeight = 0;
-      let visibleItems = [];
-      let overflowItems = [];
-
-      const tempMore = document.createElement("div");
-      tempMore.setAttribute("data-menu-item", "");
-      const moreText = this.$t ? this.$t('dashboard.more', 'More') : 'More';
-      tempMore.innerHTML = `
-        <img
-          src="${this.assets.more || ''}"
-          alt="${moreText}"
-          class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]"
-        />
-        <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text ">${moreText}</span>
-      `;
-      tempMore.className =
-        "main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active ";
-      const moreWrapper = document.createElement("div");
-      moreWrapper.className =
-        "sidebar-menu-item block transition-all duration-200 ease-in-out rounded-md flex-col items-center justify-center self-stretch";
-      moreWrapper.appendChild(tempMore);
-      testContainer.appendChild(moreWrapper);
-      const moreBtnHeight = moreWrapper.offsetHeight + 4;
-
-      // Use resolved menu items (with asset URLs) or fallback to original
-      const itemsToUse = this.resolvedMenuItems.length > 0 ? this.resolvedMenuItems : menuItems;
-
-      for (let item of itemsToUse) {
-        const tempItem = this.createMenuItem(item);
-        testContainer.appendChild(tempItem);
-        const h = tempItem.offsetHeight + 4;
-
-        if (usedHeight + h + moreBtnHeight <= availableHeight) {
-          usedHeight += h;
-          visibleItems.push(item);
-        } else {
-          overflowItems.push(item);
+    closeAllPopups() {
+      this.showSubmenuPopup = false;
+      this.isProfileOpen = false;
+      this.isNotificationOpen = false;
+    },
+    onMoreEnter() {
+      this.moreButtonHovered = true;
+      this.showFlyout();
+    },
+    onMoreLeave() {
+      this.moreButtonHovered = false;
+      this.hideFlyout();
+    },
+    onFlyoutEnter() {
+      this.moreHovered = true;
+      this.showFlyout();
+    },
+    onFlyoutLeave() {
+      this.moreHovered = false;
+      this.hideFlyout();
+    },
+    onBridgeEnter() {
+      this.moreHovered = true;
+      this.showFlyout();
+    },
+    onBridgeLeave() {
+      this.moreHovered = false;
+      this.hideFlyout();
+    },
+    showFlyout() {
+      if (this.hideTimeout) clearTimeout(this.hideTimeout);
+      this.isMoreVisible = true;
+    },
+    hideFlyout() {
+      if (this.hideTimeout) clearTimeout(this.hideTimeout);
+      this.hideTimeout = setTimeout(() => {
+        if (!this.moreButtonHovered && !this.moreHovered) {
+          this.isMoreVisible = false;
         }
-      }
-
-      document.body.removeChild(testContainer);
-
-      const menuItemsContainer = menuEl.querySelector(
-        ".flex.flex-col.items-center.self-stretch.gap-1"
-      );
-      visibleItems.forEach((item) => {
-        menuItemsContainer.appendChild(this.createMenuItem(item));
-      });
-
-      if (overflowItems.length > 0) {
-        this.createOverflowMenu(menuItemsContainer, overflowItems);
-      }
-    },
-
-    createOverflowMenu(menuEl, overflowItems) {
-      const moreWrapper = document.createElement("div");
-      moreWrapper.setAttribute("data-more-wrapper", "");
-      moreWrapper.className =
-        "flex flex-col items-center justify-center self-stretch rounded-md transition-all duration-200 ease-in-out";
-
-      const moreBtn = document.createElement("a");
-      moreBtn.setAttribute("data-menu-item", "");
-      const moreText = this.$t ? this.$t('dashboard.more', 'More') : 'More';
-      moreBtn.innerHTML = `
-        <img
-          src="${this.assets.more || ''}"
-          alt="${moreText}"
-          class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]"
-        />
-        <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text">${moreText}</span>
-      `;
-      moreBtn.className =
-        "main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active";
-      // moreBtn.setAttribute("href", "/");
-      moreWrapper.appendChild(moreBtn);
-      menuEl.appendChild(moreWrapper);
-
-      const flyoutWrapper = document.createElement("div");
-      flyoutWrapper.setAttribute("data-floating-panel-wrapper", "");
-      flyoutWrapper.className =
-        "fixed top-[-9999px] left-[-11000] pointer-events-none z-[9999]";
-
-      const flyout = document.createElement("div");
-      flyout.setAttribute("data-floating-panel", "");
-      flyout.className = `
-        fixed bg-white shadow-lg rounded-md p-3 min-w-[200px] grid grid-cols-2 gap-4 z-[9999] border border-gray-200 backdrop-blur-lg bg-[hsla(0,0%,100%,0.5)]
-        opacity-0 invisible pointer-events-none
-        scale-0 translate-y-16
-        transition-all duration-150 ease-in-out
-        origin-bottom-left
-      `;
-
-      overflowItems.forEach((item) => {
-        const o = document.createElement("div");
-        o.setAttribute("data-flyout-item", "");
-        if (!item.enabled) o.setAttribute("data-disabled", "true");
-        o.innerHTML = `
-          <img
-            src="${item.image}"
-            alt="${item.title}"
-            class="w-6 h-6 transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]"
-          />
-          <span class=" text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text">${item.title}</span>
-        `;
-        o.className =
-          "sidebar-menu-item block group transition-all duration-200 ease-in-out rounded-md flex-col items-center justify-center self-stretch w-[4.625rem] h-14 cursor-pointer p-2 whitespace-nowrap text-sm hover:bg-sidebar-active rounded transition-colors flex items-center";
-        if (!item.enabled) {
-          o.className += " opacity-50 grayscale";
-        }
-        o.addEventListener("click", () => this.handleMenuClick(item));
-        flyout.appendChild(o);
-      });
-
-      flyoutWrapper.appendChild(flyout);
-      document.body.appendChild(flyoutWrapper);
-
-      const hoverBridge = document.createElement("div");
-      hoverBridge.className =
-        "fixed bg-transparent pointer-events-none top-[-9999px] left-[-9999px] h-0 w-0 z-[9998] transition-all duration-100 ease-in-out";
-      document.body.appendChild(hoverBridge);
-
-      const showFlyout = () => {
-        this.flyoutHovered = true;
-        if (this.hideTimeout) clearTimeout(this.hideTimeout);
-
-        requestAnimationFrame(() => {
-          const btnRect = moreBtn.getBoundingClientRect();
-          const align = overflowItems.length <= 2 ? "center" : "bottom";
-
-          let top = btnRect.top;
-          if (align === "center") {
-            top = btnRect.top + btnRect.height / 2 - flyout.offsetHeight / 2;
-          } else if (align === "bottom") {
-            top = btnRect.bottom - flyout.offsetHeight;
-          }
-
-          flyoutWrapper.style.top = `${Math.max(0, top)}px`;
-          flyoutWrapper.style.left = `${btnRect.right + 10}px`;
-          flyoutWrapper.style.pointerEvents = "auto";
-
-          flyout.className = `
-            fixed bg-white shadow-lg rounded-md p-3 ml-2 min-w-[200px] grid grid-cols-2 gap-4 z-[9999] border border-gray-200 backdrop-blur-lg bg-[hsla(0,0%,100%,0.5)]
-            opacity-100 visible pointer-events-auto
-            scale-100 translate-y-0
-            transition-all duration-150 ease-in-out
-            origin-bottom-left
-          `;
-
-          const newFlyoutRect = flyout.getBoundingClientRect();
-          const buffer = 16;
-
-          const bridgeTop =
-            Math.min(btnRect.top, newFlyoutRect.top) - buffer / 2;
-          const bridgeBottom =
-            Math.max(btnRect.bottom, newFlyoutRect.bottom) + buffer / 2;
-          const bridgeHeight = bridgeBottom - bridgeTop;
-
-          const bridgeLeft = btnRect.right - buffer;
-          const bridgeRight = newFlyoutRect.left + buffer;
-          const bridgeWidth = bridgeRight - bridgeLeft;
-
-          hoverBridge.style.top = `${bridgeTop}px`;
-          hoverBridge.style.left = `${bridgeLeft}px`;
-          hoverBridge.style.height = `${bridgeHeight}px`;
-          hoverBridge.style.width = `${bridgeWidth}px`;
-          hoverBridge.style.pointerEvents = "auto";
-        });
-      };
-
-      const hideFlyout = () => {
-        this.hideTimeout = setTimeout(() => {
-          if (!this.flyoutHovered) {
-            flyoutWrapper.style.top = "-9999px";
-            flyoutWrapper.style.left = "-9999px";
-            flyoutWrapper.style.pointerEvents = "none";
-
-            flyout.className = `
-              fixed bg-white shadow-lg rounded-md p-3 min-w-[200px] grid grid-cols-2 gap-4 z-[9999] border border-gray-200 backdrop-blur-lg bg-[hsla(0,0%,100%,0.5)]
-              opacity-0 invisible pointer-events-none
-              scale-0 translate-y-16
-              transition-all duration-150 ease-in-out
-              origin-bottom-left
-            `;
-
-            hoverBridge.style.top = "-9999px";
-            hoverBridge.style.left = "-9999px";
-            hoverBridge.style.height = "0";
-            hoverBridge.style.width = "0";
-            hoverBridge.style.pointerEvents = "none";
-          }
-        }, 150);
-      };
-
-      const onEnter = () => {
-        this.flyoutHovered = true;
-        showFlyout();
-      };
-
-      const onLeave = () => {
-        this.flyoutHovered = false;
-        hideFlyout();
-      };
-
-      moreBtn.addEventListener("mouseenter", onEnter);
-      moreBtn.addEventListener("mouseleave", onLeave);
-      flyout.addEventListener("mouseenter", onEnter);
-      flyout.addEventListener("mouseleave", onLeave);
-      hoverBridge.addEventListener("mouseenter", onEnter);
-      hoverBridge.addEventListener("mouseleave", onLeave);
-    },
-
-    handleSidebarVisibility() {
-      const shouldBeVisible = window.innerWidth > 768;
-
-      if (shouldBeVisible && !this.isSidebarAttached) {
-        document.body.insertBefore(this.$el, document.body.firstChild);
-        this.renderSidebarMenu();
-        this.isSidebarAttached = true;
-      } else if (!shouldBeVisible && this.isSidebarAttached) {
-        this.$el.remove();
-        this.isSidebarAttached = false;
-
-        document
-          .querySelectorAll("[data-floating-panel-wrapper], .hover-bridge")
-          .forEach((el) => el.remove());
-      } else if (shouldBeVisible && this.isSidebarAttached) {
-        this.renderSidebarMenu();
-      }
-    },
-  },
+      }, 150);
+    }
+  }
 };
 </script>

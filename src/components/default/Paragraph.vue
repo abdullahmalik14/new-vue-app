@@ -27,7 +27,7 @@ const props = defineProps({
   leftIcon: { type: [String, Object, Function], default: null },
 
   iconSize: { type: String, default: "w-5 h-5" },
-  iconSpacing: { type: String, default: "mr-2 inline-block" },
+  iconSpacing: { type: String, default: "inline-block" },
 
   // override props (same structure as Input)
   addId: String,
@@ -47,9 +47,10 @@ const props = defineProps({
   fontFamily: { type: String, default: "" },
   shadow: { type: String, default: "" },
   layoutClass: { type: String, default: "" },
+  class: String,
 });
 
-const paragraphConfig = {
+const paragraphConfig = computed(() => ({
   wrappers: [
     {
       targetAttribute: "wrapper1",
@@ -70,6 +71,7 @@ const paragraphConfig = {
       props.fontFamily,
       props.shadow,
       props.layoutClass,
+      props.class,
     ]
       .filter(Boolean)
       .join(" "),
@@ -77,7 +79,7 @@ const paragraphConfig = {
       role: "paragraph",
     },
   },
-};
+}));
 
-const resolvedAttrs = computed(() => resolveAllConfigs(paragraphConfig, props.version, props));
+const resolvedAttrs = computed(() => resolveAllConfigs(paragraphConfig.value, props.version, props));
 </script>

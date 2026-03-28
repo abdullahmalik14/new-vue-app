@@ -32,7 +32,7 @@ const props = defineProps({
   leftIcon: [String, Object, Function],
 
   iconSize: { type: String, default: "w-5 h-5" },
-  iconSpacing: { type: String, default: "mr-2 inline-block" },
+  iconSpacing: { type: String, default: " inline-block" },
 
   addId: String,
   removeId: Boolean,
@@ -42,6 +42,7 @@ const props = defineProps({
   removeAttributes: { type: Array, default: () => [] },
 
   wrapperOverrides: { type: Array, default: () => [] },
+  class: String,
 });
 
 // Tailwind classes matrix (themes × h1–h6)
@@ -115,7 +116,12 @@ const headingConfig = computed(() => ({
     },
   ],
   elm: {
-    addClass: themeClasses[props.theme]?.[props.tag] || themeClasses.defaultSecondaryHeading.h2,
+    addClass: [
+      themeClasses[props.theme]?.[props.tag] || themeClasses.defaultSecondaryHeading.h2,
+      props.class,
+    ]
+      .filter(Boolean)
+      .join(" "),
     addAttributes: {
       role: "heading",
       "aria-level": props.tag.replace("h", ""),

@@ -2,6 +2,8 @@
 import { computed, ref } from "vue";
 import Paragraph from "../default/Paragraph.vue";
 import { CheckIcon } from "@heroicons/vue/24/outline";
+import EyeIcon from "@heroicons/vue/24/outline/EyeIcon";
+import EyeSlashIcon from "@heroicons/vue/24/outline/EyeSlashIcon";
 import HexagonExclamationIcon from "@/components/icons/HexagonExclamationIcon.vue";
 
 const emit = defineEmits(["update:modelValue", "click:right-icon"]);
@@ -47,6 +49,14 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false
+  },
+  interactionsConfig: {
+    type: [Object, Array],
+    default: undefined
+  },
+  rightIconInteractionsConfig: {
+    type: [Object, Array],
+    default: undefined
   }
 });
 
@@ -73,6 +83,36 @@ const requiredDisplayValues = computed(() => {
   return Array.isArray(props.requiredDisplay)
     ? props.requiredDisplay
     : [props.requiredDisplay];
+});
+
+// ─────────────────────────────────────────────
+// Internal v-interactions config for password fields
+// ─────────────────────────────────────────────
+const internalEyeVisibilityConfig = computed(() => {
+  if (props.type !== "password" || !props.id) return undefined;
+  return Object.freeze([
+    {
+      triggerEvents: ["input"],
+      rules: [{ type: "hasContent" }],
+      onValid: { actionType: "show", targetSelector: `#${props.id}-eye` },
+      onInvalid: { actionType: "hide", targetSelector: `#${props.id}-eye` },
+    },
+  ]);
+});
+
+const internalTypeToggleConfig = computed(() => {
+  if (props.type !== "password" || !props.id) return undefined;
+  return Object.freeze([
+    {
+      triggerEvents: ["click"],
+      rules: [{ type: "bypassValidation" }],
+      onValid: [
+        { actionType: "toggleDisplay", targetSelector: `#${props.id}`, attribute: "type", values: ["password", "text"] },
+        { actionType: "toggleDisplay", targetSelector: `#${props.id}-eye-icon` },
+        { actionType: "toggleDisplay", targetSelector: `#${props.id}-eyeslash-icon` },
+      ],
+    },
+  ]);
 });
 </script>
 
@@ -106,15 +146,31 @@ const requiredDisplayValues = computed(() => {
         :data-required="$attrs['data-required']" :disabled="disabled"
         class="w-full bg-transparent outline-none focus:outline-none focus:ring-0 focus:border-none poppins-medium placeholder:font-[400]"
         :class="[textColor, placeholderColor, leftIcon ? 'pl-8' : 'pl-1', rightIcon ? (rightIconText ? 'pr-16' : 'pr-8') : '']" @input="$emit('update:modelValue', $event.target.value)"
-        @focus="handleFocus" @blur="handleBlur" />
+        @focus="handleFocus" @blur="handleBlur"
+        v-interactions="interactionsConfig || internalEyeVisibilityConfig" />
 
-      <div v-if="rightIcon"
+      <div v-if="rightIcon || $slots['right-icon'] || type === 'password'"
+        :id="`${id}-eye`"
         class="absolute right-2 top-[50%] transform -translate-y-1/2 flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+        hidden
+        v-interactions="rightIconInteractionsConfig || internalTypeToggleConfig"
         @click="$emit('click:right-icon')">
         <span v-if="rightIconText" class="text-xs font-medium poppins-medium" :class="textColor">{{ rightIconText
         }}</span>
-        <component :is="typeof rightIcon === 'string' ? 'img' : rightIcon"
-          :src="typeof rightIcon === 'string' ? rightIcon : undefined" alt="icon" class="w-5 h-5" :class="textColor" />
+        <slot name="right-icon">
+          <!-- Password icons default: shown if no slot is provided and type is password -->
+          <template v-if="type === 'password' && !rightIcon">
+            <span :id="`${id}-eye-icon`">
+              <EyeSlashIcon class="w-5 h-5" :class="textColor" />
+            </span>
+            <span :id="`${id}-eyeslash-icon`" hidden>
+              <EyeIcon class="w-5 h-5" :class="textColor" />
+            </span>
+          </template>
+
+          <component v-else-if="rightIcon" :is="typeof rightIcon === 'string' ? 'img' : rightIcon"
+            :src="typeof rightIcon === 'string' ? rightIcon : undefined" alt="icon" class="w-5 h-5" :class="textColor" />
+        </slot>
       </div>
     </div>
 
@@ -157,6 +213,11 @@ const requiredDisplayValues = computed(() => {
 </template>
 
 <style scoped>
+/* Force HTML5 hidden attribute to override Tailwind display utility classes (like .flex) */
+[hidden] {
+  display: none !important;
+}
+
 /* Hide browser's default password reveal button for all browsers */
 input[type="password"]::-webkit-credentials-auto-fill-button {
   display: none !important;

@@ -1,56 +1,79 @@
 <template>
   <transition name="fade" mode="out-in">
-    <div v-if="isOpen" class="w-full border-b border-[#E5E7EB] flex relative">
-      <!-- Left border color -->
-      <div class="toast-border w-[0.188rem] absolute h-full left-0 top-0" :class="variantConfig.leftBorderClass" />
-
-      <!-- Card body -->
-      <div class="dashboard-toast-inner-wrapper flex gap-4 py-3 px-3 flex-1 min-w-0 min-h-0"
+    <div v-if="isOpen" 
+      class="relative flex justify-center items-center self-stretch border-b border-gray-200 dark:border-gray-700 transition-all duration-150 ease-in-out"
+      :class="variantConfig.borderLeftClass">
+      
+      <div 
+        class="flex-1 pt-3 pb-3 pl-2 pr-2 z-[2] relative self-stretch flex flex-col items-start transition-all duration-150 ease-in-out"
         :class="variantConfig.bgClass">
-        <div class="dashboard-toast-inner-container relative w-full flex items-start gap-5">
+        
+        <div class="relative flex justify-start items-start self-stretch gap-5">
           <!-- Close button -->
-          <div v-if="closable" class="absolute top-0 right-0 cursor-pointer" @click="handleClose">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="w-6 h-6">
-              <path d="M17 7L7 17M7 7L17 17" stroke="#D0D5DD" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round"></path>
-            </svg>
-          </div>
+          <a v-if="closable" @click="handleClose"
+            class="absolute right-0 top-0 flex justify-center items-center w-6 h-6 cursor-pointer z-10">
+            <img src="https://i.ibb.co/jvsPTy91/svgviewer-png-output-81.webp" alt="close"
+              class="w-4 h-4 pointer-events-none opacity-40 hover:opacity-100 transition-opacity" />
+          </a>
 
-          <!-- Icon -->
-          <div v-if="showIconComputed" class="relative">
-            <div class="toast-icon-container w-10 h-10 flex justify-center items-center rounded-lg"
+          <!-- Icon with Badge -->
+          <div v-if="showIcon" class="relative">
+            <div class="relative flex justify-center items-center w-10 h-10 rounded-lg"
               :class="variantConfig.iconBgClass">
-              <component v-if="icon" :is="icon" class="w-7 h-7" :class="variantConfig.iconStrokeClass" />
-              <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" fill="none" class="w-7 h-7"
-                :class="variantConfig.iconStrokeClass">
-                <path
-                  d="M25.666 24.5V22.167c0-2.175-1.487-4.002-3.5-4.52M18.083 3.839A4.666 4.666 0 0 1 21 8.167a4.667 4.667 0 0 1-2.917 4.327M19.833 24.5c0-2.174 0-3.262-.355-4.12a4.666 4.666 0 0 0-2.526-2.525c-.858-.355-1.945-.355-4.12-.355H9.333c-2.174 0-3.262 0-4.12.355A4.666 4.666 0 0 0 2.688 20.38C2.333 21.238 2.333 22.326 2.333 24.5M15.75 8.167a4.667 4.667 0 1 1-9.334 0 4.667 4.667 0 0 1 9.334 0Z"
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
+              <!-- Main Icon -->
+              <component v-if="icon && typeof icon !== 'string'" :is="icon" class="w-6 h-6" :class="variantConfig.iconColorClass" />
+              <img v-else-if="icon" :src="icon" class="w-6 h-6" :class="variantConfig.iconColorClass" />
+              <img v-else src="https://i.ibb.co.com/27y6kPNB/placeholder-jpeg.webp" class="w-full h-full rounded-lg" />
+
+              <!-- Badge Icon -->
+              <div v-if="badgeIcon"
+                class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg"
+                :class="variantConfig.badgeBgClass">
+                <component v-if="badgeIcon && typeof badgeIcon !== 'string'" :is="badgeIcon" class="w-4 h-4 text-white" />
+                <img v-else :src="badgeIcon" class="w-4 h-4 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
+              </div>
             </div>
           </div>
 
           <!-- Content -->
-          <div class="flex flex-col flex-1 min-w-0 min-h-0 pr-[1.125rem] md:pr-0">
-            <div class="flex flex-col gap-2 pb-2" v-if="title">
-              <div class="flex justify-between items-center pt-1 pr-1">
-                <span v-if="title" class="toast-heading text-sm" :class="variantConfig.titleTextClass">{{ title
-                }}</span>
-                <slot name="title" />
+          <div class="flex-1 self-stretch flex flex-col items-start min-w-0">
+            <div class="self-stretch flex flex-col items-start min-h-0">
+              <!-- Text -->
+              <div class="self-stretch flex justify-start items-start pr-6 pt-1 min-w-0">
+                <p class="text-sm leading-5 font-normal text-gray-900 dark:text-gray-100 break-words">
+                  <span v-if="title" class="font-semibold block mb-0.5">{{ title }}</span>
+                  <slot>{{ description }}</slot>
+                </p>
               </div>
-            </div>
-            <div class="flex justify-between items-center gap-4">
-              <span v-if="description"
-                class="text-sm flex-1 [text-shadow:0_0_10px_rgba(0,0,0,0.10)] text-[#0F172A] pr-5">{{ description
-                }}</span>
-              <slot />
 
-              <a v-if="linkHref && linkLabel" :href="linkHref" class="flex gap-0.5 items-center"
-                @click.prevent="onLink">
-                <span class="toast-link text-xs font-medium whitespace-nowrap" :class="variantConfig.linkTextClass">{{
-                  linkLabel }}</span>
-              </a>
-              <slot name="actions" />
+              <!-- Bottom Content: Time & Actions -->
+              <div class="self-stretch flex justify-between items-end pt-2 gap-2">
+                <!-- Timestamp -->
+                <div v-if="timestamp" class="flex justify-start items-end">
+                  <span class="text-xs leading-[1.125rem] text-gray-400 font-medium">{{ timestamp }}</span>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-end gap-2" v-if="finalActionLabel || dismissLabel || $slots.actions">
+                  <slot name="actions">
+                    <!-- Dismiss Link -->
+                    <a v-if="dismissLabel" @click.prevent="handleClose"
+                      class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out cursor-pointer">
+                      <span class="text-xs leading-[1.125rem] font-medium text-gray-500 hover:text-indigo-600 transition-colors">{{ dismissLabel }}</span>
+                      <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" 
+                        class="h-4 w-4 [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
+                    </a>
+
+                    <!-- Action Link (support both action and link) -->
+                    <a v-if="finalActionLabel" :href="linkHref || '#'" @click.prevent="handleAction"
+                      class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out cursor-pointer">
+                      <span class="text-xs leading-[1.125rem] font-medium" :class="variantConfig.actionTextClass">{{ finalActionLabel }}</span>
+                      <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" 
+                        class="h-4 w-4" :class="variantConfig.actionIconFilterClass" />
+                    </a>
+                  </slot>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -65,127 +88,92 @@ import { computed, ref, watch } from "vue";
 const props = defineProps({
   variant: {
     type: String,
-    default: "notice",
-    validator: (value) => ["notice", "alert", "success", "error", "info", "warning", "limit-exceeded"].includes(value),
+    default: "info",
+    // Adding backward compatibility variants: notice, alert, limit-exceeded
+    validator: (value) => ["info", "success", "warning", "error", "destructive", "notice", "alert", "limit-exceeded"].includes(value),
   },
-  title: {
-    type: String,
-    default: "",
-  },
-  description: {
-    type: String,
-    default: "",
-  },
-  linkLabel: {
-    type: String,
-    default: "",
-  },
-  linkHref: {
-    type: String,
-    default: "",
-  },
-  icon: {
-    type: [Object, Function, String],
-  },
-  showIcon: {
-    type: Boolean,
-    default: true,
-  },
-  closable: {
-    type: Boolean,
-    default: true,
-  },
-  modelValue: {
-    type: Boolean,
-    default: true,
-  },
+  title: String,
+  description: String,
+  timestamp: String,
+  icon: [Object, Function, String],
+  badgeIcon: [Object, Function, String],
+  showIcon: { type: Boolean, default: true },
+  closable: { type: Boolean, default: true },
+  modelValue: { type: Boolean, default: true },
+  actionLabel: String,
+  dismissLabel: String,
+  // Backward compatibility props
+  linkLabel: String,
+  linkHref: String,
 });
 
-const emit = defineEmits(["update:modelValue", "close", "link"]);
+const emit = defineEmits(["update:modelValue", "close", "action", "link"]);
 
-// Local open state to support both controlled and uncontrolled usages
 const isOpen = ref(props.modelValue);
-watch(
-  () => props.modelValue,
-  (v) => {
-    isOpen.value = v;
-  }
-);
+watch(() => props.modelValue, (v) => isOpen.value = v);
 watch(isOpen, (v) => emit("update:modelValue", v));
 
-const showIconComputed = computed(() => props.showIcon !== false);
+// Computed labels for backward compatibility
+const finalActionLabel = computed(() => props.actionLabel || props.linkLabel);
 
-const palettes = {
-  notice: {
-    left: "bg-[#22CCEE]",
-    bg: "[background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(34,204,238,0.15)_0,rgba(34,204,238,0.15)_100%),rgba(255,255,255,0.9)] ",
-    title: "text-[#000000] ",
-    link: "text-[#22CCEE] ",
-    iconBg: "bg-[rgba(34,204,238,0.15)]",
-    iconStroke: "stroke-[#22CCEE] text-[#22CCEE]",
-  },
-  alert: {
-    left: "bg-[#FDB022]",
-    bg: "[background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(253,176,34,0.15)_0,rgba(253,176,34,0.15)_100%),rgba(255,255,255,0.9)] ",
-    title: "text-[#B54708] font-semibold",
-    link: "text-[#FDB022]",
-    iconBg: "bg-[rgba(253,176,34,0.15)]",
-    iconStroke: "stroke-[#FDB022] text-[#FDB022]",
+const basePalettes = {
+  info: {
+    border: "border-l-3 border-l-[#22CCEE] dark:border-l-[#0e98b4]",
+    bg: "[background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(34,204,238,0.15)_0,rgba(34,204,238,0.15)_100%),rgba(255,255,255,0.9)] dark:[background:linear-gradient(90deg,rgba(24,26,27,0)_0px,rgba(24,26,27,0.9)_100%),linear-gradient(0deg,rgba(14,152,180,0.15)_0px,rgba(14,152,180,0.15)_100%)]",
+    iconBg: "bg-[rgba(34,204,238,0.1)] dark:bg-[rgba(14,152,180,0.1)]",
+    iconColor: "[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(37%)_saturate(913%)_hue-rotate(145deg)_brightness(95%)_contrast(97%)]",
+    badgeBg: "bg-[#2ce] dark:bg-[#0e98b4]",
+    actionText: "text-[#2ce] dark:text-[#0e98b4] group-hover:text-indigo-600 transition-colors",
+    actionFilter: "[filter:brightness(0)_saturate(100%)_invert(39%)_sepia(96%)_saturate(762%)_hue-rotate(157deg)_brightness(88%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]",
   },
   success: {
-    left: "bg-[#07f468]",
-    bg: "[background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(7,244,104,0.15)_0,rgba(7,244,104,0.15)_100%),rgba(255,255,255,0.9)]",
-    title: "text-[#07f468] ",
-    link: "text-[#07f468] ",
-    iconBg: "bg-[rgba(7,244,104,0.15)]",
-    iconStroke: " text-[#07f468]",
-    // stroke-[#07f468]
-  },
-  error: {
-    left: "bg-[#FF4405] ",
-    bg: "[background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(255,68,5,0.12)_0,rgba(255,68,5,0.12)_100%),rgba(255,255,255,0.9)] ",
-    title: "text-[#FF4405] ",
-    link: "text-[#FF4405] ",
-    iconBg: "bg-[rgba(255,68,5,0.12)]",
-    iconStroke: "stroke-[#FF4405] text-[#FF4405]",
+    border: "border-l-3 border-l-[#2ed3b7] dark:border-l-[#23a897]",
+    bg: "[background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(46,211,183,0.15)_0,rgba(46,211,183,0.15)_100%),rgba(255,255,255,0.9)] dark:[background:linear-gradient(90deg,rgba(24,26,27,0)_0px,rgba(24,26,27,0.9)_100%),linear-gradient(0deg,rgba(35,168,151,0.15)_0px,rgba(35,168,151,0.15)_100%)]",
+    iconBg: "bg-[rgba(46,211,183,0.1)] dark:bg-[rgba(35,168,151,0.1)]",
+    iconColor: "",
+    badgeBg: "bg-[#2ed3b7] dark:bg-[#23a897]",
+    actionText: "text-[#2ed3b7] dark:text-[#23a897] group-hover:text-indigo-600 transition-colors",
+    actionFilter: "[filter:brightness(0)_saturate(100%)_invert(34%)_sepia(63%)_saturate(508%)_hue-rotate(123deg)_brightness(94%)_contrast(97%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]",
   },
   warning: {
-    left: "bg-[#FF4405] ",
-    bg: "[background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(255,68,5,0.10)_0,rgba(255,68,5,0.10)_100%),rgba(255,255,255,0.9)] ",
-    title: "text-[#FF4405] ",
-    link: "text-[#FF4405] ",
-    iconBg: "bg-[rgba(255,68,5,0.10)]",
-    iconStroke: " text-[#FF4405]",
-    // stroke-[#FF4405]
+    border: "border-l-3 border-l-[#fdb022] dark:border-l-[#b77702]",
+    bg: "[background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(253,176,34,0.15)_0,rgba(253,176,34,0.15)_100%),rgba(255,255,255,0.9)] dark:[background:linear-gradient(90deg,rgba(24,26,27,0)_0px,rgba(24,26,27,0.9)_100%),linear-gradient(0deg,rgba(183,119,2,0.15)_0px,rgba(183,119,2,0.15)_100%)]",
+    iconBg: "bg-[rgba(253,176,34,0.1)] dark:bg-[rgba(183,119,2,0.1)]",
+    iconColor: "[filter:brightness(0)_saturate(100%)_invert(81%)_sepia(13%)_saturate(5746%)_hue-rotate(341deg)_brightness(102%)_contrast(98%)]",
+    badgeBg: "bg-[#fdb022] dark:bg-[#b77702]",
+    actionText: "text-[#fdb022] dark:text-[#b77702] group-hover:text-indigo-600 transition-colors",
+    actionFilter: "[filter:brightness(0)_saturate(100%)_invert(24%)_sepia(100%)_saturate(1622%)_hue-rotate(10deg)_brightness(98%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]",
   },
-  info: {
-    left: "bg-[#3B82F6]",
-    bg: "[background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(59,130,246,0.12)_0,rgba(59,130,246,0.12)_100%),rgba(255,255,255,0.9)] ",
-    title: "text-[#3B82F6]",
-    link: "text-[#3B82F6]",
-    iconBg: "bg-[rgba(59,130,246,0.12)]",
-    iconStroke: "stroke-[#3B82F6] text-[#3B82F6]",
-  },
-  "limit-exceeded": {
-    left: "bg-[#FF4405]",
-    bg: " bg-[#242424] [background:linear-gradient(0deg,rgba(255,68,5,0.3),rgba(255,68,5,0.3)),linear-gradient(90deg,rgba(0,0,0,0)0%,rgba(0,0,0,0.9)100%)] before:absolute before:content-[''] before:top-0 before:left-0 before:w-full before:h-full before:bg-[linear-gradient(90deg,rgba(0,0,0,0)0%,rgba(0,0,0,0.9)100%)]",
-    title: "text-[#FF4405] text-sm font-semibold",
-    link: "text-[#FF4405] text-xs font-medium",
-    iconBg: "bg-transparent", // Transparent since we might use a custom icon or no bg
-    iconStroke: "stroke-[#FF4405] text-[#FF4405]",
+  error: {
+    border: "border-l-3 border-l-[#ff4405] dark:border-l-[#c93300]",
+    bg: "[background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(255,68,5,0.1)_0,rgba(255,68,5,0.1)_100%),rgba(255,255,255,0.9)] dark:[background:linear-gradient(90deg,rgba(24,26,27,0)_0px,rgba(24,26,27,0.9)_100%),linear-gradient(0deg,rgba(201,51,0,0.1)_0px,rgba(201,51,0,0.1)_100%)]",
+    iconBg: "bg-[rgba(255,68,5,0.1)] dark:bg-[rgba(201,51,0,0.1)]",
+    iconColor: "[filter:brightness(0)_saturate(100%)_invert(42%)_sepia(53%)_saturate(6174%)_hue-rotate(356deg)_brightness(98%)_contrast(105%)]",
+    badgeBg: "bg-[#ff4405] dark:bg-[#c93300]",
+    actionText: "text-[#ff4405] dark:text-[#c93300] group-hover:text-indigo-600 transition-colors",
+    actionFilter: "[filter:brightness(0)_saturate(100%)_invert(12%)_sepia(50%)_saturate(4284%)_hue-rotate(351deg)_brightness(115%)_contrast(102%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]",
   },
 };
 
+// Aliases for compatibility
+const palettes = {
+  ...basePalettes,
+  notice: basePalettes.info,
+  alert: basePalettes.warning,
+  'limit-exceeded': basePalettes.error,
+  destructive: basePalettes.error,
+};
+
 const variantConfig = computed(() => {
-  const p = palettes[props.variant];
+  const p = palettes[props.variant] || palettes.info;
   return {
-    leftBorderClass: p.left,
+    borderLeftClass: p.border,
     bgClass: p.bg,
-    titleTextClass: p.title,
-    linkTextClass: p.link,
     iconBgClass: p.iconBg,
-    iconStrokeClass: p.iconStroke,
-    closeColor: "#D0D5DD",
+    iconColorClass: p.iconColor,
+    badgeBgClass: p.badgeBg,
+    actionTextClass: p.actionText,
+    actionIconFilterClass: p.actionFilter,
   };
 });
 
@@ -194,8 +182,12 @@ function handleClose() {
   emit("close");
 }
 
-function onLink() {
-  emit("link");
+function handleAction() {
+  if (props.linkHref) {
+    emit("link");
+    // If it's a real link and not just an action, let browser handle it if needed
+  }
+  emit("action");
 }
 </script>
 

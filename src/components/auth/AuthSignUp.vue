@@ -40,18 +40,18 @@
           <InputAuthComponent :model-value="password" @update:model-value="handlePasswordInput"
             :placeholder="t('auth.register.passwordPlaceholder')" id="password" show-label
             :label-text="t('auth.register.passwordLabel')" data-required="true" required-display="italic-text"
-            :type="passwordInputType" :right-icon="passwordIcon" :show-errors="passwordErrors.length > 0"
+            type="password" :show-errors="passwordErrors.length > 0"
             :errors="passwordErrors" :on-success="passwordSuccess.length > 0" :success="passwordSuccess"
-            @click:right-icon="togglePasswordVisibility" :disabled="isLoading" />
+            :disabled="isLoading" />
 
           <!-- Confirm Password input -->
           <InputAuthComponent :model-value="confirmPassword" @update:model-value="handleConfirmPasswordInput"
             :placeholder="t('auth.register.confirmPasswordPlaceholder')" id="confirmPassword" show-label
             :label-text="t('auth.register.confirmPasswordLabel')" data-required="true" required-display="italic-text"
-            :type="confirmPasswordInputType" :right-icon="confirmPasswordIcon"
+            type="password"
             :show-errors="confirmPasswordErrors.length > 0" :errors="confirmPasswordErrors"
             :on-success="confirmPasswordSuccess.length > 0" :success="confirmPasswordSuccess"
-            @click:right-icon="toggleConfirmPasswordVisibility" :disabled="isLoading" />
+            :disabled="isLoading" />
         </div>
 
         <!-- Signup button -->
@@ -103,8 +103,6 @@ import { interactionsEngine } from "@/utils/validation/interactionsEngine.js";
 import {
   InformationCircleIcon,
   CheckCircleIcon,
-  EyeIcon,
-  EyeSlashIcon,
   XMarkIcon,
 } from "@heroicons/vue/24/outline";
 import { ExclamationCircleIcon } from "@heroicons/vue/24/solid";
@@ -186,10 +184,6 @@ const passwordConfig = computed(() => ({
     ],
   },
   validateOnInput: true,
-  ui: {
-    dynamicType: "password",
-    visibilityMetaKey: "passwordVisible",
-  },
 }));
 
 const confirmPasswordConfig = computed(() => ({
@@ -207,10 +201,6 @@ const confirmPasswordConfig = computed(() => ({
     ],
   },
   validateOnInput: true,
-  ui: {
-    dynamicType: "password",
-    visibilityMetaKey: "confirmPasswordVisible",
-  },
 }));
 
 // Get field states from the engine
@@ -307,46 +297,6 @@ const confirmPasswordSuccess = computed(() => {
     confirmPasswordConfig.value,
     "confirmPassword"
   );
-});
-
-// Computed properties for dynamic input types (password visibility)
-const passwordInputType = computed(() => {
-  return interactionsEngine.getInputType(passwordConfig.value, "password");
-});
-
-const confirmPasswordInputType = computed(() => {
-  return interactionsEngine.getInputType(
-    confirmPasswordConfig.value,
-    "password"
-  );
-});
-
-// Computed properties for dynamic password icons (eye/eye-slash)
-const passwordIcon = computed(() => {
-  if (!password.value) return null;
-  const isPasswordVisible = passwordInputType.value === "text";
-  return isPasswordVisible ? EyeIcon : EyeSlashIcon;
-});
-
-const confirmPasswordIcon = computed(() => {
-  if (!confirmPassword.value) return null;
-  const isPasswordVisible = confirmPasswordInputType.value === "text";
-  return isPasswordVisible ? EyeIcon : EyeSlashIcon;
-});
-
-// Computed properties for password toggle text
-const passwordToggleText = computed(() => {
-  const isPasswordVisible = passwordInputType.value === "text";
-  return isPasswordVisible
-    ? t("auth.common.hidePassword")
-    : t("auth.common.showPassword");
-});
-
-const confirmPasswordToggleText = computed(() => {
-  const isPasswordVisible = confirmPasswordInputType.value === "text";
-  return isPasswordVisible
-    ? t("auth.common.hidePassword")
-    : t("auth.common.showPassword");
 });
 
 // Computed button text based on loading and script availability
@@ -891,21 +841,6 @@ const handleConfirmPasswordInput = (value) => {
   if (state?.isValid && state?.element) {
     state.element.classList.remove("first-invalid");
   }
-};
-
-// Toggle password visibility
-const togglePasswordVisibility = () => {
-  interactionsEngine.runInteractions(
-    [{ type: "toggleFieldMeta", metaKey: "passwordVisible" }],
-    passwordConfig.value
-  );
-};
-
-const toggleConfirmPasswordVisibility = () => {
-  interactionsEngine.runInteractions(
-    [{ type: "toggleFieldMeta", metaKey: "confirmPasswordVisible" }],
-    confirmPasswordConfig.value
-  );
 };
 
 async function handleSignUp() {

@@ -1,3 +1,8 @@
+<script setup lang="ts">
+import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWrapperTwoColContainer.vue';
+
+</script>
+
 <template>
 <!-- <DashboardWrapperTwoColContainer>
 
@@ -181,8 +186,10 @@
     <ProfileMerchPopup v-model="profileMerchPopupOpen" />
     <TopUpPopup v-model="topUpPopupOpen" />
   </DashboardWrapperTwoColContainer> -->
+<DashboardWrapperTwoColContainer>
 
-Dashboard page
+  Dashboard page
+</DashboardWrapperTwoColContainer>
 </template>
 
 <!-- <script setup>

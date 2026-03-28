@@ -30,14 +30,14 @@
             <InputAuthComponent :model-value="password" @update:model-value="handlePasswordInput"
               :placeholder="t('auth.login.passwordPlaceholder')" id="password" show-label
               :label-text="t('auth.login.passwordLabel')" data-required="true" required-display="italic-text"
-              :type="passwordInputType" :right-icon="passwordIcon" :right-icon-text="passwordToggleText"
+              type="password"
               :show-errors="passwordErrors.length > 0" :errors="passwordErrors"
-              @click:right-icon="togglePasswordVisibility" :disabled="isLoading" />
+              :disabled="isLoading" />
             <!-- Forgot password link — popup-aware -->
             <component :is="popupNavHandler ? 'button' : RouterLink"
               v-bind="popupNavHandler ? { type: 'button' } : { to: '/lost-password' }"
               @click="popupNavHandler ? popupNavHandler('/lost-password') : undefined"
-              class="w-fit opacity-70 text-xs capitalize text-text font-semibold"
+              class="w-fit opacity-70 text-xs capitalize text-text font-normal"
               :class="{ 'opacity-50 pointer-events-none': isLoading }">
               {{ t("auth.login.forgotPassword") }}
             </component>
@@ -95,8 +95,6 @@ import { createAssetHandler } from "@/utils/assets/assetHandlerFactory.js";
 import { interactionsEngine } from "@/utils/validation/interactionsEngine.js";
 import {
   InformationCircleIcon,
-  EyeIcon,
-  EyeSlashIcon,
   XMarkIcon,
 } from "@heroicons/vue/24/outline";
 import { ExclamationCircleIcon } from "@heroicons/vue/24/solid";
@@ -160,10 +158,6 @@ const passwordConfig = computed(() => ({
     requiredMessage: t("auth.validation.passwordRequired"),
   },
   validateOnInput: false,
-  ui: {
-    dynamicType: "password",
-    visibilityMetaKey: "passwordVisible",
-  },
 }));
 
 // Get field states from the engine
@@ -192,25 +186,6 @@ const passwordErrors = computed(() => {
     error: rule.message,
     icon: InformationCircleIcon,
   }));
-});
-
-// Computed property for dynamic input type (password visibility)
-const passwordInputType = computed(() => {
-  return interactionsEngine.getInputType(passwordConfig.value, "password");
-});
-
-// Computed property for dynamic password icon (eye/eye-slash)
-// Only show icon when password field has content
-const passwordIcon = computed(() => {
-  if (!password.value) return null;
-  const isPasswordVisible = passwordInputType.value === "text";
-  return isPasswordVisible ? EyeIcon : EyeSlashIcon;
-});
-
-// Computed property for password toggle text
-const passwordToggleText = computed(() => {
-  const isPasswordVisible = passwordInputType.value === "text";
-  return isPasswordVisible ? t("") : t("");
 });
 
 // Computed button text based on loading and script availability
@@ -425,20 +400,12 @@ const handlePasswordInput = (value) => {
   }
 };
 
-// Cleanup AssetHandler
+// Cleanup Assets
 onBeforeUnmount(() => {
   if (assetHandler.value) {
     assetHandler.value.dispose();
   }
 });
-
-// Toggle password visibility
-const togglePasswordVisibility = () => {
-  interactionsEngine.runInteractions(
-    [{ type: "toggleFieldMeta", metaKey: "passwordVisible" }],
-    passwordConfig.value
-  );
-};
 
 async function handleLogin() {
   if (isLoading.value) return;
