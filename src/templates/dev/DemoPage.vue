@@ -634,7 +634,7 @@
                 <p class="text-xs text-slate-500/80 -mt-8">
                     Modern tier cards with integrated feature lists and price toggles (Data from TierData.js)
                 </p>
-                <div class="flex flex-wrap justify-center gap-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
                     <div v-for="tier in tierData" :key="tier.id" class="flex flex-col gap-4">
                         <TierCard :tier="tier" />
                         <ShowCodeToggle :code="demoSnippets.tierCard[tier.id]" />
