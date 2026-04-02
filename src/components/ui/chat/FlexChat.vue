@@ -52,6 +52,9 @@ const props = defineProps({
     // Customization callbacks
     variantForMessage: { type: Function, default: null }, // (msg, index) => 'system' | null
     messageAttrs: { type: Function, default: null }, // (msg, index) => { ...data-attrs }
+
+    // Typing Users
+    typingUsers: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits(['load-more', 'message-click', 'message-context'])
@@ -324,8 +327,8 @@ watch(() => props.messages, async (newVal) => {
                                 </div>
 
                                 <!-- NAME (FOR OTHERS) -->
-                                <span v-if="!isMe(msg) && msg.senderName" :class="[theme.otherNameMeta, 'mb-1 ml-1']">{{
-                                    msg.senderName }}</span>
+                                <!-- <span v-if="!isMe(msg) && msg.senderName" :class="[theme.otherNameMeta, 'mb-1 ml-1']">{{
+                                    msg.senderName }}</span> -->
 
                                 <!-- BUBBLE -->
                                 <div :class="isMe(msg) ? theme.myBubble : theme.otherBubble"
@@ -339,8 +342,18 @@ watch(() => props.messages, async (newVal) => {
 
                         </div>
                     </slot>
-                </template>
+                </template> <!-- END V-FOR -->
             </template>
+        </div> <!-- END BODY -->
+
+        <!-- TYPING INDICATOR (Fixed to bottom above compose box, always visible) -->
+        <div v-if="typingUsers && typingUsers.length > 0" class="absolute bottom-[75px] inset-x-0 px-6 py-1.5 bg-gradient-to-t from-[#fafafa] to-transparent text-[11px] text-zinc-500 italic flex items-center gap-2 z-20 pointer-events-none">
+            <span class="flex gap-1 items-center">
+                <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
+                <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></span>
+            </span>
+            <span>{{ typingUsers.join(', ') }} {{ typingUsers.length > 1 ? 'are' : 'is' }} typing...</span>
         </div>
 
         <!-- COMPOSE AREA SLOT -->
