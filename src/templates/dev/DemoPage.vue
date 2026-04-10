@@ -113,156 +113,125 @@
                 <DemoSectionHeader title="InputComponentDashboard" />
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-                    <!-- 1. Default -->
+                   
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Default</span>
-                        <div class="min-h-[100px] flex items-center">
+                        
                             <InputComponentDashboard 
                                 v-model="inputs.basic" 
-                                placeholder="Enter text..." 
+                                placeholder="carrot_popxoxo123" 
                                 showLabel
                                 labelText="Username"
-                                v-bind="lightInputProps"
+                                description="Usernames cannot be changed after your first month on our website, but special circumstances may allow for exceptions. Please contact us if you need assistance with changing your username."
                             />
-                        </div>
+                        
                         <ShowCodeToggle :code="demoSnippets.icd.default" />
                     </div>
+
+                    <div class="flex flex-col gap-3">
+                        
+                            <InputComponentDashboard 
+                                v-model="inputs.basic" 
+                                placeholder="mscarrot_pops@gmail.com" 
+                                showLabel
+                                labelText="Email"
+                            />
+                        
+                        <ShowCodeToggle :code="demoSnippets.icd.email" />
+                    </div>
+
+                     <div class="flex flex-col gap-3">
+                        
+                            <InputComponentDashboard 
+                                v-model="inputs.basic" 
+                                placeholder=""
+                                showLabel
+                                labelText="First Name"
+                            />
+                        
+                        <ShowCodeToggle :code="demoSnippets.icd.firstName" />
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        
+                            <InputComponentDashboard 
+                                v-model="inputs.basic" 
+                                placeholder=""
+                                showLabel
+                                labelText="Last Name"
+                            />
+                        
+                        <ShowCodeToggle :code="demoSnippets.icd.lastName" />
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        
+                            <InputComponentDashboard 
+                                v-model="inputs.basic" 
+                                placeholder="Event Title"
+                                showLabel
+                                labelText="Title"
+                            />
+                        
+                        <ShowCodeToggle :code="demoSnippets.icd.title" />
+                    </div>
+
+                     <div class="flex flex-col gap-3">
+                         <InputComponentDashboard 
+                         placeholder="Search by username & email"
+                    v-model="inputs.basic" 
+                    showLabel
+                    label-text="Co-performer (Optional)"
+                    :left-icon="MagnifyingGlassIcon"
+                     optionalLabel class="w-full" />
+
+                     <ShowCodeToggle :code="demoSnippets.icd.coPerformer" />
+                     </div>
 
                     <!-- 2. Password with Toggle -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Password with Toggle</span>
-                        <div class="min-h-[100px] flex items-center">
                             <InputComponentDashboard 
                                 v-model="inputs.password" 
-                                :type="inputs.showPass ? 'text' : 'password'"
-                                placeholder="••••••••" 
+                                placeholder="Old Password" 
                                 showLabel
-                                labelText="Password"
-                                :rightIcon="inputs.showPass ? EyeSlashIcon : EyeIcon"
-                                clickableRightIcon
+                                labelText="Old Password"
                                 @rightIconClick="inputs.showPass = !inputs.showPass"
-                                v-bind="lightInputProps"
+                                
                             />
-                        </div>
                         <ShowCodeToggle :code="demoSnippets.icd.password" />
                     </div>
 
-                    <!-- 3. With Left Icon -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Left Icon</span>
-                        <div class="min-h-[100px] flex items-center">
-                            <InputComponentDashboard 
-                                v-model="inputs.email" 
-                                placeholder="Search..." 
-                                showLabel
-                                labelText="Search" 
-                                :leftIcon="MagnifyingGlassIcon"
-                                v-bind="lightInputProps"
-                            />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.icd.leftIcon" />
-                    </div>
-
+                   
                     <!-- 4. With Right Icon -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Right Icon</span>
-                        <div class="min-h-[100px] flex items-center">
                             <InputComponentDashboard 
                                 v-model="inputs.email" 
                                 placeholder="Enter email..." 
                                 showLabel
                                 labelText="Email Support" 
                                 :rightIcon="EnvelopeIcon"
-                                v-bind="lightInputProps"
+                                
                             />
-                        </div>
                         <ShowCodeToggle :code="demoSnippets.icd.rightIcon" />
                     </div>
 
                     <!-- 5. Required Display -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Required (*)</span>
-                        <div class="min-h-[100px] flex items-center">
                             <InputComponentDashboard 
                                 v-model="inputs.email" 
                                 placeholder="Required field" 
                                 showLabel
                                 labelText="Full Name" 
                                 requiredDisplay="*"
-                                v-bind="lightInputProps"
+                                
                             />
-                        </div>
                         <ShowCodeToggle :code="demoSnippets.icd.requiredStar" />
                     </div>
 
-                    <!-- 5. Italic Required -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Required Italic</span>
-                        <div class="min-h-[100px] flex items-center">
-                            <InputComponentDashboard 
-                                v-model="inputs.email" 
-                                placeholder="Enter..." 
-                                showLabel 
-                                labelText="Email Address"
-                                requiredDisplay="italic-text" 
-                                requiredDisplayText="Required"
-                                v-bind="lightInputProps"
-                            />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.icd.requiredItalic" />
-                    </div>
 
-                    <!-- 6. With Errors -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Validation Errors</span>
-                        <div class="min-h-[100px] flex items-center">
-                            <InputComponentDashboard 
-                                v-model="inputs.error" 
-                                placeholder="Enter..." 
-                                showLabel
-                                labelText="Promo Code" 
-                                showErrors
-                                :errors="[{ error: 'Invalid promo code' }, { error: 'Minimum spend $50' }]"
-                                v-bind="lightInputProps"
-                            />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.icd.errors" />
-                    </div>
-
-                    <!-- 7. On Success -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Success State</span>
-                        <div class="min-h-[100px] flex items-center">
-                            <InputComponentDashboard 
-                                v-model="inputs.success" 
-                                placeholder="Enter..." 
-                                showLabel
-                                labelText="Profile Handle" 
-                                onSuccess 
-                                :success="[{ message: 'Handle is available!' }]"
-                                v-bind="lightInputProps"
-                            />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.icd.success" />
-                    </div>
-
-                    <!-- 8. Spans / Suffix (Unit Price) -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Suffix / Spans (Unit Price)</span>
-                        <div class="min-h-[100px] flex items-center">
-                            <InputComponentDashboard 
-                                v-model="inputs.price" 
-                                placeholder="0.00" 
-                                showLabel 
-                                labelText="Unit Price"
-                                rightSpan 
-                                rightSpanText="USD" 
-                                v-bind="lightInputProps"
-                            />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.icd.suffixPrice" />
-                    </div>
-
+                    
                     <!-- 9. Prefix and Suffix Icons -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Both Icons (Left & Right)</span>
@@ -275,7 +244,7 @@
                                 :leftIcon="MagnifyingGlassIcon"
                                 :rightIcon="Bars3Icon"
                                 clickableRightIcon
-                                v-bind="lightInputProps"
+                                
                             />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.icd.bothIcons" />
@@ -284,16 +253,18 @@
                     <!-- 10. Textarea -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Textarea</span>
-                        <div class="min-h-[100px] flex items-center">
-                            <InputComponentDashboard 
-                                v-model="inputs.bio" 
-                                type="textarea" 
-                                showLabel 
-                                labelText="Biography"
-                                placeholder="Tell us about yourself..."
-                                v-bind="lightInputProps"
-                            />
-                        </div>
+                  
+                           <InputComponentDashboard
+                            id="input_g"
+                            type="textarea"
+                            show-label
+                            v-model="inputs.bio"
+                            textAreaRows="3"
+                            label-text=""
+                            placeholder="Description (Optional)"
+                            description="0/200 characters"
+                        />
+                  
                         <ShowCodeToggle :code="demoSnippets.icd.textarea" />
                     </div>
                 </div>
@@ -926,9 +897,9 @@
                     <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
                         <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">SVG
                             Sprite</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner src="https://api.iconify.design/svg-spinners:ring-resize.svg" size="lg" />
-                        </div>
+                        <!-- <div class="h-12 flex items-center justify-center"> -->
+                            <Spinner src="https://i.ibb.co.com/TM7mTrZJ/spinner.webp" size="2xl" />
+                        <!-- </div> -->
                         <ShowCodeToggle code="<!-- Template -->\n<Spinner src='svg-path.svg' />" />
                     </div>
                 </div>
@@ -1361,7 +1332,7 @@ const handleAction = (action) => {
 // Global light input props for demo consistency
 const lightInputProps = {
     labelClass: "!text-slate-900",
-    inputClass: "!text-slate-900 !placeholder-slate-400",
+    inputClass: "flex items-center gap-2 border-b border-[#D0D5DD] md:group-[.invalid]/input-field:border-[#FF4405] bg-white/50 px-3 [box-shadow:0px_1px_2px_0px_rgba(16,24,40,0.05)] dark:border-[#3b4043] dark:bg-[#181a1b]/50 dark:[box-shadow:0px_1px_2px_0px_rgba(24,36,61,0.05)] h-10",
     wrapperClass: "!border-slate-300 !bg-white",
     descriptionClass: "!text-slate-500",
     errorClass: "!text-red-600",

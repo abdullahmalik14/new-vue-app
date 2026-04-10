@@ -1,249 +1,210 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-[#710A0A] to-[#200000] py-10 px-4 font-sans">
-        <div class="max-w-6xl mx-auto flex flex-col gap-16">
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="InputComponentDashboard" class="text-white" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10 text-white">
-                    <!-- 1. Default -->
-                    <DemoCard label="Default" dark :code="codeExamples.default">
-                        <InputComponentDashboard v-model="vals.icd1" placeholder="Enter text..." showLabel
-                            labelText="Username" />
-                    </DemoCard>
-                    <!-- 2. With left icon -->
-                    <DemoCard label="With Left Icon" dark :code="codeExamples.leftIcon">
-                        <InputComponentDashboard v-model="vals.icd2" placeholder="Search..." showLabel
-                            labelText="Search" :leftIcon="MagnifyingGlassIcon" />
-                    </DemoCard>
-                    <!-- 3. With right icon -->
-                    <DemoCard label="With Right Icon" dark :code="codeExamples.rightIcon">
-                        <InputComponentDashboard v-model="vals.icd3" placeholder="Email..." showLabel labelText="Email"
-                            :rightIcon="EnvelopeIcon" />
-                    </DemoCard>
-                    <!-- 4. Required (*) -->
-                    <DemoCard label="Required (*)" dark :code="codeExamples.requiredAsterisk">
-                        <InputComponentDashboard v-model="vals.icd4" placeholder="Required field" showLabel
-                            labelText="Full Name" requiredDisplay="*" />
-                    </DemoCard>
-                    <!-- 5. Required italic text -->
-                    <DemoCard label="Required (italic-text)" dark :code="codeExamples.requiredItalic">
-                        <InputComponentDashboard v-model="vals.icd5" placeholder="Enter..." showLabel labelText="Email"
-                            requiredDisplay="italic-text" requiredDisplayText="Required" />
-                    </DemoCard>
-                    <!-- 6. With description -->
-                    <DemoCard label="With Description" dark :code="codeExamples.withDesc">
-                        <InputComponentDashboard v-model="vals.icd6" placeholder="your@email.com" showLabel
-                            labelText="Email" description="We'll never share your email." />
-                    </DemoCard>
-                    <!-- 7. Dynamic Errors -->
-                    <DemoCard label="Dynamic Errors" dark :code="codeExamples.dynamicErrors">
-                        <InputComponentDashboard v-model="vals.icd7" placeholder="Enter strong password..." showLabel
-                            labelText="Password" 
-                            :type="showDynamicPassword ? 'text' : 'password'"
-                            :rightIcon="showDynamicPassword ? EyeSlashIcon : EyeIcon"
-                            clickableRightIcon
-                            @rightIconClick="showDynamicPassword = !showDynamicPassword"
-                            :showErrors="passwordErrors.length > 0" :errors="passwordErrors"
-                            :onSuccess="passwordSuccess.length > 0" :success="passwordSuccess" />
-                    </DemoCard>
-                    <!-- 8. Username Availability -->
-                    <DemoCard label="Username Availability" dark :code="codeExamples.dynamicSuccess">
-                        <InputComponentDashboard v-model="vals.icd8" placeholder="Type jane_doe or admin..." showLabel
-                            labelText="Username" 
-                            :onSuccess="usernameSuccess.length > 0" :success="usernameSuccess"
-                            :showErrors="usernameErrors.length > 0" :errors="usernameErrors" />
-                    </DemoCard>
-                    <!-- 9. Left span (prefix) -->
-                    <DemoCard label="Left Span (Prefix)" dark :code="codeExamples.leftSpan">
-                        <InputComponentDashboard v-model="vals.icd9" placeholder="amount" showLabel labelText="Price"
-                            leftSpan leftSpanText="USD" leftSpanClass="text-white/70 bg-transparent pr-2" />
-                    </DemoCard>
-                    <!-- 10. Right span (suffix) -->
-                    <DemoCard label="Right Span (Suffix)" dark :code="codeExamples.rightSpan">
-                        <InputComponentDashboard v-model="vals.icd10" placeholder="0.00" showLabel labelText="Weight"
-                            rightSpan rightSpanText="kg" rightSpanClass="text-white/70 bg-transparent pl-2" />
-                    </DemoCard>
-                    <!-- 11. Textarea -->
-                    <DemoCard label="Textarea" dark :code="codeExamples.textarea">
-                        <InputComponentDashboard v-model="vals.icd11" type="textarea" showLabel labelText="Bio"
-                            placeholder="Write something..." />
-                    </DemoCard>
-                    <!-- 12. Required error text -->
-                    <DemoCard label="Phone Validation logic" dark :code="codeExamples.requiredErrorText">
-                        <InputComponentDashboard v-model="vals.icd12" placeholder="Enter..." showLabel labelText="Phone"
-                            :showErrors="phoneErrors.length > 0" :errors="phoneErrors"
-                            :onSuccess="phoneSuccess.length > 0" :success="phoneSuccess" />
-                    </DemoCard>
-                </div>
-            </section>
+  <section class="flex flex-col gap-10 bg-[#ececec] ">
+    <DemoSectionHeader title="InputComponentDashboard" />
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+
+      <div class="flex flex-col gap-3">
+        <InputComponentDashboard 
+          v-model="inputs.basic" 
+          placeholder="carrot_popxoxo123" 
+          showLabel 
+          labelText="Username"
+          description="Usernames cannot be changed after your first month on our website, but special circumstances may allow for exceptions. Please contact us if you need assistance with changing your username." 
+        />
+        <ShowCodeToggle :code="icdSnippets.default" />
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <InputComponentDashboard 
+          v-model="inputs.basic" 
+          placeholder="mscarrot_pops@gmail.com" 
+          showLabel 
+          labelText="Email" 
+        />
+        <ShowCodeToggle :code="icdSnippets.email" />
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <InputComponentDashboard 
+          v-model="inputs.basic" 
+          placeholder="" 
+          showLabel 
+          labelText="First Name" 
+        />
+        <ShowCodeToggle :code="icdSnippets.firstName" />
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <InputComponentDashboard 
+          v-model="inputs.basic" 
+          placeholder="" 
+          showLabel 
+          labelText="Last Name" 
+        />
+        <ShowCodeToggle :code="icdSnippets.lastName" />
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <InputComponentDashboard 
+          v-model="inputs.basic" 
+          placeholder="Event Title" 
+          showLabel 
+          labelText="Title" 
+        />
+        <ShowCodeToggle :code="icdSnippets.title" />
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <InputComponentDashboard 
+          placeholder="Search by username & email" 
+          v-model="inputs.basic" 
+          showLabel
+          label-text="Co-performer (Optional)" 
+          :left-icon="MagnifyingGlassIcon" 
+          optionalLabel 
+          class="w-full" 
+        />
+        <ShowCodeToggle :code="icdSnippets.coPerformer" />
+      </div>
+
+      <!-- 2. Password with Toggle -->
+      <div class="flex flex-col gap-3">
+        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Password with Toggle</span>
+        <InputComponentDashboard 
+          v-model="inputs.password" 
+          placeholder="Old Password" 
+          showLabel 
+          labelText="Old Password"
+          @rightIconClick="inputs.showPass = !inputs.showPass" 
+        />
+        <ShowCodeToggle :code="icdSnippets.password" />
+      </div>
+
+      <!-- 4. With Right Icon -->
+      <div class="flex flex-col gap-3">
+        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Right Icon</span>
+        <InputComponentDashboard 
+          v-model="inputs.email" 
+          placeholder="Enter email..." 
+          showLabel 
+          labelText="Email Support"
+          :rightIcon="EnvelopeIcon" 
+        />
+        <ShowCodeToggle :code="icdSnippets.rightIcon" />
+      </div>
+
+      <!-- 5. Required Display -->
+      <div class="flex flex-col gap-3">
+        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Required (*)</span>
+        <InputComponentDashboard 
+          v-model="inputs.email" 
+          placeholder="Required field" 
+          showLabel 
+          labelText="Full Name"
+          requiredDisplay="*" 
+        />
+        <ShowCodeToggle :code="icdSnippets.requiredStar" />
+      </div>
+
+      <!-- 9. Prefix and Suffix Icons -->
+      <div class="flex flex-col gap-3">
+        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Both Icons (Left & Right)</span>
+        <div class="min-h-[100px] flex items-center">
+          <InputComponentDashboard 
+            v-model="inputs.email" 
+            placeholder="Search with filters..." 
+            showLabel
+            labelText="Advanced Search" 
+            :leftIcon="MagnifyingGlassIcon" 
+            :rightIcon="Bars3Icon" 
+            clickableRightIcon 
+          />
         </div>
+        <ShowCodeToggle :code="icdSnippets.bothIcons" />
+      </div>
+
+      <!-- 10. Textarea -->
+      <div class="flex flex-col gap-3">
+        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Textarea</span>
+        <InputComponentDashboard 
+          id="input_g" 
+          type="textarea" 
+          show-label 
+          v-model="inputs.bio" 
+          textAreaRows="3"
+          label-text="" 
+          placeholder="Description (Optional)" 
+          description="0/200 characters" 
+        />
+        <ShowCodeToggle :code="icdSnippets.textarea" />
+      </div>
     </div>
+  </section>
 </template>
 
 <script setup>
-import { reactive, computed, ref } from 'vue';
+import { ref, reactive, defineComponent, h } from 'vue';
 import InputComponentDashboard from '@/components/input/InputComponentDashboard.vue';
 import DemoSectionHeader from '@/templates/dev/DemoSectionHeader.vue';
-import DemoCard from '@/templates/dev/DemoCard.vue';
-import { MagnifyingGlassIcon, EnvelopeIcon, EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline';
+import {
+  MagnifyingGlassIcon,
+  EnvelopeIcon,
+  Bars3Icon
+} from '@heroicons/vue/24/outline';
 
-const showDynamicPassword = ref(false);
-
-const vals = reactive({
-    icd1: '', icd2: '', icd3: '', icd4: '', icd5: '', icd6: '',
-    icd7: 'short', icd8: 'jane_doe', icd9: '', icd10: '', icd11: '', icd12: ''
+// Inline ShowCode toggle component
+const ShowCodeToggle = defineComponent({
+  props: { code: { type: String, default: '' } },
+  setup(props) {
+    const open = ref(false);
+    const copied = ref(false);
+    const copy = async () => {
+      await navigator.clipboard.writeText(props.code).catch(() => { });
+      copied.value = true;
+      setTimeout(() => (copied.value = false), 2000);
+    };
+    return () => h('div', { class: 'flex flex-col gap-0 mb-4' }, [
+      h('button', {
+        type: 'button',
+        onClick: () => (open.value = !open.value),
+        class: 'self-start flex items-center gap-1.5 text-[0.7rem] font-medium text-gray-500 hover:text-gray-800 dark:text-white/50 dark:hover:text-white/80 transition-colors mt-1 px-0 py-0',
+      }, [
+        h('svg', { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', 'stroke-width': '1.8', stroke: 'currentColor', class: 'w-3 h-3' },
+          [h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5' })]),
+        open.value ? 'Hide Code' : 'Show Code',
+      ]),
+      open.value && h('div', { class: 'mt-2 rounded-lg overflow-hidden bg-[#1a1a1a]' }, [
+        h('div', { class: 'flex justify-between items-center px-3 py-1.5 bg-[#252525]' }, [
+          h('span', { class: 'text-[0.6rem] font-mono text-white/30 uppercase tracking-wider' }, 'Vue'),
+          h('button', { type: 'button', onClick: copy, class: 'text-[0.65rem] text-white/40 hover:text-white/70 transition-colors' }, copied.value ? '✓ Copied' : 'Copy'),
+        ]),
+        h('pre', { class: 'p-3 overflow-x-auto text-[0.72rem] leading-relaxed text-[#d4d4d4] font-mono' },
+          h('code', {}, props.code)),
+      ]),
+    ]);
+  },
 });
 
-const passwordErrors = computed(() => {
-    const errors = [];
-    if (vals.icd7.length < 8) errors.push({ error: 'At least 8 characters long' });
-    if (!/[A-Z]/.test(vals.icd7)) errors.push({ error: 'Contain at least 1 uppercase letter' });
-    if (!/[a-z]/.test(vals.icd7)) errors.push({ error: 'Contain at least 1 lowercase letter' });
-    if (!/\d/.test(vals.icd7)) errors.push({ error: 'Contain at least 1 number' });
-    return errors;
+const inputs = reactive({
+  basic: '',
+  email: '',
+  password: '',
+  showPass: false,
+  bio: ''
 });
 
-const passwordSuccess = computed(() => {
-    const successes = [];
-    if (vals.icd7.length >= 8) successes.push({ message: 'At least 8 characters long' });
-    if (/[A-Z]/.test(vals.icd7)) successes.push({ message: 'Contain at least 1 uppercase letter' });
-    if (/[a-z]/.test(vals.icd7)) successes.push({ message: 'Contain at least 1 lowercase letter' });
-    if (/\d/.test(vals.icd7)) successes.push({ message: 'Contain at least 1 number' });
-    return successes;
-});
-
-const usernameSuccess = computed(() => {
-    return vals.icd8.length >= 4 && vals.icd8.toLowerCase() !== 'admin' ? [{ message: 'Username is available!' }] : [];
-});
-
-const usernameErrors = computed(() => {
-    if (vals.icd8.trim().length === 0) {
-        return [{ error: 'Username is required' }];
-    }
-    if (vals.icd8.toLowerCase() === 'admin') {
-        return [{ error: 'Username is taken' }];
-    }
-    return [];
-});
-
-const phoneErrors = computed(() => {
-    if (vals.icd12.trim().length === 0) {
-        return [{ error: 'This field is required.' }];
-    }
-    const isNum = /^[0-9+\-\s()]+$/.test(vals.icd12);
-    if (!isNum) {
-        return [{ error: 'Must be a valid phone number.' }];
-    }
-    return [];
-});
-
-const phoneSuccess = computed(() => {
-    if (vals.icd12.trim().length > 0 && phoneErrors.value.length === 0) {
-        return [{ message: 'Valid phone number!' }];
-    }
-    return [];
-});
-
-const codeExamples = {
-    default: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="Enter text..." 
-  showLabel
-  labelText="Username" 
-/>`,
-    leftIcon: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="Search..." 
-  showLabel
-  labelText="Search" 
-  :leftIcon="MagnifyingGlassIcon" 
-/>`,
-    rightIcon: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="Email..." 
-  showLabel 
-  labelText="Email"
-  :rightIcon="EnvelopeIcon" 
-/>`,
-    requiredAsterisk: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="Required field" 
-  showLabel
-  labelText="Full Name" 
-  requiredDisplay="*" 
-/>`,
-    requiredItalic: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="Enter..." 
-  showLabel 
-  labelText="Email"
-  requiredDisplay="italic-text" 
-  requiredDisplayText="Required" 
-/>`,
-    withDesc: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="your@email.com" 
-  showLabel
-  labelText="Email" 
-  description="We'll never share your email." 
-/>`,
-    dynamicErrors: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="Enter strong password..." 
-  showLabel
-  labelText="Password" 
-  :type="showPassword ? 'text' : 'password'"
-  :rightIcon="showPassword ? EyeSlashIcon : EyeIcon"
-  clickableRightIcon
-  @rightIconClick="showPassword = !showPassword"
-  :showErrors="passwordErrors.length > 0"
-  :errors="passwordErrors" 
-  :onSuccess="passwordSuccess.length > 0"
-  :success="passwordSuccess"
-/>`,
-    dynamicSuccess: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="Type jane_doe or admin..." 
-  showLabel
-  labelText="Username" 
-  :onSuccess="usernameSuccess.length > 0" 
-  :success="usernameSuccess" 
-  :showErrors="usernameErrors.length > 0"
-  :errors="usernameErrors"
-/>`,
-    leftSpan: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="amount" 
-  showLabel 
-  labelText="Price"
-  leftSpan 
-  leftSpanText="USD" 
-  leftSpanClass="text-white/70 bg-transparent pr-2" 
-/>`,
-    rightSpan: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="0.00" 
-  showLabel 
-  labelText="Weight"
-  rightSpan 
-  rightSpanText="kg" 
-  rightSpanClass="text-white/70 bg-transparent pl-2" 
-/>`,
-    textarea: `<InputComponentDashboard 
-  v-model="val" 
-  type="textarea" 
-  showLabel 
-  labelText="Bio"
-  placeholder="Write something..." 
-/>`,
-    requiredErrorText: `<InputComponentDashboard 
-  v-model="val" 
-  placeholder="Enter..." 
-  showLabel 
-  labelText="Phone"
-  :showErrors="phoneErrors.length > 0"
-  :errors="phoneErrors"
-  :onSuccess="phoneSuccess.length > 0"
-  :success="phoneSuccess"
-/>`
+const icdSnippets = {
+  default: `<InputComponentDashboard \n  v-model="val" \n  labelText="Username" \n  placeholder="Enter text..." \n  showLabel\n/>`,
+  email: `<InputComponentDashboard \n  v-model="email" \n  labelText="Email" \n  placeholder="mscarrot_pops@gmail.com" \n  showLabel\n/>`,
+  firstName: `<InputComponentDashboard \n  v-model="firstName" \n  labelText="First Name" \n  showLabel\n/>`,
+  lastName: `<InputComponentDashboard \n  v-model="lastName" \n  labelText="Last Name" \n  showLabel\n/>`,
+  title: `<InputComponentDashboard \n  v-model="title" \n  labelText="Title" \n  showLabel\n/>`,
+  coPerformer: `<InputComponentDashboard \n  v-model="search" \n  labelText="Co-performer (Optional)" \n  :leftIcon="MagnifyingGlassIcon"\n  showLabel\n  optionalLabel\n/>`,
+  password: `<InputComponentDashboard \n  v-model="password" \n  labelText="Password"\n  @rightIconClick="showPass = !showPass"\n  showLabel\n/>`,
+  rightIcon: `<InputComponentDashboard \n  v-model="email" \n  labelText="Email Support" \n  :rightIcon="EnvelopeIcon"\n  showLabel\n/>`,
+  requiredStar: `<InputComponentDashboard \n  v-model="name" \n  labelText="Full Name" \n  requiredDisplay="*"\n  showLabel\n/>`,
+  bothIcons: `<InputComponentDashboard \n  v-model="search" \n  labelText="Advanced Search" \n  :leftIcon="MagnifyingGlassIcon"\n  :rightIcon="Bars3Icon"\n  clickableRightIcon\n  showLabel\n/>`,
+  textarea: `<InputComponentDashboard \n  v-model="bio" \n  type="textarea" \n  placeholder="Description (Optional)"\n  textAreaRows="3"\n  showLabel\n/>`,
 };
 </script>
