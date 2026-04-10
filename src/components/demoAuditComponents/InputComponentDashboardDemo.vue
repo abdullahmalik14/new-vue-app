@@ -1,5 +1,5 @@
 <template>
-  <section class="flex flex-col gap-10 bg-[#ececec] ">
+  <section class="flex flex-col gap-10 bg-[#ececec] p-4">
     <DemoSectionHeader title="InputComponentDashboard" />
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -70,7 +70,6 @@
 
       <!-- 2. Password with Toggle -->
       <div class="flex flex-col gap-3">
-        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Password with Toggle</span>
         <InputComponentDashboard 
           v-model="inputs.password" 
           placeholder="Old Password" 
@@ -96,7 +95,6 @@
 
       <!-- 5. Required Display -->
       <div class="flex flex-col gap-3">
-        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Required (*)</span>
         <InputComponentDashboard 
           v-model="inputs.email" 
           placeholder="Required field" 
@@ -109,8 +107,7 @@
 
       <!-- 9. Prefix and Suffix Icons -->
       <div class="flex flex-col gap-3">
-        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Both Icons (Left & Right)</span>
-        <div class="min-h-[100px] flex items-center">
+        
           <InputComponentDashboard 
             v-model="inputs.email" 
             placeholder="Search with filters..." 
@@ -120,20 +117,18 @@
             :rightIcon="Bars3Icon" 
             clickableRightIcon 
           />
-        </div>
         <ShowCodeToggle :code="icdSnippets.bothIcons" />
       </div>
 
       <!-- 10. Textarea -->
       <div class="flex flex-col gap-3">
-        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Textarea</span>
         <InputComponentDashboard 
           id="input_g" 
           type="textarea" 
           show-label 
           v-model="inputs.bio" 
           textAreaRows="3"
-          label-text="" 
+          label-text="Textarea" 
           placeholder="Description (Optional)" 
           description="0/200 characters" 
         />
