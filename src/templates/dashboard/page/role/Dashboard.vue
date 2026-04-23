@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BookingAdjustmentPopup from '@/components/BookingAdjustmentPopup.vue';
+import BookingMoreOptionsDropdown from '@/components/BookingMoreOptionsDropdown.vue';
 import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWrapperTwoColContainer.vue';
 
 </script>
@@ -187,8 +189,46 @@ import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWra
     <TopUpPopup v-model="topUpPopupOpen" />
   </DashboardWrapperTwoColContainer> -->
 <DashboardWrapperTwoColContainer>
+   <!-- Booking Action Flow Components (Unified Rendering) -->
+    <div class="mt-8 mb-8 flex flex-wrap gap-8 ">
+      <div class="flex flex-col gap-4">
+        <h3 class="text-lg font-semibold">Ask for more time</h3>
+        <BookingAdjustmentPopup 
+          type="moreTime" 
+          title="Ask for more time" 
+          eventDate="April 24, 2025" 
+          newTime="9:30pm" 
+          endTime="10:30pm" 
+          originalTime="9:15pm" 
+        />
+      </div>
+      
+      <div class="flex flex-col gap-4">
+        <h3 class="text-lg font-semibold">Ask to reschedule</h3>
+        <BookingAdjustmentPopup 
+          type="reschedule" 
+          title="Ask to reschedule" 
+          eventDate="Tue, August 24, 2025" 
+          originalDate="April 24, 2025"
+          newTime="9:30pm" 
+          endTime="10:30pm" 
+          originalTime="9:15pm" 
+        />
+      </div>
 
-  Dashboard page
+      <div class="flex flex-col gap-4">
+        <h3 class="text-lg font-semibold">Cancel Call</h3>
+        <BookingAdjustmentPopup 
+          type="cancel" 
+          title="Cancel Call" 
+        />
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <h3 class="text-lg font-semibold">Options Dropdown</h3>
+        <BookingMoreOptionsDropdown />
+      </div>
+    </div>
 </DashboardWrapperTwoColContainer>
 </template>
 
