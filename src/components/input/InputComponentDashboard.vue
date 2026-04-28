@@ -1,19 +1,20 @@
 <template>
-  <div v-bind="resolvedAttrs.wrapperAttrs.wrapper1" class="gap-1.5">
+  <div v-bind="resolvedAttrs.wrapperAttrs.wrapper1" class="gap-1.5 w-full">
     <label v-if="showLabel" v-bind="resolvedAttrs.labelAttrs" class="flex justify-between items-center w-full ">
       <span class="text-left font-[500] text-[14px]" :class="labelClass">{{
         labelText
       }}</span>
 
-      <span class="text-right">
+      <span class="text-right flex items-center">
         <Paragraph v-if="requiredDisplay === 'italic-text'" :text="requiredDisplayText" fontSize="text-xs"
           fontColor="text-gray-500" fontFamily="italic" :class="requiredClass" />
         <span v-else-if="requiredDisplay === '*'" class="text-red-500">*</span>
+        <span v-if="optionalLabel" class="text-xs leading-normal italic text-[#667085] dark:text-[#9e9589]" :class="optionalLabelClass">
+          {{ optionalLabelText }}
+        </span>
       </span>
     </label>
 
-    <Paragraph v-if="optionalLabel" :text="optionalLabelText" fontSize="text-sm" fontWeight="font-normal"
-      fontColor="" shadow="opacity-70" :class="optionalLabelClass" />
 
     <!-- Input -->
     <div v-bind="resolvedAttrs.wrapperAttrs.wrapper2" class="">
@@ -32,7 +33,7 @@
                 'update:modelValue',
                 ($event.target as HTMLInputElement).value
               )
-              " :class="[leftIcon ? 'pl-1' : 'pl-0', rightIcon ? 'pr-1' : 'pr-0', inputClass]" />
+              " :class="[leftIcon ? 'pl-1' : 'pl-0', rightIcon || showTooltip ? 'pr-1' : 'pr-0', inputClass]" />
         </div>
 
         <textarea v-if="type === 'textarea'" v-bind="resolvedAttrs.inputAttrs" :rows="textAreaRows" @input="
@@ -43,7 +44,43 @@
           " :class="inputClass"></textarea>
       </div>
 
-      <div>
+      <div class="flex items-center gap-2">
+        <!-- Tooltip -->
+        <div v-if="showTooltip" class="flex items-center justify-center min-w-[1rem]">
+          <div ref="tooltipAnchor" class="cursor-pointer opacity-70 hover:opacity-100 transition-opacity">
+            <img v-if="typeof tooltipIcon === 'string'" :src="tooltipIcon" alt="tooltip icon" class="w-4 h-4">
+            <component v-else :is="tooltipIcon" class="w-4 h-4" />
+          </div>
+          <DropdownHandler :anchor="tooltipAnchor" :config="{
+            trigger: 'hover',
+            layer: 'tooltip',
+            theme: 'tooltip-dark',
+            width: 250,
+            offset: 12,
+            positionMode: tooltipPlacement === 'top' ? 'above' : (tooltipPlacement === 'bottom' ? 'below' : 'adaptive'),
+            align: 'center',
+            flipOnOverflow: true,
+            ariaRole: 'tooltip',
+            scrollEnabled: false,
+            animation: 'fade'
+          }" @repositioned="onTooltipRepositioned">
+            <div class="relative p-1">
+              <!-- Custom Triangle Arrow (pointing down if tooltip is above anchor) -->
+              <div v-if="actualTooltipPlacement === 'top'"
+                class="absolute left-1/2 -translate-x-1/2 -bottom-2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[#101828B2] dark:border-t-[rgba(14,19,32,0.9)]">
+              </div>
+              <!-- Custom Triangle Arrow (pointing up if tooltip is below anchor) -->
+              <div v-if="actualTooltipPlacement === 'bottom'"
+                class="absolute left-1/2 -translate-x-1/2 -top-2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-l-transparent border-r-transparent border-b-[#101828B2] dark:border-b-[rgba(14,19,32,0.9)]">
+              </div>
+
+              <p class="text-xs leading-normal font-medium text-white dark:text-[#dbd8d3]">
+                {{ tooltipText }}
+              </p>
+            </div>
+          </DropdownHandler>
+        </div>
+
         <!-- Right icon -->
         <div v-if="rightIcon" @click="clickableRightIcon ? $emit('rightIconClick') : null"
           :class="[clickableRightIcon ? 'cursor-pointer transition-colors' : '', 'opacity-70 hover:opacity-100', rightIconClass]">
@@ -95,11 +132,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type Component } from "vue";
+import { computed, type Component, ref } from "vue";
 import { resolveAllConfigs } from "@/utils/componentRenderingUtils";
 import Paragraph from "../default/Paragraph.vue";
 import HexagonExclamationIcon from "@/components/icons/HexagonExclamationIcon.vue";
-import { CheckIcon } from "@heroicons/vue/24/outline";
+import { CheckIcon, InformationCircleIcon } from "@heroicons/vue/24/outline";
+import DropdownHandler from "@/components/dropdownHandler/DropdownHandler.vue";
 
 const props = defineProps({
   modelValue: [String, Number],
@@ -126,7 +164,7 @@ const props = defineProps({
   requiredDisplay: { type: String, default: "" }, // "*" or "italic-text"
   requiredDisplayText: { type: String, default: "" },
 
-  optionalLabel: { type: Boolean, default: "" },
+  optionalLabel: { type: Boolean, default: false },
   optionalLabelText: { type: String, default: "" },
 
   showErrors: Boolean,
@@ -161,6 +199,12 @@ const props = defineProps({
   rightIconClass: { type: String, default: "" },
   clickableRightIcon: { type: Boolean, default: false },
 
+  // Tooltip
+  showTooltip: { type: Boolean, default: false },
+  tooltipText: { type: String, default: "" },
+  tooltipIcon: { type: [String, Object, Function], default: "https://i.ibb.co/DPgMH5GG/svgviewer-png-output-15.webp" },
+  tooltipPlacement: { type: String, default: "top" },
+
   //spans
   rightSpan: { type: Boolean, default: false },
   rightSpanText: { type: String, default: "" },
@@ -184,6 +228,13 @@ const props = defineProps({
   // Wrapper overrides
   wrapperOverrides: { type: Array as () => any[], default: () => [] },
 });
+
+const tooltipAnchor = ref<HTMLElement | null>(null);
+const actualTooltipPlacement = ref(props.tooltipPlacement || 'top');
+
+function onTooltipRepositioned(event: any) {
+  actualTooltipPlacement.value = event.placement;
+}
 
 // Input component config for dashboard styling
 const inputConfig = {

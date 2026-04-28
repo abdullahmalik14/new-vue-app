@@ -83,6 +83,7 @@
           </span>
           <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
             <svg
+              v-if="variant !== 'dashboard'"
               class="h-5 w-5 text-gray-400 transition-transform duration-200"
               :class="{ 'rotate-180': isOpen }"
               viewBox="0 0 20 20"
@@ -94,10 +95,27 @@
                 clip-rule="evenodd"
               />
             </svg>
+            <!-- Dashboard Chevron -->
+            <img 
+              v-else
+              class="select-arrow h-5 w-5 transition-transform duration-200"
+              :class="{ 'rotate-180': isOpen }"
+              src="https://i.ibb.co.com/jkt6FN7G/chevron-down.webp" 
+              alt="chevron down" 
+            />
           </span>
         </template>
       </template>
     </button>
+
+    <input 
+      v-if="name" 
+      ref="hiddenInput"
+      type="hidden" 
+      :name="name" 
+      :value="typeof modelValue === 'object' ? modelValue[optionValueKey] : modelValue" 
+      :required="required"
+    />
 
     <!-- Dropdown Panel -->
     <div
@@ -423,7 +441,13 @@
               <span class="flex-1">{{ getOptionLabel(option) }}</span>
             </div>
             <!-- Regular text for single selection -->
-            <span v-else>{{ getOptionLabel(option) }}</span>
+            <div v-else :class="variant === 'dashboard' ? 'option-inner-container flex flex-1 gap-[0.625rem] px-[0.625rem] py-[0.563rem]' : ''">
+              <span 
+                :class="variant === 'dashboard' ? 'text-sm font-medium text-[#0c111d] capitalize tracking-[0.01875rem] text-balance dark:text-[#dbd8d3]' : ''"
+              >
+                {{ getOptionLabel(option) }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -457,8 +481,16 @@ const props = defineProps({
   },
   variant: {
     type: String,
-    default: 'list', // 'list', 'cards', 'users', 'themed', or 'color-picker'
-    validator: (value) => ['list', 'cards', 'users', 'themed', 'color-picker'].includes(value)
+    default: 'list', // 'list', 'cards', 'users', 'themed', 'color-picker', or 'dashboard'
+    validator: (value) => ['list', 'cards', 'users', 'themed', 'color-picker', 'dashboard'].includes(value)
+  },
+  name: {
+    type: String,
+    default: ''
+  },
+  required: {
+    type: Boolean,
+    default: false
   },
   size: {
     type: String,
@@ -503,6 +535,7 @@ const selectButton = ref(null)
 const searchInput = ref(null)
 const dropdownRef = ref(null)
 const openActionDropdown = ref(null)
+const hiddenInput = ref(null)
 
 // Computed properties
 const selectedOption = computed(() => {
@@ -555,8 +588,16 @@ const filteredOptions = computed(() => {
 // Dynamic classes based on props
 const buttonClasses = computed(() => {
   const baseClasses = [
-    'relative w-full cursor-pointer rounded-lg border text-left shadow-sm transition-all duration-300'
+    'relative w-full cursor-pointer text-left transition-all duration-300'
   ]
+
+  if (props.variant === 'dashboard') {
+    baseClasses.push(
+      'h-10 flex items-center gap-2 py-2 px-3 border-b border-[#D0D5DD] bg-white/50 shadow-[0_1px_2px_0_#1018280D] dark:bg-[#181a1b]/50 dark:border-[#4a5568] rounded-none'
+    )
+  } else {
+    baseClasses.push('rounded-lg border shadow-sm shadow-black/5')
+  }
 
   const sizeClasses = {
     sm: props.variant === 'color-picker' ? 'py-2 pl-3 pr-2 text-sm' : 'py-2 pl-3 pr-10 text-sm',
@@ -567,7 +608,7 @@ const buttonClasses = computed(() => {
   // Custom styling for themed variant
   if (props.variant === 'themed' && props.customTheme.button) {
     baseClasses.push(props.customTheme.button.classes || '')
-  } else {
+  } else if (props.variant !== 'dashboard') {
     // Default styling for other variants
     baseClasses.push(
       'border-gray-300 bg-white',
@@ -580,7 +621,12 @@ const buttonClasses = computed(() => {
     baseClasses.push('opacity-50 cursor-not-allowed')
   }
 
-  return [...baseClasses, sizeClasses[props.size]]
+  const result = [...baseClasses]
+  if (props.variant !== 'dashboard') {
+    result.push(sizeClasses[props.size])
+  }
+
+  return result
 })
 
 const buttonStyles = computed(() => {
@@ -590,14 +636,24 @@ const buttonStyles = computed(() => {
   return {}
 })
 
-const dropdownClasses = computed(() => [
-  'absolute z-10 mt-1 bg-white shadow-xl rounded-lg border border-gray-200 overflow-hidden',
-  props.variant === 'color-picker' ? 'w-18 right-0' : 'w-full',
-  props.variant === 'cards' ? 'max-h-80' :
-  props.variant === 'themed' ? 'max-h-96' :
-  props.variant === 'color-picker' ? 'max-h-60' :
-  'max-h-60'
-])
+const dropdownClasses = computed(() => {
+  const classes = [
+    'absolute z-10 mt-1 shadow-xl overflow-hidden',
+    props.variant === 'color-picker' ? 'w-18 right-0' : 'w-full',
+    props.variant === 'cards' ? 'max-h-80' :
+    props.variant === 'themed' ? 'max-h-96' :
+    props.variant === 'color-picker' ? 'max-h-60' :
+    'max-h-60'
+  ]
+
+  if (props.variant === 'dashboard') {
+    classes.push('rounded-[0.125rem] border border-[rgba(186,188,203,0.5)] bg-white dark:border-[rgba(61,71,73,0.5)] dark:bg-[#181a1b]')
+  } else {
+    classes.push('bg-white rounded-lg border border-gray-200')
+  }
+
+  return classes
+})
 
 const searchContainerClasses = computed(() => [
   'p-3 border-b border-gray-200',
@@ -634,15 +690,27 @@ const cardClasses = (option) => [
   'group'
 ]
 
-const listItemClasses = (option) => [
-  'cursor-pointer select-none relative py-2 pl-3 pr-9',
-  'hover:bg-gray-100 transition-colors duration-150',
-  props.multiple
-    ? 'text-gray-900' // No selected background for multi-select
-    : isSelected(option)
-      ? 'bg-blue-600 text-white'
-      : 'text-gray-900'
-]
+const listItemClasses = (option) => {
+  const classes = ['cursor-pointer select-none relative transition-colors duration-150']
+
+  if (props.variant === 'dashboard') {
+    classes.push('flex items-center justify-center gap-[0.625rem] p-[0.75rem] dark:hover:bg-[#181a1b]')
+    if (isSelected(option)) {
+      classes.push('bg-gray-50 dark:bg-[#181a1b]/80')
+    } else {
+      classes.push('hover:bg-gray-50 dark:hover:bg-[#181a1b]/50')
+    }
+  } else {
+    classes.push('py-2 pl-3 pr-9 hover:bg-gray-100')
+    if (!props.multiple && isSelected(option)) {
+      classes.push('bg-blue-600 text-white')
+    } else {
+      classes.push('text-gray-900')
+    }
+  }
+
+  return classes
+}
 
 const userItemClasses = (option) => [
   'flex items-center px-3 py-3 hover:bg-gray-50 transition-colors duration-150',
@@ -930,6 +998,14 @@ watch(isOpen, async (newValue) => {
     if (searchInput.value) {
       searchInput.value.focus()
     }
+  }
+})
+
+watch(() => props.modelValue, () => {
+  if (hiddenInput.value) {
+    nextTick(() => {
+      hiddenInput.value.dispatchEvent(new Event('change', { bubbles: true }))
+    })
   }
 })
 

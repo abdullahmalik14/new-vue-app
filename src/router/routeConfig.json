@@ -1192,6 +1192,14 @@
     "requiresAuth": false,
     "supportedRoles": ["all"]
   },
+   {
+    "slug": "/demo-dropdowns",
+    "requiresAuth": false,
+    "section": "demo",
+    "supportedRoles": ["all"],
+    "enabled": true,
+    "componentPath": "@/components/dropdownHandler/demo/DemoDropdowns.vue"
+  },
   {
     "slug": "/MediaUploader",
   "componentPath": "@/components/ui/global/media/uploader/MediaUploader.vue"
