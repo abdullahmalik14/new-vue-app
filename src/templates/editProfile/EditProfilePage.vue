@@ -5,7 +5,20 @@
     <div class="relative before:content-[''] before:fixed before:top-0 before:left-0 before:w-full before:h-screen before:pointer-events-none before:bg-cover before:bg-center before:bg-no-repeat before:bg-[url('https://i.ibb.co.com/QvpHN5vD/mobile-gradient-main-bg-1.webp')] before:z-[-1] sm:before:bg-[url('https://i.ibb.co.com/dw910Z5b/gradient-main-bg.webp')]">
         <!-- container -->
         <div data-container class="flex flex-col min-h-screen z-[0]">
-            <!-- nav -->
+            <!-- notification -->
+        <div class="fixed top-0 left-0 right-0 z-[100] w-full max-w-[100vw]">
+            <NotificationCard 
+                v-model="showNotification"
+                variant="notice"
+                title="You have unsaved changes"
+                description="You have made changes to your profile since your last saved. Remember to click ‘SAVE’ to publish your changes."
+                icon="https://i.ibb.co.com/ksz4bh87/smiley-face.webp"
+                badgeIcon="https://i.ibb.co.com/Tqx4sFpx/info-square.webp"
+                :closable="true"
+            />
+        </div>
+
+        <!-- nav -->
             <div class="flex flex-col gap-4 px-4 py-2 w-full h-max bg-[linear-gradient(0deg,rgba(234,236,240,0.9),rgba(234,236,240,0.9)),linear-gradient(0deg,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0)_100%)] relative md:[background:transparent] md:py-6 xl:px-10 xl:pt-10 xl:[background:linear-gradient(90deg,rgba(255,255,255,0.3)_0%,rgba(255,255,255,0)_8%)]">
                 <!-- blur-overlay -->
                 <div class="absolute inset-0 w-full h-full backdrop-blur-[5px] pointer-events-none z-[-1] md:backdrop-blur-[25px]"></div>
@@ -107,6 +120,23 @@
 
                         <!-- input-section -->
                         <div class="flex flex-col gap-4">
+                            <!-- dropdown-wrapper (profile-visibility) -->
+                            <div class="flex flex-col gap-1.5 w-full pb-1 md:absolute md:-top-[5.125rem] md:right-0 md:w-[22.5rem]">
+                                <!-- dropdown-field -->
+                                <div class="flex flex-col gap-1.5 md:items-end md:gap-1">
+                                    <label for="profile-visibility" class="text-sm font-medium text-[#667085] md:text-[#0C111D] dark:text-[#9e9589] md:dark:text-[#dbd8d3]">
+                                        Profile Visibility
+                                    </label>
+
+                                    <UnifiedSelect
+                                        v-model="profileData.visibility"
+                                        :options="visibilityOptions"
+                                        variant="dashboard"
+                                        placeholder="Select Visibility"
+                                        dropdownMaxHeight="max-h-[30rem]"
+                                    />
+                                </div>
+                            </div>
                             <!-- input-group -->
                             <div class="flex flex-col gap-4 sm:flex-row">
                                 <!-- input-container -->
@@ -303,10 +333,10 @@
                                 </section>
 
                                 <!-- upload-section -->
-                                <div class="flex flex-col gap-4 lg:flex-row-reverse">
+                                <div class="flex flex-col gap-4 lg:flex-row-reverse transition-opacity duration-300" :class="{ 'pointer-events-none opacity-50': !isPremiumVideoUnlocked }">
                                     <!-- upload-container -->
                                     <ThumbnailUploader
-                                        :uploader="mediaUploader"
+                                        :uploader="galleryUploader"
                                         title="Click to upload"
                                         subtitle="or drag and drop image or video files here"
                                         fileInfo="MP4, AVI, QUICKTIME, X-MATROSKA, X-MS-WMV, WEBM, OGG, PNG or JPG (max. 15MB)"
@@ -323,19 +353,37 @@
                                         </template>
                                     </ThumbnailUploader>
 
-                                    <!-- upload-container -->
-                                    <div class="relative flex flex-col gap-6 h-[12.5rem] rounded-xl cursor-pointer sm:h-[13.3125rem] lg:w-1/2">
-                                        <!-- dashed border -->
-                                        <svg class="absolute inset-0 w-full h-full pointer-events-none">
-                                            <rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="12" ry="12" fill="none" stroke="#D0D5DD" stroke-width="1" stroke-dasharray="4 4"
-                                            class="dark:stroke-[#3b4043]"
-                                            />
-                                        </svg>
-
-                                        <!-- content -->
-                                        <div class="flex flex-col gap-6 h-full justify-center items-center">
+                                    <!-- gallery-display-container -->
+                                    <div class="relative flex flex-col gap-6 min-h-[12.5rem] h-max rounded-xl sm:min-h-[13.3125rem] lg:w-1/2">
+                                        <!-- placeholder if empty -->
+                                        <div v-if="galleryItems.length === 0" class="flex flex-col gap-6 h-full justify-center items-center py-8">
+                                            <!-- dashed border -->
+                                            <svg class="absolute inset-0 w-full h-full pointer-events-none">
+                                                <rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="12" ry="12" fill="none" stroke="#D0D5DD" stroke-width="1" stroke-dasharray="4 4" class="dark:stroke-[#3b4043]" />
+                                            </svg>
                                             <img src="https://i.ibb.co.com/9Hm4KHzN/Images.webp" alt="Images" class="w-16 h-16">
                                             <p class="text-xs leading-normal text-[#667085] dark:text-[#9e9589]">Upload your first piece and watch yourself shine!</p>
+                                        </div>
+
+                                        <!-- grid if media exists -->
+                                        <div v-else class="grid grid-cols-2 gap-2 p-2 sm:grid-cols-3 h-full overflow-y-auto">
+                                            <div v-for="(item, index) in galleryItems" :key="index" class="relative group overflow-hidden h-[5.5rem] bg-black/5 dark:bg-white/5">
+                                                <video v-if="item.type?.startsWith('video/')" :src="item.url" class="w-full h-full object-cover"></video>
+                                                <img v-else :src="item.url" class="w-full h-full object-cover">
+                                                
+                                                <!-- video-tag -->
+                                                <div v-if="item.type?.startsWith('video/')" class="absolute bottom-0 left-0 flex justify-center items-center z-[3]">
+                                                    <div data-video-tag class="flex justify-center items-center gap-[0.1875rem] px-1 h-5 bg-[rgba(48,52,55,.7)] dark:bg-[rgba(31,44,63,0.50)]">
+                                                        <span class="text-xs text-white leading-normal tracking-[0.008rem] dark:text-[#e8e6e3]">Video</span>
+                                                        <img src="https://i.ibb.co.com/wN978Hjm/video.webp" alt="video" class="w-4 h-4" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- delete-button (cross) -->
+                                                <div @click="removeGalleryItem(index)" class="flex justify-center items-center absolute top-0 right-0 z-[3] w-5 h-5 cursor-pointer bg-[#ff4405] hover:bg-[#ff692e]">
+                                                    <img src="https://i.ibb.co.com/W4TXDR0j/x-close.webp" alt="x-close" class="w-3.5 h-3.5 [filter:brightness(100)_saturate(0)]"/>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -343,6 +391,8 @@
 
                             <!-- button -->
                             <TwoPieceButton
+                                v-if="!isPremiumVideoUnlocked"
+                                @click="isPremiumVideoUnlocked = true"
                                 tag="button"
                                 variant="link-x"
                                 rootClass="filter drop-shadow-[4px_3px_0px_#000000] group hover:drop-shadow-[4px_3px_0px_#FF439D] block w-max appearance-button"
@@ -383,10 +433,33 @@
                                 <InputComponentDashboard v-model="profileData.additionalUrl1" labelText="Additional URL 1" showLabel
                                     placeholder="" />
                             </div>
+
+                            <template v-if="isPremiumLinksUnlocked">
+                                <!-- input-group -->
+                                <div class="flex flex-col gap-4 lg:flex-row">
+                                    <!-- input-container -->
+                                    <InputComponentDashboard v-model="profileData.additionalUrl2" labelText="Additional URL 2" showLabel
+                                        placeholder="" class="flex-1" />
+
+                                    <!-- input-container -->
+                                    <InputComponentDashboard v-model="profileData.additionalUrl3" labelText="Additional URL 3" showLabel
+                                        placeholder="" class="flex-1" />
+                                </div>
+
+                                <!-- input-group -->
+                                <div class="flex flex-col gap-4 lg:flex-row">
+                                    <!-- input-container -->
+                                    <InputComponentDashboard v-model="profileData.additionalUrl4" labelText="Additional URL 4" showLabel
+                                        placeholder="" class="flex-1" />
+                                    <div class="hidden lg:block lg:flex-1"></div>
+                                </div>
+                            </template>
                         </div>
 
                         <!-- button -->
                         <TwoPieceButton
+                            v-if="!isPremiumLinksUnlocked"
+                            @click="isPremiumLinksUnlocked = true"
                             tag="button"
                             variant="link-x"
                             rootClass="filter drop-shadow-[4px_3px_0px_#000000] group hover:drop-shadow-[4px_3px_0px_#FF439D] block w-max appearance-button mt-4"
@@ -507,11 +580,11 @@
                                                 radioLabelClass="relative pl-8 cursor-pointer text-base font-medium text-black dark:text-[#e8e6e3] before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-5 before:h-5 before:rounded-full before:border before:border-[#d0d5dd] dark:before:border-[#3b4043] before:bg-[#ffffff] dark:before:bg-[#181a1b] peer-checked:before:bg-[#000000] dark:peer-checked:before:bg-[#000000] after:content-[''] after:absolute after:left-[0.4375rem] after:top-1/2 after:-translate-y-1/2 after:w-[0.375rem] after:h-[0.375rem] after:rounded-full after:bg-[#07f468] dark:after:bg-[#07f468] after:hidden peer-checked:after:block"
                                             />
                                         </div>
-
                                         <div class="flex flex-col" v-show="profileData.attachMedia === 'upload'">
                                             <!-- upload-container -->
                                             <ThumbnailUploader
-                                                :uploader="mediaUploader"
+                                                v-if="!postMediaUploader.state.uploadedThumbnailFile"
+                                                :uploader="postMediaUploader"
                                                 title="Click to upload"
                                                 subtitle="or drag and drop image or video files here"
                                                 fileInfo="MP4, AVI, QUICKTIME, X-MATROSKA, X-MS-WMV, WEBM, OGG, PNG or JPG (max. 15MB)"
@@ -527,6 +600,31 @@
                                                     <img src="https://i.ibb.co.com/9JDWMW1/upload-03.webp" alt="upload 03" class="w-5 h-5 [filter:brightness(0)] group-hover/upload:[filter:brightness(0)_saturate(100%)_invert(65%)_sepia(22%)_saturate(4910%)_hue-rotate(97deg)_brightness(113%)_contrast(94%)]">
                                                 </template>
                                             </ThumbnailUploader>
+
+                                            <!-- uploaded-media-container -->
+                                            <div v-else data-uploaded-media-container class="flex justify-center items-center relative rounded-sm overflow-hidden w-full max-w-[23.6667rem] h-[11.0625rem] bg-white/50 min-[600px]:h-[13.3125rem] md:h-[11.0625rem] lg:h-[13.3125rem] dark:bg-[#181a1b]/50">
+                                                <!-- uploaded-image/video -->
+                                                <div class="flex justify-center items-center w-full h-full">
+                                                    <video v-if="postMediaUploader.state.uploadedThumbnailFile?.type?.startsWith('video/')" 
+                                                        data-upload-video 
+                                                        :src="postMediaPreviewUrl" 
+                                                        class="w-full h-full object-cover"
+                                                        autoplay muted loop playsinline></video>
+                                                    <img v-else data-upload-image :src="postMediaPreviewUrl" alt="uploaded-media" class="w-full h-full object-cover">
+                                                </div>
+                                                <!-- delete-button (cross) -->
+                                                <div @click="deletePostMedia" class="flex justify-center items-center absolute top-0 right-0 z-[3] w-6 h-6 group/button cursor-pointer bg-[#ff4405] hover:bg-[#ff692e]">
+                                                    <img src="https://i.ibb.co.com/W4TXDR0j/x-close.webp" alt="x-close" class="w-4 h-4 [filter:brightness(100)_saturate(0)]"/>
+                                                </div>
+                                                <!-- fullscreen-button -->
+                                                <div @click="expandPostMedia" data-uploaded-media-fullscreen-button class="flex justify-center items-center absolute bottom-0 left-0 z-[3] w-8 h-8 group/button cursor-pointer bg-black hover:bg-[#07F468]">
+                                                    <img src="https://i.ibb.co.com/p6FPV9QX/fullscreen.webp" alt="fullscreen" class="w-5 h-5 group-hover/button:[filter:brightness(0)]">
+                                                </div>
+                                                <!-- media-type-tag -->
+                                                <div class="flex justify-center items-center absolute bottom-0 right-0 z-[3] px-1 h-[1.375rem] bg-black dark:bg-[#181a1b]">
+                                                    <span class="text-xs leading-normal font-medium text-white dark:text-[#e8e6e3]">Thumbnail</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </section>
                                 </div>
@@ -559,7 +657,11 @@
                                         <p class="text-xs leading-normal font-medium text-[#0C111D] dark:text-[#dbd8d3]">{{ profileData.postMessage || 'I got some lovely tips from fans...' }}<span v-show="profileData.showUsername">@manogoes4eva tipped 400 tokens</span></p>
                                     
                                         <div class="flex justify-center items-center rounded-[0.625rem] overflow-hidden bg-[#F2F6FC] w-full h-[10.9375rem] min-[600px]:h-[8.9375rem] lg:h-[11.9375rem] dark:bg-[#1d1f20]" v-show="profileData.attachMedia === 'upload'">
-                                            <img src="https://i.ibb.co/Kx9QDc68/auth-bg-compressed.webp" alt="auth-bg-compressed" class="w-full h-full object-cover">
+                                            <video v-if="postMediaUploader.state.uploadedThumbnailFile?.type?.startsWith('video/') && postMediaPreviewUrl" 
+                                                :src="postMediaPreviewUrl" 
+                                                class="w-full h-full object-cover"
+                                                autoplay muted loop playsinline></video>
+                                            <img v-else :src="postMediaPreviewUrl || 'https://i.ibb.co/Kx9QDc68/auth-bg-compressed.webp'" alt="post-media-preview" class="w-full h-full object-cover">
                                         </div>
                                     </div>
                                 </div>
@@ -582,6 +684,50 @@
             </div>
         </div>
     </div>
+
+    <!-- light-gallery-container -->
+    <div v-if="isLightboxOpen" data-lightgallery-container class="fixed inset-0 flex justify-center items-center backdrop-blur-[5px] z-[99999] bg-white/10 dark:bg-[#181a1b]/10" @click="closeLightbox">
+        <!-- media-container -->
+        <div @click.stop data-lightgallery-media-wrapper class="flex justify-center items-center rounded-sm shadow-[0px_0px_24px_-2px_#10182880] relative max-h-screen max-w-[min(22.5rem,90vw)] sm:max-w-[min(46rem,90vw)] md:max-w-[min(39rem,90vw)] lg:max-w-[min(64rem,90vw)] bg-white/50 dark:bg-[#181a1b]/50">
+            <div data-lightgallery-media-container class="flex justify-center items-center w-full h-full">
+                <video v-if="lightboxMedia?.type?.startsWith('video/')" 
+                    ref="lightboxVideo"
+                    :src="lightboxMedia?.url" 
+                    class="w-full h-full object-cover"
+                    loop playsinline></video>
+                <img v-else :src="lightboxMedia?.url" alt="lightbox-media" class="w-full h-full object-cover">
+            </div>
+            
+            <!-- close-button -->
+            <button @click="closeLightbox" data-lightgallery-close-button class="absolute top-2 right-2 rounded-full flex justify-center items-center w-6 h-6 backdrop-blur-[10px] bg-black/30 sm:w-12 sm:h-12 dark:bg-[#181a1b]/30">
+                <img src="https://i.ibb.co.com/W4TXDR0j/x-close.webp" alt="x close" class="w-6 h-6 [filter:brightness(0)_saturate(100%)_invert(100%)_sepia(0%)_saturate(1710%)_hue-rotate(335deg)_brightness(107%)_contrast(107%)] drop-shadow-[0px_0px_8px_0px_#00000080] sm:w-8 sm:h-8">
+            </button>
+
+            <!-- media-type-container -->
+            <div class="absolute bottom-0 left-0 flex justify-center items-center z-[3]">
+                <!-- image-tag -->
+                <div v-if="!lightboxMedia?.type?.startsWith('video/')" data-image-tag class="flex justify-center items-center px-1 py-0.5 gap-[0.1875rem] bg-[rgba(48,52,55,.7)] dark:bg-[rgba(31,44,63,0.50)]">
+                    <span class="text-xs text-white leading-normal tracking-[0.008rem] dark:text-[#e8e6e3]">Image</span>
+                    <img src="https://i.ibb.co.com/nN9TqnGb/image-03.webp" alt="image 03" class="w-4 h-4" />
+                </div>
+                
+                <!-- video-tag -->
+                <div v-else data-video-tag class="flex justify-center items-center px-1 py-0.5 gap-[0.1875rem] bg-[rgba(48,52,55,.7)] dark:bg-[rgba(31,44,63,0.50)]">
+                    <span class="text-xs text-white leading-normal tracking-[0.008rem] dark:text-[#e8e6e3]">Video</span>
+                    <img src="https://i.ibb.co.com/wN978Hjm/video.webp" alt="video" class="w-4 h-4" />
+                </div>
+            </div>
+
+            <!-- video-play-button -->
+            <button v-if="lightboxMedia?.type?.startsWith('video/')" @click="toggleVideoPlay" data-video-play-button class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center w-14 h-14 rounded-full backdrop-blur-[3.945px] bg-white/10 md:w-[7.5rem] md:h-[7.5rem] dark:bg-[#181a1b]/10">
+                <img v-if="isVideoPaused" src="https://i.ibb.co.com/Y7hmQnSb/play-icon-big.webp" alt="play icon big" class="w-8 h-8 opacity-70 md:w-14 md:h-14">
+                <div v-else class="w-8 h-8 opacity-70 md:w-14 md:h-14 flex justify-center items-center gap-1.5 md:gap-2.5">
+                    <div class="w-2 h-8 bg-white/70 md:w-3 md:h-12 rounded-sm"></div>
+                    <div class="w-2 h-8 bg-white/70 md:w-3 md:h-12 rounded-sm"></div>
+                </div>
+            </button>
+        </div>
+    </div>
     </div>
 </template>
 
@@ -593,14 +739,115 @@ import CheckboxSwitch from '@/components/checkbox/CheckboxSwitch.vue';
 import DropdownHandler from '@/components/dropdownHandler/DropdownHandler.vue';
 import RadioGroup from '@/components/ui/form/radio/dashboard/RadioGroup.vue';
 import ThumbnailUploader from '@/components/ui/global/media/uploader/HelperComponents/ThumbnailUploader.vue';
-import { ref, computed, onMounted, onUnmounted, reactive } from 'vue';
+import UnifiedSelect from '@/components/ui/popup/dropdown/dashboard/customThemeSelect/UnifiedSelect.vue';
+import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vue';
+import { ref, computed, onMounted, onUnmounted, reactive, watch } from 'vue';
 
 const tooltipAnchor = ref(null);
-
-const mediaUploader = reactive({
+const isPremiumVideoUnlocked = ref(false);
+const isPremiumLinksUnlocked = ref(false);
+const galleryUploader = reactive({
   state: { uploadedThumbnailFile: null },
   setState(key, value) { this.state[key] = value; }
 });
+
+const postMediaUploader = reactive({
+  state: { uploadedThumbnailFile: null },
+  setState(key, value) { this.state[key] = value; }
+});
+
+const galleryItems = ref([]);
+
+watch(() => galleryUploader.state.uploadedThumbnailFile, (newFile) => {
+    if (newFile) {
+        const videoCount = galleryItems.value.filter(item => item.type?.startsWith('video/')).length;
+        if (newFile.type?.startsWith('video/') && videoCount >= 2) {
+            alert("Maximum 2 video files allowed.");
+            galleryUploader.setState('uploadedThumbnailFile', null);
+            galleryUploader.setState('thumbnailUrl', null);
+            return;
+        }
+        if (galleryItems.value.length >= 6) {
+            alert("Maximum 6 media files allowed.");
+            galleryUploader.setState('uploadedThumbnailFile', null);
+            galleryUploader.setState('thumbnailUrl', null);
+            return;
+        }
+
+        galleryItems.value.push({
+            file: newFile,
+            url: galleryUploader.state.thumbnailUrl,
+            type: newFile.type
+        });
+
+        galleryUploader.setState('uploadedThumbnailFile', null);
+        galleryUploader.setState('thumbnailUrl', null);
+    }
+});
+
+const removeGalleryItem = (index) => {
+    galleryItems.value.splice(index, 1);
+};
+
+const postMediaPreviewUrl = computed(() => postMediaUploader.state.thumbnailUrl);
+
+const isLightboxOpen = ref(false);
+const lightboxVideo = ref(null);
+const isVideoPaused = ref(true);
+const lightboxMedia = ref(null);
+
+const disableScroll = () => {
+  const scrollY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.classList.add('overflow-hidden');
+  return scrollY;
+};
+
+const enableScroll = (scrollY) => {
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.classList.remove('overflow-hidden');
+  window.scrollTo(0, scrollY);
+};
+
+let lastScrollY = 0;
+
+const deletePostMedia = () => {
+  postMediaUploader.setState('uploadedThumbnailFile', null);
+  postMediaUploader.setState('thumbnailUrl', null);
+};
+
+const expandPostMedia = () => {
+  lastScrollY = disableScroll();
+  lightboxMedia.value = {
+    url: postMediaPreviewUrl.value,
+    type: postMediaUploader.state.uploadedThumbnailFile?.type
+  };
+  isLightboxOpen.value = true;
+  isVideoPaused.value = true;
+};
+
+const closeLightbox = () => {
+  isLightboxOpen.value = false;
+  enableScroll(lastScrollY);
+};
+
+const toggleVideoPlay = () => {
+  if (lightboxVideo.value) {
+    if (lightboxVideo.value.paused) {
+      lightboxVideo.value.play();
+      isVideoPaused.value = false;
+    } else {
+      lightboxVideo.value.pause();
+      isVideoPaused.value = true;
+    }
+  }
+};
 
 const profileData = ref({
   displayName: '',
@@ -614,14 +861,19 @@ const profileData = ref({
   instagram: '',
   wishlist: '',
   additionalUrl1: '',
+  additionalUrl2: '',
+  additionalUrl3: '',
+  additionalUrl4: '',
   tipMessage: '',
   postToX: false,
   postMessage: '',
   showUsername: false,
-  attachMedia: 'upload'
+  attachMedia: 'upload',
+  visibility: 'everyone'
 });
 
 const initialProfileData = ref(null);
+const initialGalleryItems = ref(null);
 const activeDropdown = ref(null);
 
 const toggleDropdown = (name) => {
@@ -643,6 +895,14 @@ const genderOptions = [
   { label: 'Male', value: 'male' },
   { label: 'Female', value: 'female' },
   { label: 'Others', value: 'others' }
+];
+
+const visibilityOptions = [
+  { label: 'Everyone', value: 'everyone', description: 'Your profile link will be visible to everyone.' },
+  { label: 'Models Only', value: 'models-only', description: 'Your profile link will be accessible only to Fansocial users with model accounts and will not be visible to other users.' },
+  { label: 'Fans Only', value: 'fans-only', description: 'Your profile link will be accessible only to Fansocial users with fan accounts and will not be visible to other users.' },
+  { label: 'Registered User Only', value: 'registered-user-only', description: 'Your profile link will be accessible only to logged-in Fansocial users and will not be visible to others.' },
+  { label: 'Nobody', value: 'nobody', description: 'Your profile link will remain completely private and inaccessible to anyone.' }
 ];
 
 const countryOptions = [
@@ -671,20 +931,34 @@ const hairOptions = [
 ];
 
 const isChanged = computed(() => {
-  if (!initialProfileData.value) return false;
-  return JSON.stringify(profileData.value) !== JSON.stringify(initialProfileData.value);
+  if (!initialProfileData.value || !initialGalleryItems.value) return false;
+  const profileChanged = JSON.stringify(profileData.value) !== JSON.stringify(initialProfileData.value);
+  const galleryChanged = JSON.stringify(galleryItems.value) !== JSON.stringify(initialGalleryItems.value);
+  return profileChanged || galleryChanged;
+});
+
+const showNotification = ref(false);
+watch(isChanged, (newVal) => {
+    if (newVal) {
+        showNotification.value = true;
+    } else {
+        showNotification.value = false;
+    }
 });
 
 const onCancel = () => {
   profileData.value = JSON.parse(JSON.stringify(initialProfileData.value));
+  galleryItems.value = JSON.parse(JSON.stringify(initialGalleryItems.value));
 };
 
 const onSave = () => {
   initialProfileData.value = JSON.parse(JSON.stringify(profileData.value));
+  initialGalleryItems.value = JSON.parse(JSON.stringify(galleryItems.value));
 };
 
 onMounted(() => {
   initialProfileData.value = JSON.parse(JSON.stringify(profileData.value));
+  initialGalleryItems.value = JSON.parse(JSON.stringify(galleryItems.value));
   window.addEventListener('click', closeDropdowns);
 });
 

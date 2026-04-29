@@ -78,7 +78,10 @@
 
         <!-- Single select or empty multi-select -->
         <template v-else>
-          <span class="block truncate text-left">
+          <span 
+            class="block truncate text-left flex-grow"
+            :class="variant === 'dashboard' ? 'text-base text-[#0C111D] capitalize text-balance dark:text-[#dbd8d3]' : ''"
+          >
             {{ displayText }}
           </span>
           <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -98,7 +101,7 @@
             <!-- Dashboard Chevron -->
             <img 
               v-else
-              class="select-arrow h-5 w-5 transition-transform duration-200"
+              class="select-arrow h-6 w-6 transition-transform duration-200 [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(6%)_saturate(1597%)_hue-rotate(183deg)_brightness(91%)_contrast(76%)]"
               :class="{ 'rotate-180': isOpen }"
               src="https://i.ibb.co.com/jkt6FN7G/chevron-down.webp" 
               alt="chevron down" 
@@ -441,12 +444,15 @@
               <span class="flex-1">{{ getOptionLabel(option) }}</span>
             </div>
             <!-- Regular text for single selection -->
-            <div v-else :class="variant === 'dashboard' ? 'option-inner-container flex flex-1 gap-[0.625rem] px-[0.625rem] py-[0.563rem]' : ''">
+            <div v-else :class="variant === 'dashboard' ? 'option-inner-container flex flex-col flex-1 gap-1 px-4 py-2.5 md:items-start md:py-4' : ''">
               <span 
-                :class="variant === 'dashboard' ? 'text-sm font-medium text-[#0c111d] capitalize tracking-[0.01875rem] text-balance dark:text-[#dbd8d3]' : ''"
+                :class="variant === 'dashboard' ? 'text-base font-medium text-[#344054] capitalize text-balance group-[.selected]:font-semibold dark:text-[#bdb8af]' : ''"
               >
                 {{ getOptionLabel(option) }}
               </span>
+              <p v-if="variant === 'dashboard' && option.description" class="text-xs leading-normal text-[#667085] dark:text-[#9e9589]">
+                {{ option.description }}
+              </p>
             </div>
           </div>
         </div>
@@ -524,6 +530,10 @@ const props = defineProps({
   noResultsMessage: {
     type: String,
     default: 'No results found'
+  },
+  dropdownMaxHeight: {
+    type: String,
+    default: ''
   }
 })
 
@@ -593,7 +603,7 @@ const buttonClasses = computed(() => {
 
   if (props.variant === 'dashboard') {
     baseClasses.push(
-      'h-10 flex items-center gap-2 py-2 px-3 border-b border-[#D0D5DD] bg-white/50 shadow-[0_1px_2px_0_#1018280D] dark:bg-[#181a1b]/50 dark:border-[#4a5568] rounded-none'
+      'h-12 flex items-center gap-2 py-2 px-3.5 border-b border-[#D0D5DD] bg-white/50 shadow-[0_1px_2px_0_#1018280D] dark:bg-[#181a1b]/50 dark:border-[#4a5568] rounded-none md:rounded-[0.3125rem]'
     )
   } else {
     baseClasses.push('rounded-lg border shadow-sm shadow-black/5')
@@ -639,11 +649,7 @@ const buttonStyles = computed(() => {
 const dropdownClasses = computed(() => {
   const classes = [
     'absolute z-10 mt-1 shadow-xl overflow-hidden',
-    props.variant === 'color-picker' ? 'w-18 right-0' : 'w-full',
-    props.variant === 'cards' ? 'max-h-80' :
-    props.variant === 'themed' ? 'max-h-96' :
-    props.variant === 'color-picker' ? 'max-h-60' :
-    'max-h-60'
+    props.variant === 'color-picker' ? 'w-18 right-0' : 'w-full'
   ]
 
   if (props.variant === 'dashboard') {
@@ -666,17 +672,21 @@ const searchInputClasses = computed(() => [
 ])
 
 const optionsContainerClasses = computed(() => {
-  let baseClasses
-
+  const maxHeight = props.dropdownMaxHeight || (
+    props.variant === 'cards' ? 'max-h-64' :
+    props.variant === 'themed' ? 'max-h-80' :
+    'max-h-52'
+  )
+  
+  const classes = [maxHeight, 'overflow-y-auto scrollbar-hide']
+  
   if (props.variant === 'cards') {
-    baseClasses = 'p-3 max-h-64 overflow-y-auto'
+    classes.push('p-3')
   } else if (props.variant === 'themed') {
-    baseClasses = 'max-h-80 overflow-y-auto bg-transparent pb-2'
-  } else {
-    baseClasses = 'max-h-52 overflow-y-auto'
+    classes.push('bg-transparent pb-2')
   }
 
-  return [baseClasses]
+  return classes
 })
 
 const cardClasses = (option) => [
