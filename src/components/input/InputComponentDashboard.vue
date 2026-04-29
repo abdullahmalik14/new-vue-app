@@ -249,7 +249,7 @@ const inputConfig = {
     },
     {
       targetAttribute: "wrapper2",
-      addClass: `flex ${props.type === 'textarea' ? 'items-start pt-2' : 'items-center h-10'} gap-2 border-b border-[#D0D5DD] md:group-[.invalid]/input-field:border-[#FF4405] bg-white/50 px-3 [box-shadow:0px_1px_2px_0px_rgba(16,24,40,0.05)] dark:border-[#3b4043] dark:bg-[#181a1b]/50 dark:[box-shadow:0px_1px_2px_0px_rgba(24,36,61,0.05)] ${props.wrapperClass}`,
+      addClass: `flex ${props.type === 'textarea' ? 'items-start' : 'items-center h-11'}  border-b border-[#D0D5DD] md:group-[.invalid]/input-field:border-[#FF4405] bg-white/50 pl-3 [box-shadow:0px_1px_2px_0px_rgba(16,24,40,0.05)] dark:border-[#3b4043] dark:bg-[#181a1b]/50 dark:[box-shadow:0px_1px_2px_0px_rgba(24,36,61,0.05)] ${props.wrapperClass}`,
       addAttributes: { "data-wrapper": "wrapper2" },
     },
   ],

@@ -1,23 +1,15 @@
 <template>
-  <div
-    class="cursor-pointer border-2 border-transparent bg-black/5 rounded-xl p-2 h-[12.1875rem] flex flex-col items-center justify-center hover:border-dark-text hover:bg-black/10 group"
-  >
-    <div
-      class="gap-1 w-full flex flex-col justify-center self-stretch border-2 border-dashed border-transparent"
-    >
+  <div :class="wrapperClass">
+    <div :class="innerWrapperClass">
       <div class="flex flex-col items-center justify-center gap-3">
-        <div
-          class="shadow-[0_1px_2px_0_rgba(16,24,40,0.05)] rounded-lg h-10 w-10 relative flex justify-center items-center"
-        >
+        <div :class="iconWrapperClass">
           <input
             type="file"
-            class="appearance-none z-[5] opacity-0 absolute w-full h-full cursor-pointer"
+            class="appearance-none z-[5] opacity-0 absolute  cursor-pointer"
             @change="handleFileChange" 
-            accept="image/png, image/jpeg"
+            accept="image/png, image/jpeg, video/mp4, video/avi, video/webm, video/ogg"
           />
-          <span
-            class="cursor-pointer shadow-[0_1px_2px_0_rgba(16,24,40,0.05)] bg-success rounded-lg h-10 w-10 flex justify-center items-center group-hover:bg-black"
-          >
+          <span :class="iconInnerWrapperClass">
             <slot name="icon">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -42,19 +34,18 @@
           </span>
         </div>
 
-        <h4 class="text-dark-gray text-sm leading-5 text-center font-normal">
-          <span class="text-dark-text font-semibold">{{ title }}</span> {{ subtitle }}
-        </h4>
+        <div class="flex flex-col gap-1 text-center">
+          <p :class="titleClass">
+            <span :class="titleHighlightClass">{{ title }}</span> {{ subtitle }}
+          </p>
+          <p :class="fileInfoClass">
+            {{ fileInfo }}
+          </p>
+        </div>
       </div>
 
       <div v-if="fileName">
          <p class="text-success text-xs text-center font-semibold mt-2">Selected: {{ fileName }}</p>
-      </div>
-
-      <div>
-        <p class="text-dark-gray text-xs leading-[1.125rem] text-center mb-0">
-          {{ fileInfo }}
-        </p>
       </div>
     </div>
   </div>
@@ -80,6 +71,34 @@ const props = defineProps({
     type: String,
     default: "PNG or JPG (max. 10MB)",
   },
+  wrapperClass: {
+    type: String,
+    default: "cursor-pointer border-2 border-transparent bg-black/5 rounded-xl p-2 h-[12.1875rem] flex flex-col items-center justify-center hover:border-dark-text hover:bg-black/10 group"
+  },
+  innerWrapperClass: {
+    type: String,
+    default: "gap-1 w-full flex flex-col justify-center self-stretch border-2 border-dashed border-transparent"
+  },
+  iconWrapperClass: {
+    type: String,
+    default: "shadow-[0_1px_2px_0_rgba(16,24,40,0.05)] rounded-lg h-10 w-10 relative flex justify-center items-center"
+  },
+  iconInnerWrapperClass: {
+    type: String,
+    default: "cursor-pointer shadow-[0_1px_2px_0_rgba(16,24,40,0.05)] bg-success rounded-lg h-10 w-10 flex justify-center items-center group-hover:bg-black"
+  },
+  titleClass: {
+    type: String,
+    default: "text-dark-gray text-sm leading-5 text-center font-normal"
+  },
+  titleHighlightClass: {
+    type: String,
+    default: "text-dark-text font-semibold"
+  },
+  fileInfoClass: {
+    type: String,
+    default: "text-dark-gray text-xs leading-[1.125rem] text-center mb-0 mt-2"
+  }
 });
 
 // Computed property to show uploaded filename from state

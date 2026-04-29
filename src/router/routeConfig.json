@@ -1201,6 +1201,12 @@
     "componentPath": "@/components/dropdownHandler/demo/DemoDropdowns.vue"
   },
   {
+    "slug": "/edit-profile-page",
+    "componentPath": "@/templates/editProfile/EditProfilePage.vue",
+    "requiresAuth": false,
+    "supportedRoles": ["all"]
+  },
+  {
     "slug": "/MediaUploader",
   "componentPath": "@/components/ui/global/media/uploader/MediaUploader.vue"
   },
