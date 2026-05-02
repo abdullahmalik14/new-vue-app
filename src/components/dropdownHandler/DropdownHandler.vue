@@ -1508,6 +1508,7 @@ function repositionInternal(reason = 'manual') {
           }
         })
       }
+      
       return
     }
 

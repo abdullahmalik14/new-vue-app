@@ -27,6 +27,7 @@
         </div>
       </div>
     </template>
+    
 
     <!-- Variant: link-x / premium-upgrade -->
     <template v-else-if="variant === 'link-x' || variant === 'premium-upgrade'">
