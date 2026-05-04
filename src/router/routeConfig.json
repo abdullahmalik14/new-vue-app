@@ -2,7 +2,7 @@
   {
     "slug": "/confirm-email",
     "section": "auth",
-    "requiresAuth": true,
+    "requiresAuth": false,
     "redirectIfLoggedIn": "/dashboard",
     "supportedRoles": [],
     "componentPath": "@/templates/auth/page/role/AuthConfirmEmail.vue",

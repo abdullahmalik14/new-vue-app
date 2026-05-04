@@ -1,6 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#710A0A] to-[#200000] py-10 px-4 font-sans">
-    <div class="max-w-6xl mx-auto flex flex-col gap-16">
+  <div class="min-h-screen bg-cover bg-no-repeat bg-lightgray xl:bg-center lg:bg-center md:bg-left sm:bg-[position:-100px] max-[479px]:bg-[position:-290px] relative overflow-x-hidden"
+  :style="{ backgroundImage: bgUrl ? `url(${bgUrl})` : undefined }">
+    
+    <!-- Full-screen blur overlay -->
+    <div class="fixed inset-0 bg-black/30 backdrop-blur-[50px] z-0"></div>
+
+    <div class="relative z-10 max-w-6xl mx-auto py-10 px-4 flex flex-col gap-16 font-sans">
       <section class="flex flex-col gap-6">
         <DemoSectionHeader title="InputAuthComponent — Live Demo" class="text-white" />
 
@@ -16,7 +21,7 @@
               <!-- Email -->
               <div class="flex flex-col gap-1">
                 <InputAuthComponent :model-value="loginEmail" @update:model-value="handleLoginEmailInput"
-                  placeholder="linden@codelinden.com" id="login-email" show-label label-text="Email Address"
+                  placeholder="linden@codelinden.com" id="login-email" show-label label-text="Email"
                   data-required="true" required-display="italic-text" type="text"
                   :show-errors="loginEmailErrors.length > 0" :errors="loginEmailErrors" />
                 <ShowCodeToggle :code="codeSnippets.loginEmail" />
@@ -58,7 +63,7 @@
               <!-- Email -->
               <div class="flex flex-col gap-1">
                 <InputAuthComponent :model-value="signupEmail" @update:model-value="handleSignupEmailInput"
-                  placeholder="linden@codelinden.com" id="signup-email" show-label label-text="Email Address"
+                  placeholder="linden@codelinden.com" id="signup-email" show-label label-text="Email address"
                   data-required="true" required-display="italic-text" type="text"
                   :show-errors="signupEmailErrors.length > 0" :errors="signupEmailErrors" />
                 <ShowCodeToggle :code="codeSnippets.signupEmail" />
@@ -86,12 +91,62 @@
               </div>
 
               <div>
-                <ButtonComponent text="Create Account" variant="authPink" size="lg" type="submit" />
+                <ButtonComponent text="Sign up" variant="authPink" size="lg" type="submit" />
               </div>
+
+              <ButtonComponent :text="'Continue with X (twitter)'" variant="authTransparent" size="lg" :leftIcon="xIcon"
+          leftIconClass="w-8 h-8" />
+
             </form>
           </div>
         </div>
 
+      </section>
+      
+      <section class="flex flex-col gap-6">
+        <DemoSectionHeader title="Verification (OTP)" class="text-white" />
+
+        <div class="flex flex-col lg:flex-row gap-8 items-start">
+          <!-- ===== VERIFICATION SECTION ===== -->
+          <div class="flex-1 flex flex-col gap-6">
+            <h3 class="text-xl text-white font-semibold border-b border-white/10 pb-3">Email Verification</h3>
+
+            <div class="flex flex-col gap-4 w-full">
+              <div class="flex flex-col gap-2">
+                <!-- Hidden input for interactionsEngine -->
+                <input type="hidden" id="verification-code" :value="verificationCode" />
+
+                <CodeInputAuthComponent 
+                  :model-value="verificationCode"
+                  @update:model-value="handleVerificationInput"
+                  show-label
+                  label-text="Verification Code"
+                  data-required="true"
+                  required-display="italic-text"
+                  :show-errors="verificationErrors.length > 0"
+                  :errors="verificationErrors"
+                  :disabled="isVerifying"
+                  :is-submitting="isVerifying"
+                />
+              </div>
+
+              <div>
+                <ButtonComponent text="Confirm" variant="authPink" size="lg" @click="handleVerify" />
+              </div>
+              
+              <ShowCodeToggle :code="codeSnippets.verificationCode" />
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="hidden lg:block w-px bg-white/10 self-stretch" />
+
+          <!-- Placeholder for other auth components -->
+          <div class="flex-1 flex flex-col gap-6 opacity-40">
+            <h3 class="text-xl text-white font-semibold border-b border-white/10 pb-3">More Components...</h3>
+            <p class="text-white/60 italic">Additional auth components can be added here.</p>
+          </div>
+        </div>
       </section>
     </div>
   </div>
@@ -100,6 +155,7 @@
 <script setup>
 import { ref, computed, onMounted, defineComponent, h } from 'vue';
 import InputAuthComponent from '@/components/input/InputAuthComponent.vue';
+import CodeInputAuthComponent from '@/components/input/CodeInputAuthComponent.vue';
 import DemoSectionHeader from '@/templates/dev/DemoSectionHeader.vue';
 import ButtonComponent from '@/components/button/ButtonComponent.vue';
 import Checkbox from '@/components/checkbox/CheckboxGroup.vue';
@@ -108,6 +164,13 @@ import {
   InformationCircleIcon,
   CheckCircleIcon,
 } from '@heroicons/vue/24/outline';
+import { getAssetUrl } from '@/utils/assets/assetLibrary'
+
+const bgUrl = ref('')
+
+onMounted(async () => {
+  bgUrl.value = await getAssetUrl('auth.background')
+})
 
 // ─────────────────────────────────────────────
 // Inline ShowCode toggle component (no external file needed)
@@ -153,6 +216,57 @@ const loginEmail = ref("");
 const loginPassword = ref("");
 const loginRememberMe = ref(false);
 const loginHasAttemptedSubmit = ref(false);
+
+const verificationCode = ref("");
+const isVerifying = ref(false);
+const verificationHasAttemptedSubmit = ref(false);
+const xIcon = ref("");
+// Load icons independently (dynamic)
+  xIcon.value = await getAssetUrl("icon.social.x");
+
+const verificationCodeConfig = computed(() => ({
+  scope: VERIFICATION_SCOPE,
+  id: "verification-code",
+  validation: {
+    required: true,
+    requiredMessage: "Confirmation code is required.",
+    rules: [
+      { type: "minLength", param: 6, message: "Code must be 6 digits." },
+    ],
+  },
+  validateOnInput: true,
+}));
+
+const verificationState = computed(() => interactionsEngine.getFieldState(verificationCodeConfig.value));
+
+const verificationErrors = computed(() => {
+  if (!verificationState.value || verificationState.value.isValid) return [];
+  return verificationState.value.failedRules
+    .filter((r) => r.type !== "required" || verificationHasAttemptedSubmit.value)
+    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));
+});
+
+const handleVerify = () => {
+  verificationHasAttemptedSubmit.value = true;
+  interactionsEngine.validateScope(VERIFICATION_SCOPE);
+  
+  if (verificationState.value?.isValid) {
+    isVerifying.value = true;
+    setTimeout(() => {
+      isVerifying.value = false;
+      alert("Email verified successfully (Demo)!");
+    }, 1500);
+  }
+};
+
+const handleVerificationInput = (value) => {
+  verificationCode.value = value;
+  const state = interactionsEngine.getFieldState(verificationCodeConfig.value);
+  if (state) state.value = value;
+  interactionsEngine.validateField(verificationCodeConfig.value);
+};
+
+
 
 const loginEmailConfig = computed(() => ({
   scope: LOGIN_SCOPE,
@@ -223,6 +337,7 @@ const handleLoginSubmit = () => {
 // SIGNUP scope
 // ─────────────────────────────────────────────
 const SIGNUP_SCOPE = "demo-signupScope";
+const VERIFICATION_SCOPE = "demo-verificationScope";
 
 const signupEmail = ref("");
 const signupPassword = ref("");
@@ -357,6 +472,8 @@ onMounted(() => {
   interactionsEngine.register(signupEmailConfig.value, signupEmail.value, document.getElementById("signup-email"));
   interactionsEngine.register(signupPasswordConfig.value, signupPassword.value, document.getElementById("signup-password"));
   interactionsEngine.register(signupConfirmPasswordConfig.value, signupConfirmPassword.value, document.getElementById("signup-confirmPassword"));
+
+  interactionsEngine.register(verificationCodeConfig.value, verificationCode.value, document.getElementById("verification-code"));
 });
 
 // ─────────────────────────────────────────────
@@ -525,6 +642,21 @@ const codeSnippets = {
     '',
     '// "matchValue" compares against the sibling field with id="password"',
     '// registered in the same scope — no custom logic needed.',
+  ].join('\n'),
+  
+  verificationCode: [
+    '<!-- Template -->',
+    '<CodeInputAuthComponent',
+    '  v-model="code"',
+    '  show-label label-text="Verification Code"',
+    '  data-required="true" required-display="italic-text"',
+    '  :show-errors="errors.length > 0"',
+    '  :errors="errors"',
+    '  :is-submitting="isVerifying"',
+    '/>',
+    '',
+    '<!-- Verify button -->',
+    '<ButtonComponent text="Confirm" variant="authPink" />',
   ].join('\n'),
 };
 </script>

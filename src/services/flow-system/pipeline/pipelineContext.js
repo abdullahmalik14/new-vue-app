@@ -69,6 +69,19 @@ export function createPipelineContext({
   const optionPipeline = options.pipeline || {};
   const pipeline = mergeConfig(mergeConfig(defaultPipeline, registryPipeline), optionPipeline);
 
+  const backendJwtToken = typeof options.backendJwtToken === "string"
+    ? options.backendJwtToken.trim()
+    : typeof options.context?.backendJwtToken === "string"
+      ? options.context.backendJwtToken.trim()
+      : "";
+  const requestHeaders = {
+    ...((isPlainObject(options.context?.requestHeaders) ? options.context.requestHeaders : {})),
+    ...((isPlainObject(options.requestHeaders) ? options.requestHeaders : {})),
+  };
+  if (backendJwtToken && !Object.prototype.hasOwnProperty.call(requestHeaders, "Authorization")) {
+    requestHeaders.Authorization = `Bearer ${backendJwtToken}`;
+  }
+
   return {
     runId: makeRunId(),
     flowName,
@@ -81,7 +94,7 @@ export function createPipelineContext({
     executeFlow,
     rerunFlow,
     progress: { loading: false, step: "start", attempt: 1 },
-    requestHeaders: {},
+    requestHeaders,
     runtimeOptions: {
       forceRefresh: !!options.forceRefresh,
       bypassEtag: !!options.bypassEtag,
@@ -98,6 +111,7 @@ export function createPipelineContext({
     totalFlowTimeoutMs: options.totalFlowTimeoutMs || pipeline.timeouts?.totalFlowMs || pipeline.timeoutMs || 15000,
     retryAttempts: options.retryAttempts,
     userId: options.userId,
+    backendJwtToken,
     apiBaseUrl: options.apiBaseUrl,
     storage: options.storage,
     stateEngine: options.stateEngine || options.context?.stateEngine,

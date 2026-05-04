@@ -64,7 +64,17 @@ function normalizeValidators(validators) {
   };
 }
 
+const _globalContext = {
+  piniaStores: {},
+  stateEngine: null,
+};
+
 export const FlowHandler = {
+  configure({ piniaStores = {}, stateEngine = null } = {}) {
+    if (piniaStores) Object.assign(_globalContext.piniaStores, piniaStores);
+    if (stateEngine) _globalContext.stateEngine = stateEngine;
+  },
+
   async run(flowName, payload = {}, options = {}) {
     const rawFlowEntry = flowRegistry[flowName];
     if (!rawFlowEntry) {
@@ -107,6 +117,12 @@ export const FlowHandler = {
 
     const middlewares = options.middlewares || flowEntry.middlewares || defaultMiddlewares;
     const runWithMiddleware = composeMiddlewares(baseHandler, middlewares);
+    const mergedOptions = {
+      ..._globalContext,
+      ...options,
+      piniaStores: { ..._globalContext.piniaStores, ...(options.piniaStores || {}) },
+    };
+
     const context = createPipelineContext({
       flowName,
       flowEntry,
@@ -116,9 +132,9 @@ export const FlowHandler = {
       flowKind,
       mapper,
       validators,
-      options,
+      options: mergedOptions,
       rerunFlow: (overrideOptions = {}) => FlowHandler.run(flowName, payload, {
-        ...options,
+        ...mergedOptions,
         ...overrideOptions,
       }),
       executeFlow: async ({ payload: nextPayload }) => runWithMiddleware({
