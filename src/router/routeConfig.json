@@ -1139,8 +1139,8 @@
     "supportedRoles": ["all"]
   },
   {
-    "slug": "/demo/audit/input-auth",
-    "componentPath": "@/components/demoAuditComponents/InputAuthComponentDemo.vue",
+    "slug": "/demo/audit/auth-components",
+    "componentPath": "@/components/demoAuditComponents/AuthComponentDemo.vue",
     "requiresAuth": false,
     "supportedRoles": ["all"]
   },

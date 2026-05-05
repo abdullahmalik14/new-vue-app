@@ -5,7 +5,7 @@
     <!-- Full-screen blur overlay -->
     <div class="fixed inset-0 bg-black/30 backdrop-blur-[50px] z-0"></div>
 
-    <div class="relative z-10 max-w-6xl mx-auto py-10 px-4 flex flex-col gap-16 font-sans">
+    <div class="relative z-10 p-10 flex flex-col gap-16 font-sans">
       <section class="flex flex-col gap-6">
         <DemoSectionHeader title="InputAuthComponent — Live Demo" class="text-white" />
 
@@ -97,6 +97,8 @@
               <ButtonComponent :text="'Continue with X (twitter)'" variant="authTransparent" size="lg" :leftIcon="xIcon"
           leftIconClass="w-8 h-8" />
 
+              <ButtonComponent :text="'Continue with Telegram'" variant="authTransparent" size="lg"  />
+
             </form>
           </div>
         </div>
@@ -143,9 +145,7 @@
 
           <!-- Placeholder for other auth components -->
           <div class="flex-1 flex flex-col gap-6 opacity-40">
-            <h3 class="text-xl text-white font-semibold border-b border-white/10 pb-3">More Components...</h3>
-            <p class="text-white/60 italic">Additional auth components can be added here.</p>
-          </div>
+            </div>
         </div>
       </section>
     </div>

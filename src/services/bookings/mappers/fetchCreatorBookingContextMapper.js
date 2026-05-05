@@ -13,6 +13,7 @@ export function mapFetchCreatorBookingContextFromResponse(responseData = {}) {
     rawEvents,
     bookedSlots,
     bookedSlotsIndex,
+    isFirstBookingForCreator: responseData?.isFirstBookingForCreator ?? null,
     stats: responseData?.stats || {},
     meta: {
       fetchedAt: Date.now(),

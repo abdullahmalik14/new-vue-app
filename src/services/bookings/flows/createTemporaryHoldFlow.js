@@ -6,7 +6,7 @@ export async function createTemporaryHoldFlow({ payload, context, api }) {
   const baseUrl = getBookingsApiBaseUrl(context);
   const headers = context.requestHeaders || {};
 
-  const requiredFields = ["eventId", "userId", "creatorId", "startIso", "endIso"];
+  const requiredFields = ["eventId", "creatorId", "startIso", "endIso"];
   const missingFields = requiredFields.filter((field) => !payload?.[field]);
 
   if (missingFields.length > 0) {
@@ -39,6 +39,7 @@ export async function createTemporaryHoldFlow({ payload, context, api }) {
       {
         temporaryHoldId: response?.temporaryHoldId || temporaryHold?.temporaryHoldId || null,
         expiresAt: response?.expiresAt || temporaryHold?.expiresAt || null,
+        guestHoldToken: response?.guestHoldToken || temporaryHold?.guestHoldToken || null,
         temporaryHold,
       },
       {

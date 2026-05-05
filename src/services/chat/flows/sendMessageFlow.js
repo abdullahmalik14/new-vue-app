@@ -17,14 +17,22 @@ export async function sendMessageFlow({ payload, context, api }) {
   };
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${chatId}/messages`, messagePayload);
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages`, messagePayload);
     
     const status = getHttpStatus(response, 201);
     if (response?.ok === false) {
       return fail({ code: "SEND_MESSAGE_FAILED", message: response?.error || "Failed to send message" }, { flow: "chat.sendMessage", status });
     }
     
-    return ok({ item: response?.item, chatId }, { flow: "chat.sendMessage", status });
+    const raw = response?.item || {};
+    const item = {
+      ...raw,
+      senderId: raw.sender_id,
+      text: raw.content?.text ?? raw.text ?? '',
+      status: 'sent',
+    };
+
+    return ok({ item, chatId }, { flow: "chat.sendMessage", status });
   } catch (error) {
     return asFlowError(error, "SEND_MESSAGE_UNEXPECTED");
   }

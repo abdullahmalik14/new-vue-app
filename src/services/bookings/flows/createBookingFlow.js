@@ -6,7 +6,7 @@ export async function createBookingFlow({ payload, context, api }) {
   const baseUrl = getBookingsApiBaseUrl(context);
   const headers = context.requestHeaders || {};
 
-  const requiredFields = ["eventId", "userId", "creatorId", "startIso", "endIso"];
+  const requiredFields = ["eventId", "creatorId", "startIso", "endIso"];
   const missingFields = requiredFields.filter((field) => !payload?.[field]);
 
   if (missingFields.length > 0) {

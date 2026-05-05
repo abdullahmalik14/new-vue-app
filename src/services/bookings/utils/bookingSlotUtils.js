@@ -87,6 +87,51 @@ function normalizePositiveMinutes(value, fallback = 15) {
   return Math.floor(parsed);
 }
 
+function isGroupEvent(event = {}) {
+  const raw = event?.raw || {};
+  return String(event?.type || event?.eventType || raw?.type || raw?.eventType || "").toLowerCase() === "group-event";
+}
+
+function resolveGroupCapacity(event = {}) {
+  const raw = event?.raw || {};
+  const enabled = raw?.enableMaxUsersInGroup ?? event?.enableMaxUsersInGroup ?? raw?.setMaxUsers ?? event?.setMaxUsers;
+  const capacity = Number(
+    raw?.maxUsersInGroup
+      ?? event?.maxUsersInGroup
+      ?? raw?.maxUsers
+      ?? event?.maxUsers
+      ?? raw?.maxAttendees
+      ?? event?.maxAttendees
+      ?? raw?.capacity
+      ?? event?.capacity,
+  );
+
+  if (enabled === false || enabled === "false" || enabled === 0 || enabled === "0") return Infinity;
+  if (!Number.isFinite(capacity) || capacity <= 0) return Infinity;
+  return Math.floor(capacity);
+}
+
+function inferSlotDurationMinutes(slot = {}) {
+  if (!slot || !Number.isFinite(slot.startMs) || !Number.isFinite(slot.endMs)) return 0;
+  return Math.max(0, Math.round((slot.endMs - slot.startMs) / (60 * 1000)));
+}
+
+function normalizeEndDayOffset(value, startHm = "", endHm = "") {
+  const parsed = Number(value);
+  if (Number.isFinite(parsed)) {
+    if (parsed <= 0) return 0;
+    return 1;
+  }
+
+  const startMinutes = Number(startHm.slice(0, 2)) * 60 + Number(startHm.slice(3, 5));
+  const endMinutes = Number(endHm.slice(0, 2)) * 60 + Number(endHm.slice(3, 5));
+  if (Number.isFinite(startMinutes) && Number.isFinite(endMinutes) && endMinutes < startMinutes) {
+    return 1;
+  }
+
+  return 0;
+}
+
 function sliceWindowIntoSessionSlots(windowSlot, sessionMinutes, bufferMinutes = 0) {
   const rows = [];
   const segmentMs = normalizePositiveMinutes(sessionMinutes, 15) * 60 * 1000;
@@ -128,7 +173,16 @@ function sliceWindowIntoSessionSlots(windowSlot, sessionMinutes, bufferMinutes =
 
 function isOverlappingBookedRange(startMs, endMs, bookedRows = []) {
   if (!Array.isArray(bookedRows) || bookedRows.length === 0) return false;
-  return bookedRows.some((booked) => startMs < booked.endMs && endMs > booked.startMs);
+  return bookedRows.some((booked) => (
+    isBlockingBookedSlot(booked)
+    && startMs < booked.endMs
+    && endMs > booked.startMs
+  ));
+}
+
+function isBlockingBookedSlot(booked) {
+  const status = String(booked?.status || "").toLowerCase();
+  return !status.includes("cancel");
 }
 
 function sliceWindowIntoSessionSlotsWithPostBookedBuffer(
@@ -208,6 +262,7 @@ function normalizeWeeklySlots(rawSlots = []) {
       dayIndex,
       startTime: toHm(slot.startTime, "15:00"),
       endTime: toHm(slot.endTime, "16:00"),
+      endDayOffset: normalizeEndDayOffset(slot.endDayOffset, slot.startTime, slot.endTime),
       offHours: !!slot.offHours,
     });
   });
@@ -223,7 +278,9 @@ function normalizeOneTimeSlots(rawSlots = []) {
     const hktDate = extractDateIso(dateEntry.date, null);
     if (!hktDate) return;
 
-    const times = Array.isArray(dateEntry.times) ? dateEntry.times : [];
+    const times = Array.isArray(dateEntry.times)
+      ? dateEntry.times
+      : (Array.isArray(dateEntry.slots) ? dateEntry.slots : []);
     if (times.length === 0) return;
 
     times.forEach((timeEntry) => {
@@ -237,6 +294,7 @@ function normalizeOneTimeSlots(rawSlots = []) {
         hktDate,
         startTime: startHm,
         endTime: endHm,
+        endDayOffset: normalizeEndDayOffset(timeEntry.endDayOffset, startHm, endHm),
         offHours: !!timeEntry.offHours,
       });
     });
@@ -258,6 +316,7 @@ function normalizeMonthlySlots(rawSlots = []) {
       kind: "monthly",
       startTime: startHm,
       endTime: endHm,
+      endDayOffset: normalizeEndDayOffset(slot.endDayOffset, startHm, endHm),
       offHours: !!slot.offHours,
     });
   });
@@ -280,15 +339,17 @@ function shouldIncludeWeeklyDate({ repeatRule, repeatX, dateFrom, candidateHktDa
   return gapWeeks % interval === 0;
 }
 
-function buildLocalSlotFromHkt({ hktDateIso, startHm, endHm, offHours = false }) {
+function buildLocalSlotFromHkt({
+  hktDateIso,
+  startHm,
+  endHm,
+  endDayOffset = null,
+  offHours = false,
+}) {
   const startDate = hktDateTimeToLocalDate(hktDateIso, startHm);
 
-  let endHktDateIso = hktDateIso;
-  const startMinutes = Number(startHm.slice(0, 2)) * 60 + Number(startHm.slice(3, 5));
-  const endMinutes = Number(endHm.slice(0, 2)) * 60 + Number(endHm.slice(3, 5));
-  if (endMinutes <= startMinutes) {
-    endHktDateIso = addDays(hktDateIso, 1);
-  }
+  const safeEndDayOffset = normalizeEndDayOffset(endDayOffset, startHm, endHm);
+  const endHktDateIso = safeEndDayOffset > 0 ? addDays(hktDateIso, safeEndDayOffset) : hktDateIso;
 
   const endDate = hktDateTimeToLocalDate(endHktDateIso, endHm);
 
@@ -304,6 +365,7 @@ function buildLocalSlotFromHkt({ hktDateIso, startHm, endHm, offHours = false })
     localDateIso,
     startHm: localStartHm,
     endHm: localEndHm,
+    endDayOffset: safeEndDayOffset,
     offHours: !!offHours,
     startMs: startDate.getTime(),
     endMs: endDate.getTime(),
@@ -318,6 +380,7 @@ export function buildCandidateSlotsForEventDate(event = {}, localDateIso, option
   const eventId = options.eventId || event?.eventId || event?.id;
   const bookedSlotsIndex = options.bookedSlotsIndex || {};
   const applyBufferAfterBooked = options.applyBufferAfterBooked !== false;
+  const groupEvent = isGroupEvent(event);
   const sessionMinutes = normalizePositiveMinutes(
     raw.sessionDurationMinutes ?? event?.sessionDurationMinutes,
     15,
@@ -335,7 +398,9 @@ export function buildCandidateSlotsForEventDate(event = {}, localDateIso, option
   )
     ? [...bookedSlotsIndex[eventId][localDateIso]].sort((left, right) => left.startMs - right.startMs)
     : [];
-  const rawSlots = Array.isArray(raw.slots) ? raw.slots : [];
+  const rawSlots = Array.isArray(raw.slots) && raw.slots.length > 0
+    ? raw.slots
+    : (Array.isArray(raw.dates) ? raw.dates : []);
   let hasExplicitScheduleSlots = false;
 
   if (!localDateIso) return [];
@@ -361,6 +426,7 @@ export function buildCandidateSlotsForEventDate(event = {}, localDateIso, option
         hktDateIso: slot.hktDate,
         startHm: slot.startTime,
         endHm: slot.endTime,
+        endDayOffset: slot.endDayOffset,
         offHours: slot.offHours,
       });
       if (!mapped) return;
@@ -388,6 +454,7 @@ export function buildCandidateSlotsForEventDate(event = {}, localDateIso, option
           hktDateIso: candidateHktDateIso,
           startHm: slot.startTime,
           endHm: slot.endTime,
+          endDayOffset: slot.endDayOffset,
           offHours: slot.offHours,
         });
 
@@ -420,6 +487,7 @@ export function buildCandidateSlotsForEventDate(event = {}, localDateIso, option
           hktDateIso: candidateHktDateIso,
           startHm: slot.startTime,
           endHm: slot.endTime,
+          endDayOffset: slot.endDayOffset,
           offHours: slot.offHours,
         });
 
@@ -432,6 +500,15 @@ export function buildCandidateSlotsForEventDate(event = {}, localDateIso, option
 
   const segmented = [];
   built.forEach((slotWindow) => {
+    if (groupEvent) {
+      segmented.push({
+        ...slotWindow,
+        windowEndMs: slotWindow.endMs,
+        durationMinutes: inferSlotDurationMinutes(slotWindow),
+      });
+      return;
+    }
+
     const parts = (applyBufferAfterBooked && bufferMinutes > 0)
       ? sliceWindowIntoSessionSlotsWithPostBookedBuffer(
           slotWindow,
@@ -477,25 +554,31 @@ export function buildCandidateSlotsForEventDate(event = {}, localDateIso, option
           offHours: false,
           startMs,
           endMs,
+          windowEndMs: endMs,
+          durationMinutes: Math.max(0, Math.round((endMs - startMs) / (60 * 1000))),
           value: fallbackStart,
           label: hmToLabel(fallbackStart),
         };
 
-        const fallbackParts = sliceWindowIntoSessionSlots(fallbackWindow, sessionMinutes, 0);
-        const fallbackRows = (applyBufferAfterBooked && bufferMinutes > 0)
-          ? sliceWindowIntoSessionSlotsWithPostBookedBuffer(
-              fallbackWindow,
-              sessionMinutes,
-              bookedRowsForDate,
-              bufferMinutes,
-            )
-          : fallbackParts;
-        if (fallbackRows.length > 0) {
-          fallbackRows.forEach((part) => {
-            dedupe.set(`${part.localDateIso}_${part.startHm}_${part.endHm}`, part);
-          });
-        } else {
+        if (groupEvent) {
           dedupe.set(`${localDateIso}_${fallbackStart}_${fallbackEnd}`, fallbackWindow);
+        } else {
+          const fallbackParts = sliceWindowIntoSessionSlots(fallbackWindow, sessionMinutes, 0);
+          const fallbackRows = (applyBufferAfterBooked && bufferMinutes > 0)
+            ? sliceWindowIntoSessionSlotsWithPostBookedBuffer(
+                fallbackWindow,
+                sessionMinutes,
+                bookedRowsForDate,
+                bufferMinutes,
+              )
+            : fallbackParts;
+          if (fallbackRows.length > 0) {
+            fallbackRows.forEach((part) => {
+              dedupe.set(`${part.localDateIso}_${part.startHm}_${part.endHm}`, part);
+            });
+          } else {
+            dedupe.set(`${localDateIso}_${fallbackStart}_${fallbackEnd}`, fallbackWindow);
+          }
         }
       }
     }
@@ -544,7 +627,48 @@ export function isSlotBooked({ eventId, localDateIso, slot, bookedSlotsIndex = {
   const rows = bookedSlotsIndex?.[eventId]?.[localDateIso];
   if (!Array.isArray(rows) || rows.length === 0) return false;
 
-  return rows.some((booked) => slot.startMs < booked.endMs && slot.endMs > booked.startMs);
+  return rows.some((booked) => (
+    isBlockingBookedSlot(booked)
+    && slot.startMs < booked.endMs
+    && slot.endMs > booked.startMs
+  ));
+}
+
+function countBlockingOverlaps({ eventId, startMs, endMs, bookedSlotsIndex = {} }) {
+  if (!eventId || !Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) {
+    return 0;
+  }
+
+  const byDate = bookedSlotsIndex?.[eventId];
+  if (!byDate || typeof byDate !== "object") return 0;
+
+  let count = 0;
+  Object.values(byDate).forEach((rows) => {
+    if (!Array.isArray(rows)) return;
+    rows.forEach((booked) => {
+      if (
+        isBlockingBookedSlot(booked)
+        && startMs < booked.endMs
+        && endMs > booked.startMs
+      ) {
+        count += 1;
+      }
+    });
+  });
+  return count;
+}
+
+export function isGroupSlotAtCapacity({ event, eventId, slot, bookedSlotsIndex = {} }) {
+  if (!isGroupEvent(event)) return false;
+  const capacity = resolveGroupCapacity(event);
+  if (!Number.isFinite(capacity)) return false;
+  const occupied = countBlockingOverlaps({
+    eventId,
+    startMs: slot?.startMs,
+    endMs: slot?.endMs,
+    bookedSlotsIndex,
+  });
+  return occupied >= capacity;
 }
 
 export function isRangeBooked({ eventId, startMs, endMs, bookedSlotsIndex = {} }) {
@@ -557,7 +681,11 @@ export function isRangeBooked({ eventId, startMs, endMs, bookedSlotsIndex = {} }
 
   return Object.values(byDate).some((rows) => {
     if (!Array.isArray(rows) || rows.length === 0) return false;
-    return rows.some((booked) => startMs < booked.endMs && endMs > booked.startMs);
+    return rows.some((booked) => (
+      isBlockingBookedSlot(booked)
+      && startMs < booked.endMs
+      && endMs > booked.startMs
+    ));
   });
 }
 
@@ -574,12 +702,16 @@ export function computeNextAvailableSlot(event = {}, bookedSlotsIndex = {}, days
       bookedSlotsIndex,
       applyBufferAfterBooked: true,
     });
-    const firstFree = candidates.find((slot) => !isSlotBooked({
-      eventId: event.eventId,
-      localDateIso,
-      slot,
-      bookedSlotsIndex,
-    }));
+    const firstFree = candidates.find((slot) => (
+      isGroupEvent(event)
+        ? !isGroupSlotAtCapacity({ event, eventId: event.eventId, slot, bookedSlotsIndex })
+        : !isSlotBooked({
+          eventId: event.eventId,
+          localDateIso,
+          slot,
+          bookedSlotsIndex,
+        })
+    ));
 
     if (firstFree) {
       return {
@@ -593,8 +725,19 @@ export function computeNextAvailableSlot(event = {}, bookedSlotsIndex = {}, days
   return null;
 }
 
-export function createSlotUiModel({ eventId, localDateIso, slot, bookedSlotsIndex }) {
-  const disabled = isSlotBooked({ eventId, localDateIso, slot, bookedSlotsIndex });
+export function createSlotUiModel({ event, eventId, localDateIso, slot, bookedSlotsIndex }) {
+  const bookedDisabled = isGroupEvent(event)
+    ? isGroupSlotAtCapacity({ event, eventId, slot, bookedSlotsIndex })
+    : isSlotBooked({ eventId, localDateIso, slot, bookedSlotsIndex });
+  const today = new Date();
+  const todayIso = toLocalDateIsoFromDate(today);
+  const pastDisabled = (
+    Boolean(localDateIso)
+    && localDateIso === todayIso
+    && Number.isFinite(slot?.startMs)
+    && slot.startMs < today.getTime()
+  );
+  const disabled = bookedDisabled || pastDisabled;
   return {
     ...slot,
     disabled,
@@ -722,14 +865,17 @@ export function mapAvailabilityToCalendarEvents(events = [], options = {}) {
     const status = String(event?.status || "").toLowerCase();
     if (status && status !== "active") return;
 
+    const repeatRule = String(event?.raw?.repeatRule || event?.repeatRule || "");
     const dateFrom = event?.dateFrom || null;
     const dateTo = event?.dateTo || null;
     const callType = String(event?.eventCallType || event?.raw?.eventCallType || "").toLowerCase();
 
     for (let day = new Date(start); day <= end; day = addDaysToDate(day, 1)) {
       const localDateIso = toLocalDateIsoFromDate(day);
-      if (dateFrom && localDateIso < dateFrom) continue;
-      if (dateTo && localDateIso > dateTo) continue;
+      if (repeatRule !== "doesNotRepeat") {
+        if (dateFrom && localDateIso < dateFrom) continue;
+        if (dateTo && localDateIso > dateTo) continue;
+      }
 
       const candidates = buildCandidateSlotsForEventDate(event, localDateIso, {
         eventId,
