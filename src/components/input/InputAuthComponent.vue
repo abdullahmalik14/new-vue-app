@@ -18,7 +18,7 @@ const props = defineProps({
   labelClass: {
     type: String,
     default: "text-[#ffffff]",
-  },  
+  },
   required: { type: Boolean, default: false },
   requiredDisplay: { type: [String, Array], default: "" },
   rightIcon: String,
@@ -128,7 +128,7 @@ const internalTypeToggleConfig = computed(() => {
         {{ labelText }}
       </label>
       <span v-if="requiredDisplayValues.includes('*')" class="text-red-500">*</span>
-      <span v-if="requiredDisplayValues.includes('italic-text')" class="text-[0.625rem] leading-6 text-right italic"
+      <span v-if="requiredDisplayValues.includes('italic-text')" class="text-[10px] leading-6 text-right italic"
         :class="labelColor">
         Required
       </span>
@@ -136,40 +136,39 @@ const internalTypeToggleConfig = computed(() => {
 
     <!-- Input Wrapper -->
     <div
-      class="relative rounded-xl border border-[#DEE5EC] bg-[rgba(255,255,255,0.20)] min-h-[3rem] gap-2.5 pt-3 pb-3 px-[10px] flex justify-center items-center self-stretch shadow-sm"
+      class="relative rounded-xl border border-dee5ec bg-white/20 min-h-12 gap-2.5 py-3 px-2.5 flex justify-center items-center self-stretch shadow-sm focus-within:border-dee5ec"
       :class="{ 'opacity-50 pointer-events-none': disabled }">
       <component v-if="leftIcon" :is="typeof leftIcon === 'string' ? 'img' : leftIcon"
         :src="typeof leftIcon === 'string' ? leftIcon : undefined" alt="icon"
-        class="absolute left-2 top-[50%] transform -translate-y-1/2 pointer-events-none w-5 h-5" :class="textColor" />
+        class="absolute left-2 top-1/2 transform -translate-y-1/2 pointer-events-none w-5 h-5" :class="textColor" />
 
       <input :id="id" :type="type" :value="modelValue" :placeholder="activePlaceholder" :required="required"
         :data-required="$attrs['data-required']" :disabled="disabled"
-        class="w-full bg-transparent outline-none focus:outline-none focus:ring-0 focus:border-none poppins-medium placeholder:font-[400]"
-        :class="[textColor, placeholderColor, leftIcon ? 'pl-8' : 'pl-1', rightIcon ? (rightIconText ? 'pr-16' : 'pr-8') : '']" @input="$emit('update:modelValue', $event.target.value)"
-        @focus="handleFocus" @blur="handleBlur"
+        class="w-full bg-transparent outline-none focus:outline-none focus:ring-0 focus:border-none placeholder:font-[400] [&::-webkit-credentials-auto-fill-button]:!hidden [&::-ms-reveal]:!hidden [&::-ms-clear]:!hidden"
+        :class="[textColor, placeholderColor, leftIcon ? 'pl-8' : 'pl-1', rightIcon ? (rightIconText ? 'pr-16' : 'pr-8') : '', 'poppins-medium']"
+        @input="$emit('update:modelValue', $event.target.value)" @focus="handleFocus" @blur="handleBlur"
         v-interactions="interactionsConfig || internalEyeVisibilityConfig" />
 
-      <div v-if="rightIcon || $slots['right-icon'] || type === 'password'"
-        :id="`${id}-eye`"
-        class="absolute right-2 top-[50%] transform -translate-y-1/2 flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
-        hidden
+      <div v-if="rightIcon || $slots['right-icon'] || type === 'password'" :id="`${id}-eye`"
+        class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity [&[hidden]]:!hidden"
         v-interactions="rightIconInteractionsConfig || internalTypeToggleConfig"
         @click="$emit('click:right-icon')">
-        <span v-if="rightIconText" class="text-xs font-medium poppins-medium" :class="textColor">{{ rightIconText
+        <span v-if="rightIconText" class="text-xs font-medium" :class="textColor">{{ rightIconText
         }}</span>
         <slot name="right-icon">
           <!-- Password icons default: shown if no slot is provided and type is password -->
           <template v-if="type === 'password' && !rightIcon">
-            <span :id="`${id}-eye-icon`">
+            <span :id="`${id}-eye-icon`" class="[&[hidden]]:!hidden">
               <EyeSlashIcon class="w-5 h-5" :class="textColor" />
             </span>
-            <span :id="`${id}-eyeslash-icon`" hidden>
+            <span :id="`${id}-eyeslash-icon`" class="[&[hidden]]:!hidden" hidden>
               <EyeIcon class="w-5 h-5" :class="textColor" />
             </span>
           </template>
 
           <component v-else-if="rightIcon" :is="typeof rightIcon === 'string' ? 'img' : rightIcon"
-            :src="typeof rightIcon === 'string' ? rightIcon : undefined" alt="icon" class="w-5 h-5" :class="textColor" />
+            :src="typeof rightIcon === 'string' ? rightIcon : undefined" alt="icon" class="w-5 h-5"
+            :class="textColor" />
         </slot>
       </div>
     </div>
@@ -181,78 +180,5 @@ const internalTypeToggleConfig = computed(() => {
     <Paragraph v-if="requiredDisplayValues.includes('required-text-error')" :text="'This field is required.'"
       fontSize="text-xs" fontColor="text-[#FF4405]" />
 
-    <!-- Validation Messages (Errors and Success combined) -->
-    <div v-if="(showErrors && errors.length) || (onSuccess && success.length)"
-      class="flex flex-col items-start self-stretch">
-      <!-- Success List -->
-      <div v-if="onSuccess && success.length" class="flex flex-col gap-1 w-full">
-        <div v-for="(successObj, index) in success" :key="`success-${index}`"
-          class="flex w-full items-center gap-[.4375rem]">
-          <CheckIcon class="w-[1.125rem] h-[1.125rem] text-white flex-shrink-0" />
-          <p class="text-white text-[12px] sm:text-[14px] font-normal">
-            {{ successObj.message || successObj.text || successObj }}
-          </p>
-        </div>
-      </div>
-
-      <!-- Errors List -->
-      <div v-if="showErrors && errors.length" :class="[
-        'flex flex-col gap-1 w-full',
-        onSuccess && success.length ? 'mt-2' : '',
-      ]">
-        <div v-for="(errorObj, index) in errors" :key="`error-${index}`"
-          class="flex w-full items-center gap-[.4375rem]">
-          <HexagonExclamationIcon />
-          <p class="text-[#ff7c1e] text-[12px] sm:text-[14px] font-normal">
-            {{ errorObj.error || errorObj.message || errorObj }}
-          </p>
-        </div>
-      </div>
     </div>
-  </div>
 </template>
-
-<style scoped>
-/* Force HTML5 hidden attribute to override Tailwind display utility classes (like .flex) */
-[hidden] {
-  display: none !important;
-}
-
-/* Hide browser's default password reveal button for all browsers */
-input[type="password"]::-webkit-credentials-auto-fill-button {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-input[type="password"]::-ms-reveal {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-input[type="password"]::-ms-clear {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* Remove all focus borders, outlines and transitions - prevent 50ms flash on blur */
-input,
-input:focus,
-input:focus-visible,
-input:active,
-input:focus-within {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  transition: none !important;
-}
-
-/* Wrapper: lock border at all times, no transition */
-div:has(input) {
-  transition: none !important;
-}
-div:has(input:focus) {
-  border-color: rgb(222 229 236) !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-</style>

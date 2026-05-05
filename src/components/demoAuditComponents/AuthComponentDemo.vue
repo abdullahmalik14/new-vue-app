@@ -16,37 +16,52 @@
           <div class="flex-1 flex flex-col gap-6">
             <h3 class="text-xl text-white font-semibold border-b border-white/10 pb-3">Login</h3>
 
-            <form @submit.prevent="handleLoginSubmit" class="flex flex-col gap-4 w-full">
+            <form id="login-form" interaction-container @submit.prevent class="flex flex-col gap-4 w-full">
 
               <!-- Email -->
               <div class="flex flex-col gap-1">
-                <InputAuthComponent :model-value="loginEmail" @update:model-value="handleLoginEmailInput"
-                  placeholder="linden@codelinden.com" id="login-email" show-label label-text="Email"
-                  data-required="true" required-display="italic-text" type="text"
-                  :show-errors="loginEmailErrors.length > 0" :errors="loginEmailErrors" />
+                <InputAuthComponent v-model="loginEmail" placeholder="linden@codelinden.com" id="login-email"
+                  show-label label-text="Email" data-required="true" required-display="italic-text" type="text"
+                  :interactions-config="loginEmailInteractions" />
+                
+                <!-- Errors -->
+                <div id="login-email-required-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Email is required.</p>
+                </div>
+                <div id="login-email-format-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Please enter a valid email address.</p>
+                </div>
+
                 <ShowCodeToggle :code="codeSnippets.loginEmail" />
               </div>
 
               <!-- Password -->
               <div class="flex flex-col gap-1">
-                <InputAuthComponent :model-value="loginPassword" @update:model-value="handleLoginPasswordInput"
-                  placeholder="********" id="login-password" show-label label-text="Password" data-required="true"
-                  required-display="italic-text" type="password"
-                  :show-errors="loginPasswordErrors.length > 0" :errors="loginPasswordErrors" />
+                <InputAuthComponent v-model="loginPassword" placeholder="********" id="login-password"
+                  show-label label-text="Password" data-required="true" required-display="italic-text" type="password"
+                  :interactions-config="loginPasswordInteractions" />
+
+                <!-- Errors -->
+                <div id="login-password-required-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Password is required.</p>
+                </div>
+
                 <ShowCodeToggle :code="codeSnippets.loginPassword" />
               </div>
 
-              <!-- Remember Me checkbox -->
               <div class="flex flex-col gap-1">
                 <Checkbox v-model="loginRememberMe" label="Remember me"
-                  checkboxClass="m-0 border border-checkboxBorder [appearance:none] w-[0.75rem] h-[0.75rem] rounded-[2px] bg-transparent relative cursor-pointer checked:bg-checkbox checked:border-checkbox checked:[&::after]:content-[''] checked:[&::after]:absolute checked:[&::after]:left-[0.2rem] checked:[&::after]:w-[0.25rem] checked:[&::after]:h-[0.5rem] checked:[&::after]:border checked:[&::after]:border-solid checked:[&::after]:border-white checked:[&::after]:border-r-[2px] checked:[&::after]:border-b-[2px] checked:[&::after]:border-t-0 checked:[&::after]:border-l-0 checked:[&::after]:rotate-45"
+                  :checkboxClass="checkboxClass"
                   labelClass="text-[0.875rem] leading-6 text-text cursor-pointer"
                   wrapperClass="flex items-center gap-2" />
                 <ShowCodeToggle :code="codeSnippets.loginCheckbox" />
               </div>
 
               <div>
-                <ButtonComponent text="Log In" variant="authPink" size="lg" type="submit" />
+                <ButtonComponent text="Log In" variant="authPink" size="lg" v-interactions="loginSubmitInteractions" />
               </div>
             </form>
           </div>
@@ -58,53 +73,84 @@
           <div class="flex-1 flex flex-col gap-6">
             <h3 class="text-xl text-white font-semibold border-b border-white/10 pb-3">Sign Up</h3>
 
-            <form @submit.prevent="handleSignupSubmit" class="flex flex-col gap-4 w-full">
+            <form id="signup-form" interaction-container @submit.prevent class="flex flex-col gap-4 w-full">
 
               <!-- Email -->
               <div class="flex flex-col gap-1">
-                <InputAuthComponent :model-value="signupEmail" @update:model-value="handleSignupEmailInput"
-                  placeholder="linden@codelinden.com" id="signup-email" show-label label-text="Email address"
-                  data-required="true" required-display="italic-text" type="text"
-                  :show-errors="signupEmailErrors.length > 0" :errors="signupEmailErrors" />
+                <InputAuthComponent v-model="signupEmail" placeholder="linden@codelinden.com" id="signup-email"
+                  show-label label-text="Email address" data-required="true" required-display="italic-text" type="text"
+                  :interactions-config="signupEmailInteractions" />
+
+                <!-- Errors -->
+                <div id="signup-email-required-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Email is required.</p>
+                </div>
+                <div id="signup-email-format-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Please enter a valid email address.</p>
+                </div>
+
                 <ShowCodeToggle :code="codeSnippets.signupEmail" />
               </div>
 
               <!-- Password -->
               <div class="flex flex-col gap-1">
-                <InputAuthComponent :model-value="signupPassword" @update:model-value="handleSignupPasswordInput"
-                  placeholder="********" id="signup-password" show-label label-text="Password" data-required="true"
-                  required-display="italic-text" type="password"
-                  :show-errors="signupPasswordErrors.length > 0" :errors="signupPasswordErrors"
-                  :on-success="signupPasswordSuccess.length > 0" :success="signupPasswordSuccess" />
+                <InputAuthComponent v-model="signupPassword" placeholder="********" id="signup-password"
+                  show-label label-text="Password" data-required="true" required-display="italic-text" type="password"
+                  :interactions-config="signupPasswordInteractions" />
+
+                <!-- Errors -->
+                <div id="signup-password-min8-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Use 8 or more characters</p>
+                </div>
+                <div id="signup-password-upper-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Use upper case letters</p>
+                </div>
+                <div id="signup-password-lower-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Use lower case letters</p>
+                </div>
+                <div id="signup-password-num-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Use numbers</p>
+                </div>
+
                 <ShowCodeToggle :code="codeSnippets.signupPassword" />
               </div>
 
               <!-- Confirm Password -->
               <div class="flex flex-col gap-1">
-                <InputAuthComponent :model-value="signupConfirmPassword"
-                  @update:model-value="handleSignupConfirmPasswordInput" placeholder="********"
-                  id="signup-confirmPassword" show-label label-text="Confirm Password" data-required="true"
-                  required-display="italic-text" type="password"
-                  :show-errors="signupConfirmPasswordErrors.length > 0" :errors="signupConfirmPasswordErrors"
-                  :on-success="signupConfirmPasswordSuccess.length > 0" :success="signupConfirmPasswordSuccess" />
+                <InputAuthComponent v-model="signupConfirmPassword" placeholder="••••••••" id="signup-confirmPassword"
+                  show-label label-text="Confirm Password" data-required="true" required-display="italic-text"
+                  type="password" :interactions-config="signupConfirmPasswordInteractions" />
+
+                <!-- Errors -->
+                <div id="signup-confirm-match-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Passwords do not match.</p>
+                </div>
+
                 <ShowCodeToggle :code="codeSnippets.signupConfirmPassword" />
               </div>
 
               <div>
-                <ButtonComponent text="Sign up" variant="authPink" size="lg" type="submit" />
+                <ButtonComponent text="Sign up" variant="authPink" size="lg" v-interactions="signupSubmitInteractions" />
               </div>
 
               <ButtonComponent :text="'Continue with X (twitter)'" variant="authTransparent" size="lg" :leftIcon="xIcon"
-          leftIconClass="w-8 h-8" />
+                leftIconClass="w-8 h-8" />
 
-              <ButtonComponent :text="'Continue with Telegram'" variant="authTransparent" size="lg"  />
+              <ButtonComponent :text="'Continue with Telegram'" variant="authTransparent" size="lg" />
 
             </form>
           </div>
         </div>
 
       </section>
-      
+
       <section class="flex flex-col gap-6">
         <DemoSectionHeader title="Verification (OTP)" class="text-white" />
 
@@ -113,29 +159,23 @@
           <div class="flex-1 flex flex-col gap-6">
             <h3 class="text-xl text-white font-semibold border-b border-white/10 pb-3">Email Verification</h3>
 
-            <div class="flex flex-col gap-4 w-full">
+            <div id="verification-form" interaction-container class="flex flex-col gap-4 w-full">
               <div class="flex flex-col gap-2">
-                <!-- Hidden input for interactionsEngine -->
-                <input type="hidden" id="verification-code" :value="verificationCode" />
+                <CodeInputAuthComponent v-model="verificationCode" id="verification-code" show-label label-text="Verification Code"
+                  data-required="true" required-display="italic-text" :disabled="isVerifying"
+                  :is-submitting="isVerifying" :interactions-config="verificationCodeInteractions" />
 
-                <CodeInputAuthComponent 
-                  :model-value="verificationCode"
-                  @update:model-value="handleVerificationInput"
-                  show-label
-                  label-text="Verification Code"
-                  data-required="true"
-                  required-display="italic-text"
-                  :show-errors="verificationErrors.length > 0"
-                  :errors="verificationErrors"
-                  :disabled="isVerifying"
-                  :is-submitting="isVerifying"
-                />
+                <!-- Errors -->
+                <div id="verification-code-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Code must be 6 digits.</p>
+                </div>
               </div>
 
               <div>
                 <ButtonComponent text="Confirm" variant="authPink" size="lg" @click="handleVerify" />
               </div>
-              
+
               <ShowCodeToggle :code="codeSnippets.verificationCode" />
             </div>
           </div>
@@ -145,7 +185,109 @@
 
           <!-- Placeholder for other auth components -->
           <div class="flex-1 flex flex-col gap-6 opacity-40">
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ONBOARDING SECTION ===== -->
+      <section class="flex flex-col gap-6">
+        <DemoSectionHeader title="Onboarding — Role & Username" class="text-white" />
+
+        <div class="flex flex-col lg:flex-row gap-8 items-start">
+
+          <!-- Role Selector -->
+          <div class="flex-1 flex flex-col gap-6">
+            <h3 class="text-xl text-white font-semibold border-b border-white/10 pb-3">Select Your Role</h3>
+
+            <div id="onboarding-form" interaction-container class="flex flex-col gap-4 w-full">
+
+              <!-- Custom role dropdown -->
+              <div class="flex flex-col gap-2" ref="roleDropdownRef">
+                <!-- Label row -->
+                <div class="flex justify-between items-center w-full">
+                  <label class="text-sm leading-6 tracking-[0.009rem] text-white">Role</label>
+                  <span class="text-[10px] leading-6 text-right italic text-white">Required</span>
+                </div>
+
+                <!-- Trigger -->
+                <div @click="demoToggleRoleDropdown"
+                  class="relative rounded-xl border border-white/30 bg-white/20 min-h-12 gap-2.5 py-3 px-2.5 flex justify-between items-center self-stretch cursor-pointer hover:bg-white/30 transition-colors shadow-sm"
+                  :class="{ 'border-white/60': demoRoleOpen }">
+                  <span :class="demoSelectedRole ? 'text-white' : 'text-white/50 poppins-medium text-sm'">{{ demoSelectedRole ? demoRoleLabel : 'Select your role' }}</span>
+                  <svg class="w-5 h-5 text-white transition-transform duration-200" :class="{ 'rotate-180': demoRoleOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+
+                <!-- Dropdown menu -->
+                <div v-if="demoRoleOpen" class="relative z-50 w-full mt-[-4px] overflow-hidden rounded-lg border border-gray-500/30 bg-[#181a1b]/90 backdrop-blur-xl shadow-xl">
+                  <div class="flex flex-col py-1">
+                    <div v-for="role in demoRoles" :key="role.value"
+                      @click="demoSelectRole(role.value)"
+                      class="px-4 py-3 text-white cursor-pointer transition-colors hover:bg-white/10 flex items-center justify-between"
+                      :class="{ 'bg-white/5': demoSelectedRole === role.value }">
+                      <span class="poppins-medium text-sm">{{ role.label }}</span>
+                      <svg v-if="demoSelectedRole === role.value" class="w-4 h-4 text-[#fb5ba2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Hidden input that drives Interactions Engine -->
+                <input id="onboarding-role" type="text" :value="demoSelectedRole" class="hidden" readonly
+                  v-interactions="onboardingRoleInteractions" />
+
+                <!-- Error -->
+                <div id="onboarding-role-err" class="flex items-center gap-1.5 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Please select a role.</p>
+                </div>
+
+                <ShowCodeToggle :code="codeSnippets.onboardingRole" />
+              </div>
+
+              <div>
+                <ButtonComponent text="Continue" variant="authPink" size="lg" v-interactions="onboardingSubmitInteractions" />
+              </div>
             </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="hidden lg:block w-px bg-white/10 self-stretch" />
+
+          <!-- Username Field -->
+          <div class="flex-1 flex flex-col gap-6">
+            <h3 class="text-xl text-white font-semibold border-b border-white/10 pb-3">Username</h3>
+
+            <div id="onboarding-username-form" interaction-container class="flex flex-col gap-4 w-full">
+              <div class="flex flex-col gap-1">
+                <InputAuthComponent v-model="demoUsername" placeholder="e.g. codelinden" id="onboarding-username"
+                  show-label label-text="Username" data-required="true" required-display="italic-text" type="text"
+                  :interactions-config="onboardingUsernameInteractions" />
+
+                <!-- Errors -->
+                <div id="onboarding-username-required-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Username is required.</p>
+                </div>
+                <div id="onboarding-username-min-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Username must be at least 4 characters.</p>
+                </div>
+                <div id="onboarding-username-max-err" class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>
+                  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />
+                  <p class="text-[#ff7c1e] text-sm font-medium">Username must be 20 characters or fewer.</p>
+                </div>
+
+                <ShowCodeToggle :code="codeSnippets.onboardingUsername" />
+              </div>
+
+              <div>
+                <ButtonComponent text="Continue" variant="authPink" size="lg" v-interactions="onboardingUsernameSubmitInteractions" />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -208,344 +350,332 @@ const ShowCodeToggle = defineComponent({
 });
 
 // ─────────────────────────────────────────────
+// Interaction Configurations
+// ─────────────────────────────────────────────
+
+/** Login Interactions */
+const loginEmailInteractions = [
+  {
+    triggerEvents: ['input', 'blur'],
+    rules: [{ type: 'required' }],
+    onInvalid: { actionType: 'show', targetSelector: '#login-email-required-err' },
+    onValid: { actionType: 'hide', targetSelector: '#login-email-required-err' }
+  },
+  {
+    triggerEvents: ['input', 'blur'],
+    rules: [{ type: 'isEmail' }],
+    onInvalid: { actionType: 'show', targetSelector: '#login-email-format-err' },
+    onValid: { actionType: 'hide', targetSelector: '#login-email-format-err' }
+  }
+];
+
+const loginPasswordInteractions = [
+  {
+    triggerEvents: ['input', 'blur'],
+    rules: [{ type: 'required' }],
+    onInvalid: { actionType: 'show', targetSelector: '#login-password-required-err' },
+    onValid: { actionType: 'hide', targetSelector: '#login-password-required-err' }
+  }
+];
+
+/** Signup Interactions */
+const signupEmailInteractions = [
+  {
+    triggerEvents: ['input', 'blur'],
+    rules: [{ type: 'required' }],
+    onInvalid: { actionType: 'show', targetSelector: '#signup-email-required-err' },
+    onValid: { actionType: 'hide', targetSelector: '#signup-email-required-err' }
+  },
+  {
+    triggerEvents: ['input', 'blur'],
+    rules: [{ type: 'isEmail' }],
+    onInvalid: { actionType: 'show', targetSelector: '#signup-email-format-err' },
+    onValid: { actionType: 'hide', targetSelector: '#signup-email-format-err' }
+  }
+];
+
+const signupPasswordInteractions = [
+  {
+    triggerEvents: ['input', 'focus'],
+    rules: [{ type: 'minLength', param: 8 }],
+    onInvalid: { actionType: 'show', targetSelector: '#signup-password-min8-err' },
+    onValid: { actionType: 'hide', targetSelector: '#signup-password-min8-err' }
+  },
+  {
+    triggerEvents: ['input', 'focus'],
+    rules: [{ type: 'hasUpper' }],
+    onInvalid: { actionType: 'show', targetSelector: '#signup-password-upper-err' },
+    onValid: { actionType: 'hide', targetSelector: '#signup-password-upper-err' }
+  },
+  {
+    triggerEvents: ['input', 'focus'],
+    rules: [{ type: 'hasLower' }],
+    onInvalid: { actionType: 'show', targetSelector: '#signup-password-lower-err' },
+    onValid: { actionType: 'hide', targetSelector: '#signup-password-lower-err' }
+  },
+  {
+    triggerEvents: ['input', 'focus'],
+    rules: [{ type: 'hasNumber' }],
+    onInvalid: { actionType: 'show', targetSelector: '#signup-password-num-err' },
+    onValid: { actionType: 'hide', targetSelector: '#signup-password-num-err' }
+  }
+];
+
+const signupConfirmPasswordInteractions = [
+  {
+    triggerEvents: ['input', 'blur'],
+    rules: [{ type: 'matchValue', param: '#signup-password' }],
+    onInvalid: { actionType: 'show', targetSelector: '#signup-confirm-match-err' },
+    onValid: { actionType: 'hide', targetSelector: '#signup-confirm-match-err' }
+  }
+];
+
+const verificationCodeInteractions = [
+  {
+    triggerEvents: ['input', 'submit'],
+    rules: [{ type: 'minLength', param: 6 }],
+    onInvalid: { actionType: 'show', targetSelector: '#verification-code-err' },
+    onValid: { actionType: 'hide', targetSelector: '#verification-code-err' }
+  }
+];
+
+const loginSubmitInteractions = [
+  {
+    triggerEvents: ['click'],
+    actionType: 'validateScope',
+    scope: '#login-form',
+    options: { focusFirst: true }
+  },
+  {
+    triggerEvents: ['click'],
+    actionType: 'script',
+    code: 'scope.querySelectorAll("[interaction-config]").forEach(el => el.dispatchEvent(new Event("input")))'
+  }
+];
+
+const signupSubmitInteractions = [
+  {
+    triggerEvents: ['click'],
+    actionType: 'validateScope',
+    scope: '#signup-form',
+    options: { focusFirst: true }
+  },
+  {
+    triggerEvents: ['click'],
+    actionType: 'script',
+    code: 'scope.querySelectorAll("[interaction-config]").forEach(el => el.dispatchEvent(new Event("input")))'
+  }
+];
+
+// ─────────────────────────────────────────────
 // LOGIN scope
 // ─────────────────────────────────────────────
-const LOGIN_SCOPE = "demo-loginScope";
-
 const loginEmail = ref("");
 const loginPassword = ref("");
 const loginRememberMe = ref(false);
-const loginHasAttemptedSubmit = ref(false);
 
 const verificationCode = ref("");
 const isVerifying = ref(false);
-const verificationHasAttemptedSubmit = ref(false);
+
+const checkboxClass = "m-0 border border-checkboxBorder [appearance:none] w-[0.75rem] h-[0.75rem] rounded-[2px] bg-transparent relative cursor-pointer checked:bg-checkbox checked:border-checkbox checked:[&::after]:content-[''] checked:[&::after]:absolute checked:[&::after]:left-[0.2rem] checked:[&::after]:w-[0.25rem] checked:[&::after]:h-[0.5rem] checked:[&::after]:border checked:[&::after]:border-solid checked:[&::after]:border-white checked:[&::after]:border-r-[2px] checked:[&::after]:border-b-[2px] checked:[&::after]:border-t-0 checked:[&::after]:border-l-0 checked:[&::after]:rotate-45";
 const xIcon = ref("");
-// Load icons independently (dynamic)
-  xIcon.value = await getAssetUrl("icon.social.x");
 
-const verificationCodeConfig = computed(() => ({
-  scope: VERIFICATION_SCOPE,
-  id: "verification-code",
-  validation: {
-    required: true,
-    requiredMessage: "Confirmation code is required.",
-    rules: [
-      { type: "minLength", param: 6, message: "Code must be 6 digits." },
-    ],
-  },
-  validateOnInput: true,
-}));
-
-const verificationState = computed(() => interactionsEngine.getFieldState(verificationCodeConfig.value));
-
-const verificationErrors = computed(() => {
-  if (!verificationState.value || verificationState.value.isValid) return [];
-  return verificationState.value.failedRules
-    .filter((r) => r.type !== "required" || verificationHasAttemptedSubmit.value)
-    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));
-});
+// Load icons independently
+getAssetUrl("icon.social.x").then(url => xIcon.value = url);
 
 const handleVerify = () => {
-  verificationHasAttemptedSubmit.value = true;
-  interactionsEngine.validateScope(VERIFICATION_SCOPE);
-  
-  if (verificationState.value?.isValid) {
-    isVerifying.value = true;
-    setTimeout(() => {
-      isVerifying.value = false;
-      alert("Email verified successfully (Demo)!");
-    }, 1500);
-  }
-};
-
-const handleVerificationInput = (value) => {
-  verificationCode.value = value;
-  const state = interactionsEngine.getFieldState(verificationCodeConfig.value);
-  if (state) state.value = value;
-  interactionsEngine.validateField(verificationCodeConfig.value);
-};
-
-
-
-const loginEmailConfig = computed(() => ({
-  scope: LOGIN_SCOPE,
-  id: "login-email",
-  validation: {
-    required: true,
-    requiredMessage: "Email is required.",
-    rules: [{ type: "isEmail", message: "Please enter a valid email address." }],
-  },
-  validateOnInput: false,
-}));
-
-const loginPasswordConfig = computed(() => ({
-  scope: LOGIN_SCOPE,
-  id: "login-password",
-  validation: {
-    required: true,
-    requiredMessage: "Password is required.",
-  },
-  validateOnInput: false,
-}));
-
-const loginEmailState = computed(() => interactionsEngine.getFieldState(loginEmailConfig.value));
-const loginPasswordState = computed(() => interactionsEngine.getFieldState(loginPasswordConfig.value));
-
-const loginEmailErrors = computed(() => {
-  if (!loginEmailState.value || loginEmailState.value.isValid) return [];
-  return loginEmailState.value.failedRules
-    .filter((r) => r.type !== "required" || loginHasAttemptedSubmit.value)
-    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));
-});
-
-const loginPasswordErrors = computed(() => {
-  if (!loginPasswordState.value || loginPasswordState.value.isValid) return [];
-  return loginPasswordState.value.failedRules
-    .filter((r) => r.type !== "required" || loginHasAttemptedSubmit.value)
-    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));
-});
-
-const handleLoginEmailInput = (value) => {
-  loginEmail.value = value;
-  const state = interactionsEngine.getFieldState(loginEmailConfig.value);
-  if (state) state.value = value;
-  if (state?.element) state.element.setCustomValidity?.("");
-  if (loginHasAttemptedSubmit.value) {
-    interactionsEngine.validateField(loginEmailConfig.value);
-    if (state?.isValid && state?.element) state.element.classList.remove("first-invalid");
-  }
-};
-
-const handleLoginPasswordInput = (value) => {
-  loginPassword.value = value;
-  const state = interactionsEngine.getFieldState(loginPasswordConfig.value);
-  if (state) state.value = value;
-  if (state?.element) state.element.setCustomValidity?.("");
-  if (loginHasAttemptedSubmit.value) {
-    interactionsEngine.validateField(loginPasswordConfig.value);
-    if (state?.isValid && state?.element) state.element.classList.remove("first-invalid");
-  }
-};
-
-const handleLoginSubmit = () => {
-  loginHasAttemptedSubmit.value = true;
-  interactionsEngine.validateScope(LOGIN_SCOPE);
+  // Manual trigger for demo purposes if needed, but validateScope handles it
+  isVerifying.value = true;
+  setTimeout(() => {
+    isVerifying.value = false;
+    alert("Email verified successfully (Demo)!");
+  }, 1500);
 };
 
 // ─────────────────────────────────────────────
 // SIGNUP scope
 // ─────────────────────────────────────────────
-const SIGNUP_SCOPE = "demo-signupScope";
-const VERIFICATION_SCOPE = "demo-verificationScope";
-
 const signupEmail = ref("");
 const signupPassword = ref("");
 const signupConfirmPassword = ref("");
-const signupHasAttemptedSubmit = ref(false);
 
-const signupEmailConfig = computed(() => ({
-  scope: SIGNUP_SCOPE,
-  id: "signup-email",
-  validation: {
-    required: true,
-    requiredMessage: "Email is required.",
-    rules: [{ type: "isEmail", message: "Please enter a valid email address." }],
-  },
-  validateOnInput: false,
-}));
-
-const signupPasswordConfig = computed(() => ({
-  scope: SIGNUP_SCOPE,
-  id: "signup-password",
-  validation: {
-    required: true,
-    requiredMessage: "Password is required.",
-    rules: [
-      { type: "minLength", param: 8, message: "Use 8 or more characters" },
-      { type: "hasUpper", message: "Use upper case letters" },
-      { type: "hasLower", message: "Use lower case letters" },
-      { type: "hasNumber", message: "Use numbers" },
-    ],
-  },
-  validateOnInput: true,
-}));
-
-const signupConfirmPasswordConfig = computed(() => ({
-  scope: SIGNUP_SCOPE,
-  id: "signup-confirmPassword",
-  validation: {
-    required: true,
-    requiredMessage: "Please confirm your password.",
-    rules: [
-      { type: "matchValue", param: "signup-password", message: "Passwords do not match." },
-    ],
-  },
-  validateOnInput: true,
-}));
-
-const signupEmailState = computed(() => interactionsEngine.getFieldState(signupEmailConfig.value));
-const signupPasswordState = computed(() => interactionsEngine.getFieldState(signupPasswordConfig.value));
-const signupConfirmPasswordState = computed(() => interactionsEngine.getFieldState(signupConfirmPasswordConfig.value));
-
-const getValidationSuccess = (fieldState, fieldConfig) => {
-  if (!fieldState || !fieldConfig) return [];
-  const rules = (fieldState.validationConfig || fieldConfig.validation || {}).rules || [];
-  const failedTypes = new Set((fieldState.failedRules || []).map((r) => r.type));
-  return rules
-    .filter((r) => !failedTypes.has(r.type))
-    .map((r) => ({ message: r.message, icon: CheckCircleIcon }));
-};
-
-const signupEmailErrors = computed(() => {
-  if (!signupEmailState.value || signupEmailState.value.isValid) return [];
-  return signupEmailState.value.failedRules
-    .filter((r) => r.type !== "required" || signupHasAttemptedSubmit.value)
-    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));
+onMounted(() => {
+  // No manual registration needed for v-interactions
 });
 
-const signupPasswordErrors = computed(() => {
-  if (!signupPasswordState.value || signupPasswordState.value.isValid) return [];
-  return signupPasswordState.value.failedRules
-    .filter((r) => r.type !== "required" || signupHasAttemptedSubmit.value)
-    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));
+// ─────────────────────────────────────────────
+// ONBOARDING scope
+// ─────────────────────────────────────────────
+const demoUsername = ref('');
+const demoSelectedRole = ref('');
+const demoRoleOpen = ref(false);
+const roleDropdownRef = ref(null);
+
+const demoRoles = [
+  { value: 'creator', label: 'Creator' },
+  { value: 'fan', label: 'Fan' },
+  { value: 'vendor', label: 'Vendor' },
+  { value: 'agent', label: 'Agent' },
+];
+
+const demoRoleLabel = computed(() => {
+  const found = demoRoles.find(r => r.value === demoSelectedRole.value);
+  return found ? found.label : '';
 });
 
-const signupPasswordSuccess = computed(() => {
-  if (!signupPassword.value?.trim()) return [];
-  return getValidationSuccess(signupPasswordState.value, signupPasswordConfig.value);
-});
-
-const signupConfirmPasswordErrors = computed(() => {
-  if (!signupConfirmPasswordState.value || signupConfirmPasswordState.value.isValid) return [];
-  return signupConfirmPasswordState.value.failedRules
-    .filter((r) => r.type !== "required" || signupHasAttemptedSubmit.value)
-    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));
-});
-
-const signupConfirmPasswordSuccess = computed(() => {
-  if (!signupConfirmPassword.value?.trim() || !signupPassword.value?.trim()) return [];
-  return getValidationSuccess(signupConfirmPasswordState.value, signupConfirmPasswordConfig.value);
-});
-
-const handleSignupEmailInput = (value) => {
-  signupEmail.value = value;
-  const state = interactionsEngine.getFieldState(signupEmailConfig.value);
-  if (state) state.value = value;
-  if (state?.element) state.element.setCustomValidity?.("");
-  if (signupHasAttemptedSubmit.value) {
-    interactionsEngine.validateField(signupEmailConfig.value);
-    if (state?.isValid && state?.element) state.element.classList.remove("first-invalid");
+const demoToggleRoleDropdown = () => { demoRoleOpen.value = !demoRoleOpen.value; };
+const demoSelectRole = (val) => {
+  demoSelectedRole.value = val;
+  demoRoleOpen.value = false;
+  // Set el.value directly so engine reads the new value synchronously
+  // (Vue's :value binding updates the DOM async on next tick)
+  const el = document.getElementById('onboarding-role');
+  if (el) {
+    el.value = val;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
   }
 };
 
-const handleSignupPasswordInput = (value) => {
-  signupPassword.value = value;
-  const state = interactionsEngine.getFieldState(signupPasswordConfig.value);
-  if (state) state.value = value;
-  if (state?.element) state.element.setCustomValidity?.("");
-  interactionsEngine.validateField(signupPasswordConfig.value);
-  if (state?.isValid && state?.element) state.element.classList.remove("first-invalid");
-};
+const onboardingRoleInteractions = [
+  {
+    triggerEvents: ['input', 'change'],
+    rules: [{ type: 'isSelect' }],
+    onInvalid: { actionType: 'show', targetSelector: '#onboarding-role-err' },
+    onValid: { actionType: 'hide', targetSelector: '#onboarding-role-err' },
+  },
+];
 
-const handleSignupConfirmPasswordInput = (value) => {
-  signupConfirmPassword.value = value;
-  const state = interactionsEngine.getFieldState(signupConfirmPasswordConfig.value);
-  if (state) state.value = value;
-  if (state?.element) state.element.setCustomValidity?.("");
-  interactionsEngine.validateField(signupConfirmPasswordConfig.value);
-  if (state?.isValid && state?.element) state.element.classList.remove("first-invalid");
-};
+const onboardingUsernameInteractions = [
+  {
+    triggerEvents: ['input', 'blur'],
+    rules: [{ type: 'hasContent' }],
+    onInvalid: { actionType: 'show', targetSelector: '#onboarding-username-required-err' },
+    onValid: { actionType: 'hide', targetSelector: '#onboarding-username-required-err' },
+  },
+  {
+    triggerEvents: ['input'],
+    rules: [{ type: 'minLength', param: 4 }],
+    onInvalid: { actionType: 'show', targetSelector: '#onboarding-username-min-err' },
+    onValid: { actionType: 'hide', targetSelector: '#onboarding-username-min-err' },
+  },
+  {
+    triggerEvents: ['input'],
+    rules: [{ type: 'maxLength', param: 20 }],
+    onInvalid: { actionType: 'show', targetSelector: '#onboarding-username-max-err' },
+    onValid: { actionType: 'hide', targetSelector: '#onboarding-username-max-err' },
+  },
+];
 
-const handleSignupSubmit = () => {
-  signupHasAttemptedSubmit.value = true;
-  interactionsEngine.validateScope(SIGNUP_SCOPE);
-};
+const onboardingSubmitInteractions = [
+  {
+    triggerEvents: ['click'],
+    actionType: 'validateScope',
+    scope: '#onboarding-form',
+    options: { focusFirst: true }
+  },
+];
+
+const onboardingUsernameSubmitInteractions = [
+  {
+    triggerEvents: ['click'],
+    actionType: 'validateScope',
+    scope: '#onboarding-username-form',
+    options: { focusFirst: true }
+  },
+];
 
 // ─────────────────────────────────────────────
-// Register fields on mount
-// ─────────────────────────────────────────────
-onMounted(() => {
-  interactionsEngine.register(loginEmailConfig.value, loginEmail.value, document.getElementById("login-email"));
-  interactionsEngine.register(loginPasswordConfig.value, loginPassword.value, document.getElementById("login-password"));
-
-  interactionsEngine.register(signupEmailConfig.value, signupEmail.value, document.getElementById("signup-email"));
-  interactionsEngine.register(signupPasswordConfig.value, signupPassword.value, document.getElementById("signup-password"));
-  interactionsEngine.register(signupConfirmPasswordConfig.value, signupConfirmPassword.value, document.getElementById("signup-confirmPassword"));
-
-  interactionsEngine.register(verificationCodeConfig.value, verificationCode.value, document.getElementById("verification-code"));
-});
-
-// ─────────────────────────────────────────────
-// Per-input code snippets
+// Per-input code snippets (full actual usage)
 // ─────────────────────────────────────────────
 const codeSnippets = {
   loginEmail: [
     '<!-- Template -->',
-    '<InputAuthComponent',
-    '  :model-value="email"',
-    '  @update:model-value="handleEmailInput"',
-    '  placeholder="linden@codelinden.com"',
-    '  id="email" show-label label-text="Email"',
-    '  data-required="true" required-display="italic-text"',
-    '  type="text"',
-    '  :show-errors="emailErrors.length > 0"',
-    '  :errors="emailErrors"',
-    '/>',
+    '<div class="flex flex-col gap-1">',
+    '  <InputAuthComponent',
+    '    v-model="loginEmail"',
+    '    placeholder="linden@codelinden.com"',
+    '    id="login-email"',
+    '    show-label',
+    '    label-text="Email"',
+    '    data-required="true"',
+    '    required-display="italic-text"',
+    '    type="text"',
+    '    :interactions-config="loginEmailInteractions"',
+    '  />',
     '',
-    '<!-- Interactions (script) -->',
-    'const emailConfig = computed(() => ({',
-    '  scope: SCOPE_ID, id: "email",',
-    '  validation: {',
-    '    required: true, requiredMessage: "Email is required.",',
-    '    rules: [{ type: "isEmail", message: "Please enter a valid email." }],',
+    '  <!-- Required error -->',
+    '  <div id="login-email-required-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Email is required.</p>',
+    '  </div>',
+    '  <!-- Format error -->',
+    '  <div id="login-email-format-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Please enter a valid email address.</p>',
+    '  </div>',
+    '</div>',
+    '',
+    '<!-- Script -->',
+    'const loginEmail = ref("");',
+    '',
+    'const loginEmailInteractions = [',
+    '  {',
+    '    triggerEvents: ["input", "blur"],',
+    '    rules: [{ type: "hasContent" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#login-email-required-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#login-email-required-err" },',
     '  },',
-    '  validateOnInput: false,',
-    '}));',
-    'const emailState = computed(() => interactionsEngine.getFieldState(emailConfig.value));',
-    'const emailErrors = computed(() => {',
-    '  if (!emailState.value || emailState.value.isValid) return [];',
-    '  return emailState.value.failedRules',
-    '    .filter((r) => r.type !== "required" || hasAttemptedSubmit.value)',
-    '    .map((r) => ({ error: r.message, icon: InformationCircleIcon }));',
-    '});',
-    'const handleEmailInput = (value) => {',
-    '  email.value = value;',
-    '  const state = interactionsEngine.getFieldState(emailConfig.value);',
-    '  if (state) state.value = value;',
-    '  if (hasAttemptedSubmit.value) interactionsEngine.validateField(emailConfig.value);',
-    '};',
-    'onMounted(() => {',
-    '  interactionsEngine.register(emailConfig.value, email.value, document.getElementById("email"));',
-    '});',
+    '  {',
+    '    triggerEvents: ["input", "blur"],',
+    '    rules: [{ type: "isEmail" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#login-email-format-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#login-email-format-err" },',
+    '  },',
+    '];',
   ].join('\n'),
 
   loginPassword: [
     '<!-- Template -->',
-    '<InputAuthComponent',
-    '  :model-value="password"',
-    '  @update:model-value="handlePasswordInput"',
-    '  placeholder="********"',
-    '  id="password" show-label label-text="Password"',
-    '  data-required="true" required-display="italic-text"',
-    '  type="password"',
-    '  :show-errors="passwordErrors.length > 0"',
-    '  :errors="passwordErrors"',
-    '/>',
+    '<div class="flex flex-col gap-1">',
+    '  <InputAuthComponent',
+    '    v-model="loginPassword"',
+    '    placeholder="••••••••"',
+    '    id="login-password"',
+    '    show-label',
+    '    label-text="Password"',
+    '    data-required="true"',
+    '    required-display="italic-text"',
+    '    type="password"',
+    '    :interactions-config="loginPasswordInteractions"',
+    '  />',
     '',
-    '<!-- Interactions (script) -->',
-    '// Eye icons and visibility toggling are handled automatically by InputAuthComponent',
-    'const passwordConfig = computed(() => ({',
-    '  scope: SCOPE_ID, id: "password",',
-    '  validation: { required: true, requiredMessage: "Password is required." },',
-    '  validateOnInput: false,',
-    '}));',
+    '  <!-- Required error -->',
+    '  <div id="login-password-required-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Password is required.</p>',
+    '  </div>',
+    '</div>',
+    '',
+    '<!-- Script -->',
+    'const loginPassword = ref("");',
+    '',
+    'const loginPasswordInteractions = [',
+    '  {',
+    '    triggerEvents: ["input", "blur"],',
+    '    rules: [{ type: "hasContent" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#login-password-required-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#login-password-required-err" },',
+    '  },',
+    '];',
   ].join('\n'),
 
   loginCheckbox: [
     '<!-- Template -->',
     '<Checkbox',
-    '  v-model="rememberMe"',
+    '  v-model="loginRememberMe"',
     '  label="Remember me"',
     '  checkboxClass="m-0 border border-checkboxBorder [appearance:none]',
     '    w-[0.75rem] h-[0.75rem] rounded-[2px] bg-transparent relative cursor-pointer',
@@ -561,102 +691,313 @@ const codeSnippets = {
     '  wrapperClass="flex items-center gap-2"',
     '/>',
     '',
-    '<!-- Interactions (script) -->',
-    '// Simple boolean — no engine registration needed.',
-    'const rememberMe = ref(false);',
+    '<!-- Script -->',
+    'const loginRememberMe = ref(false);',
+    '// No engine registration needed — plain boolean ref.',
   ].join('\n'),
 
   signupEmail: [
-    '<!-- Template (same as Login email, different id/scope) -->',
-    '<InputAuthComponent',
-    '  :model-value="email"',
-    '  @update:model-value="handleEmailInput"',
-    '  placeholder="linden@codelinden.com"',
-    '  id="email" show-label label-text="Email Address"',
-    '  data-required="true" required-display="italic-text"',
-    '  type="text"',
-    '  :show-errors="emailErrors.length > 0"',
-    '  :errors="emailErrors"',
-    '/>',
+    '<!-- Template -->',
+    '<div class="flex flex-col gap-1">',
+    '  <InputAuthComponent',
+    '    v-model="signupEmail"',
+    '    placeholder="linden@codelinden.com"',
+    '    id="signup-email"',
+    '    show-label',
+    '    label-text="Email"',
+    '    data-required="true"',
+    '    required-display="italic-text"',
+    '    type="text"',
+    '    :interactions-config="signupEmailInteractions"',
+    '  />',
     '',
-    '<!-- Interactions: same pattern as Login email above -->',
+    '  <!-- Required error -->',
+    '  <div id="signup-email-required-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Email is required.</p>',
+    '  </div>',
+    '  <!-- Format error -->',
+    '  <div id="signup-email-format-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Please enter a valid email address.</p>',
+    '  </div>',
+    '</div>',
+    '',
+    '<!-- Script -->',
+    'const signupEmail = ref("");',
+    '',
+    'const signupEmailInteractions = [',
+    '  {',
+    '    triggerEvents: ["input", "blur"],',
+    '    rules: [{ type: "hasContent" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#signup-email-required-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#signup-email-required-err" },',
+    '  },',
+    '  {',
+    '    triggerEvents: ["input", "blur"],',
+    '    rules: [{ type: "isEmail" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#signup-email-format-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#signup-email-format-err" },',
+    '  },',
+    '];',
   ].join('\n'),
 
   signupPassword: [
     '<!-- Template -->',
-    '<InputAuthComponent',
-    '  :model-value="password"',
-    '  @update:model-value="handlePasswordInput"',
-    '  placeholder="********"',
-    '  id="password" show-label label-text="Password"',
-    '  data-required="true" required-display="italic-text"',
-    '  type="password"',
-    '  :show-errors="passwordErrors.length > 0" :errors="passwordErrors"',
-    '  :on-success="passwordSuccess.length > 0" :success="passwordSuccess"',
-    '/>',
+    '<div class="flex flex-col gap-1">',
+    '  <InputAuthComponent',
+    '    v-model="signupPassword"',
+    '    placeholder="••••••••"',
+    '    id="signup-password"',
+    '    show-label',
+    '    label-text="Password"',
+    '    data-required="true"',
+    '    required-display="italic-text"',
+    '    type="password"',
+    '    :interactions-config="signupPasswordInteractions"',
+    '  />',
     '',
-    '<!-- Interactions (script) -->',
-    '// Eye icons and visibility toggling are handled automatically by InputAuthComponent',
-    'const passwordConfig = computed(() => ({',
-    '  scope: SCOPE_ID, id: "password",',
-    '  validation: {',
-    '    required: true, requiredMessage: "Password is required.",',
-    '    rules: [',
-    '      { type: "minLength", param: 8, message: "Use 8 or more characters" },',
-    '      // ... other rules',
-    '    ],',
+    '  <!-- Complexity errors (show/hide per rule) -->',
+    '  <div id="signup-password-min8-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Use 8 or more characters</p>',
+    '  </div>',
+    '  <div id="signup-password-upper-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Use upper case letters</p>',
+    '  </div>',
+    '  <div id="signup-password-lower-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Use lower case letters</p>',
+    '  </div>',
+    '  <div id="signup-password-num-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Use numbers</p>',
+    '  </div>',
+    '</div>',
+    '',
+    '<!-- Script -->',
+    'const signupPassword = ref("");',
+    '',
+    'const signupPasswordInteractions = [',
+    '  {',
+    '    triggerEvents: ["input", "focus"],',
+    '    rules: [{ type: "minLength", param: 8 }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#signup-password-min8-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#signup-password-min8-err" },',
     '  },',
-    '  validateOnInput: true, // validates on every keystroke',
-    '}));',
-    '',
-    '// Errors: show rule failures live; required only after submit',
-    'const passwordErrors = computed(() => { /* ... */ });',
-    '',
-    '// Success: show green ticks for passing rules',
-    'const passwordSuccess = computed(() => { /* ... */ });',
+    '  {',
+    '    triggerEvents: ["input", "focus"],',
+    '    rules: [{ type: "hasUpper" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#signup-password-upper-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#signup-password-upper-err" },',
+    '  },',
+    '  {',
+    '    triggerEvents: ["input", "focus"],',
+    '    rules: [{ type: "hasLower" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#signup-password-lower-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#signup-password-lower-err" },',
+    '  },',
+    '  {',
+    '    triggerEvents: ["input", "focus"],',
+    '    rules: [{ type: "hasNumber" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#signup-password-num-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#signup-password-num-err" },',
+    '  },',
+    '];',
   ].join('\n'),
 
   signupConfirmPassword: [
     '<!-- Template -->',
-    '<InputAuthComponent',
-    '  :model-value="confirmPassword"',
-    '  @update:model-value="handleConfirmPasswordInput"',
-    '  placeholder="********"',
-    '  id="confirmPassword" show-label label-text="Confirm Password"',
-    '  data-required="true" required-display="italic-text"',
-    '  type="password"',
-    '  :show-errors="confirmPasswordErrors.length > 0" :errors="confirmPasswordErrors"',
-    '  :on-success="confirmPasswordSuccess.length > 0" :success="confirmPasswordSuccess"',
-    '/>',
+    '<div class="flex flex-col gap-1">',
+    '  <InputAuthComponent',
+    '    v-model="signupConfirmPassword"',
+    '    placeholder="••••••••"',
+    '    id="signup-confirmPassword"',
+    '    show-label',
+    '    label-text="Confirm Password"',
+    '    data-required="true"',
+    '    required-display="italic-text"',
+    '    type="password"',
+    '    :interactions-config="signupConfirmPasswordInteractions"',
+    '  />',
     '',
-    '<!-- Interactions (script) -->',
-    '// Eye icons and visibility toggling are handled automatically by InputAuthComponent',
-    'const confirmPasswordConfig = computed(() => ({',
-    '  scope: SCOPE_ID, id: "confirmPassword",',
-    '  validation: {',
-    '    required: true, requiredMessage: "Please confirm your password.",',
-    '    rules: [{ type: "matchValue", param: "password", message: "Passwords do not match." }],',
+    '  <!-- Mismatch error -->',
+    '  <div id="signup-confirm-match-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Passwords do not match.</p>',
+    '  </div>',
+    '</div>',
+    '',
+    '<!-- Script -->',
+    'const signupConfirmPassword = ref("");',
+    '',
+    'const signupConfirmPasswordInteractions = [',
+    '  {',
+    '    triggerEvents: ["input", "blur"],',
+    '    rules: [{ type: "matchValue", param: "password", scope: "signup-form" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#signup-confirm-match-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#signup-confirm-match-err" },',
     '  },',
-    '  validateOnInput: true,',
-    '}));',
-    '',
-    '// "matchValue" compares against the sibling field with id="password"',
-    '// registered in the same scope — no custom logic needed.',
+    '];',
   ].join('\n'),
-  
+
   verificationCode: [
     '<!-- Template -->',
-    '<CodeInputAuthComponent',
-    '  v-model="code"',
-    '  show-label label-text="Verification Code"',
-    '  data-required="true" required-display="italic-text"',
-    '  :show-errors="errors.length > 0"',
-    '  :errors="errors"',
-    '  :is-submitting="isVerifying"',
+    '<div class="flex flex-col gap-2">',
+    '  <CodeInputAuthComponent',
+    '    v-model="verificationCode"',
+    '    id="verification-code"',
+    '    show-label',
+    '    label-text="Verification Code"',
+    '    data-required="true"',
+    '    required-display="italic-text"',
+    '    :interactions-config="verificationCodeInteractions"',
+    '  />',
+    '',
+    '  <!-- Length error -->',
+    '  <div id="verification-code-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Code must be 6 digits.</p>',
+    '  </div>',
+    '</div>',
+    '',
+    '<!-- Script -->',
+    'const verificationCode = ref("");',
+    '',
+    'const verificationCodeInteractions = [',
+    '  {',
+    '    triggerEvents: ["input"],',
+    '    rules: [{ type: "minLength", param: 6 }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#verification-code-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#verification-code-err" },',
+    '  },',
+    '];',
+  ].join('\n'),
+
+  onboardingRole: [
+    '<!-- Template -->',
+    '',
+    '<!-- 1. Custom dropdown trigger (your own UI) -->',
+    '<div @click="toggleDropdown"',
+    '  class="rounded-xl border border-white/30 bg-white/20 min-h-12 py-3 px-2.5',
+    '         flex justify-between items-center cursor-pointer">',
+    '  <span>{{ selectedRole || "Select your role" }}</span>',
+    '  <svg class="w-5 h-5" ...> ... </svg>',
+    '</div>',
+    '',
+    '<!-- 2. Dropdown menu (v-if) -->',
+    '<div v-if="isOpen" class="absolute z-50 w-full ...">',
+    '  <div v-for="role in roles" @click="selectRole(role.value)">',
+    '    {{ role.label }}',
+    '  </div>',
+    '</div>',
+    '',
+    '<!-- 3. Hidden input — the engine watches this -->',
+    '<input',
+    '  id="onboarding-role"',
+    '  type="text"',
+    '  :value="selectedRole"',
+    '  class="hidden"',
+    '  readonly',
+    '  v-interactions="roleInteractions"',
     '/>',
     '',
-    '<!-- Verify button -->',
-    '<ButtonComponent text="Confirm" variant="authPink" />',
+    '<!-- 4. Error div -->',
+    '<div id="onboarding-role-err"',
+    '  class="flex items-center gap-1.5 [&[hidden]]:!hidden" hidden>',
+    '  <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '  <p class="text-[#ff7c1e] text-sm font-medium">Please select a role.</p>',
+    '</div>',
+    '',
+    '<!-- Script -->',
+    'const selectedRole = ref("");',
+    'const isOpen = ref(false);',
+    '',
+    'const selectRole = (val) => {',
+    '  selectedRole.value = val;',
+    '  isOpen.value = false;',
+    '  // Notify the engine that the hidden input value changed',
+    '  const el = document.getElementById("onboarding-role");',
+    '  if (el) el.dispatchEvent(new Event("input", { bubbles: true }));',
+    '};',
+    '',
+    'const roleInteractions = [',
+    '  {',
+    '    triggerEvents: ["input"],',
+    '    rules: [{ type: "isSelect" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#onboarding-role-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#onboarding-role-err" },',
+    '  },',
+    '];',
+  ].join('\n'),
+
+  onboardingUsername: [
+    '<!-- Template -->',
+    '<div class="flex flex-col gap-1">',
+    '  <InputAuthComponent',
+    '    v-model="username"',
+    '    placeholder="e.g. codelinden"',
+    '    id="onboarding-username"',
+    '    show-label',
+    '    label-text="Username"',
+    '    data-required="true"',
+    '    required-display="italic-text"',
+    '    type="text"',
+    '    :interactions-config="usernameInteractions"',
+    '  />',
+    '',
+    '  <!-- Required error -->',
+    '  <div id="onboarding-username-required-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Username is required.</p>',
+    '  </div>',
+    '  <!-- Min length error -->',
+    '  <div id="onboarding-username-min-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Username must be at least 4 characters.</p>',
+    '  </div>',
+    '  <!-- Max length error -->',
+    '  <div id="onboarding-username-max-err"',
+    '    class="flex items-center gap-1.5 mt-1 [&[hidden]]:!hidden" hidden>',
+    '    <InformationCircleIcon class="w-4 h-4 text-[#ff7c1e]" />',
+    '    <p class="text-[#ff7c1e] text-sm font-medium">Username must be 20 characters or fewer.</p>',
+    '  </div>',
+    '</div>',
+    '',
+    '<!-- Script -->',
+    'const username = ref("");',
+    '',
+    'const usernameInteractions = [',
+    '  {',
+    '    triggerEvents: ["input", "blur"],',
+    '    rules: [{ type: "hasContent" }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#onboarding-username-required-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#onboarding-username-required-err" },',
+    '  },',
+    '  {',
+    '    triggerEvents: ["input"],',
+    '    rules: [{ type: "minLength", param: 4 }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#onboarding-username-min-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#onboarding-username-min-err" },',
+    '  },',
+    '  {',
+    '    triggerEvents: ["input"],',
+    '    rules: [{ type: "maxLength", param: 20 }],',
+    '    onInvalid: { actionType: "show", targetSelector: "#onboarding-username-max-err" },',
+    '    onValid:   { actionType: "hide", targetSelector: "#onboarding-username-max-err" },',
+    '  },',
+    '];',
   ].join('\n'),
 };
 </script>

@@ -31,16 +31,6 @@ const props = defineProps({
     type: [String, Array],
     default: ''
   },
-  showErrors: Boolean,
-  errors: {
-    type: Array,
-    default: () => [],
-  },
-  onSuccess: Boolean,
-  success: {
-    type: Array,
-    default: () => [],
-  },
   disabled: {
     type: Boolean,
     default: false
@@ -48,6 +38,11 @@ const props = defineProps({
   isSubmitting: {
     type: Boolean,
     default: false
+  },
+  id: String,
+  interactionsConfig: {
+    type: [Object, Array],
+    default: undefined
   }
 })
 
@@ -78,6 +73,13 @@ const fullCode = computed(() => inputs.value.join(''))
 // Watch for changes and emit events
 watch(fullCode, (newValue) => {
   emit('update:modelValue', newValue)
+  // Manually dispatch input event for v-interactions on the hidden input
+  if (props.id) {
+    nextTick(() => {
+      const el = document.getElementById(props.id)
+      if (el) el.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+  }
 })
 
 watch(isCodeValid, (newValue) => {
@@ -279,62 +281,18 @@ defineExpose({
       </div>
     </div>
 
-    <!-- Required Error Text -->
     <Paragraph v-if="requiredDisplayValues.includes('required-text-error')" :text="'This field is required.'"
       fontSize="text-xs" fontColor="text-[#FF4405]" />
 
-    <!-- Validation Messages -->
-    <div v-if="(showErrors && errors.length) || (onSuccess && success.length)" class="flex flex-col items-start self-stretch mt-1">
-      <!-- Success List -->
-      <div v-if="onSuccess && success.length" class="flex flex-col gap-1 w-full">
-        <div v-for="(successObj, index) in success" :key="`success-${index}`"
-          class="flex w-full items-center gap-[.4375rem]">
-          <component v-if="successObj.icon" :is="successObj.icon" class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-white" />
-          <CheckIcon v-else class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-white" />
-          <p class="text-white text-[12px] sm:text-[14px] font-normal">
-            {{ successObj.message || successObj.text || successObj }}
-          </p>
-        </div>
-      </div>
-
-      <!-- Errors List -->
-      <div v-if="showErrors && errors.length" class="flex flex-col gap-1 w-full" :class="onSuccess && success.length ? 'mt-2' : ''">
-        <div v-for="(errorObj, index) in errors" :key="`error-${index}`"
-          class="flex w-full items-center gap-[.4375rem]">
-          <component v-if="errorObj.icon" :is="errorObj.icon" class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-[#ff7c1e]" />
-          <HexagonExclamationIcon v-else class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-[#ff7c1e]" />
-          <p class="text-[#ff7c1e] text-[12px] sm:text-[14px] font-normal">
-            {{ errorObj.error || errorObj.message || errorObj }}
-          </p>
-        </div>
-      </div>
-    </div>
+    <!-- Hidden input for interactionsEngine -->
+    <input type="hidden" :id="id" :value="fullCode" v-interactions="interactionsConfig" />
   </div>
 </template>
 
 <style scoped>
-/* Remove all focus borders and outlines - override global pink focus style */
-input:focus,
-input:focus-visible,
-input:active {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
 
-/* Ensure wrapper doesn't change border on input focus */
 div:has(input:focus) {
   border-color: inherit !important;
 }
 
-/* Hide number input spinners */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}
 </style>
