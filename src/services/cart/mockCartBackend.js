@@ -113,7 +113,7 @@ let products = [];
 // Fetch product config for strict lookups (Audit 1.1)
 const loadProductConfig = async () => {
   try {
-    const res = await fetch("/configs/products.json");
+    const res = await fetch("/config/products.json");
     const data = await res.json();
     products = data.products || [];
   } catch (e) {

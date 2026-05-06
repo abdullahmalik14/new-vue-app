@@ -42,6 +42,11 @@ export async function fetchCartFlow({ payload, context, api }) {
       {
         items: response?.items || [],
         summary: response?.summary || {},
+        label: response?.label,
+        couponCode: response?.couponCode,
+        cartType: response?.cartType,
+        isDefault: response?.isDefault,
+        userId: response?.userId,
         etag: etag, // Passed along to update store metadata
       },
       {

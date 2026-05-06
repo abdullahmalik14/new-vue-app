@@ -106,7 +106,7 @@ export class APIHandler {
                 response = await fetch(url, {
                     method: httpMethod,
                     headers: isFormData ? {} : { 'Content-Type': 'application/json' },
-                    body: httpMethod === 'POST' ? (isFormData ? requestData : JSON.stringify(requestData)) : null
+                    body: ['POST', 'PUT', 'PATCH'].includes(httpMethod) ? (isFormData ? requestData : JSON.stringify(requestData)) : null
                 });
             }
 

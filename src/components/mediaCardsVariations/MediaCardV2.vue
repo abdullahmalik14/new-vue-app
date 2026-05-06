@@ -27,6 +27,7 @@
             muted
             class="object-cover w-full h-full"
             :src="media.videoUrl"
+            :poster="media.poster"
           ></video>
           <img 
             v-else

@@ -88,7 +88,8 @@ const sizeClass = computed(() => {
     md: 'w-6 h-6',
     lg: 'w-10 h-10',
     xl: 'w-14 h-14',
-    '2xl': 'w-20 h-20'
+    '2xl': 'w-20 h-20',
+    '3xl': 'w-28 h-28'
   };
   return map[props.size] || '';
 });

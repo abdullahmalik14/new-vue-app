@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-[#ececec] py-16 px-6 font-sans antialiased text-slate-900">
+    <div class="bg-[#ececec] py-16 px-4 font-sans antialiased text-slate-900">
         <div class="max-w-7xl mx-auto flex flex-col gap-24">
 
             <!-- PAGE TITLE -->
@@ -11,12 +11,8 @@
                     class="text-5xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-800 tracking-tighter drop-shadow-sm mb-4">
                     Dashboard Component Showcase
                 </h1>
-                <p class="text-indigo-900/40 font-bold tracking-[0.3em] uppercase text-xs">
-                    Modular Dashboard System & UI Laboratory
-                </p>
+
             </div>
-
-
 
             <!-- ===== SECTION: MediaCardVariants ===== -->
             <div class="flex flex-col gap-12">
@@ -111,141 +107,93 @@
             <!-- ===== SECTION: InputComponentDashboard ===== -->
             <section class="flex flex-col gap-10">
                 <DemoSectionHeader title="InputComponentDashboard" />
-                
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-                   
+
                     <div class="flex flex-col gap-3">
-                        
-                            <InputComponentDashboard 
-                                v-model="inputs.basic" 
-                                placeholder="carrot_popxoxo123" 
-                                showLabel
-                                labelText="Username"
-                                description="Usernames cannot be changed after your first month on our website, but special circumstances may allow for exceptions. Please contact us if you need assistance with changing your username."
-                            />
-                        
+
+                        <InputComponentDashboard v-model="inputs.basic" placeholder="carrot_popxoxo123" showLabel
+                            labelText="Username"
+                            description="Usernames cannot be changed after your first month on our website, but special circumstances may allow for exceptions. Please contact us if you need assistance with changing your username." />
+
                         <ShowCodeToggle :code="demoSnippets.icd.default" />
                     </div>
 
                     <div class="flex flex-col gap-3">
-                        
-                            <InputComponentDashboard 
-                                v-model="inputs.basic" 
-                                placeholder="mscarrot_pops@gmail.com" 
-                                showLabel
-                                labelText="Email"
-                            />
-                        
+
+                        <InputComponentDashboard v-model="inputs.basic" placeholder="mscarrot_pops@gmail.com" showLabel
+                            labelText="Email" />
+
                         <ShowCodeToggle :code="demoSnippets.icd.email" />
                     </div>
 
-                     <div class="flex flex-col gap-3">
-                        
-                            <InputComponentDashboard 
-                                v-model="inputs.basic" 
-                                placeholder=""
-                                showLabel
-                                labelText="First Name"
-                            />
-                        
+                    <div class="flex flex-col gap-3">
+
+                        <InputComponentDashboard v-model="inputs.basic" placeholder="" showLabel
+                            labelText="First Name" />
+
                         <ShowCodeToggle :code="demoSnippets.icd.firstName" />
                     </div>
 
                     <div class="flex flex-col gap-3">
-                        
-                            <InputComponentDashboard 
-                                v-model="inputs.basic" 
-                                placeholder=""
-                                showLabel
-                                labelText="Last Name"
-                            />
-                        
+
+                        <InputComponentDashboard v-model="inputs.basic" placeholder="" showLabel
+                            labelText="Last Name" />
+
                         <ShowCodeToggle :code="demoSnippets.icd.lastName" />
                     </div>
 
                     <div class="flex flex-col gap-3">
-                        
-                            <InputComponentDashboard 
-                                v-model="inputs.basic" 
-                                placeholder="Event Title"
-                                showLabel
-                                labelText="Title"
-                            />
-                        
+
+                        <InputComponentDashboard v-model="inputs.basic" placeholder="Event Title" showLabel
+                            labelText="Title" />
+
                         <ShowCodeToggle :code="demoSnippets.icd.title" />
                     </div>
 
-                     <div class="flex flex-col gap-3">
-                         <InputComponentDashboard 
-                         placeholder="Search by username & email"
-                    v-model="inputs.basic" 
-                    showLabel
-                    label-text="Co-performer (Optional)"
-                    :left-icon="MagnifyingGlassIcon"
-                     optionalLabel class="w-full" />
+                    <div class="flex flex-col gap-3">
+                        <InputComponentDashboard placeholder="Search by username & email" v-model="inputs.basic"
+                            showLabel label-text="Co-performer (Optional)" :left-icon="MagnifyingGlassIcon"
+                            optionalLabel class="w-full" />
 
-                     <ShowCodeToggle :code="demoSnippets.icd.coPerformer" />
-                     </div>
+                        <ShowCodeToggle :code="demoSnippets.icd.coPerformer" />
+                    </div>
 
                     <!-- 2. Password with Toggle -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Password with Toggle</span>
-                            <InputComponentDashboard 
-                                v-model="inputs.password" 
-                                placeholder="Old Password" 
-                                showLabel
-                                labelText="Old Password"
-                                @rightIconClick="inputs.showPass = !inputs.showPass"
-                                
-                            />
+                        <InputComponentDashboard v-model="inputs.password" placeholder="Old Password" showLabel
+                            labelText="Old Password" @rightIconClick="inputs.showPass = !inputs.showPass" />
                         <ShowCodeToggle :code="demoSnippets.icd.password" />
                     </div>
 
-                   
+
                     <!-- 4. With Right Icon -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Right Icon</span>
-                            <InputComponentDashboard 
-                                v-model="inputs.email" 
-                                placeholder="Enter email..." 
-                                showLabel
-                                labelText="Email Support" 
-                                :rightIcon="EnvelopeIcon"
-                                
-                            />
+                        <InputComponentDashboard v-model="inputs.email" placeholder="Enter email..." showLabel
+                            labelText="Email Support" :rightIcon="EnvelopeIcon" />
                         <ShowCodeToggle :code="demoSnippets.icd.rightIcon" />
                     </div>
 
                     <!-- 5. Required Display -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Required (*)</span>
-                            <InputComponentDashboard 
-                                v-model="inputs.email" 
-                                placeholder="Required field" 
-                                showLabel
-                                labelText="Full Name" 
-                                requiredDisplay="*"
-                                
-                            />
+                        <InputComponentDashboard v-model="inputs.email" placeholder="Required field" showLabel
+                            labelText="Full Name" requiredDisplay="*" />
                         <ShowCodeToggle :code="demoSnippets.icd.requiredStar" />
                     </div>
 
 
-                    
+
                     <!-- 9. Prefix and Suffix Icons -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Both Icons (Left & Right)</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Both Icons (Left &
+                            Right)</span>
                         <div class="min-h-[100px] flex items-center">
-                            <InputComponentDashboard 
-                                v-model="inputs.email" 
-                                placeholder="Search with filters..." 
-                                showLabel
-                                labelText="Advanced Search" 
-                                :leftIcon="MagnifyingGlassIcon"
-                                :rightIcon="Bars3Icon"
-                                clickableRightIcon
-                                
-                            />
+                            <InputComponentDashboard v-model="inputs.email" placeholder="Search with filters..."
+                                showLabel labelText="Advanced Search" :leftIcon="MagnifyingGlassIcon"
+                                :rightIcon="Bars3Icon" clickableRightIcon />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.icd.bothIcons" />
                     </div>
@@ -253,18 +201,11 @@
                     <!-- 10. Textarea -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Textarea</span>
-                  
-                           <InputComponentDashboard
-                            id="input_g"
-                            type="textarea"
-                            show-label
-                            v-model="inputs.bio"
-                            textAreaRows="3"
-                            label-text=""
-                            placeholder="Description (Optional)"
-                            description="0/200 characters"
-                        />
-                  
+
+                        <InputComponentDashboard id="input_g" type="textarea" show-label v-model="inputs.bio"
+                            textAreaRows="3" label-text="" placeholder="Description (Optional)"
+                            description="0/200 characters" />
+
                         <ShowCodeToggle :code="demoSnippets.icd.textarea" />
                     </div>
                 </div>
@@ -527,14 +468,7 @@
                         <ShowCodeToggle :code="demoSnippets.notification.error" />
                     </div>
                 </div>
-                <!-- Reopen buttons -->
-                <div class="flex flex-wrap gap-2 mt-2">
-                    <button v-for="key in Object.keys(notifOpen)" :key="key"
-                        class="text-[0.65rem] px-4 py-1.5 bg-white hover:bg-slate-50 rounded-full text-slate-600 font-semibold capitalize transition shadow-sm border border-slate-200"
-                        @click="notifOpen[key] = true">
-                        Reopen {{ key }}
-                    </button>
-                </div>
+
             </section>
 
             <!-- ===== SECTION: QuillEditor ===== -->
@@ -550,14 +484,7 @@
                         <ShowCodeToggle :code="demoSnippets.quill.default" />
                     </div>
 
-                    <!-- 2. Placeholder -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Placeholder</span>
-                        <div class="bg-transparent overflow-hidden">
-                            <QuillEditor v-model="vals.q2" placeholder="Start typing your story..." />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.quill.placeholder" />
-                    </div>
+
 
                     <!-- 3. Initial Content -->
                     <div class="flex flex-col gap-3">
@@ -568,14 +495,7 @@
                         <ShowCodeToggle :code="demoSnippets.quill.initial" />
                     </div>
 
-                    <!-- 4. Announcement -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Announcement Draft</span>
-                        <div class="bg-transparent overflow-hidden">
-                            <QuillEditor v-model="vals.q4" placeholder="Write your announcement..." />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.quill.announcement" />
-                    </div>
+
                 </div>
             </section>
 
@@ -653,255 +573,128 @@
             </section>
 
 
-            <!-- ===== SECTION: VueDatePicker ===== -->
-            <section class="flex flex-col gap-6 mb-20">
-                <DemoSectionHeader title="VueDatePicker" />
-                <p class="text-xs text-gray-400 -mt-4">
-                    All pickers are always-visible (inline) calendars. Config-driven: <code>mode</code>,
-                    <code>enableTime</code>, <code>blockedDates</code>, <code>minDate/maxDate</code>, etc.
-                </p>
 
-                <!-- GROUP 1: Basic Modes -->
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-4">Basic Modes</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Single Date -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Single Date
-                            (Default)</span>
-                        <div class="p-2">
-                            <VueDatePicker v-model="dp.single" />
-                            <p class="text-[10px] mt-2 text-gray-400 font-mono">{{ dp.single || '—' }}</p>
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.datepicker.single" />
+
+            <!-- ===== SECTION: Spinner ===== -->
+            <section class="flex flex-col gap-6">
+                <DemoSectionHeader title="Spinner" />
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+
+                    <!-- 12. Using Img Src -->
+                    <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
+
+                        <Spinner src="https://i.ibb.co.com/TM7mTrZJ/spinner.webp" size="2xl" />
+
+                        <ShowCodeToggle :code="demoSnippets.spinner.img" />
                     </div>
 
-                    <!-- Range Selection -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Range (Max 7
-                            days)</span>
-                        <div class="p-2">
-                            <VueDatePicker v-model="dp.range"
-                                :config="{ mode: 'range', maxRangeDays: 7, style: { theme: 'indigo' } }" />
-                            <p class="text-[10px] mt-2 text-gray-400 font-mono">{{ dp.range?.start || '—' }} → {{
-                                dp.range?.end || '—' }}</p>
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.datepicker.range" />
+                    <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
+
+                        <Spinner thickness="3.5" size="lg" color="text-green-500" trackColor="text-white" />
+
+                        <ShowCodeToggle :code="demoSnippets.spinner.styled" />
                     </div>
 
-                    <!-- With Time Selection -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">With Time (Dark
-                            Theme)</span>
-                        <div class="p-2">
-                            <VueDatePicker v-model="dp.withTime"
-                                :config="{ enableTime: true, format: 'DD/MM/YYYY HH:mm', style: { theme: 'dark' } }" />
-                            <p class="text-[10px] mt-2 text-gray-400 font-mono">{{ dp.withTime || '—' }}</p>
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.datepicker.withTime" />
-                    </div>
 
-                    <!-- Blocked Dates -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[14px] text-gray-400 uppercase tracking-widest font-semibold">Blocked
-                            Dates</span>
-                        <div class="p-2">
-                            <VueDatePicker v-model="dp.blocked"
-                                :config="{ style: { theme: 'red' }, blockedDates: [new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0]] }" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.datepicker.blocked" />
-                    </div>
-                </div>
+                    <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
 
-                <!-- GROUP 2: Advanced Styling -->
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-8">Advanced Styling</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Teal Header -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Teal Header +
-                            Blue Theme</span>
-                        <div class="p-2">
-                            <VueDatePicker v-model="dp.tealHeader"
-                                :config="{ style: { headerClass: 'bg-teal-600 text-white', theme: 'blue' } }" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.datepicker.tealHeader" />
-                    </div>
+                        <Spinner thickness="1" size="3xl" color="text-green-500" trackColor="text-white" />
 
-                    <!-- Square -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Square
-                            (rounded-none)</span>
-                        <div class="p-2">
-                            <VueDatePicker v-model="dp.square"
-                                :config="{ style: { rounded: 'rounded-none', todayStyle: 'background' } }" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.datepicker.square" />
-                    </div>
-
-                </div>
-
-                <!-- GROUP 3: Business Edge Cases -->
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-8">Business & Validation</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Glassmorphism -->
-                    <div class="flex flex-col gap-3 lg:col-span-1">
-                        <span
-                            class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Glassmorphism</span>
-                        <div
-                            class="flex justify-center p-6 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-xl">
-                            <VueDatePicker v-model="dp.glass"
-                                :config="{ style: { customClass: 'bg-white/10 backdrop-blur-md border border-white/20 text-white', headerClass: 'bg-transparent text-white border-white/10', theme: 'indigo' } }" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.datepicker.glass" />
-                    </div>
-
-                    <!-- Min/Max Date -->
-                    <div class="flex flex-col gap-3 py-4">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Min/Max limits
-                            (2026 only)</span>
-                        <div class="p-2">
-                            <VueDatePicker v-model="dp.minDate"
-                                :config="{ minDate: '2026-01-01', maxDate: '2026-12-31' }" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.datepicker.minMax" />
-                    </div>
-
-                    <!-- Trip Planner -->
-                    <div class="flex flex-col gap-3 py-4">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Trip Planner
-                            (Tomorrow + 30d)</span>
-                        <div class="p-2">
-                            <VueDatePicker v-model="dp.trip"
-                                :config="{ mode: 'range', minDate: new Date(Date.now() + 86400000).toISOString().split('T')[0], style: { theme: 'indigo' } }" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.datepicker.trip" />
+                        <ShowCodeToggle :code="demoSnippets.spinner.thin" />
                     </div>
                 </div>
             </section>
 
+            <!-- ===== SECTION: Buttons ===== -->
+            <section class="flex flex-col gap-8 mb-20">
+                <DemoSectionHeader title="Button Showcase" />
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-
-            <!-- ===== SECTION: Spinner ===== -->
-            <section class="flex flex-col gap-6 mb-20">
-                <DemoSectionHeader title="Spinner" />
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
-                    <!-- 1. Default -->
-                    <div class="flex flex-col items-center gap-3 p-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Default</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner />
-                        </div>
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner />" />
+                    <!-- Auth Pink -->
+                    <div class="flex flex-col gap-4">
+                        <ButtonComponent :text="buttonText" variant="authPink" type="submit" />
+                        <ShowCodeToggle :code="demoSnippets.buttons.authPink" />
                     </div>
 
-                    <!-- 2. Extra Small -->
-                    <div class="flex flex-col items-center gap-3 p-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Extra
-                            Small</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner size="xs" />
-                        </div>
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner size='xs' />" />
+                    <!-- Auth Transparent (Telegram) -->
+                    <div class="flex flex-col gap-4">
+                        <ButtonComponent text="Continue with Telegram" variant="authTransparent" size="lg"
+                            :leftIcon="telegramIcon" leftIconClass="w-8 h-8" />
+                        <ShowCodeToggle :code="demoSnippets.buttons.authTransparent" />
                     </div>
 
-                    <!-- 3. Small -->
-                    <div class="flex flex-col items-center gap-3 p-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Small</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner size="sm" />
-                        </div>
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner size='sm' />" />
+                    <!-- New Events -->
+                    <div class="flex flex-col gap-4">
+                        <ButtonComponent text="NEW EVENTS" variant="none"
+                            customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]"
+                            :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'"
+                            :leftIconClass="`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`" />
+                        <ShowCodeToggle :code="demoSnippets.buttons.newEvents" />
                     </div>
 
-                    <!-- 4. Large -->
-                    <div class="flex flex-col items-center gap-3 p-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Large</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner size="lg" />
-                        </div>
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner size='lg' />" />
+                    <!-- Polygon Next -->
+                    <div class="flex flex-col gap-4">
+                        <ButtonComponent text="Next" variant="polygonLeft"
+                            :rightIcon="'https://i.ibb.co.com/hx8ztZFf/svgviewer-png-output-8.webp'" :rightIconClass="`
+                                w-6 h-6 transition duration-200
+                                filter brightness-0 invert-0
+                                group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]
+                                `" btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468" />
+                        <ShowCodeToggle :code="demoSnippets.buttons.polygonNext" />
                     </div>
 
-                    <!-- 5. 2XL -->
-                    <div class="flex flex-col items-center gap-3 p-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Huge
-                            (2xl)</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner size="2xl" />
-                        </div>
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner size='2xl' />" />
+                    <!-- Publish Schedule -->
+                    <div class="flex flex-col gap-4">
+                        <ButtonComponent text="PUBLISH SCHEDULE" variant="polygonLeft"
+                            :leftIcon="'https://i.ibb.co/S74jfvBw/Icon-1.png'" :leftIconClass="`
+                            w-6 h-6 transition duration-200
+                            filter brightness-0
+                            group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]
+                            `" />
+                        <ShowCodeToggle :code="demoSnippets.buttons.publishSchedule" />
                     </div>
 
-                    <!-- 6. Custom Color -->
-                    <div class="flex flex-col items-center gap-3 p-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Color
-                            (Pink)</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner color="text-pink-500" />
-                        </div>
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner color='text-pink-500' />" />
+                    <!-- Add-on Service -->
+                    <div class="flex flex-col gap-4">
+                    <!-- Add-on Service -->
+                    <div class="flex flex-col gap-4">
+                        <ButtonComponent text="add-on service" variant="none"
+                            customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
+                            :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" :leftIconClass="`
+                            w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]
+                            rounded-sm  outline outline-[1.50px] outline-offset-[-0.75px] `" />
+                        <ShowCodeToggle :code="demoSnippets.buttons.addonService" />
                     </div>
 
-                    <!-- 7. No Track -->
-                    <div class="flex flex-col items-center gap-3 p-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">No Track</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner :showTrack="false" color="text-indigo-600" />
-                        </div>
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner :showTrack='false' />" />
+                    <!-- Add-on Service V2 -->
+                    <div class="flex flex-col gap-4">
+                        <ButtonComponent text="add-on service" variant="none"
+                            customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
+                            :leftIcon="'https://i.ibb.co.com/bRYvsTVs/Icon.png'" :leftIconClass="`
+                            w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]
+                            `" />
+                        <ShowCodeToggle :code="demoSnippets.buttons.addonServiceV2" />
                     </div>
 
-                    <!-- 8. Thick -->
-                    <div class="flex flex-col items-center gap-3 p-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Thick
-                            Stroke</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner thickness="6" size="lg" />
-                        </div>
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner thickness='6' />" />
+                    <!-- Proceed Payment -->
+                    <div class="flex flex-col gap-4">
+                        <ButtonComponent text="Proceed Payment" variant="checkoutProceedpayment"
+                            :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'"
+                            :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]`" />
+                        <ShowCodeToggle :code="demoSnippets.buttons.proceedPayment" />
                     </div>
 
-                    <!-- 9. Fast Speed -->
-                    <div class="flex flex-col items-center gap-3 p-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Speed:
-                            Fast</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner speed="fast" color="text-orange-500" />
-                        </div>
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner speed='fast' />" />
+
+
+                    <!-- Action Green (X) -->
+                    <div class="flex flex-col gap-4">
+                        <ButtonComponent text="Continue with X (Twitter)" variant="actionGreen"
+                            leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp"
+                            leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]" />
+                        <ShowCodeToggle :code="demoSnippets.buttons.actionGreenX" />
                     </div>
 
-                    <!-- 10. With Text -->
-                    <div class="flex flex-col items-center gap-3 p-2 lg:col-span-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">With Text</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <Spinner text="Loading your data..." color="text-teal-500" />
-                        </div>
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner text='Loading...' />" />
-                    </div>
-
-                    <!-- 11. Button Integration -->
-                    <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">In Button</span>
-                        <div class="h-12 flex items-center justify-center">
-                            <button
-                                class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-xs font-medium inline-flex items-center">
-                                <Spinner size="xs" color="text-white" trackColor="text-indigo-400" customClass="mr-2" />
-                                Processing
-                            </button>
-                        </div>
-                        <ShowCodeToggle
-                            code="<!-- Template -->\n<button>\n  <Spinner size='xs' color='text-white' /> \n  Processing\n</button>" />
-                    </div>
-
-                    <!-- 12. Using Img Src -->
-                    <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">SVG
-                            Sprite</span>
-                        <!-- <div class="h-12 flex items-center justify-center"> -->
-                            <Spinner src="https://i.ibb.co.com/TM7mTrZJ/spinner.webp" size="2xl" />
-                        <!-- </div> -->
-                        <ShowCodeToggle code="<!-- Template -->\n<Spinner src='svg-path.svg' />" />
-                    </div>
+                </div>
                 </div>
             </section>
 
@@ -923,9 +716,9 @@ import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vu
 import QuillEditor from '@/components/input/QuillEditor.vue';
 import SubscriptionCard from '@/templates/profileAbdullah/components/SubscriptionCard.vue';
 import CountryStateDemo from '@/templates/dev/CountryStateDemo.vue';
-import VueDatePicker from '@/components/datePicker/VueDatePicker.vue';
 import DemoSectionHeader from '@/templates/dev/DemoSectionHeader.vue';
 import DemoCard from '@/templates/dev/DemoCard.vue';
+import ButtonComponent from '@/components/button/ButtonComponent.vue';
 import { tierData } from "/public/data/TierData.js";
 // Heroicons
 import {
@@ -1004,42 +797,6 @@ const notifOpen = reactive({
     error: true,
     warning: true,
     info: true,
-});
-
-// ===== VueDatePicker refs =====
-const dp = reactive({
-    // Basic
-    single: null,
-    range: { start: null, end: null },
-    green: null,
-    blocked: null,
-    withTime: null,
-    todayBg: null,
-    // Advanced styling
-    tealHeader: null,
-    compact: null,
-    largeRounded: null,
-    noBorder: null,
-    square: null,
-    error: null,
-    // Time combos
-    rangeTime: { start: null, end: null },
-    customFmt: null,
-    appt: null,
-    timeBlocked: null,
-    // Edge cases
-    maxRange1: { start: null, end: null },
-    minDate: null,
-    maxDate: null,
-    mondayStart: null,
-    pastOnly: null,
-    futureOnly: null,
-    // Business
-    trip: { start: null, end: null },
-    mono: null,
-    debug: null,
-    rangeBlocked: { start: null, end: null },
-    glass: null,
 });
 
 // ===== Media data =====
@@ -1206,121 +963,95 @@ const handleCardAction = (card) => {
 
 const demoSnippets = {
     mediaV1: {
-        myMedia: `<!-- Template -->\n<MediaCardV1 \n  v-for="item in myMediaList" \n  :key="item.id" \n  :media="item" \n  variant="default" \n/>\n\n<!-- Script Data -->\nconst myMediaList = ref([\n  {\n    id: 1,\n    type: 'video',\n    videoUrl: 'http://.../video.mp4',\n    title: 'Took a walk...', ...\n  }\n]);`,
+        myMedia: `<!-- Template -->\n<MediaCardV1 \n  v-for="item in myMediaList" \n  :key="item.id" \n  :media="item" \n  variant="default" \n  @menu-action="handleAction" \n/>\n\n<!-- Script Data -->\nconst myMediaList = ref([\n  {\n    id: 1,\n    type: 'video',\n    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',\n    poster: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp',\n    title: 'Took a walk in the park.',\n    duration: '14:55',\n    timeAgo: '5mo',\n    likes: 0,\n    views: 4,\n    creatorName: 'Creator Allen',\n    avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'\n  }\n]);\n\nconst handleAction = (action) => {\n  console.log("Action triggered:", action);\n};`,
         resume: `<!-- Template -->\n<MediaCardV1 \n  :media="myMediaList[0]" \n  variant="resume" \n/>`,
-        latest: `<!-- Template -->\n<MediaCardV1 \n  :media="latestMediaItem" \n  variant="latest" \n/>`,
-        purchased: `<!-- Template -->\n<MediaCardV1 \n  :media="purchasedMediaItem" \n  variant="purchased" \n/>`,
-        gridView: `<!-- Template -->\n<MediaCardV1 \n  v-for="item in gridMediaList" \n  :key="item.id" \n  :media="item" \n  variant="grid" \n/>`,
+        latest: `<!-- Template -->\n<MediaCardV1 \n  :media="latestMediaItem" \n  variant="latest" \n/>\n\n<!-- Script Data -->\nconst latestMediaItem = ref({\n  id: 3,\n  type: 'video',\n  videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',\n  poster: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp',\n  title: 'My 2nd coming soon',\n  duration: '14:55',\n  timeAgo: '5mo',\n  likes: 0,\n  views: 4,\n  creatorName: 'Creator Allen',\n  avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'\n});`,
+        purchased: `<!-- Template -->\n<MediaCardV1 \n  :media="purchasedMediaItem" \n  variant="purchased" \n  @menu-action="handleAction" \n/>\n\n<!-- Script Data -->\nconst purchasedMediaItem = ref({\n  id: 4,\n  type: 'video',\n  videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',\n  poster: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp',\n  title: 'Took a walk in the park today.',\n  duration: '14:55',\n  timeAgo: '5mo',\n  likes: 0,\n  views: 4,\n  creatorName: 'Mistress Jessica',\n  avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'\n});`,
+        gridView: `<!-- Template -->\n<MediaCardV1 \n  v-for="item in gridMediaList" \n  :key="item.id" \n  :media="item" \n  variant="grid" \n  @menu-action="handleAction" \n/>\n\n<!-- Script Data -->\nconst gridMediaList = ref([\n  {\n    id: 101,\n    type: 'image',\n    poster: 'https://i.ibb.co.com/bjGQxr5S/sample-bg-image.webp',\n    title: 'Took a walk in the park this morning',\n    duration: '',\n    timeAgo: '5mo',\n    likes: 0,\n    views: 4,\n    creatorName: 'Mistress Jessica',\n    avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'\n  },\n  {\n    id: 102,\n    type: 'video',\n    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',\n    poster: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp',\n    title: 'Morning workout session',\n    duration: '10:30',\n    timeAgo: '2d',\n    likes: 120,\n    views: 1200,\n    creatorName: 'Mistress Jessica',\n    avatar: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp'\n  }\n]);`,
     },
     mediaV2: {
-        gallery: `<!-- Template -->\n<MediaCardV2 :media="galleryCard" />\n\n<!-- Script Data -->\nconst galleryCard = ref({\n  type: 'gallery',\n  isLocked: true,\n  showTag: true,\n  tagText: 'Subscriber Exclusive',\n  tagColor: 'green'\n});`,
-        image: `<!-- Template -->\n<MediaCardV2 :media="imageCard" />\n\n<!-- Script Data -->\nconst imageCard = ref({\n  type: 'image',\n  showTag: true,\n  tagText: 'Subscribe or Buy',\n  tagColor: 'pink'\n});`,
-        video: `<!-- Template -->\n<MediaCardV2 :media="videoCard" />\n\n<!-- Script Data -->\nconst videoCard = ref({\n  type: 'video',\n  videoUrl: 'https://.../video.mp4',\n  isLocked: true,\n  showTag: false\n});`,
-    },
-    inputDashboard: {
-        basic: `<!-- Template -->\n<InputComponentDashboard \n  v-model="username" \n  showLabel \n  labelText="Username" \n  requiredDisplay="*" \n  placeholder="Enter username" \n/>`,
-        icons: `<!-- Template -->\n<InputComponentDashboard \n  v-model="email" \n  showLabel \n  labelText="Email" \n  :leftIcon="EnvelopeIcon" \n/>`,
-        password: `<!-- Template -->\n<InputComponentDashboard \n  v-model="password" \n  type="password" \n  :rightIcon="showPass ? EyeIcon : EyeSlashIcon" \n  clickableRightIcon \n  @rightIconClick="showPass = !showPass" \n/>`,
-        error: `<!-- Template -->\n<InputComponentDashboard \n  showErrors \n  :errors="[{ message: 'Invalid format', icon: InformationCircleIcon }]" \n/>`,
-        success: `<!-- Template -->\n<InputComponentDashboard \n  onSuccess \n  :success="[{ message: 'Available!' }]" \n/>`,
-        spans: `<!-- Template -->\n<InputComponentDashboard \n  leftSpan \n  leftSpanText="$" \n  rightSpan \n  rightSpanText="USD" \n/>`,
-        textarea: `<!-- Template -->\n<InputComponentDashboard \n  v-model="bio" \n  type="textarea" \n  description="Brief bio..." \n/>`,
+        gallery: `<!-- Template -->\n<MediaCardV2 :media="galleryCard" />\n\n<!-- Script Data -->\nconst galleryCard = ref({\n  id: 1,\n  type: 'gallery',\n  poster: 'https://i.ibb.co.com/bjGQxr5S/sample-bg-image.webp',\n  title: 'Took a walk in the park this morning',\n  timeAgo: '5mo',\n  likes: 0,\n  views: 4,\n  galleryCount: 7,\n  isLocked: true,               \n  showTag: true,                \n  tagText: 'Subscriber Exclusive',\n  tagColor: 'green'\n});`,
+        image: `<!-- Template -->\n<MediaCardV2 :media="imageCard" />\n\n<!-- Script Data -->\nconst imageCard = ref({\n  id: 2,\n  type: 'image',\n  poster: 'https://i.ibb.co.com/bjGQxr5S/sample-bg-image.webp',\n  title: 'Took a walk in the park this morning',\n  timeAgo: '5mo',\n  likes: 0,\n  views: 4,\n  isLocked: false,              \n  showTag: true,                \n  tagText: 'Subscribe or Buy',  \n  tagColor: 'pink'              \n});`,
+        video: `<!-- Template -->\n<MediaCardV2 :media="videoCard" />\n\n<!-- Script Data -->\nconst videoCard = ref({\n  id: 3,\n  type: 'video',\n  videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',\n  poster: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp',\n  title: 'Took a walk in the park this morning',\n  duration: '14:55',\n  timeAgo: '5mo',\n  likes: 0,\n  views: 4,\n  isLocked: true,               \n  showTag: false,\n  tagText: '',\n  tagColor: 'green'\n});`,
     },
     heading: {
-        h1Primary: `<Heading text="Primary H1" tag="h1" theme="defaultPrimaryHeading" class="!text-black" version="basic" />`,
-        h2Secondary: `<Heading text="Secondary H2" tag="h2" theme="defaultSecondaryHeading" class="!text-black" version="basic" />`,
-        h3Section: `<Heading text="Section H3" tag="h3" theme="sectionHeading" class="!text-black" version="basic" />`,
-        h2Dashboard: `<Heading text="Dashboard Title" tag="h2" theme="dashboardHeading" version="basic" />`,
-        h2Auth: `<Heading text="Login" tag="h2" theme="AuthHeading" class="!text-black" version="basic" />`,
-        h4Form: `<Heading text="Profile Settings" tag="h4" theme="formHeading" version="basic" />`,
-        h1Demo: `<Heading text="Demo H1 Bold" tag="h1" theme="demoHeadings" version="basic" />`,
-        h3Demo: `<Heading text="Demo H3 Medium" tag="h3" theme="demoHeadings" version="basic" />`,
-        withIcon: `<Heading text="With Icon" tag="h3" theme="defaultSecondaryHeading" class="!text-black" version="basic" :leftIcon="StarIcon" />`,
-        order: `<Heading text="Order #1234" tag="h1" theme="orderHeading" version="basic" />`,
+        h1Primary: `<Heading \n  text="Primary H1" \n  tag="h1" \n  theme="defaultPrimaryHeading" \n  version="basic" \n  class="!text-black" \n/>`,
+        h2Secondary: `<Heading \n  text="Secondary H2" \n  tag="h2" \n  theme="defaultSecondaryHeading" \n  version="basic" \n  class="!text-black" \n/>`,
+        h3Section: `<Heading \n  text="Section H3" \n  tag="h3" \n  theme="sectionHeading" \n  version="basic" \n  class="!text-black" \n/>`,
+        h2Dashboard: `<Heading \n  text="Dashboard Title" \n  tag="h2" \n  theme="dashboardHeading" \n  version="basic" \n/>`,
+        h2Auth: `<Heading \n  text="Login" \n  tag="h2" \n  theme="AuthHeading" \n  version="basic" \n  class="!text-black" \n/>`,
+        h4Form: `<Heading \n  text="Profile Settings" \n  tag="h4" \n  theme="formHeading" \n  version="basic" \n/>`,
+        h1Demo: `<Heading \n  text="Demo H1 Bold" \n  tag="h1" \n  theme="demoHeadings" \n  version="basic" \n/>`,
+        h3Demo: `<Heading \n  text="Demo H3 Medium" \n  tag="h3" \n  theme="demoHeadings" \n  version="basic" \n/>`,
+        withIcon: `<Heading \n  text="With Icon" \n  tag="h3" \n  theme="defaultSecondaryHeading" \n  version="basic" \n  class="!text-black" \n  :leftIcon="StarIcon" \n/>`,
+        order: `<Heading \n  text="Order #1234" \n  tag="h1" \n  theme="orderHeading" \n  version="basic" \n/>`,
     },
     paragraph: {
-        default: `<Paragraph text="Standard text content..." class="!text-black" />`,
-        small: `<Paragraph text="Small caption text" class="!text-black text-sm" />`,
-        large: `<Paragraph text="Large paragraph text" class="!text-black text-xl" />`,
-        bold: `<Paragraph text="Bold text" class="!text-black font-bold" />`,
-        blue: `<Paragraph text="Blue text" fontColor="text-blue-600" />`,
-        error: `<Paragraph text="Error message" fontColor="text-red-500" fontSize="text-sm" />`,
-        success: `<Paragraph text="Success message" fontColor="text-green-600" />`,
-        italic: `<Paragraph text="Italic note" fontFamily="italic" />`,
-        withIcon: `<Paragraph text="Info message" :leftIcon="InfoIcon" />`,
-        xs: `<Paragraph text="Helper text" fontSize="text-xs" />`,
+        default: `<Paragraph \n  text="This is a default paragraph with standard styling." \n  class="!text-black" \n/>`,
+        small: `<Paragraph \n  text="Small text paragraph for captions." \n  class="!text-black text-sm" \n/>`,
+        large: `<Paragraph \n  text="Large paragraph text." \n  class="!text-black text-xl" \n/>`,
+        bold: `<Paragraph \n  text="Bold paragraph text." \n  class="!text-black font-bold" \n/>`,
+        blue: `<Paragraph \n  text="Blue paragraph text." \n  fontColor="text-blue-600" \n/>`,
+        error: `<Paragraph \n  text="This field is required." \n  fontColor="text-red-500" \n  fontSize="text-sm" \n/>`,
+        success: `<Paragraph \n  text="Action successful!" \n  fontColor="text-green-600" \n  fontWeight="font-medium" \n/>`,
+        italic: `<Paragraph \n  text="Italic paragraph text for notes." \n  fontFamily="italic" \n  fontColor="text-gray-500" \n/>`,
+        withIcon: `<Paragraph \n  text="Info message here" \n  :leftIcon="InformationCircleIcon" \n  fontSize="text-sm" \n  fontColor="text-blue-600" \n/>`,
+        xs: `<Paragraph \n  text="Helper text displayed below the input field." \n  fontSize="text-xs" \n  fontColor="text-gray-400" \n/>`,
     },
     icd: {
-        default: `<InputComponentDashboard \n  v-model="val" \n  labelText="Username" \n  placeholder="Enter text..." \n  showLabel\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
-        password: `<InputComponentDashboard \n  v-model="password" \n  :type="showPass ? 'text' : 'password'"\n  labelText="Password"\n  :rightIcon="showPass ? EyeSlashIcon : EyeIcon"\n  clickableRightIcon\n  @rightIconClick="showPass = !showPass"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
-        leftIcon: `<InputComponentDashboard \n  v-model="search" \n  labelText="Search" \n  :leftIcon="MagnifyingGlassIcon"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
-        rightIcon: `<InputComponentDashboard \n  v-model="email" \n  labelText="Email" \n  :rightIcon="EnvelopeIcon"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
-        requiredStar: `<InputComponentDashboard \n  v-model="name" \n  labelText="Full Name" \n  requiredDisplay="*"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
-        requiredItalic: `<InputComponentDashboard \n  v-model="email" \n  labelText="Email" \n  requiredDisplay="italic-text" \n  requiredDisplayText="Required"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
-        errors: `<InputComponentDashboard \n  v-model="code" \n  labelText="Promo Code" \n  showErrors\n  :errors="[{ error: 'Invalid code' }]"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n  errorClass="!text-red-500"\n/>`,
-        success: `<InputComponentDashboard \n  v-model="handle" \n  labelText="Username" \n  onSuccess\n  :success="[{ message: 'Available!' }]"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n  successClass="!text-green-600"\n/>`,
-        suffixPrice: `<InputComponentDashboard \n  v-model="price" \n  labelText="Unit Price" \n  rightSpan \n  rightSpanText="USD"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n  rightSpanClass="!text-slate-500"\n/>`,
-        textarea: `<InputComponentDashboard \n  v-model="bio" \n  type="textarea" \n  labelText="Bio"\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n/>`,
-        bothIcons: `<InputComponentDashboard \n  v-model="search" \n  labelText="Advanced Search" \n  :leftIcon="MagnifyingGlassIcon"\n  :rightIcon="Bars3Icon"\n  clickableRightIcon\n  labelClass="!text-slate-900"\n  inputClass="!text-slate-900"\n  wrapperClass="!border-slate-300 !bg-white"\n  leftIconClass="!text-slate-500"\n  rightIconClass="!text-slate-400"\n/>`,
+        default: `<InputComponentDashboard \n  v-model="inputs.basic" \n  placeholder="carrot_popxoxo123" \n  showLabel \n  labelText="Username" \n  description="Usernames cannot be changed..." \n/>`,
+        email: `<InputComponentDashboard \n  v-model="inputs.basic" \n  placeholder="mscarrot_pops@gmail.com" \n  showLabel \n  labelText="Email" \n/>`,
+        firstName: `<InputComponentDashboard \n  v-model="inputs.basic" \n  placeholder="" \n  showLabel \n  labelText="First Name" \n/>`,
+        lastName: `<InputComponentDashboard \n  v-model="inputs.basic" \n  placeholder="" \n  showLabel \n  labelText="Last Name" \n/>`,
+        title: `<InputComponentDashboard \n  v-model="inputs.basic" \n  placeholder="Event Title" \n  showLabel \n  labelText="Title" \n/>`,
+        coPerformer: `<InputComponentDashboard \n  placeholder="Search by username & email" \n  v-model="inputs.basic" \n  showLabel \n  label-text="Co-performer (Optional)" \n  :left-icon="MagnifyingGlassIcon" \n  optionalLabel \n/>`,
+        password: `<InputComponentDashboard \n  v-model="inputs.password" \n  placeholder="Old Password" \n  showLabel \n  labelText="Old Password" \n  @rightIconClick="inputs.showPass = !inputs.showPass" \n/>`,
+        rightIcon: `<InputComponentDashboard \n  v-model="inputs.email" \n  placeholder="Enter email..." \n  showLabel \n  labelText="Email Support" \n  :rightIcon="EnvelopeIcon" \n/>`,
+        requiredStar: `<InputComponentDashboard \n  v-model="inputs.email" \n  placeholder="Required field" \n  showLabel \n  labelText="Full Name" \n  requiredDisplay="*" \n/>`,
+        bothIcons: `<InputComponentDashboard \n  v-model="inputs.email" \n  placeholder="Search with filters..." \n  showLabel \n  labelText="Advanced Search" \n  :leftIcon="MagnifyingGlassIcon" \n  :rightIcon="Bars3Icon" \n  clickableRightIcon \n/>`,
+        textarea: `<InputComponentDashboard \n  id="input_g" \n  type="textarea" \n  show-label \n  v-model="inputs.bio" \n  textAreaRows="3" \n  label-text="" \n  placeholder="Description (Optional)" \n  description="0/200 characters" \n/>`,
     },
     notification: {
-        warning: `<!-- Template -->\n<NotificationCard \n  variant="warning" \n  title="Media Content Required"\n  description="Your profile currently has no media..."\n  timestamp="1w"\n  :icon="FilmIcon"\n  :badgeIcon="ArrowUpTrayIcon"\n  dismissLabel="Dismiss"\n  actionLabel="Take Action"\n  v-model="visible" \n/>\n\n<!-- Script Data -->\nconst visible = ref(true);`,
-        success: `<!-- Template -->\n<NotificationCard \n  variant="success" \n  title="Congratulations"\n  description="Your media has been approved."\n  timestamp="1m"\n  :icon="PhotoIcon"\n  :badgeIcon="CheckIcon"\n  dismissLabel="Dismiss"\n  actionLabel="Take Action"\n  v-model="visible" \n/>\n\n<!-- Script Data -->\nconst visible = ref(true);`,
-        error: `<!-- Template -->\n<NotificationCard \n  variant="error" \n  title="Action Required"\n  description="Critical update needed..."\n  timestamp="Just now"\n  :icon="BellAlertIcon"\n  :badgeIcon="TrashIcon"\n  dismissLabel="Dismiss"\n  actionLabel="Finalize"\n  v-model="visible" \n/>\n\n<!-- Script Data -->\nconst visible = ref(true);`,
-        info: `<!-- Template -->\n<NotificationCard \n  variant="info" \n  title="Bank Details Required"\n  description="Please complete your bank information."\n  timestamp="3m"\n  :icon="BuildingLibraryIcon"\n  :badgeIcon="InformationCircleIcon"\n  dismissLabel="Dismiss"\n  actionLabel="Take Action"\n  v-model="visible" \n/>\n\n<!-- Script Data -->\nconst visible = ref(true);`,
+        warning: `<NotificationCard \n  variant="warning" \n  title="Media Content Required" \n  description="Your profile currently has no media..." \n  timestamp="1w" \n  :icon="FilmIcon" \n  :badgeIcon="ArrowUpTrayIcon" \n  dismissLabel="Dismiss" \n  actionLabel="Take Action" \n  v-model="notifOpen.warning" \n/>`,
+        success: `<NotificationCard \n  variant="success" \n  title="Congratulations" \n  description="Your media has been approved." \n  timestamp="1m" \n  :icon="PhotoIcon" \n  :badgeIcon="CheckIcon" \n  dismissLabel="Dismiss" \n  actionLabel="Take Action" \n  v-model="notifOpen.success" \n/>`,
+        info: `<NotificationCard \n  variant="info" \n  title="Bank Details Required" \n  description="To ensure seamless transactions, please complete..." \n  timestamp="3m" \n  :icon="BuildingLibraryIcon" \n  :badgeIcon="InformationCircleIcon" \n  dismissLabel="Dismiss" \n  actionLabel="Take Action" \n  v-model="notifOpen.info" \n/>`,
+        error: `<NotificationCard \n  variant="error" \n  title="Action Required" \n  description="Critical update needed for account security..." \n  timestamp="Just now" \n  :icon="BellAlertIcon" \n  :badgeIcon="TrashIcon" \n  dismissLabel="Dismiss" \n  actionLabel="Finalize" \n  v-model="notifOpen.error" \n/>`,
     },
     quill: {
-        default: `<!-- Template -->\n<QuillEditor v-model="content" />\n\n<!-- Script Data -->\nconst content = ref('');`,
-        placeholder: `<!-- Template -->\n<QuillEditor v-model="content" placeholder="Start typing..." />\n\n<!-- Script Data -->\nconst content = ref('');`,
-        initial: `<!-- Template -->\n<QuillEditor v-model="content" />\n\n<!-- Script Data -->\nconst content = ref('<strong>Initial</strong> content...');`,
-        announcement: `<!-- Template -->\n<QuillEditor v-model="content" placeholder="Announcement title..." />\n\n<!-- Script Data -->\nconst content = ref('');`,
-    },
-    datepicker: {
-        single: `<!-- Template -->\n<VueDatePicker v-model="date" />\n\n<!-- Script Data -->\nconst date = ref(null);`,
-        range: `<!-- Template -->\n<VueDatePicker v-model="range" :config="config" />\n\n<!-- Script Data -->\nconst range = ref({ start: null, end: null });\nconst config = {\n  mode: 'range',\n  maxRangeDays: 7\n};`,
-        withTime: `<!-- Template -->\n<VueDatePicker v-model="dateTime" :config="config" />\n\n<!-- Script Data -->\nconst dateTime = ref(null);\nconst config = {\n  enableTime: true,\n  format: 'DD/MM/YYYY HH:mm'\n};`,
-        blocked: `<!-- Template -->\n<VueDatePicker v-model="date" :config="config" />\n\n<!-- Script Data -->\nconst date = ref(null);\nconst config = {\n  blockedDates: ['2026-03-29']\n};`,
-        tealHeader: `<!-- Template -->\n<VueDatePicker :config="config" />\n\n<!-- Script Data -->\nconst config = {\n  style: {\n    headerClass: 'bg-teal-600 text-white',\n    theme: 'blue'\n  }\n};`,
-        square: `<!-- Template -->\n<VueDatePicker :config="config" />\n\n<!-- Script Data -->\nconst config = {\n  style: {\n    rounded: 'rounded-none',\n    todayStyle: 'background'\n  }\n};`,
-        error: `<!-- Template -->\n<div class="border-2 border-red-500 rounded-xl">\n  <VueDatePicker :config="config" />\n</div>\n\n<!-- Script Data -->\nconst config = {\n  style: {\n    border: 'border-0',\n    shadow: 'shadow-none'\n  },\n  placeholder: 'Required!'\n};`,
-        glass: `<!-- Template -->\n<div class="bg-gradient-to-br from-indigo-600 to-purple-600 p-6 rounded-2xl">\n  <VueDatePicker :config="config" />\n</div>\n\n<!-- Script Data -->\nconst config = {\n  style: {\n    customClass: 'bg-white/10 backdrop-blur-md border border-white/20 text-white',\n    headerClass: 'bg-transparent text-white border-white/10',\n    theme: 'indigo'\n  }\n};`,
-        minMax: `<!-- Template -->\n<VueDatePicker :config="config" />\n\n<!-- Script Data -->\nconst config = {\n  minDate: '2026-01-01',\n  maxDate: '2026-12-31'\n};`,
-        trip: `<!-- Template -->\n<VueDatePicker v-model="range" :config="config" />\n\n<!-- Script Data -->\nconst tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];\nconst config = {\n  mode: 'range',\n  minDate: tomorrow\n};`,
+        default: `<QuillEditor v-model="vals.q1" />`,
+        initial: `<QuillEditor v-model="vals.q3" />`,
     },
     tierCard: {
-        1: `<!-- Template -->\n<TierCard :tier="tierData[0]" />\n\n<!-- Script Data (Source: TierData.js) -->\nconst tier = {\n  title: "My VVIP Lounge ❤️️️",\n  backgroundImage: "...",\n  plans: [{ id: '1m', label: '1 month', price: '55.86' }, ...],\n  theme: { textPrimary: '#FB0464', ... }\n};`,
-        2: `<!-- Template -->\n<TierCard :tier="tierData[1]" />\n\n<!-- Script Data (Spend Mode) -->\nconst tier = {\n  footer: {\n    type: 'spend',\n    progress: { leftText: "Spend $200 more to claim", width: "80%" }\n  }\n};`,
-        3: `<!-- Template -->\n<TierCard :tier="tierData[2]" />\n\n<!-- Script Data -->\nconst tier = { ... };`,
-        4: `<!-- Template -->\n<TierCard :tier="tierData[3]" />\n\n<!-- Script Data (Hidden Progress) -->\nconst tier = {\n  footer: { type: 'hidden' }\n};`,
-        5: `<!-- Template -->\n<TierCard :tier="tierData[4]" />\n\n<!-- Script Data (Subscribe Mode) -->\nconst tier = {\n  footer: { type: 'subscribe', buttonText: 'SUBSCRIBE' }\n};`,
+        1: `<!-- Template -->\n<TierCard :tier="tierData[0]" />\n\n<!-- Script Data (Source: TierData.js) -->\nconst tier = {\n  id: 1,\n  title: "My VVIP Lounge ❤️️️",\n  backgroundImage: "https://i.ibb.co.com/ht8z7r27/card-bg-gradient.webp",\n  plans: [\n    { id: '1m', label: '1 month', price: '55.86', discount: '0', isCurrent: false },\n    { id: '3m', label: '3 months', price: '124.86', discount: '25', isCurrent: false },\n    { id: '6m', label: '6 months', price: '221.86', discount: '34', isCurrent: false },\n    { id: '1y', label: '1 year', price: '320.86', discount: '52', isCurrent: false }\n  ],\n  theme: {\n    textPrimary: '#FB0464',\n    textSecondary: '#111827',\n    buttonBg: '#FB0464',\n    buttonText: '#FFFFFF',\n    tagBg: '#FEF2F2',\n    tagText: '#FB0464',\n    progressBg: '#FEE2E2',\n    progressFill: '#FB0464'\n  },\n  footer: {\n    type: 'spend',\n    progress: { leftText: "Spend $200 more to claim", rightText: "$200.00", width: "80%" }\n  }\n};`,
+        2: `<TierCard :tier="tierData[1]" />`,
+        3: `<TierCard :tier="tierData[2]" />`,
+        4: `<TierCard :tier="tierData[3]" />`,
+        5: `<TierCard :tier="tierData[4]" />`,
     },
     eventCard: {
-        orangeButton: `<!-- Template -->\n<EventCard theme="orange" :hasButton="true" />`,
-        orangeProgress: `<!-- Template -->\n<EventCard theme="orange" :hasButton="false" />`,
-        pinkButton: `<!-- Template -->\n<EventCard theme="pink" :hasButton="true" />`,
-        pinkProgress: `<!-- Template -->\n<EventCard theme="pink" :hasButton="false" />`,
+        orangeButton: `<EventCard theme="orange" :hasButton="true" />`,
+        orangeProgress: `<EventCard theme="orange" :hasButton="false" />`,
+        pinkButton: `<EventCard theme="pink" :hasButton="true" />`,
+        pinkProgress: `<EventCard theme="pink" :hasButton="false" />`,
     },
     cart: {
-        default: `<!-- Template -->
-<Cart />
-
-<!-- Interaction Logic (Custom Events) -->
-// To add an item via console or script:
-window.dispatchEvent(new CustomEvent('cart:add', {
-  detail: {
-    item: {
-      title: "NBA Hoops Card",
-      productId: "nba123",
-      qty: 1,
-      price: 12.23,
-      originalPrice: 20.00,
-      shipping: 12.23,
-      seller: "Princess Carrot Pop",
-      image: "https://i.ibb.co.com/70sHrpv/featured-media-bg.webp",
-      promoCodes: ["PROMOCODE2025", "MEMBER BENEFIT"]
-    }
-  }
-}));`,
+        default: `<!-- Template -->\n<Cart />\n\n<!-- Interaction Logic (Custom Events) -->\n// To add an item via console or script:\nwindow.dispatchEvent(new CustomEvent('cart:add', {\n  detail: {\n    item: {\n      title: "NBA Hoops Card",\n      productId: "nba123",\n      qty: 1,\n      price: 12.23,\n      originalPrice: 20.00,\n      shipping: 12.23,\n      seller: "Princess Carrot Pop",\n      image: "https://i.ibb.co.com/70sHrpv/featured-media-bg.webp",\n      promoCodes: ["PROMOCODE2025", "MEMBER BENEFIT"]\n    }\n  }\n}));`,
+    },
+    spinner: {
+        img: `<Spinner \n  src="https://i.ibb.co.com/TM7mTrZJ/spinner.webp" \n  size="2xl" \n/>`,
+        styled: `<Spinner \n  thickness="3.5" \n  size="lg" \n  color="text-green-500" \n  trackColor="text-white" \n/>`,
+        thin: `<Spinner \n  thickness="1" \n  size="3xl" \n  color="text-green-500" \n  trackColor="text-white" \n/>`,
+    },
+    buttons: {
+        authPink: `<ButtonComponent \n  :text="buttonText" \n  variant="authPink" \n  type="submit" \n/>`,
+        authTransparent: `<ButtonComponent \n  text="Continue with Telegram" \n  variant="authTransparent" \n  size="lg" \n  :leftIcon="telegramIcon" \n  leftIconClass="w-8 h-8" \n/>`,
+        newEvents: `<ButtonComponent \n  text="NEW EVENTS" \n  variant="none" \n  customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" \n  :leftIconClass="\`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]\`" \n/>`,
+        polygonNext: `<ButtonComponent \n  text="Next" \n  variant="polygonLeft" \n  :rightIcon="'https://i.ibb.co.com/hx8ztZFf/svgviewer-png-output-8.webp'" \n  :rightIconClass="\`w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]\`" \n  btnBg="#07f468" \n  btnHoverBg="black" \n  btnText="black" \n  btnHoverText="#07f468" \n/>`,
+        publishSchedule: `<ButtonComponent \n  text="PUBLISH SCHEDULE" \n  variant="polygonLeft" \n  :leftIcon="'https://i.ibb.co.com/S74jfvBw/Icon-1.png'" \n  :leftIconClass="\`w-6 h-6 transition duration-200 filter brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]\`" \n/>`,
+        addonService: `<ButtonComponent \n  text="add-on service" \n  variant="none" \n  customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" \n  :leftIconClass="\`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)] rounded-sm outline outline-[1.50px] outline-offset-[-0.75px]\`" \n/>`,
+        addonServiceV2: `<ButtonComponent \n  text="add-on service" \n  variant="none" \n  customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/bRYvsTVs/Icon.png'" \n  :leftIconClass="\`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]\`" \n/>`,
+        proceedPayment: `<ButtonComponent \n  text="Proceed Payment" \n  variant="checkoutProceedpayment" \n  :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'" \n  :rightIconClass="\`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]\`" \n/>`,
+        actionGreenX: `<ButtonComponent \n  text="Continue with X (Twitter)" \n  variant="actionGreen" \n  leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp" \n  leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]" \n/>`,
     }
 };
 
@@ -1363,6 +1094,7 @@ const myMediaList = ref([
         id: 1,
         type: 'video',
         videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        poster: POSTER,
         title: 'Took a walk in the park.',
         duration: '14:55',
         timeAgo: '5mo',
@@ -1378,6 +1110,7 @@ const latestMediaItem = ref({
     id: 3,
     type: 'video',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    poster: POSTER,
     title: 'My 2nd coming soon',
     duration: '14:55',
     timeAgo: '5mo',
@@ -1392,6 +1125,7 @@ const purchasedMediaItem = ref({
     id: 4,
     type: 'video',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    poster: POSTER,
     title: 'Took a walk in the park today.',
     duration: '14:55',
     timeAgo: '5mo',
@@ -1419,6 +1153,7 @@ const gridMediaList = ref([
         id: 102,
         type: 'video',
         videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        poster: POSTER,
         title: 'Took a walk in the park this morning',
         duration: '14:55',
         timeAgo: '5mo',
@@ -1479,6 +1214,7 @@ const videoCard = ref({
     id: 3,
     type: 'video',
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    poster: POSTER,
     title: 'Took a walk in the park this morning',
     duration: '14:55',
     timeAgo: '5mo',
@@ -1490,6 +1226,11 @@ const videoCard = ref({
     tagText: '',                  // Empty
     tagColor: 'green'             // Irrelevant
 });
+
+// Button Showcase Data
+const buttonText = ref("Auth Button");
+const telegramIcon = "https://i.ibb.co.com/8LKPbgm1/telegram.webp"; // Using a consistent placeholder if not found
+
 </script>
 
 <style>

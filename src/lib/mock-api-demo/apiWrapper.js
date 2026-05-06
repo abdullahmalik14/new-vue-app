@@ -79,6 +79,14 @@ class ApiWrapper {
         return this.call(endpoint, 'POST', data, options);
     }
 
+    put(endpoint, data = {}, options = {}) {
+        return this.call(endpoint, 'PUT', data, options);
+    }
+
+    patch(endpoint, data = {}, options = {}) {
+        return this.call(endpoint, 'PATCH', data, options);
+    }
+
     delete(endpoint, options = {}) {
         return this.call(endpoint, 'DELETE', null, options);
     }

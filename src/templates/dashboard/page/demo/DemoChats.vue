@@ -470,6 +470,7 @@ import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWra
 import { useChatStore } from '@/stores/useChatStore.js'
 import { FlowHandler } from '@/services/flow-system/FlowHandler.js'
 
+
 const chatTheme = {
   container: 'relative bg-[#f4f4f5] rounded-tl rounded-tr flex flex-col h-full overflow-hidden border border-zinc-200/50 container-shadow',
   header: 'bg-gray-200 font-sans px-2 py-2 shrink-0 z-10 shadow-sm relative',

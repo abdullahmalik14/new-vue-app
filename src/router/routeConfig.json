@@ -1168,12 +1168,7 @@
     "requiresAuth": false,
     "supportedRoles": ["all"]
   },
-  {
-    "slug": "/demo/audit/button",
-    "componentPath": "@/components/demoAuditComponents/ButtonComponentDemo.vue",
-    "requiresAuth": false,
-    "supportedRoles": ["all"]
-  },
+
   {
     "slug": "/settings",
     "componentPath": "@/templates/settings/Settings.vue",
@@ -1209,6 +1204,11 @@
   {
     "slug": "/MediaUploader",
   "componentPath": "@/components/ui/global/media/uploader/MediaUploader.vue"
+  },
+    {
+    "slug": "/chats",
+          "componentPath": "@/templates/dashboard/page/demo/DemoChats.vue"
+
   },
   {
     "slug": "/:pathMatch(.*)*",
