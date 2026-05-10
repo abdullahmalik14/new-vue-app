@@ -11,8 +11,10 @@
                         d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
                 </svg>
                 {{ showCode ? 'Hide Code' : 'Show Code' }}
+                
             </button>
         </div>
+
         <div
             :class="['rounded-xl border p-4 transition-all duration-300', dark ? 'border-white/10 bg-transparent' : 'border-white/20 bg-white/5 shadow-sm']">
             <slot />
