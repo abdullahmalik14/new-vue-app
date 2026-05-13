@@ -42,6 +42,42 @@
     <div class="relative before:content-[''] before:fixed before:top-0 before:left-0 before:w-full before:h-screen before:pointer-events-none before:bg-cover before:bg-center before:bg-no-repeat before:bg-[url('https://i.ibb.co.com/QvpHN5vD/mobile-gradient-main-bg-1.webp')] before:z-[-1] sm:before:bg-[url('https://i.ibb.co.com/dw910Z5b/gradient-main-bg.webp')]">
         <!-- container -->
         <div data-container class="flex flex-col min-h-screen z-[0]">
+            <!-- notification -->
+            <div class="fixed right-2 top-2 w-[calc(100%-1rem)] h-max z-[99] sm:w-[30rem]">
+                <div class="w-full border-b-[0.5px] border-[#EAECF0] flex relative">
+                    <div class="w-[3px] block bg-[#FF4405]"></div>
+                    <div class="flex gap-4 py-3 px-2 flex-1 min-w-0 min-h-0 [background:linear-gradient(0deg,rgba(255,255,255,0.9),rgba(255,255,255))] before:absolute before:content-[''] before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-r before:from-[rgba(255,68,5,0.1)] before:to-[rgba(255,255,255,0.9)] relative">
+                        <div class="relative w-full flex items-start gap-4">
+                            <div class="relative">
+                                <div class="flex justify-center items-center w-10 h-10 relative rounded-lg bg-[#22CCEE]/10 bg-center bg-cover bg-no-repeat">
+                                    <img src="https://i.ibb.co.com/Kx9QDc68/auth-bg-compressed.webp" alt="auth-bg-compressed" class="w-full h-full object-cover rounded-lg">
+                                    <div class="absolute -bottom-2.5 -right-2.5 w-[23px] h-[22px] flex justify-center items-center rounded-lg bg-[#FF4405]">
+                                        <img src="https://i.ibb.co.com/Z6VXQMC1/alert-triangle-white.webp" alt="alert triangle white" class="h-4">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col w-full">
+                                <div class="flex justify-between items-start gap-1 pb-2">
+                                    <div class="flex flex-col gap-2 pt-1">
+                                        <h3 class="text-sm font-semibold text-[#97180C]">1 file failed to upload.</h3>
+                                    </div>
+
+                                    <!-- close-button -->
+                                    <button class="flex justify-center items-center w-6 h-6">
+                                        <img src="https://i.ibb.co.com/DfT6Sg5g/x-close.webp" alt="x close" class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(92%)_sepia(8%)_saturate(217%)_hue-rotate(178deg)_brightness(97%)_contrast(82%)]">
+                                    </button>
+                                </div>
+
+                                <div class="flex flex-col gap-2.5">
+                                    <p class="text-sm drop-shadow-[0px_0px_10px_-34px_#0000001A] text-black">Failed to upload ‘xyz.mp3’. Please check your file size and type.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- nav -->
             <div class="flex flex-col gap-4 px-4 py-2 w-full h-max bg-[linear-gradient(0deg,rgba(234,236,240,0.9),rgba(234,236,240,0.9)),linear-gradient(0deg,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0)_100%)] relative md:[background:transparent] md:py-6 xl:px-10 xl:pt-10 xl:[background:linear-gradient(90deg,rgba(255,255,255,0.3)_0%,rgba(255,255,255,0)_8%)]">
                 <!-- blur-overlay -->
@@ -144,80 +180,6 @@
 
                         <!-- input-section -->
                         <div class="flex flex-col gap-4">
-                            <!-- dropdown-wrapper (profile-visibility) -->
-                            <div class="flex flex-col gap-1.5 w-full pb-1 md:absolute md:-top-[5.125rem] md:right-0 md:w-[22.5rem]">
-                                <!-- dropdown-field -->
-                                <div class="flex flex-col gap-1.5 md:items-end md:gap-1">
-                                    <label for="profile-visibility" class="text-sm font-medium text-[#667085] md:text-[#0C111D] dark:text-[#9e9589] md:dark:text-[#dbd8d3]">
-                                        Profile Visibility
-                                    </label>
-
-                                    <!-- select-dropdown -->
-                                    <div class="select-dropdown relative flex w-full">
-                                        <div class="dropdown-select w-full cursor-pointer border-none">
-                                            <div class="dash-select__trigger w-full h-12 flex items-center gap-2 py-2 px-3.5 rounded-t-sm border-b border-[#D0D5DD] bg-white/50 shadow-[0_1px_2px_0_#1018280D] md:rounded-[0.3125rem] dark:bg-[#181a1b]/50 dark:border-[#4a5568]">
-                                                <span class="text-base flex-grow text-[#0C111D] capitalize text-balance dark:text-[#dbd8d3]">
-                                                Everyone
-                                                </span>
-                                                <img class="select-arrow h-6 w-6 transition-transform duration-200 [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(6%)_saturate(1597%)_hue-rotate(183deg)_brightness(91%)_contrast(76%)]"
-                                                src="https://i.ibb.co.com/jkt6FN7G/chevron-down.webp" alt="chevron down" />
-                                            </div>
-                                            <div class="dash-options-container max-md:!fixed max-md:!bottom-0 max-md:!top-auto max-md:!shadow-[0px_-2px_4px_0px_#0000001A] absolute left-auto right-0 top-[calc(100%+0.5rem)] z-[9999] w-full origin-top scale-95 opacity-0 backdrop-blur-[25px] shadow-lg rounded-lg transition-[opacity,transform] duration-200 ease-out [transform-origin:50%_0] h-0 overflow-hidden pointer-events-none md:rounded-[0.3125rem]">
-                                                <div class="rounded-lg border border-[rgba(186,188,203,0.5)] bg-white/50 dark:border-[rgba(61,71,73,0.5)] dark:bg-[#181a1b]/50">
-                                                    <div data-value="everyone" class="option flex flex-col justify-center items-center gap-1 group [&.selected]:bg-[#EAECF0] hover:bg-white md:items-start md:border-b md:border-[#EAECF0] dark:hover:bg-[#181a1b] dark:[&.selected]:bg-[#222526] md:dark:border-[#222526]">
-                                                        <div class="option-inner-container flex flex-col justify-center items-center gap-1 flex-1 px-4 py-2.5 md:items-start md:py-4">
-                                                            <span class="text-base font-medium capitalize text-balance text-[#344054] group-[.selected]:font-semibold dark:text-[#bdb8af]">Everyone</span>
-                                                            <p class="text-xs leading-normal text-[#667085] dark:text-[#9e9589]">Your profile link will be visible to everyone.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div data-value="models-only" class="option flex flex-col justify-center items-center gap-1 group [&.selected]:bg-[#EAECF0] hover:bg-white md:items-start md:border-b md:border-[#EAECF0] dark:hover:bg-[#181a1b] dark:[&.selected]:bg-[#222526] md:dark:border-[#222526]">
-                                                        <div class="option-inner-container flex flex-col justify-center items-center gap-1 flex-1 px-4 py-2.5 md:items-start md:py-4">
-                                                            <span class="text-base font-medium capitalize text-balance text-[#344054] group-[.selected]:font-semibold dark:text-[#bdb8af]">Models Only</span>
-                                                            <p class="text-xs leading-normal text-[#667085] dark:text-[#9e9589]">Your profile link will be accessible only to Fansocial users with model accounts and will not be visible to other users.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div data-value="fans-only" class="option flex flex-col justify-center items-center gap-1 group [&.selected]:bg-[#EAECF0] hover:bg-white md:items-start md:border-b md:border-[#EAECF0] dark:hover:bg-[#181a1b] dark:[&.selected]:bg-[#222526] md:dark:border-[#222526]">
-                                                        <div class="option-inner-container flex flex-col justify-center items-center gap-1 flex-1 px-4 py-2.5 md:items-start md:py-4">
-                                                            <span class="text-base font-medium capitalize text-balance text-[#344054] group-[.selected]:font-semibold dark:text-[#bdb8af]">Fans Only</span>
-                                                            <p class="text-xs leading-normal text-[#667085] dark:text-[#9e9589]">Your profile link will be accessible only to Fansocial users with fan accounts and will not be visible to other users.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div data-value="registered-user-only" class="option flex flex-col justify-center items-center gap-1 group [&.selected]:bg-[#EAECF0] hover:bg-white md:items-start md:border-b md:border-[#EAECF0] dark:hover:bg-[#181a1b] dark:[&.selected]:bg-[#222526] md:dark:border-[#222526]">
-                                                        <div class="option-inner-container flex flex-col justify-center items-center gap-1 flex-1 px-4 py-2.5 md:items-start md:py-4">
-                                                            <span class="text-base font-medium capitalize text-balance text-[#344054] group-[.selected]:font-semibold dark:text-[#bdb8af]">Registered User Only</span>
-                                                            <p class="text-xs leading-normal text-[#667085] dark:text-[#9e9589]">Your profile link will be accessible only to logged-in Fansocial users and will not be visible to others.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div data-value="nobody" class="option flex flex-col justify-center items-center gap-1 group [&.selected]:bg-[#EAECF0] hover:bg-white md:items-start md:border-b md:border-[#EAECF0] dark:hover:bg-[#181a1b] dark:[&.selected]:bg-[#222526] md:dark:border-[#222526]">
-                                                        <div class="option-inner-container flex flex-col justify-center items-center gap-1 flex-1 px-4 py-2.5 md:items-start md:py-4">
-                                                            <span class="text-base font-medium capitalize text-balance text-[#344054] group-[.selected]:font-semibold dark:text-[#bdb8af]">Nobody</span>
-                                                            <p class="text-xs leading-normal text-[#667085] dark:text-[#9e9589]">Your profile link will remain completely private and inaccessible to anyone.</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <select class="dash-real-select hidden" name="dropdown-select" required>
-                                            <option value="everyone">
-                                                Everyone
-                                            </option>
-                                            <option value="models-only">
-                                                Models Only
-                                            </option>
-                                            <option value="fans-only">
-                                                Fans Only
-                                            </option>
-                                            <option value="registered-user-only">
-                                                Registered User Only
-                                            </option>
-                                            <option value="nobody">
-                                                Nobody
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- input-group -->
                             <div class="flex flex-col gap-4 sm:flex-row">
                                 <!-- input-container -->
@@ -586,7 +548,7 @@
                                 <div class="flex flex-col gap-4 lg:flex-row-reverse">
                                     <!-- upload-container -->
                                     <div data-media-upload="" class="cursor-pointer border-2 border-transparent bg-[rgba(0,0,0,0.05)] rounded-xl relative h-[12.5rem] w-full flex flex-col items-center justify-center hover:border-[#0c111d] dark:bg-[#181a1b]/5 dark:hover:border-[#857c6d] hover:bg-[rgba(0,0,0,0.10)] dark:hover:bg-[rgba(0,0,0,0.05)] group/upload sm:h-[13.3125rem] lg:w-1/2">
-                                        <div data-media-upload-input-wrap="" class="gap-3 w-full flex flex-col justify-center items-center px-6 py-4 self-stretch border-2 border-dashed border-transparent">
+                                        <div data-media-upload-input-wrap="" class="hidden gap-3 w-full flex flex-col justify-center items-center px-6 py-4 self-stretch border-2 border-dashed border-transparent">
                                             <div class="flex justify-center items-center w-10 h-10 rounded-lg shadow-[0px_1px_2px_0px_#1018280D] bg-[#07F468] group-hover/upload:bg-[#0C111D] dark:bg-[#06c454] dark:group-hover/upload:bg-[#162036]">
                                                 <img src="https://i.ibb.co.com/9JDWMW1/upload-03.webp" alt="upload 03" class="w-5 h-5 [filter:brightness(0)] group-hover/upload:[filter:brightness(0)_saturate(100%)_invert(65%)_sepia(22%)_saturate(4910%)_hue-rotate(97deg)_brightness(113%)_contrast(94%)]">
                                             </div>
@@ -596,7 +558,7 @@
                                             </div>
                                         </div>
 
-                                        <div data-uploaded-media-container="" class="hidden flex flex-col gap-1 px-2 pt-2 pb-12 w-full h-full">
+                                        <div data-uploaded-media-container="" class="flex flex-col gap-1 px-2 pt-2 pb-12 w-full h-full">
                                             <div class="flex flex-col w-full overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none]">
                                                 <!-- media-item -->
                                                 <div class="flex justify-between items-center gap-2 h-12 min-h-[3rem] px-2 py-1 border-b border-[#D0D5DD] dark:border-[#3b4043]">
@@ -677,7 +639,7 @@
                                         </div>
 
                                         <!-- Add Tier Button -->
-                                        <button class="hidden absolute -right-0.5 -bottom-0.5 w-max [clip-path:polygon(8%_0,_100%_0,_105%_105%,_0_105%)] group flex items-center justify-center gap-[0.625rem] py-1 pl-[1.4rem] pr-2 rounded-br-xl bg-black hover:bg-[#07f468] cursor-pointer">
+                                        <button class="absolute -right-0.5 -bottom-0.5 w-max [clip-path:polygon(8%_0,_100%_0,_105%_105%,_0_105%)] group flex items-center justify-center gap-[0.625rem] py-1 pl-[1.4rem] pr-2 rounded-br-xl bg-black hover:bg-[#07f468] cursor-pointer">
                                             <div class="flex items-center justify-center gap-2.5">
                                                 <img src="https://i.ibb.co.com/LzBLyfyn/upload-01.webp" alt="upload-01"
                                                     class="[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)] w-6 h-6 group-hover:filter-none"
@@ -697,7 +659,7 @@
                                     </div>
 
                                     <!-- upload-container -->
-                                    <div class="hidden relative flex flex-col gap-6 h-[12.5rem] rounded-xl cursor-pointer sm:h-[13.3125rem] lg:w-1/2">
+                                    <div class="relative flex flex-col gap-6 h-[12.5rem] rounded-xl cursor-pointer sm:h-[13.3125rem] lg:w-1/2">
                                         <!-- dashed border -->
                                         <svg class="absolute inset-0 w-full h-full pointer-events-none">
                                             <rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="12" ry="12" fill="none" stroke="#D0D5DD" stroke-width="1" stroke-dasharray="4 4"
@@ -709,138 +671,6 @@
                                         <div class="flex flex-col gap-6 h-full justify-center items-center">
                                             <img src="https://i.ibb.co.com/9Hm4KHzN/Images.webp" alt="Images" class="w-16 h-16">
                                             <p class="text-xs leading-normal text-[#667085] dark:text-[#9e9589]">Upload your first piece and watch yourself shine!</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- uploaded-gallery-grid-container -->
-                                    <div data-uploaded-grid-container class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:w-1/2">
-                                        <!-- uploaded-media -->
-                                        <div data-uploaded-media draggable="true" class="flex justify-center items-center relative rounded-sm overflow-hidden w-full aspect-[1.9886] bg-white/50 cursor-pointer lg:h-[6.40625rem] lg:aspect-[unset] dark:bg-[#181a1b]/50">
-                                            <!-- uploaded-image -->
-                                            <div class="flex justify-center items-center w-full h-full">
-                                                <img data-upload-image src="https://i.ibb.co.com/Kx9QDc68/auth-bg-compressed.webp" alt="auth-bg-compressed" class="w-full h-full object-cover">
-                                            </div>
-                                            <!-- delete-button -->
-                                            <div data-delete-button class="flex justify-center items-center absolute top-0 right-0 z-[3] w-6 h-6 group/button cursor-pointer bg-[#ff4405] hover:bg-[#ff692e]">
-                                                <img src="https://i.ibb.co.com/j9XG8FWR/close-button.webp" alt="close button" class="w-5 h-5 [filter:brightness(100)_saturate(0)]"/>
-                                            </div>
-                                            <!-- media-type-container -->
-                                            <div class="absolute bottom-0 left-0 flex justify-center items-center z-[3]">
-                                                <!-- image-tag -->
-                                                <div data-image-tag class="flex justify-center items-center gap-[0.1875rem] h-5 px-1 bg-[rgba(48,52,55,.7)] dark:bg-[rgba(31,44,63,0.50)]">
-                                                    <span class="text-xs leading-normal tracking-[0.008rem] text-white dark:text-[#e8e6e3]">Image</span>
-                                                    <img src="https://i.ibb.co.com/nN9TqnGb/image-03.webp" alt="image 03" class="w-4 h-4" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- uploaded-media -->
-                                        <div data-uploaded-media draggable="true" class="flex justify-center items-center relative rounded-sm overflow-hidden w-full aspect-[1.9886] bg-white/50 cursor-pointer lg:h-[6.40625rem] lg:aspect-[unset] dark:bg-[#181a1b]/50">
-                                            <!-- uploaded-image -->
-                                            <div class="flex justify-center items-center w-full h-full">
-                                                <video data-upload-video
-                                                    class="w-full h-full object-cover"
-                                                    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-                                                ></video>
-                                            </div>
-                                            <!-- delete-button -->
-                                            <div data-delete-button class="flex justify-center items-center absolute top-0 right-0 z-[3] w-6 h-6 group/button cursor-pointer bg-[#ff4405] hover:bg-[#ff692e]">
-                                                <img src="https://i.ibb.co.com/j9XG8FWR/close-button.webp" alt="close button" class="w-5 h-5 [filter:brightness(100)_saturate(0)]"/>
-                                            </div>
-                                            <!-- media-type-container -->
-                                            <div class="absolute bottom-0 left-0 flex justify-center items-center z-[3]">
-                                                <!-- video-tag -->
-                                                <div data-video-tag class="flex justify-center items-center gap-[0.1875rem] px-1 h-5 bg-[rgba(48,52,55,.7)] dark:bg-[rgba(31,44,63,0.50)]">
-                                                    <span class="text-xs text-white leading-normal tracking-[0.008rem] dark:text-[#e8e6e3]">Video</span>
-                                                    <img src="https://i.ibb.co.com/wN978Hjm/video.webp" alt="video" class="w-4 h-4" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- uploaded-media -->
-                                        <div data-uploaded-media draggable="true" class="flex justify-center items-center relative rounded-sm overflow-hidden w-full aspect-[1.9886] bg-white/50 cursor-pointer lg:h-[6.40625rem] lg:aspect-[unset] dark:bg-[#181a1b]/50">
-                                            <!-- uploaded-image -->
-                                            <div class="flex justify-center items-center w-full h-full">
-                                                <img data-upload-image src="https://i.ibb.co.com/Kx9QDc68/auth-bg-compressed.webp" alt="auth-bg-compressed" class="w-full h-full object-cover">
-                                            </div>
-                                            <!-- delete-button -->
-                                            <div data-delete-button class="flex justify-center items-center absolute top-0 right-0 z-[3] w-6 h-6 group/button cursor-pointer bg-[#ff4405] hover:bg-[#ff692e]">
-                                                <img src="https://i.ibb.co.com/j9XG8FWR/close-button.webp" alt="close button" class="w-5 h-5 [filter:brightness(100)_saturate(0)]"/>
-                                            </div>
-                                            <!-- media-type-container -->
-                                            <div class="absolute bottom-0 left-0 flex justify-center items-center z-[3]">
-                                                <!-- image-tag -->
-                                                <div data-image-tag class="flex justify-center items-center gap-[0.1875rem] h-5 px-1 bg-[rgba(48,52,55,.7)] dark:bg-[rgba(31,44,63,0.50)]">
-                                                    <span class="text-xs leading-normal tracking-[0.008rem] text-white dark:text-[#e8e6e3]">Image</span>
-                                                    <img src="https://i.ibb.co.com/nN9TqnGb/image-03.webp" alt="image 03" class="w-4 h-4" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- uploaded-media -->
-                                        <div data-uploaded-media draggable="true" class="flex justify-center items-center relative rounded-sm overflow-hidden w-full aspect-[1.9886] bg-white/50 cursor-pointer lg:h-[6.40625rem] lg:aspect-[unset] dark:bg-[#181a1b]/50">
-                                            <!-- uploaded-image -->
-                                            <div class="flex justify-center items-center w-full h-full">
-                                                <video data-upload-video
-                                                    class="w-full h-full object-cover"
-                                                    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-                                                ></video>
-                                            </div>
-                                            <!-- delete-button -->
-                                            <div data-delete-button class="flex justify-center items-center absolute top-0 right-0 z-[3] w-6 h-6 group/button cursor-pointer bg-[#ff4405] hover:bg-[#ff692e]">
-                                                <img src="https://i.ibb.co.com/j9XG8FWR/close-button.webp" alt="close button" class="w-5 h-5 [filter:brightness(100)_saturate(0)]"/>
-                                            </div>
-                                            <!-- media-type-container -->
-                                            <div class="absolute bottom-0 left-0 flex justify-center items-center z-[3]">
-                                                <!-- video-tag -->
-                                                <div data-video-tag class="flex justify-center items-center gap-[0.1875rem] px-1 h-5 bg-[rgba(48,52,55,.7)] dark:bg-[rgba(31,44,63,0.50)]">
-                                                    <span class="text-xs text-white leading-normal tracking-[0.008rem] dark:text-[#e8e6e3]">Video</span>
-                                                    <img src="https://i.ibb.co.com/wN978Hjm/video.webp" alt="video" class="w-4 h-4" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- uploaded-media -->
-                                        <div data-uploaded-media draggable="true" class="flex justify-center items-center relative rounded-sm overflow-hidden w-full aspect-[1.9886] bg-white/50 cursor-pointer lg:h-[6.40625rem] lg:aspect-[unset] dark:bg-[#181a1b]/50">
-                                            <!-- uploaded-image -->
-                                            <div class="flex justify-center items-center w-full h-full">
-                                                <img data-upload-image src="https://i.ibb.co.com/Kx9QDc68/auth-bg-compressed.webp" alt="auth-bg-compressed" class="w-full h-full object-cover">
-                                            </div>
-                                            <!-- delete-button -->
-                                            <div data-delete-button class="flex justify-center items-center absolute top-0 right-0 z-[3] w-6 h-6 group/button cursor-pointer bg-[#ff4405] hover:bg-[#ff692e]">
-                                                <img src="https://i.ibb.co.com/j9XG8FWR/close-button.webp" alt="close button" class="w-5 h-5 [filter:brightness(100)_saturate(0)]"/>
-                                            </div>
-                                            <!-- media-type-container -->
-                                            <div class="absolute bottom-0 left-0 flex justify-center items-center z-[3]">
-                                                <!-- image-tag -->
-                                                <div data-image-tag class="flex justify-center items-center gap-[0.1875rem] h-5 px-1 bg-[rgba(48,52,55,.7)] dark:bg-[rgba(31,44,63,0.50)]">
-                                                    <span class="text-xs leading-normal tracking-[0.008rem] text-white dark:text-[#e8e6e3]">Image</span>
-                                                    <img src="https://i.ibb.co.com/nN9TqnGb/image-03.webp" alt="image 03" class="w-4 h-4" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- uploaded-media -->
-                                        <div data-uploaded-media draggable="true" class="flex justify-center items-center relative rounded-sm overflow-hidden w-full aspect-[1.9886] bg-white/50 cursor-pointer lg:h-[6.40625rem] lg:aspect-[unset] dark:bg-[#181a1b]/50">
-                                            <!-- uploaded-image -->
-                                            <div class="flex justify-center items-center w-full h-full">
-                                                <video data-upload-video
-                                                    class="w-full h-full object-cover"
-                                                    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-                                                ></video>
-                                            </div>
-                                            <!-- delete-button -->
-                                            <div data-delete-button class="flex justify-center items-center absolute top-0 right-0 z-[3] w-6 h-6 group/button cursor-pointer bg-[#ff4405] hover:bg-[#ff692e]">
-                                                <img src="https://i.ibb.co.com/j9XG8FWR/close-button.webp" alt="close button" class="w-5 h-5 [filter:brightness(100)_saturate(0)]"/>
-                                            </div>
-                                            <!-- media-type-container -->
-                                            <div class="absolute bottom-0 left-0 flex justify-center items-center z-[3]">
-                                                <!-- video-tag -->
-                                                <div data-video-tag class="flex justify-center items-center gap-[0.1875rem] px-1 h-5 bg-[rgba(48,52,55,.7)] dark:bg-[rgba(31,44,63,0.50)]">
-                                                    <span class="text-xs text-white leading-normal tracking-[0.008rem] dark:text-[#e8e6e3]">Video</span>
-                                                    <img src="https://i.ibb.co.com/wN978Hjm/video.webp" alt="video" class="w-4 h-4" />
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1606,36 +1436,35 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 </script>
 
-<!-- ==================== LIGHTBOX SCRIPT ==================== -->
+<!-- handle lightbox -->
 <script>
   /**
-   * Lightbox Gallery – Fullscreen overlay for images/videos.
-   * Triggered by:
-   *   - [data-uploaded-media-fullscreen-button] inside a container
-   *   - Click on any [data-uploaded-media] container
-   * Features:
-   *   - Detects media type (image/video) and toggles UI accordingly
-   *   - Locks background scroll while open
-   *   - Closes via close button, backdrop click, or Escape key
+   * Lightbox Gallery – Displays images and videos in a fullscreen overlay.
+   * - Opens when clicking any element with [data-uploaded-media-fullscreen-button].
+   * - Supports both images and videos, toggles UI accordingly.
+   * - Locks background scroll while open (mobile-friendly).
+   * - Closes via close button, backdrop click, or Escape key.
+   * - Videos can be played/paused using the custom play button.
    */
+
   (function() {
-    // ---------- DOM references ----------
+    // DOM elements used by the lightbox
     const lightbox = document.querySelector('[data-lightgallery-container]');
     const mediaContainer = document.querySelector('[data-lightgallery-media-container]');
-    const imageTag = lightbox.querySelector('[data-image-tag]');
-    const videoTag = lightbox.querySelector('[data-video-tag]');
+    const imageTag = document.querySelector('[data-image-tag]');
+    const videoTag = document.querySelector('[data-video-tag]');
     const videoPlayButton = document.querySelector('[data-video-play-button]');
     const closeButton = document.querySelector('[data-lightgallery-close-button]');
 
-    // Initially hide video‑specific UI (will be shown only when video is loaded)
+    // Initially hide video-related elements until a video is loaded
     if (videoTag) videoTag.classList.add('hidden');
     if (videoPlayButton) videoPlayButton.classList.add('hidden');
 
-    // States
-    let currentVideo = null;      // Reference to the currently playing video element
-    let scrollY = 0;              // Store scroll position before locking
+    let currentVideo = null; // Reference to the currently playing video, to pause/resume
 
-    // Scroll locking (prevents background scrolling on mobile)
+    // Scroll lock helpers – prevent background scrolling while lightbox is open (essential for mobile)
+    let scrollY = 0;
+
     function disableScroll() {
       scrollY = window.scrollY;
       document.body.style.position = 'fixed';
@@ -1654,190 +1483,112 @@ document.addEventListener('DOMContentLoaded', function() {
       window.scrollTo(0, scrollY);
     }
 
-    // Close lightbox
+    // Close the lightbox: hide it, restore scrolling, and pause any playing video
     function closeLightbox() {
       if (!lightbox) return;
+
       lightbox.classList.add('hidden');
       enableScroll();
+
       if (currentVideo) {
         currentVideo.pause();
         currentVideo = null;
       }
     }
 
-    // Event listeners for close button and video play button
+    // Close button listener
     if (closeButton) {
       closeButton.addEventListener('click', closeLightbox);
     }
 
+    // Play/pause toggle for video – triggered by the custom play button
     if (videoPlayButton) {
       videoPlayButton.addEventListener('click', function(e) {
-        e.stopPropagation(); // Prevent closing lightbox when clicking the button
+        e.stopPropagation(); // Prevent click from bubbling to the lightbox backdrop
         if (!currentVideo) return;
-        currentVideo.paused ? currentVideo.play() : currentVideo.pause();
+
+        if (currentVideo.paused) {
+          currentVideo.play();
+        } else {
+          currentVideo.pause();
+        }
       });
     }
 
-    // Open lightbox with a given media element (image or video)
-    function openLightboxWithMedia(mediaEl) {
-      if (!mediaEl) return;
-      const src = mediaEl.src || mediaEl.currentSrc;
-      const isVideo = mediaEl.tagName.toLowerCase() === 'video';
-
-      // Clear previous content from the lightbox container
-      mediaContainer.innerHTML = '';
-
-      if (isVideo) {
-        // Create video element and append to container
-        const video = document.createElement('video');
-        video.src = src;
-        video.className = 'w-full h-full object-cover';
-        video.loop = false;
-        video.controls = false;      // Use custom play button
-        video.playsInline = true;    // Mobile friendly
-        mediaContainer.appendChild(video);
-        currentVideo = video;
-
-        // Show video‑specific UI, hide image UI
-        if (imageTag) imageTag.classList.add('hidden');
-        if (videoTag) videoTag.classList.remove('hidden');
-        if (videoPlayButton) videoPlayButton.classList.remove('hidden');
-
-        // --- Auto‑hide play button while video is playing ---
-        function updatePlayButtonVisibility() {
-          if (video.paused) {
-            videoPlayButton.classList.remove('hidden');
-          } else {
-            videoPlayButton.classList.add('hidden');
-          }
-        }
-
-        // Listen to play/pause events to toggle the button
-        video.addEventListener('play', updatePlayButtonVisibility);
-        video.addEventListener('pause', updatePlayButtonVisibility);
-        video.addEventListener('ended', updatePlayButtonVisibility); // also show button when ended
-        // Initial state: video is paused, button should be visible
-        updatePlayButtonVisibility();
-      } else {
-        // Create image element and append
-        const img = document.createElement('img');
-        img.src = src;
-        img.alt = 'lightbox media';
-        img.className = 'w-full h-full object-cover';
-        mediaContainer.appendChild(img);
-        currentVideo = null;
-
-        // Show image UI, hide video controls
-        if (imageTag) imageTag.classList.remove('hidden');
-        if (videoTag) videoTag.classList.add('hidden');
-        if (videoPlayButton) videoPlayButton.classList.add('hidden');
-      }
-
-      // Show the lightbox overlay and lock scrolling
-      lightbox.classList.remove('hidden');
-      disableScroll();
-    }
-
-    // Trigger 1: Fullscreen button inside a media container
-    // Searches for [data-uploaded-media-fullscreen-button] and opens the media
-    // found inside its closest [data-uploaded-media-container].
+    // Open lightbox for a specific media item (image or video) when the fullscreen button is clicked
     document.querySelectorAll('[data-uploaded-media-fullscreen-button]').forEach(btn => {
       btn.addEventListener('click', function(e) {
-        e.stopPropagation(); // Prevent accidental bubbling
+        e.stopPropagation();
+
+        // Find the parent container that holds the actual media element
         const uploadedContainer = this.closest('[data-uploaded-media-container]');
         if (!uploadedContainer) return;
+
+        // Get the media element (image or video) inside that container
         const mediaEl = uploadedContainer.querySelector('img[data-upload-image], video[data-upload-video]');
-        openLightboxWithMedia(mediaEl);
+        if (!mediaEl) return;
+
+        const src = mediaEl.src || mediaEl.currentSrc;
+        const isVideo = mediaEl.tagName.toLowerCase() === 'video';
+
+        // Clear previous content from the lightbox media container
+        mediaContainer.innerHTML = '';
+
+        if (isVideo) {
+          const video = document.createElement('video');
+          video.src = src;
+          video.className = 'w-full h-full object-cover';
+          video.loop = false;
+          video.controls = false;
+          video.playsInline = true;
+
+          mediaContainer.appendChild(video);
+          currentVideo = video;
+
+          // Show video UI, hide image placeholder
+          if (imageTag) imageTag.classList.add('hidden');
+          if (videoTag) videoTag.classList.remove('hidden');
+          if (videoPlayButton) videoPlayButton.classList.remove('hidden');
+
+        } else {
+          const img = document.createElement('img');
+          img.src = src;
+          img.alt = 'lightbox media';
+          img.className = 'w-full h-full object-cover';
+
+          mediaContainer.appendChild(img);
+          currentVideo = null;
+
+          // Show image UI, hide video controls
+          if (imageTag) imageTag.classList.remove('hidden');
+          if (videoTag) videoTag.classList.add('hidden');
+          if (videoPlayButton) videoPlayButton.classList.add('hidden');
+        }
+
+        // Display the lightbox
+        lightbox.classList.remove('hidden');
+        // Prevent background scrolling while lightbox is open
+        disableScroll();
       });
     });
 
-    // Trigger 2: Click on the entire media tile (grid item)
-    // This allows opening the lightbox by clicking anywhere on the media element,
-    // except when clicking on the delete button (which has [data-delete-button]).
-    document.querySelectorAll('[data-uploaded-media]').forEach(container => {
-      container.addEventListener('click', function(e) {
-        // Ignore clicks that started on a delete button or its children
-        if (e.target.closest('[data-delete-button]')) return;
-
-        const mediaEl = this.querySelector('img[data-upload-image], video[data-upload-video]');
-        openLightboxWithMedia(mediaEl);
-      });
-    });
-
-    // Close on backdrop click (click on the overlay itself)
+    // Close lightbox when clicking on the backdrop (the lightbox container itself)
     if (lightbox) {
       lightbox.addEventListener('click', function(e) {
-        if (e.target === lightbox) closeLightbox();
+        if (e.target === lightbox) {
+          closeLightbox();
+        }
       });
     }
 
-    // Close on Escape key
+    // Optional: close lightbox with the Escape key
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeLightbox();
-    });
-  })();
-</script>
-
-<!-- ==================== DRAG & DROP REORDERING SCRIPT ==================== -->
-<script>
-  /**
-   * Drag and drop reordering for media tiles inside a grid container.
-   * Allows users to rearrange items by dragging and dropping.
-   * Target container: [data-uploaded-grid-container] containing [data-uploaded-media] children.
-   */
-  const grid = document.querySelector('[data-uploaded-grid-container]');
-
-  let dragSrc = null; // Holds the element being dragged
-
-  // Drag event handlers
-  function handleDragStart(e) {
-    dragSrc = this;
-    e.dataTransfer.effectAllowed = 'move';
-    this.classList.add('dragging');
-  }
-
-  function handleDragEnd(e) {
-    this.classList.remove('dragging');
-    document.querySelectorAll('[data-uploaded-media]').forEach(i => i.classList.remove('drag-over'));
-  }
-
-  function handleDragOver(e) {
-    e.preventDefault();
-    if (dragSrc !== this) this.classList.add('drag-over');
-  }
-
-  function handleDragLeave(e) {
-    this.classList.remove('drag-over');
-  }
-
-  function handleDrop(e) {
-    e.preventDefault();
-    this.classList.remove('drag-over');
-
-    // Only swap if contains a valid source and the target is different
-    if (dragSrc && dragSrc !== this) {
-      const parent = this.parentNode;
-      const children = Array.from(parent.children);
-      const srcIndex = children.indexOf(dragSrc);
-      const targetIndex = children.indexOf(this);
-
-      // Swap DOM positions: insert source before or after target depending on index
-      if (srcIndex < targetIndex) {
-        parent.insertBefore(dragSrc, this.nextSibling);
-      } else {
-        parent.insertBefore(dragSrc, this);
+      if (e.key === 'Escape') {
+        closeLightbox();
       }
-    }
-  }
+    });
 
-  // Attach drag & drop event listeners to all media tiles
-  document.querySelectorAll('[data-uploaded-media]').forEach(item => {
-    item.addEventListener('dragstart', handleDragStart);
-    item.addEventListener('dragend', handleDragEnd);
-    item.addEventListener('dragover', handleDragOver);
-    item.addEventListener('dragleave', handleDragLeave);
-    item.addEventListener('drop', handleDrop);
-  });
+  })();
 </script>
 </body>
 </html>

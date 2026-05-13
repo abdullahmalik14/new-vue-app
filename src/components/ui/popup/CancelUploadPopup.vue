@@ -17,14 +17,14 @@
             @click="emit('update:modelValue', false)"
             class="w-full h-10 flex justify-center items-center bg-transparent"
           >
-            <span class="text-base font-medium text-[#FF4405]">Cancel</span>
+            <span class="text-base font-medium text-[#FF4405]">No</span>
           </button>
 
           <button
             @click="handleDelete"
             class="w-full h-10 flex justify-center items-center bg-[#FF4405] hover:bg-[#ff692e]"
           >
-            <span class="text-base font-medium text-white">Cancel</span>
+            <span class="text-base font-medium text-white">Confirm</span>
           </button>
         </div>
       </div>

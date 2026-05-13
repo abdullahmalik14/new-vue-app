@@ -137,7 +137,6 @@ import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWra
     <UploadingProgressBar :progress="uploadPercentage" imageSrc="https://i.ibb.co.com/Kx9QDc68/auth-bg-compressed.webp"
       label="Uploading..." />
     <br />
-    <AvatarMenu />
 
     <br />
     <div class="flex flex-col items-center gap-6 md:gap-8">
@@ -243,7 +242,6 @@ import ProfileMediaDetailsPopup from "@/components/ui/popup/ProfileMediaDetailsP
 import AvatarUploadPopup from "@/components/ui/popup/AvatarUploadPopup.vue";
 import { onMounted, ref } from "vue";
 import ImageCropperModal from "@/components/ui/popup/ImageCropperModal.vue";
-import AvatarMenu from "@/components/AvatarMenu.vue";
 import CancelUploadPopup from "@/components/ui/popup/CancelUploadPopup.vue";
 import UploadingProgressBar from "@/components/UploadingProgressBar.vue";
 import BuyNowLoginPopup from "@/components/ui/popup/buyNow/BuyNowLoginPopup.vue";

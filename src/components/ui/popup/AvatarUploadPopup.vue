@@ -11,7 +11,7 @@
               Choose Avatar
             </h1>
             <img
-              @click="emit('update:modelValue', false)"
+              @click="handleCancel"
               src="https://i.ibb.co.com/zWwvfc1B/close-btn.webp"
               alt="close-btn"
               class="w-6 h-6 cursor-pointer hover:opacity-80 dark:[filter:brightness(0)_invert(100%)]"
@@ -70,10 +70,10 @@
           </div>
 
           <div class="flex justify-between items-center gap-4 p-4">
-            <button @click="emit('update:modelValue', false)" class="w-full h-10 flex justify-center items-center px-2 py-1 cursor-pointer">
+            <button @click="handleCancel" class="w-full h-10 flex justify-center items-center px-2 py-1 cursor-pointer">
               <span class="text-lg font-medium text-[#0C111D] dark:text-text">CANCEL</span>
             </button>
-            <button class="w-full h-10 flex justify-center items-center bg-black dark:bg-background-dark-app px-2 py-1 group/button cursor-pointer hover:bg-[#07F468] dark:hover:bg-[#07F468]">
+            <button @click="saveSelection" class="w-full h-10 flex justify-center items-center bg-black dark:bg-background-dark-app px-2 py-1 group/button cursor-pointer hover:bg-[#07F468] dark:hover:bg-[#07F468]">
               <span class="text-lg font-medium text-[#07F468] group-hover/button:text-black">SAVE</span>
             </button>
           </div>
@@ -91,11 +91,23 @@ import BackgroundSelector from "@/components/BackgroundSelector.vue";
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "save", "cancel"]);
 
 // --- Data ---
 const selectedAvatarId = ref(1);
 const selectedBgId = ref(106);
+
+const handleCancel = () => {
+  emit('cancel');
+};
+
+const saveSelection = () => {
+  emit('save', {
+    src: currentAvatarSrc.value,
+    bgColor: currentBgColor.value
+  });
+  emit('update:modelValue', false);
+};
 
 // --- Row 1 Data ---
 const avatarListRow1 = [
@@ -162,7 +174,7 @@ const avatarPopupConfig = {
   speed: "250ms",
   effect: "ease-in-out",
   showOverlay: false,
-  closeOnOutside: true,
+  closeOnOutside: false,
   lockScroll: false,
   escToClose: true,
   width: { default: "90%", "<768": "100%" },

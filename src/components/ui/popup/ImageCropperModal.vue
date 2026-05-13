@@ -15,7 +15,7 @@
             Crop photo
           </h1>
           <img
-            @click="closeModal"
+            @click="handleCancel"
             src="https://i.ibb.co.com/zWwvfc1B/close-btn.webp"
             alt="close-btn"
             class="w-6 h-6
@@ -130,7 +130,7 @@
 
         <div class="flex justify-between items-center gap-4 p-4">
           <button
-            @click="closeModal"
+            @click="handleCancel"
             class="w-full h-10 flex justify-center items-center px-2 py-1 cursor-pointer hover:bg-gray-200 rounded transition-colors"
           >
             <span class="text-lg font-medium text-[#0C111D] dark:text-text"
@@ -164,8 +164,8 @@ const props = defineProps({
   modelValue: { type: Boolean, default: false },
 });
 
-// CHANGE 1: Added "save" to emits
-const emit = defineEmits(["update:modelValue", "save"]);
+// CHANGE 1: Added "save" and "cancel" to emits
+const emit = defineEmits(["update:modelValue", "save", "cancel"]);
 
 const zoomValue = ref(25);
 const rotateValue = ref(50);
@@ -208,6 +208,10 @@ const adjustRotate = (amount) => {
   rotateValue.value = newValue;
 };
 
+const handleCancel = () => {
+  emit('cancel');
+};
+
 // CHANGE 2: Helper function to close modal
 const closeModal = () => {
   emit("update:modelValue", false);
@@ -232,7 +236,7 @@ const imageCropConfig = {
   speed: "250ms",
   effect: "ease-in-out",
   showOverlay: false,
-  closeOnOutside: true,
+  closeOnOutside: false,
   lockScroll: false,
   escToClose: true,
   width: { default: "360px", "<768": "100%" },

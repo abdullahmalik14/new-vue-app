@@ -1176,12 +1176,6 @@
     "supportedRoles": ["all"]
   },
   {
-    "slug": "/edit-profile",
-    "componentPath": "@/templates/editProfile/EditProfile.vue",
-    "requiresAuth": false,
-    "supportedRoles": ["all"]
-  },
-  {
     "slug": "/plan",
     "componentPath": "@/components/ui/global/plan/Plan.vue",
     "requiresAuth": false,
@@ -1196,7 +1190,7 @@
     "componentPath": "@/components/dropdownHandler/demo/DemoDropdowns.vue"
   },
   {
-    "slug": "/edit-profile-page",
+    "slug": "/dashboard/edit-profile",
     "componentPath": "@/templates/editProfile/EditProfilePage.vue",
     "requiresAuth": false,
     "supportedRoles": ["all"]

@@ -1,8 +1,9 @@
 <template>
+    <DashboardWrapperTwoColContainer>
  
-<div class="bg-[#EAECF0] font-sans p-0 m-0 box-border overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] [&.dark]:bg-[#222526]" @click="closeDropdowns">
+<div @click="closeDropdowns">
     <!-- main-wrapper -->
-    <div class="relative before:content-[''] before:fixed before:top-0 before:left-0 before:w-full before:h-screen before:pointer-events-none before:bg-cover before:bg-center before:bg-no-repeat before:bg-[url('https://i.ibb.co.com/QvpHN5vD/mobile-gradient-main-bg-1.webp')] before:z-[-1] sm:before:bg-[url('https://i.ibb.co.com/dw910Z5b/gradient-main-bg.webp')]">
+    <div class="relative">
         <!-- container -->
         <div data-container class="flex flex-col min-h-screen z-[0]">
             <!-- notification -->
@@ -14,12 +15,23 @@
                 description="You have made changes to your profile since your last saved. Remember to click ‘SAVE’ to publish your changes."
                 icon="https://i.ibb.co.com/ksz4bh87/smiley-face.webp"
                 badgeIcon="https://i.ibb.co.com/Tqx4sFpx/info-square.webp"
-                :closable="true"
+                />
+        </div>
+
+        <!-- Gallery Upload Notification -->
+        <div class="fixed right-2 top-2 w-[calc(100%-1rem)] h-max z-[101] sm:w-[30rem]">
+            <NotificationCard 
+                v-model="isGalleryNotificationOpen"
+                :variant="galleryNotificationConfig.variant"
+                :title="galleryNotificationConfig.title"
+                :description="galleryNotificationConfig.description"
+                :icon="galleryNotificationConfig.icon"
+                :badgeIcon="galleryNotificationConfig.badgeIcon"
             />
         </div>
 
         <!-- nav -->
-            <div class="flex flex-col gap-4 px-4 py-2 w-full h-max bg-[linear-gradient(0deg,rgba(234,236,240,0.9),rgba(234,236,240,0.9)),linear-gradient(0deg,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0)_100%)] relative md:[background:transparent] md:py-6 xl:px-10 xl:pt-10 xl:[background:linear-gradient(90deg,rgba(255,255,255,0.3)_0%,rgba(255,255,255,0)_8%)]">
+            <div class="flex flex-col gap-4 px-4 py-2 w-full h-max relative md:py-6 xl:px-10 xl:pt-10 ">
                 <!-- blur-overlay -->
                 <div class="absolute inset-0 w-full h-full backdrop-blur-[5px] pointer-events-none z-[-1] md:backdrop-blur-[25px]"></div>
                 
@@ -97,7 +109,7 @@
             </div>
 
             <!-- content-container -->
-            <div class="flex flex-col gap-6 py-6 sm:pt-10 md:gap-8 md:pt-[6.25rem] md:px-4 lg:pt-[5.75rem] lg:pb-6 xl:px-10 xl:pt-24 xl:[background:linear-gradient(90deg,rgba(255,255,255,0.3)_0%,rgba(255,255,255,0)_8%)]">
+            <div class="flex flex-col gap-6 py-6 sm:pt-10 md:gap-8 md:pt-[6.25rem] md:px-4 lg:pt-[5.75rem] lg:pb-6 xl:px-10 xl:pt-24 ">
                 <!-- user-info-section -->
                 <div class="flex flex-col items-center md:items-start">
                     <!-- form-section -->
@@ -105,14 +117,70 @@
                         <!-- avatar-container -->
                         <div class="absolute -top-14 left-0 right-0 mx-auto flex justify-center items-center w-max z-[1] md:-top-[7.75rem] md:right-auto md:pl-8 lg:pl-10 xl:-top-32 xl:pl-[1.09375rem]">
                             <!-- avatar -->
-                            <div class="flex justify-center items-center w-[7.5rem] h-[7.5rem] rounded-full bg-[#F04CC9] shadow-[0px_0px_10px_-34px_#0000001A] md:w-[10.6875rem] md:h-[10.6875rem] xl:w-[12.1875rem] xl:h-[12.1875rem]">
-                                <span class="text-[3.66rem] leading-[4.577rem] font-bold tracking-[-0.073rem] text-white md:text-[5.218rem] md:leading-[6.522rem] md:tracking-[-0.10435rem] xl:text-[5.95rem] xl:leading-[7.4375rem] xl:tracking-[-0.119rem] dark:text-[#e8e6e3]">CP</span>
+                            <div 
+                                class="flex justify-center items-center w-[7.5rem] h-[7.5rem] rounded-full shadow-[0px_0px_10px_-34px_#0000001A] md:w-[10.6875rem] md:h-[10.6875rem] xl:w-[12.1875rem] xl:h-[12.1875rem] overflow-hidden"
+                                :style="{ backgroundColor: profileData.profileImageBg || '#F04CC9' }"
+                            >
+                                <UploadingProgressBar 
+                                    v-if="isUploading"
+                                    :progress="uploadProgress"
+                                    :imageSrc="tempUploadSrc"
+                                />
+                                <template v-else>
+                                    <img 
+                                        v-if="profileData.profileImageUrl" 
+                                        :src="profileData.profileImageUrl" 
+                                        :style="profileData.profileImageStyle"
+                                        class="w-full h-full object-cover transition-transform duration-200"
+                                    >
+                                    <span v-else class="text-[3.66rem] leading-[4.577rem] font-bold tracking-[-0.073rem] text-white md:text-[5.218rem] md:leading-[6.522rem] md:tracking-[-0.10435rem] xl:text-[5.95rem] xl:leading-[7.4375rem] xl:tracking-[-0.119rem] dark:text-[#e8e6e3]">CP</span>
+                                </template>
                             </div>
 
                             <!-- edit-button -->
-                            <button class="absolute bottom-0 right-0 flex justify-center items-center w-10 h-10 p-2 bg-[#07F468] rounded-full md:w-12 md:h-12 md:p-2.5 dark:bg-[#06c454]">
+                            <button @click.stop="toggleEditMenu" class="absolute bottom-0 right-0 flex justify-center items-center w-10 h-10 p-2 bg-[#07F468] rounded-full md:w-12 md:h-12 md:p-2.5 dark:bg-[#06c454]">
                                 <img src="https://i.ibb.co.com/wZgQbKp9/svgviewer-png-output-49.webp" alt="edit" class="w-full h-full"/>
                             </button>
+
+                            <!-- edit-menu -->
+                            <div v-show="isEditMenuOpen" class="absolute top-[calc(100%+0.5rem)] right-0 z-[10] min-[600px]:right-auto min-[600px]:left-0">
+                                <EditProfileMenu 
+                                    :hasImage="!!profileData.profileImageUrl" 
+                                    @upload-new="triggerFileUpload"
+                                    @edit="openCropper"
+                                    @choose-avatar="openAvatarPopup"
+                                />
+                            </div>
+
+                            <!-- Avatar Upload Popup -->
+                            <AvatarUploadPopup 
+                                v-model="showAvatarPopup"
+                                @save="handleAvatarSave"
+                                @cancel="handleCancelAttempt('avatar')"
+                            />
+
+                            <!-- Image Cropper Modal -->
+                            <ImageCropperModal 
+                                v-model="showCropper"
+                                :imageSrc="profileData.profileImageUrl"
+                                @save="handleCropSave"
+                                @cancel="handleCancelAttempt('cropper')"
+                            />
+
+                            <!-- Cancel Upload Popup -->
+                            <CancelUploadPopup 
+                                v-model="showCancelPopup"
+                                @delete="confirmCancel"
+                            />
+
+                            <!-- hidden file input -->
+                            <input 
+                                type="file" 
+                                ref="fileInput" 
+                                class="hidden" 
+                                accept="image/*"
+                                @change="handleFileChange"
+                            />
                         </div>
                         
                         <!-- blur-overlay -->
@@ -334,30 +402,13 @@
                                 </section>
 
                                 <!-- upload-section -->
-                                <div class="flex flex-col gap-4 lg:flex-row-reverse transition-opacity duration-300" :class="{ 'pointer-events-none opacity-50': !isPremiumVideoUnlocked }">
-                                    <!-- upload-container -->
-                                    <ThumbnailUploader
-                                        :uploader="galleryUploader"
-                                        title="Click to upload"
-                                        subtitle="or drag and drop image or video files here"
-                                        fileInfo="MP4, AVI, QUICKTIME, X-MATROSKA, X-MS-WMV, WEBM, OGG, PNG or JPG (max. 15MB)"
-                                        wrapperClass="cursor-pointer border-2 border-transparent bg-[rgba(0,0,0,0.05)] rounded-xl relative h-[12.5rem] w-full flex flex-col items-center justify-center hover:border-[#0c111d] dark:bg-[#181a1b]/5 dark:hover:border-[#857c6d] hover:bg-[rgba(0,0,0,0.10)] dark:hover:bg-[rgba(0,0,0,0.05)] group/upload sm:h-[13.3125rem] lg:w-1/2"
-                                        innerWrapperClass="gap-3 w-full flex flex-col justify-center items-center px-6 py-4 self-stretch border-2 border-dashed border-transparent"
-                                        iconWrapperClass="flex justify-center items-center w-10 h-10 rounded-lg shadow-[0px_1px_2px_0px_#1018280D] bg-[#07F468] group-hover/upload:bg-[#0C111D] dark:bg-[#06c454] dark:group-hover/upload:bg-[#162036]"
-                                        iconInnerWrapperClass="contents"
-                                        titleClass="text-sm text-[#475467] dark:text-[#b1aba0]"
-                                        titleHighlightClass="text-sm font-semibold text-center text-[#0C111D] dark:text-[#dbd8d3]"
-                                        fileInfoClass="text-xs leading-normal text-[#475467] dark:text-[#b1aba0]"
+                                <div class="flex flex-col gap-4 lg:flex-row transition-opacity duration-300" :class="{ 'pointer-events-none opacity-50': !isPremiumVideoUnlocked }">
+                                    <!-- gallery-display-container (LEFT SIDE) -->
+                                    <div class="relative flex flex-col gap-6  rounded-xl  lg:w-1/2"
+                                        :class="galleryItems.length > 0 ? 'border border-[#D0D5DD] dark:border-[#3b4043]' : ''"
                                     >
-                                        <template #icon>
-                                            <img src="https://i.ibb.co.com/9JDWMW1/upload-03.webp" alt="upload 03" class="w-5 h-5 [filter:brightness(0)] group-hover/upload:[filter:brightness(0)_saturate(100%)_invert(65%)_sepia(22%)_saturate(4910%)_hue-rotate(97deg)_brightness(113%)_contrast(94%)]">
-                                        </template>
-                                    </ThumbnailUploader>
-
-                                    <!-- gallery-display-container -->
-                                    <div class="relative flex flex-col gap-6 min-h-[12.5rem] h-max rounded-xl sm:min-h-[13.3125rem] lg:w-1/2">
                                         <!-- placeholder if empty -->
-                                        <div v-if="galleryItems.length === 0" class="flex flex-col gap-6 h-full justify-center items-center py-8">
+                                        <div v-if="galleryItems.length === 0" class="flex flex-col gap-6 h-full justify-center items-center py-8 relative">
                                             <!-- dashed border -->
                                             <svg class="absolute inset-0 w-full h-full pointer-events-none">
                                                 <rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="12" ry="12" fill="none" stroke="#D0D5DD" stroke-width="1" stroke-dasharray="4 4" class="dark:stroke-[#3b4043]" />
@@ -368,7 +419,10 @@
 
                                         <!-- grid if media exists -->
                                         <div v-else class="grid grid-cols-2 gap-2 p-2 sm:grid-cols-3 h-full overflow-y-auto">
-                                            <div v-for="(item, index) in galleryItems" :key="index" class="relative group overflow-hidden h-[5.5rem] bg-black/5 dark:bg-white/5">
+                                            <div v-for="(item, index) in galleryItems" :key="index" 
+                                                class="relative group overflow-hidden h-[5.5rem] bg-black/5 dark:bg-white/5 border border-[#eaecf0] dark:border-[#2d3748] cursor-pointer"
+                                                @click="openGalleryLightbox(item)"
+                                            >
                                                 <video v-if="item.type?.startsWith('video/')" :src="item.url" class="w-full h-full object-cover"></video>
                                                 <img v-else :src="item.url" class="w-full h-full object-cover">
                                                 
@@ -381,10 +435,88 @@
                                                 </div>
                                                 
                                                 <!-- delete-button (cross) -->
-                                                <div @click="removeGalleryItem(index)" class="flex justify-center items-center absolute top-0 right-0 z-[3] w-5 h-5 cursor-pointer bg-[#ff4405] hover:bg-[#ff692e]">
+                                                <div @click.stop="removeGalleryItem(index)" class="flex justify-center items-center absolute top-0 right-0 z-[3] w-5 h-5 cursor-pointer bg-[#ff4405] hover:bg-[#ff692e]">
                                                     <img src="https://i.ibb.co.com/W4TXDR0j/x-close.webp" alt="x-close" class="w-3.5 h-3.5 [filter:brightness(100)_saturate(0)]"/>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- upload-container (RIGHT SIDE) -->
+                                    <div class="lg:w-1/2">
+                                        <div data-media-upload="" 
+                                            class="cursor-pointer border-2 border-transparent bg-[rgba(0,0,0,0.05)] rounded-xl relative h-[12.5rem] w-full flex flex-col items-center justify-center hover:border-[#0c111d] dark:bg-[#181a1b]/5 dark:hover:border-[#857c6d] hover:bg-[rgba(0,0,0,0.10)] dark:hover:bg-[rgba(0,0,0,0.05)] group/upload sm:h-[13.3125rem]"
+                                            @click="!isGalleryUploading && $refs.galleryInputManual.click()"
+                                        >
+                                            <!-- input-wrap -->
+                                            <div v-show="stagedGalleryItems.length === 0 && !isGalleryUploading" data-media-upload-input-wrap="" class="gap-3 w-full flex flex-col justify-center items-center px-6 py-4 self-stretch border-2 border-dashed border-transparent">
+                                                <div class="flex justify-center items-center w-10 h-10 rounded-lg shadow-[0px_1px_2px_0px_#1018280D] bg-[#07F468] group-hover/upload:bg-[#0C111D] dark:bg-[#06c454] dark:group-hover/upload:bg-[#162036]">
+                                                    <img src="https://i.ibb.co.com/9JDWMW1/upload-03.webp" alt="upload 03" class="w-5 h-5 [filter:brightness(0)] group-hover/upload:[filter:brightness(0)_saturate(100%)_invert(65%)_sepia(22%)_saturate(4910%)_hue-rotate(97deg)_brightness(113%)_contrast(94%)]">
+                                                </div>
+                                                <div class="flex flex-col gap-1 text-center">
+                                                    <p class="text-sm text-[#475467] dark:text-[#b1aba0]"><span class="text-sm font-semibold text-center text-[#0C111D] dark:text-[#dbd8d3]">Click to upload</span> or drag and drop image or video files here</p>
+                                                    <p class="text-xs leading-normal text-[#475467] dark:text-[#b1aba0]">MP4, AVI, QUICKTIME, X-MATROSKA, X-MS-WMV, WEBM, OGG, PNG or JPG (max. 15MB)</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- list-container -->
+                                            <div v-show="stagedGalleryItems.length > 0 && !isGalleryUploading" data-uploaded-media-container="" class="flex flex-col gap-1 px-2 pt-2 pb-12 w-full h-full overflow-hidden">
+                                                <div class="flex flex-col w-full overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+                                                    <!-- media-item -->
+                                                    <div v-for="(item, index) in stagedGalleryItems" :key="index" class="flex justify-between items-center gap-2 h-12 min-h-[3rem] px-2 py-1 border-b border-[#D0D5DD] dark:border-[#3b4043]">
+                                                        <div class="flex items-center gap-4">
+                                                            <img v-if="!item.type?.startsWith('video/')" src="https://i.ibb.co.com/Qjn50qJy/Images.webp" alt="Images" class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(5%)_sepia(8%)_saturate(6048%)_hue-rotate(189deg)_brightness(94%)_contrast(96%)]">
+                                                            <img v-else src="https://i.ibb.co.com/sdBL6k4R/video.webp" alt="video" class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(5%)_sepia(8%)_saturate(6048%)_hue-rotate(189deg)_brightness(94%)_contrast(96%)]">
+                                                            <span class="text-base font-medium tracking-[0.015rem] text-[#303437] dark:text-[#b1aba0] truncate max-w-[10rem]">{{ item.file?.name }}</span>
+                                                        </div>
+
+                                                        <button @click.stop="removeStagedGalleryItem(index)" class="flex justify-center items-center gap-0.5">
+                                                            <img src="https://i.ibb.co.com/VYYz44p3/minus-square.webp" alt="minus square" class="w-4 h-4 [filter:brightness(0)_saturate(100%)_invert(66%)_sepia(13%)_saturate(347%)_hue-rotate(179deg)_brightness(94%)_contrast(92%)]">
+                                                            <span class="text-xs leading-normal font-medium text-[#98A2B3] dark:text-[#b0a993]">remove</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- progress-container -->
+                                            <div v-show="isGalleryUploading" data-upload-progress-container="" class="flex flex-col justify-center items-center gap-1 px-6 py-4 w-full h-full">
+                                                <div class="flex flex-col justify-center items-center gap-6 w-full h-full">
+                                                    <!-- progress-bar -->
+                                                    <div data-progress-bar class="rounded-[3.125rem] overflow-hidden w-full max-w-[26.25rem] h-2 bg-[#DEE5EC] dark:bg-[#272a2c] z-0">
+                                                        <div data-progress-fill class="h-full bg-[#0c111d] dark:bg-[#162036] transition-all duration-300" :style="{ width: galleryUploadProgress + '%' }"></div>
+                                                    </div>
+
+                                                    <span class="text-sm leading-normal tracking-[-0.00875rem] text-[#0C111D] dark:text-[#dbd8d3]">Uploading...</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Add Tier Button (Upload Button) -->
+                                            <button v-show="stagedGalleryItems.length > 0 && !isGalleryUploading" 
+                                                @click.stop="startGalleryUpload"
+                                                class="absolute -right-0.5 -bottom-0.5 w-max [clip-path:polygon(8%_0,_100%_0,_105%_105%,_0_105%)] group flex items-center justify-center gap-[0.625rem] py-1 pl-[1.4rem] pr-2 rounded-br-xl bg-black hover:bg-[#07f468] cursor-pointer"
+                                            >
+                                                <div class="flex items-center justify-center gap-2.5">
+                                                    <img src="https://i.ibb.co.com/LzBLyfyn/upload-01.webp" alt="upload-01"
+                                                        class="[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)] w-6 h-6 group-hover:filter-none"
+                                                    />
+                                                    <span class="text-lg leading-7 font-medium text-[#07f468] group-hover:text-black">Upload</span>
+                                                    <div class="flex items-start h-8">
+                                                        <span class="text-[0.625rem] leading-normal text-[#07f468] group-hover:text-black">{{ stagedGalleryItems.length }}</span>
+                                                    </div>
+                                                </div>
+                                            </button>
+
+                                            <!-- cancel-button -->
+                                            <button v-show="isGalleryUploading" 
+                                                @click.stop="cancelGalleryStaging"
+                                                class="absolute right-2 bottom-2 w-max flex justify-center items-center gap-1 h-[1.125rem]"
+                                            >
+                                                <img src="https://i.ibb.co.com/j9XG8FWR/close-button.webp" alt="close button" class="w-4 h-4 [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(13%)_saturate(1332%)_hue-rotate(179deg)_brightness(94%)_contrast(87%)]">
+                                                <span class="text-xs font-medium text-[#344054] dark:text-[#bdb8af]">Cancel</span>
+                                            </button>
+
+                                            <!-- hidden file input -->
+                                            <input type="file" ref="galleryInputManual" class="hidden" multiple accept="image/*,video/*" @change="handleGalleryManualSelect">
                                         </div>
                                     </div>
                                 </div>
@@ -689,14 +821,14 @@
     <!-- light-gallery-container -->
     <div v-if="isLightboxOpen" data-lightgallery-container class="fixed inset-0 flex justify-center items-center backdrop-blur-[5px] z-[99999] bg-white/10 dark:bg-[#181a1b]/10" @click="closeLightbox">
         <!-- media-container -->
-        <div @click.stop data-lightgallery-media-wrapper class="flex justify-center items-center rounded-sm shadow-[0px_0px_24px_-2px_#10182880] relative max-h-screen max-w-[min(22.5rem,90vw)] sm:max-w-[min(46rem,90vw)] md:max-w-[min(39rem,90vw)] lg:max-w-[min(64rem,90vw)] bg-white/50 dark:bg-[#181a1b]/50">
-            <div data-lightgallery-media-container class="flex justify-center items-center w-full h-full">
+        <div @click.stop data-lightgallery-media-wrapper class="flex justify-center items-center rounded-sm shadow-[0px_0px_24px_-2px_#10182880] relative max-h-[90vh] max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] bg-black/80">
+            <div data-lightgallery-media-container class="flex justify-center items-center w-full h-full p-2 overflow-hidden">
                 <video v-if="lightboxMedia?.type?.startsWith('video/')" 
                     ref="lightboxVideo"
                     :src="lightboxMedia?.url" 
-                    class="w-full h-full object-cover"
+                    class="max-w-full max-h-full object-contain"
                     loop playsinline></video>
-                <img v-else :src="lightboxMedia?.url" alt="lightbox-media" class="w-full h-full object-cover">
+                <img v-else :src="lightboxMedia?.url" alt="lightbox-media" class="max-w-full max-h-full object-contain">
             </div>
             
             <!-- close-button -->
@@ -730,9 +862,16 @@
         </div>
     </div>
     </div>
+        
+    </DashboardWrapperTwoColContainer>
 </template>
 
 <script setup>
+import EditProfileMenu from '@/components/EditProfileMenu.vue';
+import ImageCropperModal from '@/components/ui/popup/ImageCropperModal.vue';
+import AvatarUploadPopup from '@/components/ui/popup/AvatarUploadPopup.vue';
+import CancelUploadPopup from '@/components/ui/popup/CancelUploadPopup.vue';
+import UploadingProgressBar from '@/components/UploadingProgressBar.vue';
 import DashboardSectionContainer from '@/components/dashboard/DashboardSectionContainer.vue';
 import InputComponentDashboard from '@/components/input/InputComponentDashboard.vue';
 import TwoPieceButton from '@/components/button/TwoPieceButton.vue';
@@ -743,6 +882,7 @@ import ThumbnailUploader from '@/components/ui/global/media/uploader/HelperCompo
 import UnifiedSelect from '@/components/ui/popup/dropdown/dashboard/customThemeSelect/UnifiedSelect.vue';
 import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vue';
 import { ref, computed, onMounted, onUnmounted, reactive, watch } from 'vue';
+import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWrapperTwoColContainer.vue';
 
 const tooltipAnchor = ref(null);
 const isPremiumVideoUnlocked = ref(false);
@@ -758,27 +898,116 @@ const postMediaUploader = reactive({
 });
 
 const galleryItems = ref([]);
+const stagedGalleryItems = ref([]);
+const isGalleryUploading = ref(false);
+const galleryUploadProgress = ref(0);
+
+const openGalleryLightbox = (item) => {
+    lastScrollY = disableScroll();
+    lightboxMedia.value = {
+        url: item.url,
+        type: item.type
+    };
+    isLightboxOpen.value = true;
+    isVideoPaused.value = true;
+};
+
+const isGalleryNotificationOpen = ref(false);
+const galleryNotificationConfig = reactive({
+    variant: 'success-teal',
+    title: '',
+    description: '',
+    icon: '',
+    badgeIcon: ''
+});
+
+const triggerNotification = (config) => {
+    Object.assign(galleryNotificationConfig, {
+        variant: config.variant || 'success-teal',
+        title: config.title || '',
+        description: config.description || '',
+        icon: config.icon || 'https://i.ibb.co.com/Kx9QDc68/auth-bg-compressed.webp',
+        badgeIcon: config.badgeIcon || ''
+    });
+    isGalleryNotificationOpen.value = true;
+    // Auto hide after 5 seconds
+    setTimeout(() => {
+        isGalleryNotificationOpen.value = false;
+    }, 5000);
+};
+
+const handleGalleryManualSelect = (event) => {
+    const files = Array.from(event.target.files);
+    files.forEach(file => {
+        const totalCount = galleryItems.value.length + stagedGalleryItems.value.length;
+        const videoCount = galleryItems.value.filter(item => item.type?.startsWith('video/')).length + 
+                           stagedGalleryItems.value.filter(item => item.type?.startsWith('video/')).length;
+        
+        if (file.type?.startsWith('video/') && videoCount >= 2) {
+            triggerNotification({
+                variant: 'error',
+                title: '1 file failed to upload.',
+                description: `Failed to upload ‘${file.name}’. Maximum 2 video files allowed.`,
+                badgeIcon: 'https://i.ibb.co.com/Z6VXQMC1/alert-triangle-white.webp'
+            });
+            return;
+        }
+        if (totalCount >= 6) {
+            triggerNotification({
+                variant: 'error',
+                title: 'Failed to add media.',
+                description: `Failed to add ‘${file.name}’. You can only upload up to 6 media files in total.`,
+                badgeIcon: 'https://i.ibb.co.com/Z6VXQMC1/alert-triangle-white.webp'
+            });
+            return;
+        }
+
+        stagedGalleryItems.value.push({
+            file: file,
+            url: URL.createObjectURL(file),
+            type: file.type,
+            progress: 0,
+            status: 'pending'
+        });
+    });
+    event.target.value = ''; // Reset input
+};
 
 watch(() => galleryUploader.state.uploadedThumbnailFile, (newFile) => {
     if (newFile) {
-        const videoCount = galleryItems.value.filter(item => item.type?.startsWith('video/')).length;
+        const totalCount = galleryItems.value.length + stagedGalleryItems.value.length;
+        const videoCount = galleryItems.value.filter(item => item.type?.startsWith('video/')).length + 
+                           stagedGalleryItems.value.filter(item => item.type?.startsWith('video/')).length;
+        
         if (newFile.type?.startsWith('video/') && videoCount >= 2) {
-            alert("Maximum 2 video files allowed.");
+            triggerNotification({
+                variant: 'error',
+                title: '1 file failed to upload.',
+                description: `Failed to upload ‘${newFile.name}’. Maximum 2 video files allowed.`,
+                badgeIcon: 'https://i.ibb.co.com/Z6VXQMC1/alert-triangle-white.webp'
+            });
             galleryUploader.setState('uploadedThumbnailFile', null);
             galleryUploader.setState('thumbnailUrl', null);
             return;
         }
-        if (galleryItems.value.length >= 6) {
-            alert("Maximum 6 media files allowed.");
+        if (totalCount >= 6) {
+            triggerNotification({
+                variant: 'error',
+                title: 'Failed to add media.',
+                description: `Failed to add ‘${newFile.name}’. You can only upload up to 6 media files in total.`,
+                badgeIcon: 'https://i.ibb.co.com/Z6VXQMC1/alert-triangle-white.webp'
+            });
             galleryUploader.setState('uploadedThumbnailFile', null);
             galleryUploader.setState('thumbnailUrl', null);
             return;
         }
 
-        galleryItems.value.push({
+        stagedGalleryItems.value.push({
             file: newFile,
             url: galleryUploader.state.thumbnailUrl,
-            type: newFile.type
+            type: newFile.type,
+            progress: 0,
+            status: 'pending'
         });
 
         galleryUploader.setState('uploadedThumbnailFile', null);
@@ -788,6 +1017,57 @@ watch(() => galleryUploader.state.uploadedThumbnailFile, (newFile) => {
 
 const removeGalleryItem = (index) => {
     galleryItems.value.splice(index, 1);
+};
+
+const removeStagedGalleryItem = (index) => {
+    stagedGalleryItems.value.splice(index, 1);
+};
+
+let galleryUploadInterval = null;
+
+const cancelGalleryStaging = () => {
+    if (galleryUploadInterval) {
+        clearInterval(galleryUploadInterval);
+        galleryUploadInterval = null;
+    }
+    isGalleryUploading.value = false;
+    galleryUploadProgress.value = 0;
+};
+
+const startGalleryUpload = () => {
+    if (stagedGalleryItems.value.length === 0) return;
+    
+    isGalleryUploading.value = true;
+    galleryUploadProgress.value = 0;
+    
+    // Simulate upload progress
+    galleryUploadInterval = setInterval(() => {
+        galleryUploadProgress.value += Math.floor(Math.random() * 10) + 5;
+        
+        if (galleryUploadProgress.value >= 100) {
+            galleryUploadProgress.value = 100;
+            clearInterval(galleryUploadInterval);
+            galleryUploadInterval = null;
+            setTimeout(() => {
+                const count = stagedGalleryItems.value.length;
+                galleryItems.value.push(...stagedGalleryItems.value.map(item => ({
+                    file: item.file,
+                    url: item.url,
+                    type: item.type
+                })));
+                stagedGalleryItems.value = [];
+                isGalleryUploading.value = false;
+                galleryUploadProgress.value = 0;
+
+                triggerNotification({
+                    variant: 'success-teal',
+                    title: `${count} files uploaded to your free gallery successfully.`,
+                    description: 'Click ‘Save’ on header to update change.',
+                    badgeIcon: 'https://i.ibb.co.com/Y7S5v7LR/tick-mark.webp'
+                });
+            }, 500);
+        }
+    }, 200);
 };
 
 const postMediaPreviewUrl = computed(() => postMediaUploader.state.thumbnailUrl);
@@ -851,6 +1131,9 @@ const toggleVideoPlay = () => {
 };
 
 const profileData = ref({
+  profileImageUrl: '',
+  profileImageBg: '#F04CC9',
+  profileImageStyle: {},
   displayName: '',
   age: '',
   gender: '',
@@ -877,12 +1160,105 @@ const initialProfileData = ref(null);
 const initialGalleryItems = ref(null);
 const activeDropdown = ref(null);
 
+const isEditMenuOpen = ref(false);
+const fileInput = ref(null);
+const showCropper = ref(false);
+const showAvatarPopup = ref(false);
+const showCancelPopup = ref(false);
+const popupToClose = ref(null);
+
+const isUploading = ref(false);
+const uploadProgress = ref(0);
+const tempUploadSrc = ref('');
+
+const handleCancelAttempt = (popupType) => {
+  popupToClose.value = popupType;
+  showCancelPopup.value = true;
+};
+
+const confirmCancel = () => {
+  if (popupToClose.value === 'avatar') {
+    showAvatarPopup.value = false;
+  } else if (popupToClose.value === 'cropper') {
+    showCropper.value = false;
+  }
+  showCancelPopup.value = false;
+  popupToClose.value = null;
+};
+
+const openCropper = () => {
+  showCropper.value = true;
+  isEditMenuOpen.value = false;
+};
+
+const openAvatarPopup = () => {
+  showAvatarPopup.value = true;
+  isEditMenuOpen.value = false;
+};
+
+const handleAvatarSave = (data) => {
+  profileData.value.profileImageUrl = data.src;
+  profileData.value.profileImageBg = data.bgColor;
+  profileData.value.profileImageStyle = {}; // Reset style for preset avatars
+  showAvatarPopup.value = false;
+};
+
+const handleCropSave = (cropData) => {
+  // Apply visual crop styles to the image
+  const zoom = 1 + (cropData.zoom / 100) * 4; // Matching the 100% to 500% logic (min 1, max 5)
+  profileData.value.profileImageStyle = {
+    transform: `scale(${zoom}) rotate(${cropData.rotate}deg) scaleX(${cropData.flipH ? -1 : 1}) scaleY(${cropData.flipV ? -1 : 1})`,
+  };
+  showCropper.value = false;
+};
+
+const triggerFileUpload = () => {
+  fileInput.value?.click();
+  isEditMenuOpen.value = false;
+};
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      tempUploadSrc.value = e.target.result;
+      isUploading.value = true;
+      uploadProgress.value = 0;
+
+      const interval = setInterval(() => {
+        uploadProgress.value += 5;
+        if (uploadProgress.value >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            profileData.value.profileImageUrl = tempUploadSrc.value;
+            profileData.value.profileImageStyle = {};
+            profileData.value.profileImageBg = '#F04CC9';
+            isUploading.value = false;
+            tempUploadSrc.value = '';
+          }, 200);
+        }
+      }, 100);
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const toggleEditMenu = () => {
+  isEditMenuOpen.value = !isEditMenuOpen.value;
+  if (isEditMenuOpen.value) {
+    activeDropdown.value = null; // close other dropdowns
+  }
+};
+
 const toggleDropdown = (name) => {
+  isEditMenuOpen.value = false;
   activeDropdown.value = activeDropdown.value === name ? null : name;
 };
 
 const closeDropdowns = () => {
   activeDropdown.value = null;
+  isEditMenuOpen.value = false;
 };
 
 const selectOption = (field, value) => {
