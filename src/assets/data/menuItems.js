@@ -19,7 +19,7 @@ export const menuItems = [
     title: "Payout", // Fallback text
     translationKey: "dashboard.menu.payout", // Translation key
     image: "dashboard.menu.payout", // Asset flag instead of hardcoded URL
-    route: "/dashboard/payout",
+    route: "/payout",
     parent: false,
     children: [],
     enabled: true

@@ -20,6 +20,8 @@
     "validate-env:prod": "cross-env NODE_ENV=production node ./build/validate-env.js"
   },
   "dependencies": {
+    "@amcharts/amcharts5": "^5.17.2",
+    "@amcharts/amcharts5-geodata": "^5.1.5",
     "@aws-sdk/client-cognito-identity-provider": "^3.948.0",
     "@heroicons/vue": "^2.2.0",
     "@splidejs/vue-splide": "^0.6.12",

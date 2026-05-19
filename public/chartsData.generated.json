@@ -1,0 +1,3744 @@
+{
+  "earnings": {
+    "daily": [
+      {
+        "period": "2026-04-08",
+        "subscription": 104.89000000000001,
+        "paytoview": 24.96,
+        "merch": 90,
+        "wishtender": 5,
+        "customrequest": 0,
+        "total": 224.85000000000002,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 175,
+        "tipTokens": 0,
+        "callTokens": 35,
+        "chatTokens": 100,
+        "liveStreamTokens": 40
+      },
+      {
+        "period": "2026-04-09",
+        "subscription": 104.92,
+        "paytoview": 27.96,
+        "merch": 80,
+        "wishtender": 0,
+        "customrequest": 50,
+        "total": 262.88,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 80,
+        "tipTokens": 5,
+        "callTokens": 15,
+        "chatTokens": 60,
+        "liveStreamTokens": 0
+      }
+    ],
+    "weekly": [
+      {
+        "period": "2026-04-03",
+        "subscription": 119.91,
+        "paytoview": 19.97,
+        "merch": 65,
+        "wishtender": 10,
+        "customrequest": 0,
+        "total": 214.88,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 130,
+        "tipTokens": 5,
+        "callTokens": 0,
+        "chatTokens": 100,
+        "liveStreamTokens": 25
+      },
+      {
+        "period": "2026-04-04",
+        "subscription": 84.92,
+        "paytoview": 5.98,
+        "merch": 90,
+        "wishtender": 15,
+        "customrequest": 125,
+        "total": 320.9,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 415,
+        "tipTokens": 10,
+        "callTokens": 100,
+        "chatTokens": 155,
+        "liveStreamTokens": 150
+      },
+      {
+        "period": "2026-04-05",
+        "subscription": 59.93000000000001,
+        "paytoview": 7.98,
+        "merch": 100,
+        "wishtender": 10,
+        "customrequest": 150,
+        "total": 327.91,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 175,
+        "tipTokens": 30,
+        "callTokens": 125,
+        "chatTokens": 20,
+        "liveStreamTokens": 0
+      },
+      {
+        "period": "2026-04-06",
+        "subscription": 74.91,
+        "paytoview": 23.95,
+        "merch": 50,
+        "wishtender": 0,
+        "customrequest": 75,
+        "total": 223.86,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 275,
+        "tipTokens": 50,
+        "callTokens": 50,
+        "chatTokens": 60,
+        "liveStreamTokens": 115
+      },
+      {
+        "period": "2026-04-07",
+        "subscription": 79.92,
+        "paytoview": 16.95,
+        "merch": 90,
+        "wishtender": 25,
+        "customrequest": 150,
+        "total": 361.87,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 170,
+        "tipTokens": 155,
+        "callTokens": 5,
+        "chatTokens": 0,
+        "liveStreamTokens": 10
+      },
+      {
+        "period": "2026-04-08",
+        "subscription": 104.89000000000001,
+        "paytoview": 24.96,
+        "merch": 90,
+        "wishtender": 5,
+        "customrequest": 0,
+        "total": 224.85000000000002,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 175,
+        "tipTokens": 0,
+        "callTokens": 35,
+        "chatTokens": 100,
+        "liveStreamTokens": 40
+      },
+      {
+        "period": "2026-04-09",
+        "subscription": 104.92,
+        "paytoview": 27.96,
+        "merch": 80,
+        "wishtender": 0,
+        "customrequest": 50,
+        "total": 262.88,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 80,
+        "tipTokens": 5,
+        "callTokens": 15,
+        "chatTokens": 60,
+        "liveStreamTokens": 0
+      }
+    ],
+    "monthly": [
+      {
+        "period": "2026-03-11",
+        "subscription": 74.93,
+        "paytoview": 7.98,
+        "merch": 50,
+        "wishtender": 5,
+        "customrequest": 100,
+        "total": 237.91000000000003,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 240,
+        "tipTokens": 50,
+        "callTokens": 5,
+        "chatTokens": 80,
+        "liveStreamTokens": 105
+      },
+      {
+        "period": "2026-03-12",
+        "subscription": 119.91,
+        "paytoview": 7.98,
+        "merch": 20,
+        "wishtender": 25,
+        "customrequest": 200,
+        "total": 372.89,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 345,
+        "tipTokens": 140,
+        "callTokens": 0,
+        "chatTokens": 5,
+        "liveStreamTokens": 200
+      },
+      {
+        "period": "2026-03-13",
+        "subscription": 49.94,
+        "paytoview": 9.98,
+        "merch": 25,
+        "wishtender": 35,
+        "customrequest": 200,
+        "total": 319.92,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 155,
+        "tipTokens": 15,
+        "callTokens": 0,
+        "chatTokens": 0,
+        "liveStreamTokens": 140
+      },
+      {
+        "period": "2026-03-14",
+        "subscription": 64.94,
+        "paytoview": 15.97,
+        "merch": 30,
+        "wishtender": 0,
+        "customrequest": 75,
+        "total": 185.91,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 195,
+        "tipTokens": 15,
+        "callTokens": 100,
+        "chatTokens": 70,
+        "liveStreamTokens": 10
+      },
+      {
+        "period": "2026-03-15",
+        "subscription": 79.9,
+        "paytoview": 22.96,
+        "merch": 70,
+        "wishtender": 0,
+        "customrequest": 150,
+        "total": 322.86,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 115,
+        "tipTokens": 10,
+        "callTokens": 50,
+        "chatTokens": 15,
+        "liveStreamTokens": 40
+      },
+      {
+        "period": "2026-03-16",
+        "subscription": 54.95,
+        "paytoview": 19.98,
+        "merch": 90,
+        "wishtender": 5,
+        "customrequest": 0,
+        "total": 169.93,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 80,
+        "tipTokens": 20,
+        "callTokens": 60,
+        "chatTokens": 0,
+        "liveStreamTokens": 0
+      },
+      {
+        "period": "2026-03-17",
+        "subscription": 89.93,
+        "paytoview": 34.96,
+        "merch": 85,
+        "wishtender": 15,
+        "customrequest": 0,
+        "total": 224.89000000000001,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 235,
+        "tipTokens": 0,
+        "callTokens": 10,
+        "chatTokens": 125,
+        "liveStreamTokens": 100
+      },
+      {
+        "period": "2026-03-18",
+        "subscription": 129.89,
+        "paytoview": 20.96,
+        "merch": 25,
+        "wishtender": 25,
+        "customrequest": 300,
+        "total": 500.85,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 370,
+        "tipTokens": 0,
+        "callTokens": 0,
+        "chatTokens": 200,
+        "liveStreamTokens": 170
+      },
+      {
+        "period": "2026-03-19",
+        "subscription": 79.92,
+        "paytoview": 37.95,
+        "merch": 95,
+        "wishtender": 25,
+        "customrequest": 0,
+        "total": 237.87,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 460,
+        "tipTokens": 40,
+        "callTokens": 100,
+        "chatTokens": 0,
+        "liveStreamTokens": 320
+      },
+      {
+        "period": "2026-03-20",
+        "subscription": 69.94,
+        "paytoview": 22.96,
+        "merch": 15,
+        "wishtender": 30,
+        "customrequest": 300,
+        "total": 437.9,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 130,
+        "tipTokens": 10,
+        "callTokens": 10,
+        "chatTokens": 0,
+        "liveStreamTokens": 110
+      },
+      {
+        "period": "2026-03-21",
+        "subscription": 79.95,
+        "paytoview": 29.97,
+        "merch": 75,
+        "wishtender": 10,
+        "customrequest": 150,
+        "total": 344.92,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 190,
+        "tipTokens": 20,
+        "callTokens": 60,
+        "chatTokens": 10,
+        "liveStreamTokens": 100
+      },
+      {
+        "period": "2026-03-22",
+        "subscription": 124.91,
+        "paytoview": 17.97,
+        "merch": 50,
+        "wishtender": 0,
+        "customrequest": 200,
+        "total": 392.88,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 290,
+        "tipTokens": 20,
+        "callTokens": 110,
+        "chatTokens": 150,
+        "liveStreamTokens": 10
+      },
+      {
+        "period": "2026-03-23",
+        "subscription": 119.9,
+        "paytoview": 15.97,
+        "merch": 115,
+        "wishtender": 0,
+        "customrequest": 250,
+        "total": 500.87,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 230,
+        "tipTokens": 10,
+        "callTokens": 0,
+        "chatTokens": 115,
+        "liveStreamTokens": 105
+      },
+      {
+        "period": "2026-03-24",
+        "subscription": 94.91,
+        "paytoview": 15.97,
+        "merch": 55,
+        "wishtender": 0,
+        "customrequest": 150,
+        "total": 315.88,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 180,
+        "tipTokens": 100,
+        "callTokens": 0,
+        "chatTokens": 70,
+        "liveStreamTokens": 10
+      },
+      {
+        "period": "2026-03-25",
+        "subscription": 79.92,
+        "paytoview": 17.96,
+        "merch": 90,
+        "wishtender": 40,
+        "customrequest": 200,
+        "total": 427.88,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 230,
+        "tipTokens": 170,
+        "callTokens": 20,
+        "chatTokens": 20,
+        "liveStreamTokens": 20
+      },
+      {
+        "period": "2026-03-26",
+        "subscription": 94.9,
+        "paytoview": 15.97,
+        "merch": 50,
+        "wishtender": 15,
+        "customrequest": 0,
+        "total": 175.87,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 140,
+        "tipTokens": 0,
+        "callTokens": 5,
+        "chatTokens": 135,
+        "liveStreamTokens": 0
+      },
+      {
+        "period": "2026-03-27",
+        "subscription": 79.93,
+        "paytoview": 17.96,
+        "merch": 85,
+        "wishtender": 0,
+        "customrequest": 75,
+        "total": 257.89,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 105,
+        "tipTokens": 5,
+        "callTokens": 10,
+        "chatTokens": 65,
+        "liveStreamTokens": 25
+      },
+      {
+        "period": "2026-03-28",
+        "subscription": 64.94,
+        "paytoview": 26.94,
+        "merch": 25,
+        "wishtender": 25,
+        "customrequest": 100,
+        "total": 241.88,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 240,
+        "tipTokens": 0,
+        "callTokens": 10,
+        "chatTokens": 150,
+        "liveStreamTokens": 80
+      },
+      {
+        "period": "2026-03-29",
+        "subscription": 109.91999999999999,
+        "paytoview": 12.97,
+        "merch": 60,
+        "wishtender": 0,
+        "customrequest": 150,
+        "total": 332.89,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 210,
+        "tipTokens": 50,
+        "callTokens": 60,
+        "chatTokens": 100,
+        "liveStreamTokens": 0
+      },
+      {
+        "period": "2026-03-30",
+        "subscription": 114.89000000000001,
+        "paytoview": 10.97,
+        "merch": 65,
+        "wishtender": 25,
+        "customrequest": 75,
+        "total": 290.86,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 70,
+        "tipTokens": 20,
+        "callTokens": 30,
+        "chatTokens": 20,
+        "liveStreamTokens": 0
+      },
+      {
+        "period": "2026-03-31",
+        "subscription": 94.92,
+        "paytoview": 8.97,
+        "merch": 20,
+        "wishtender": 10,
+        "customrequest": 0,
+        "total": 133.89,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 255,
+        "tipTokens": 40,
+        "callTokens": 100,
+        "chatTokens": 0,
+        "liveStreamTokens": 115
+      },
+      {
+        "period": "2026-04-01",
+        "subscription": 69.93,
+        "paytoview": 22.96,
+        "merch": 45,
+        "wishtender": 10,
+        "customrequest": 250,
+        "total": 397.89,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 230,
+        "tipTokens": 0,
+        "callTokens": 180,
+        "chatTokens": 0,
+        "liveStreamTokens": 50
+      },
+      {
+        "period": "2026-04-02",
+        "subscription": 79.93,
+        "paytoview": 22.96,
+        "merch": 45,
+        "wishtender": 0,
+        "customrequest": 0,
+        "total": 147.89000000000001,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 385,
+        "tipTokens": 80,
+        "callTokens": 5,
+        "chatTokens": 200,
+        "liveStreamTokens": 100
+      },
+      {
+        "period": "2026-04-03",
+        "subscription": 119.91,
+        "paytoview": 19.97,
+        "merch": 65,
+        "wishtender": 10,
+        "customrequest": 0,
+        "total": 214.88,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 130,
+        "tipTokens": 5,
+        "callTokens": 0,
+        "chatTokens": 100,
+        "liveStreamTokens": 25
+      },
+      {
+        "period": "2026-04-04",
+        "subscription": 84.92,
+        "paytoview": 5.98,
+        "merch": 90,
+        "wishtender": 15,
+        "customrequest": 125,
+        "total": 320.9,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 415,
+        "tipTokens": 10,
+        "callTokens": 100,
+        "chatTokens": 155,
+        "liveStreamTokens": 150
+      },
+      {
+        "period": "2026-04-05",
+        "subscription": 59.93000000000001,
+        "paytoview": 7.98,
+        "merch": 100,
+        "wishtender": 10,
+        "customrequest": 150,
+        "total": 327.91,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 175,
+        "tipTokens": 30,
+        "callTokens": 125,
+        "chatTokens": 20,
+        "liveStreamTokens": 0
+      },
+      {
+        "period": "2026-04-06",
+        "subscription": 74.91,
+        "paytoview": 23.95,
+        "merch": 50,
+        "wishtender": 0,
+        "customrequest": 75,
+        "total": 223.86,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 275,
+        "tipTokens": 50,
+        "callTokens": 50,
+        "chatTokens": 60,
+        "liveStreamTokens": 115
+      },
+      {
+        "period": "2026-04-07",
+        "subscription": 79.92,
+        "paytoview": 16.95,
+        "merch": 90,
+        "wishtender": 25,
+        "customrequest": 150,
+        "total": 361.87,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 170,
+        "tipTokens": 155,
+        "callTokens": 5,
+        "chatTokens": 0,
+        "liveStreamTokens": 10
+      },
+      {
+        "period": "2026-04-08",
+        "subscription": 104.89000000000001,
+        "paytoview": 24.96,
+        "merch": 90,
+        "wishtender": 5,
+        "customrequest": 0,
+        "total": 224.85000000000002,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 175,
+        "tipTokens": 0,
+        "callTokens": 35,
+        "chatTokens": 100,
+        "liveStreamTokens": 40
+      },
+      {
+        "period": "2026-04-09",
+        "subscription": 104.92,
+        "paytoview": 27.96,
+        "merch": 80,
+        "wishtender": 0,
+        "customrequest": 50,
+        "total": 262.88,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 80,
+        "tipTokens": 5,
+        "callTokens": 15,
+        "chatTokens": 60,
+        "liveStreamTokens": 0
+      }
+    ],
+    "yearly": [
+      {
+        "period": "2026-01-01",
+        "subscription": 2652.6,
+        "paytoview": 566.97,
+        "merch": 1850,
+        "wishtender": 365,
+        "customrequest": 3475,
+        "total": 8909.57,
+        "subscriptionTokens": 0,
+        "paytoviewTokens": 0,
+        "merchTokens": 0,
+        "wishtenderTokens": 0,
+        "customrequestTokens": 0,
+        "totalTokens": 6500,
+        "tipTokens": 1070,
+        "callTokens": 1255,
+        "chatTokens": 2025,
+        "liveStreamTokens": 2150
+      }
+    ],
+    "summaries": {
+      "daily": {
+        "totalEarningsUSD": 262.88,
+        "tokensReceived": 80
+      },
+      "weekly": {
+        "totalEarningsUSD": 1073.46,
+        "tokensReceived": 700
+      },
+      "monthly": {
+        "totalEarningsUSD": 2482.93,
+        "tokensReceived": 2035
+      },
+      "yearly": {
+        "totalEarningsUSD": 8909.57,
+        "tokensReceived": 6500
+      }
+    },
+    "grandTotal": {
+      "subscription": 2652.6,
+      "paytoview": 566.97,
+      "merch": 1850,
+      "wishtender": 365,
+      "customrequest": 3475,
+      "total": 8909.57,
+      "subscriptionTokens": 0,
+      "paytoviewTokens": 0,
+      "merchTokens": 0,
+      "wishtenderTokens": 0,
+      "customrequestTokens": 0,
+      "totalTokens": 6500,
+      "tipTokens": 1070,
+      "callTokens": 1255,
+      "chatTokens": 2025,
+      "liveStreamTokens": 2150
+    }
+  },
+  "trendingsMedia": {
+    "daily": [
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9005",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 0,
+        "watchDurationSec": 229986,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9007",
+        "views": 6,
+        "salesUSD": 9.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 9.99,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 1665,
+        "watchDurationSec": 0,
+        "tags": [],
+        "thumbnailUrl": ""
+      }
+    ],
+    "weekly": [
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9002",
+        "views": 2,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 3,
+        "rpmUSD": 0,
+        "watchDurationSec": 403098,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9001",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 2,
+        "rpmUSD": 0,
+        "watchDurationSec": 84790,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9006",
+        "views": 1,
+        "salesUSD": 9.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 9.99,
+        "ppvSalesCount": 0,
+        "clicks": 2,
+        "rpmUSD": 9990,
+        "watchDurationSec": 205150,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9008",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 2,
+        "rpmUSD": 0,
+        "watchDurationSec": 189977,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9004",
+        "views": 3,
+        "salesUSD": 2.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 2.99,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 996.67,
+        "watchDurationSec": 424642,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9005",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 0,
+        "watchDurationSec": 229986,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9007",
+        "views": 6,
+        "salesUSD": 9.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 9.99,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 1665,
+        "watchDurationSec": 0,
+        "tags": [],
+        "thumbnailUrl": ""
+      }
+    ],
+    "monthly": [
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9007",
+        "views": 7,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 0,
+        "watchDurationSec": 348337,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9002",
+        "views": 7,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 0,
+        "watchDurationSec": 216550,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9003",
+        "views": 5,
+        "salesUSD": 9.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 9.99,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 1998,
+        "watchDurationSec": 80050,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9004",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 0,
+        "watchDurationSec": 234599,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9001",
+        "views": 2,
+        "salesUSD": 8.97,
+        "salesCount": 0,
+        "ppvSalesUSD": 8.97,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 4485,
+        "watchDurationSec": 304382,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9006",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 0,
+        "watchDurationSec": 326402,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9007",
+        "views": 3,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 6,
+        "rpmUSD": 0,
+        "watchDurationSec": 290019,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9006",
+        "views": 3,
+        "salesUSD": 2.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 2.99,
+        "ppvSalesCount": 0,
+        "clicks": 2,
+        "rpmUSD": 996.67,
+        "watchDurationSec": 65816,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9001",
+        "views": 4,
+        "salesUSD": 4.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 4.99,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 1247.5,
+        "watchDurationSec": 0,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9004",
+        "views": 3,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 0,
+        "watchDurationSec": 412198,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9008",
+        "views": 3,
+        "salesUSD": 2.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 2.99,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 996.67,
+        "watchDurationSec": 542666,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9005",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 0,
+        "watchDurationSec": 0,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9002",
+        "views": 1,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 0,
+        "watchDurationSec": 147228,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9003",
+        "views": 3,
+        "salesUSD": 5.98,
+        "salesCount": 0,
+        "ppvSalesUSD": 5.98,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 1993.33,
+        "watchDurationSec": 335001,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9006",
+        "views": 2,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 0,
+        "watchDurationSec": 356036,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9002",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 0,
+        "watchDurationSec": 0,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9003",
+        "views": 5,
+        "salesUSD": 19.97,
+        "salesCount": 0,
+        "ppvSalesUSD": 19.97,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 3994,
+        "watchDurationSec": 519524,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9004",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 0,
+        "watchDurationSec": 146407,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9008",
+        "views": 6,
+        "salesUSD": 4.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 4.99,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 831.67,
+        "watchDurationSec": 282051,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9005",
+        "views": 5,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 0,
+        "watchDurationSec": 223427,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9001",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 0,
+        "watchDurationSec": 186605,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9007",
+        "views": 2,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 0,
+        "watchDurationSec": 289326,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9003",
+        "views": 9,
+        "salesUSD": 4.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 4.99,
+        "ppvSalesCount": 0,
+        "clicks": 3,
+        "rpmUSD": 554.44,
+        "watchDurationSec": 322372,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9002",
+        "views": 2,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 3,
+        "rpmUSD": 0,
+        "watchDurationSec": 403098,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9001",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 2,
+        "rpmUSD": 0,
+        "watchDurationSec": 84790,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9006",
+        "views": 1,
+        "salesUSD": 9.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 9.99,
+        "ppvSalesCount": 0,
+        "clicks": 2,
+        "rpmUSD": 9990,
+        "watchDurationSec": 205150,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9008",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 2,
+        "rpmUSD": 0,
+        "watchDurationSec": 189977,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9004",
+        "views": 3,
+        "salesUSD": 2.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 2.99,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 996.67,
+        "watchDurationSec": 424642,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9005",
+        "views": 4,
+        "salesUSD": 0,
+        "salesCount": 0,
+        "ppvSalesUSD": 0,
+        "ppvSalesCount": 0,
+        "clicks": 1,
+        "rpmUSD": 0,
+        "watchDurationSec": 229986,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9007",
+        "views": 6,
+        "salesUSD": 9.99,
+        "salesCount": 0,
+        "ppvSalesUSD": 9.99,
+        "ppvSalesCount": 0,
+        "clicks": 0,
+        "rpmUSD": 1665,
+        "watchDurationSec": 0,
+        "tags": [],
+        "thumbnailUrl": ""
+      }
+    ],
+    "yearly": [
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9006",
+        "views": 103,
+        "salesUSD": 74.87,
+        "salesCount": 0,
+        "ppvSalesUSD": 74.87,
+        "ppvSalesCount": 0,
+        "clicks": 37,
+        "rpmUSD": 726.89,
+        "watchDurationSec": 9290515,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9005",
+        "views": 103,
+        "salesUSD": 40.93,
+        "salesCount": 0,
+        "ppvSalesUSD": 40.93,
+        "ppvSalesCount": 0,
+        "clicks": 35,
+        "rpmUSD": 397.38,
+        "watchDurationSec": 10731444,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9003",
+        "views": 110,
+        "salesUSD": 115.79,
+        "salesCount": 0,
+        "ppvSalesUSD": 115.79,
+        "ppvSalesCount": 0,
+        "clicks": 35,
+        "rpmUSD": 1052.64,
+        "watchDurationSec": 9549225,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9004",
+        "views": 121,
+        "salesUSD": 45.91,
+        "salesCount": 0,
+        "ppvSalesUSD": 45.91,
+        "ppvSalesCount": 0,
+        "clicks": 29,
+        "rpmUSD": 379.42,
+        "watchDurationSec": 9493150,
+        "tags": [],
+        "thumbnailUrl": ""
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "rank": 1,
+        "media": "Media #9001",
+        "views": 110,
+        "salesUSD": 83.84,
+        "salesCount": 0,
+        "ppvSalesUSD": 83.84,
+        "ppvSalesCount": 0,
+        "clicks": 22,
+        "rpmUSD": 762.18,
+        "watchDurationSec": 7461418,
+        "tags": [],
+        "thumbnailUrl": ""
+      }
+    ]
+  },
+  "trendingMerch": {
+    "daily": [],
+    "weekly": [],
+    "monthly": [],
+    "yearly": []
+  },
+  "trendingCountries": {
+    "daily": [
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 276",
+        "earningsUSD": 19.98,
+        "salesUSD": 19.98,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 392",
+        "earningsUSD": 9.99,
+        "salesUSD": 9.99,
+        "views": 0
+      }
+    ],
+    "weekly": [
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 826",
+        "earningsUSD": 79.96,
+        "salesUSD": 79.96,
+        "views": 0
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 392",
+        "earningsUSD": 4.99,
+        "salesUSD": 4.99,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 840",
+        "earningsUSD": 167.98,
+        "salesUSD": 167.98,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 826",
+        "earningsUSD": 84.96,
+        "salesUSD": 84.96,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 36",
+        "earningsUSD": 69.96,
+        "salesUSD": 69.96,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 276",
+        "earningsUSD": 19.98,
+        "salesUSD": 19.98,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 392",
+        "earningsUSD": 9.99,
+        "salesUSD": 9.99,
+        "views": 0
+      }
+    ],
+    "monthly": [
+      {
+        "period": "2026-04-04T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 36",
+        "earningsUSD": 357.97,
+        "salesUSD": 357.97,
+        "views": 0
+      },
+      {
+        "period": "2026-04-04T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 840",
+        "earningsUSD": 192.96,
+        "salesUSD": 192.96,
+        "views": 0
+      },
+      {
+        "period": "2026-04-04T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 276",
+        "earningsUSD": 134.99,
+        "salesUSD": 134.99,
+        "views": 0
+      },
+      {
+        "period": "2026-04-04T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 826",
+        "earningsUSD": 44.98,
+        "salesUSD": 44.98,
+        "views": 0
+      },
+      {
+        "period": "2026-04-04T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 392",
+        "earningsUSD": 5,
+        "salesUSD": 5,
+        "views": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 840",
+        "earningsUSD": 179.95,
+        "salesUSD": 179.95,
+        "views": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 276",
+        "earningsUSD": 164.98,
+        "salesUSD": 164.98,
+        "views": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 36",
+        "earningsUSD": 119.99,
+        "salesUSD": 119.99,
+        "views": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 392",
+        "earningsUSD": 44.99,
+        "salesUSD": 44.99,
+        "views": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 826",
+        "earningsUSD": 2.99,
+        "salesUSD": 2.99,
+        "views": 0
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 36",
+        "earningsUSD": 229.93,
+        "salesUSD": 229.93,
+        "views": 0
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 840",
+        "earningsUSD": 109.99,
+        "salesUSD": 109.99,
+        "views": 0
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 826",
+        "earningsUSD": 59.99,
+        "salesUSD": 59.99,
+        "views": 0
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 392",
+        "earningsUSD": 50,
+        "salesUSD": 50,
+        "views": 0
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 276",
+        "earningsUSD": 48.95,
+        "salesUSD": 48.95,
+        "views": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 840",
+        "earningsUSD": 322.96,
+        "salesUSD": 322.96,
+        "views": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 392",
+        "earningsUSD": 102.99,
+        "salesUSD": 102.99,
+        "views": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 36",
+        "earningsUSD": 55.96,
+        "salesUSD": 55.96,
+        "views": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 826",
+        "earningsUSD": 44.96,
+        "salesUSD": 44.96,
+        "views": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 276",
+        "earningsUSD": 14.99,
+        "salesUSD": 14.99,
+        "views": 0
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 840",
+        "earningsUSD": 114.93,
+        "salesUSD": 114.93,
+        "views": 0
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 276",
+        "earningsUSD": 100,
+        "salesUSD": 100,
+        "views": 0
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 36",
+        "earningsUSD": 99.97,
+        "salesUSD": 99.97,
+        "views": 0
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 826",
+        "earningsUSD": 79.96,
+        "salesUSD": 79.96,
+        "views": 0
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 392",
+        "earningsUSD": 4.99,
+        "salesUSD": 4.99,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 840",
+        "earningsUSD": 167.98,
+        "salesUSD": 167.98,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 826",
+        "earningsUSD": 84.96,
+        "salesUSD": 84.96,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 36",
+        "earningsUSD": 69.96,
+        "salesUSD": 69.96,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 276",
+        "earningsUSD": 19.98,
+        "salesUSD": 19.98,
+        "views": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 392",
+        "earningsUSD": 9.99,
+        "salesUSD": 9.99,
+        "views": 0
+      }
+    ],
+    "yearly": [
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 36",
+        "earningsUSD": 5767.73,
+        "salesUSD": 5767.73,
+        "views": 0
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 840",
+        "earningsUSD": 4958.9,
+        "salesUSD": 4958.9,
+        "views": 0
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 276",
+        "earningsUSD": 1990.6,
+        "salesUSD": 1990.6,
+        "views": 0
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 826",
+        "earningsUSD": 1745.39,
+        "salesUSD": 1745.39,
+        "views": 0
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "rank": 1,
+        "country": "Country 392",
+        "earningsUSD": 1106.79,
+        "salesUSD": 1106.79,
+        "views": 0
+      }
+    ]
+  },
+  "fanInsights": {
+    "daily": [
+      {
+        "period": "2026-04-08",
+        "newFollowers": 10,
+        "profileVisits": 40
+      },
+      {
+        "period": "2026-04-09",
+        "newFollowers": 9,
+        "profileVisits": 34
+      }
+    ],
+    "weekly": [
+      {
+        "period": "2026-04-03",
+        "newFollowers": 9,
+        "profileVisits": 37
+      },
+      {
+        "period": "2026-04-04",
+        "newFollowers": 9,
+        "profileVisits": 40
+      },
+      {
+        "period": "2026-04-05",
+        "newFollowers": 9,
+        "profileVisits": 39
+      },
+      {
+        "period": "2026-04-06",
+        "newFollowers": 10,
+        "profileVisits": 39
+      },
+      {
+        "period": "2026-04-07",
+        "newFollowers": 5,
+        "profileVisits": 31
+      },
+      {
+        "period": "2026-04-08",
+        "newFollowers": 10,
+        "profileVisits": 40
+      },
+      {
+        "period": "2026-04-09",
+        "newFollowers": 9,
+        "profileVisits": 34
+      }
+    ],
+    "monthly": [
+      {
+        "period": "2026-03-11",
+        "newFollowers": 7,
+        "profileVisits": 35
+      },
+      {
+        "period": "2026-03-12",
+        "newFollowers": 10,
+        "profileVisits": 38
+      },
+      {
+        "period": "2026-03-13",
+        "newFollowers": 11,
+        "profileVisits": 35
+      },
+      {
+        "period": "2026-03-14",
+        "newFollowers": 6,
+        "profileVisits": 43
+      },
+      {
+        "period": "2026-03-15",
+        "newFollowers": 12,
+        "profileVisits": 38
+      },
+      {
+        "period": "2026-03-16",
+        "newFollowers": 7,
+        "profileVisits": 33
+      },
+      {
+        "period": "2026-03-17",
+        "newFollowers": 11,
+        "profileVisits": 42
+      },
+      {
+        "period": "2026-03-18",
+        "newFollowers": 7,
+        "profileVisits": 33
+      },
+      {
+        "period": "2026-03-19",
+        "newFollowers": 8,
+        "profileVisits": 39
+      },
+      {
+        "period": "2026-03-20",
+        "newFollowers": 8,
+        "profileVisits": 38
+      },
+      {
+        "period": "2026-03-21",
+        "newFollowers": 9,
+        "profileVisits": 38
+      },
+      {
+        "period": "2026-03-22",
+        "newFollowers": 6,
+        "profileVisits": 42
+      },
+      {
+        "period": "2026-03-23",
+        "newFollowers": 7,
+        "profileVisits": 35
+      },
+      {
+        "period": "2026-03-24",
+        "newFollowers": 7,
+        "profileVisits": 46
+      },
+      {
+        "period": "2026-03-25",
+        "newFollowers": 6,
+        "profileVisits": 34
+      },
+      {
+        "period": "2026-03-26",
+        "newFollowers": 9,
+        "profileVisits": 34
+      },
+      {
+        "period": "2026-03-27",
+        "newFollowers": 10,
+        "profileVisits": 38
+      },
+      {
+        "period": "2026-03-28",
+        "newFollowers": 11,
+        "profileVisits": 44
+      },
+      {
+        "period": "2026-03-29",
+        "newFollowers": 9,
+        "profileVisits": 40
+      },
+      {
+        "period": "2026-03-30",
+        "newFollowers": 9,
+        "profileVisits": 39
+      },
+      {
+        "period": "2026-03-31",
+        "newFollowers": 5,
+        "profileVisits": 44
+      },
+      {
+        "period": "2026-04-01",
+        "newFollowers": 6,
+        "profileVisits": 38
+      },
+      {
+        "period": "2026-04-02",
+        "newFollowers": 7,
+        "profileVisits": 40
+      },
+      {
+        "period": "2026-04-03",
+        "newFollowers": 9,
+        "profileVisits": 37
+      },
+      {
+        "period": "2026-04-04",
+        "newFollowers": 9,
+        "profileVisits": 40
+      },
+      {
+        "period": "2026-04-05",
+        "newFollowers": 9,
+        "profileVisits": 39
+      },
+      {
+        "period": "2026-04-06",
+        "newFollowers": 10,
+        "profileVisits": 39
+      },
+      {
+        "period": "2026-04-07",
+        "newFollowers": 5,
+        "profileVisits": 31
+      },
+      {
+        "period": "2026-04-08",
+        "newFollowers": 10,
+        "profileVisits": 40
+      },
+      {
+        "period": "2026-04-09",
+        "newFollowers": 9,
+        "profileVisits": 34
+      }
+    ],
+    "yearly": [
+      {
+        "period": "2026-01-01",
+        "newFollowers": 249,
+        "profileVisits": 1146
+      }
+    ],
+    "sources": {
+      "daily": [],
+      "weekly": [],
+      "monthly": [],
+      "yearly": []
+    },
+    "countries": {
+      "daily": [
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 276",
+          "earningsUSD": 19.98,
+          "salesUSD": 19.98,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 392",
+          "earningsUSD": 9.99,
+          "salesUSD": 9.99,
+          "views": 0
+        }
+      ],
+      "weekly": [
+        {
+          "period": "2026-04-08T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 826",
+          "earningsUSD": 79.96,
+          "salesUSD": 79.96,
+          "views": 0
+        },
+        {
+          "period": "2026-04-08T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 392",
+          "earningsUSD": 4.99,
+          "salesUSD": 4.99,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 840",
+          "earningsUSD": 167.98,
+          "salesUSD": 167.98,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 826",
+          "earningsUSD": 84.96,
+          "salesUSD": 84.96,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 36",
+          "earningsUSD": 69.96,
+          "salesUSD": 69.96,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 276",
+          "earningsUSD": 19.98,
+          "salesUSD": 19.98,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 392",
+          "earningsUSD": 9.99,
+          "salesUSD": 9.99,
+          "views": 0
+        }
+      ],
+      "monthly": [
+        {
+          "period": "2026-04-04T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 36",
+          "earningsUSD": 357.97,
+          "salesUSD": 357.97,
+          "views": 0
+        },
+        {
+          "period": "2026-04-04T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 840",
+          "earningsUSD": 192.96,
+          "salesUSD": 192.96,
+          "views": 0
+        },
+        {
+          "period": "2026-04-04T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 276",
+          "earningsUSD": 134.99,
+          "salesUSD": 134.99,
+          "views": 0
+        },
+        {
+          "period": "2026-04-04T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 826",
+          "earningsUSD": 44.98,
+          "salesUSD": 44.98,
+          "views": 0
+        },
+        {
+          "period": "2026-04-04T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 392",
+          "earningsUSD": 5,
+          "salesUSD": 5,
+          "views": 0
+        },
+        {
+          "period": "2026-04-05T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 840",
+          "earningsUSD": 179.95,
+          "salesUSD": 179.95,
+          "views": 0
+        },
+        {
+          "period": "2026-04-05T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 276",
+          "earningsUSD": 164.98,
+          "salesUSD": 164.98,
+          "views": 0
+        },
+        {
+          "period": "2026-04-05T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 36",
+          "earningsUSD": 119.99,
+          "salesUSD": 119.99,
+          "views": 0
+        },
+        {
+          "period": "2026-04-05T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 392",
+          "earningsUSD": 44.99,
+          "salesUSD": 44.99,
+          "views": 0
+        },
+        {
+          "period": "2026-04-05T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 826",
+          "earningsUSD": 2.99,
+          "salesUSD": 2.99,
+          "views": 0
+        },
+        {
+          "period": "2026-04-06T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 36",
+          "earningsUSD": 229.93,
+          "salesUSD": 229.93,
+          "views": 0
+        },
+        {
+          "period": "2026-04-06T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 840",
+          "earningsUSD": 109.99,
+          "salesUSD": 109.99,
+          "views": 0
+        },
+        {
+          "period": "2026-04-06T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 826",
+          "earningsUSD": 59.99,
+          "salesUSD": 59.99,
+          "views": 0
+        },
+        {
+          "period": "2026-04-06T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 392",
+          "earningsUSD": 50,
+          "salesUSD": 50,
+          "views": 0
+        },
+        {
+          "period": "2026-04-06T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 276",
+          "earningsUSD": 48.95,
+          "salesUSD": 48.95,
+          "views": 0
+        },
+        {
+          "period": "2026-04-07T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 840",
+          "earningsUSD": 322.96,
+          "salesUSD": 322.96,
+          "views": 0
+        },
+        {
+          "period": "2026-04-07T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 392",
+          "earningsUSD": 102.99,
+          "salesUSD": 102.99,
+          "views": 0
+        },
+        {
+          "period": "2026-04-07T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 36",
+          "earningsUSD": 55.96,
+          "salesUSD": 55.96,
+          "views": 0
+        },
+        {
+          "period": "2026-04-07T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 826",
+          "earningsUSD": 44.96,
+          "salesUSD": 44.96,
+          "views": 0
+        },
+        {
+          "period": "2026-04-07T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 276",
+          "earningsUSD": 14.99,
+          "salesUSD": 14.99,
+          "views": 0
+        },
+        {
+          "period": "2026-04-08T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 840",
+          "earningsUSD": 114.93,
+          "salesUSD": 114.93,
+          "views": 0
+        },
+        {
+          "period": "2026-04-08T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 276",
+          "earningsUSD": 100,
+          "salesUSD": 100,
+          "views": 0
+        },
+        {
+          "period": "2026-04-08T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 36",
+          "earningsUSD": 99.97,
+          "salesUSD": 99.97,
+          "views": 0
+        },
+        {
+          "period": "2026-04-08T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 826",
+          "earningsUSD": 79.96,
+          "salesUSD": 79.96,
+          "views": 0
+        },
+        {
+          "period": "2026-04-08T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 392",
+          "earningsUSD": 4.99,
+          "salesUSD": 4.99,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 840",
+          "earningsUSD": 167.98,
+          "salesUSD": 167.98,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 826",
+          "earningsUSD": 84.96,
+          "salesUSD": 84.96,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 36",
+          "earningsUSD": 69.96,
+          "salesUSD": 69.96,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 276",
+          "earningsUSD": 19.98,
+          "salesUSD": 19.98,
+          "views": 0
+        },
+        {
+          "period": "2026-04-09T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 392",
+          "earningsUSD": 9.99,
+          "salesUSD": 9.99,
+          "views": 0
+        }
+      ],
+      "yearly": [
+        {
+          "period": "2026-01-01T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 36",
+          "earningsUSD": 5767.73,
+          "salesUSD": 5767.73,
+          "views": 0
+        },
+        {
+          "period": "2026-01-01T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 840",
+          "earningsUSD": 4958.9,
+          "salesUSD": 4958.9,
+          "views": 0
+        },
+        {
+          "period": "2026-01-01T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 276",
+          "earningsUSD": 1990.6,
+          "salesUSD": 1990.6,
+          "views": 0
+        },
+        {
+          "period": "2026-01-01T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 826",
+          "earningsUSD": 1745.39,
+          "salesUSD": 1745.39,
+          "views": 0
+        },
+        {
+          "period": "2026-01-01T00:00:00.000Z",
+          "rank": 1,
+          "country": "Country 392",
+          "earningsUSD": 1106.79,
+          "salesUSD": 1106.79,
+          "views": 0
+        }
+      ]
+    },
+    "grandTotal": {
+      "newFollowers": 249,
+      "profileVisits": 1146
+    }
+  },
+  "subscriptions": {
+    "daily": [
+      {
+        "newSubscriber": 7,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 11,
+        "tier1": 2,
+        "tier2": 2,
+        "tier3": 3,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-08"
+      },
+      {
+        "newSubscriber": 5,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 8,
+        "tier1": 2,
+        "tier2": 1,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-09"
+      }
+    ],
+    "weekly": [
+      {
+        "newSubscriber": 6,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 9,
+        "tier1": 2,
+        "tier2": 0,
+        "tier3": 4,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-03"
+      },
+      {
+        "newSubscriber": 5,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 8,
+        "tier1": 2,
+        "tier2": 2,
+        "tier3": 0,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-04"
+      },
+      {
+        "newSubscriber": 5,
+        "recurringSubscriber": 2,
+        "totalSubscribers": 7,
+        "tier1": 2,
+        "tier2": 1,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-05"
+      },
+      {
+        "newSubscriber": 6,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 9,
+        "tier1": 3,
+        "tier2": 1,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-06"
+      },
+      {
+        "newSubscriber": 6,
+        "recurringSubscriber": 2,
+        "totalSubscribers": 8,
+        "tier1": 2,
+        "tier2": 0,
+        "tier3": 4,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-07"
+      },
+      {
+        "newSubscriber": 7,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 11,
+        "tier1": 2,
+        "tier2": 2,
+        "tier3": 3,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-08"
+      },
+      {
+        "newSubscriber": 5,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 8,
+        "tier1": 2,
+        "tier2": 1,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-09"
+      }
+    ],
+    "monthly": [
+      {
+        "newSubscriber": 3,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 7,
+        "tier1": 1,
+        "tier2": 1,
+        "tier3": 0,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-11"
+      },
+      {
+        "newSubscriber": 5,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 9,
+        "tier1": 2,
+        "tier2": 1,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-12"
+      },
+      {
+        "newSubscriber": 3,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 6,
+        "tier1": 1,
+        "tier2": 0,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-13"
+      },
+      {
+        "newSubscriber": 3,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 6,
+        "tier1": 0,
+        "tier2": 1,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-14"
+      },
+      {
+        "newSubscriber": 5,
+        "recurringSubscriber": 5,
+        "totalSubscribers": 10,
+        "tier1": 0,
+        "tier2": 2,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-15"
+      },
+      {
+        "newSubscriber": 3,
+        "recurringSubscriber": 2,
+        "totalSubscribers": 5,
+        "tier1": 0,
+        "tier2": 0,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-16"
+      },
+      {
+        "newSubscriber": 3,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 7,
+        "tier1": 1,
+        "tier2": 2,
+        "tier3": 0,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-17"
+      },
+      {
+        "newSubscriber": 6,
+        "recurringSubscriber": 5,
+        "totalSubscribers": 11,
+        "tier1": 1,
+        "tier2": 3,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-18"
+      },
+      {
+        "newSubscriber": 4,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 8,
+        "tier1": 1,
+        "tier2": 1,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-19"
+      },
+      {
+        "newSubscriber": 3,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 6,
+        "tier1": 1,
+        "tier2": 1,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-20"
+      },
+      {
+        "newSubscriber": 3,
+        "recurringSubscriber": 2,
+        "totalSubscribers": 5,
+        "tier1": 0,
+        "tier2": 1,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-21"
+      },
+      {
+        "newSubscriber": 5,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 9,
+        "tier1": 2,
+        "tier2": 2,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-22"
+      },
+      {
+        "newSubscriber": 7,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 10,
+        "tier1": 2,
+        "tier2": 5,
+        "tier3": -1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-23"
+      },
+      {
+        "newSubscriber": 6,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 9,
+        "tier1": 2,
+        "tier2": 1,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-24"
+      },
+      {
+        "newSubscriber": 6,
+        "recurringSubscriber": 2,
+        "totalSubscribers": 8,
+        "tier1": 2,
+        "tier2": 3,
+        "tier3": 0,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-25"
+      },
+      {
+        "newSubscriber": 6,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 10,
+        "tier1": 1,
+        "tier2": 3,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-26"
+      },
+      {
+        "newSubscriber": 4,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 7,
+        "tier1": 2,
+        "tier2": 1,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-27"
+      },
+      {
+        "newSubscriber": 4,
+        "recurringSubscriber": 2,
+        "totalSubscribers": 6,
+        "tier1": 4,
+        "tier2": 0,
+        "tier3": -1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-28"
+      },
+      {
+        "newSubscriber": 4,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 8,
+        "tier1": -1,
+        "tier2": 1,
+        "tier3": 3,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-29"
+      },
+      {
+        "newSubscriber": 7,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 11,
+        "tier1": 4,
+        "tier2": 1,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-30"
+      },
+      {
+        "newSubscriber": 3,
+        "recurringSubscriber": 5,
+        "totalSubscribers": 8,
+        "tier1": 1,
+        "tier2": 0,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-03-31"
+      },
+      {
+        "newSubscriber": 4,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 7,
+        "tier1": 0,
+        "tier2": 1,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-01"
+      },
+      {
+        "newSubscriber": 4,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 7,
+        "tier1": 1,
+        "tier2": 2,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-02"
+      },
+      {
+        "newSubscriber": 6,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 9,
+        "tier1": 2,
+        "tier2": 0,
+        "tier3": 4,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-03"
+      },
+      {
+        "newSubscriber": 5,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 8,
+        "tier1": 2,
+        "tier2": 2,
+        "tier3": 0,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-04"
+      },
+      {
+        "newSubscriber": 5,
+        "recurringSubscriber": 2,
+        "totalSubscribers": 7,
+        "tier1": 2,
+        "tier2": 1,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-05"
+      },
+      {
+        "newSubscriber": 6,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 9,
+        "tier1": 3,
+        "tier2": 1,
+        "tier3": 1,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-06"
+      },
+      {
+        "newSubscriber": 6,
+        "recurringSubscriber": 2,
+        "totalSubscribers": 8,
+        "tier1": 2,
+        "tier2": 0,
+        "tier3": 4,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-07"
+      },
+      {
+        "newSubscriber": 7,
+        "recurringSubscriber": 4,
+        "totalSubscribers": 11,
+        "tier1": 2,
+        "tier2": 2,
+        "tier3": 3,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-08"
+      },
+      {
+        "newSubscriber": 5,
+        "recurringSubscriber": 3,
+        "totalSubscribers": 8,
+        "tier1": 2,
+        "tier2": 1,
+        "tier3": 2,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-04-09"
+      }
+    ],
+    "yearly": [
+      {
+        "newSubscriber": 141,
+        "recurringSubscriber": 99,
+        "totalSubscribers": 240,
+        "tier1": 43,
+        "tier2": 40,
+        "tier3": 42,
+        "tier4": 0,
+        "tier5": 0,
+        "period": "2026-01-01"
+      }
+    ],
+    "grandTotal": {
+      "newSubscriber": 141,
+      "recurringSubscriber": 99,
+      "totalSubscribers": 240,
+      "tier1": 43,
+      "tier2": 40,
+      "tier3": 42,
+      "tier4": 0,
+      "tier5": 0
+    }
+  },
+  "trendingTags": {
+    "daily": [
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 746138737",
+        "views": 2,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 12896008",
+        "views": 1,
+        "salesUSD": 0
+      }
+    ],
+    "weekly": [
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "tag": "Tag 1395481247",
+        "views": 3,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 2090088440",
+        "views": 7,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 1395481247",
+        "views": 5,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 2090835549",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 741212512",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 746138737",
+        "views": 2,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 12896008",
+        "views": 1,
+        "salesUSD": 0
+      }
+    ],
+    "monthly": [
+      {
+        "period": "2026-04-04T00:00:00.000Z",
+        "tag": "Tag 741212512",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-04T00:00:00.000Z",
+        "tag": "Tag 12896008",
+        "views": 3,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-04T00:00:00.000Z",
+        "tag": "Tag 1395481247",
+        "views": 1,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "tag": "Tag 1395481247",
+        "views": 5,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "tag": "Tag 12896008",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "tag": "Tag 2090088440",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "tag": "Tag 2090835549",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "tag": "Tag 746138737",
+        "views": 3,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-05T00:00:00.000Z",
+        "tag": "Tag 741212512",
+        "views": 1,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "tag": "Tag 1395481247",
+        "views": 5,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "tag": "Tag 2090835549",
+        "views": 5,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "tag": "Tag 746138737",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "tag": "Tag 2090088440",
+        "views": 2,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-06T00:00:00.000Z",
+        "tag": "Tag 741212512",
+        "views": 1,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "tag": "Tag 746138737",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "tag": "Tag 1395481247",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "tag": "Tag 2090835549",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "tag": "Tag 741212512",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "tag": "Tag 2090088440",
+        "views": 3,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-07T00:00:00.000Z",
+        "tag": "Tag 12896008",
+        "views": 3,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "tag": "Tag 741212512",
+        "views": 5,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "tag": "Tag 2090835549",
+        "views": 5,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "tag": "Tag 12896008",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-08T00:00:00.000Z",
+        "tag": "Tag 1395481247",
+        "views": 3,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 2090088440",
+        "views": 7,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 1395481247",
+        "views": 5,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 2090835549",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 741212512",
+        "views": 4,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 746138737",
+        "views": 2,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-04-09T00:00:00.000Z",
+        "tag": "Tag 12896008",
+        "views": 1,
+        "salesUSD": 0
+      }
+    ],
+    "yearly": [
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "tag": "Tag 741212512",
+        "views": 107,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "tag": "Tag 12896008",
+        "views": 105,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "tag": "Tag 2090835549",
+        "views": 99,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "tag": "Tag 1395481247",
+        "views": 89,
+        "salesUSD": 0
+      },
+      {
+        "period": "2026-01-01T00:00:00.000Z",
+        "tag": "Tag 2090088440",
+        "views": 86,
+        "salesUSD": 0
+      }
+    ]
+  },
+  "likes": {
+    "daily": [
+      {
+        "period": "2026-04-08",
+        "media": 15,
+        "merch": 15,
+        "profile": 15,
+        "feed": 15
+      },
+      {
+        "period": "2026-04-09",
+        "media": 18,
+        "merch": 18,
+        "profile": 18,
+        "feed": 18
+      }
+    ],
+    "weekly": [
+      {
+        "period": "2026-04-03",
+        "media": 19,
+        "merch": 19,
+        "profile": 19,
+        "feed": 19
+      },
+      {
+        "period": "2026-04-04",
+        "media": 19,
+        "merch": 19,
+        "profile": 19,
+        "feed": 19
+      },
+      {
+        "period": "2026-04-05",
+        "media": 16,
+        "merch": 16,
+        "profile": 16,
+        "feed": 16
+      },
+      {
+        "period": "2026-04-06",
+        "media": 16,
+        "merch": 16,
+        "profile": 16,
+        "feed": 16
+      },
+      {
+        "period": "2026-04-07",
+        "media": 12,
+        "merch": 12,
+        "profile": 12,
+        "feed": 12
+      },
+      {
+        "period": "2026-04-08",
+        "media": 15,
+        "merch": 15,
+        "profile": 15,
+        "feed": 15
+      },
+      {
+        "period": "2026-04-09",
+        "media": 18,
+        "merch": 18,
+        "profile": 18,
+        "feed": 18
+      }
+    ],
+    "monthly": [
+      {
+        "period": "2026-03-11",
+        "media": 13,
+        "merch": 13,
+        "profile": 13,
+        "feed": 13
+      },
+      {
+        "period": "2026-03-12",
+        "media": 10,
+        "merch": 10,
+        "profile": 10,
+        "feed": 10
+      },
+      {
+        "period": "2026-03-13",
+        "media": 23,
+        "merch": 23,
+        "profile": 23,
+        "feed": 23
+      },
+      {
+        "period": "2026-03-14",
+        "media": 13,
+        "merch": 13,
+        "profile": 13,
+        "feed": 13
+      },
+      {
+        "period": "2026-03-15",
+        "media": 21,
+        "merch": 21,
+        "profile": 21,
+        "feed": 21
+      },
+      {
+        "period": "2026-03-16",
+        "media": 11,
+        "merch": 11,
+        "profile": 11,
+        "feed": 11
+      },
+      {
+        "period": "2026-03-17",
+        "media": 22,
+        "merch": 22,
+        "profile": 22,
+        "feed": 22
+      },
+      {
+        "period": "2026-03-18",
+        "media": 12,
+        "merch": 12,
+        "profile": 12,
+        "feed": 12
+      },
+      {
+        "period": "2026-03-19",
+        "media": 17,
+        "merch": 17,
+        "profile": 17,
+        "feed": 17
+      },
+      {
+        "period": "2026-03-20",
+        "media": 18,
+        "merch": 18,
+        "profile": 18,
+        "feed": 18
+      },
+      {
+        "period": "2026-03-21",
+        "media": 24,
+        "merch": 24,
+        "profile": 24,
+        "feed": 24
+      },
+      {
+        "period": "2026-03-22",
+        "media": 25,
+        "merch": 25,
+        "profile": 25,
+        "feed": 25
+      },
+      {
+        "period": "2026-03-23",
+        "media": 14,
+        "merch": 14,
+        "profile": 14,
+        "feed": 14
+      },
+      {
+        "period": "2026-03-24",
+        "media": 12,
+        "merch": 12,
+        "profile": 12,
+        "feed": 12
+      },
+      {
+        "period": "2026-03-25",
+        "media": 23,
+        "merch": 23,
+        "profile": 23,
+        "feed": 23
+      },
+      {
+        "period": "2026-03-26",
+        "media": 18,
+        "merch": 18,
+        "profile": 18,
+        "feed": 18
+      },
+      {
+        "period": "2026-03-27",
+        "media": 10,
+        "merch": 10,
+        "profile": 10,
+        "feed": 10
+      },
+      {
+        "period": "2026-03-28",
+        "media": 20,
+        "merch": 20,
+        "profile": 20,
+        "feed": 20
+      },
+      {
+        "period": "2026-03-29",
+        "media": 13,
+        "merch": 13,
+        "profile": 13,
+        "feed": 13
+      },
+      {
+        "period": "2026-03-30",
+        "media": 17,
+        "merch": 17,
+        "profile": 17,
+        "feed": 17
+      },
+      {
+        "period": "2026-03-31",
+        "media": 12,
+        "merch": 12,
+        "profile": 12,
+        "feed": 12
+      },
+      {
+        "period": "2026-04-01",
+        "media": 15,
+        "merch": 15,
+        "profile": 15,
+        "feed": 15
+      },
+      {
+        "period": "2026-04-02",
+        "media": 10,
+        "merch": 10,
+        "profile": 10,
+        "feed": 10
+      },
+      {
+        "period": "2026-04-03",
+        "media": 19,
+        "merch": 19,
+        "profile": 19,
+        "feed": 19
+      },
+      {
+        "period": "2026-04-04",
+        "media": 19,
+        "merch": 19,
+        "profile": 19,
+        "feed": 19
+      },
+      {
+        "period": "2026-04-05",
+        "media": 16,
+        "merch": 16,
+        "profile": 16,
+        "feed": 16
+      },
+      {
+        "period": "2026-04-06",
+        "media": 16,
+        "merch": 16,
+        "profile": 16,
+        "feed": 16
+      },
+      {
+        "period": "2026-04-07",
+        "media": 12,
+        "merch": 12,
+        "profile": 12,
+        "feed": 12
+      },
+      {
+        "period": "2026-04-08",
+        "media": 15,
+        "merch": 15,
+        "profile": 15,
+        "feed": 15
+      },
+      {
+        "period": "2026-04-09",
+        "media": 18,
+        "merch": 18,
+        "profile": 18,
+        "feed": 18
+      }
+    ],
+    "yearly": [
+      {
+        "period": "2026-01-01",
+        "media": 488,
+        "merch": 488,
+        "profile": 488,
+        "feed": 488
+      }
+    ],
+    "grandTotal": {
+      "media": 488,
+      "merch": 488,
+      "profile": 488,
+      "feed": 488
+    }
+  },
+  "contributors": {
+    "topContributors": [
+      {
+        "name": "Fan 1113",
+        "subscription": 0,
+        "paytoview": 0,
+        "merch": 0,
+        "wishtender": 0,
+        "customrequest": 0,
+        "tokens": 314.98
+      },
+      {
+        "name": "Fan 1047",
+        "subscription": 0,
+        "paytoview": 0,
+        "merch": 0,
+        "wishtender": 0,
+        "customrequest": 0,
+        "tokens": 289.99
+      },
+      {
+        "name": "Fan 1003",
+        "subscription": 0,
+        "paytoview": 0,
+        "merch": 0,
+        "wishtender": 0,
+        "customrequest": 0,
+        "tokens": 272.95
+      },
+      {
+        "name": "Fan 1085",
+        "subscription": 0,
+        "paytoview": 0,
+        "merch": 0,
+        "wishtender": 0,
+        "customrequest": 0,
+        "tokens": 265
+      },
+      {
+        "name": "Fan 1034",
+        "subscription": 0,
+        "paytoview": 0,
+        "merch": 0,
+        "wishtender": 0,
+        "customrequest": 0,
+        "tokens": 249.97
+      }
+    ],
+    "topFirms": [],
+    "topOrderSpenders": [
+      {
+        "name": "Fan 1113",
+        "orders": 0,
+        "usdSpent": 314.98,
+        "tokensSpent": 0
+      },
+      {
+        "name": "Fan 1047",
+        "orders": 0,
+        "usdSpent": 289.99,
+        "tokensSpent": 0
+      },
+      {
+        "name": "Fan 1003",
+        "orders": 0,
+        "usdSpent": 272.95,
+        "tokensSpent": 0
+      },
+      {
+        "name": "Fan 1085",
+        "orders": 0,
+        "usdSpent": 265,
+        "tokensSpent": 0
+      },
+      {
+        "name": "Fan 1034",
+        "orders": 0,
+        "usdSpent": 249.97,
+        "tokensSpent": 0
+      }
+    ]
+  },
+  "fans_traffic": {
+    "daily": [
+      {
+        "source": "instagram",
+        "value": 45
+      },
+      {
+        "source": "twitter",
+        "value": 25
+      },
+      {
+        "source": "facebook",
+        "value": 15
+      },
+      {
+        "source": "direct",
+        "value": 15
+      }
+    ],
+    "weekly": [
+      {
+        "source": "instagram",
+        "value": 45
+      },
+      {
+        "source": "twitter",
+        "value": 25
+      },
+      {
+        "source": "facebook",
+        "value": 15
+      },
+      {
+        "source": "direct",
+        "value": 15
+      }
+    ],
+    "monthly": [
+      {
+        "source": "instagram",
+        "value": 45
+      },
+      {
+        "source": "twitter",
+        "value": 25
+      },
+      {
+        "source": "facebook",
+        "value": 15
+      },
+      {
+        "source": "direct",
+        "value": 15
+      }
+    ],
+    "yearly": [
+      {
+        "source": "instagram",
+        "value": 45
+      },
+      {
+        "source": "twitter",
+        "value": 25
+      },
+      {
+        "source": "facebook",
+        "value": 15
+      },
+      {
+        "source": "direct",
+        "value": 15
+      }
+    ],
+    "alltime": [
+      {
+        "source": "instagram",
+        "value": 45
+      },
+      {
+        "source": "twitter",
+        "value": 25
+      },
+      {
+        "source": "facebook",
+        "value": 15
+      },
+      {
+        "source": "direct",
+        "value": 15
+      }
+    ]
+  },
+  "fans_map": {
+    "yearly": [
+      {
+        "id": "United States",
+        "fans": 1200
+      },
+      {
+        "id": "Germany",
+        "fans": 400
+      },
+      {
+        "id": "Japan",
+        "fans": 300
+      },
+      {
+        "id": "United Kingdom",
+        "fans": 200
+      },
+      {
+        "id": "France",
+        "fans": 150
+      }
+    ],
+    "weekly": [
+      {
+        "id": "United States",
+        "fans": 1200
+      },
+      {
+        "id": "Germany",
+        "fans": 400
+      },
+      {
+        "id": "Japan",
+        "fans": 300
+      },
+      {
+        "id": "United Kingdom",
+        "fans": 200
+      },
+      {
+        "id": "France",
+        "fans": 150
+      }
+    ],
+    "monthly": [
+      {
+        "id": "United States",
+        "fans": 1200
+      },
+      {
+        "id": "Germany",
+        "fans": 400
+      },
+      {
+        "id": "Japan",
+        "fans": 300
+      },
+      {
+        "id": "United Kingdom",
+        "fans": 200
+      },
+      {
+        "id": "France",
+        "fans": 150
+      }
+    ],
+    "daily": [
+      {
+        "id": "United States",
+        "fans": 1200
+      },
+      {
+        "id": "Germany",
+        "fans": 400
+      },
+      {
+        "id": "Japan",
+        "fans": 300
+      },
+      {
+        "id": "United Kingdom",
+        "fans": 200
+      },
+      {
+        "id": "France",
+        "fans": 150
+      }
+    ],
+    "alltime": [
+      {
+        "id": "United States",
+        "fans": 1200
+      },
+      {
+        "id": "Germany",
+        "fans": 400
+      },
+      {
+        "id": "Japan",
+        "fans": 300
+      },
+      {
+        "id": "United Kingdom",
+        "fans": 200
+      },
+      {
+        "id": "France",
+        "fans": 150
+      }
+    ]
+  }
+}

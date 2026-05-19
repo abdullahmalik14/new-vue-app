@@ -1199,6 +1199,14 @@
     "slug": "/MediaUploader",
   "componentPath": "@/components/ui/global/media/uploader/MediaUploader.vue"
   },
+  {
+    "slug": "/payout",
+  "componentPath": "@/templates/payout/PayoutPage.vue"
+  },
+  {
+    "slug": "/analytics",
+  "componentPath": "@/templates/analytics/AnalyticsPage.vue"
+  },
     {
     "slug": "/chats",
           "componentPath": "@/templates/dashboard/page/demo/DemoChats.vue"

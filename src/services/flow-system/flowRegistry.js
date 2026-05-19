@@ -95,6 +95,7 @@ import {
   uploadMediaFlow,
   submitUploaderFlow,
 } from "@/services/orders/flows/mediaUploaderFlows.js";
+import { fetchAnalyticsFlow } from "@/services/analytics/flows/fetchAnalyticsFlow.js";
 
 export const flowRegistry = {
   "events.fetchEvent": {
@@ -1672,5 +1673,36 @@ export const flowRegistry = {
         SUBMIT_FAILED: "Registration failed. Please check form data.",
       },
     },
+  },
+  "analytics.fetch": {
+    flowKind: "read",
+    flow: fetchAnalyticsFlow,
+    pipeline: {
+      timeouts: { requestMs: 15000, totalFlowMs: 25000 },
+      retry: { enabled: true, maxAttempts: 2 },
+      etag: { enabled: true, varyByPayload: true },
+      concurrency: { policy: "latestWins", dedupe: true },
+      readFrom: {
+        enabled: false,
+        priority: ["pinia"],
+        sources: [{ type: "pinia", storeId: "dashboard" }],
+      },
+      destinations: [
+        { type: "piniaAction", storeId: "dashboard", action: "setAnalyticsAction" },
+      ],
+      uiErrorMap: {
+        FETCH_ANALYTICS_FAILED: "Could not load analytics data.",
+      },
+      onNotModified: [
+        {
+          type: "piniaPatch",
+          storeId: "dashboard",
+          patch: () => ({
+            lastUpdated: new Date().toISOString(),
+          }),
+        },
+      ],
+    },
+    refresh: { enabled: true, intervalMs: 30000, scopeKey: "analytics.fetch" },
   },
 };

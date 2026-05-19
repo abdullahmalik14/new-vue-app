@@ -1,0 +1,67 @@
+{
+  "earnings.trends": {
+    "datasetKey": "earnings",
+    "fields": {
+      "category": "period",
+      "total": "total"
+    },
+    "breakdownKeys": [
+      "subscription",
+      "paytoview",
+      "merch",
+      "wishtender",
+      "customrequest"
+    ]
+  },
+  "subscribers.line": {
+    "datasetKey": "subscribers",
+    "fields": {
+      "category": "month",
+      "total": "total"
+    },
+    "breakdownKeys": [
+      "sub",
+      "tip"
+    ]
+  },
+  "donut.example": {
+    "datasetKey": "donut",
+    "fields": {
+      "category": "category",
+      "total": "value"
+    },
+    "breakdownKeys": [
+      "category"
+    ]
+  },
+  "subscribers.newline": {
+    "datasetKey": "subscribers",
+    "fields": {
+      "category": "month",
+      "total": "total"
+    },
+    "breakdownKeys": [
+      "sub"
+    ]
+  },
+  "world.map": {
+    "datasetKey": "worldmap",
+    "fields": {
+      "category": "id",
+      "total": "sales"
+    },
+    "breakdownKeys": [
+      "sales"
+    ]
+  },
+  "countries.visits": {
+    "datasetKey": "countries",
+    "fields": {
+      "category": "country",
+      "total": "visits"
+    },
+    "breakdownKeys": [
+      "visits"
+    ]
+  }
+}

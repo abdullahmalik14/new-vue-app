@@ -1,0 +1,123 @@
+{
+  "earnings": {
+    "daily": [],
+    "weekly": [],
+    "monthly": [],
+    "yearly": [],
+    "grandTotal": {
+      "subscription": 0,
+      "paytoview": 0,
+      "merch": 0,
+      "wishtender": 0,
+      "customrequest": 0,
+      "total": 0,
+      "subscriptionTokens": 0,
+      "paytoviewTokens": 0,
+      "merchTokens": 0,
+      "wishtenderTokens": 0,
+      "customrequestTokens": 0,
+      "totalTokens": 0,
+      "tipTokens": 0,
+      "callTokens": 0,
+      "chatTokens": 0,
+      "liveStreamTokens": 0
+    },
+    "summaries": {
+      "daily": {
+        "totalEarningsUSD": 0,
+        "tokensReceived": 0
+      },
+      "weekly": {
+        "totalEarningsUSD": 0,
+        "tokensReceived": 0
+      },
+      "monthly": {
+        "totalEarningsUSD": 0,
+        "tokensReceived": 0
+      },
+      "yearly": {
+        "totalEarningsUSD": 0,
+        "tokensReceived": 0
+      }
+    }
+  },
+  "fanInsights": {
+    "daily": [],
+    "weekly": [],
+    "monthly": [],
+    "yearly": [],
+    "grandTotal": {
+      "newFollowers": 0,
+      "profileVisits": 0
+    },
+    "sources": {
+      "daily": [],
+      "weekly": [],
+      "monthly": [],
+      "yearly": []
+    },
+    "countries": {
+      "daily": [],
+      "weekly": [],
+      "monthly": [],
+      "yearly": []
+    }
+  },
+  "likes": {
+    "daily": [],
+    "weekly": [],
+    "monthly": [],
+    "yearly": [],
+    "grandTotal": {
+      "media": 0,
+      "merch": 0,
+      "profile": 0,
+      "feed": 0
+    }
+  },
+  "subscriptions": {
+    "daily": [],
+    "weekly": [],
+    "monthly": [],
+    "yearly": [],
+    "grandTotal": {
+      "newSubscriber": 0,
+      "recurringSubscriber": 0,
+      "totalSubscribers": 0,
+      "tier1": 0,
+      "tier2": 0,
+      "tier3": 0,
+      "tier4": 0,
+      "tier5": 0
+    }
+  },
+  "contributors": {
+    "topContributors": [],
+    "topFirms": [],
+    "topOrderSpenders": []
+  },
+  "trendingsMedia": {
+    "daily": [],
+    "weekly": [],
+    "monthly": [],
+    "yearly": []
+  },
+  "trendingMerch": {
+    "daily": [],
+    "weekly": [],
+    "monthly": [],
+    "yearly": []
+  },
+  "trendingTags": {
+    "daily": [],
+    "weekly": [],
+    "monthly": [],
+    "yearly": []
+  },
+  "trendingCountries": {
+    "daily": [],
+    "weekly": [],
+    "monthly": [],
+    "yearly": []
+  }
+}

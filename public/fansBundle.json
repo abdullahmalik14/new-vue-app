@@ -1,0 +1,395 @@
+{
+  "fans": {
+    "daily": [
+      {
+        "month": "Mar 11",
+        "newFollowers": 12,
+        "profileVisits": 45,
+        "total": 57
+      },
+      {
+        "month": "Mar 12",
+        "newFollowers": 18,
+        "profileVisits": 62,
+        "total": 80
+      },
+      {
+        "month": "Mar 13",
+        "newFollowers": 9,
+        "profileVisits": 38,
+        "total": 47
+      },
+      {
+        "month": "Mar 14",
+        "newFollowers": 14,
+        "profileVisits": 55,
+        "total": 69
+      },
+      {
+        "month": "Mar 15",
+        "newFollowers": 22,
+        "profileVisits": 78,
+        "total": 100
+      },
+      {
+        "month": "Mar 16",
+        "newFollowers": 11,
+        "profileVisits": 42,
+        "total": 53
+      },
+      {
+        "month": "Mar 17",
+        "newFollowers": 16,
+        "profileVisits": 58,
+        "total": 74
+      },
+      {
+        "month": "Mar 18",
+        "newFollowers": 20,
+        "profileVisits": 70,
+        "total": 90
+      },
+      {
+        "month": "Mar 19",
+        "newFollowers": 8,
+        "profileVisits": 32,
+        "total": 40
+      },
+      {
+        "month": "Mar 20",
+        "newFollowers": 15,
+        "profileVisits": 52,
+        "total": 67
+      },
+      {
+        "month": "Mar 21",
+        "newFollowers": 25,
+        "profileVisits": 88,
+        "total": 113
+      },
+      {
+        "month": "Mar 22",
+        "newFollowers": 13,
+        "profileVisits": 48,
+        "total": 61
+      },
+      {
+        "month": "Mar 23",
+        "newFollowers": 19,
+        "profileVisits": 65,
+        "total": 84
+      },
+      {
+        "month": "Mar 24",
+        "newFollowers": 10,
+        "profileVisits": 38,
+        "total": 48
+      },
+      {
+        "month": "Mar 25",
+        "newFollowers": 17,
+        "profileVisits": 60,
+        "total": 77
+      },
+      {
+        "month": "Mar 26",
+        "newFollowers": 21,
+        "profileVisits": 74,
+        "total": 95
+      },
+      {
+        "month": "Mar 27",
+        "newFollowers": 7,
+        "profileVisits": 28,
+        "total": 35
+      },
+      {
+        "month": "Mar 28",
+        "newFollowers": 14,
+        "profileVisits": 52,
+        "total": 66
+      },
+      {
+        "month": "Mar 29",
+        "newFollowers": 18,
+        "profileVisits": 66,
+        "total": 84
+      },
+      {
+        "month": "Mar 30",
+        "newFollowers": 12,
+        "profileVisits": 44,
+        "total": 56
+      },
+      {
+        "month": "Mar 31",
+        "newFollowers": 16,
+        "profileVisits": 58,
+        "total": 74
+      },
+      {
+        "month": "Apr 1",
+        "newFollowers": 9,
+        "profileVisits": 35,
+        "total": 44
+      },
+      {
+        "month": "Apr 2",
+        "newFollowers": 22,
+        "profileVisits": 80,
+        "total": 102
+      },
+      {
+        "month": "Apr 3",
+        "newFollowers": 15,
+        "profileVisits": 55,
+        "total": 70
+      },
+      {
+        "month": "Apr 4",
+        "newFollowers": 11,
+        "profileVisits": 40,
+        "total": 51
+      },
+      {
+        "month": "Apr 5",
+        "newFollowers": 20,
+        "profileVisits": 72,
+        "total": 92
+      },
+      {
+        "month": "Apr 6",
+        "newFollowers": 13,
+        "profileVisits": 48,
+        "total": 61
+      },
+      {
+        "month": "Apr 7",
+        "newFollowers": 18,
+        "profileVisits": 65,
+        "total": 83
+      },
+      {
+        "month": "Apr 8",
+        "newFollowers": 10,
+        "profileVisits": 38,
+        "total": 48
+      },
+      {
+        "month": "Apr 9",
+        "newFollowers": 14,
+        "profileVisits": 52,
+        "total": 66
+      }
+    ],
+    "weekly": [
+      {
+        "month": "W Mar 9",
+        "newFollowers": 86,
+        "profileVisits": 300,
+        "total": 386
+      },
+      {
+        "month": "W Mar 16",
+        "newFollowers": 102,
+        "profileVisits": 360,
+        "total": 462
+      },
+      {
+        "month": "W Mar 23",
+        "newFollowers": 95,
+        "profileVisits": 340,
+        "total": 435
+      },
+      {
+        "month": "W Mar 30",
+        "newFollowers": 88,
+        "profileVisits": 315,
+        "total": 403
+      },
+      {
+        "month": "W Apr 6",
+        "newFollowers": 75,
+        "profileVisits": 280,
+        "total": 355
+      }
+    ],
+    "monthly": [
+      {
+        "month": "Feb 2026",
+        "newFollowers": 0,
+        "profileVisits": 0,
+        "total": 0
+      },
+      {
+        "month": "Mar 2026",
+        "newFollowers": 312,
+        "profileVisits": 1105,
+        "total": 1417
+      },
+      {
+        "month": "Apr 2026",
+        "newFollowers": 163,
+        "profileVisits": 595,
+        "total": 758
+      }
+    ],
+    "yearly": [
+      {
+        "month": "2025",
+        "newFollowers": 0,
+        "profileVisits": 0,
+        "total": 0
+      },
+      {
+        "month": "2026",
+        "newFollowers": 475,
+        "profileVisits": 1700,
+        "total": 2175
+      }
+    ],
+    "alltime": [
+      {
+        "month": "2025",
+        "newFollowers": 0,
+        "profileVisits": 0,
+        "total": 0
+      },
+      {
+        "month": "2026",
+        "newFollowers": 475,
+        "profileVisits": 1700,
+        "total": 2175
+      }
+    ]
+  },
+  "grandTotal": {
+    "newFollowers": 475,
+    "profileVisits": 1700,
+    "total": 2175
+  },
+  "fans_traffic": {
+    "daily": [
+      {
+        "source": "direct",
+        "value": 38
+      },
+      {
+        "source": "twitter",
+        "value": 25
+      },
+      {
+        "source": "facebook",
+        "value": 22
+      },
+      {
+        "source": "instagram",
+        "value": 15
+      }
+    ],
+    "weekly": [
+      {
+        "source": "direct",
+        "value": 35
+      },
+      {
+        "source": "twitter",
+        "value": 28
+      },
+      {
+        "source": "facebook",
+        "value": 20
+      },
+      {
+        "source": "instagram",
+        "value": 17
+      }
+    ],
+    "monthly": [
+      {
+        "source": "direct",
+        "value": 40
+      },
+      {
+        "source": "twitter",
+        "value": 22
+      },
+      {
+        "source": "facebook",
+        "value": 25
+      },
+      {
+        "source": "instagram",
+        "value": 13
+      }
+    ],
+    "yearly": [
+      {
+        "source": "direct",
+        "value": 42
+      },
+      {
+        "source": "twitter",
+        "value": 20
+      },
+      {
+        "source": "facebook",
+        "value": 22
+      },
+      {
+        "source": "instagram",
+        "value": 16
+      }
+    ],
+    "alltime": [
+      {
+        "source": "direct",
+        "value": 42
+      },
+      {
+        "source": "twitter",
+        "value": 20
+      },
+      {
+        "source": "facebook",
+        "value": 22
+      },
+      {
+        "source": "instagram",
+        "value": 16
+      }
+    ]
+  },
+  "fans_map": {
+    "weekly": [
+      {
+        "id": "US",
+        "fans": 155
+      },
+      {
+        "id": "GB",
+        "fans": 82
+      },
+      {
+        "id": "DE",
+        "fans": 68
+      },
+      {
+        "id": "JP",
+        "fans": 55
+      },
+      {
+        "id": "FR",
+        "fans": 48
+      },
+      {
+        "id": "CA",
+        "fans": 38
+      },
+      {
+        "id": "AU",
+        "fans": 29
+      }
+    ]
+  }
+}

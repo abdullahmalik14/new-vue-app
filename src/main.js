@@ -12,8 +12,10 @@
  */
 
 import { createApp, watch } from "vue";
-import { createPinia } from "pinia";
+import { createPinia, storeToRefs } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+import { useDashboardAnalytics } from "./stores/DashboardAnalytics";
+import flowRefreshManager from "@/services/flow-system/flowRefreshManager";
 import { createI18n } from "vue-i18n";
 import App from "./App.vue";
 import router from "./router/index.js";
@@ -146,8 +148,22 @@ FlowHandler.configure({
   piniaStores: {
     chat: useChatStore(pinia),
     cart: useCartStore(pinia),
+    dashboard: useDashboardAnalytics(pinia),
   },
 });
+
+// Initialize Dashboard Analytics
+const dashboardStore = useDashboardAnalytics(pinia);
+window.dashboardStore = dashboardStore;
+const { earnings } = storeToRefs(dashboardStore);
+
+// Load analytics data immediately using the new data pipeline
+try {
+  flowRefreshManager.startFromRegistry("analytics.fetch", { source: "full" });
+  console.log("Dashboard Analytics pipeline started in main.js");
+} catch (error) {
+  console.error("Failed to start analytics pipeline in main.js:", error);
+}
 
 log("main.js", "init", "pinia", "Pinia initialized with persistence", {});
 

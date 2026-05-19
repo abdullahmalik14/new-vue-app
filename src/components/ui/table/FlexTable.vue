@@ -225,14 +225,24 @@ function onRowContext(e, row) { e?.preventDefault?.(); emit('row-context', row) 
 <style scoped>
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+
 </style>
 
 <template>
   <div ref="containerEl">
     <div :class="showDesktopClass">
       <div :class="theme.container">
-        <div ref="bodyEl" class="scroll-smooth no-scrollbar" :style="bodyStyle">
-          <div v-if="columns && columns.length" :class="[theme.header, theme.headerRow, (stickyHeader && hasScrollArea) ? 'sticky top-0 z-10' : '']">
+        <div v-if="columns && columns.length && stickyHeader && hasScrollArea" :class="[theme.header, theme.headerRow]">
+          <template v-for="col in columns" :key="'h-'+col.key">
+            <div :class="[theme.headerCell, colClass(col)]">
+              <slot :name="'header.'+col.key" :col="col">{{ col.label }}</slot>
+            </div>
+          </template>
+        </div>
+
+        <div ref="bodyEl" class="scroll-smooth scrollbar-hide" :style="bodyStyle">
+          <div v-if="columns && columns.length && !(stickyHeader && hasScrollArea)" :class="[theme.header, theme.headerRow]">
             <template v-for="col in columns" :key="'h-'+col.key">
               <div :class="[theme.headerCell, colClass(col)]">
                 <slot :name="'header.'+col.key" :col="col">{{ col.label }}</slot>
@@ -304,12 +314,14 @@ function onRowContext(e, row) { e?.preventDefault?.(); emit('row-context', row) 
        <div :class="themeMobile.container">
           <div class="p-2 space-y-3">
              <div v-for="(row, rIdx) in rows" :key="'m-'+rIdx" :class="themeMobile.card" @click="onRowClick(row)">
-                <template v-for="(col, cIdx) in columns" :key="'m-col-'+cIdx">
-                   <div v-if="!col.hiddenAt?.includes('xs')" :class="themeMobile.cardRow">
-                      <span :class="themeMobile.cardLabel">{{ col.label }}</span>
-                      <span :class="themeMobile.cardValue">{{ row[col.key] }}</span>
-                   </div>
-                </template>
+                <slot name="mobile-row" :row="row" :index="rIdx">
+                   <template v-for="(col, cIdx) in columns" :key="'m-col-'+cIdx">
+                      <div v-if="!col.hiddenAt?.includes('xs')" :class="themeMobile.cardRow">
+                         <span :class="themeMobile.cardLabel">{{ col.label }}</span>
+                         <span :class="themeMobile.cardValue">{{ row[col.key] }}</span>
+                      </div>
+                   </template>
+                </slot>
              </div>
           </div>
        </div>

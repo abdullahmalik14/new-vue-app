@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Global Header -->
-    <AppHeader ref="appHeader" v-if="shouldShowLayout" />
+    <!-- <AppHeader ref="appHeader" v-if="shouldShowLayout" /> -->
     <!-- <AppShell /> -->
 
     <!-- Main Content Area -->
@@ -28,7 +28,7 @@
     </main>
 
     <!-- Global Footer -->
-    <AppFooter v-if="shouldShowLayout" />
+    <!-- <AppFooter v-if="shouldShowLayout" /> -->
   </div>
 </template>
 

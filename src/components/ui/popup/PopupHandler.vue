@@ -13,25 +13,51 @@ A single, reusable Vue 3 SFC that handles BOTH centered popups and slide-ins.
 - NEW: Optional scrollable content with hidden scrollbar
 ================================================================= -->
 <template>
-  <Teleport to="body">
+  <Teleport :to="props.teleportTo || 'body'" :disabled="cfg.isAbsolute">
+    <!-- Local overlay for absolute popups to avoid dimming whole screen -->
+    <div 
+      v-if="isVisible && cfg.isAbsolute && cfg.showOverlay"
+      class="absolute inset-0 bg-black/5 backdrop-blur-[7.5px] z-[1999] cursor-pointer"
+      @click="onEsc"
+    ></div>
+
     <!-- Panel wrapper (modal container) -->
-    <div v-show="isVisible" ref="panelRef" :role="ariaRole" :aria-modal="isModal ? 'true' : undefined"
-      :tabindex="isModal ? -1 : undefined" :class="containerClassList" v-bind="containerBindAttrs"
-      @keydown.esc.prevent.stop="onEsc" @click.stop class="relative">
+    <div
+      v-show="isVisible"
+      ref="panelRef"
+      :role="ariaRole"
+      :aria-modal="isModal ? 'true' : undefined"
+      :tabindex="isModal ? -1 : undefined"
+      :class="containerClassList"
+      v-bind="containerBindAttrs"
+      @keydown.esc.prevent.stop="onEsc"
+      @click.stop
+      class="relative"
+    >
       <!-- Optional loader (rendered via config.loader.component) -->
-      <div v-if="isLoading" class="pointer-events-none"
-        style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:9999; background:rgba(0,0,0,0.1);">
-        <component v-if="loaderComponent" :is="loaderComponent" v-bind="loaderProps"
-          :data-loader-position="loaderPosition" />
+      <div
+        v-if="isLoading"
+        class="pointer-events-none"
+        style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:9999; background:rgba(0,0,0,0.1);"
+      >
+        <component
+          v-if="loaderComponent"
+          :is="loaderComponent"
+          v-bind="loaderProps"
+          :data-loader-position="loaderPosition"
+        />
         <div v-else class="rounded-lg shadow-lg px-6 py-4 text-center border-2 border-blue-300">
-          <div class="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2">
-          </div>
+          <div class="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
           <div class="text-sm font-medium text-gray-700">Loading...</div>
         </div>
       </div>
 
       <!-- Content slot -->
-      <div ref="contentRef" :class="contentClassList" @click.stop>
+      <div
+        ref="contentRef"
+        :class="contentClassList"
+        @click.stop
+      >
         <slot />
       </div>
     </div>
@@ -94,6 +120,13 @@ const props = defineProps({
   isLoading: {
     type: Boolean,
     default: false
+  },
+  /**
+   * Target for teleportation. Defaults to body.
+   */
+  teleportTo: {
+    type: String,
+    default: 'body'
   }
 });
 
@@ -126,8 +159,9 @@ const defaults = {
   containerAttrs: {},
   escToClose: true,
   position: 'center', // popup: center | top-center | full (inferred if width/height=100%)
-  scrollable: true,// NEW: default scrollable with hidden scrollbar
-  verticalAlign: 'stretch'
+  scrollable: true ,// NEW: default scrollable with hidden scrollbar
+  verticalAlign: 'stretch',
+  isAbsolute: false // NEW: Support for absolute positioning within relative parent
 };
 
 // -------------------- State & Refs --------------------
@@ -213,14 +247,16 @@ const isModal = computed(() => !!cfg.value.showOverlay);
 // container class: minimal Tailwind; visual decisions mostly from config / inline transforms
 const containerClassList = computed(() => {
   const base = [
-    // positioning controlled inline; still add isolation and text settings
     'isolate',
     'text-base',
     'antialiased',
-    'overflow-auto',
+    'pointer-events-auto',
     'outline-none'
   ];
-  // Allow custom class string/array
+  // Hide scrollbar via CSS (for Chrome/Safari — inline styles can't target ::webkit-scrollbar)
+  if (cfg.value.scrollable !== false) {
+    base.push('scrollbar-hide');
+  }
   if (cfg.value.containerClass) {
     if (Array.isArray(cfg.value.containerClass)) base.push(...cfg.value.containerClass);
     else base.push(cfg.value.containerClass);
@@ -230,25 +266,9 @@ const containerClassList = computed(() => {
 });
 
 const contentClassList = computed(() => {
-  // Provide a minimal default for white bg and shadow; caller can override via slot classes if desired
-  const base = [
-    'h-full',
-    'w-full'
-  ];
-
-  // Add border radius only for popups, not slide-ins
-  // if (isPopup.value) {
-  //   base.push('rounded-xl');
-  // }
-
-  // NEW: Add scrollable behavior with hidden scrollbar if enabled
-  if (cfg.value.scrollable !== false) {
-    base.push('overflow-auto', 'scrollbar-hide');
-  } else {
-    base.push('overflow-visible');
-  }
-
-  return base;
+  // contentRef is a pure pass-through — panelRef itself is the scroll container.
+  // Slot content just needs to fill the parent naturally (no height or overflow constraint here).
+  return ['w-full'];
 });
 
 const containerBindAttrs = computed(() => {
@@ -274,16 +294,30 @@ async function openPanel() {
 
   // z-index calc & overlay
   const baseZ = (cfg.value.forceZIndex != null) ? cfg.value.forceZIndex : (cfg.value.zIndex ?? defaults.zIndex);
+  
+  // Register with stack after nextTick ensures panelRef.value is not null
+  registerPanel(panelRef, {
+    onBecomeTop: () => { 
+      registerOverlayHandler();
+    },
+    onAllClosed: () => {
+      setOverlayVisible(false);
+      setOverlayActive(false);
+      bodyScrollLock(false);
+    }
+  });
+
   currentZ.value = bringToFront(panel, baseZ);
-  if (cfg.value.showOverlay) {
+  if (cfg.value.showOverlay && !cfg.value.isAbsolute) {
     setOverlayZ(currentZ.value - 1);
     setOverlayActive(true);
     setOverlayVisible(true);
     registerOverlayHandler();
   } else if (cfg.value.closeOnOutside) {
-    // Even without overlay, set up outside click detection
+    // Even without global overlay, set up outside click detection
     registerOverlayHandler();
   }
+
 
   // Body scroll lock
   if (cfg.value.lockScroll) bodyScrollLock(true);
@@ -308,7 +342,7 @@ async function openPanel() {
           document.addEventListener('click', handleDocumentClick);
         }, 100);
       }
-
+      
       // Dispatch events with flags
       const detail = buildEventDetail('open');
       const domName = isPopup.value ? (cfg.value.onOpen || 'popup:open') : (cfg.value.onOpen || 'slidein:open');
@@ -374,7 +408,7 @@ function closeTopMost() {
 function handleDocumentClick(event) {
   const panel = panelRef.value;
   if (!panel || !isVisible.value) return;
-
+  
   // Check if click is outside the panel
   if (!panel.contains(event.target)) {
     closeTopMost();
@@ -414,12 +448,12 @@ function validateBeforeOpen() {
 
 function validateSizeValue(value, name) {
   if (value == null) return; // null/undefined is allowed
-
+  
   if (typeof value === 'string') {
     // String values: px, %, vw, vh, auto
-    const validStringPattern = /^(auto|\d+(\.\d+)?(px|%|vw|vh))$/i;
+    const validStringPattern = /^(auto|\d+(\.\d+)?(px|%|vw|vh|rem|em))$/i;
     if (!validStringPattern.test(value.trim())) {
-      errorAndThrow(`Invalid ${name} string value "${value}". Use format like "600px", "50%", "100vw", "100vh", or "auto".`);
+      errorAndThrow(`Invalid ${name} string value "${value}". Use format like "600px", "50%", "100vw", "100vh", "30rem", "2em", or "auto".`);
     }
   } else if (typeof value === 'number') {
     // Number values: treated as pixels
@@ -464,22 +498,35 @@ function applyInitialStyles(panel) {
   const isFullH = ['100%', '100vh'].includes(normalizedH);
 
   // Base styles
-  panel.style.position = 'fixed';
+  panel.style.position = cfg.value.isAbsolute ? 'absolute' : 'fixed';
   panel.style.zIndex = String(currentZ.value);
   panel.style.visibility = 'visible';
   panel.style.width = (normalizedW ?? 'auto');
-  // Height logic changed below for slide-ins
   panel.style.maxHeight = window.innerHeight + 'px';
-  panel.style.overflow = 'visible';
+
+  // panelRef IS the scroll container. This means:
+  // - Mouse wheel fires on panelRef (or its children) → scrolls panelRef ✓
+  // - Arrow keys work because panelRef is focused (tabindex=-1) and overflow-y: auto ✓
+  // - Touch scroll works naturally ✓
+  // - overscroll-behavior: contain prevents scroll chain leaking to the locked body ✓
+  if (cfg.value.scrollable !== false) {
+    panel.style.overflowY = 'auto';
+    panel.style.overflowX = 'hidden';
+    panel.style.overscrollBehavior = 'contain';
+    panel.style.scrollbarWidth = 'none';       // Firefox: hide scrollbar
+    panel.style.msOverflowStyle = 'none';      // IE/Edge: hide scrollbar
+  } else {
+    panel.style.overflow = 'visible';
+  }
 
   // --- POPUP LOGIC ---
   if (isPopup.value) {
     // ... (Popup logic same as before) ...
     panel.style.height = (normalizedH ?? '500px'); // Restore popup height logic
-
-    const pos = cfg.value.position || 'center';
+    
+    const pos = resolveResponsive(cfg.value.position) || 'center';
     if (isFullW) { panel.style.left = '0'; panel.style.right = '0'; } else { panel.style.left = '50%'; }
-    if (isFullH) { panel.style.top = '0'; panel.style.bottom = '0'; }
+    if (isFullH) { panel.style.top = '0'; panel.style.bottom = '0'; } 
     else {
       if (pos === 'top-center') panel.style.top = '0';
       else panel.style.top = '50%';
@@ -506,7 +553,7 @@ function applyInitialStyles(panel) {
         panel.style.transition = `transform ${cfg.value.speed} ${cfg.value.effect}`;
       }
     }
-
+    
     if (!isFullW && !isFullH && cfg.value.position !== 'top-center') {
       panel.style.transform = panel.style.transform || 'translate(-50%, -50%)';
     }
@@ -519,7 +566,7 @@ function applyInitialStyles(panel) {
 
     // LEFT / RIGHT SLIDE-INS
     if (dir === 'left' || dir === 'right') {
-
+      
       // Vertical Alignment Logic
       if (vAlign === 'stretch') {
         panel.style.top = '0';
@@ -580,31 +627,31 @@ function applyInitialStyles(panel) {
 
 function applyEnterStyles(panel) {
   if (isPopup.value) {
-    // ... (Popup logic same as before, no change needed) ...
-    // Copy paste old popup enter logic here
-    const w = resolveResponsive(cfg.value.width);
-    const h = resolveResponsive(cfg.value.height);
-    const isFullW = ['100%', '100vw'].includes((w || '').toString());
-    const isFullH = ['100%', '100vh'].includes((h || '').toString());
-    const pos = cfg.value.position || 'center';
-    const effect = cfg.value.customEffect || 'scale';
+     // ... (Popup logic same as before, no change needed) ...
+     // Copy paste old popup enter logic here
+     const w = resolveResponsive(cfg.value.width);
+     const h = resolveResponsive(cfg.value.height);
+     const isFullW = ['100%', '100vw'].includes((w || '').toString());
+     const isFullH = ['100%', '100vh'].includes((h || '').toString());
+     const pos = cfg.value.position || 'center';
+     const effect = cfg.value.customEffect || 'scale';
 
-    if (effect === 'fade') { panel.style.opacity = '1'; }
-    else if (effect === 'slideTopFade') {
-      panel.style.opacity = '1';
-      panel.style.transform = (isFullW || isFullH) ? 'none' : (pos === 'top-center' ? 'translate(-50%, 0)' : 'translate(-50%, -50%)');
-    } else {
-      panel.style.transform = (isFullW || isFullH) ? 'none' : (pos === 'top-center' ? 'translate(-50%, 0) scale(1)' : 'translate(-50%, -50%) scale(1)');
-    }
+     if (effect === 'fade') { panel.style.opacity = '1'; }
+     else if (effect === 'slideTopFade') {
+       panel.style.opacity = '1';
+       panel.style.transform = (isFullW || isFullH) ? 'none' : (pos === 'top-center' ? 'translate(-50%, 0)' : 'translate(-50%, -50%)');
+     } else {
+       panel.style.transform = (isFullW || isFullH) ? 'none' : (pos === 'top-center' ? 'translate(-50%, 0) scale(1)' : 'translate(-50%, -50%) scale(1)');
+     }
   } else {
     // --- SLIDE IN ENTER ---
     const vAlign = cfg.value.verticalAlign || 'stretch';
     const dir = cfg.value.from || 'left';
 
     if ((dir === 'left' || dir === 'right') && vAlign === 'center') {
-      panel.style.transform = 'translate(0, -50%)'; // Keep vertical centering
+       panel.style.transform = 'translate(0, -50%)'; // Keep vertical centering
     } else {
-      panel.style.transform = 'translate(0, 0)';
+       panel.style.transform = 'translate(0, 0)';
     }
   }
 }
@@ -639,10 +686,11 @@ function focusFirstFocusable() {
   lastActive = document.activeElement;
   const el = panelRef.value;
   if (!el) return;
-  // Try to focus the first focusable inside content
-  const selectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-  const first = el.querySelector(selectors);
-  (first || el).focus({ preventScroll: true });
+  // Focus the panel itself (tabindex=-1 for modals).
+  // This is critical: when panelRef is focused, arrow keys and Page Up/Down
+  // scroll the panelRef (which is overflow-y: auto). If we focused a child
+  // button instead, arrow keys would do nothing (buttons don't respond to arrow keys).
+  el.focus({ preventScroll: true });
 }
 
 function restoreFocus() {
@@ -695,26 +743,13 @@ function registerOverlayHandler() {
     overlayClick.setHandler(() => closeTopMost());
   } else if (cfg.value.showOverlay) {
     // If showing overlay but NOT closing on outside, swallow clicks
-    overlayClick.setHandler(() => { });
+    overlayClick.setHandler(() => {});
   }
 }
 
 // -------------------- Watchers & lifecycle --------------------
 watch(() => props.modelValue, (nv) => {
   if (nv) {
-    registerPanel(panelRef, {
-      onBecomeTop: () => {
-        // When this panel becomes top-most again (e.g. child closed), 
-        // restore its overlay click handler
-        registerOverlayHandler();
-      },
-      onAllClosed: () => {
-        // When all closed: hide overlay & unlock scroll
-        setOverlayVisible(false);
-        setOverlayActive(false);
-        bodyScrollLock(false);
-      }
-    });
     openPanel();
   } else {
     if (isVisible.value) closePanel();

@@ -10,11 +10,43 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+    <script data-charts="config" type="application/json">
+      {
+        "datasetsSrc": "/chartsData.bundle.json"
+      }
+    </script>
   </head>
   <body>
     <!-- Application root -->
     <div id="app"></div>
     
+
+    <!-- DebugLogger shim — chartsHandler/Calculator/Utilities require it -->
+    <script>
+      window.DebugLogger = {
+        log: function() {},
+        warn: function() {},
+        error: function() {},
+        table: function() {},
+        group: function() {},
+        groupEnd: function() {},
+        groupCollapsed: function() {}
+      };
+    </script>
+    <script src="/chartsUtilities.js"></script>
+    <script src="/chartsCalculator.js"></script>
+    <script src="/chartsHandler.js"></script>
+    <script>
+      // chartsHandler global instance banao
+      window.chartsHandler = new ChartsHandler();
+    </script>
     <!-- Main application script -->
     <script type="module" src="/src/main.js"></script>
   </body>

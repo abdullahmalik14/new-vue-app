@@ -1,0 +1,162 @@
+{
+  "subscribers": {
+    "daily": { 
+      "new": 15, 
+      "recurring": 8,
+      "newPercentage": 20,
+      "recurringPercentage": 15
+    },
+    "weekly": { "new": 105, "recurring": 56 },
+    "monthly": { "new": 450, "recurring": 240 },
+    "yearly": { "new": 5400, "recurring": 2800 }
+  },
+  "fans": {
+    "daily": { 
+      "newFollowers": 20, 
+      "profileVisit": 45,
+      "newFollowersPercentage": 10,
+      "profileVisitPercentage": 5,
+      "topCountries": [
+        { "id": 1, "rank": 1, "country": "Hong Kong", "visits": "1,230" },
+        { "id": 2, "rank": 2, "country": "United States of America", "visits": "1,230" },
+        { "id": 3, "rank": 3, "country": "Singapore", "visits": "1,230" },
+        { "id": 4, "rank": 4, "country": "Australia", "visits": "1,230" },
+        { "id": 5, "rank": 5, "country": "Taiwan", "visits": "1,230" },
+        { "id": 6, "rank": 6, "country": "Hong Kong", "visits": "1,230" },
+        { "id": 7, "rank": 7, "country": "United States of America", "visits": "1,230" },
+        { "id": 8, "rank": 8, "country": "Singapore", "visits": "1,230" },
+        { "id": 9, "rank": 9, "country": "Australia", "visits": "1,230" },
+        { "id": 10, "rank": 10, "country": "Taiwan", "visits": "1,230" }
+      ]
+    },
+    "weekly": { 
+      "newFollowers": 140, 
+      "profileVisit": 315,
+      "topCountries": [
+        { "id": 1, "rank": 1, "country": "Hong Kong", "visits": "8,450" },
+        { "id": 2, "rank": 2, "country": "United States of America", "visits": "7,120" },
+        { "id": 3, "rank": 3, "country": "Singapore", "visits": "6,200" },
+        { "id": 4, "rank": 4, "country": "Australia", "visits": "5,100" },
+        { "id": 5, "rank": 5, "country": "Taiwan", "visits": "4,300" }
+      ]
+    },
+    "monthly": { 
+      "newFollowers": 600, 
+      "profileVisit": 1350,
+      "topCountries": [
+        { "id": 1, "rank": 1, "country": "Hong Kong", "visits": "25,432" },
+        { "id": 2, "rank": 2, "country": "United States of America", "visits": "22,432" },
+        { "id": 3, "rank": 3, "country": "Singapore", "visits": "18,432" },
+        { "id": 4, "rank": 4, "country": "Australia", "visits": "15,432" },
+        { "id": 5, "rank": 5, "country": "Taiwan", "visits": "12,432" }
+      ]
+    },
+    "yearly": { 
+      "newFollowers": 7300, 
+      "profileVisit": 16400,
+      "topCountries": [
+        { "id": 1, "rank": 1, "country": "Hong Kong", "visits": "150,432" },
+        { "id": 2, "rank": 2, "country": "United States of America", "visits": "140,432" },
+        { "id": 3, "rank": 3, "country": "Singapore", "visits": "130,432" },
+        { "id": 4, "rank": 4, "country": "Australia", "visits": "120,432" },
+        { "id": 5, "rank": 5, "country": "Taiwan", "visits": "110,432" }
+      ]
+    }
+  },
+  "earnings": {
+    "daily": [
+      {
+        "period": "2025-08-11",
+        "total": 49,
+        "totalTokens": 27,
+        "earningsPercentage": 20,
+        "tokenPercentage": 20,
+        "topCountries": [
+          { "id": 1, "rank": 1, "country": "Hong Kong", "sales": "5,432.00" },
+          { "id": 2, "rank": 2, "country": "United States of America", "sales": "4,432.00" },
+          { "id": 3, "rank": 3, "country": "Singapore", "sales": "3,432.00" },
+          { "id": 4, "rank": 4, "country": "Taiwan", "sales": "2,432.00" },
+          { "id": 5, "rank": 5, "country": "Australia", "sales": "1,432.00" },
+          { "id": 6, "rank": 6, "country": "United States of America", "sales": "4,432.00" },
+          { "id": 7, "rank": 7, "country": "Singapore", "sales": "3,432.00" },
+          { "id": 8, "rank": 8, "country": "Taiwan", "sales": "2,432.00" },
+          { "id": 9, "rank": 9, "country": "Australia", "sales": "1,432.00" },
+          { "id": 10, "rank": 10, "country": "Hong Kong", "sales": "5,432.00" }
+        ]
+      }
+    ],
+    "weekly": [
+      {
+        "period": "Week 32",
+        "total": 88,
+        "totalTokens": 67,
+        "earningsPercentage": 20,
+        "tokenPercentage": 20,
+        "topCountries": [
+          { "id": 1, "rank": 1, "country": "Hong Kong", "sales": "5,432.00" },
+          { "id": 2, "rank": 2, "country": "United States of America", "sales": "4,432.00" },
+          { "id": 3, "rank": 3, "country": "Singapore", "sales": "3,432.00" },
+          { "id": 4, "rank": 4, "country": "Taiwan", "sales": "2,432.00" },
+          { "id": 5, "rank": 5, "country": "Australia", "sales": "1,432.00" },
+          { "id": 6, "rank": 6, "country": "United States of America", "sales": "4,432.00" },
+          { "id": 7, "rank": 7, "country": "Singapore", "sales": "3,432.00" },
+          { "id": 8, "rank": 8, "country": "Taiwan", "sales": "2,432.00" },
+          { "id": 9, "rank": 9, "country": "Australia", "sales": "1,432.00" },
+          { "id": 10, "rank": 10, "country": "Hong Kong", "sales": "5,432.00" }
+        ]
+      }
+    ],
+    "monthly": [
+      {
+        "period": "August 2025",
+        "total": 1200,
+        "totalTokens": 650,
+        "earningsPercentage": 20,
+        "tokenPercentage": 20,
+        "topCountries": [
+          { "id": 1, "rank": 1, "country": "Hong Kong", "sales": "5,432.00" },
+          { "id": 2, "rank": 2, "country": "United States of America", "sales": "4,432.00" },
+          { "id": 3, "rank": 3, "country": "Singapore", "sales": "3,432.00" },
+          { "id": 4, "rank": 4, "country": "Taiwan", "sales": "2,432.00" },
+          { "id": 5, "rank": 5, "country": "Australia", "sales": "1,432.00" },
+          { "id": 6, "rank": 6, "country": "United States of America", "sales": "4,432.00" },
+          { "id": 7, "rank": 7, "country": "Singapore", "sales": "3,432.00" },
+          { "id": 8, "rank": 8, "country": "Taiwan", "sales": "2,432.00" },
+          { "id": 9, "rank": 9, "country": "Australia", "sales": "1,432.00" },
+          { "id": 10, "rank": 10, "country": "Hong Kong", "sales": "5,432.00" }
+        ]
+      }
+    ],
+    "yearly": [
+      {
+        "period": "2025",
+        "total": 14000,
+        "totalTokens": 1289,
+        "earningsPercentage": 20,
+        "tokenPercentage": 20,
+        "topCountries": [
+          { "id": 1, "rank": 1, "country": "Hong Kong", "sales": "5,432.00" },
+          { "id": 2, "rank": 2, "country": "United States of America", "sales": "4,432.00" },
+          { "id": 3, "rank": 3, "country": "Singapore", "sales": "3,432.00" },
+          { "id": 4, "rank": 4, "country": "Taiwan", "sales": "2,432.00" },
+          { "id": 5, "rank": 5, "country": "Australia", "sales": "1,432.00" },
+          { "id": 6, "rank": 6, "country": "United States of America", "sales": "4,432.00" },
+          { "id": 7, "rank": 7, "country": "Singapore", "sales": "3,432.00" },
+          { "id": 8, "rank": 8, "country": "Taiwan", "sales": "2,432.00" },
+          { "id": 9, "rank": 9, "country": "Australia", "sales": "1,432.00" },
+          { "id": 10, "rank": 10, "country": "Hong Kong", "sales": "5,432.00" }
+        ]
+      }
+    ]
+  },
+  "likes": {
+    "media": 120,
+    "mediaPercentage": 110,
+    "merch": 35,
+    "merchPercentage": 95,
+    "profile": 80,
+    "profilePercentage": 130,
+    "feed": 52,
+    "feedPercentage": 125
+  }
+}
