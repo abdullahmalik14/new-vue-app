@@ -184,6 +184,7 @@
               </div>
 
               <!-- media-details-container -->
+               
               <div class="flex flex-col gap-12 z-[1]">
                 <div class="flex flex-col gap-2 w-[31.625rem] lg:gap-5 lg:w-[42rem]">
                   <!-- avatar & user-info -->

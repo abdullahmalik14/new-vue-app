@@ -84,13 +84,14 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
   getters: {
     // Subscribers card: daily ka sabse latest entry
     subscribers(state) {
-      const daily = state.subscriptionsBundle.daily
+      const daily = state.subscriptionsBundle.daily || []
       const latest = daily[daily.length - 1] || {}
       const prev = daily[daily.length - 2] || {}
 
       // Percentage calculate karo (prev se compare)
       const calcPct = (curr, prev) => {
-        if (!prev || prev === 0) return null
+        if (curr == null || curr === 0) return null
+        if (!prev || prev === 0) return 100
         return Math.round(((curr - prev) / prev) * 100)
       }
 
@@ -143,7 +144,8 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
       const prev = daily[daily.length - 2] || {}
 
       const calcPct = (curr, prev) => {
-        if (!prev || prev === 0) return null
+        if (curr == null || curr === 0) return null
+        if (!prev || prev === 0) return 100
         return Math.round(((curr - prev) / prev) * 100)
       }
 
@@ -218,8 +220,11 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
         }
 
         if (bundle.fanInsights) {
-          const getPct = (curr, prev) =>
-            !prev || prev === 0 ? null : Math.round(((curr - prev) / prev) * 100)
+          const getPct = (curr, prev) => {
+            if (curr == null || curr === 0) return null
+            if (!prev || prev === 0) return 100
+            return Math.round(((curr - prev) / prev) * 100)
+          }
           const mapFans = (arr, countriesArr) => {
             if (!arr || arr.length === 0)
               return {
@@ -229,7 +234,7 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
                 profileVisitPercentage: null,
                 topCountries: [],
               }
-            const latest = arr[arr.length - 1]
+            const latest = arr[arr.length - 1] || {}
             const prev = arr[arr.length - 2] || {}
             const topCountries = (countriesArr || [])
               .map((c, i) => ({ rank: c.rank || i + 1, country: c.country, visits: c.views || 0 }))
@@ -266,8 +271,11 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
         }
 
         if (bundle.likes) {
-          const getPct = (curr, prev) =>
-            !prev || prev === 0 ? null : Math.round(((curr - prev) / prev) * 100)
+          const getPct = (curr, prev) => {
+            if (curr == null || curr === 0) return null
+            if (!prev || prev === 0) return 100
+            return Math.round(((curr - prev) / prev) * 100)
+          }
           const arr = bundle.likes.daily || bundle.likes.weekly || bundle.likes.monthly || []
           const latest = arr[arr.length - 1] || {}
           const prev = arr[arr.length - 2] || {}
