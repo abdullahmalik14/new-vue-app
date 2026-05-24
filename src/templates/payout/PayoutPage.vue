@@ -2,6 +2,10 @@
 import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWrapperTwoColContainer.vue';
 import FlexTable from '@/components/ui/table/FlexTable.vue';
 import PayoutCard from '@/components/ui/card/dashboard/PayoutCard.vue';
+import PayoutSettingsPopup from '@/components/ui/popup/PayoutSettingsPopup.vue';
+import { ref } from 'vue';
+
+const showPayoutSettingsPopup = ref(false);
 
 const payoutColumns = [
   { key: 'period', label: 'Period', basis: 'min-w-[11.75rem]' },
@@ -58,7 +62,7 @@ const tableThemeMobile = {
               <h1 class="text-3xl leading-[2.375rem] font-medium tracking-[-0.045rem] text-[#475467] dark:text-[#b1aaa0]">Your Earnings</h1>
             
               <!-- payout-settings-button -->
-              <button class="flex justify-center items-center gap-2.5 pl-1 pr-2 h-10">
+              <button @click="showPayoutSettingsPopup = true" class="flex justify-center items-center gap-2.5 pl-1 pr-2 h-10">
                 <img src="https://i.ibb.co.com/xt47cMfQ/settings-02.webp" alt="settings 02" class="w-6 h-6 [filter:brightness(0)_saturate(100%)_invert(49%)_sepia(5%)_saturate(1614%)_hue-rotate(183deg)_brightness(85%)_contrast(84%)]">
                 <span class="text-lg font-medium text-[#667085] dark:text-[#9e9589]">Payout Settings</span>
               </button>
@@ -248,5 +252,6 @@ const tableThemeMobile = {
         </div>
     </div>
     </div>
+    <PayoutSettingsPopup v-model="showPayoutSettingsPopup" />
  </DashboardWrapperTwoColContainer>
 </template>

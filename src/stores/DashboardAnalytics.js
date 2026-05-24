@@ -206,8 +206,6 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
                 : null,
           }
         }
-
-        // Baki cards ke liye (baad mein implement honge)
         if (bundle.earnings) {
           this.earnings = {
             daily: bundle.earnings.daily || [],
