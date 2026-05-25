@@ -41,7 +41,8 @@ export function scanDistAssetsForSections(distPath) {
 
         // Extract section name from filename
         // Format: section-{name}-{hash}.{ext}
-        const match = file.match(/^section-([^-]+)-.+\.(js|css)$/);
+        // const match = file.match(/^section-([^-]+)-.+\.(js|css)$/);
+        const match = file.match(/^section-(.+)-[A-Za-z0-9]{8,}\.(js|css)$/);
 
         if (match) {
           const sectionName = match[1];

@@ -1,0 +1,13 @@
+{
+  "auth": { "css": "/assets/section-auth-dev.css" },
+  "dashboard-global": { "css": "/assets/section-dashboard-global-dev.css" },
+  "dashboard-creator": { "css": "/assets/section-dashboard-creator-dev.css" },
+  "dashboard-fan": { "css": "/assets/section-dashboard-fan-dev.css" },
+  "shop": { "css": "/assets/section-shop-dev.css" },
+  "misc": { "css": "/assets/section-misc-dev.css" },
+  "discover": { "css": "/assets/section-discover-dev.css" },
+  "profile": { "css": "/assets/section-profile-dev.css" },
+  "about": { "css": "/assets/section-about-dev.css" },
+  "contact": { "css": "/assets/section-contact-dev.css" },
+  "dev": { "css": "/assets/section-dev-dev.css" }
+}

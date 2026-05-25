@@ -18,7 +18,7 @@ export {
 
 // Export section preloader functions
 export {
-  preloadSectionBundle,
+  preloadSection,
   preloadMultipleSections,
   isSectionPreloaded,
   clearPreloadState,

@@ -4,7 +4,8 @@ import { log } from '../utils/common/logHandler.js';
 export const usePreloadStore = defineStore('preload', {
   state: () => ({
     preloadedSections: [], // Array of strings
-    preloadedAssets: []    // Array of strings (URLs)
+    preloadedAssets: [],    // Array of strings (URLs)
+    buildHash: null        // Cleared on new deploy to invalidate stale preload state
   }),
 
   actions: {
@@ -55,6 +56,7 @@ export const usePreloadStore = defineStore('preload', {
     clearState() {
       this.preloadedSections = [];
       this.preloadedAssets = [];
+      this.buildHash = null;
       log('usePreloadStore.js', 'clearState', 'clear', 'Preload state cleared', {});
     }
   },
@@ -62,6 +64,6 @@ export const usePreloadStore = defineStore('preload', {
   persist: {
     key: 'app-preload-state',
     storage: localStorage,
-    paths: ['preloadedSections', 'preloadedAssets']
+    paths: ['preloadedSections', 'preloadedAssets', 'buildHash']
   }
 });

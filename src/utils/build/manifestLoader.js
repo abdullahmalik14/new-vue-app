@@ -86,7 +86,8 @@ export async function loadSectionManifest() {
               flag: 'error',
               purpose: 'Manifest load failed'
             });
-            cachedManifest = {};
+            cachedManifest = null;
+            manifestPromise = null;
             return {};
           } finally {
             manifestPromise = null;
@@ -97,18 +98,26 @@ export async function loadSectionManifest() {
       return manifestPromise;
     }
 
-    // In development, return empty (Vite handles module loading)
-    log('manifestLoader.js', 'loadSectionManifest', 'dev', 'Development mode, using empty manifest', {});
-    window.performanceTracker.step({
-      step: 'loadSectionManifest_dev',
-      file: 'manifestLoader.js',
-      method: 'loadSectionManifest',
-      flag: 'dev',
-      purpose: 'Development mode, no manifest needed'
-    });
+    // In development, load from dev stub so the full preload path can be exercised locally
+    if (import.meta.env.DEV) {
+      log('manifestLoader.js', 'loadSectionManifest', 'dev', 'Development mode, loading dev manifest stub', {});
+      window.performanceTracker.step({
+        step: 'loadSectionManifest_dev',
+        file: 'manifestLoader.js',
+        method: 'loadSectionManifest',
+        flag: 'dev',
+        purpose: 'Development mode, loading stub manifest'
+      });
 
-    cachedManifest = {};
-    return {};
+      try {
+        const r = await fetch('/section-manifest.dev.json');
+        cachedManifest = r.ok ? await r.json() : null;
+      } catch {
+        cachedManifest = {};
+      }
+
+      return cachedManifest;
+    }
 
   } catch (error) {
     log('manifestLoader.js', 'loadSectionManifest', 'error', 'Error loading manifest', {
@@ -124,7 +133,8 @@ export async function loadSectionManifest() {
     });
 
     // Return empty manifest on error (fail gracefully)
-    cachedManifest = {};
+    cachedManifest = null;
+    manifestPromise = null;
     return {};
   }
 }

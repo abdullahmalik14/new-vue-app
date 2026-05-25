@@ -206,11 +206,47 @@ async function loadRouteComponent(route) {
     }
   }
 
-  try {
-    // Get auth store for role-based resolution
-    const authStore = useAuthStore();
-    const userRole = authStore.currentUser?.role || 'guest';
+  // Resolve section name for this role
+  const authStore = useAuthStore();
+  const userRole = authStore.currentUser?.role || 'guest';
+  const { resolveRoleSectionVariant } = await import('../utils/section/sectionResolver.js');
+  const rawSection = route.section;
+  const sectionName = rawSection ? resolveRoleSectionVariant(rawSection, userRole) : null;
 
+  if (sectionName) {
+    const { usePreloadStore } = await import('../stores/usePreloadStore.js');
+    const store = usePreloadStore();
+
+    if (store.hasSection(sectionName)) {
+      // FAST PATH: chunk is already in browser cache — import.meta.glob will be instant
+      log('router/index.js', 'loadRouteComponent', 'cache-hit', 'Section preloaded, fast load', { sectionName });
+      return loadViaGlob(route, userRole);
+    } else {
+      // SLOW PATH: not preloaded — lazy load now, then kick off section preload in background
+      log('router/index.js', 'loadRouteComponent', 'cache-miss', 'Section not preloaded, lazy load + background preload', { sectionName });
+      const componentModule = await loadViaGlob(route, userRole);
+      // Non-blocking: preload section AFTER component is already resolved
+      import('../utils/section/sectionPreloader.js')
+        .then(({ preloadSection }) => preloadSection(sectionName))
+        .catch(() => {});
+      return componentModule;
+    }
+  }
+
+  // No section on this route — standard lazy load only
+  return loadViaGlob(route, userRole);
+}
+
+/**
+ * Load a route component via import.meta.glob — the standard lazy load path.
+ * Used by both the fast path (cache hit, instant) and slow path (cache miss).
+ *
+ * @param {object} route - Route configuration object
+ * @param {string} userRole - Resolved user role string
+ * @returns {Promise} - Component default export
+ */
+async function loadViaGlob(route, userRole) {
+  try {
     // Resolve component path (handles role-based customComponentPath)
     const componentPath = resolveComponentPathForRoute(route, userRole);
 
@@ -218,17 +254,15 @@ async function loadRouteComponent(route) {
       throw new Error(`No component path found for route: ${route.slug}`);
     }
 
-    log('router/index.js', 'loadRouteComponent', 'resolve', 'Component path resolved', {
+    log('router/index.js', 'loadViaGlob', 'resolve', 'Component path resolved', {
       slug: route.slug,
       userRole,
       componentPath
     });
 
-    // Find the component loader in the pre-loaded modules
-    // Log available keys in development for debugging
     if (import.meta.env.DEV) {
-      const availableKeys = Object.keys(componentModules).slice(0, 5); // Log first 5 for debugging
-      log('router/index.js', 'loadRouteComponent', 'debug', 'Sample glob keys (first 5)', {
+      const availableKeys = Object.keys(componentModules).slice(0, 5);
+      log('router/index.js', 'loadViaGlob', 'debug', 'Sample glob keys (first 5)', {
         availableKeys,
         componentPath,
         totalKeys: Object.keys(componentModules).length
@@ -238,20 +272,18 @@ async function loadRouteComponent(route) {
     const componentLoader = findComponentLoader(componentPath);
 
     if (!componentLoader) {
-      // Log available keys for debugging
       const allKeys = Object.keys(componentModules);
-      log('router/index.js', 'loadRouteComponent', 'error', 'Component not found in pre-loaded modules', {
+      log('router/index.js', 'loadViaGlob', 'error', 'Component not found in pre-loaded modules', {
         componentPath,
-        availableKeys: allKeys.slice(0, 10), // Log first 10 keys
+        availableKeys: allKeys.slice(0, 10),
         totalKeys: allKeys.length
       });
       throw new Error(`Component not found in pre-loaded modules: ${componentPath}`);
     }
 
-    // Load the component - this will use the bundled chunk reference
     const componentModule = await componentLoader();
 
-    log('router/index.js', 'loadRouteComponent', 'success', 'Component loaded successfully', {
+    log('router/index.js', 'loadViaGlob', 'success', 'Component loaded successfully', {
       slug: route.slug,
       path: componentPath
     });
@@ -261,19 +293,18 @@ async function loadRouteComponent(route) {
         window.performanceTracker.step({
           step: 'loadComponent_complete',
           file: 'router/index.js',
-          method: 'loadRouteComponent',
+          method: 'loadViaGlob',
           flag: 'component-success',
           purpose: `Component loaded for ${route.slug}`
         });
-      } catch (e) {
-        // Performance tracker session ended, ignore
-      }
+      } catch (e) {}
     }
 
-    log('router/index.js', 'loadRouteComponent', 'return', 'Returning loaded component', { slug: route.slug, componentType: typeof componentModule.default });
+    log('router/index.js', 'loadViaGlob', 'return', 'Returning loaded component', { slug: route.slug });
     return componentModule.default || componentModule;
+
   } catch (error) {
-    log('router/index.js', 'loadRouteComponent', 'error', 'Failed to load component, using fallback', {
+    log('router/index.js', 'loadViaGlob', 'error', 'Failed to load component, using fallback', {
       slug: route.slug,
       error: error.message,
       stack: error.stack,
@@ -285,17 +316,14 @@ async function loadRouteComponent(route) {
         window.performanceTracker.step({
           step: 'loadComponent_fallback',
           file: 'router/index.js',
-          method: 'loadRouteComponent',
+          method: 'loadViaGlob',
           flag: 'component-error',
           purpose: `Component load failed, using NotFound fallback`
         });
-      } catch (e) {
-        // Performance tracker session ended, ignore
-      }
+      } catch (e) {}
     }
 
-    log('router/index.js', 'loadRouteComponent', 'return', 'Returning NotFound fallback component', { slug: route.slug });
-    // Fallback to centralized NotFound component loader
+    log('router/index.js', 'loadViaGlob', 'return', 'Returning NotFound fallback component', { slug: route.slug });
     return loadNotFoundComponent();
   }
 }
@@ -464,74 +492,6 @@ router.beforeEach(async (to, from, next) => {
       }
     }
 
-    // Load translations for current section BEFORE allowing navigation
-    // This ensures translations are ready before component renders (no placeholder text flash)
-    const currentSection = to.meta?.section;
-    if (currentSection) {
-      let resolvedSection = currentSection;
-      if (typeof currentSection === 'object' && currentSection !== null) {
-        const { resolveRoleSectionVariant } = await import('../utils/section/sectionResolver.js');
-        resolvedSection = resolveRoleSectionVariant(currentSection, guardContext.userRole);
-      }
-
-      if (resolvedSection && typeof resolvedSection === 'string') {
-        try {
-          // Get the active locale to ensure we load the correct translations
-          const activeLocale = resolveActiveLocale();
-
-          log('router/index.js', 'beforeEach', 'translation-preload', 'Loading translations before navigation', {
-            section: resolvedSection,
-            locale: activeLocale,
-            path: to.path
-          });
-
-          if (window.performanceTracker) {
-            try {
-              window.performanceTracker.step({
-                step: 'translationPreload_start',
-                file: 'router/index.js',
-                method: 'beforeEach',
-                flag: 'translation-preload',
-                purpose: `Preload translations for ${resolvedSection} (locale: ${activeLocale})`
-              });
-            } catch (e) {
-              // Performance tracker session ended, ignore
-            }
-          }
-
-          // AWAIT translation loading - blocks navigation until complete
-          // Explicitly pass the active locale to ensure correct translations are loaded
-          await loadTranslationsForSection(resolvedSection, activeLocale);
-
-          log('router/index.js', 'beforeEach', 'translation-preloaded', 'Translations loaded before navigation', {
-            section: resolvedSection,
-            path: to.path
-          });
-
-          if (window.performanceTracker) {
-            try {
-              window.performanceTracker.step({
-                step: 'translationPreload_complete',
-                file: 'router/index.js',
-                method: 'beforeEach',
-                flag: 'translation-ready',
-                purpose: `Translations ready for ${resolvedSection}`
-              });
-            } catch (e) {
-              // Performance tracker session ended, ignore
-            }
-          }
-        } catch (err) {
-          // Log error but don't block navigation
-          log('router/index.js', 'beforeEach', 'translation-preload-error', 'Translation preload failed (non-blocking)', {
-            section: resolvedSection,
-            path: to.path,
-            error: err.message
-          });
-        }
-      }
-    }
-
     next();
   } else {
     log('router/index.js', 'beforeEach', 'block', 'Navigation blocked by guards', {
@@ -605,13 +565,8 @@ router.afterEach(async (to, from) => {
   // Check if route should be excluded from preloading
   const preloadExclude = routeConfig?.preloadExclude === true;
 
-  if (preloadExclude) {
-    log('router/index.js', 'afterEach', 'preload-excluded', 'Route excluded from preloading', {
-      path: to.path,
-      preloadExclude
-    });
-    return;
-  }
+  // Note: preloadExclude only skips the background preLoadSections loop below.
+  // Current page CSS, translations, and assets still run regardless.
 
   if (routeConfig) {
     // Get auth store for role-based preload resolution
@@ -653,14 +608,20 @@ router.afterEach(async (to, from) => {
       });
     }
 
-    // Load current section CSS
+    // Load current section CSS — resolve role-object to string first
     if (currentSection) {
-      loadSectionCss(currentSection).catch(err => {
-        log('router/index.js', 'afterEach', 'css-error', 'Section CSS load failed (non-blocking)', {
-          section: currentSection,
-          error: err.message
+      const { resolveRoleSectionVariant } = await import('../utils/section/sectionResolver.js');
+      const resolvedCurrentSection = typeof currentSection === 'object'
+        ? resolveRoleSectionVariant(currentSection, userRole)
+        : currentSection;
+      if (resolvedCurrentSection) {
+        loadSectionCss(resolvedCurrentSection).catch(err => {
+          log('router/index.js', 'afterEach', 'css-error', 'Section CSS load failed (non-blocking)', {
+            section: resolvedCurrentSection,
+            error: err.message
+          });
         });
-      });
+      }
     }
 
     // Also load translations for the current route's section (for current view)
@@ -712,13 +673,17 @@ router.afterEach(async (to, from) => {
       }
     }
 
-    if (uniqueResolvedSections.length > 0) {
+    if (uniqueResolvedSections.length > 0 && !preloadExclude) {
       log('router/index.js', 'afterEach', 'preload', 'Preloading sections for route', {
         path: to.path,
         originalIdentifiers: sectionsToPreload,
         resolvedSections: uniqueResolvedSections,
         note: 'ONLY these sections will be preloaded, not all sections'
       });
+
+      // Hoist locale resolution above the loop — only needs to run once
+      const { resolveActiveLocale } = await import('../utils/translation/localeManager.js');
+      const activeLocale = resolveActiveLocale();
 
       try {
         // Preload ONLY sections from preLoadSections array (non-blocking)
@@ -734,25 +699,13 @@ router.afterEach(async (to, from) => {
               path: to.path
             });
 
-            // Preload CSS for future sections
-            preloadSectionCss(sectionToPreload).catch(err => {
-              log('router/index.js', 'afterEach', 'preload-css-error', 'CSS preload failed (non-blocking)', {
-                section: sectionToPreload,
-                error: err.message
-              });
-            });
-
+            // preloadSection handles CSS internally — do not call preloadSectionCss separately
             preloadSection(sectionToPreload).catch(err => {
               log('router/index.js', 'afterEach', 'preload-error', 'Section preload failed (non-blocking)', {
                 section: sectionToPreload,
                 error: err.message
               });
             });
-
-            // Load translations for preloaded sections (non-blocking)
-            // Get the active locale to ensure we load the correct translations
-            const { resolveActiveLocale } = await import('../utils/translation/localeManager.js');
-            const activeLocale = resolveActiveLocale();
 
             loadTranslationsForSection(sectionToPreload, activeLocale).catch(err => {
               log('router/index.js', 'afterEach', 'translation-error', 'Translation load failed (non-blocking)', {

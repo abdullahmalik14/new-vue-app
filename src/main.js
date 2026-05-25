@@ -21,7 +21,7 @@ import App from "./App.vue";
 import router from "./router/index.js";
 import { log } from "./utils/common/logHandler.js";
 import PerfTracker from "./utils/common/performanceTracker.js";
-import { resolveActiveLocale } from "./utils/translation/localeManager.js";
+import { resolveActiveLocale, SUPPORTED_LOCALES } from "./utils/translation/localeManager.js";
 import { loadTranslationsForSection } from "./utils/translation/translationLoader.js";
 import { useAuthStore } from "./stores/useAuthStore.js";
 import { useLocaleStore } from "./stores/useLocaleStore.js";
@@ -35,6 +35,7 @@ import { resolveRouteFromPath } from "./utils/route/routeResolver.js";
 import {
   getPreloadSectionsForRoute,
   resolveRoleSectionVariant,
+  resolveSectionIdentifier
 } from "./utils/section/sectionResolver.js";
 import { registerI18nInstance } from "./utils/translation/i18nInstance.js";
 import breakpoints from "./utils/breakpoints.js";
@@ -50,7 +51,7 @@ import { initMockCartApi } from "@/services/cart/mockCartBackend.js";
 import FlowHandler from "./services/flow-system/FlowHandler";
 import { useCartStore } from "./stores/useCartStore";
 import { useChatStore } from "./stores/useChatStore";
-
+import { usePreloadStore } from "./stores/usePreloadStore.js";
 
 // Initialize the mock cart backend interceptor
 initMockCartApi();
@@ -166,6 +167,19 @@ try {
 }
 
 log("main.js", "init", "pinia", "Pinia initialized with persistence", {});
+
+// If the build hash has changed since last session, clear all preloaded section state
+// so stale chunk names from the previous deploy don't cause ghost cache hits
+const preloadStore = usePreloadStore();
+const currentBuildHash = import.meta.env.VITE_BUILD_HASH || null;
+if (currentBuildHash && preloadStore.buildHash !== currentBuildHash) {
+  preloadStore.clearState();
+  preloadStore.buildHash = currentBuildHash;
+  log("main.js", "init", "build-hash", "New deploy detected — preload state cleared", {
+    previousHash: preloadStore.buildHash,
+    currentHash: currentBuildHash,
+  });
+}
 
 // Initialize utilities (requires Pinia to be active)
 try {
@@ -394,26 +408,61 @@ router
       "Preloading default auth section",
       { section: "auth" },
     );
-    preloadSection("auth").catch((err) => {
-      log(
-        "main.js",
-        "init",
-        "preload-error",
-        "Default auth section preload failed (non-blocking)",
-        {
-          section: "auth",
-          error: err.message,
-        },
-      );
-    });
 
-    const currentPath = router.currentRoute.value.path;
+    const shouldPreloadAuth =
+      !authStore.isAuthenticated ||
+      router.currentRoute.value.path === "/log-in" ||
+      (Array.isArray(currentRoute?.preLoadSections) && currentRoute.preLoadSections.includes("auth"));
+
+    if (shouldPreloadAuth) {
+      preloadSection("auth").catch((err) => {
+        log(
+          "main.js",
+          "init",
+          "preload-error",
+          "Default auth section preload failed (non-blocking)",
+          {
+            section: "auth",
+            error: err.message,
+          },
+        );
+      });
+    }
+
+    const rawPath = router.currentRoute.value.path;
+    const localePrefixMatch = rawPath.match(new RegExp(`^/(${SUPPORTED_LOCALES.join("|")})(/.*|$)`));
+    const currentPath = localePrefixMatch ? (localePrefixMatch[2] || "/") : rawPath;
     const currentRoute = resolveRouteFromPath(currentPath);
 
     if (currentRoute) {
+      const userRoleForPreload = authStore.currentUser?.role || "guest";
       const sectionsToPreload = Array.isArray(currentRoute.preLoadSections)
-        ? [...currentRoute.preLoadSections]
+        ? [...new Set(
+            currentRoute.preLoadSections
+              .map((id) => resolveSectionIdentifier(id, userRoleForPreload))
+              .filter((s) => typeof s === "string" && s.length > 0)
+          )]
         : [];
+
+      const shouldPreloadAuth =
+        !authStore.isAuthenticated ||
+        currentPath === "/log-in" ||
+        sectionsToPreload.includes("auth");
+  
+      if (shouldPreloadAuth) {
+        preloadSection("auth").catch((err) => {
+          log(
+            "main.js",
+            "init",
+            "preload-error",
+            "Default auth section preload failed (non-blocking)",
+            {
+              section: "auth",
+              error: err.message,
+            },
+          );
+        });
+      }
 
       log(
         "main.js",
