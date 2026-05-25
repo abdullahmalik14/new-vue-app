@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/charts/:path*",
+      "destination": "http://168.144.35.180:3000/api/charts/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
