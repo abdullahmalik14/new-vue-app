@@ -25,7 +25,7 @@ import { deepMergePreferChild, safelyGetNestedProperty } from '../common/objectS
  */
 export function resolveRouteFromPath(targetPath) {
   log('routeResolver.js', 'resolveRouteFromPath', 'start', 'Finding route by path', { targetPath });
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'resolveRoute',
     file: 'route/routeResolver.js',
     method: 'resolveRouteFromPath',
@@ -45,7 +45,7 @@ export function resolveRouteFromPath(targetPath) {
       });
 
       // Track success
-      window.performanceTracker.step({
+      window.performanceTracker?.step({
         step: 'routeResolved',
         file: 'routeResolver.js',
         method: 'resolveRouteFromPath',
@@ -71,7 +71,7 @@ export function resolveRouteFromPath(targetPath) {
         });
 
         // Track success
-        window.performanceTracker.step({
+        window.performanceTracker?.step({
           step: 'routeResolved',
           file: 'routeResolver.js',
           method: 'resolveRouteFromPath',
@@ -89,7 +89,7 @@ export function resolveRouteFromPath(targetPath) {
   log('routeResolver.js', 'resolveRouteFromPath', 'not-found', 'No route match found for path', { targetPath });
 
   // Track miss
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'routeNotFound',
     file: 'routeResolver.js',
     method: 'resolveRouteFromPath',
@@ -160,7 +160,7 @@ export function resolveComponentPathForRoute(route, userRole) {
     slug: route.slug,
     userRole
   });
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'resolveComponentPath',
     file: 'route/routeResolver.js',
     method: 'resolveComponentPathForRoute',
@@ -189,7 +189,7 @@ export function resolveComponentPathForRoute(route, userRole) {
       });
 
       // Track resolution
-      window.performanceTracker.step({
+      window.performanceTracker?.step({
         step: 'componentPathResolved',
         file: 'routeResolver.js',
         method: 'resolveComponentPathForRoute',
@@ -209,7 +209,7 @@ export function resolveComponentPathForRoute(route, userRole) {
     });
 
     // Track resolution
-    window.performanceTracker.step({
+    window.performanceTracker?.step({
       step: 'componentPathResolved',
       file: 'routeResolver.js',
       method: 'resolveComponentPathForRoute',
@@ -249,7 +249,7 @@ export function inheritConfigurationFromParentRoute(childRoute) {
     log('routeResolver.js', 'inheritConfigurationFromParentRoute', 'return', 'Returning original route - no inheritance', { slug: childRoute.slug });
     return childRoute;
   }
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'inheritParentConfig',
     file: 'route/routeResolver.js',
     method: 'inheritConfigurationFromParentRoute',
@@ -277,7 +277,7 @@ export function inheritConfigurationFromParentRoute(childRoute) {
   });
 
   // Track merge completion
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'parentConfigInherited',
     file: 'routeResolver.js',
     method: 'inheritConfigurationFromParentRoute',

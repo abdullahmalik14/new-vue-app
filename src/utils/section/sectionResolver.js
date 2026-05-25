@@ -10,6 +10,44 @@ import { logError } from '../common/errorHandler.js';
 import { safelyGetNestedProperty } from '../common/objectSafety.js';
 import { resolveRouteFromPath } from '../route/routeResolver.js';
 
+const PRELOAD_SECTIONS_FALLBACK_ROLE = 'default';
+
+/**
+ * Resolve role-keyed or flat preLoadSections config to a string array.
+ *
+ * @param {Array<string>|object|null|undefined} preLoadSections
+ * @param {string} userRole
+ * @returns {Array<string>}
+ */
+function resolveRolePreLoadSections(preLoadSections, userRole) {
+  if (!preLoadSections) {
+    return [];
+  }
+
+  if (Array.isArray(preLoadSections)) {
+    return preLoadSections;
+  }
+
+  if (typeof preLoadSections === 'object') {
+    const roleSections =
+      safelyGetNestedProperty(preLoadSections, userRole) ??
+      safelyGetNestedProperty(preLoadSections, PRELOAD_SECTIONS_FALLBACK_ROLE) ??
+      safelyGetNestedProperty(preLoadSections, 'guest');
+
+    if (Array.isArray(roleSections)) {
+      return roleSections;
+    }
+
+    log('sectionResolver.js', 'resolveRolePreLoadSections', 'warn', 'Role-keyed preLoadSections could not be resolved', {
+      userRole,
+      availableRoles: Object.keys(preLoadSections)
+    });
+    return [];
+  }
+
+  return [];
+}
+
 /**
  * Get sections to preload for a route
  * Returns sections that should be eagerly loaded before navigation completes
@@ -35,12 +73,7 @@ export function getPreloadSectionsForRoute(route, userRole) {
   }
 
   try {
-    const sections = [];
-
-    // Get explicitly declared preload sections
-    if (Array.isArray(route.preLoadSections)) {
-      sections.push(...route.preLoadSections);
-    }
+    const sections = resolveRolePreLoadSections(route.preLoadSections, userRole);
 
     // Remove duplicates
     const uniqueSections = [...new Set(sections)];
@@ -334,18 +367,11 @@ export function resolveRoleSectionVariant(sectionConfig, userRole, fallback = 'd
       return fallbackSectionName;
     }
 
-    // Use first available section as last resort
-    const firstSectionName = Object.values(sectionConfig)[0];
-
-    if (firstSectionName) {
-      log('sectionResolver.js', 'resolveRoleSectionVariant', 'warn', 'Using first available section as fallback', {
-        userRole,
-        section: firstSectionName
-      });
-
-      log('sectionResolver.js', 'resolveRoleSectionVariant', 'return', 'Returning first available section', { section: firstSectionName });
-      return firstSectionName;
-    }
+    log('sectionResolver.js', 'resolveRoleSectionVariant', 'warn', 'Could not resolve role-based section', {
+      userRole,
+      fallback,
+      availableRoles: Object.keys(sectionConfig)
+    });
   }
 
   // No section could be resolved

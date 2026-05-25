@@ -10,6 +10,7 @@ import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { loadJsonConfigSync } from '../../src/utils/common/jsonConfigLoaderNode.js';
+import { validateRouteConfig } from '../../src/utils/build/jsonConfigValidator.js';
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -39,6 +40,14 @@ export function discoverAllSectionsFromConfig() {
     if (!Array.isArray(routeConfigData)) {
       console.error('[SectionBundler] Invalid route config format. Expected array, got:', typeof routeConfigData);
       throw new Error('Route config must be an array');
+    }
+
+    const routeValidation = validateRouteConfig(routeConfigData);
+    if (!routeValidation.valid) {
+      const details = routeValidation.errors
+        .map((error) => error.message)
+        .join('\n  - ');
+      throw new Error(`Route config validation failed:\n  - ${details}`);
     }
 
     const discoveredSections = new Set();

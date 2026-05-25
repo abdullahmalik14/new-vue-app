@@ -16,12 +16,16 @@ import {
 import { log } from '../utils/common/logHandler.js';
 import { logError } from '../utils/common/errorHandler.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
-import { preloadSection } from '../utils/section/sectionPreloader.js';
-import { preloadSectionAssets, preloadSectionCriticalImages } from '../utils/assets/assetPreloader.js';
-import { loadSectionCss, preloadSectionCss } from '../utils/section/sectionCssLoader.js';
+import { preloadSectionAssets } from '../utils/assets/assetPreloader.js';
+import { loadSectionCss } from '../utils/section/sectionCssLoader.js';
 import { loadTranslationsForSection } from '../utils/translation/translationLoader.js';
 import { SUPPORTED_LOCALES } from '../utils/translation/localeManager.js';
-import { resolveSectionIdentifier } from '../utils/section/sectionResolver.js';
+import { resolveRoleSectionVariant } from '../utils/section/sectionResolver.js';
+import {
+  getRoutePreloadPlan,
+  resolveEffectiveRouteConfig,
+  startBackgroundSectionPreloads
+} from '../utils/section/sectionPreloadOrchestrator.js';
 import { loadNotFoundComponent } from '../utils/route/notFoundComponentLoader.js';
 
 /**
@@ -171,14 +175,7 @@ function findComponentLoader(componentPath) {
     return componentModules[relativePath];
   }
 
-  // Try to find by matching the end of the path (filename)
-  const fileName = componentPath.split('/').pop();
-  for (const [key, loader] of Object.entries(componentModules)) {
-    if (key.endsWith(fileName)) {
-      return loader;
-    }
-  }
-
+  // No filename-only fallback — wrong component can load silently (B-06 / .cursorrules)
   return null;
 }
 
@@ -441,6 +438,9 @@ router.beforeEach(async (to, from, next) => {
     return;
   }
 
+  const effectiveRouteConfig = resolveEffectiveRouteConfig(routeConfig);
+  const effectiveFromRouteConfig = resolveEffectiveRouteConfig(from.meta?.routeConfig);
+
   // Get auth context from auth store
   const authStore = useAuthStore();
   const guardContext = {
@@ -453,12 +453,12 @@ router.beforeEach(async (to, from, next) => {
 
   // Resolve section for current user role and store on meta to ensure downstream consumers get a concrete section string
   try {
-    const resolvedSection = resolveSectionIdentifier(routeConfig.section, guardContext.userRole);
+    const resolvedSection = resolveRoleSectionVariant(effectiveRouteConfig.section, guardContext.userRole);
     if (resolvedSection && typeof resolvedSection === 'string') {
       to.meta.section = resolvedSection;
     } else {
       // fallback to original section if resolution fails
-      to.meta.section = routeConfig.section;
+      to.meta.section = effectiveRouteConfig.section;
     }
     log('router/index.js', 'beforeEach', 'section-resolve', 'Resolved meta.section for current role', {
       role: guardContext.userRole,
@@ -468,11 +468,11 @@ router.beforeEach(async (to, from, next) => {
     log('router/index.js', 'beforeEach', 'section-resolve-error', 'Failed to resolve meta.section (non-blocking)', {
       error: e?.message
     });
-    to.meta.section = routeConfig.section;
+    to.meta.section = effectiveRouteConfig.section;
   }
 
-  // Run all route guards (AWAIT the async call)
-  const guardResult = await runAllRouteGuards(routeConfig, from.meta?.routeConfig, guardContext);
+  // Run all route guards against inherited/effective route config (L-11)
+  const guardResult = await runAllRouteGuards(effectiveRouteConfig, effectiveFromRouteConfig, guardContext);
 
   // Handle guard result
   if (guardResult.allow) {
@@ -561,43 +561,36 @@ router.afterEach(async (to, from) => {
   }
 
   const routeConfig = to.meta?.routeConfig;
+  const effectiveRouteConfig = resolveEffectiveRouteConfig(routeConfig);
 
   // Check if route should be excluded from preloading
-  const preloadExclude = routeConfig?.preloadExclude === true;
+  const preloadExclude = effectiveRouteConfig?.preloadExclude === true;
 
   // Note: preloadExclude only skips the background preLoadSections loop below.
   // Current page CSS, translations, and assets still run regardless.
 
-  if (routeConfig) {
+  if (effectiveRouteConfig) {
     // Get auth store for role-based preload resolution
     const authStore = useAuthStore();
     const userRole = authStore.currentUser?.role || 'guest';
 
-    // IMPORTANT: Only use preLoadSections directly from routeConfig
-    // Do NOT use getPreloadSectionsForRoute if it might merge/inherit other sections
-    // Get sections to preload ONLY from the route's preLoadSections array
-    const sectionsToPreload = Array.isArray(routeConfig.preLoadSections)
-      ? [...routeConfig.preLoadSections]  // Create a copy to avoid mutations
-      : [];
-
-    const resolvedSectionsToPreload = sectionsToPreload
-      .map(identifier => resolveSectionIdentifier(identifier, userRole))
-      .filter(sectionName => typeof sectionName === 'string' && sectionName.length > 0);
-
-    const uniqueResolvedSections = [...new Set(resolvedSectionsToPreload)];
+    const { identifiers: sectionsToPreload, resolved: resolvedSectionsToPreload } =
+      getRoutePreloadPlan(routeConfig, userRole);
 
     // Log what we're about to preload for debugging
     log('router/index.js', 'afterEach', 'preload-check', 'Checking preload sections', {
       path: to.path,
-      preLoadSections: routeConfig.preLoadSections,
+      preLoadSections: effectiveRouteConfig.preLoadSections,
       sectionsToPreload,
-      resolvedSections: uniqueResolvedSections,
-      routeConfigSlug: routeConfig.slug
+      resolvedSections: resolvedSectionsToPreload,
+      routeConfigSlug: effectiveRouteConfig.slug
     });
 
-    // Load CSS for the current route's section (blocking)
+    // Current-section CSS, translations, and assets — fire-and-forget (Preloading Task 4)
     const currentSection = to.meta?.section;
     const previousSection = from.meta?.section;
+    const { resolveActiveLocale } = await import('../utils/translation/localeManager.js');
+    const activeLocale = resolveActiveLocale();
 
     // Unload previous section CSS if navigating to a different section
     if (previousSection && previousSection !== currentSection) {
@@ -608,134 +601,76 @@ router.afterEach(async (to, from) => {
       });
     }
 
-    // Load current section CSS — resolve role-object to string first
+    let resolvedCurrentSection = null;
     if (currentSection) {
-      const { resolveRoleSectionVariant } = await import('../utils/section/sectionResolver.js');
-      const resolvedCurrentSection = typeof currentSection === 'object'
+      resolvedCurrentSection = typeof currentSection === 'object'
         ? resolveRoleSectionVariant(currentSection, userRole)
         : currentSection;
-      if (resolvedCurrentSection) {
-        loadSectionCss(resolvedCurrentSection).catch(err => {
-          log('router/index.js', 'afterEach', 'css-error', 'Section CSS load failed (non-blocking)', {
-            section: resolvedCurrentSection,
-            error: err.message
-          });
-        });
-      }
     }
 
-    // Also load translations for the current route's section (for current view)
-    if (currentSection) {
-      // Resolve section to string (handles both string and object sections)
-      let resolvedSection = currentSection;
-      if (typeof currentSection === 'object' && currentSection !== null) {
-        const { resolveRoleSectionVariant } = await import('../utils/section/sectionResolver.js');
-        resolvedSection = resolveRoleSectionVariant(currentSection, userRole);
-      }
-
-      if (resolvedSection && typeof resolvedSection === 'string') {
-        // Get the active locale to ensure we load the correct translations
-        const { resolveActiveLocale } = await import('../utils/translation/localeManager.js');
-        const activeLocale = resolveActiveLocale();
-
-        loadTranslationsForSection(resolvedSection, activeLocale).catch(err => {
-          log('router/index.js', 'afterEach', 'translation-error', 'Translation load failed (non-blocking)', {
-            originalSection: currentSection,
-            resolvedSection,
-            locale: activeLocale,
-            error: err.message
-          });
+    if (resolvedCurrentSection && typeof resolvedCurrentSection === 'string') {
+      loadSectionCss(resolvedCurrentSection).catch(err => {
+        log('router/index.js', 'afterEach', 'css-error', 'Section CSS load failed (non-blocking)', {
+          section: resolvedCurrentSection,
+          error: err.message
         });
-      } else {
-        log('router/index.js', 'afterEach', 'translation-warn', 'Could not resolve section to string, skipping translation load', {
-          section: currentSection,
-          resolvedSection,
-          userRole
+      });
+
+      loadTranslationsForSection(resolvedCurrentSection, activeLocale).catch(err => {
+        log('router/index.js', 'afterEach', 'translation-error', 'Translation load failed (non-blocking)', {
+          originalSection: currentSection,
+          resolvedSection: resolvedCurrentSection,
+          locale: activeLocale,
+          error: err.message
         });
-      }
+      });
+
+      preloadSectionAssets(resolvedCurrentSection).catch(err => {
+        log('router/index.js', 'afterEach', 'asset-preload-error', 'Current section asset preload failed (non-blocking)', {
+          section: resolvedCurrentSection,
+          error: err.message
+        });
+      });
+    } else if (currentSection) {
+      log('router/index.js', 'afterEach', 'translation-warn', 'Could not resolve section to string, skipping translation load', {
+        section: currentSection,
+        resolvedSection: resolvedCurrentSection,
+        userRole
+      });
     }
 
-    // Preload assets for the current section (non-blocking)
-    if (currentSection) {
-      let resolvedSectionForAssets = currentSection;
-      if (typeof currentSection === 'object' && currentSection !== null) {
-        const { resolveRoleSectionVariant } = await import('../utils/section/sectionResolver.js');
-        resolvedSectionForAssets = resolveRoleSectionVariant(currentSection, userRole);
-      }
-
-      if (resolvedSectionForAssets && typeof resolvedSectionForAssets === 'string') {
-        preloadSectionAssets(resolvedSectionForAssets).catch(err => {
-          log('router/index.js', 'afterEach', 'asset-preload-error', 'Current section asset preload failed (non-blocking)', {
-            section: resolvedSectionForAssets,
-            error: err.message
-          });
-        });
-      }
-    }
-
-    if (uniqueResolvedSections.length > 0 && !preloadExclude) {
+    if (resolvedSectionsToPreload.length > 0 && !preloadExclude) {
       log('router/index.js', 'afterEach', 'preload', 'Preloading sections for route', {
         path: to.path,
         originalIdentifiers: sectionsToPreload,
-        resolvedSections: uniqueResolvedSections,
+        resolvedSections: resolvedSectionsToPreload,
         note: 'ONLY these sections will be preloaded, not all sections'
       });
 
-      // Hoist locale resolution above the loop — only needs to run once
-      const { resolveActiveLocale } = await import('../utils/translation/localeManager.js');
-      const activeLocale = resolveActiveLocale();
-
-      try {
-        // Preload ONLY sections from preLoadSections array (non-blocking)
-        for (const sectionToPreload of uniqueResolvedSections) {
-          // Skip preloading the current section (it's already loaded)
-          if (sectionToPreload === currentSection) {
-            continue;
-          }
-
-          if (sectionToPreload && typeof sectionToPreload === 'string') {
-            log('router/index.js', 'afterEach', 'preload-section', 'Preloading specific section', {
-              section: sectionToPreload,
-              path: to.path
-            });
-
-            // preloadSection handles CSS internally — do not call preloadSectionCss separately
-            preloadSection(sectionToPreload).catch(err => {
-              log('router/index.js', 'afterEach', 'preload-error', 'Section preload failed (non-blocking)', {
-                section: sectionToPreload,
-                error: err.message
-              });
-            });
-
-            loadTranslationsForSection(sectionToPreload, activeLocale).catch(err => {
-              log('router/index.js', 'afterEach', 'translation-error', 'Translation load failed (non-blocking)', {
-                section: sectionToPreload,
-                locale: activeLocale,
-                error: err.message
-              });
-            });
-          } else {
-            log('router/index.js', 'afterEach', 'preload-skip', 'Skipping invalid section name', {
-              sectionToPreload,
-              type: typeof sectionToPreload
-            });
-          }
-        }
-
-        log('router/index.js', 'afterEach', 'success', 'Section preload and translation load initiated', {
-          sections: uniqueResolvedSections
+      startBackgroundSectionPreloads({
+        sections: resolvedSectionsToPreload,
+        skipSection: resolvedCurrentSection,
+        locale: activeLocale,
+        preloadTranslations: true,
+        logContext: { file: 'router/index.js', method: 'afterEach' },
+        path: to.path
+      })
+        .then(() => {
+          log('router/index.js', 'afterEach', 'success', 'Section preload and translation load initiated', {
+            sections: resolvedSectionsToPreload
+          });
+        })
+        .catch((error) => {
+          log('router/index.js', 'afterEach', 'error', 'Error during post-navigation tasks', {
+            error: error.message,
+            stack: error.stack
+          });
         });
-      } catch (error) {
-        log('router/index.js', 'afterEach', 'error', 'Error during post-navigation tasks', {
-          error: error.message,
-          stack: error.stack
-        });
-      }
     } else {
       log('router/index.js', 'afterEach', 'no-preload', 'No sections to preload for route', {
         path: to.path,
-        hasPreLoadSections: !!routeConfig.preLoadSections,
-        preLoadSectionsValue: routeConfig.preLoadSections
+        hasPreLoadSections: !!effectiveRouteConfig.preLoadSections,
+        preLoadSectionsValue: effectiveRouteConfig.preLoadSections
       });
     }
   } else {

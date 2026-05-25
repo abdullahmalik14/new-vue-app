@@ -18,9 +18,12 @@ import { useLocaleStore } from "../../stores/useLocaleStore.js";
 import { useAuthStore } from "../../stores/useAuthStore.js";
 
 import {
-  resolveSectionIdentifier,
   resolveRoleSectionVariant,
 } from "../section/sectionResolver.js";
+import {
+  getRoutePreloadPlan,
+  refreshSectionPreloadsOnLocaleChange,
+} from "../section/sectionPreloadOrchestrator.js";
 import { getI18nInstance } from "./i18nInstance.js";
 
 // Supported locales - exported as the single source of truth
@@ -502,7 +505,6 @@ export async function setActiveLocale(localeCode, options = {}) {
     const {
       clearTranslationCaches,
       loadTranslationsForSection,
-      preloadTranslationsForSections,
     } = await import("./translationLoader.js");
     clearTranslationCaches();
     log(
@@ -584,51 +586,43 @@ export async function setActiveLocale(localeCode, options = {}) {
             );
           }
 
-          // Reload translations for preloaded sections (if any)
-          const preloadedSections = Array.isArray(currentRoute.preLoadSections)
-            ? currentRoute.preLoadSections.filter(
-                (sectionName) =>
-                  typeof sectionName === "string" && sectionName.length > 0
-              )
-            : [];
+          // Refresh bundle/CSS preload and translations for background preLoadSections
+          const { resolved: preloadedSectionsToRefresh } = getRoutePreloadPlan(
+            currentRoute,
+            userRole
+          );
 
-          const resolvedPreloadedSections = preloadedSections
-            .map((identifier) => resolveSectionIdentifier(identifier, userRole))
-            .filter(
-              (sectionName) =>
-                typeof sectionName === "string" && sectionName.length > 0
-            );
-
-          const uniquePreloadedSections = [
-            ...new Set(resolvedPreloadedSections),
-          ];
-
-          if (uniquePreloadedSections.length > 0) {
+          if (preloadedSectionsToRefresh.length > 0) {
             log(
               "localeManager.js",
               "setActiveLocale",
               "info",
-              "Reloading translations for preloaded sections",
+              "Refreshing section preloads for locale change",
               {
                 localeCode,
-                originalIdentifiers: preloadedSections,
-                resolvedSections: uniquePreloadedSections,
+                resolvedSections: preloadedSectionsToRefresh,
+                skipSection: resolvedSection,
               }
             );
 
             try {
-              await preloadTranslationsForSections(
-                uniquePreloadedSections,
-                localeCode
-              );
+              await refreshSectionPreloadsOnLocaleChange({
+                sections: preloadedSectionsToRefresh,
+                locale: localeCode,
+                skipSection: resolvedSection,
+                logContext: {
+                  file: "localeManager.js",
+                  method: "setActiveLocale",
+                },
+              });
               log(
                 "localeManager.js",
                 "setActiveLocale",
                 "info",
-                "Reloaded translations for all preloaded sections",
+                "Refreshed section bundles and translations for preloaded sections",
                 {
                   localeCode,
-                  resolvedSections: uniquePreloadedSections,
+                  resolvedSections: preloadedSectionsToRefresh,
                 }
               );
             } catch (error) {
@@ -636,11 +630,10 @@ export async function setActiveLocale(localeCode, options = {}) {
                 "localeManager.js",
                 "setActiveLocale",
                 "warn",
-                "Failed to reload translations for preloaded sections",
+                "Failed to refresh section preloads for locale change",
                 {
                   localeCode,
-                  resolvedSections: uniquePreloadedSections,
-                  originalIdentifiers: preloadedSections,
+                  resolvedSections: preloadedSectionsToRefresh,
                   error: error?.message,
                 }
               );

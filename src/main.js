@@ -25,18 +25,19 @@ import { resolveActiveLocale, SUPPORTED_LOCALES } from "./utils/translation/loca
 import { loadTranslationsForSection } from "./utils/translation/translationLoader.js";
 import { useAuthStore } from "./stores/useAuthStore.js";
 import { useLocaleStore } from "./stores/useLocaleStore.js";
-import { preloadSection } from "./utils/section/sectionPreloader.js";
+import {
+  getRoutePreloadPlan,
+  preloadDefaultAuthSection,
+  resolveCurrentRouteSectionName,
+  shouldPreloadDefaultAuthSection,
+  startBackgroundSectionPreloads,
+} from "./utils/section/sectionPreloadOrchestrator.js";
 import buildConfig from "../build/buildConfig.js";
 import {
   validateOnStartup,
   printEnvSummary,
 } from "./utils/build/envValidator.js";
 import { resolveRouteFromPath } from "./utils/route/routeResolver.js";
-import {
-  getPreloadSectionsForRoute,
-  resolveRoleSectionVariant,
-  resolveSectionIdentifier
-} from "./utils/section/sectionResolver.js";
 import { registerI18nInstance } from "./utils/translation/i18nInstance.js";
 import breakpoints from "./utils/breakpoints.js";
 import InteractionsPlugin from "./interactions/index.js";
@@ -173,10 +174,11 @@ log("main.js", "init", "pinia", "Pinia initialized with persistence", {});
 const preloadStore = usePreloadStore();
 const currentBuildHash = import.meta.env.VITE_BUILD_HASH || null;
 if (currentBuildHash && preloadStore.buildHash !== currentBuildHash) {
+  const previousHash = preloadStore.buildHash;
   preloadStore.clearState();
   preloadStore.buildHash = currentBuildHash;
   log("main.js", "init", "build-hash", "New deploy detected — preload state cleared", {
-    previousHash: preloadStore.buildHash,
+    previousHash,
     currentHash: currentBuildHash,
   });
 }
@@ -400,70 +402,51 @@ if (window.performanceTracker) {
 router
   .isReady()
   .then(() => {
-    // Preload auth section by default (non-blocking)
-    log(
-      "main.js",
-      "init",
-      "preload-default",
-      "Preloading default auth section",
-      { section: "auth" },
-    );
-
-    const shouldPreloadAuth =
-      !authStore.isAuthenticated ||
-      router.currentRoute.value.path === "/log-in" ||
-      (Array.isArray(currentRoute?.preLoadSections) && currentRoute.preLoadSections.includes("auth"));
-
-    if (shouldPreloadAuth) {
-      preloadSection("auth").catch((err) => {
-        log(
-          "main.js",
-          "init",
-          "preload-error",
-          "Default auth section preload failed (non-blocking)",
-          {
-            section: "auth",
-            error: err.message,
-          },
-        );
-      });
-    }
-
     const rawPath = router.currentRoute.value.path;
     const localePrefixMatch = rawPath.match(new RegExp(`^/(${SUPPORTED_LOCALES.join("|")})(/.*|$)`));
     const currentPath = localePrefixMatch ? (localePrefixMatch[2] || "/") : rawPath;
     const currentRoute = resolveRouteFromPath(currentPath);
+    const userRoleForPreload = authStore.currentUser?.role || "guest";
+
+    const currentSectionName = currentRoute
+      ? resolveCurrentRouteSectionName(currentRoute, userRoleForPreload)
+      : null;
+    const { resolved: baseSectionsToPreload } = getRoutePreloadPlan(
+      currentRoute,
+      userRoleForPreload,
+    );
+    const sectionsToPreload =
+      currentSectionName && !baseSectionsToPreload.includes(currentSectionName)
+        ? [...baseSectionsToPreload, currentSectionName]
+        : baseSectionsToPreload;
+
+    if (
+      currentSectionName &&
+      currentRoute?.section &&
+      !baseSectionsToPreload.includes(currentSectionName)
+    ) {
+      log(
+        "main.js",
+        "init",
+        "preload-current",
+        "Added current section to preload list",
+        {
+          section: currentSectionName,
+        },
+      );
+    }
+
+    if (
+      shouldPreloadDefaultAuthSection({
+        isAuthenticated: authStore.isAuthenticated,
+        currentPath,
+        resolvedSections: sectionsToPreload,
+      })
+    ) {
+      preloadDefaultAuthSection({ file: "main.js", method: "init" });
+    }
 
     if (currentRoute) {
-      const userRoleForPreload = authStore.currentUser?.role || "guest";
-      const sectionsToPreload = Array.isArray(currentRoute.preLoadSections)
-        ? [...new Set(
-            currentRoute.preLoadSections
-              .map((id) => resolveSectionIdentifier(id, userRoleForPreload))
-              .filter((s) => typeof s === "string" && s.length > 0)
-          )]
-        : [];
-
-      const shouldPreloadAuth =
-        !authStore.isAuthenticated ||
-        currentPath === "/log-in" ||
-        sectionsToPreload.includes("auth");
-  
-      if (shouldPreloadAuth) {
-        preloadSection("auth").catch((err) => {
-          log(
-            "main.js",
-            "init",
-            "preload-error",
-            "Default auth section preload failed (non-blocking)",
-            {
-              section: "auth",
-              error: err.message,
-            },
-          );
-        });
-      }
-
       log(
         "main.js",
         "init",
@@ -476,35 +459,9 @@ router
         },
       );
 
-      // Add current section to preload list (to ensure assets are preloaded)
-      if (currentRoute.section) {
-        // Import resolver dynamically if needed or use the one we will import at top
-        // We will add the import at the top, so we can use it here
-        const userRole = authStore.currentUser?.role || "guest";
-        const currentSectionName = resolveRoleSectionVariant(
-          currentRoute.section,
-          userRole,
-        );
-
-        if (
-          currentSectionName &&
-          !sectionsToPreload.includes(currentSectionName)
-        ) {
-          sectionsToPreload.push(currentSectionName);
-          log(
-            "main.js",
-            "init",
-            "preload-current",
-            "Added current section to preload list",
-            {
-              section: currentSectionName,
-            },
-          );
-        }
-
+      if (currentSectionName) {
         // Load translations for current section on initial page load
         // This ensures translations are ready before the app mounts (no placeholder text flash)
-        if (currentSectionName) {
           log(
             "main.js",
             "init",
@@ -560,40 +517,14 @@ router
                 },
               );
             });
-        }
       }
 
       if (sectionsToPreload.length > 0) {
-        Promise.all(
-          sectionsToPreload.map((section) => {
-            if (section && typeof section === "string") {
-              return preloadSection(section).catch((err) => {
-                log(
-                  "main.js",
-                  "init",
-                  "preload-error",
-                  "Section preload failed (non-blocking)",
-                  {
-                    section,
-                    error: err.message,
-                  },
-                );
-              });
-            } else {
-              log(
-                "main.js",
-                "init",
-                "preload-skip",
-                "Skipping invalid section name",
-                {
-                  section,
-                  type: typeof section,
-                },
-              );
-              return Promise.resolve();
-            }
-          }),
-        ).then(() => {
+        startBackgroundSectionPreloads({
+          sections: sectionsToPreload,
+          logContext: { file: "main.js", method: "init" },
+          path: currentPath,
+        }).then(() => {
           log(
             "main.js",
             "init",

@@ -8,6 +8,203 @@
 import { log } from '../common/logHandler.js';
 import { logError } from '../common/errorHandler.js';
 
+const PRELOAD_RESOLVE_ROLE = 'guest';
+const PRELOAD_SECTION_FALLBACK_ROLE = 'default';
+
+/**
+ * Collect concrete section names declared on routes (including role variants).
+ *
+ * @param {Array<object>} routes
+ * @returns {Set<string>}
+ */
+export function collectKnownSectionNames(routes) {
+  const known = new Set();
+
+  for (const route of routes) {
+    if (!route?.section) {
+      continue;
+    }
+
+    if (typeof route.section === 'string') {
+      const name = route.section.trim();
+      if (name) {
+        known.add(name);
+      }
+      continue;
+    }
+
+    if (typeof route.section === 'object' && route.section !== null) {
+      for (const value of Object.values(route.section)) {
+        if (typeof value === 'string' && value.trim()) {
+          known.add(value.trim());
+        }
+      }
+    }
+  }
+
+  return known;
+}
+
+/**
+ * Index routes by slug path (with and without leading slash).
+ *
+ * @param {Array<object>} routes
+ * @returns {Map<string, object>}
+ */
+export function buildRouteSlugIndex(routes) {
+  const index = new Map();
+
+  for (const route of routes) {
+    if (typeof route.slug !== 'string' || !route.slug) {
+      continue;
+    }
+
+    index.set(route.slug, route);
+
+    const bareSlug = route.slug.replace(/^\//, '');
+    if (bareSlug) {
+      index.set(bareSlug, route);
+    }
+  }
+
+  return index;
+}
+
+function resolveRoleSectionVariantStatic(sectionConfig, userRole = PRELOAD_RESOLVE_ROLE) {
+  if (typeof sectionConfig === 'string') {
+    const trimmed = sectionConfig.trim();
+    return trimmed || null;
+  }
+
+  if (typeof sectionConfig === 'object' && sectionConfig !== null) {
+    const resolved =
+      sectionConfig[userRole] ??
+      sectionConfig[PRELOAD_SECTION_FALLBACK_ROLE] ??
+      sectionConfig.guest;
+
+    return typeof resolved === 'string' && resolved.trim() ? resolved.trim() : null;
+  }
+
+  return null;
+}
+
+/**
+ * Resolve a preLoadSections identifier to a known section name (slug alias or direct name).
+ *
+ * @param {string} identifier
+ * @param {Array<object>} routes
+ * @param {Set<string>} [knownSections]
+ * @returns {string|null}
+ */
+export function resolvePreloadSectionIdentifier(identifier, routes, knownSections = null) {
+  if (typeof identifier !== 'string') {
+    return null;
+  }
+
+  const trimmed = identifier.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const sections = knownSections ?? collectKnownSectionNames(routes);
+  const slugIndex = buildRouteSlugIndex(routes);
+  const slugCandidates = trimmed.startsWith('/')
+    ? [trimmed, trimmed.replace(/^\//, '')]
+    : [trimmed, `/${trimmed}`];
+
+  for (const slugKey of slugCandidates) {
+    const matchedRoute = slugIndex.get(slugKey);
+
+    if (matchedRoute?.section) {
+      const resolved = resolveRoleSectionVariantStatic(matchedRoute.section);
+      if (resolved && sections.has(resolved)) {
+        return resolved;
+      }
+    }
+  }
+
+  return sections.has(trimmed) ? trimmed : null;
+}
+
+/**
+ * Flatten preLoadSections config entries for validation.
+ *
+ * @param {Array<string>|object|null|undefined} preLoadSections
+ * @returns {Array<unknown>}
+ */
+export function collectPreloadSectionIdentifiers(preLoadSections) {
+  if (!preLoadSections) {
+    return [];
+  }
+
+  if (Array.isArray(preLoadSections)) {
+    return preLoadSections;
+  }
+
+  if (typeof preLoadSections === 'object') {
+    const identifiers = [];
+
+    for (const sections of Object.values(preLoadSections)) {
+      if (Array.isArray(sections)) {
+        identifiers.push(...sections);
+      }
+    }
+
+    return identifiers;
+  }
+
+  return [];
+}
+
+function validatePreLoadSectionEntries(routes, errors) {
+  const knownSections = collectKnownSectionNames(routes);
+
+  routes.forEach((route, index) => {
+    if (!route.preLoadSections) {
+      return;
+    }
+
+    const identifiers = collectPreloadSectionIdentifiers(route.preLoadSections);
+    const routeSlug = route.slug ?? `index ${index}`;
+
+    for (const rawIdentifier of identifiers) {
+      if (typeof rawIdentifier !== 'string') {
+        errors.push({
+          type: 'INVALID_FIELD_TYPE',
+          routeIndex: index,
+          field: 'preLoadSections',
+          message: `Route at index ${index} (${routeSlug}) has non-string preLoadSections entry`,
+          expected: 'string',
+          received: typeof rawIdentifier
+        });
+        continue;
+      }
+
+      if (rawIdentifier.trim().length === 0) {
+        errors.push({
+          type: 'INVALID_PRELOAD_SECTION',
+          routeIndex: index,
+          field: 'preLoadSections',
+          message: `Route at index ${index} (${routeSlug}) has empty preLoadSections entry`,
+          identifier: rawIdentifier
+        });
+        continue;
+      }
+
+      const resolved = resolvePreloadSectionIdentifier(rawIdentifier, routes, knownSections);
+      if (!resolved) {
+        errors.push({
+          type: 'UNKNOWN_PRELOAD_SECTION',
+          routeIndex: index,
+          field: 'preLoadSections',
+          message: `Route at index ${index} (${routeSlug}) has unknown preLoadSections entry "${rawIdentifier}"`,
+          identifier: rawIdentifier
+        });
+      }
+    }
+  });
+}
+
 /**
  * Validate route configuration schema
  * Ensures all required fields are present and correctly typed
@@ -20,7 +217,7 @@ export function validateRouteConfig(routes) {
     routeCount: routes?.length
   });
 
-  if (window.performanceTracker) {
+  if (typeof window !== 'undefined' && window.performanceTracker) {
     window.performanceTracker.step({
       step: 'validateRouteConfig_start',
       file: 'jsonConfigValidator.js',
@@ -110,16 +307,33 @@ export function validateRouteConfig(routes) {
       });
     }
 
-    // Validate preLoadSections if present
-    if (route.preLoadSections && !Array.isArray(route.preLoadSections)) {
-      errors.push({
-        type: 'INVALID_FIELD_TYPE',
-        routeIndex: index,
-        field: 'preLoadSections',
-        message: `Route at index ${index} (${route.slug}) has invalid preLoadSections type`,
-        expected: 'array',
-        received: typeof route.preLoadSections
-      });
+    // Validate preLoadSections if present (flat string[] or role-keyed object)
+    if (route.preLoadSections) {
+      if (Array.isArray(route.preLoadSections)) {
+        // valid flat array
+      } else if (typeof route.preLoadSections === 'object' && route.preLoadSections !== null) {
+        for (const [role, sections] of Object.entries(route.preLoadSections)) {
+          if (!Array.isArray(sections)) {
+            errors.push({
+              type: 'INVALID_FIELD_TYPE',
+              routeIndex: index,
+              field: 'preLoadSections',
+              message: `Route at index ${index} (${route.slug}) has invalid preLoadSections.${role} type`,
+              expected: 'array',
+              received: typeof sections
+            });
+          }
+        }
+      } else {
+        errors.push({
+          type: 'INVALID_FIELD_TYPE',
+          routeIndex: index,
+          field: 'preLoadSections',
+          message: `Route at index ${index} (${route.slug}) has invalid preLoadSections type`,
+          expected: 'array or role-keyed object',
+          received: typeof route.preLoadSections
+        });
+      }
     }
 
     // Validate boolean fields
@@ -163,6 +377,8 @@ export function validateRouteConfig(routes) {
     }
   });
 
+  validatePreLoadSectionEntries(routes, errors);
+
   // Check for duplicate slugs
   const slugs = routes.map(r => r.slug).filter(Boolean);
   const duplicates = slugs.filter((slug, index) => slugs.indexOf(slug) !== index);
@@ -177,7 +393,7 @@ export function validateRouteConfig(routes) {
 
   const valid = errors.length === 0;
 
-  if (window.performanceTracker) {
+  if (typeof window !== 'undefined' && window.performanceTracker) {
     window.performanceTracker.step({
       step: 'validateRouteConfig_complete',
       file: 'jsonConfigValidator.js',
@@ -318,7 +534,7 @@ export function validateJsonStructure(jsonString, configName = 'config') {
 export function validateAllConfigs(configs) {
   log('jsonConfigValidator.js', 'validateAllConfigs', 'start', 'Validating all configuration files', {});
 
-  if (window.performanceTracker) {
+  if (typeof window !== 'undefined' && window.performanceTracker) {
     window.performanceTracker.step({
       step: 'validateAllConfigs_start',
       file: 'jsonConfigValidator.js',
@@ -361,7 +577,7 @@ export function validateAllConfigs(configs) {
     overallValid = false;
   }
 
-  if (window.performanceTracker) {
+  if (typeof window !== 'undefined' && window.performanceTracker) {
     window.performanceTracker.step({
       step: 'validateAllConfigs_complete',
       file: 'jsonConfigValidator.js',

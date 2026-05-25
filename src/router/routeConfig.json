@@ -1190,7 +1190,7 @@
     "componentPath": "@/components/dropdownHandler/demo/DemoDropdowns.vue"
   },
   {
-    "slug": "/dashboard/edit-profile",
+    "slug": "/edit-profile",
     "componentPath": "@/templates/editProfile/EditProfilePage.vue",
     "requiresAuth": false,
     "supportedRoles": ["all"]
