@@ -57,6 +57,7 @@ import FlowHandler from "./services/flow-system/FlowHandler";
 import { useCartStore } from "./stores/useCartStore";
 import { useChatStore } from "./stores/useChatStore";
 import { usePreloadStore } from "./stores/usePreloadStore.js";
+import { syncPreloadStoreBuildHash } from "./utils/build/appBuildHash.js";
 
 // Initialize the mock cart backend interceptor
 initMockCartApi();
@@ -176,14 +177,11 @@ log("main.js", "init", "pinia", "Pinia initialized with persistence", {});
 // If the build hash has changed since last session, clear all preloaded section state
 // so stale chunk names from the previous deploy don't cause ghost cache hits
 const preloadStore = usePreloadStore();
-const currentBuildHash = import.meta.env.VITE_BUILD_HASH || null;
-if (currentBuildHash && preloadStore.buildHash !== currentBuildHash) {
-  const previousHash = preloadStore.buildHash;
-  preloadStore.clearState();
-  preloadStore.buildHash = currentBuildHash;
+const buildHashSync = syncPreloadStoreBuildHash(preloadStore);
+if (buildHashSync.invalidated) {
   log("main.js", "init", "build-hash", "New deploy detected — preload state cleared", {
-    previousHash,
-    currentHash: currentBuildHash,
+    previousHash: buildHashSync.previousHash,
+    currentHash: buildHashSync.currentBuildHash,
   });
 }
 

@@ -8,6 +8,7 @@
 
 import routeConfigData from '../../router/routeConfig.json';
 import sharedAssetPreloads from '../../router/sharedAssetPreloads.json';
+import assetMapData from '../../config/assetMap.json';
 import { loadJsonConfigFromImport, clearConfigCache } from '../common/jsonConfigLoader.js';
 import { log } from '../common/logHandler.js';
 import { trackStep } from '../common/performanceTrackerAccess.js';
@@ -16,6 +17,7 @@ import { validateRouteConfig } from '../build/jsonConfigValidator.js';
 import { resolveRouteAssetPreloads } from './resolveRouteAssetPreloads.js';
 import { validateRouteComponentPathsWithResolver } from './routeComponentPathValidator.js';
 import { findComponentLoader } from './routeComponentLoader.js';
+import { validateRouteAssetPreloadFlags } from '../assets/validateRouteAssetPreloadFlags.js';
 
 // Performance tracking via trackStep() from performanceTrackerAccess.js
 
@@ -72,6 +74,12 @@ export function loadRouteConfigurationFromFile() {
       if (!componentValidation.valid) {
         const details = componentValidation.errors.map((error) => error.message).join('\n  - ');
         throw new Error(`Route componentPath validation failed:\n  - ${details}`);
+      }
+
+      const flagValidation = validateRouteAssetPreloadFlags(loadedRouteConfig, assetMapData);
+
+      if (!flagValidation.valid) {
+        throw new Error(`Asset preload flag validation failed:\n  - ${flagValidation.errors.join('\n  - ')}`);
       }
     }
 

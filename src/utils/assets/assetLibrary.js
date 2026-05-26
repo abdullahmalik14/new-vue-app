@@ -668,7 +668,7 @@ export function getEnvironment() {
  * Candidate URLs for runtime asset map fetch (dev may serve from public or /src).
  * @returns {string[]}
  */
-function getAssetMapFetchCandidates() {
+export function getAssetMapFetchCandidates() {
   const candidates = ['/config/assetMap.json'];
 
   if (import.meta.env.DEV) {

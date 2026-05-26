@@ -61,6 +61,63 @@ describe('getAssetPreloadEntriesForSection (P-06)', () => {
     expect(getRouteConfiguration).toHaveBeenCalledTimes(1);
   });
 
+  it('deduplicates assetPreload entries by flag within a section (M-01)', async () => {
+    getRouteConfiguration.mockReturnValue([
+      {
+        slug: '/dashboard',
+        section: 'dashboard-global',
+        assetPreload: [
+          { flag: 'dashboard.logo', type: 'image', priority: 'high' },
+          { flag: 'dashboard.avatar', type: 'image' },
+        ],
+      },
+      {
+        slug: '/dashboard/overview',
+        section: 'dashboard-global',
+        assetPreload: [
+          { flag: 'dashboard.logo', type: 'image', priority: 'low' },
+          { flag: 'dashboard.hamburger', type: 'image' },
+        ],
+      },
+    ]);
+
+    const { getAssetPreloadEntriesForSection } = await import(
+      '../../src/utils/assets/getAssetPreloadEntriesForSection.js'
+    );
+
+    const result = getAssetPreloadEntriesForSection('dashboard-global');
+
+    expect(result.routeCount).toBe(2);
+    expect(result.rawAssetCount).toBe(4);
+    expect(result.assets).toHaveLength(3);
+    expect(result.assets.find((entry) => entry.flag === 'dashboard.logo')?.priority).toBe('high');
+  });
+
+  it('deduplicates assetPreload entries by src when flag is absent (M-01)', async () => {
+    getRouteConfiguration.mockReturnValue([
+      {
+        slug: '/log-in',
+        section: 'auth',
+        assetPreload: [{ src: '/images/auth-bg.webp', type: 'image', priority: 'high' }],
+      },
+      {
+        slug: '/sign-up',
+        section: 'auth',
+        assetPreload: [{ src: '/images/auth-bg.webp', type: 'image', priority: 'low' }],
+      },
+    ]);
+
+    const { getAssetPreloadEntriesForSection } = await import(
+      '../../src/utils/assets/getAssetPreloadEntriesForSection.js'
+    );
+
+    const result = getAssetPreloadEntriesForSection('auth');
+
+    expect(result.rawAssetCount).toBe(2);
+    expect(result.assets).toHaveLength(1);
+    expect(result.assets[0].priority).toBe('high');
+  });
+
   it('clearAssetPreloadSectionCache forces a rebuild on next call', async () => {
     getRouteConfiguration.mockReturnValue([
       {

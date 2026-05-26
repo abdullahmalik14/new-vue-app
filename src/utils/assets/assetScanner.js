@@ -84,6 +84,70 @@ export function extractAssetsFromComponent(component) {
 }
 
 /**
+ * @param {string} tag
+ * @param {string} attributeName
+ * @returns {string|null}
+ */
+export function extractLiteralBoundAttribute(tag, attributeName) {
+  const staticMatch = tag.match(new RegExp(`\\s${attributeName}=["']([^"']+)["']`, 'i'));
+
+  if (staticMatch?.[1]) {
+    return staticMatch[1];
+  }
+
+  const boundSingleQuoted = tag.match(
+    new RegExp(`\\s(?::${attributeName}|v-bind:${attributeName})\\s*=\\s*"'([^']+)'"`, 'i'),
+  );
+
+  if (boundSingleQuoted?.[1]) {
+    return boundSingleQuoted[1];
+  }
+
+  const boundDoubleQuoted = tag.match(
+    new RegExp(`\\s(?::${attributeName}|v-bind:${attributeName})\\s*=\\s*'\\"([^"]+)\\"'`, 'i'),
+  );
+
+  if (boundDoubleQuoted?.[1]) {
+    return boundDoubleQuoted[1];
+  }
+
+  const boundPathLiteral = tag.match(
+    new RegExp(`\\s(?::${attributeName}|v-bind:${attributeName})\\s*=\\s*"([/@][^"]+)"`, 'i'),
+  );
+
+  if (boundPathLiteral?.[1]) {
+    return boundPathLiteral[1];
+  }
+
+  return null;
+}
+
+/**
+ * @param {string} template
+ * @param {string} tagName
+ * @param {'image'|'video'|'audio'} type
+ * @returns {Array<object>}
+ */
+function collectMediaAssetsFromTemplate(template, tagName, type) {
+  const assets = [];
+  const tagRegex = new RegExp(`<${tagName}\\b[^>]*>`, 'gi');
+  let tagMatch;
+
+  while ((tagMatch = tagRegex.exec(template)) !== null) {
+    const src = extractLiteralBoundAttribute(tagMatch[0], 'src');
+
+    if (!src || src.startsWith('data:') || src.startsWith('blob:')) {
+      continue;
+    }
+
+    assets.push({ src, type, auto: true });
+    log('assetScanner.js', 'collectMediaAssetsFromTemplate', 'found', `Found ${type} reference`, { src, binding: tagMatch[0].includes(':src') || tagMatch[0].includes('v-bind:src') ? 'dynamic-literal' : 'static' });
+  }
+
+  return assets;
+}
+
+/**
  * @function scanComponentForAssetReferences
  * @description Scan component template for asset URLs (images, etc.)
  * @param {string} template - Component template string
@@ -116,40 +180,11 @@ export function scanComponentForAssetReferences(template) {
       return assets;
     }
 
-    // Scan for image sources
-    const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    let imgMatch;
-    while ((imgMatch = imgRegex.exec(template)) !== null) {
-      const src = imgMatch[1];
-      if (src && !src.startsWith('data:') && !src.startsWith('blob:')) {
-        assets.push({ src, type: 'image', auto: true });
-        log('assetScanner.js', 'scanComponentForAssetReferences', 'found-image', 'Found image reference', { src });
-      }
-    }
+    assets.push(...collectMediaAssetsFromTemplate(template, 'img', 'image'));
+    assets.push(...collectMediaAssetsFromTemplate(template, 'video', 'video'));
+    assets.push(...collectMediaAssetsFromTemplate(template, 'audio', 'audio'));
 
-    // Scan for video sources
-    const videoRegex = /<video[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    let videoMatch;
-    while ((videoMatch = videoRegex.exec(template)) !== null) {
-      const src = videoMatch[1];
-      if (src) {
-        assets.push({ src, type: 'video', auto: true });
-        log('assetScanner.js', 'scanComponentForAssetReferences', 'found-video', 'Found video reference', { src });
-      }
-    }
-
-    // Scan for audio sources
-    const audioRegex = /<audio[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    let audioMatch;
-    while ((audioMatch = audioRegex.exec(template)) !== null) {
-      const src = audioMatch[1];
-      if (src) {
-        assets.push({ src, type: 'audio', auto: true });
-        log('assetScanner.js', 'scanComponentForAssetReferences', 'found-audio', 'Found audio reference', { src });
-      }
-    }
-
-    log('assetScanner.js', 'scanComponentForAssetReferences', 'success', 'Template scanning complete', { 
+    log('assetScanner.js', 'scanComponentForAssetReferences', 'success', 'Template scanning complete', {
       totalFound: assets.length 
     });
     trackStep({

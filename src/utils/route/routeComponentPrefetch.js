@@ -26,7 +26,7 @@ const PATH_ALIASES = {
  * @param {string|object} target
  * @returns {string|null}
  */
-function normalizeTargetPath(target) {
+export function normalizeTargetPath(target) {
   if (typeof target === 'string') {
     return stripLeadingLocaleFromPath(target.split('?')[0].split('#')[0]);
   }
@@ -102,7 +102,7 @@ function getRouteBySlugCache() {
  * @param {string} menuPath
  * @returns {{ route: object, resolvedSlug: string }|null}
  */
-function resolveRouteForPrefetch(menuPath) {
+export function resolveRouteForPrefetch(menuPath) {
   const slugIndex = getRouteBySlugCache();
 
   for (const candidate of buildPrefetchPathCandidates(menuPath)) {

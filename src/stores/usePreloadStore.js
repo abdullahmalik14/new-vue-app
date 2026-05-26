@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { log } from '../utils/common/logHandler.js';
+import { getAppBuildHash, syncPreloadStoreBuildHash } from '../utils/build/appBuildHash.js';
 
 function normalizePreloadedAssets(assets) {
   if (assets instanceof Set) {
@@ -177,6 +178,14 @@ export const usePreloadStore = defineStore('preload', {
     },
     afterHydrate({ store }) {
       store.preloadedAssets = normalizePreloadedAssets(store.preloadedAssets);
+
+      const sync = syncPreloadStoreBuildHash(store);
+      if (sync.invalidated) {
+        log('usePreloadStore.js', 'afterHydrate', 'build-hash', 'Stale preload state cleared after persist rehydrate', {
+          previousHash: sync.previousHash,
+          currentHash: sync.currentBuildHash,
+        });
+      }
     },
   }
 });

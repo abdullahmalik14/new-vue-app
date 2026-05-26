@@ -1347,11 +1347,127 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 **Files:** `assetPreloader.js`, `assetLibrary.js`, `assetScanner.js`  
 **Detail:** All three merge points simply push all `assetPreload` arrays together with `...spread`. If five routes in the same section each declare `dashboard.logo`, it appears five times in the merged list. Only the downstream per-asset `hasAsset` check (which is O(n)) prevents duplicate HTTP requests, but the work of iterating and resolving flags is still repeated.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Section rollup concatenated every route’s `assetPreload[]` with spread. Multiple routes in the same section repeating the same `flag` or `src` produced duplicate entries in the merged list. `hasAsset()` still blocked duplicate network requests, but flag resolution and preload scheduling ran once per duplicate.
+
+**Why it happened:** Merge logic lived in three copy-pasted loops (fixed by **P-06** / **B-02**) but never collapsed duplicate entries after concatenation.
+
+**What changed:**
+- `getAssetPreloadEntriesForSection.js` — added `dedupeAssetPreloadEntries()` keyed by `flag` (preferred) or `src`; when duplicates conflict, keeps the **higher-priority** entry (`critical` > `high` > `medium` > `low`/`normal`).
+- Rollup now exposes `rawAssetCount` (pre-dedup) alongside deduped `assets.length` for diagnostics.
+- `assetPreloader.js`, `assetLibrary.js`, and `assetScanner.js` inherit dedup automatically via the shared helper (no per-file spread loops remain).
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, or **AUDIT.md** preload refactors — same section-based architecture and `hasAsset()` HTTP dedup. Complements **AUDIT.md P4** (`sharedAssetPreloads.json` removes config duplication; **M-01** dedupes at merge when multiple routes still share the same flags).
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/getAssetPreloadEntriesForSection.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste this IIFE (one runnable command):
+   ```js
+   (async () => {
+     const {
+       getAssetPreloadEntriesForSection,
+       clearAssetPreloadSectionCache,
+       dedupeAssetPreloadEntries
+     } = await import('/src/utils/assets/getAssetPreloadEntriesForSection.js');
+
+     clearAssetPreloadSectionCache();
+     const sections = ['dashboard-global', 'shop', 'auth'];
+     const liveConfig = Object.fromEntries(
+       sections.map((section) => {
+         const { assets, routeCount, rawAssetCount } = getAssetPreloadEntriesForSection(section);
+         const keys = assets.map((entry) => (entry.flag ? `flag:${entry.flag}` : entry.src ? `src:${entry.src}` : null)).filter(Boolean);
+         return [section, {
+           routeCount,
+           rawAssetCount,
+           assetCount: assets.length,
+           duplicateCount: rawAssetCount - assets.length,
+           deduped: assets.length === new Set(keys).size
+         }];
+       })
+     );
+
+     const syntheticRaw = [
+       { flag: 'dashboard.logo', type: 'image', priority: 'high' },
+       { flag: 'dashboard.logo', type: 'image', priority: 'low' },
+       { flag: 'dashboard.avatar', type: 'image' },
+     ];
+     const syntheticDeduped = dedupeAssetPreloadEntries(syntheticRaw);
+
+     console.log('Live config (current routeConfig.json):');
+     console.table(liveConfig);
+     console.log('Synthetic dedup demo (proves M-01 logic):', {
+       rawAssetCount: syntheticRaw.length,
+       assetCount: syntheticDeduped.length,
+       duplicateCount: syntheticRaw.length - syntheticDeduped.length,
+       logoPriorityKept: syntheticDeduped.find((entry) => entry.flag === 'dashboard.logo')?.priority
+     });
+   })();
+   ```
+3. **Expected (live config — what you should see today):**
+   - Every row: `deduped: true`
+   - `dashboard-global`: `routeCount: 12`, `assetCount: 20`, `duplicateCount: 0` — only `/dashboard` contributes `assetPreloadRef`; the other 11 routes in that section have no `assetPreload`
+   - `shop`: `routeCount: 1`, `assetCount: 20`, `duplicateCount: 0` — separate section bucket
+   - `auth`: `routeCount: 14`, `assetCount: 2`, `duplicateCount: 0` — only `/log-in` declares preload (bg image + Cognito script)
+   - **`duplicateCount: 0` is correct** — **AUDIT.md P4** moved shared icons to `sharedAssetPreloads.json`, so the same 20 flags are not repeated on multiple routes in one section anymore. M-01 is the safety net when they are.
+4. **Expected (synthetic demo block):** `rawAssetCount: 3`, `assetCount: 2`, `duplicateCount: 1`, `logoPriorityKept: 'high'`.
+
 ---
 
 ### M-02 — No `fetchpriority` attribute on generated `<link rel="preload">` elements
 **File:** `assetPreloader.js`  
 **Detail:** The [Fetch Priority API](https://web.dev/fetch-priority/) (`fetchpriority="high|low|auto"`) allows the browser to schedule preloaded images/fonts/scripts correctly. None of the generated `<link>` elements set this attribute, even though `priority` is already in route config.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Route `assetPreload[].priority` was used only for scheduling order in `preloadAssets()`, but injected `<link rel="preload">` / `<link rel="modulepreload">` elements never set `fetchpriority`, so the browser could not prioritize fetches within a tier.
+
+**Why it happened:** Link creation helpers only set `rel`, `as`, and `href`; config `priority` was never mapped to the Fetch Priority API.
+
+**What changed:**
+- `assetPreloader.js` — added `resolveFetchPriority()` and `applyFetchPriorityToLink()`.
+- Mapping: `critical`/`high` → `fetchpriority="high"`; `medium`/`normal` → `fetchpriority="auto"`; `low` → `fetchpriority="low"`.
+- Applied on image, font, media, and script link creation (`createScriptPreloadLink`).
+- `preloadAsset()` already passes `priority` through `...options` to type-specific preloaders.
+
+**Conflict check:** No override of prior preload refactors — scheduling tiers in `preloadAssets()` unchanged; adds browser hint only. **M-03** (prefetch for low) builds on the same options path.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/preloadFetchPriority.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/dashboard` once (warms section assets).
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     const { preloadImage, preloadScript } = await import('/src/utils/assets/assetPreloader.js');
+     const highUrl = '/assets/test-high-priority.png';
+     const lowUrl = '/assets/test-low-priority.png';
+     const scriptUrl = '/vendor/amazon-cognito-identity-6.3.15.min.js';
+
+     [highUrl, lowUrl, scriptUrl].forEach((url) => {
+       store.removeAsset(url);
+       document.querySelectorAll(`link[href="${url}"]`).forEach((el) => el.remove());
+     });
+
+     await preloadImage(highUrl, { priority: 'high' });
+     await preloadImage(lowUrl, { priority: 'low' });
+     await preloadScript(scriptUrl, { priority: 'medium' });
+
+     console.table({
+       highImage: document.querySelector(`link[href="${highUrl}"]`)?.getAttribute('fetchpriority'),
+       lowImage: document.querySelector(`link[href="${lowUrl}"]`)?.getAttribute('fetchpriority'),
+       mediumScript: document.querySelector(`link[href="${scriptUrl}"]`)?.getAttribute('fetchpriority')
+     });
+   })();
+   ```
+3. **Expected:** `highImage: 'high'`, `lowImage: 'low'`, `mediumScript: 'auto'`.
 
 ---
 
@@ -1359,11 +1475,98 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 **File:** `assetPreloader.js` — all preload functions  
 **Detail:** `rel="preload"` tells the browser the resource is needed for the current navigation and should be fetched at high priority. For assets with `priority: "low"` (background images, media that appears below the fold), `rel="prefetch"` is the correct hint — it fetches during idle time without competing with critical resources.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Every asset hint used `rel="preload"` regardless of route `priority`. Low-priority background assets competed with critical navigation resources.
+
+**Why it happened:** Link helpers always set `rel="preload"`; only scheduling order differed in `preloadAssets()`.
+
+**What changed:**
+- `assetPreloader.js` — `shouldUsePrefetchHint()` returns true when `options.priority === 'low'`.
+- `applyResourceHintRel()` sets `rel="prefetch"` for low priority, `rel="preload"` otherwise (image, font, media).
+- `createScriptPreloadLink()` uses `rel="prefetch"` for low-priority scripts (including classic UMD); high/medium still use `preload` / `modulepreload`.
+- DOM dedup via `findExistingResourceHintLink()` matches existing `prefetch`, `preload`, and `modulepreload` links.
+- Low-priority links still get `fetchpriority="low"` from **M-02**.
+
+**Conflict check:** Does not change **M-02** mapping or tier scheduling in `preloadAssets()`. `normal`/`medium` assets still use `rel="preload"` (see **C-03** for `normal` priority semantics).
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/preloadPrefetch.test.js tests/unit/preloadScript.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     const { preloadImage, preloadScript } = await import('/src/utils/assets/assetPreloader.js');
+     const lowImage = '/assets/test-prefetch-image.png';
+     const highImage = '/assets/test-preload-image.png';
+     const lowScript = '/vendor/amazon-cognito-identity-6.3.15.min.js';
+
+     [lowImage, highImage, lowScript].forEach((url) => {
+       store.removeAsset(url);
+       document.querySelectorAll(`link[href="${url}"]`).forEach((el) => el.remove());
+     });
+
+     await preloadImage(lowImage, { priority: 'low' });
+     await preloadImage(highImage, { priority: 'high' });
+     await preloadScript(lowScript, { priority: 'low' });
+
+     console.table({
+       lowImage: document.querySelector(`link[href="${lowImage}"]`)?.rel,
+       highImage: document.querySelector(`link[href="${highImage}"]`)?.rel,
+       lowScript: document.querySelector(`link[href="${lowScript}"]`)?.rel
+     });
+   })();
+   ```
+3. **Expected:** `lowImage: 'prefetch'`, `highImage: 'preload'`, `lowScript: 'prefetch'`.
+4. Visit `/dashboard` and inspect Elements → `<head>` — menu icons with `"priority": "normal"` in `sharedAssetPreloads.json` still use `rel="preload"` (only `"low"` uses prefetch).
+
 ---
 
 ### M-04 — No validation at startup that flags in `routeConfig.json` exist in `assetMap.json`
 **Files:** `routeConfig.json`, `assetMap.json`, `assetLibrary.js`  
 **Detail:** When a route declares `{ "flag": "dashboard.hamburger", "type": "image" }` but the flag is missing from `assetMap.json`, `getAssetUrl` returns `null`, the preload is silently skipped, and no warning surfaces at build time or application startup. A startup validation step that cross-references all flags in routeConfig against assetMap would catch typos early.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Typos or missing entries in `assetMap.json` for `assetPreload[].flag` values were only discovered at runtime when `getAssetUrl()` returned `null` and preload was silently skipped.
+
+**Why it happened:** `jsonConfigValidator` validated route shape but never cross-checked flag names against `assetMap.json`. **S-06** had a partial build test that read raw `routeConfig.json` without expanding `assetPreloadRef`.
+
+**What changed:**
+- `validateRouteAssetPreloadFlags.js` — `collectAssetMapFlags()` + `validateRouteAssetPreloadFlags(routes, assetMap)` with route slug in error messages.
+- `routeConfigLoader.js` — in **DEV**, fail fast after `resolveRouteAssetPreloads()` (same pattern as component path validation).
+- `assetMapBuildValidation.test.js` — build check now uses expanded routes + shared validator (**M-04** / **S-06** aligned).
+- Exported from `src/utils/assets/index.js` for console diagnostics.
+
+**Conflict check:** Does not override prior preload refactors — validation only; no change to preload scheduling or URL resolution. **C-09** (shape/priority validator) remains separate.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/validateRouteAssetPreloadFlags.test.js tests/unit/assetMapBuildValidation.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev` — app should start normally (all current flags valid).
+2. DevTools → **Console** — paste this IIFE to run the same check live:
+   ```js
+   (async () => {
+     const { getRouteConfiguration } = await import('/src/utils/route/routeConfigLoader.js');
+     const assetMap = (await import('/src/config/assetMap.json')).default;
+     const { validateRouteAssetPreloadFlags } = await import('/src/utils/assets/validateRouteAssetPreloadFlags.js');
+
+     const result = validateRouteAssetPreloadFlags(getRouteConfiguration(), assetMap);
+     console.log({
+       valid: result.valid,
+       missingCount: result.missingCount,
+       errors: result.errors
+     });
+   })();
+   ```
+3. **Expected:** `valid: true`, `missingCount: 0`, `errors: []`.
+4. **Fail-fast test:** In `routeConfig.json`, change one `assetPreload` flag to a typo (e.g. `dashboard.typo.logo`), restart `npm run dev` — startup should throw `Asset preload flag validation failed` before first navigation. Revert the typo afterward.
 
 ---
 
@@ -1371,11 +1574,79 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 **File:** `usePreloadStore.js` lines 62–66  
 **Detail:** Preloaded asset URLs are persisted to localStorage indefinitely. After a production deploy where asset filenames change (content hashing), the stored URLs still match old paths. The store has no version key or TTL, so users will never re-preload changed assets without manually clearing storage. A store version tied to the app's build hash should be added, with automatic invalidation on version mismatch.
 
+#### Resolution ✅
+
+**Status:** Resolved (already implemented by **Preloading.md Task 6**; hardened in this audit pass).
+
+**What was broken (at audit time):** Persisted `preloadedAssets` / `preloadedSections` could survive a deploy with stale URLs when filenames changed.
+
+**Why it happened:** Early store had no deploy version key.
+
+**What changed (Preloading Task 6 + this pass):**
+- `usePreloadStore.js` — `buildHash` persisted in `app-preload-state` localStorage.
+- `main.js` — on startup, clears preload state when `VITE_BUILD_HASH` changes.
+- **This pass:** extracted `appBuildHash.js` (`getAppBuildHash`, `syncPreloadStoreBuildHash`) shared by `main.js` and Pinia `afterHydrate` (clears stale state immediately on persist rehydrate).
+
+**Conflict check:** Aligns with **P-03** / **SECTION_PRELOAD_AUDIT M-01** — same `buildHash` field; no duplicate `preloadStateVersion`. `clearPreloadCache()` still preserves `buildHash` (P-03).
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/appBuildHash.test.js tests/unit/assetPreloadCache.test.js`
+
+**How to test in the browser:**
+1. Run `npm run build` with `VITE_BUILD_HASH=deploy-v1` (or set in `.env.production`), then `npm run preview`.
+2. DevTools → **Application** → **Local Storage** → note `app-preload-state` (sections/assets populated after navigation).
+3. Rebuild with `VITE_BUILD_HASH=deploy-v2`, refresh preview.
+4. DevTools → **Console** — paste:
+   ```js
+   (() => {
+     const raw = localStorage.getItem('app-preload-state');
+     const parsed = raw ? JSON.parse(raw) : null;
+     console.log({
+       buildHash: parsed?.buildHash,
+       sectionCount: parsed?.preloadedSections?.length ?? 0,
+       assetCount: parsed?.preloadedAssets?.length ?? 0
+     });
+   })();
+   ```
+5. **Expected:** `buildHash: 'deploy-v2'` and cleared sections/assets on first load after hash change (check console log from `main.js` / store: “New deploy detected — preload state cleared”).
+
 ---
 
 ### M-06 — No retry logic for failed asset preloads
 **File:** `assetPreloader.js`  
 **Detail:** When a `link.onerror` fires, the error is logged, the item is removed from `preloadInProgress`, and execution continues. There is no retry with back-off for transient CDN failures.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** A single transient network/CDN failure permanently failed a link preload; no second attempt.
+
+**Why it happened:** `link.onerror` immediately rejected and cleared `preloadInProgress`.
+
+**What changed:**
+- `withPreloadRetry()` — up to **2** retries (3 total attempts) with exponential backoff (400ms base).
+- `waitForLinkLoad()` — shared link load promise used by image/font/media/script preloaders.
+- `preloadJSON()` fetch wrapped with the same retry helper.
+
+**Conflict check:** Retries stay non-blocking; failed assets still do not throw from `preloadAsset()` (continues with siblings). Does not change URL policy / SRI guards.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/preloadRetry.test.js tests/unit/preloadScript.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, DevTools → **Network** → enable **Offline** briefly is hard to time; use console simulation instead:
+   ```js
+   (async () => {
+     const { withPreloadRetry } = await import('/src/utils/assets/assetPreloader.js');
+     let attempts = 0;
+     const result = await withPreloadRetry(async (attempt) => {
+       attempts += 1;
+       if (attempt < 2) throw new Error('simulated CDN blip');
+       return 'recovered';
+     }, { maxRetries: 2, baseDelayMs: 50 });
+     console.log({ result, attempts });
+   })();
+   ```
+2. **Expected:** `{ result: 'recovered', attempts: 3 }` (initial + 2 retries).
 
 ---
 
@@ -1383,10 +1654,101 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 **File:** `assetPreloader.js` (`preloadAssets`)  
 **Detail:** All assets for a section start in parallel via `Promise.allSettled` with no max concurrency. Large icon sets (e.g. dashboard) can flood the browser with simultaneous `<link rel="preload">` requests. Batch by priority (high first, then chunks of N) to respect connection limits.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Within each priority tier, every asset started at once (`Promise.allSettled` on the full tier). Dashboard’s ~20 icons could open ~20 simultaneous link requests.
+
+**Why it happened:** Tier grouping existed (high before low) but no cap inside a tier.
+
+**What changed:**
+- `ASSET_PRELOAD_MAX_CONCURRENCY = 6` — max parallel preloads per tier.
+- `runInConcurrencyChunks()` — processes tier assets in chunks of 6; priority tiers still run sequentially (high finishes before lower tiers start).
+- Exported for tests/diagnostics.
+
+**Conflict check:** Preserves **M-02**/**M-03** link hints and tier ordering; only limits parallelism inside each tier.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/preloadConcurrency.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/dashboard` once.
+2. DevTools → **Console**:
+   ```js
+   (async () => {
+     const { ASSET_PRELOAD_MAX_CONCURRENCY, runInConcurrencyChunks } = await import('/src/utils/assets/assetPreloader.js');
+     let maxInFlight = 0;
+     let inFlight = 0;
+     const items = Array.from({ length: 12 }, (_, i) => i);
+
+     await runInConcurrencyChunks(items, async () => {
+       inFlight += 1;
+       maxInFlight = Math.max(maxInFlight, inFlight);
+       await new Promise((r) => setTimeout(r, 20));
+       inFlight -= 1;
+     });
+
+     console.log({ ASSET_PRELOAD_MAX_CONCURRENCY, demoMaxInFlight: maxInFlight });
+   })();
+   ```
+3. **Expected:** `ASSET_PRELOAD_MAX_CONCURRENCY: 6`, `demoMaxInFlight: 6` (never 12 at once).
+
 ---
 
 ### M-08 — No intent-based asset preload (hover / viewport)
 **Detail:** Assets preload only after navigation (`preloadSectionAssets` from router `afterEach`). No hover on nav links or viewport-based prefetch for known `assetPreload` targets.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Section `assetPreload[]` warmed only after navigation (`preloadSectionAssets` from router `afterEach`). Hovering a nav link prefetched the Vue component chunk (AUDIT **P10**) but not static assets for the destination section.
+
+**Why it happened:** Intent prefetch existed only for route components (`routeComponentPrefetch.js`), not section asset rollup.
+
+**What changed:**
+- `routeAssetPrefetch.js` — `prefetchSectionAssetsForRoute()` resolves the target route + role section, then calls `preloadSectionAssets()` non-blocking; dedupes by section name.
+- `useRoutePrefetch.js` — `prefetchOnIntent()` now triggers **both** component prefetch and section asset prefetch; split handlers `prefetchComponentOnIntent` / `prefetchAssetsOnIntent` also exported.
+- Re-exported from `src/utils/route/index.js`.
+
+**Conflict check:** Complements **AUDIT.md P10** (component intent prefetch) without changing post-navigation preload. Does not add viewport observers (hover/focus only, matching existing component pattern).
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/routeAssetPrefetch.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open DevTools → **Network** → filter `Img` or `webp`.
+2. From `/log-in`, hover **Dashboard** or **Shop** nav link (uses `useRoutePrefetch` / `@mouseenter`).
+3. **Expected:** Static icon/asset requests for that route's section begin **before** click (same timing window as component chunk prefetch).
+4. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const { prefetchSectionAssetsForRoute, resetRouteAssetPrefetchCache } = await import('/src/utils/route/routeAssetPrefetch.js');
+     const { resetRoutePrefetchCache } = await import('/src/utils/route/routeComponentPrefetch.js');
+
+     const linksBefore = document.querySelectorAll('link[rel="preload"], link[rel="prefetch"]').length;
+
+     resetRouteAssetPrefetchCache();
+     resetRoutePrefetchCache();
+
+     await prefetchSectionAssetsForRoute('/shop');
+     await prefetchSectionAssetsForRoute('/shop');
+
+     const linksAfter = document.querySelectorAll('link[rel="preload"], link[rel="prefetch"]').length;
+
+     console.log({
+       sectionResolved: 'shop',
+       dedupedSecondCall: true,
+       linksBefore,
+       linksAfter,
+       note: 'If you already visited /shop or /dashboard, most images log already-preloaded — Pinia store hit, not a failure'
+     });
+   })();
+   ```
+5. **Expected (console test):**
+   - **One** `preloadSectionAssets [start]` log (second `/shop` call is deduped — no second start).
+   - **One** `Section assets prefetched on intent` success log.
+   - `linksAfter` may stay low (e.g. 3) if assets were already in `usePreloadStore` from an earlier visit — you will see many `preloadImage [already-preloaded]` lines instead of new `<link>` tags. That is correct.
+6. **Expected (hover on nav):** From `/log-in`, hover a link to a **different section** (e.g. `/shop` or `/dashboard`) — Network tab shows icon/webp requests **before** click. Hover **Sign up** on the login form only prefetches the **Vue component** today (`AuthLogIn.vue` uses `createRoutePrefetchIntentHandler` from component prefetch only); `/sign-up` is the same `auth` section as `/log-in`, so auth assets are usually already warm on that page.
 
 ---
 
@@ -1394,11 +1756,76 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 **File:** `assetScanner.js` lines 122–132  
 **Detail:** The regex `/<img[^>]+src=["']([^"']+)["'][^>]*>/gi` only matches static `src="..."` attributes. Vue template bindings like `:src="imageUrl"` or `v-bind:src="..."` are not matched. The scanner is therefore blind to dynamically-bound assets.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Template scanner only matched static `src="..."` on `<img>`, `<video>`, and `<audio>` tags.
+
+**Why it happened:** Single regex covered static HTML attributes only.
+
+**What changed:**
+- `extractLiteralBoundAttribute()` — matches `src`, `:src`, and `v-bind:src` when the value is a **string literal** (`'/path.png'`).
+- `collectMediaAssetsFromTemplate()` — scans full tags for img/video/audio instead of one combined regex.
+- Variable expressions (`:src="imageUrl"`) are intentionally skipped — no static URL to preload without runtime evaluation.
+
+**Conflict check:** Scanner-only change; does not alter runtime `preloadSectionAssets` rollup from `routeConfig.json`.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/assetScanner.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const { scanComponentForAssetReferences } = await import('/src/utils/assets/assetScanner.js');
+     const template = `
+       <img src="/assets/static.png" />
+       <img :src="'/assets/bound.png'" />
+       <img :src="imageUrl" />
+     `;
+     console.log(scanComponentForAssetReferences(template));
+   })();
+   ```
+3. **Expected:** Two entries — `/assets/static.png` and `/assets/bound.png` — no entry for `imageUrl`.
+
 ---
 
 ### M-10 — `loadAssetMapConfig` path is not configurable via environment variable
 **File:** `assetLibrary.js` line 667  
 **Detail:** The asset map URL is hardcoded to `/config/assetMap.json`. There is no `import.meta.env.VITE_ASSET_MAP_URL` override. This makes it impossible to serve environment-specific asset maps from different paths (e.g., `/config/assetMap.staging.json`) without modifying source code.
+
+#### Resolution ✅
+
+**Status:** Resolved (already fixed in **L-10** audit pass; verified and exported this pass).
+
+**What was broken (at audit time):** Only `/config/assetMap.json` was fetched; no env override for staging/custom paths.
+
+**Why it happened:** Single hardcoded public path.
+
+**What changed (L-10 + this pass):**
+- `getAssetMapFetchCandidates()` — optional `VITE_ASSET_MAP_URL` prepended; dev fallbacks `/config/assetMap.json` and `/src/config/assetMap.json`.
+- `fetchAssetMapFromNetwork()` tries candidates in order; bundled map remains final fallback.
+- **This pass:** exported `getAssetMapFetchCandidates` from `assetLibrary.js` / `assets/index.js` for tests and diagnostics.
+
+**Conflict check:** Same behavior as **L-10** / **S-06** runtime override rules — production still defaults to bundled map unless `VITE_ASSET_MAP_RUNTIME_OVERRIDE=true`.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/assetMapUrl.test.js tests/unit/assetMapSource.test.js`
+
+**How to test in the browser:**
+1. Set `VITE_ASSET_MAP_URL=/config/assetMap.staging.json` in `.env.local`, restart `npm run dev`.
+2. DevTools → **Console**:
+   ```js
+   (async () => {
+     const { getAssetMapFetchCandidates, getAssetMapConfigSource, clearAssetMapConfigCache, loadAssetMapConfig } = await import('/src/utils/assets/assetLibrary.js');
+
+     console.log({ candidates: getAssetMapFetchCandidates() });
+     clearAssetMapConfigCache();
+     await loadAssetMapConfig();
+     console.log({ source: getAssetMapConfigSource() });
+   })();
+   ```
+3. **Expected:** `candidates[0]` is your override URL; Network tab shows fetch attempts starting with that path when runtime override is enabled.
 
 ---
 

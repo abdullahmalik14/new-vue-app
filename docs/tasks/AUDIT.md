@@ -783,6 +783,8 @@ No preload-architecture change — `preloadSectionAssets` still merges by sectio
 3. DevTools → **Network** → filter Img — confirm dashboard icon requests still fire for each section visit (no missing icons).
 4. Edit one flag in `sharedAssetPreloads.json` only — both routes should pick up the change after refresh (proves single source of truth).
 
+**M-01 follow-up (2026-05-26):** Merge-time dedup is now implemented in `getAssetPreloadEntriesForSection.js` (**ASSET_PRELOAD_AUDIT.md M-01**). P4 removed JSON duplication; M-01 ensures multiple routes in the **same section** that repeat the same flag/src only produce one rollup entry (highest priority wins). `hasAsset()` HTTP dedup unchanged.
+
 ---
 
 ### P5 — `findComponentLoader` falls back to O(n) full-map scan

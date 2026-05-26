@@ -19,11 +19,170 @@ import { usePreloadStore } from '../../stores/usePreloadStore.js';
 // Track in-progress preloads to avoid duplicate requests
 const preloadInProgress = new Map();
 
+/** @type {number} Max parallel asset preloads within one priority tier (M-07) */
+export const ASSET_PRELOAD_MAX_CONCURRENCY = 6;
+
+/** @type {number} Retries after the first failed link/fetch attempt (M-06) */
+const LINK_PRELOAD_MAX_RETRIES = 2;
+
+/** @type {number} Base backoff ms for preload retries (M-06) */
+const LINK_PRELOAD_RETRY_BASE_MS = 400;
+
 /** @type {Record<string, number>} Higher value = scheduled earlier in preloadAssets */
 const ASSET_PRELOAD_PRIORITY_MAP = { critical: 4, high: 3, medium: 2, low: 1 };
 
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Retry an async preload operation with exponential backoff (M-06).
+ *
+ * @template T
+ * @param {(attempt: number) => Promise<T>} operation
+ * @param {object} [options]
+ * @returns {Promise<T>}
+ */
+export async function withPreloadRetry(operation, options = {}) {
+  const maxRetries = options.maxRetries ?? LINK_PRELOAD_MAX_RETRIES;
+  const baseDelayMs = options.baseDelayMs ?? LINK_PRELOAD_RETRY_BASE_MS;
+  let attempt = 0;
+  let lastError;
+
+  while (attempt <= maxRetries) {
+    try {
+      return await operation(attempt);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= maxRetries) {
+        throw lastError;
+      }
+      await delay(baseDelayMs * (2 ** attempt));
+      attempt += 1;
+    }
+  }
+
+  throw lastError;
+}
+
+/**
+ * @param {HTMLLinkElement} link
+ * @returns {Promise<void>}
+ */
+function waitForLinkLoad(link) {
+  return new Promise((resolve, reject) => {
+    link.onload = () => {
+      link.onload = null;
+      link.onerror = null;
+      resolve();
+    };
+
+    link.onerror = () => {
+      link.onload = null;
+      link.onerror = null;
+      link.remove();
+      reject(new Error(`Failed to load resource hint: ${link.href}`));
+    };
+  });
+}
+
+/**
+ * Run preload work in bounded parallel chunks (M-07).
+ *
+ * @template T
+ * @param {T[]} items
+ * @param {(item: T) => Promise<unknown>} worker
+ * @param {number} [maxConcurrency]
+ */
+export async function runInConcurrencyChunks(items, worker, maxConcurrency = ASSET_PRELOAD_MAX_CONCURRENCY) {
+  for (let index = 0; index < items.length; index += maxConcurrency) {
+    const chunk = items.slice(index, index + maxConcurrency);
+    await Promise.allSettled(chunk.map((item) => worker(item)));
+  }
+}
+
 function getAssetPreloadPriorityValue(priority) {
   return ASSET_PRELOAD_PRIORITY_MAP[priority] || 1;
+}
+
+/** @typedef {'high' | 'low' | 'auto'} FetchPriorityHint */
+
+/**
+ * Map route-config priority to the Fetch Priority API (M-02).
+ *
+ * @param {object} [options]
+ * @returns {FetchPriorityHint | null}
+ */
+export function resolveFetchPriority(options = {}) {
+  if (
+    options.fetchPriority === 'high' ||
+    options.fetchPriority === 'low' ||
+    options.fetchPriority === 'auto'
+  ) {
+    return options.fetchPriority;
+  }
+
+  switch (options.priority) {
+    case 'critical':
+    case 'high':
+      return 'high';
+    case 'low':
+      return 'low';
+    case 'medium':
+    case 'normal':
+      return 'auto';
+    default:
+      return null;
+  }
+}
+
+/**
+ * @param {HTMLLinkElement} link
+ * @param {object} [options]
+ */
+function applyFetchPriorityToLink(link, options = {}) {
+  const fetchPriority = resolveFetchPriority(options);
+
+  if (fetchPriority) {
+    link.setAttribute('fetchpriority', fetchPriority);
+  }
+}
+
+/**
+ * Low-priority assets should use idle-time prefetch instead of navigation preload (M-03).
+ *
+ * @param {object} [options]
+ * @returns {boolean}
+ */
+function shouldUsePrefetchHint(options = {}) {
+  return options.priority === 'low';
+}
+
+/**
+ * @param {HTMLLinkElement} link
+ * @param {object} options
+ * @param {string} [asValue]
+ */
+function applyResourceHintRel(link, options, asValue) {
+  if (shouldUsePrefetchHint(options)) {
+    link.rel = 'prefetch';
+  } else {
+    link.rel = 'preload';
+  }
+
+  if (asValue) {
+    link.as = asValue;
+  }
+}
+
+/**
+ * @param {string} src
+ * @returns {HTMLLinkElement | null}
+ */
+function findExistingResourceHintLink(src) {
+  return document.querySelector(
+    `link[rel="prefetch"][href="${src}"], link[rel="preload"][href="${src}"], link[rel="modulepreload"][href="${src}"]`,
+  );
 }
 
 function shouldUseModulePreload(options, src) {
@@ -40,6 +199,7 @@ function shouldUseModulePreload(options, src) {
 
 function findExistingScriptPreloadLink(src) {
   return (
+    document.querySelector(`link[rel="prefetch"][href="${src}"]`) ||
     document.querySelector(`link[rel="preload"][as="script"][href="${src}"]`) ||
     document.querySelector(`link[rel="modulepreload"][href="${src}"]`)
   );
@@ -49,7 +209,10 @@ function createScriptPreloadLink(src, options) {
   const link = document.createElement('link');
   link.href = src;
 
-  if (shouldUseModulePreload(options, src)) {
+  if (shouldUsePrefetchHint(options)) {
+    link.rel = 'prefetch';
+    link.setAttribute('as', 'script');
+  } else if (shouldUseModulePreload(options, src)) {
     link.rel = 'modulepreload';
   } else {
     link.rel = 'preload';
@@ -66,6 +229,8 @@ function createScriptPreloadLink(src, options) {
       link.crossOrigin = 'anonymous';
     }
   }
+
+  applyFetchPriorityToLink(link, options);
 
   return link;
 }
@@ -174,7 +339,7 @@ export function preloadImage(src, options = {}) {
 
   const { promise, resolve, reject } = reserved;
 
-  const existingLink = document.querySelector(`link[rel="preload"][href="${src}"]`);
+  const existingLink = findExistingResourceHintLink(src);
   if (existingLink) {
     log('assetPreloader.js', 'preloadImage', 'already-exists', 'Image preload link already exists in DOM', { src });
     preloadStore.addAsset(src);
@@ -190,46 +355,53 @@ export function preloadImage(src, options = {}) {
     return promise;
   }
 
-  const link = document.createElement('link');
-  link.rel = 'preload';
-  link.as = 'image';
-  link.href = src;
+  withPreloadRetry(async (attempt) => {
+    if (attempt > 0) {
+      document.querySelectorAll(`link[href="${src}"]`).forEach((element) => element.remove());
+      log('assetPreloader.js', 'preloadImage', 'retry', 'Retrying image preload', { src, attempt });
+    }
 
-  if (options.crossOrigin) {
-    link.crossOrigin = options.crossOrigin;
-  }
+    const link = document.createElement('link');
+    link.href = src;
+    applyResourceHintRel(link, options, 'image');
 
-  link.onload = () => {
-    preloadStore.addAsset(src);
-    preloadInProgress.delete(src);
-    log('assetPreloader.js', 'preloadImage', 'success', 'Image preloaded successfully', { src });
-    trackStep({
-      step: 'preloadImage_complete',
-      file: 'assetPreloader.js',
-      method: 'preloadImage',
-      flag: 'success',
-      purpose: 'Image preload complete'
+    if (options.crossOrigin) {
+      link.crossOrigin = options.crossOrigin;
+    }
+
+    applyFetchPriorityToLink(link, options);
+    document.head.appendChild(link);
+    await waitForLinkLoad(link);
+  })
+    .then(() => {
+      preloadStore.addAsset(src);
+      preloadInProgress.delete(src);
+      log('assetPreloader.js', 'preloadImage', 'success', 'Image preloaded successfully', { src });
+      trackStep({
+        step: 'preloadImage_complete',
+        file: 'assetPreloader.js',
+        method: 'preloadImage',
+        flag: 'success',
+        purpose: 'Image preload complete'
+      });
+      resolve();
+    })
+    .catch((error) => {
+      preloadInProgress.delete(src);
+      log('assetPreloader.js', 'preloadImage', 'error', 'Image preload failed', {
+        src,
+        error: error.message || 'Load error'
+      });
+      trackStep({
+        step: 'preloadImage_error',
+        file: 'assetPreloader.js',
+        method: 'preloadImage',
+        flag: 'error',
+        purpose: 'Image preload failed'
+      });
+      reject(new Error(`Failed to preload image: ${src}`));
     });
-    resolve();
-  };
 
-  link.onerror = (error) => {
-    preloadInProgress.delete(src);
-    log('assetPreloader.js', 'preloadImage', 'error', 'Image preload failed', {
-      src,
-      error: error.message || 'Load error'
-    });
-    trackStep({
-      step: 'preloadImage_error',
-      file: 'assetPreloader.js',
-      method: 'preloadImage',
-      flag: 'error',
-      purpose: 'Image preload failed'
-    });
-    reject(new Error(`Failed to preload image: ${src}`));
-  };
-
-  document.head.appendChild(link);
   return promise;
 }
 
@@ -278,7 +450,7 @@ export function preloadFont(src, options = {}) {
 
   const { promise: fontPromise, resolve: resolveFont, reject: rejectFont } = fontReserved;
 
-  const existingFontLink = document.querySelector(`link[rel="preload"][href="${src}"]`);
+  const existingFontLink = findExistingResourceHintLink(src);
   if (existingFontLink) {
     log('assetPreloader.js', 'preloadFont', 'already-exists', 'Font preload link already exists in DOM', { src });
     preloadStore.addAsset(src);
@@ -294,47 +466,54 @@ export function preloadFont(src, options = {}) {
     return fontPromise;
   }
 
-  const fontLink = document.createElement('link');
-  fontLink.rel = 'preload';
-  fontLink.as = 'font';
-  fontLink.href = src;
-  fontLink.type = options.type || 'font/woff2';
+  withPreloadRetry(async (attempt) => {
+    if (attempt > 0) {
+      document.querySelectorAll(`link[href="${src}"]`).forEach((element) => element.remove());
+      log('assetPreloader.js', 'preloadFont', 'retry', 'Retrying font preload', { src, attempt });
+    }
 
-  if (options.crossOrigin !== false) {
-    fontLink.crossOrigin = 'anonymous';
-  }
+    const link = document.createElement('link');
+    link.href = src;
+    applyResourceHintRel(link, options, 'font');
+    link.type = options.type || 'font/woff2';
 
-  fontLink.onload = () => {
-    preloadStore.addAsset(src);
-    preloadInProgress.delete(src);
-    log('assetPreloader.js', 'preloadFont', 'success', 'Font preloaded successfully', { src });
-    trackStep({
-      step: 'preloadFont_complete',
-      file: 'assetPreloader.js',
-      method: 'preloadFont',
-      flag: 'success',
-      purpose: 'Font preload complete'
+    if (options.crossOrigin !== false) {
+      link.crossOrigin = 'anonymous';
+    }
+
+    applyFetchPriorityToLink(link, options);
+    document.head.appendChild(link);
+    await waitForLinkLoad(link);
+  })
+    .then(() => {
+      preloadStore.addAsset(src);
+      preloadInProgress.delete(src);
+      log('assetPreloader.js', 'preloadFont', 'success', 'Font preloaded successfully', { src });
+      trackStep({
+        step: 'preloadFont_complete',
+        file: 'assetPreloader.js',
+        method: 'preloadFont',
+        flag: 'success',
+        purpose: 'Font preload complete'
+      });
+      resolveFont();
+    })
+    .catch((error) => {
+      preloadInProgress.delete(src);
+      log('assetPreloader.js', 'preloadFont', 'error', 'Font preload failed', {
+        src,
+        error: error.message || 'Load error'
+      });
+      trackStep({
+        step: 'preloadFont_error',
+        file: 'assetPreloader.js',
+        method: 'preloadFont',
+        flag: 'error',
+        purpose: 'Font preload failed'
+      });
+      rejectFont(new Error(`Failed to preload font: ${src}`));
     });
-    resolveFont();
-  };
 
-  fontLink.onerror = (error) => {
-    preloadInProgress.delete(src);
-    log('assetPreloader.js', 'preloadFont', 'error', 'Font preload failed', {
-      src,
-      error: error.message || 'Load error'
-    });
-    trackStep({
-      step: 'preloadFont_error',
-      file: 'assetPreloader.js',
-      method: 'preloadFont',
-      flag: 'error',
-      purpose: 'Font preload failed'
-    });
-    rejectFont(new Error(`Failed to preload font: ${src}`));
-  };
-
-  document.head.appendChild(fontLink);
   return fontPromise;
 }
 
@@ -384,7 +563,7 @@ export function preloadMedia(src, type = 'video', options = {}) {
 
   const { promise: mediaPromise, resolve: resolveMedia, reject: rejectMedia } = mediaReserved;
 
-  const existingMediaLink = document.querySelector(`link[rel="preload"][href="${src}"]`);
+  const existingMediaLink = findExistingResourceHintLink(src);
   if (existingMediaLink) {
     log('assetPreloader.js', 'preloadMedia', 'already-exists', 'Media preload link already exists in DOM', { src });
     preloadStore.addAsset(src);
@@ -400,47 +579,54 @@ export function preloadMedia(src, type = 'video', options = {}) {
     return mediaPromise;
   }
 
-  const mediaLink = document.createElement('link');
-  mediaLink.rel = 'preload';
-  mediaLink.as = type;
-  mediaLink.href = src;
+  withPreloadRetry(async (attempt) => {
+    if (attempt > 0) {
+      document.querySelectorAll(`link[href="${src}"]`).forEach((element) => element.remove());
+      log('assetPreloader.js', 'preloadMedia', 'retry', 'Retrying media preload', { src, type, attempt });
+    }
 
-  if (options.type) {
-    mediaLink.type = options.type;
-  }
+    const link = document.createElement('link');
+    link.href = src;
+    applyResourceHintRel(link, options, type);
 
-  mediaLink.onload = () => {
-    preloadStore.addAsset(src);
-    preloadInProgress.delete(src);
-    log('assetPreloader.js', 'preloadMedia', 'success', 'Media preloaded successfully', { src, type });
-    trackStep({
-      step: 'preloadMedia_complete',
-      file: 'assetPreloader.js',
-      method: 'preloadMedia',
-      flag: 'success',
-      purpose: 'Media preload complete'
+    if (options.type) {
+      link.type = options.type;
+    }
+
+    applyFetchPriorityToLink(link, options);
+    document.head.appendChild(link);
+    await waitForLinkLoad(link);
+  })
+    .then(() => {
+      preloadStore.addAsset(src);
+      preloadInProgress.delete(src);
+      log('assetPreloader.js', 'preloadMedia', 'success', 'Media preloaded successfully', { src, type });
+      trackStep({
+        step: 'preloadMedia_complete',
+        file: 'assetPreloader.js',
+        method: 'preloadMedia',
+        flag: 'success',
+        purpose: 'Media preload complete'
+      });
+      resolveMedia();
+    })
+    .catch((error) => {
+      preloadInProgress.delete(src);
+      log('assetPreloader.js', 'preloadMedia', 'error', 'Media preload failed', {
+        src,
+        type,
+        error: error.message || 'Load error'
+      });
+      trackStep({
+        step: 'preloadMedia_error',
+        file: 'assetPreloader.js',
+        method: 'preloadMedia',
+        flag: 'error',
+        purpose: 'Media preload failed'
+      });
+      rejectMedia(new Error(`Failed to preload ${type}: ${src}`));
     });
-    resolveMedia();
-  };
 
-  mediaLink.onerror = (error) => {
-    preloadInProgress.delete(src);
-    log('assetPreloader.js', 'preloadMedia', 'error', 'Media preload failed', {
-      src,
-      type,
-      error: error.message || 'Load error'
-    });
-    trackStep({
-      step: 'preloadMedia_error',
-      file: 'assetPreloader.js',
-      method: 'preloadMedia',
-      flag: 'error',
-      purpose: 'Media preload failed'
-    });
-    rejectMedia(new Error(`Failed to preload ${type}: ${src}`));
-  };
-
-  document.head.appendChild(mediaLink);
   return mediaPromise;
 }
 
@@ -512,39 +698,45 @@ export function preloadScript(src, options = {}) {
     return scriptPromise;
   }
 
-  const scriptLink = createScriptPreloadLink(src, options);
+  withPreloadRetry(async (attempt) => {
+    if (attempt > 0) {
+      document.querySelectorAll(`link[href="${src}"]`).forEach((element) => element.remove());
+      log('assetPreloader.js', 'preloadScript', 'retry', 'Retrying script preload', { src, attempt });
+    }
 
-  scriptLink.onload = () => {
-    preloadStore.addAsset(src);
-    preloadInProgress.delete(src);
-    log('assetPreloader.js', 'preloadScript', 'success', 'Script preloaded successfully', { src });
-    trackStep({
-      step: 'preloadScript_complete',
-      file: 'assetPreloader.js',
-      method: 'preloadScript',
-      flag: 'success',
-      purpose: 'Script preload complete'
+    const scriptLink = createScriptPreloadLink(src, options);
+    document.head.appendChild(scriptLink);
+    await waitForLinkLoad(scriptLink);
+  })
+    .then(() => {
+      preloadStore.addAsset(src);
+      preloadInProgress.delete(src);
+      log('assetPreloader.js', 'preloadScript', 'success', 'Script preloaded successfully', { src });
+      trackStep({
+        step: 'preloadScript_complete',
+        file: 'assetPreloader.js',
+        method: 'preloadScript',
+        flag: 'success',
+        purpose: 'Script preload complete'
+      });
+      resolveScript();
+    })
+    .catch((error) => {
+      preloadInProgress.delete(src);
+      log('assetPreloader.js', 'preloadScript', 'error', 'Script preload failed', {
+        src,
+        error: error.message || 'Load error'
+      });
+      trackStep({
+        step: 'preloadScript_error',
+        file: 'assetPreloader.js',
+        method: 'preloadScript',
+        flag: 'error',
+        purpose: 'Script preload failed'
+      });
+      rejectScript(new Error(`Failed to preload script: ${src}`));
     });
-    resolveScript();
-  };
 
-  scriptLink.onerror = (error) => {
-    preloadInProgress.delete(src);
-    log('assetPreloader.js', 'preloadScript', 'error', 'Script preload failed', {
-      src,
-      error: error.message || 'Load error'
-    });
-    trackStep({
-      step: 'preloadScript_error',
-      file: 'assetPreloader.js',
-      method: 'preloadScript',
-      flag: 'error',
-      purpose: 'Script preload failed'
-    });
-    rejectScript(new Error(`Failed to preload script: ${src}`));
-  };
-
-  document.head.appendChild(scriptLink);
   return scriptPromise;
 }
 
@@ -601,15 +793,20 @@ export async function preloadJSON(src, options = {}) {
 
   const loadPromise = (async () => {
     try {
-      log('assetPreloader.js', 'preloadJSON', 'fetching', 'Fetching JSON file', { src });
+      const data = await withPreloadRetry(async (attempt) => {
+        if (attempt > 0) {
+          log('assetPreloader.js', 'preloadJSON', 'retry', 'Retrying JSON preload', { src, attempt });
+        }
 
-      const response = await fetch(src);
+        log('assetPreloader.js', 'preloadJSON', 'fetching', 'Fetching JSON file', { src });
+        const response = await fetch(src);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-      const data = await response.json();
+        return response.json();
+      });
 
       jsonDataCache.set(src, data);
       preloadStore.addAsset(src);
@@ -772,7 +969,7 @@ export async function preloadAssets(assets) {
       tierIndex += 1;
     }
 
-    await Promise.allSettled(tierAssets.map(asset => preloadAsset(asset)));
+    await runInConcurrencyChunks(tierAssets, (asset) => preloadAsset(asset));
   }
 
   log('assetPreloader.js', 'preloadAssets', 'success', 'All assets preloaded', { count: assets.length });

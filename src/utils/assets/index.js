@@ -22,8 +22,14 @@ export {
 
 export {
   getAssetPreloadEntriesForSection,
-  clearAssetPreloadSectionCache
+  clearAssetPreloadSectionCache,
+  dedupeAssetPreloadEntries
 } from './getAssetPreloadEntriesForSection.js';
+
+export {
+  collectAssetMapFlags,
+  validateRouteAssetPreloadFlags
+} from './validateRouteAssetPreloadFlags.js';
 
 // Export asset scanner functions
 export {
@@ -58,6 +64,7 @@ export {
   loadAssetMapConfig,
   getAssetMapConfigSource,
   clearAssetMapConfigCache,
+  getAssetMapFetchCandidates,
   setEnvironment,
   getEnvironment
 } from './assetLibrary';
