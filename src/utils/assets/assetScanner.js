@@ -1,6 +1,7 @@
 // vueApp-main-new/src/utils/assets/assetScanner.js
 
 import { log } from '../common/logHandler';
+import { getAssetPreloadEntriesForSection } from './getAssetPreloadEntriesForSection.js';
 
 /**
  * @file assetScanner.js
@@ -192,33 +193,12 @@ export async function scanSectionComponents(sectionName) {
   });
 
   try {
-    const allAssets = [];
-
-    // Get section routes
-    const { getRouteConfiguration } = await import('../route/routeConfigLoader');
-    const routes = getRouteConfiguration();
-    
-    const sectionRoutes = routes.filter(route => {
-      if (typeof route.section === 'string') {
-        return route.section === sectionName;
-      }
-      if (typeof route.section === 'object') {
-        return Object.values(route.section).includes(sectionName);
-      }
-      return false;
-    });
+    const { assets: allAssets, routeCount } = getAssetPreloadEntriesForSection(sectionName);
 
     log('assetScanner.js', 'scanSectionComponents', 'routes-found', 'Section routes found', { 
       sectionName, 
-      routeCount: sectionRoutes.length 
+      routeCount 
     });
-
-    // Collect assets from routes
-    for (const route of sectionRoutes) {
-      if (route.assetPreload && Array.isArray(route.assetPreload)) {
-        allAssets.push(...route.assetPreload);
-      }
-    }
 
     log('assetScanner.js', 'scanSectionComponents', 'success', 'Section component scanning complete', { 
       sectionName, 
@@ -258,13 +238,6 @@ export async function scanSectionComponents(sectionName) {
  */
 export function shouldIgnoreComponent(component) {
   log('assetScanner.js', 'shouldIgnoreComponent', 'check', 'Checking if component should be ignored', {});
-  window.performanceTracker.step({
-    step: 'shouldIgnoreComponent',
-    file: 'assetScanner.js',
-    method: 'shouldIgnoreComponent',
-    flag: 'check',
-    purpose: 'Check component ignore status'
-  });
 
   try {
     // Check for IGNORE_ASSET_PRELOAD constant
@@ -286,13 +259,6 @@ export function shouldIgnoreComponent(component) {
       error: error.message, 
       stack: error.stack 
     });
-    window.performanceTracker.step({
-      step: 'shouldIgnoreComponent_error',
-      file: 'assetScanner.js',
-      method: 'shouldIgnoreComponent',
-      flag: 'error',
-      purpose: 'Ignore check failed'
-    });
     return false;
   }
 }
@@ -306,13 +272,6 @@ export function shouldIgnoreComponent(component) {
 export function normalizeAssetDefinition(asset) {
   log('assetScanner.js', 'normalizeAssetDefinition', 'start', 'Normalizing asset definition', { 
     assetType: typeof asset 
-  });
-  window.performanceTracker.step({
-    step: 'normalizeAssetDefinition',
-    file: 'assetScanner.js',
-    method: 'normalizeAssetDefinition',
-    flag: 'normalize',
-    purpose: 'Normalize asset to standard format'
   });
 
   try {
@@ -343,13 +302,6 @@ export function normalizeAssetDefinition(asset) {
       asset, 
       error: error.message, 
       stack: error.stack 
-    });
-    window.performanceTracker.step({
-      step: 'normalizeAssetDefinition_error',
-      file: 'assetScanner.js',
-      method: 'normalizeAssetDefinition',
-      flag: 'error',
-      purpose: 'Normalization failed'
     });
     return { src: '', type: 'unknown', priority: 'low' };
   }

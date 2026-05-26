@@ -1,14 +1,45 @@
 import { defineStore } from 'pinia';
 import { log } from '../utils/common/logHandler.js';
 
+function normalizePreloadedAssets(assets) {
+  if (assets instanceof Set) {
+    return assets;
+  }
+
+  if (Array.isArray(assets)) {
+    return new Set(assets);
+  }
+
+  return new Set();
+}
+
+function serializePreloadPersistedState(state) {
+  return JSON.stringify({
+    ...state,
+    preloadedAssets: [...normalizePreloadedAssets(state.preloadedAssets)],
+  });
+}
+
+function deserializePreloadPersistedState(raw) {
+  const parsed = JSON.parse(raw);
+  parsed.preloadedAssets = normalizePreloadedAssets(parsed.preloadedAssets);
+  return parsed;
+}
+
 export const usePreloadStore = defineStore('preload', {
   state: () => ({
     preloadedSections: [], // Array of strings
-    preloadedAssets: [],    // Array of strings (URLs)
+    preloadedAssets: new Set(), // Resolved asset URLs (O(1) membership)
     buildHash: null,       // Cleared on new deploy to invalidate stale preload state
     manifestLoadFailed: false, // Set when production section manifest cannot be loaded
     sectionsInProgress: [] // Reactive in-flight section preloads (not persisted)
   }),
+
+  getters: {
+    preloadedAssetCount(state) {
+      return state.preloadedAssets.size;
+    },
+  },
 
   actions: {
     /**
@@ -49,8 +80,8 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} assetUrl 
      */
     addAsset(assetUrl) {
-      if (!this.preloadedAssets.includes(assetUrl)) {
-        this.preloadedAssets.push(assetUrl);
+      if (!this.preloadedAssets.has(assetUrl)) {
+        this.preloadedAssets.add(assetUrl);
         // Log less frequently for assets to avoid noise, or keep it if needed
         // log('usePreloadStore.js', 'addAsset', 'add', 'Asset marked as preloaded', { assetUrl });
       }
@@ -62,7 +93,22 @@ export const usePreloadStore = defineStore('preload', {
      * @returns {boolean}
      */
     hasAsset(assetUrl) {
-      return this.preloadedAssets.includes(assetUrl);
+      return this.preloadedAssets.has(assetUrl);
+    },
+
+    /**
+     * Remove a single asset URL from the preload cache (e.g. test / DOM dedup scenarios).
+     * @param {string} assetUrl
+     */
+    removeAsset(assetUrl) {
+      this.preloadedAssets.delete(assetUrl);
+    },
+
+    /**
+     * Clear only resolved asset URLs; section bundle state is unchanged.
+     */
+    clearAssets() {
+      this.preloadedAssets = new Set();
     },
 
     /**
@@ -113,7 +159,7 @@ export const usePreloadStore = defineStore('preload', {
      */
     clearState() {
       this.preloadedSections = [];
-      this.preloadedAssets = [];
+      this.preloadedAssets = new Set();
       this.buildHash = null;
       this.manifestLoadFailed = false;
       this.sectionsInProgress = [];
@@ -124,6 +170,13 @@ export const usePreloadStore = defineStore('preload', {
   persist: {
     key: 'app-preload-state',
     storage: localStorage,
-    paths: ['preloadedSections', 'preloadedAssets', 'buildHash']
+    paths: ['preloadedSections', 'preloadedAssets', 'buildHash'],
+    serializer: {
+      serialize: serializePreloadPersistedState,
+      deserialize: deserializePreloadPersistedState,
+    },
+    afterHydrate({ store }) {
+      store.preloadedAssets = normalizePreloadedAssets(store.preloadedAssets);
+    },
   }
 });

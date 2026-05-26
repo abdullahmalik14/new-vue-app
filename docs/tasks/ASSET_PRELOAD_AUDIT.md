@@ -75,7 +75,7 @@ Routes define `assetPreload[]` per route (`flag` or `src`, `type`, `priority`). 
 
 **What changed:**
 - `preloadFont` and `preloadMedia` — before creating a link, query `link[rel="preload"][href="…"]`; if found, `addAsset(src)` and return `Promise.resolve()`.
-- `preloadScript` — same pattern with `link[rel="modulepreload"][href="…"]` (matches how scripts are injected).
+- `preloadScript` — same pattern with `link[rel="preload"][as="script"][href="…"]` for classic scripts (see **P-07**; legacy `modulepreload` links still dedupe).
 - Each path logs `[already-exists]` and records a `*_dom_exists` performance step, matching `preloadImage`.
 
 **Conflict check:** No change to section rollup or navigation; extends existing image DOM dedup pattern only.
@@ -83,22 +83,23 @@ Routes define `assetPreload[]` per route (`flag` or `src`, `type`, `priority`). 
 **How it was tested:** Code review — parity with `preloadImage` DOM branch; script selector matches `rel="modulepreload"` used on insert.
 
 **How to test in the browser:**
-1. Run `npm run dev`, visit `/log-in` once (creates Cognito `modulepreload` link).
+1. Run `npm run dev`, visit `/log-in` once (creates Cognito script preload link).
 2. **Console** — DOM dedup (store cleared, link kept):
    ```js
    (async () => {
      const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
      const { preloadScript } = await import('/src/utils/assets/assetPreloader.js');
      const scriptUrl = '/vendor/amazon-cognito-identity-6.3.15.min.js';
+     const linkSelector = `link[rel="preload"][as="script"][href="${scriptUrl}"]`;
 
-     const linksBefore = document.querySelectorAll(`link[rel="modulepreload"][href="${scriptUrl}"]`).length;
-     store.preloadedAssets = store.preloadedAssets.filter(u => u !== scriptUrl);
-
-     await preloadScript(scriptUrl);
-     const linksAfterFirst = document.querySelectorAll(`link[rel="modulepreload"][href="${scriptUrl}"]`).length;
+     const linksBefore = document.querySelectorAll(linkSelector).length;
+     store.removeAsset(scriptUrl);
 
      await preloadScript(scriptUrl);
-     const linksAfterSecond = document.querySelectorAll(`link[rel="modulepreload"][href="${scriptUrl}"]`).length;
+     const linksAfterFirst = document.querySelectorAll(linkSelector).length;
+
+     await preloadScript(scriptUrl);
+     const linksAfterSecond = document.querySelectorAll(linkSelector).length;
 
      console.log({ linksBefore, linksAfterFirst, linksAfterSecond });
    })();
@@ -137,7 +138,7 @@ Routes define `assetPreload[]` per route (`flag` or `src`, `type`, `priority`). 
      const { preloadImage } = await import('/src/utils/assets/assetPreloader.js');
      const url = 'https://i.ibb.co/jPw7ChWb/auth-bg.webp';
 
-     store.preloadedAssets = store.preloadedAssets.filter(u => u !== url);
+     store.removeAsset(url);
 
      await Promise.all([preloadImage(url), preloadImage(url)]);
 
@@ -243,7 +244,7 @@ Routes define `assetPreload[]` per route (`flag` or `src`, `type`, `priority`). 
    ```js
    (async () => {
      const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
-     store.preloadedAssets = [];
+     store.clearAssets();
      const { preloadSectionAssets } = await import('/src/utils/assets/assetPreloader.js');
      await preloadSectionAssets('dashboard-global');
      console.log('done — check logs: high-tier flags before normal-tier');
@@ -346,7 +347,7 @@ Routes define `assetPreload[]` per route (`flag` or `src`, `type`, `priority`). 
    ```js
    (async () => {
      const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
-     store.preloadedAssets = [];
+     store.clearAssets();
      const { preloadAssets } = await import('/src/utils/assets/assetPreloader.js');
      await preloadAssets([
        { flag: 'dashboard.hamburger', type: 'image', priority: 'low' },
@@ -435,11 +436,106 @@ If the original `asset` object has `src: null`, `type: undefined`, or `priority:
 **File:** `usePreloadStore.js` lines 35–49 (`preloadedAssets`; `preloadedSections` is section-bundle state — out of scope)  
 **Detail:** `preloadedAssets` is a plain array; `hasAsset` uses `Array.includes` (O(n)). With 50+ icon URLs on dashboard sections, every preload check scans the list. Use a `Set` for O(1) URL lookups.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `preloadedAssets` was a plain array; every `hasAsset(url)` and dedup check in `addAsset` scanned the full list (O(n)). Dashboard sections with 50+ icon URLs repeated that work on every preload call.
+
+**Why it happened:** Initial store used a simple string array; scale grew with section asset rollup.
+
+**What changed:**
+- `preloadedAssets` is now a `Set` for O(1) `has` / `add` / `delete`.
+- Pinia persist uses a custom serializer (Set ↔ array in `localStorage`) plus `afterHydrate` so existing saved sessions migrate cleanly.
+- Added `preloadedAssetCount` getter, `clearAssets()`, and `removeAsset(url)` for tests and targeted invalidation.
+- `assetPreloader.js` count logging uses `preloadedAssetCount` instead of `.length`.
+
+**Conflict check:** Aligns with **Preloading.md** Task 6 (`buildHash` invalidation) and **SECTION_PRELOAD_AUDIT** — only asset URL tracking changes; `preloadedSections` stays an array. Does **not** implement full P-03 cache consolidation (URL resolution caches in `assetLibrary` / `cacheHandler` unchanged). Partial overlap with P-03 item 1 (Set) — done here; M-05 `preloadStateVersion` remains separate.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/usePreloadStore.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/dashboard` once (warms assets).
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     const { preloadImage } = await import('/src/utils/assets/assetPreloader.js');
+     const url =
+       document.querySelector('link[rel="preload"][as="image"]')?.href ||
+       'https://i.ibb.co/jPw7ChWb/auth-bg.webp';
+
+     console.log('is Set:', store.preloadedAssets instanceof Set, 'count:', store.preloadedAssetCount);
+
+     store.removeAsset(url);
+     const t0 = performance.now();
+     await preloadImage(url);
+     const firstMs = performance.now() - t0;
+
+     const t1 = performance.now();
+     const cached = store.hasAsset(url);
+     const lookupMs = performance.now() - t1;
+
+     await preloadImage(url);
+
+     console.log({
+       isSet: store.preloadedAssets instanceof Set,
+       cachedAfterFirstLoad: cached,
+       lookupMs,
+       firstLoadMs: firstMs,
+       count: store.preloadedAssetCount
+     });
+   })();
+   ```
+3. **Expected:** `isSet: true`; `cachedAfterFirstLoad: true` after first preload; `lookupMs` near `0`; second `preloadImage` logs `[already-preloaded]` without duplicate network work.
+4. **Persistence:** Reload page → Console: `(await import('/src/stores/usePreloadStore.js')).usePreloadStore().preloadedAssetCount` should be `> 0` and `preloadedAssets instanceof Set` should be `true`.
+
 ---
 
 ### P-02 — Dynamic `import()` called inside `preloadSectionAssets` and `preloadSectionCriticalImages` on every invocation
 **File:** `assetPreloader.js` lines 620 and 707  
 **Detail:** `await import('../route/routeConfigLoader')` is called on every invocation of both functions. Although ES module caching means the module is only evaluated once, the dynamic import machinery still executes on each call. The import should be moved to the module's top-level static imports.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Each call to `preloadSectionAssets` or `preloadSectionCriticalImages` ran `await import('../route/routeConfigLoader')`, paying dynamic-import overhead on every navigation even though the module was already cached.
+
+**Why it happened:** Likely deferred loading to avoid a perceived circular dependency; `routeConfigLoader` does not import `assetPreloader`.
+
+**What changed:**
+- Added top-level `import { getRouteConfiguration } from '../route/routeConfigLoader.js'` (same pattern as `assetLibrary.js`).
+- Removed both in-function dynamic imports; both section preload helpers call `getRouteConfiguration()` directly.
+
+**Conflict check:** No override of **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, or **AUDIT.md** — behavior unchanged; only import style. Aligns with `.cursorrules` perf rule 5 (hoist imports).
+
+**How it was tested:** Code review — grep confirms no `import('../route/routeConfigLoader')` remains in `assetPreloader.js`; `npm run test:unit -- --run tests/unit/sectionPreloader.test.js tests/unit/usePreloadStore.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/dashboard` once.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     store.clearAssets();
+     const { preloadSectionAssets, preloadSectionCriticalImages } = await import('/src/utils/assets/assetPreloader.js');
+
+     await preloadSectionAssets('dashboard-global');
+     const afterFull = store.preloadedAssetCount;
+
+     store.clearAssets();
+     await preloadSectionCriticalImages('dashboard-global');
+     const afterCritical = store.preloadedAssetCount;
+
+     console.log({
+       afterFullPreload: afterFull,
+       afterCriticalPreload: afterCritical,
+       bothCompleted: afterFull > 0 && afterCritical >= 0
+     });
+   })();
+   ```
+3. **Expected:** `afterFullPreload > 0`; logs include `[success] Section assets preloaded` and `[success] Critical section images preloaded` (or `assetCount: 0` for critical if none match); no import/module errors.
 
 ---
 
@@ -475,11 +571,100 @@ If the original `asset` object has `src: null`, `type: undefined`, or `priority:
 
 **Outcome:** One place answers “was this asset URL already preloaded?” Config/resolution caches stay separate.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Three layers could imply “asset done” with different meanings: Pinia URL list, `getAssetUrl` resolution cache, and `jsonDataCache` for JSON (checked independently of `hasAsset`). `clearPreloadCache()` called `clearState()`, wiping section preload state and `buildHash` along with asset URLs.
+
+**Why it happened:** Caches grew independently — resolution TTL cache, JSON content cache, and preload store were never explicitly separated.
+
+**What changed:**
+- **SSOT:** `usePreloadStore.hasAsset(url)` is the only completion check for preloaded URLs (Set from P-01).
+- **`preloadJSON`:** Returns cached data only when both `hasAsset(src)` and `jsonDataCache` agree; orphan `jsonDataCache` entries without store membership are dropped.
+- **`clearPreloadCache()`:** Uses `clearAssets()` instead of `clearState()` — clears URL preload + in-flight + JSON content only; **`preloadedSections` and `buildHash` preserved**.
+- **`assetLibrary`:** Documented that `loadedAssets` / `areAssetsLoadedForSection` = section **bundle metadata**; `getAssetUrl` TTL cache = **flag→URL resolution only**, not preload completion.
+- **Version invalidation:** Existing `buildHash` + `main.js` deploy check (Preloading.md Task 6) satisfies the `preloadStateVersion` recommendation — no duplicate field added (M-05 overlap noted).
+
+**Conflict check:** Does **not** override **Preloading.md** / **SECTION_PRELOAD_AUDIT.md** — `buildHash` invalidation unchanged; section preload state no longer accidentally cleared by asset-only cache reset. P-01 Set work retained.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/assetPreloadCache.test.js tests/unit/usePreloadStore.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/dashboard` once.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     const { clearPreloadCache, preloadJSON } = await import('/src/utils/assets/assetPreloader.js');
+     const path = '/src/config/countries.json';
+
+     store.addSection('dashboard-global');
+     store.addAsset('https://example.com/test-icon.svg');
+     const sectionBefore = store.hasSection('dashboard-global');
+     const hashBefore = store.buildHash;
+     const assetsBefore = store.preloadedAssetCount;
+
+     clearPreloadCache();
+
+     await preloadJSON(path);
+
+     console.log({
+       assetsBeforeClear: assetsBefore,
+       assetsAfterClear: store.preloadedAssetCount,
+       sectionPreserved: store.hasSection('dashboard-global') === sectionBefore,
+       buildHashPreserved: store.buildHash === hashBefore,
+       jsonTrackedInStore: store.hasAsset(path)
+     });
+   })();
+   ```
+3. **Expected:** `assetsBeforeClear > 0`, `assetsAfterClear` equals `1` (only JSON path re-added), `sectionPreserved: true`, `buildHashPreserved: true`, `jsonTrackedInStore: true`.
+4. **Resolution vs preload:** `(await import('/src/utils/assets/assetLibrary.js')).getAssetUrl('script.cognito')` may hit `[cache-hit]` for flag resolution — that is separate from `usePreloadStore().hasAsset(resolvedUrl)`.
+
 ---
 
 ### P-05 — Performance tracker `.step()` called for every trivial getter
 **Files:** `assetPreloader.js`, `assetScanner.js`  
 **Detail:** `getPreloadedAssetsCount`, `shouldIgnoreComponent`, and similar one-liner functions each generate a tracker step. This produces hundreds of trace entries for a single asset preload pass, drowning out meaningful measurements.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Trivial getters/checkers (`getPreloadedAssetsCount`, `shouldIgnoreComponent`, `normalizeAssetDefinition`) each called `window.performanceTracker.step()`. When invoked per asset or per component during scanning, they flooded traces and hid meaningful preload steps.
+
+**Why it happened:** Performance tracking was added uniformly without distinguishing hot-path micro-helpers from orchestration boundaries.
+
+**What changed:** Removed `performanceTracker.step()` from:
+- `getPreloadedAssetsCount()` in `assetPreloader.js`
+- `shouldIgnoreComponent()` in `assetScanner.js`
+- `normalizeAssetDefinition()` in `assetScanner.js`
+
+Section-level and preload I/O boundaries (e.g. `preloadSectionAssets`, `preloadImage` start/complete) still emit tracker steps.
+
+**Conflict check:** No override of prior preload refactors — logging retained; only noisy tracker calls removed from trivial helpers.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/assetScanner.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open DevTools → **Console**.
+2. Paste this IIFE:
+   ```js
+   (async () => {
+     const tracker = window.performanceTracker;
+     const before = tracker?.steps?.length ?? 0;
+     const { shouldIgnoreComponent, normalizeAssetDefinition } = await import('/src/utils/assets/assetScanner.js');
+     const { getPreloadedAssetsCount } = await import('/src/utils/assets/assetPreloader.js');
+
+     shouldIgnoreComponent({});
+     normalizeAssetDefinition({ src: '/x.png', type: 'image' });
+     getPreloadedAssetsCount();
+
+     const after = tracker?.steps?.length ?? 0;
+     console.log({ stepsAddedByTrivialGetters: after - before });
+   })();
+   ```
+3. **Expected:** `stepsAddedByTrivialGetters: 0` (or unchanged if tracker uses a different API — no new `shouldIgnoreComponent` / `getPreloadedAssetsCount` / `normalizeAssetDefinition` step names in the trace).
 
 ---
 
@@ -487,11 +672,90 @@ If the original `asset` object has `src: null`, `type: undefined`, or `priority:
 **Files:** `assetScanner.js`, `assetPreloader.js` (`preloadSectionAssets`, `preloadSectionCriticalImages`), `assetLibrary.js` (`getAssetPreloadConfigForSection`)  
 **Detail:** Each call loads full `routeConfig` and filters routes by section to merge `assetPreload[]`. No per-section memoisation. A shared helper (e.g. `getAssetPreloadListForSection(sectionName)`) with cache would avoid repeated O(routes) work when preloading many assets for one section.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `preloadSectionAssets`, `preloadSectionCriticalImages`, `getAssetPreloadConfigForSection`, and `scanSectionComponents` each independently filtered the full route list and merged `assetPreload[]` — O(routes) on every call with no memoization.
+
+**Why it happened:** Section rollup logic was copy-pasted across asset modules as each was built.
+
+**What changed:**
+- Added `getAssetPreloadEntriesForSection.js` — shared `routeBelongsToSection`, memoized `{ assets, routeCount }` per section, and `clearAssetPreloadSectionCache()`.
+- `assetPreloader.js`, `assetLibrary.js`, and `assetScanner.js` now call the shared helper (partial **B-02** dedup; full B-02 may still apply elsewhere).
+
+**Conflict check:** No override of prior preload refactors — same merged asset lists; only caching and deduplication of rollup work. Aligns with `.cursorrules` section-based asset architecture.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/getAssetPreloadEntriesForSection.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/dashboard` once.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const { getAssetPreloadEntriesForSection, clearAssetPreloadSectionCache } = await import('/src/utils/assets/getAssetPreloadEntriesForSection.js');
+
+     clearAssetPreloadSectionCache();
+     const first = getAssetPreloadEntriesForSection('dashboard-global');
+     const second = getAssetPreloadEntriesForSection('dashboard-global');
+
+     console.log({
+       routeCount: first.routeCount,
+       assetCount: first.assetCount ?? first.assets.length,
+       sameReference: first === second,
+       sameAssetCount: first.assets.length === second.assets.length
+     });
+   })();
+   ```
+3. **Expected:** `routeCount > 0`, `assetCount > 0`, `sameReference: true` (memoized), `sameAssetCount: true`; second call logs `[cache-hit]`.
+
 ---
 
 ### P-07 — `preloadScript` uses `rel="modulepreload"` for all scripts, including third-party UMD bundles
 **File:** `assetPreloader.js` line 326; `assetMap.json` line 11/59  
 **Detail:** `modulepreload` is only valid for ES modules. The Cognito SDK (`amazon-cognito-identity-js`) is a UMD bundle. Browsers that see `rel="modulepreload"` for a non-ESM script either ignore the hint or parse the file incorrectly. These should use `rel="preload" as="script"`.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `preloadScript` always injected `<link rel="modulepreload">`, including for the self-hosted Cognito UMD bundle (`/vendor/amazon-cognito-identity-6.3.15.min.js`). `modulepreload` is only valid for ES modules.
+
+**Why it happened:** Script preloading copied the section-bundle pattern (`sectionPreloader` uses `modulepreload` for ES module chunks) without distinguishing asset-map classic scripts.
+
+**What changed:**
+- Classic/UMD scripts default to `<link rel="preload" as="script">`.
+- ES modules: pass `{ module: true }` or use a `.mjs` URL for `rel="modulepreload"`.
+- DOM dedup checks both `preload[as=script]` and legacy `modulepreload` links for the same `href`.
+- **L-02** browser test updated to match the new script link shape.
+
+**Conflict check:** Does **not** change **sectionPreloader** JS bundle hints (still `modulepreload` for section ES chunks). Aligns with **cognitoScriptSelfHost** / S2 self-hosted Cognito path.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/preloadScript.test.js tests/unit/cognitoScriptSelfHost.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/log-in` once.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     const { preloadScript } = await import('/src/utils/assets/assetPreloader.js');
+     const scriptUrl = '/vendor/amazon-cognito-identity-6.3.15.min.js';
+
+     store.removeAsset(scriptUrl);
+     document.querySelectorAll(`link[href="${scriptUrl}"]`).forEach((el) => el.remove());
+
+     await preloadScript(scriptUrl);
+
+     const link = document.querySelector(`link[href="${scriptUrl}"]`);
+     console.log({
+       rel: link?.rel,
+       as: link?.getAttribute('as'),
+       isClassicPreload: link?.rel === 'preload' && link?.getAttribute('as') === 'script'
+     });
+   })();
+   ```
+3. **Expected:** `rel: "preload"`, `as: "script"`, `isClassicPreload: true` — not `modulepreload`.
 
 ---
 

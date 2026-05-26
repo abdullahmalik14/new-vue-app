@@ -26,7 +26,7 @@ import {
   removeCacheKeysByPrefix
 } from '../common/cacheHandler.js';
 import { loadSectionManifest, getSectionBundlePaths } from '../build/manifestLoader.js';
-import { getRouteConfiguration } from '../route/routeConfigLoader.js';
+import { getAssetPreloadEntriesForSection } from './getAssetPreloadEntriesForSection.js';
 import bundledAssetMap from '../../config/assetMap.json';
 
 // ============================================================================
@@ -40,7 +40,7 @@ const ASSET_CACHE_TTL = 3600000; // 1 hour
 // Track which assets are currently loading to prevent duplicates
 const assetsLoadingInProgress = new Set();
 
-// Track loaded assets in memory
+// Track loaded section bundle metadata in memory (NOT per-URL preload completion; see usePreloadStore.hasAsset)
 const loadedAssets = new Map();
 
 // In-memory manifest cache
@@ -99,36 +99,19 @@ function getAssetPreloadConfigForSection(sectionName) {
   log('assetLibrary.js', 'getAssetPreloadConfigForSection', 'start', 'Getting asset preload config', { sectionName });
 
   try {
-    const routes = getRouteConfiguration();
-    const sectionRoutes = routes.filter(route => {
-      if (typeof route.section === 'string') {
-        return route.section === sectionName;
-      }
-      if (typeof route.section === 'object') {
-        return Object.values(route.section).includes(sectionName);
-      }
-      return false;
-    });
+    const { assets, routeCount } = getAssetPreloadEntriesForSection(sectionName);
 
     log('assetLibrary.js', 'getAssetPreloadConfigForSection', 'info', 'Section routes found', {
       sectionName,
-      routeCount: sectionRoutes.length
+      routeCount
     });
-
-    // Collect all asset preload configs from routes
-    const assetConfigs = [];
-    for (const route of sectionRoutes) {
-      if (route.assetPreload && Array.isArray(route.assetPreload)) {
-        assetConfigs.push(...route.assetPreload);
-      }
-    }
 
     log('assetLibrary.js', 'getAssetPreloadConfigForSection', 'success', 'Asset preload configs collected', {
       sectionName,
-      assetCount: assetConfigs.length
+      assetCount: assets.length
     });
 
-    return assetConfigs;
+    return assets;
   } catch (error) {
     logError('assetLibrary.js', 'getAssetPreloadConfigForSection', 'Failed to get asset preload config', error, { sectionName });
     return [];
@@ -413,10 +396,11 @@ export function getAssetsForSection(sectionName) {
 }
 
 /**
- * Check if assets are loaded for a section
- * 
+ * Check if section bundle metadata is loaded (manifest paths, preload config rollup).
+ * For resolved URL preload completion, use usePreloadStore.hasAsset(url) instead.
+ *
  * @param {string} sectionName - Section name
- * @returns {boolean} - True if assets are loaded
+ * @returns {boolean} - True if section bundle metadata is loaded
  */
 export function areAssetsLoadedForSection(sectionName) {
   const loaded = loadedAssets.has(sectionName);
@@ -798,7 +782,7 @@ export async function getAssetUrl(flag, environment = null) {
   // Determine environment
   const env = environment || detectEnvironment();
 
-  // Check cache first
+  // Resolution cache only (flag → URL). Does not mean the URL was preloaded in the browser.
   const cacheKey = `${ASSET_URL_CACHE_PREFIX}${env}_${flag}`;
   const cachedUrl = getValueFromCache(cacheKey);
   if (cachedUrl) {

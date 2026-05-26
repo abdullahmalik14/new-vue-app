@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { normalizeAssetDefinition } from '../../src/utils/assets/assetScanner.js';
+import { createPinia, setActivePinia } from 'pinia';
+import {
+  normalizeAssetDefinition,
+  shouldIgnoreComponent,
+} from '../../src/utils/assets/assetScanner.js';
+import { getPreloadedAssetsCount } from '../../src/utils/assets/assetPreloader.js';
 
 describe('assetScanner — normalizeAssetDefinition (L-11)', () => {
   beforeEach(() => {
@@ -31,5 +36,31 @@ describe('assetScanner — normalizeAssetDefinition (L-11)', () => {
       type: 'image',
       priority: 'high'
     });
+  });
+});
+
+describe('assetScanner / assetPreloader — trivial getters skip performanceTracker (P-05)', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    window.performanceTracker = { step: vi.fn() };
+  });
+
+  it('shouldIgnoreComponent does not emit performanceTracker steps', () => {
+    shouldIgnoreComponent({ IGNORE_ASSET_PRELOAD: true });
+    shouldIgnoreComponent({ ignoreAssetPreload: false });
+
+    expect(window.performanceTracker.step).not.toHaveBeenCalled();
+  });
+
+  it('normalizeAssetDefinition does not emit performanceTracker steps', () => {
+    normalizeAssetDefinition({ src: '/a.png', type: 'image', priority: 'high' });
+
+    expect(window.performanceTracker.step).not.toHaveBeenCalled();
+  });
+
+  it('getPreloadedAssetsCount does not emit performanceTracker steps', () => {
+    getPreloadedAssetsCount();
+
+    expect(window.performanceTracker.step).not.toHaveBeenCalled();
   });
 });

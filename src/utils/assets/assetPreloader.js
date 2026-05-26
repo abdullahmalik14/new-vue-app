@@ -3,6 +3,7 @@
 import { log } from '../common/logHandler';
 import { logError } from '../common/errorHandler.js';
 import { getAssetUrl } from './assetLibrary';
+import { getAssetPreloadEntriesForSection } from './getAssetPreloadEntriesForSection.js';
 import { usePreloadStore } from '../../stores/usePreloadStore.js';
 
 /**
@@ -21,6 +22,43 @@ const ASSET_PRELOAD_PRIORITY_MAP = { critical: 4, high: 3, medium: 2, low: 1 };
 
 function getAssetPreloadPriorityValue(priority) {
   return ASSET_PRELOAD_PRIORITY_MAP[priority] || 1;
+}
+
+function shouldUseModulePreload(options, src) {
+  if (options?.module === true) {
+    return true;
+  }
+
+  if (options?.module === false) {
+    return false;
+  }
+
+  return typeof src === 'string' && src.endsWith('.mjs');
+}
+
+function findExistingScriptPreloadLink(src) {
+  return (
+    document.querySelector(`link[rel="preload"][as="script"][href="${src}"]`) ||
+    document.querySelector(`link[rel="modulepreload"][href="${src}"]`)
+  );
+}
+
+function createScriptPreloadLink(src, options) {
+  const link = document.createElement('link');
+  link.href = src;
+
+  if (shouldUseModulePreload(options, src)) {
+    link.rel = 'modulepreload';
+  } else {
+    link.rel = 'preload';
+    link.setAttribute('as', 'script');
+  }
+
+  if (options.crossOrigin) {
+    link.crossOrigin = options.crossOrigin;
+  }
+
+  return link;
 }
 
 /**
@@ -385,7 +423,7 @@ export function preloadScript(src, options = {}) {
 
   const { promise: scriptPromise, resolve: resolveScript, reject: rejectScript } = scriptReserved;
 
-  const existingScriptLink = document.querySelector(`link[rel="modulepreload"][href="${src}"]`);
+  const existingScriptLink = findExistingScriptPreloadLink(src);
   if (existingScriptLink) {
     log('assetPreloader.js', 'preloadScript', 'already-exists', 'Script preload link already exists in DOM', { src });
     preloadStore.addAsset(src);
@@ -401,13 +439,7 @@ export function preloadScript(src, options = {}) {
     return scriptPromise;
   }
 
-  const scriptLink = document.createElement('link');
-  scriptLink.rel = 'modulepreload';
-  scriptLink.href = src;
-
-  if (options.crossOrigin) {
-    scriptLink.crossOrigin = options.crossOrigin;
-  }
+  const scriptLink = createScriptPreloadLink(src, options);
 
   scriptLink.onload = () => {
     preloadStore.addAsset(src);
@@ -443,7 +475,7 @@ export function preloadScript(src, options = {}) {
   return scriptPromise;
 }
 
-// Cache for JSON data
+// Parsed JSON content cache (not the SSOT for "URL preloaded"; use usePreloadStore.hasAsset)
 const jsonDataCache = new Map();
 
 /**
@@ -465,8 +497,8 @@ export async function preloadJSON(src, options = {}) {
     purpose: 'Preload JSON asset'
   });
 
-  // Check if JSON data is already cached
-  if (jsonDataCache.has(src)) {
+  // SSOT: store tracks URL completion; jsonDataCache holds parsed content only
+  if (preloadStore.hasAsset(src) && jsonDataCache.has(src)) {
     log('assetPreloader.js', 'preloadJSON', 'cache-hit', 'JSON already cached', { src });
     window.performanceTracker.step({
       step: 'preloadJSON_cached',
@@ -476,6 +508,10 @@ export async function preloadJSON(src, options = {}) {
       purpose: 'JSON already cached'
     });
     return jsonDataCache.get(src);
+  }
+
+  if (jsonDataCache.has(src) && !preloadStore.hasAsset(src)) {
+    jsonDataCache.delete(src);
   }
 
   // Check if load is in progress
@@ -687,37 +723,16 @@ export async function preloadSectionCriticalImages(sectionName) {
   });
 
   try {
-    // Get section manifest
-    const { getRouteConfiguration } = await import('../route/routeConfigLoader');
-    const routes = getRouteConfiguration();
-
-    // Find all routes for this section
-    const sectionRoutes = routes.filter(route => {
-      if (typeof route.section === 'string') {
-        return route.section === sectionName;
-      }
-      if (typeof route.section === 'object') {
-        return Object.values(route.section).includes(sectionName);
-      }
-      return false;
-    });
+    const { assets: sectionAssets, routeCount } = getAssetPreloadEntriesForSection(sectionName);
 
     log('assetPreloader.js', 'preloadSectionCriticalImages', 'routes-found', 'Section routes found', {
       sectionName,
-      routeCount: sectionRoutes.length
+      routeCount
     });
 
-    // Collect only high-priority image assets from these routes
-    const criticalAssets = [];
-    for (const route of sectionRoutes) {
-      if (route.assetPreload && Array.isArray(route.assetPreload)) {
-        // Filter for high-priority images only
-        const highPriorityImages = route.assetPreload.filter(asset => 
-          asset.type === 'image' && (asset.priority === 'high' || asset.priority === 'critical')
-        );
-        criticalAssets.push(...highPriorityImages);
-      }
-    }
+    const criticalAssets = sectionAssets.filter(asset =>
+      asset.type === 'image' && (asset.priority === 'high' || asset.priority === 'critical')
+    );
 
     log('assetPreloader.js', 'preloadSectionCriticalImages', 'assets-collected', 'Critical images collected for section', {
       sectionName,
@@ -774,33 +789,12 @@ export async function preloadSectionAssets(sectionName) {
   });
 
   try {
-    // Get section manifest
-    const { getRouteConfiguration } = await import('../route/routeConfigLoader');
-    const routes = getRouteConfiguration();
-
-    // Find all routes for this section
-    const sectionRoutes = routes.filter(route => {
-      if (typeof route.section === 'string') {
-        return route.section === sectionName;
-      }
-      if (typeof route.section === 'object') {
-        return Object.values(route.section).includes(sectionName);
-      }
-      return false;
-    });
+    const { assets: allAssets, routeCount } = getAssetPreloadEntriesForSection(sectionName);
 
     log('assetPreloader.js', 'preloadSectionAssets', 'routes-found', 'Section routes found', {
       sectionName,
-      routeCount: sectionRoutes.length
+      routeCount
     });
-
-    // Collect all assets from these routes
-    const allAssets = [];
-    for (const route of sectionRoutes) {
-      if (route.assetPreload && Array.isArray(route.assetPreload)) {
-        allAssets.push(...route.assetPreload);
-      }
-    }
 
     log('assetPreloader.js', 'preloadSectionAssets', 'assets-collected', 'Assets collected for section', {
       sectionName,
@@ -839,12 +833,13 @@ export async function preloadSectionAssets(sectionName) {
 
 /**
  * @function clearPreloadCache
- * @description Clear the preloaded assets cache
+ * @description Clear resolved asset URL preload state and in-flight/content caches.
+ * Section bundle preload state (preloadedSections) is preserved.
  * @returns {void}
  */
 export function clearPreloadCache() {
   const preloadStore = usePreloadStore();
-  log('assetPreloader.js', 'clearPreloadCache', 'start', 'Clearing preload cache', { cacheSize: preloadStore.preloadedAssets.length });
+  log('assetPreloader.js', 'clearPreloadCache', 'start', 'Clearing preload cache', { cacheSize: preloadStore.preloadedAssetCount });
   window.performanceTracker.step({
     step: 'clearPreloadCache',
     file: 'assetPreloader.js',
@@ -853,7 +848,7 @@ export function clearPreloadCache() {
     purpose: 'Clear preload cache'
   });
 
-  preloadStore.clearState();
+  preloadStore.clearAssets();
   preloadInProgress.clear();
   jsonDataCache.clear();
 
@@ -867,16 +862,9 @@ export function clearPreloadCache() {
  */
 export function getPreloadedAssetsCount() {
   const preloadStore = usePreloadStore();
-  const count = preloadStore.preloadedAssets.length;
+  const count = preloadStore.preloadedAssetCount;
 
   log('assetPreloader.js', 'getPreloadedAssetsCount', 'get', 'Getting preloaded assets count', { count });
-  window.performanceTracker.step({
-    step: 'getPreloadedAssetsCount',
-    file: 'assetPreloader.js',
-    method: 'getPreloadedAssetsCount',
-    flag: 'get',
-    purpose: 'Get preload count'
-  });
 
   return count;
 }
