@@ -57,6 +57,7 @@
                 :class="{ 'opacity-50 pointer-events-none grayscale': !item.enabled }"
                 :title="item.title">
                 <a href="#" @click.prevent="handleMenuClick(item)"
+                  @mouseenter="prefetchMenuRoute(item)" @focus="prefetchMenuRoute(item)"
                   class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active"
                   :style="!item.enabled ? { pointerEvents: 'none', opacity: '0.5' } : {}">
                   <img :src="item.image" :alt="item.title"
@@ -117,7 +118,8 @@
         <div class="grid grid-cols-2 gap-x-6 gap-y-6">
           <div v-for="item in overflowItems" :key="item.id || item.title"
             class="flex flex-col items-center justify-center cursor-pointer group"
-            @click="handleMenuClick(item)">
+            @click="handleMenuClick(item)"
+            @mouseenter="prefetchMenuRoute(item)" @focus="prefetchMenuRoute(item)">
             <div class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group-hover:bg-sidebar-active">
               <img :src="item.image" :alt="item.title"
                 class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
@@ -168,7 +170,9 @@
         <!-- Submenu items -->
         <div class="flex flex-col overflow-auto w-full gap-2 py-2">
           <button v-for="child in currentSubmenuItems" :key="child.id" :disabled="!child.enabled"
-            @click="child.enabled && handleChildClick(child)" :class="[
+            @click="child.enabled && handleChildClick(child)"
+            @mouseenter="child.enabled && prefetchMenuRoute(child)"
+            @focus="child.enabled && prefetchMenuRoute(child)" :class="[
               'relative flex w-full gap-3 rounded-md px-4 py-2 group transition-all duration-200 outline-none',
               child.enabled
                 ? 'hover:bg-transparent cursor-pointer'
@@ -212,6 +216,7 @@ import NotificationPopup from "@/components/ui/popup/NotificationPopup.vue";
 import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js";
 import { getActiveLocale } from "@/utils/translation/localeManager.js";
 import { getI18nInstance } from "@/utils/translation/i18nInstance.js";
+import { prefetchRouteComponent } from "@/utils/route/routeComponentPrefetch.js";
 
 export default {
   name: "Sidebar",
@@ -490,6 +495,11 @@ export default {
         this.showSubmenuPopup = true;
       } else if (item.enabled && item.route) {
         this.$router.push(item.route);
+      }
+    },
+    prefetchMenuRoute(item) {
+      if (item?.enabled && item?.route) {
+        prefetchRouteComponent(item.route);
       }
     },
     handleChildClick(child) {

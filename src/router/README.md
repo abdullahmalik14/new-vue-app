@@ -16,7 +16,7 @@ Single source of truth for routing, sections, bundling, and manifest generation.
   {
     "slug": "/dashboard",
     "section": "dashboard-global",
-    "componentPath": "@/components/dashboard/Dashboard.vue",
+    "componentPath": "@/templates/dashboard/page/role/Dashboard.vue",
     "requiresAuth": true,
     "enabled": true,
     "supportedRoles": ["all"],
@@ -38,8 +38,8 @@ Single source of truth for routing, sections, bundling, and manifest generation.
 
 **Required Fields**:
 - `slug` - URL path
-- `section` - Section name (string or role object)
-- `componentPath` - Path to Vue component
+- `section` - Section name (string or role object); required on navigable routes — omit only for redirect-only / catch-all entries
+- `componentPath` - Path to Vue component (or use `customComponentPath`; omit for redirect-only routes)
 
 **Optional Fields**:
 - `requiresAuth` - Requires authentication (default: false)
@@ -78,20 +78,24 @@ Different components/bundles per role.
 
 **Simple**:
 ```json
-"componentPath": "@/components/auth/AuthLogIn.vue"
+"componentPath": "@/templates/auth/page/role/AuthLogIn.vue"
 ```
 
 **Role-Specific**:
 ```json
 "customComponentPath": {
   "creator": {
-    "componentPath": "@/components/dashboard/creator/OverviewCreator.vue"
+    "componentPath": "@/templates/dashboard/page/creator/DashboardCouponsCreator.vue"
   },
   "fan": {
-    "componentPath": "@/components/dashboard/fan/OverviewFan.vue"
+    "componentPath": "@/templates/dashboard/page/fan/DashboardCouponsFan.vue"
   }
 }
 ```
+
+*(Illustrative — use paths that exist under `src/templates/` or `src/components/`.)*
+
+**Path convention:** Page-level route components live under `@/templates/**` (matches production `routeConfig.json`). Shared UI pieces may use `@/components/**`. Always use the `@/` alias; paths must resolve via the router's pre-loaded `import.meta.glob` map (`src/router/index.js`).
 
 ---
 
@@ -114,27 +118,37 @@ See this file for complete field descriptions, examples, and validation rules.
 
 **Route Generation**:
 ```javascript
-// From routeConfig.json entry
+// routeConfig.json entry (source of truth)
 {
   "slug": "/dashboard",
   "section": "dashboard-global",
-  "componentPath": "@/components/dashboard/Dashboard.vue",
+  "componentPath": "@/templates/dashboard/page/role/Dashboard.vue",
   "requiresAuth": true
 }
 
-// Generates Vue Router route
+// Generated Vue Router route (see generateRoutesFromConfig in index.js)
 {
-  path: '/dashboard',
+  path: '/:locale?/dashboard',           // optional locale prefix
   name: '/dashboard',
-  component: () => import('../components/dashboard/Dashboard.vue'),
+  component: () => loadRouteComponent(route),  // NOT inline import('...')
   meta: {
-    routeConfig: { /* full config */ },
+    routeConfig: { /* full config object */ },
     section: 'dashboard-global',
     requiresAuth: true,
     enabled: true
   }
 }
 ```
+
+**Component loading (not inline `import()`):**
+1. `loadRouteComponent(route)` resolves `componentPath` / `customComponentPath` via `resolveComponentPathForRoute()` (role-aware).
+2. `findComponentLoader()` in `src/utils/route/routeComponentLoader.js` looks up a pre-registered lazy loader from:
+   ```javascript
+   import.meta.glob(['@/templates/**/*.vue', '@/components/**/*.vue'], { eager: false })
+   ```
+3. The glob loader is invoked; if the path is missing from the map, navigation falls back to the 404 component (no filename-only matching — see B-06).
+
+To add a routable page: set `componentPath` in `routeConfig.json` and place the `.vue` file under `src/templates/` or `src/components/` so it is included in the glob above.
 
 **Navigation Flow**:
 ```
@@ -147,7 +161,7 @@ See this file for complete field descriptions, examples, and validation rules.
    → If allowed: next()
    → If blocked: next(redirectTo)
    ↓
-3. Component loads (lazy)
+3. Component loads via `loadRouteComponent` → `import.meta.glob` lookup (lazy)
    ↓
 4. router.afterEach() hook
    → Update active route
@@ -180,26 +194,38 @@ See this file for complete field descriptions, examples, and validation rules.
 
 1. **Single Source of Truth**: ONLY place to define sections
 2. **Never Hardcode Sections**: Extract dynamically from this file
-3. **Validate Before Build**: Run validation on routeConfig structure
+3. **Validate Before Build**: Run `validateRouteConfig()` on the full `routeConfig.json` array (same validator as runtime loader)
 4. **Section Naming**: Use descriptive names (auth, dashboard-global, etc.)
 5. **Role Consistency**: Use same role names everywhere (creator, fan, agent, vendor)
-6. **Component Paths**: Use @/ alias, must exist in src/components/
+6. **Component Paths**: Use `@/` alias; page routes typically under `@/templates/**` (some routes use `@/components/**`). File must exist and be discoverable by the router glob loader.
 7. **PreLoad Wisely**: Only preload frequently accessed sections
 8. **Dependencies**: Document required user state clearly
 
 ## Testing
 
 ### Validate Route Config
+
+Runtime loader (`routeConfigLoader.js`) and build plugins validate the **full route array** via `validateRouteConfig()` in `src/utils/build/jsonConfigValidator.js` — not the legacy per-route helper in `build/buildConfig.js`.
+
 ```javascript
-import { validateRouteConfiguration } from '../../build/buildConfig.js';
+import { validateRouteConfig } from '../utils/build/jsonConfigValidator.js';
 import routeConfig from './routeConfig.json';
 
-for (const route of routeConfig) {
-  const result = validateRouteConfiguration(route);
-  if (!result.valid) {
-    console.error(`Invalid route ${route.slug}:`, result.errors);
-  }
+const result = validateRouteConfig(routeConfig);
+
+if (!result.valid) {
+  console.error('Route config validation failed:', result.errors);
 }
+
+if (result.warnings?.length) {
+  console.warn('Route config warnings:', result.warnings);
+}
+```
+
+Or run the unit suite (includes production `routeConfig.json`):
+
+```bash
+npm run test:unit -- --run tests/unit/jsonConfigValidator.test.js
 ```
 
 ### Test Route Generation
@@ -227,6 +253,7 @@ console.log('Sections:', Array.from(sections));
 - [ ] Auth requirements correct (requiresAuth, redirects)
 - [ ] Roles specified if needed
 - [ ] Dependencies documented
+- [ ] High-traffic nav links use `@mouseenter` / `@focus` intent prefetch where snappy navigation matters
 - [ ] PreLoad sections chosen wisely
 - [ ] Translations created if new section
 - [ ] Test route access for all roles
@@ -262,7 +289,7 @@ misc                    // Utility routes (404, etc.)
 {
   "slug": "/about",
   "section": "about",
-  "componentPath": "@/components/about/About.vue",
+  "componentPath": "@/templates/about/AboutWrapper.vue",
   "requiresAuth": false,
   "supportedRoles": []
 }
@@ -273,7 +300,7 @@ misc                    // Utility routes (404, etc.)
 {
   "slug": "/dashboard",
   "section": "dashboard-global",
-  "componentPath": "@/components/dashboard/Dashboard.vue",
+  "componentPath": "@/templates/dashboard/page/role/Dashboard.vue",
   "requiresAuth": true,
   "redirectIfNotAuth": "/log-in",
   "supportedRoles": ["all"]
@@ -285,19 +312,11 @@ misc                    // Utility routes (404, etc.)
 {
   "slug": "/dashboard/overview",
   "section": {
-    "creator": "dashboard-creator",
-    "fan": "dashboard-fan"
+    "creator": "dashboard-creator"
   },
   "inheritConfigFromParent": true,
-  "supportedRoles": ["creator", "fan"],
-  "customComponentPath": {
-    "creator": {
-      "componentPath": "@/components/dashboard/creator/Overview.vue"
-    },
-    "fan": {
-      "componentPath": "@/components/dashboard/fan/Overview.vue"
-    }
-  }
+  "supportedRoles": ["creator"],
+  "componentPath": "@/templates/dashboard/page/creator/DashboardOverviewCreator.vue"
 }
 ```
 
@@ -306,7 +325,7 @@ misc                    // Utility routes (404, etc.)
 {
   "slug": "/dashboard",
   "section": "dashboard-global",
-  "componentPath": "@/components/dashboard/Dashboard.vue",
+  "componentPath": "@/templates/dashboard/page/role/Dashboard.vue",
   "requiresAuth": true,
   "dependencies": {
     "roles": {
@@ -330,12 +349,27 @@ misc                    // Utility routes (404, etc.)
 {
   "slug": "/log-in",
   "section": "auth",
-  "componentPath": "@/components/auth/AuthLogIn.vue",
+  "componentPath": "@/templates/auth/page/role/AuthLogIn.vue",
   "requiresAuth": false,
   "redirectIfLoggedIn": "/dashboard",
   "preLoadSections": ["dashboard", "shop"]
 }
 ```
+
+### Intent-based component prefetch (P10)
+Section preload warms JS/CSS bundles; component `.vue` modules can be warmed on hover/focus before navigation:
+
+```vue
+<script setup>
+import { createRoutePrefetchIntentHandler } from '@/utils/route/routeComponentPrefetch.js';
+
+const prefetchShop = createRoutePrefetchIntentHandler('/shop');
+</script>
+
+<RouterLink to="/shop" @mouseenter="prefetchShop" @focus="prefetchShop">Shop</RouterLink>
+```
+
+Or `useRoutePrefetch()` from `@/utils/route/useRoutePrefetch.js`. Prefetch is non-blocking and does not run route guards.
 
 ## Troubleshooting
 

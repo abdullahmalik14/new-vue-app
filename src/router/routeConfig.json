@@ -4,7 +4,9 @@
     "section": "auth",
     "requiresAuth": false,
     "redirectIfLoggedIn": "/dashboard",
-    "supportedRoles": [],
+    "supportedRoles": [
+      "all"
+    ],
     "componentPath": "@/templates/auth/page/role/AuthConfirmEmail.vue",
     "preLoadSections": [
       "dashboard"
@@ -15,7 +17,9 @@
     "section": "auth",
     "requiresAuth": false,
     "redirectIfLoggedIn": "/dashboard",
-    "supportedRoles": [],
+    "supportedRoles": [
+      "all"
+    ],
     "componentPath": "@/templates/auth/page/role/AuthTwitter.vue",
     "preLoadSections": [],
     "hideLayout": true
@@ -24,128 +28,24 @@
     "slug": "/404",
     "section": "misc",
     "requiresAuth": false,
-    "supportedRoles": [],
+    "supportedRoles": [
+      "all"
+    ],
     "componentPath": "@/templates/misc/NotFound.vue",
     "preLoadSections": []
   },
   {
     "slug": "/dashboard",
     "section": "dashboard-global",
-    "redirectIfLoggedIn": "",
     "requiresAuth": true,
     "enabled": true,
     "supportedRoles": [
       "all"
     ],
     "redirectIfNotAuth": "/log-in",
-    "assetPreload": [
-      {
-        "flag": "dashboard.logo",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "flag": "dashboard.avatar",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "flag": "dashboard.notification",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "flag": "dashboard.logout",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "flag": "dashboard.language",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.help",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.close.desktop",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.close.mobile",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.more",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.analytics",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.payout",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.orders",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.media",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.chats",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.subscriptions",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.shops",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.profile",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.settings",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.xrepost",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.blog",
-        "type": "image",
-        "priority": "normal"
-      }
-    ],
+    "assetPreloadRef": "dashboardMenuIcons",
     "componentPath": "@/templates/dashboard/page/role/Dashboard.vue",
     "dependencies": {
-      "onboardingRequired": {
-        "required": true,
-        "fallbackSlug": "/sign-up/onboarding"
-      },
       "roles": {
         "creator": {
           "onboardingPassed": {
@@ -157,6 +57,12 @@
             "fallbackSlug": "/sign-up/onboarding/kyc"
           }
         },
+        "fan": {
+          "onboardingPassed": {
+            "required": true,
+            "fallbackSlug": "/sign-up/onboarding"
+          }
+        },
         "vendor": {
           "onboardingPassed": {
             "required": true,
@@ -164,6 +70,12 @@
           }
         },
         "agent": {
+          "onboardingPassed": {
+            "required": true,
+            "fallbackSlug": "/sign-up/onboarding"
+          }
+        },
+        "guest": {
           "onboardingPassed": {
             "required": true,
             "fallbackSlug": "/sign-up/onboarding"
@@ -178,7 +90,13 @@
     "requiresAuth": false,
     "enabled": true,
     "redirectIfLoggedIn": "/dashboard",
-    "supportedRoles": [],
+    "redirectFrom": [
+      "/login",
+      "/sign-in"
+    ],
+    "supportedRoles": [
+      "all"
+    ],
     "componentPath": "@/templates/auth/page/role/AuthLogIn.vue",
     "assetPreload": [
       {
@@ -187,7 +105,7 @@
         "priority": "high"
       },
       {
-        "src": "https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.15/dist/amazon-cognito-identity.min.js",
+        "flag": "script.cognito",
         "type": "script",
         "priority": "high"
       }
@@ -200,9 +118,10 @@
   {
     "slug": "/lost-password",
     "section": "auth",
-    "redirectIfLoggedIn": "",
     "requiresAuth": false,
-    "supportedRoles": [],
+    "supportedRoles": [
+      "all"
+    ],
     "componentPath": "@/templates/auth/page/role/AuthLostPassword.vue",
     "preLoadSections": [
       "dashboard"
@@ -212,8 +131,9 @@
     "slug": "/reset-password",
     "section": "auth",
     "requiresAuth": false,
-    "redirectIfLoggedIn": "",
-    "supportedRoles": [],
+    "supportedRoles": [
+      "all"
+    ],
     "componentPath": "@/templates/auth/page/role/AuthResetPassword.vue",
     "preLoadSections": [
       "dashboard"
@@ -224,8 +144,9 @@
     "section": "auth",
     "requiresAuth": false,
     "enabled": true,
-    "redirectIfLoggedIn": "",
-    "supportedRoles": [],
+    "supportedRoles": [
+      "all"
+    ],
     "componentPath": "@/templates/auth/page/role/AuthSignUp.vue",
     "preLoadSections": [
       "dashboard"
@@ -271,8 +192,10 @@
   },
   {
     "slug": "/dashboard/social-linking",
+    "envAccess": "development",
     "section": "dashboard-global",
     "requiresAuth": true,
+    "enabled": false,
     "redirectIfNotAuth": "/log-in",
     "supportedRoles": [
       "all"
@@ -457,7 +380,9 @@
       "creator": "dashboard-creator"
     },
     "inheritConfigFromParent": true,
-    "supportedRoles": [],
+    "supportedRoles": [
+      "creator"
+    ],
     "componentPath": "@/templates/dashboard/page/creator/DashboardOverviewCreator.vue",
     "assetPreload": [
       {
@@ -469,7 +394,7 @@
           "dashboard-metrics"
         ],
         "location": "head-last",
-        "defer": false,
+        "defer": true,
         "async": false
       }
     ]
@@ -746,7 +671,7 @@
   {
     "slug": "/sign-up/onboarding",
     "section": "auth",
-    "requiresAuth": false,
+    "requiresAuth": true,
     "redirectIfNotAuth": "/log-in",
     "supportedRoles": [
       "all"
@@ -758,13 +683,13 @@
     "dependencies": {
       "roles": {
         "creator": {
-          "kycPassed": {
-            "redirectIfComplete": true,
-            "fallbackSlug": "/dashboard"
-          },
           "onboardingPassed": {
             "redirectIfComplete": true,
             "fallbackSlug": "/sign-up/onboarding/kyc"
+          },
+          "kycPassed": {
+            "redirectIfComplete": true,
+            "fallbackSlug": "/dashboard"
           }
         },
         "vendor": {
@@ -791,7 +716,7 @@
   {
     "slug": "/sign-up/onboarding/kyc",
     "section": "auth",
-    "requiresAuth": false,
+    "requiresAuth": true,
     "redirectIfNotAuth": "/log-in",
     "supportedRoles": [
       "creator"
@@ -836,7 +761,8 @@
   {
     "slug": "/auth/callback/social/facebook",
     "section": "auth",
-    "inheritConfigFromParent": true,
+    "requiresAuth": false,
+    "enabled": true,
     "supportedRoles": [
       "creator",
       "fan",
@@ -848,7 +774,8 @@
   {
     "slug": "/auth/callback/social/google",
     "section": "auth",
-    "inheritConfigFromParent": true,
+    "requiresAuth": false,
+    "enabled": true,
     "supportedRoles": [
       "creator",
       "fan",
@@ -860,7 +787,8 @@
   {
     "slug": "/auth/callback/social/twitter",
     "section": "auth",
-    "inheritConfigFromParent": true,
+    "requiresAuth": false,
+    "enabled": true,
     "supportedRoles": [
       "creator",
       "fan",
@@ -872,7 +800,8 @@
   {
     "slug": "/auth/callback/social/telegram",
     "section": "auth",
-    "inheritConfigFromParent": true,
+    "requiresAuth": false,
+    "enabled": true,
     "supportedRoles": [
       "creator",
       "fan",
@@ -884,7 +813,7 @@
   {
     "slug": "/sign-up/onboarding/kyc/callback",
     "section": "auth",
-    "requiresAuth": false,
+    "requiresAuth": true,
     "redirectIfNotAuth": "/log-in",
     "supportedRoles": [
       "creator",
@@ -910,7 +839,7 @@
   {
     "slug": "/sign-up/onboarding/kyc/status",
     "section": "auth",
-    "requiresAuth": false,
+    "requiresAuth": true,
     "redirectIfNotAuth": "/log-in",
     "supportedRoles": [
       "creator"
@@ -935,7 +864,9 @@
     "section": "about",
     "requiresAuth": false,
     "enabled": false,
-    "supportedRoles": [],
+    "supportedRoles": [
+      "all"
+    ],
     "componentPath": "@/templates/about/AboutWrapper.vue",
     "preLoadSections": [
       "dashboard"
@@ -946,7 +877,9 @@
     "section": "contact",
     "enabled": true,
     "requiresAuth": false,
-    "supportedRoles": [],
+    "supportedRoles": [
+      "all"
+    ],
     "componentPath": "@/templates/contact/ContactWrapper.vue",
     "preLoadSections": [
       "discover"
@@ -958,7 +891,7 @@
     "requiresAuth": false,
     "enabled": true,
     "supportedRoles": [
-      "any"
+      "all"
     ],
     "componentPath": "@/templates/profileAbdullah/ProfileWrapper.vue",
     "preLoadSections": []
@@ -989,115 +922,14 @@
     ],
     "enabled": true,
     "componentPath": "@/templates/shop/ShopWrapper.vue",
-    "redirectIfNotAuth": "",
-    "assetPreload": [
-      {
-        "flag": "dashboard.logo",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "flag": "dashboard.avatar",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "flag": "dashboard.notification",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "flag": "dashboard.logout",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "flag": "dashboard.language",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.help",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.close.desktop",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.close.mobile",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.more",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.analytics",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.payout",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.orders",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.media",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.chats",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.subscriptions",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.shops",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.profile",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.settings",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.xrepost",
-        "type": "image",
-        "priority": "normal"
-      },
-      {
-        "flag": "dashboard.menu.blog",
-        "type": "image",
-        "priority": "normal"
-      }
-    ],
+    "assetPreloadRef": "dashboardMenuIcons",
     "preLoadSections": [
       "dashboard"
     ]
   },
   {
     "slug": "/dev/country-state-demo",
+    "envAccess": "development",
     "requiresAuth": false,
     "section": "dev",
     "supportedRoles": [
@@ -1109,6 +941,7 @@
   },
   {
     "slug": "/dashboard/demo-page",
+    "envAccess": "development",
     "requiresAuth": false,
     "section": "dev",
     "supportedRoles": [
@@ -1120,97 +953,163 @@
   },
   {
     "slug": "/dev/datepicker-showcase",
-    "componentPath": "@/components/datePicker/DatePickerShowcase.vue"
+    "envAccess": "development",
+    "section": "dev",
+    "componentPath": "@/components/datePicker/DatePickerShowcase.vue",
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/dev/bookingform",
-    "componentPath": "@/components/ui/form/BookingForm/UnifiedBookingForm.vue"
+    "envAccess": "development",
+    "section": "dev",
+    "componentPath": "@/components/ui/form/BookingForm/UnifiedBookingForm.vue",
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/demo/audit/base-input",
+    "envAccess": "development",
+    "section": "demo",
     "componentPath": "@/components/demoAuditComponents/BaseInputDemo.vue",
     "requiresAuth": false,
-    "supportedRoles": ["all"]
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/demo/audit/input-dashboard",
+    "envAccess": "development",
+    "section": "demo",
     "componentPath": "@/components/demoAuditComponents/InputComponentDashboardDemo.vue",
     "requiresAuth": false,
-    "supportedRoles": ["all"]
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/demo/audit/auth-components",
+    "envAccess": "development",
+    "section": "demo",
     "componentPath": "@/components/demoAuditComponents/AuthComponentDemo.vue",
     "requiresAuth": false,
-    "supportedRoles": ["all"]
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/demo/audit/input-default",
+    "envAccess": "development",
+    "section": "demo",
     "componentPath": "@/components/demoAuditComponents/InputDefaultComponentDemo.vue",
     "requiresAuth": false,
-    "supportedRoles": ["all"]
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/demo/audit/code-input",
+    "envAccess": "development",
+    "section": "demo",
     "componentPath": "@/components/demoAuditComponents/CodeInputAuthComponentDemo.vue",
     "requiresAuth": false,
-    "supportedRoles": ["all"]
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/demo/audit/checkbox-group",
+    "envAccess": "development",
+    "section": "demo",
     "componentPath": "@/components/demoAuditComponents/CheckboxGroupDemo.vue",
     "requiresAuth": false,
-    "supportedRoles": ["all"]
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/demo/audit/checkbox-switch",
+    "envAccess": "development",
+    "section": "demo",
     "componentPath": "@/components/demoAuditComponents/CheckboxSwitchDemo.vue",
     "requiresAuth": false,
-    "supportedRoles": ["all"]
+    "supportedRoles": [
+      "all"
+    ]
   },
-
   {
     "slug": "/settings",
+    "section": "misc",
     "componentPath": "@/templates/settings/Settings.vue",
     "requiresAuth": false,
-    "supportedRoles": ["all"]
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/plan",
+    "section": "misc",
     "componentPath": "@/components/ui/global/plan/Plan.vue",
     "requiresAuth": false,
-    "supportedRoles": ["all"]
+    "supportedRoles": [
+      "all"
+    ]
   },
-   {
+  {
     "slug": "/demo-dropdowns",
+    "envAccess": "development",
     "requiresAuth": false,
     "section": "demo",
-    "supportedRoles": ["all"],
+    "supportedRoles": [
+      "all"
+    ],
     "enabled": true,
     "componentPath": "@/components/dropdownHandler/demo/DemoDropdowns.vue"
   },
   {
     "slug": "/edit-profile",
+    "envAccess": "development",
+    "section": "profile",
     "componentPath": "@/templates/editProfile/EditProfilePage.vue",
     "requiresAuth": false,
-    "supportedRoles": ["all"]
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/MediaUploader",
-  "componentPath": "@/components/ui/global/media/uploader/MediaUploader.vue"
+    "section": "misc",
+    "componentPath": "@/components/ui/global/media/uploader/MediaUploader.vue",
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/payout",
-  "componentPath": "@/templates/payout/PayoutPage.vue"
+    "section": "misc",
+    "componentPath": "@/templates/payout/PayoutPage.vue",
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/analytics",
-  "componentPath": "@/templates/analytics/AnalyticsPage.vue"
+    "section": "misc",
+    "componentPath": "@/templates/analytics/AnalyticsPage.vue",
+    "supportedRoles": [
+      "all"
+    ]
   },
-    {
+  {
     "slug": "/chats",
-          "componentPath": "@/templates/dashboard/page/demo/DemoChats.vue"
-
+    "envAccess": "development",
+    "section": "dev",
+    "componentPath": "@/templates/dashboard/page/demo/DemoChats.vue",
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/:pathMatch(.*)*",

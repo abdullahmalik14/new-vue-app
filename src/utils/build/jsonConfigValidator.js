@@ -7,6 +7,8 @@
 
 import { log } from '../common/logHandler.js';
 import { logError } from '../common/errorHandler.js';
+import { isValidRouteEnvAccess } from '../route/routeEnvAccess.js';
+import { findDuplicateRoutePathClaims } from '../route/routeAliases.js';
 
 const PRELOAD_RESOLVE_ROLE = 'guest';
 const PRELOAD_SECTION_FALLBACK_ROLE = 'default';
@@ -272,11 +274,11 @@ export function validateRouteConfig(routes) {
 
     // Required field: section (unless it's a redirect or catch-all)
     if (!route.redirect && !route.slug?.includes('pathMatch') && !route.section) {
-      warnings.push({
-        type: 'MISSING_RECOMMENDED_FIELD',
+      errors.push({
+        type: 'MISSING_REQUIRED_FIELD',
         routeIndex: index,
         field: 'section',
-        message: `Route at index ${index} (${route.slug}) missing 'section' field`,
+        message: `Route at index ${index} (${route.slug}) missing required field 'section'`,
         route: route
       });
     }
@@ -305,6 +307,35 @@ export function validateRouteConfig(routes) {
         expected: 'array',
         received: typeof route.supportedRoles
       });
+    } else if (!route.redirect || route.componentPath || route.customComponentPath) {
+      // B4: require explicit supportedRoles on navigable routes (redirect-only catch-alls exempt)
+      if (!route.supportedRoles) {
+        errors.push({
+          type: 'MISSING_FIELD',
+          routeIndex: index,
+          field: 'supportedRoles',
+          message: `Route at index ${index} (${route.slug}) must define supportedRoles (use ["all"] for unrestricted access)`,
+          route: route
+        });
+      } else if (route.supportedRoles.length === 0) {
+        errors.push({
+          type: 'INVALID_FIELD_VALUE',
+          routeIndex: index,
+          field: 'supportedRoles',
+          message: `Route at index ${index} (${route.slug}) has empty supportedRoles — use ["all"] for unrestricted access`,
+          expected: '["all"] or role list e.g. ["creator"]',
+          received: route.supportedRoles
+        });
+      } else if (route.supportedRoles.includes('any')) {
+        errors.push({
+          type: 'INVALID_FIELD_VALUE',
+          routeIndex: index,
+          field: 'supportedRoles',
+          message: `Route at index ${index} (${route.slug}) uses deprecated "any" — use "all" instead`,
+          expected: '"all"',
+          received: 'any'
+        });
+      }
     }
 
     // Validate preLoadSections if present (flat string[] or role-keyed object)
@@ -332,6 +363,19 @@ export function validateRouteConfig(routes) {
           message: `Route at index ${index} (${route.slug}) has invalid preLoadSections type`,
           expected: 'array or role-keyed object',
           received: typeof route.preLoadSections
+        });
+      }
+    }
+
+    if (route.envAccess !== undefined) {
+      if (typeof route.envAccess !== 'string' || !isValidRouteEnvAccess(route.envAccess)) {
+        errors.push({
+          type: 'INVALID_FIELD_VALUE',
+          routeIndex: index,
+          field: 'envAccess',
+          message: `Route at index ${index} (${route.slug}) has invalid envAccess value`,
+          expected: '"all" or "development"',
+          received: route.envAccess
         });
       }
     }
@@ -375,6 +419,48 @@ export function validateRouteConfig(routes) {
         received: typeof route.preloadExclude
       });
     }
+
+    if (route.aliases !== undefined) {
+      if (!Array.isArray(route.aliases) || route.aliases.some((entry) => typeof entry !== 'string')) {
+        errors.push({
+          type: 'INVALID_FIELD_TYPE',
+          routeIndex: index,
+          field: 'aliases',
+          message: `Route at index ${index} (${route.slug}) has invalid aliases type`,
+          expected: 'string[]',
+          received: typeof route.aliases
+        });
+      }
+    }
+
+    if (route.redirectFrom !== undefined) {
+      const redirectFromValid =
+        typeof route.redirectFrom === 'string' ||
+        (Array.isArray(route.redirectFrom) &&
+          route.redirectFrom.every((entry) => typeof entry === 'string'));
+
+      if (!redirectFromValid) {
+        errors.push({
+          type: 'INVALID_FIELD_TYPE',
+          routeIndex: index,
+          field: 'redirectFrom',
+          message: `Route at index ${index} (${route.slug}) has invalid redirectFrom type`,
+          expected: 'string | string[]',
+          received: typeof route.redirectFrom
+        });
+      }
+    }
+
+    if (route.adminOnly !== undefined && typeof route.adminOnly !== 'boolean') {
+      errors.push({
+        type: 'INVALID_FIELD_TYPE',
+        routeIndex: index,
+        field: 'adminOnly',
+        message: `Route at index ${index} (${route.slug}) has invalid adminOnly type`,
+        expected: 'boolean',
+        received: typeof route.adminOnly
+      });
+    }
   });
 
   validatePreLoadSectionEntries(routes, errors);
@@ -388,6 +474,16 @@ export function validateRouteConfig(routes) {
       type: 'DUPLICATE_SLUGS',
       message: 'Found duplicate route slugs',
       duplicates: [...new Set(duplicates)]
+    });
+  }
+
+  for (const duplicate of findDuplicateRoutePathClaims(routes)) {
+    errors.push({
+      type: 'DUPLICATE_ROUTE_PATH',
+      message: `Route path "${duplicate.path}" is claimed by ${duplicate.first.slug} (${duplicate.first.kind}) and ${duplicate.second.slug} (${duplicate.second.kind})`,
+      path: duplicate.path,
+      first: duplicate.first,
+      second: duplicate.second,
     });
   }
 

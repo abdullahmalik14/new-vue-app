@@ -21,7 +21,10 @@ import App from "./App.vue";
 import router from "./router/index.js";
 import { log } from "./utils/common/logHandler.js";
 import PerfTracker from "./utils/common/performanceTracker.js";
-import { resolveActiveLocale, SUPPORTED_LOCALES } from "./utils/translation/localeManager.js";
+import {
+  resolveActiveLocale,
+  stripLeadingLocaleFromPath,
+} from "./utils/translation/localeManager.js";
 import { loadTranslationsForSection } from "./utils/translation/translationLoader.js";
 import { useAuthStore } from "./stores/useAuthStore.js";
 import { useLocaleStore } from "./stores/useLocaleStore.js";
@@ -44,6 +47,7 @@ import InteractionsPlugin from "./interactions/index.js";
 
 // Import base styles
 import "./assets/main.css";
+import "./assets/route-transitions.css";
 
 // Initialize mock API and utilities
 import { initUtilities } from "@/lib/mock-api-demo/utilities/index.js";
@@ -399,74 +403,92 @@ if (window.performanceTracker) {
   });
 }
 
-router
-  .isReady()
-  .then(() => {
-    const rawPath = router.currentRoute.value.path;
-    const localePrefixMatch = rawPath.match(new RegExp(`^/(${SUPPORTED_LOCALES.join("|")})(/.*|$)`));
-    const currentPath = localePrefixMatch ? (localePrefixMatch[2] || "/") : rawPath;
-    const currentRoute = resolveRouteFromPath(currentPath);
-    const userRoleForPreload = authStore.currentUser?.role || "guest";
+// Preload sections based on current route (non-blocking — after router.isReady, before/after mount)
+function startStartupPreloadForCurrentRoute() {
+  const rawPath = router.currentRoute.value.path;
+  const currentPath = stripLeadingLocaleFromPath(rawPath);
+  const currentRoute = resolveRouteFromPath(currentPath);
+  const userRoleForPreload = authStore.currentUser?.role || "guest";
 
-    const currentSectionName = currentRoute
-      ? resolveCurrentRouteSectionName(currentRoute, userRoleForPreload)
-      : null;
-    const { resolved: baseSectionsToPreload } = getRoutePreloadPlan(
-      currentRoute,
-      userRoleForPreload,
+  const currentSectionName = currentRoute
+    ? resolveCurrentRouteSectionName(currentRoute, userRoleForPreload)
+    : null;
+  const { resolved: baseSectionsToPreload } = getRoutePreloadPlan(
+    currentRoute,
+    userRoleForPreload,
+  );
+  const sectionsToPreload =
+    currentSectionName && !baseSectionsToPreload.includes(currentSectionName)
+      ? [...baseSectionsToPreload, currentSectionName]
+      : baseSectionsToPreload;
+
+  if (
+    currentSectionName &&
+    currentRoute?.section &&
+    !baseSectionsToPreload.includes(currentSectionName)
+  ) {
+    log(
+      "main.js",
+      "init",
+      "preload-current",
+      "Added current section to preload list",
+      {
+        section: currentSectionName,
+      },
     );
-    const sectionsToPreload =
-      currentSectionName && !baseSectionsToPreload.includes(currentSectionName)
-        ? [...baseSectionsToPreload, currentSectionName]
-        : baseSectionsToPreload;
+  }
 
-    if (
-      currentSectionName &&
-      currentRoute?.section &&
-      !baseSectionsToPreload.includes(currentSectionName)
-    ) {
+  if (
+    shouldPreloadDefaultAuthSection({
+      isAuthenticated: authStore.isAuthenticated,
+      currentPath,
+      resolvedSections: sectionsToPreload,
+    })
+  ) {
+    preloadDefaultAuthSection({ file: "main.js", method: "init" });
+  }
+
+  if (currentRoute) {
+    log(
+      "main.js",
+      "init",
+      "preload",
+      "Preloading sections for current route",
+      {
+        path: currentPath,
+        sections: sectionsToPreload,
+        routeConfigSlug: currentRoute.slug,
+      },
+    );
+
+    if (currentSectionName) {
       log(
         "main.js",
         "init",
-        "preload-current",
-        "Added current section to preload list",
+        "translation-preload",
+        "Loading translations for current section",
         {
           section: currentSectionName,
         },
       );
-    }
 
-    if (
-      shouldPreloadDefaultAuthSection({
-        isAuthenticated: authStore.isAuthenticated,
-        currentPath,
-        resolvedSections: sectionsToPreload,
-      })
-    ) {
-      preloadDefaultAuthSection({ file: "main.js", method: "init" });
-    }
+      if (window.performanceTracker) {
+        window.performanceTracker.step({
+          step: "initialTranslationLoad_start",
+          file: "main.js",
+          method: "main",
+          flag: "translation-preload",
+          purpose: `Load translations for ${currentSectionName}`,
+        });
+      }
 
-    if (currentRoute) {
-      log(
-        "main.js",
-        "init",
-        "preload",
-        "Preloading sections for current route",
-        {
-          path: currentPath,
-          sections: sectionsToPreload,
-          routeConfigSlug: currentRoute.slug,
-        },
-      );
-
-      if (currentSectionName) {
-        // Load translations for current section on initial page load
-        // This ensures translations are ready before the app mounts (no placeholder text flash)
+      loadTranslationsForSection(currentSectionName)
+        .then(() => {
           log(
             "main.js",
             "init",
-            "translation-preload",
-            "Loading translations for current section",
+            "translation-preloaded",
+            "Translations loaded for current section",
             {
               section: currentSectionName,
             },
@@ -474,155 +496,139 @@ router
 
           if (window.performanceTracker) {
             window.performanceTracker.step({
-              step: "initialTranslationLoad_start",
+              step: "initialTranslationLoad_complete",
               file: "main.js",
               method: "main",
-              flag: "translation-preload",
-              purpose: `Load translations for ${currentSectionName}`,
+              flag: "translation-ready",
+              purpose: `Translations ready for ${currentSectionName}`,
             });
           }
-
-          // Load translations before mounting app (non-blocking for initial render)
-          loadTranslationsForSection(currentSectionName)
-            .then(() => {
-              log(
-                "main.js",
-                "init",
-                "translation-preloaded",
-                "Translations loaded for current section",
-                {
-                  section: currentSectionName,
-                },
-              );
-
-              if (window.performanceTracker) {
-                window.performanceTracker.step({
-                  step: "initialTranslationLoad_complete",
-                  file: "main.js",
-                  method: "main",
-                  flag: "translation-ready",
-                  purpose: `Translations ready for ${currentSectionName}`,
-                });
-              }
-            })
-            .catch((err) => {
-              log(
-                "main.js",
-                "init",
-                "translation-preload-error",
-                "Translation preload failed (non-blocking)",
-                {
-                  section: currentSectionName,
-                  error: err.message,
-                },
-              );
-            });
-      }
-
-      if (sectionsToPreload.length > 0) {
-        startBackgroundSectionPreloads({
-          sections: sectionsToPreload,
-          logContext: { file: "main.js", method: "init" },
-          path: currentPath,
-        }).then(() => {
+        })
+        .catch((err) => {
           log(
             "main.js",
             "init",
-            "preload-complete",
-            "Route sections preloaded",
+            "translation-preload-error",
+            "Translation preload failed (non-blocking)",
             {
-              path: currentPath,
-              count: sectionsToPreload.length,
+              section: currentSectionName,
+              error: err.message,
             },
           );
-          if (window.performanceTracker) {
-            window.performanceTracker.step({
-              step: "preloadSections_complete",
-              file: "main.js",
-              method: "main",
-              flag: "preload",
-              purpose: `Preloaded ${sectionsToPreload.length} sections for ${currentPath}`,
-            });
-          }
         });
-      } else {
+    }
+
+    if (sectionsToPreload.length > 0) {
+      startBackgroundSectionPreloads({
+        sections: sectionsToPreload,
+        logContext: { file: "main.js", method: "init" },
+        path: currentPath,
+      }).then(() => {
         log(
           "main.js",
           "init",
-          "preload-skip",
-          "No sections to preload for current route",
+          "preload-complete",
+          "Route sections preloaded",
           {
             path: currentPath,
-            hasPreLoadSections: !!currentRoute.preLoadSections,
-            preLoadSectionsValue: currentRoute.preLoadSections,
+            count: sectionsToPreload.length,
           },
         );
-      }
+        if (window.performanceTracker) {
+          window.performanceTracker.step({
+            step: "preloadSections_complete",
+            file: "main.js",
+            method: "main",
+            flag: "preload",
+            purpose: `Preloaded ${sectionsToPreload.length} sections for ${currentPath}`,
+          });
+        }
+      });
     } else {
       log(
         "main.js",
         "init",
         "preload-skip",
-        "No route config found for current path, skipping preload",
+        "No sections to preload for current route",
         {
           path: currentPath,
+          hasPreLoadSections: !!currentRoute.preLoadSections,
+          preLoadSectionsValue: currentRoute.preLoadSections,
         },
       );
     }
-  })
-  .catch((err) => {
-    log("main.js", "init", "preload-error", "Error waiting for router ready", {
+  } else {
+    log(
+      "main.js",
+      "init",
+      "preload-skip",
+      "No route config found for current path, skipping preload",
+      {
+        path: currentPath,
+      },
+    );
+  }
+}
+
+async function mountApplication() {
+  if (window.performanceTracker) {
+    window.performanceTracker.step({
+      step: "mountApp_start",
+      file: "main.js",
+      method: "main",
+      flag: "mount",
+      purpose: "Mount Vue application to DOM",
+    });
+  }
+
+  try {
+    await router.isReady();
+    startStartupPreloadForCurrentRoute();
+  } catch (err) {
+    log("main.js", "init", "router-ready-error", "Error waiting for router ready", {
       error: err.message,
     });
+  }
+
+  app.mount("#app");
+
+  log("main.js", "init", "mount", "Application mounted successfully", {});
+
+  if (window.performanceTracker) {
+    window.performanceTracker.step({
+      step: "mountApp_complete",
+      file: "main.js",
+      method: "main",
+      flag: "mount",
+      purpose: "Application mounted",
+    });
+  }
+
+  // Track app ready
+  if (window.performanceTracker) {
+    window.performanceTracker.step({
+      step: "appReady",
+      file: "main.js",
+      method: "main",
+      flag: "ready",
+      purpose: "Application initialization complete",
+    });
+  }
+
+  // Log initialization summary
+  log("main.js", "init", "complete", "Application initialization complete", {
+    locale: activeLocale,
+    isAuthenticated: authStore.isAuthenticated,
+    currentPath: router.currentRoute.value.path,
   });
 
-// Mount application
-if (window.performanceTracker) {
-  window.performanceTracker.step({
-    step: "mountApp_start",
-    file: "main.js",
-    method: "main",
-    flag: "mount",
-    purpose: "Mount Vue application to DOM",
-  });
+  // Print performance table if logging enabled
+  if (
+    import.meta.env.VITE_ENABLE_LOGGER === "true" &&
+    window.performanceTracker
+  ) {
+    console.table(window.performanceTracker.table());
+  }
 }
 
-app.mount("#app");
-
-log("main.js", "init", "mount", "Application mounted successfully", {});
-
-if (window.performanceTracker) {
-  window.performanceTracker.step({
-    step: "mountApp_complete",
-    file: "main.js",
-    method: "main",
-    flag: "mount",
-    purpose: "Application mounted",
-  });
-}
-
-// Track app ready
-if (window.performanceTracker) {
-  window.performanceTracker.step({
-    step: "appReady",
-    file: "main.js",
-    method: "main",
-    flag: "ready",
-    purpose: "Application initialization complete",
-  });
-}
-
-// Log initialization summary
-log("main.js", "init", "complete", "Application initialization complete", {
-  locale: activeLocale,
-  isAuthenticated: authStore.isAuthenticated,
-  currentPath: router.currentRoute.value.path,
-});
-
-// Print performance table if logging enabled
-if (
-  import.meta.env.VITE_ENABLE_LOGGER === "true" &&
-  window.performanceTracker
-) {
-  console.table(window.performanceTracker.table());
-}
+mountApplication();

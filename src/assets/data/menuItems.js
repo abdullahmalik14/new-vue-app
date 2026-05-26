@@ -9,7 +9,7 @@ export const menuItems = [
     title: "Analytics", // Fallback text
     translationKey: "dashboard.menu.analytics", // Translation key
     image: "dashboard.menu.analytics", // Asset flag instead of hardcoded URL
-    route: "/dashboard/analytics",
+    route: "/analytics",
     parent: false,
     children: [],
     enabled: true
@@ -95,7 +95,7 @@ export const menuItems = [
     title: "Shops", // Fallback text
     translationKey: "dashboard.menu.shops", // Translation key
     image: "dashboard.menu.shops", // Asset flag instead of hardcoded URL
-    route: "/shops",
+    route: "/shop",
     parent: false,
     children: [],
     enabled: false // Disabled as in original

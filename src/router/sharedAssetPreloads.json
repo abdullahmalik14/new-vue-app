@@ -1,0 +1,104 @@
+{
+  "dashboardMenuIcons": [
+    {
+      "flag": "dashboard.logo",
+      "type": "image",
+      "priority": "high"
+    },
+    {
+      "flag": "dashboard.avatar",
+      "type": "image",
+      "priority": "high"
+    },
+    {
+      "flag": "dashboard.notification",
+      "type": "image",
+      "priority": "high"
+    },
+    {
+      "flag": "dashboard.logout",
+      "type": "image",
+      "priority": "high"
+    },
+    {
+      "flag": "dashboard.language",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.help",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.close.desktop",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.close.mobile",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.more",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.analytics",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.payout",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.orders",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.media",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.chats",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.subscriptions",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.shops",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.profile",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.settings",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.xrepost",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.menu.blog",
+      "type": "image",
+      "priority": "normal"
+    }
+  ]
+}

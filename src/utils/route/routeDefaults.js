@@ -9,6 +9,19 @@ export function getDefaultNotFoundSlug() {
   return defaults?.notFoundSlug || '/404';
 }
 
+export function getDefaultGuardErrorSlug() {
+  return defaults?.guardErrorSlug || defaults?.notFoundSlug || '/404';
+}
+
+export function getDefaultNavigationErrorSlug() {
+  return (
+    defaults?.navigationErrorSlug ||
+    defaults?.guardErrorSlug ||
+    defaults?.notFoundSlug ||
+    '/404'
+  );
+}
+
 export function getDefaultLoginSlug() {
   return defaults?.loginSlug || '/log-in';
 }

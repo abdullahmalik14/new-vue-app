@@ -60,8 +60,8 @@ console.assert(routes !== routes3); // Should be new load
 **Key Methods**:
 - `resolveRouteFromPath(path)` - Find route by path
 - `resolveComponentPathForRoute(route, role)` - Get component path for role
-- `inheritConfigurationFromParentRoute(route)` - Merge parent config
-- `getRouteChainForPath(path)` - Get full parent chain
+- `inheritConfigurationFromParentRoute(route)` - Merge parent config (used by router guards/preload via `resolveEffectiveRouteConfig`)
+- `getRouteChainForPath(path)` - Optional breadcrumb/path utility; **not** used in guard or preload pipeline
 
 **Testing**:
 ```javascript
@@ -98,42 +98,50 @@ console.assert(component !== null);
 **How it works**:
 Guards execute in sequence:
 1. **Loop Prevention**: Detect circular redirects
-2. **Enabled Check**: Route must be enabled
+2. **Environment Access**: Block dev-only routes if registered outside dev (S1 defense in depth)
 3. **Authentication**: User must be authenticated if required
 4. **Role Check**: User role must be in supportedRoles
 5. **Dependencies**: Check onboarding, KYC, etc.
 
+**Disabled routes (`enabled: false`)**: Not registered in Vue Router at build time. Direct URLs hit the catch-all → `/404`. Guards do not check `enabled` (see audit B3).
+
 **Key Methods**:
-- `runAllRouteGuards(toRoute, fromRoute, context)` - Execute full chain
+- `runAllRouteGuards(toRoute, fromRoute, context)` - Execute full chain (**async** — returns `Promise<GuardResult>`)
 - `guardPreventNavigationLoop(to, from)` - Loop detection
-- `guardCheckRouteEnabled(route)` - Enabled flag
+- `guardCheckRouteEnvironmentAccess(route)` - envAccess availability
+- `guardCheckRouteEnabled(route)` - Deprecated alias for environment access only
 - `guardCheckAuthentication(route, context)` - Auth requirement
 - `guardCheckUserRole(route, context)` - Role permission
 - `guardCheckDependencies(route, context)` - Prerequisites
+- `clearGuardNavigationHistory()` - Clear redirect-loop detection buffer only (not `routeNavigation.clearNavigationHistory`)
 
 **Testing**:
 ```javascript
 import { runAllRouteGuards } from './routeGuards.js';
 
-// Test auth guard
-const publicRoute = { slug: '/log-in', requiresAuth: false };
-const protectedRoute = { slug: '/dashboard', requiresAuth: true };
+// runAllRouteGuards is async — always await (or use .then)
+async function testRouteGuards() {
+  const publicRoute = { slug: '/log-in', requiresAuth: false, enabled: true, supportedRoles: ['all'] };
+  const protectedRoute = { slug: '/dashboard', requiresAuth: true, enabled: true, supportedRoles: ['creator'] };
 
-const guestContext = { isAuthenticated: false, userRole: 'guest' };
-const userContext = { isAuthenticated: true, userRole: 'creator' };
+  const guestContext = { isAuthenticated: false, userRole: 'guest' };
+  const userContext = { isAuthenticated: true, userRole: 'creator' };
 
-// Guest can access login
-let result = runAllRouteGuards(publicRoute, {}, guestContext);
-console.assert(result.allow === true);
+  // Guest can access login
+  let result = await runAllRouteGuards(publicRoute, {}, guestContext);
+  console.assert(result.allow === true);
 
-// Guest cannot access dashboard
-result = runAllRouteGuards(protectedRoute, {}, guestContext);
-console.assert(result.allow === false);
-console.assert(result.redirectTo === '/log-in');
+  // Guest cannot access dashboard
+  result = await runAllRouteGuards(protectedRoute, {}, guestContext);
+  console.assert(result.allow === false);
+  console.assert(result.redirectTo === '/log-in');
 
-// User can access dashboard
-result = runAllRouteGuards(protectedRoute, {}, userContext);
-console.assert(result.allow === true);
+  // User can access dashboard
+  result = await runAllRouteGuards(protectedRoute, {}, userContext);
+  console.assert(result.allow === true);
+}
+
+testRouteGuards();
 ```
 
 **Development Rules**:
@@ -169,7 +177,7 @@ console.assert(result.allow === true);
 - `getPreviousActivePath()` - Get previous path
 - `getNavigationHistory(maxEntries)` - Get history array
 - `canNavigateBack()` - Check if back is possible
-- `clearNavigationHistory()` - Reset state
+- `clearNavigationHistory()` - Reset full navigation state (current/previous/history). Do **not** confuse with `clearGuardNavigationHistory()` in `routeGuards.js`.
 
 **Testing**:
 ```javascript
@@ -237,7 +245,7 @@ console.assert(getPreviousActivePath() === '/log-in');
 ## Performance Considerations
 
 - Route config cached for 1 hour
-- Guards execute synchronously
-- Keep guard logic fast (< 10ms each)
+- `runAllRouteGuards()` is async — `router/index.js` `beforeEach` must `await` it before calling `next()`
+- Individual guard helpers (`guardCheckAuthentication`, etc.) are synchronous; keep each fast (< 10ms)
 - Log performance of slow guards
 

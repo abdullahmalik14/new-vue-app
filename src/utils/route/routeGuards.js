@@ -1,28 +1,88 @@
 /**
  * RouteGuards - Navigation guard implementations
  *
- * **CRITICAL**: Every guard operation tracked with global window.performanceTracker.
+ * **CRITICAL**: Every guard operation tracked via trackStep() (SSR-safe performanceTracker access).
  * Guards determine if navigation should proceed, redirect, or abort.
  *
  * Guard execution order:
  * 1. Loop prevention
- * 2. Enabled check
+ * 2. Environment access (envAccess — defense in depth; see S1)
  * 3. Authentication check
- * 4. Role check
- * 5. Dependency check
+ * 4. Admin-only check (adminOnly — M11)
+ * 5. Role check
+ * 6. Dependency check
+ *
+ * Note (B3): `enabled: false` routes are excluded in `generateRoutesFromConfig`.
+ * They never reach the guard chain — direct URLs fall through to the catch-all → /404.
  */
 
 import { log } from "../common/logHandler.js";
+import { trackStep } from "../common/performanceTrackerAccess.js";
+import { reportApplicationError } from "../common/errorHandler.js";
 import { safelyGetNestedProperty } from "../common/objectSafety.js";
 import {
   getDefaultLoginSlug,
   getDefaultNotFoundSlug,
+  getDefaultGuardErrorSlug,
   getDefaultDashboardSlug,
 } from "./routeDefaults.js";
+import { isRouteAccessibleInCurrentEnvironment } from "./routeEnvAccess.js";
+import { isRouteAccessibleToAdmin } from "./routeAdminAccess.js";
 
 // Navigation history for loop detection
 const navigationHistory = [];
 const MAX_NAVIGATION_HISTORY = 50;
+
+/** Creator onboarding flow order — earlier deps must pass before later redirectIfComplete */
+const ORDERED_DEPENDENCY_KEYS = ["onboardingPassed", "kycPassed"];
+
+/**
+ * @param {Record<string, object>} roleDependencies
+ * @returns {[string, object][]}
+ */
+function getOrderedRoleDependencyEntries(roleDependencies) {
+  return Object.entries(roleDependencies).sort(([keyA], [keyB]) => {
+    const rankA = ORDERED_DEPENDENCY_KEYS.indexOf(keyA);
+    const rankB = ORDERED_DEPENDENCY_KEYS.indexOf(keyB);
+    const orderA = rankA === -1 ? ORDERED_DEPENDENCY_KEYS.length : rankA;
+    const orderB = rankB === -1 ? ORDERED_DEPENDENCY_KEYS.length : rankB;
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+    return 0;
+  });
+}
+
+/**
+ * redirectIfComplete on kycPassed must not skip an incomplete onboardingPassed step.
+ *
+ * @param {string} depKey
+ * @param {Record<string, object>} roleDependencies
+ * @param {object} userProfile
+ * @returns {boolean}
+ */
+function arePrerequisiteDependenciesMet(depKey, roleDependencies, userProfile) {
+  const orderedKeys = getOrderedRoleDependencyEntries(roleDependencies).map(
+    ([key]) => key,
+  );
+  const depIndex = orderedKeys.indexOf(depKey);
+
+  if (depIndex <= 0) {
+    return true;
+  }
+
+  for (let i = 0; i < depIndex; i++) {
+    const prereqKey = orderedKeys[i];
+    if (!roleDependencies[prereqKey]) {
+      continue;
+    }
+    if (userProfile[prereqKey] !== true) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 /**
  * Run all route guards in sequence
@@ -38,20 +98,13 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
     toPath: toRoute?.slug,
     fromPath: fromRoute?.slug,
   });
-
-  if (window.performanceTracker) {
-    try {
-      window.performanceTracker.step({
+  trackStep({
         step: "guardChainStart",
         file: "routeGuards.js",
         method: "runAllRouteGuards",
         flag: "guard-start",
         purpose: `Begin guard chain for ${toRoute?.slug}`,
       });
-    } catch (e) {
-      // Performance tracker session ended, ignore
-    }
-  }
 
   try {
     // Execute guards in order
@@ -69,17 +122,17 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
       return loopGuard;
     }
 
-    // 2. Check if route is enabled
-    const enabledGuard = guardCheckRouteEnabled(toRoute);
-    if (!enabledGuard.allow) {
+    // 2. Check environment access (envAccess only — enabled: false handled at route generation)
+    const envGuard = guardCheckRouteEnvironmentAccess(toRoute);
+    if (!envGuard.allow) {
       log(
         "routeGuards.js",
         "runAllRouteGuards",
         "block",
-        "Navigation blocked by enabled guard",
-        enabledGuard,
+        "Navigation blocked by environment guard",
+        envGuard,
       );
-      return enabledGuard;
+      return envGuard;
     }
 
     // 3. Check authentication requirements
@@ -95,7 +148,20 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
       return authGuard;
     }
 
-    // 4. Check role requirements
+    // 4. Check admin-only routes (M11)
+    const adminGuard = guardCheckRouteAdminAccess(toRoute, context);
+    if (!adminGuard.allow) {
+      log(
+        "routeGuards.js",
+        "runAllRouteGuards",
+        "block",
+        "Navigation blocked by admin guard",
+        adminGuard,
+      );
+      return adminGuard;
+    }
+
+    // 5. Check role requirements
     const roleGuard = guardCheckUserRole(toRoute, context);
     if (!roleGuard.allow) {
       log(
@@ -108,7 +174,7 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
       return roleGuard;
     }
 
-    // 5. Check dependencies (onboarding, KYC, etc.)
+    // 6. Check dependencies (onboarding, KYC, etc.)
     const dependencyGuard = guardCheckDependencies(toRoute, context);
     if (!dependencyGuard.allow) {
       log(
@@ -129,19 +195,13 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
     };
 
     // Track guard chain completion
-    if (window.performanceTracker) {
-      try {
-        window.performanceTracker.step({
+  trackStep({
           step: "guardChainComplete",
           file: "routeGuards.js",
           method: "runAllRouteGuards",
           flag: "guard-complete",
           purpose: `Guard chain result: ALLOW`,
         });
-      } catch (e) {
-        // Performance tracker session ended, ignore
-      }
-    }
 
     log(
       "routeGuards.js",
@@ -152,43 +212,42 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
     );
     return guardResult;
   } catch (error) {
-    log(
+    reportApplicationError(
       "routeGuards.js",
       "runAllRouteGuards",
-      "error",
       "Guard chain execution failed",
+      error,
       {
-        error: error.message,
-        stack: error.stack,
+        toSlug: toRoute?.slug,
+        fromSlug: fromRoute?.slug,
+        userRole: context?.userRole,
+        isAuthenticated: context?.isAuthenticated,
+        errorCode: "GUARD_CHAIN_FAILURE",
       },
     );
-
-    if (window.performanceTracker) {
-      try {
-        window.performanceTracker.step({
+  trackStep({
           step: "guardChainError",
           file: "routeGuards.js",
           method: "runAllRouteGuards",
           flag: "error",
           purpose: "Guard chain failed with exception",
         });
-      } catch (e) {
-        // Performance tracker session ended, ignore
-      }
-    }
+
+    const guardErrorResult = {
+      allow: false,
+      redirectTo: getDefaultGuardErrorSlug(),
+      reason: "Guard execution failed",
+      errorCode: "GUARD_CHAIN_FAILURE",
+    };
 
     log(
       "routeGuards.js",
       "runAllRouteGuards",
       "return",
-      "Returning fallback notFound redirect",
-      { error: error.message },
+      "Returning guard error redirect after exception",
+      guardErrorResult,
     );
-    return {
-      allow: false,
-      redirectTo: getDefaultNotFoundSlug(),
-      reason: "Guard execution failed",
-    };
+    return guardErrorResult;
   }
 }
 
@@ -211,20 +270,13 @@ export function guardPreventNavigationLoop(toRoute, fromRoute) {
       fromPath: fromRoute?.slug,
     },
   );
-
-  if (window.performanceTracker) {
-    try {
-      window.performanceTracker.step({
+  trackStep({
         step: "guardLoopCheck",
         file: "routeGuards.js",
         method: "guardPreventNavigationLoop",
         flag: "loop-detection",
         purpose: "Check for navigation loops",
       });
-    } catch (e) {
-      // Performance tracker session ended, ignore
-    }
-  }
 
   // Only consider loops when the router is trying to go to the same path again
   // This prevents false positives from legitimate user navigation between different pages
@@ -272,20 +324,13 @@ export function guardPreventNavigationLoop(toRoute, fromRoute) {
         count: repeatedPath.length,
       },
     );
-
-    if (window.performanceTracker) {
-      try {
-        window.performanceTracker.step({
+  trackStep({
           step: "loopDetected",
           file: "routeGuards.js",
           method: "guardPreventNavigationLoop",
           flag: "loop-found",
           purpose: `Loop detected for path: ${toRoute?.slug}`,
         });
-      } catch (e) {
-        // Performance tracker session ended, ignore
-      }
-    }
 
     const result = {
       allow: false,
@@ -316,73 +361,77 @@ export function guardPreventNavigationLoop(toRoute, fromRoute) {
 }
 
 /**
- * Check if route is enabled
- * Disabled routes should return 404
+ * Check route environment access (envAccess).
+ * Defense in depth for dev-only routes that were registered (S1).
+ *
+ * `enabled: false` is NOT checked here — those routes are omitted in
+ * `generateRoutesFromConfig` and unreachable URLs hit the catch-all → /404 (B3).
  *
  * @param {object} route - Route to check
  * @returns {object} - Guard result
  */
-export function guardCheckRouteEnabled(route) {
+export function guardCheckRouteEnvironmentAccess(route) {
   log(
     "routeGuards.js",
-    "guardCheckRouteEnabled",
+    "guardCheckRouteEnvironmentAccess",
     "start",
-    "Checking if route is enabled",
+    "Checking route environment access",
     {
       slug: route?.slug,
-      enabled: route?.enabled,
+      envAccess: route?.envAccess,
     },
   );
-
-  if (window.performanceTracker) {
-    try {
-      window.performanceTracker.step({
-        step: "guardEnabledCheck",
+  trackStep({
+        step: "guardEnvAccessCheck",
         file: "routeGuards.js",
-        method: "guardCheckRouteEnabled",
-        flag: "enabled-check",
-        purpose: "Check if route is enabled",
+        method: "guardCheckRouteEnvironmentAccess",
+        flag: "env-access-check",
+        purpose: "Check route envAccess availability",
       });
-    } catch (e) {
-      // Performance tracker session ended, ignore
-    }
-  }
 
-  // Routes are enabled by default
-  if (route.enabled === false) {
+  if (!isRouteAccessibleInCurrentEnvironment(route)) {
     log(
       "routeGuards.js",
-      "guardCheckRouteEnabled",
+      "guardCheckRouteEnvironmentAccess",
       "warn",
-      "Route is disabled",
-      { slug: route.slug },
+      "Route is not available in this environment",
+      { slug: route.slug, envAccess: route.envAccess },
     );
 
     const result = {
       allow: false,
       redirectTo: getDefaultNotFoundSlug(),
-      reason: "Route is disabled",
+      reason: "Route not available in this environment",
     };
 
     log(
       "routeGuards.js",
-      "guardCheckRouteEnabled",
+      "guardCheckRouteEnvironmentAccess",
       "return",
-      "Returning disabled route block",
+      "Returning environment block",
       result,
     );
     return result;
   }
 
-  const result = { allow: true, redirectTo: null, reason: "Route is enabled" };
+  const result = {
+    allow: true,
+    redirectTo: null,
+    reason: "Route available in this environment",
+  };
   log(
     "routeGuards.js",
-    "guardCheckRouteEnabled",
+    "guardCheckRouteEnvironmentAccess",
     "return",
-    "Route is enabled",
+    "Route environment check passed",
     result,
   );
   return result;
+}
+
+/** @deprecated Use guardCheckRouteEnvironmentAccess — enabled flag is handled at route generation (B3). */
+export function guardCheckRouteEnabled(route) {
+  return guardCheckRouteEnvironmentAccess(route);
 }
 
 /**
@@ -405,20 +454,13 @@ export function guardCheckAuthentication(route, context) {
       isAuthenticated: context?.isAuthenticated,
     },
   );
-
-  if (window.performanceTracker) {
-    try {
-      window.performanceTracker.step({
+  trackStep({
         step: "guardAuthCheck",
         file: "routeGuards.js",
         method: "guardCheckAuthentication",
         flag: "auth-check",
         purpose: "Check authentication requirements",
       });
-    } catch (e) {
-      // Performance tracker session ended, ignore
-    }
-  }
 
   // Check if route requires authentication
   if (route.requiresAuth === true) {
@@ -499,6 +541,46 @@ export function guardCheckAuthentication(route, context) {
 }
 
 /**
+ * Block routes marked adminOnly when the user is not an admin (M11).
+ *
+ * @param {object} route
+ * @param {object} context
+ * @returns {object}
+ */
+export function guardCheckRouteAdminAccess(route, context) {
+  log("routeGuards.js", "guardCheckRouteAdminAccess", "start", "Checking admin-only route access", {
+    slug: route?.slug,
+    adminOnly: route?.adminOnly,
+    userRole: context?.userRole,
+  });
+  trackStep({
+    step: "guardAdminAccessCheck",
+    file: "routeGuards.js",
+    method: "guardCheckRouteAdminAccess",
+    flag: "admin-access-check",
+    purpose: "Check route adminOnly restriction",
+  });
+
+  if (!isRouteAccessibleToAdmin(route, context)) {
+    const result = {
+      allow: false,
+      redirectTo: getDefaultNotFoundSlug(),
+      reason: "Route requires admin access",
+    };
+    log("routeGuards.js", "guardCheckRouteAdminAccess", "return", "Returning admin block", result);
+    return result;
+  }
+
+  const result = {
+    allow: true,
+    redirectTo: null,
+    reason: "Admin access check passed",
+  };
+  log("routeGuards.js", "guardCheckRouteAdminAccess", "return", "Admin access check passed", result);
+  return result;
+}
+
+/**
  * Check user role requirements
  * Verifies if user's role is allowed to access route
  *
@@ -518,42 +600,19 @@ export function guardCheckUserRole(route, context) {
       userRole: context?.userRole,
     },
   );
-
-  if (window.performanceTracker) {
-    try {
-      window.performanceTracker.step({
+  trackStep({
         step: "guardRoleCheck",
         file: "routeGuards.js",
         method: "guardCheckUserRole",
         flag: "role-check",
         purpose: "Check user role permissions",
       });
-    } catch (e) {
-      // Performance tracker session ended, ignore
-    }
-  }
 
-  // If no role requirements, allow access
-  if (!route.supportedRoles || route.supportedRoles.length === 0) {
-    const result = {
-      allow: true,
-      redirectTo: null,
-      reason: "No role restrictions",
-    };
-    log(
-      "routeGuards.js",
-      "guardCheckUserRole",
-      "return",
-      "No role restrictions",
-      result,
-    );
-    return result;
-  }
-
-  // Check for "all" roles
+  // Open to all roles — config should use [\"all\"] (B4); empty/omitted still allowed at runtime
   if (
-    route.supportedRoles.includes("all") ||
-    route.supportedRoles.includes("any")
+    !route.supportedRoles ||
+    route.supportedRoles.length === 0 ||
+    route.supportedRoles.includes("all")
   ) {
     const result = {
       allow: true,
@@ -707,20 +766,13 @@ export function guardCheckDependencies(route, context) {
       hasDependencies: !!route?.dependencies,
     },
   );
-
-  if (window.performanceTracker) {
-    try {
-      window.performanceTracker.step({
+  trackStep({
         step: "guardDependencyCheck",
         file: "routeGuards.js",
         method: "guardCheckDependencies",
         flag: "dependency-check",
         purpose: "Check route dependencies",
       });
-    } catch (e) {
-      // Performance tracker session ended, ignore
-    }
-  }
 
   // If no dependencies, allow access
   if (!route.dependencies) {
@@ -798,10 +850,10 @@ export function guardCheckDependencies(route, context) {
   );
 
   if (roleDependencies) {
-    // Check each dependency in order
-    // For creators, we check onboardingPassed first, then kycPassed
-    // This ensures proper redirect flow: onboarding -> kyc -> dashboard
-    for (const [depKey, depConfig] of Object.entries(roleDependencies)) {
+    // Check each dependency in onboarding flow order (onboardingPassed before kycPassed)
+    for (const [depKey, depConfig] of getOrderedRoleDependencyEntries(
+      roleDependencies,
+    )) {
       const isRequired = depConfig.required === true;
       const redirectIfComplete = depConfig.redirectIfComplete === true;
       const fallbackSlug = depConfig.fallbackSlug;
@@ -837,6 +889,24 @@ export function guardCheckDependencies(route, context) {
       // Handle inverse check: redirect if dependency IS met
       // Used for routes like onboarding that should redirect if already completed
       if (redirectIfComplete && userHasDependency) {
+        if (
+          !arePrerequisiteDependenciesMet(depKey, roleDependencies, userProfile)
+        ) {
+          log(
+            "routeGuards.js",
+            "guardCheckDependencies",
+            "info",
+            "Skipping redirectIfComplete — prerequisite dependency incomplete",
+            {
+              slug: route.slug,
+              userRole,
+              dependency: depKey,
+              userValue,
+            },
+          );
+          continue;
+        }
+
         log(
           "routeGuards.js",
           "guardCheckDependencies",
@@ -904,6 +974,43 @@ export function guardCheckDependencies(route, context) {
     }
   }
 
+  // Block roles not listed in supportedRoles after dependency redirects are evaluated (L6).
+  // Role guard may allow non-listed roles through when dependencies.roles[userRole] exists
+  // so redirectIfComplete / required checks can run; if none fired, deny access here.
+  const supportedRoles = route.supportedRoles;
+  const hasRoleRestrictions =
+    supportedRoles?.length > 0 &&
+    !supportedRoles.includes("all");
+
+  if (hasRoleRestrictions && !supportedRoles.includes(userRole)) {
+    log(
+      "routeGuards.js",
+      "guardCheckDependencies",
+      "warn",
+      "Role not in supportedRoles after dependency check",
+      {
+        slug: route.slug,
+        userRole,
+        supportedRoles,
+      },
+    );
+
+    const result = {
+      allow: false,
+      redirectTo: getDefaultNotFoundSlug(),
+      reason: `Role ${userRole} not authorized for route`,
+    };
+
+    log(
+      "routeGuards.js",
+      "guardCheckDependencies",
+      "return",
+      "Returning unsupported role block after dependencies",
+      result,
+    );
+    return result;
+  }
+
   // Check general dependencies (not role-specific)
   if (route.dependencies.onboardingRequired) {
     const onboardingComplete = userProfile.onboardingPassed === true;
@@ -959,21 +1066,21 @@ export function guardCheckDependencies(route, context) {
 }
 
 /**
- * Clear navigation history
- * Useful for testing or after logout
+ * Clear guard redirect-loop detection history (not full navigation state).
+ * Used by router afterEach on real route changes (L5) and in tests/logout flows.
  *
  * @returns {void}
  */
-export function clearNavigationHistory() {
+export function clearGuardNavigationHistory() {
   log(
     "routeGuards.js",
-    "clearNavigationHistory",
+    "clearGuardNavigationHistory",
     "info",
-    "Navigation history cleared",
+    "Guard navigation history cleared",
     { previousLength: navigationHistory.length },
   );
   navigationHistory.length = 0;
-  log("routeGuards.js", "clearNavigationHistory", "return", "History cleared", {
+  log("routeGuards.js", "clearGuardNavigationHistory", "return", "History cleared", {
     newLength: 0,
   });
 }

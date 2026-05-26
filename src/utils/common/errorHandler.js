@@ -46,6 +46,41 @@ export function isError(value) {
   return value instanceof Error;
 }
 
+/**
+ * Log an error and optionally forward to an external reporter (e.g. Sentry via window.reportAppError).
+ *
+ * @param {string} fileName
+ * @param {string} methodName
+ * @param {string} description
+ * @param {Error|string} error
+ * @param {object} additionalData
+ * @returns {void}
+ */
+export function reportApplicationError(fileName, methodName, description, error, additionalData = {}) {
+  logError(fileName, methodName, description, error, additionalData);
+
+  if (typeof window !== 'undefined' && typeof window.reportAppError === 'function') {
+    try {
+      window.reportAppError({
+        fileName,
+        methodName,
+        description,
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        ...additionalData,
+      });
+    } catch (reportingError) {
+      logError(
+        'errorHandler.js',
+        'reportApplicationError',
+        'External error reporter failed',
+        reportingError,
+        { originalDescription: description },
+      );
+    }
+  }
+}
+
 // Export for backward compatibility (but prefer direct try/catch usage)
 export function handleErrorSilently(error, operationContext, additionalData = null) {
   logError('errorHandler.js', 'handleErrorSilently', `Error in ${operationContext}`, error, additionalData);

@@ -12,6 +12,7 @@
 import { getRouteConfiguration } from './routeConfigLoader.js';
 import { log } from '../common/logHandler.js';
 import { deepMergePreferChild, safelyGetNestedProperty } from '../common/objectSafety.js';
+import { routeConfigMatchesPath } from './routeAliases.js';
 
 
 // Performance tracker available globally as window.performanceTracker
@@ -38,7 +39,7 @@ export function resolveRouteFromPath(targetPath) {
 
   // Try exact match first
   for (const route of allRoutes) {
-    if (route.slug === targetPath) {
+    if (routeConfigMatchesPath(route, targetPath)) {
       log('routeResolver.js', 'resolveRouteFromPath', 'exact-match', 'Exact route match found', {
         slug: route.slug,
         section: route.section
@@ -98,6 +99,25 @@ export function resolveRouteFromPath(targetPath) {
   });
 
   log('routeResolver.js', 'resolveRouteFromPath', 'return', 'Returning null - no route found', { targetPath });
+  return null;
+}
+
+/**
+ * Find a route by exact slug only (no wildcard / catch-all fallback).
+ * Use for intent prefetch and other lookups that must not match /:pathMatch(.*)*.
+ *
+ * @param {string} targetPath
+ * @returns {object|null}
+ */
+export function resolveExactRouteFromPath(targetPath) {
+  const allRoutes = getRouteConfiguration();
+
+  for (const route of allRoutes) {
+    if (routeConfigMatchesPath(route, targetPath)) {
+      return route;
+    }
+  }
+
   return null;
 }
 
@@ -268,12 +288,20 @@ export function inheritConfigurationFromParentRoute(childRoute) {
     return childRoute;
   }
 
+  // Resolve parent first so nested inheritConfigFromParent chains merge auth (S4)
+  const resolvedParentRoute = parentRoute.inheritConfigFromParent
+    ? inheritConfigurationFromParentRoute(parentRoute)
+    : parentRoute;
+
   // Merge parent config with child config (child wins)
-  const mergedConfig = deepMergePreferChild(parentRoute, childRoute);
+  const mergedConfig = deepMergePreferChild(resolvedParentRoute, childRoute);
 
   log('routeResolver.js', 'inheritConfigurationFromParentRoute', 'success', 'Parent configuration inherited', {
     childSlug: childRoute.slug,
-    parentSlug: parentRoute.slug
+    parentSlug: parentRoute.slug,
+    requiresAuth: mergedConfig.requiresAuth,
+    redirectIfNotAuth: mergedConfig.redirectIfNotAuth,
+    inheritedRequiresAuth: childRoute.requiresAuth === undefined && mergedConfig.requiresAuth === true,
   });
 
   // Track merge completion
@@ -327,9 +355,12 @@ function findParentRouteBySlug(childSlug) {
 
 /**
  * Get all matched routes for a path (including parent chain)
- * Useful for breadcrumbs and nested layouts
- * 
- * @param {string} targetPath - Path to get route chain for
+ * Optional utility for breadcrumbs and path introspection.
+ *
+ * NOT used by the router guard/preload pipeline — config inheritance uses
+ * `inheritConfigurationFromParentRoute()` / `resolveEffectiveRouteConfig()` instead.
+ *
+ * @param {string} targetPath - Path to get route chain for (locale-free slug path)
  * @returns {Array} - Array of route objects from root to target
  */
 export function getRouteChainForPath(targetPath) {
@@ -338,10 +369,10 @@ export function getRouteChainForPath(targetPath) {
   const routeChain = [];
   const slugParts = targetPath.split('/').filter(part => part.length > 0);
 
-  // Build progressively longer paths
+  // Build progressively longer paths (exact slug matches only — no catch-all)
   for (let i = 1; i <= slugParts.length; i++) {
     const partialPath = '/' + slugParts.slice(0, i).join('/');
-    const route = resolveRouteFromPath(partialPath);
+    const route = resolveExactRouteFromPath(partialPath);
 
     if (route) {
       routeChain.push(route);

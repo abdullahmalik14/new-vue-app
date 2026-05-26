@@ -43,4 +43,41 @@ describe('performanceTracker guards (S-05)', () => {
 
     expect(route).toMatchObject({ slug: '/log-in', section: 'auth' });
   });
+
+  it('routeGuards runAllRouteGuards works without performanceTracker (B1)', async () => {
+    const { runAllRouteGuards } = await import('../../src/utils/route/routeGuards.js');
+
+    const result = await runAllRouteGuards(
+      { slug: '/log-in', requiresAuth: false, enabled: true, supportedRoles: ['all'] },
+      { slug: '/' },
+      { isAuthenticated: false, userRole: 'guest' },
+    );
+
+    expect(result.allow).toBe(true);
+  });
+
+  it('routeConfigLoader getRouteConfiguration works without performanceTracker (B1)', async () => {
+    const { getRouteConfiguration } = await import('../../src/utils/route/routeConfigLoader.js');
+
+    const routes = getRouteConfiguration();
+
+    expect(Array.isArray(routes)).toBe(true);
+    expect(routes.length).toBeGreaterThan(0);
+  });
+
+  it('routeNavigation setCurrentActiveRoute works without performanceTracker (A4)', async () => {
+    const {
+      setCurrentActiveRoute,
+      getCurrentActiveRoute,
+      clearNavigationHistory,
+    } = await import('../../src/utils/route/routeNavigation.js');
+
+    setCurrentActiveRoute({ slug: '/dashboard' });
+
+    expect(getCurrentActiveRoute()).toMatchObject({ slug: '/dashboard' });
+
+    clearNavigationHistory();
+
+    expect(getCurrentActiveRoute()).toBeNull();
+  });
 });

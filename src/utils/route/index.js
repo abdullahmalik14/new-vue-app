@@ -19,6 +19,7 @@ export {
 // Export route resolver functions
 export {
   resolveRouteFromPath,
+  resolveExactRouteFromPath,
   resolveComponentPathForRoute,
   inheritConfigurationFromParentRoute,
   getRouteChainForPath
@@ -28,11 +29,13 @@ export {
 export {
   runAllRouteGuards,
   guardPreventNavigationLoop,
+  guardCheckRouteEnvironmentAccess,
   guardCheckRouteEnabled,
+  guardCheckRouteAdminAccess,
   guardCheckAuthentication,
   guardCheckUserRole,
   guardCheckDependencies,
-  clearNavigationHistory as clearGuardNavigationHistory
+  clearGuardNavigationHistory
 } from './routeGuards.js';
 
 // Export navigation functions
@@ -49,4 +52,56 @@ export {
   isOnPath,
   wasPreviouslyOnPath
 } from './routeNavigation.js';
+
+export {
+  prefetchRouteComponent,
+  createRoutePrefetchIntentHandler
+} from './routeComponentPrefetch.js';
+
+export { useRoutePrefetch } from './useRoutePrefetch.js';
+
+export {
+  resolveRouteTransition,
+  ROUTE_TRANSITION_PRESETS,
+} from './routeTransition.js';
+
+export {
+  createRouteRenderError,
+  shouldClearRouteErrorOnNavigation,
+} from './routeErrorBoundary.js';
+
+export {
+  normalizeRoutePath,
+  buildLocaleOptionalRoutePath,
+  buildVueRouterAliases,
+  normalizeRedirectFromList,
+  normalizeAliasList,
+  routeConfigMatchesPath,
+  createRedirectFromRouteRecords,
+  findDuplicateRoutePathClaims,
+} from './routeAliases.js';
+
+export {
+  resolveCurrentSectionForNavigation,
+  startCurrentSectionResourceLoads,
+} from './routeNavigationData.js';
+
+export {
+  isAdminUser,
+  isRouteAccessibleToAdmin,
+} from './routeAdminAccess.js';
+
+export {
+  collectComponentPathsFromRoute,
+  collectComponentPathsFromRoutes,
+  componentPathToRelativeFile,
+  validateRouteComponentPathsWithResolver,
+} from './routeComponentPathValidator.js';
+
+export {
+  startNavigationProgress,
+  finishNavigationProgress,
+  failNavigationProgress,
+  useNavigationProgress,
+} from './navigationProgress.js';
 

@@ -10,18 +10,21 @@ const baseRoutes = [
     slug: '/log-in',
     section: 'auth',
     componentPath: '@/templates/auth/page/role/AuthLogIn.vue',
+    supportedRoles: ['all'],
     preLoadSections: ['dashboard', 'shop']
   },
   {
     slug: '/dashboard',
     section: 'dashboard-global',
     componentPath: '@/templates/dashboard/page/DashboardPage.vue',
+    supportedRoles: ['creator', 'fan', 'agent', 'vendor'],
     preLoadSections: []
   },
   {
     slug: '/shop',
     section: 'shop',
     componentPath: '@/templates/shop/page/ShopPage.vue',
+    supportedRoles: ['all'],
     preLoadSections: []
   }
 ];
@@ -117,6 +120,7 @@ describe('jsonConfigValidator preLoadSections (M-08)', () => {
           fan: 'dashboard-fan'
         },
         componentPath: '@/templates/dashboard/page/DashboardPage.vue',
+        supportedRoles: ['creator', 'fan'],
         preLoadSections: {
           creator: ['shop'],
           fan: ['unknown-section']
@@ -126,6 +130,7 @@ describe('jsonConfigValidator preLoadSections (M-08)', () => {
         slug: '/shop',
         section: 'shop',
         componentPath: '@/templates/shop/page/ShopPage.vue',
+        supportedRoles: ['all'],
         preLoadSections: []
       }
     ];
@@ -151,5 +156,114 @@ describe('jsonConfigValidator preLoadSections (M-08)', () => {
     );
 
     expect(unknownPreloadErrors).toHaveLength(0);
+    expect(result.valid).toBe(true);
+  });
+});
+
+describe('jsonConfigValidator supportedRoles (B4)', () => {
+  it('validateRouteConfig rejects empty supportedRoles', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+
+    const result = validateRouteConfig([
+      {
+        slug: '/open',
+        section: 'misc',
+        componentPath: '@/templates/misc/Open.vue',
+        supportedRoles: [],
+      },
+    ]);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((error) => error.field === 'supportedRoles')).toBe(true);
+  });
+
+  it('validateRouteConfig rejects deprecated "any" wildcard', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+
+    const result = validateRouteConfig([
+      {
+        slug: '/profile',
+        section: 'profile',
+        componentPath: '@/templates/profile/Profile.vue',
+        supportedRoles: ['any'],
+      },
+    ]);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((error) =>
+      error.field === 'supportedRoles' && error.message.includes('"any"')
+    )).toBe(true);
+  });
+
+  it('validateRouteConfig allows redirect-only routes without supportedRoles', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+
+    const result = validateRouteConfig([
+      {
+        slug: '/:pathMatch(.*)*',
+        redirect: '/404',
+      },
+    ]);
+
+    expect(result.valid).toBe(true);
+  });
+
+  it('production routeConfig uses supportedRoles convention', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+    const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
+    const routes = JSON.parse(
+      readFileSync(join(projectRoot, 'src/router/routeConfig.json'), 'utf8')
+    );
+
+    const result = validateRouteConfig(routes);
+    const roleErrors = result.errors.filter((error) => error.field === 'supportedRoles');
+
+    expect(roleErrors).toHaveLength(0);
+  });
+});
+
+describe('jsonConfigValidator section (A6)', () => {
+  it('validateRouteConfig fails when navigable route is missing section', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+
+    const result = validateRouteConfig([
+      {
+        slug: '/missing-section',
+        componentPath: '@/templates/misc/MissingSection.vue',
+        supportedRoles: ['all'],
+      },
+    ]);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((error) =>
+      error.type === 'MISSING_REQUIRED_FIELD' && error.field === 'section'
+    )).toBe(true);
+  });
+
+  it('validateRouteConfig allows redirect-only routes without section', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+
+    const result = validateRouteConfig([
+      {
+        slug: '/:pathMatch(.*)*',
+        redirect: '/404',
+      },
+    ]);
+
+    expect(result.valid).toBe(true);
+  });
+
+  it('production routeConfig has section on all navigable routes', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+    const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
+    const routes = JSON.parse(
+      readFileSync(join(projectRoot, 'src/router/routeConfig.json'), 'utf8')
+    );
+
+    const result = validateRouteConfig(routes);
+    const sectionErrors = result.errors.filter((error) => error.field === 'section');
+
+    expect(sectionErrors).toHaveLength(0);
+    expect(result.valid).toBe(true);
   });
 });

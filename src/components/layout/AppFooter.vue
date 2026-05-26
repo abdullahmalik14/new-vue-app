@@ -20,6 +20,7 @@
           <li v-for="route in visibleRoutes" :key="route.slug" class="text-sm">
             <router-link :to="route.slug"
               class="text-gray-600 hover:text-gray-900 hover:underline transition-colors duration-200"
+              @mouseenter="prefetchFooterRoute(route.slug)" @focus="prefetchFooterRoute(route.slug)"
               :class="{ 'font-medium text-blue-600': isCurrentRoute(route.slug) }">
               {{ getRouteDisplayName(route) }}
             </router-link>
@@ -55,6 +56,7 @@ import { logError } from '../../utils/common/errorHandler.js';
 import routeConfigImport from '../../router/routeConfig.json';
 import { loadJsonConfigFromImport } from '../../utils/common/jsonConfigLoader.js';
 import { validateRouteConfig } from '../../utils/build/jsonConfigValidator.js';
+import { prefetchRouteComponent } from '../../utils/route/routeComponentPrefetch.js';
 
 // Component name for logging
 const componentName = 'AppFooter';
@@ -193,6 +195,10 @@ const visibleRoutes = computed(() => {
  */
 function isCurrentRoute(routeSlug) {
   return route.path === routeSlug;
+}
+
+function prefetchFooterRoute(routeSlug) {
+  prefetchRouteComponent(routeSlug);
 }
 
 /**
