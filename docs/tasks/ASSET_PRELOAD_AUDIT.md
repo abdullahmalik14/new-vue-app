@@ -765,11 +765,114 @@ Section-level and preload I/O boundaries (e.g. `preloadSectionAssets`, `preloadI
 **File:** `assetMap.json` — majority of `production` and `development` entries  
 **Detail:** Many dashboard icons use `i.ibb.co` (third-party image host). No SLA, replaceable content, and not on your allowlist. Icons should be self-hosted under your CDN/app origin.
 
+#### Verification (2026-05-26) — **Not resolved**
+
+**Status:** Open — repo scan does not show a completed self-host migration for `assetMap.json` flags.
+
+**What was checked:**
+- `src/config/assetMap.json` and `public/config/assetMap.json` — **54** lines still reference `i.ibb.co` or `i.ibb.co.com` (same content in both files).
+- Affected flags include `dashboard.*`, `auth.background`, `logo.main`, `icon.input.right`, `icon.social.x`, and `icon.globe` (malformed host — see **S-07**).
+- `public/assets/icons/` has no mirrored `.webp` files for those flags (only section-bundle stubs under `public/assets/`).
+- Hundreds of hardcoded `i.ibb.co` URLs remain in Vue templates and mock data — separate from flag-based preload but the same security class.
+
+**Conflict check (prior preload work):**
+- **Does not override** changes from **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, or **AUDIT.md** — those passes fixed preload *behavior* (dedup, Cognito self-host **S2** / **P-07**, section rollup, etc.).
+- **S2** moved `script.cognito` to `/vendor/...` — that is unrelated to image hosting (**S-01**).
+- **S-06** (allowlist + build-time validation) is still open; completing **S-01** means copying assets to `/assets/...` (or your CDN) and updating map URLs — allowlist enforcement can follow in **S-06**.
+
+**Recommended fix (unchanged):** Download each icon, commit under `public/assets/icons/` (or production CDN), point every `assetMap.json` flag at same-origin paths in `development` and `production`. Optionally add CI check that rejects `i.ibb.co` in production env.
+
+**How to test in the browser (current state — expect third-party hosts until fixed):**
+1. Run `npm run dev`, log in, open `/dashboard`.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const { loadAssetMapConfig, getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+     await loadAssetMapConfig();
+     const flags = [
+       'dashboard.logo',
+       'dashboard.menu.analytics',
+       'auth.background',
+       'icon.globe'
+     ];
+     const urls = Object.fromEntries(
+       flags.map((f) => [f, getAssetUrl(f)])
+     );
+     const ibbHosts = Object.values(urls).filter(
+       (u) => typeof u === 'string' && /i\.ibb\.co/i.test(u)
+     );
+     const sameOrigin = Object.values(urls).filter(
+       (u) => typeof u === 'string' && u.startsWith('/')
+     );
+     const domIbb = document.querySelectorAll('img[src*="ibb.co"]').length;
+     console.log({
+       urls,
+       ibbCount: ibbHosts.length,
+       sameOriginCount: sameOrigin.length,
+       domIbbImages: domIbb,
+       s01StillOpen: ibbHosts.length > 0 || domIbb > 0
+     });
+   })();
+   ```
+3. **While S-01 is open:** `ibbCount > 0`, `s01StillOpen: true`, `urls` show `https://i.ibb.co/...` (or `i.ibb.co.com` for `icon.globe`).
+4. **After S-01 is fixed:** `ibbCount: 0`, map URLs start with `/assets/` (or your CDN host), dashboard icons still render from same-origin Network requests.
+
 ---
 
 ### S-02 — Third-party script loaded without Subresource Integrity (SRI) hash
 **File:** `assetMap.json` key `script.cognito` (production + development)  
 **Detail:** `https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.15/dist/amazon-cognito-identity.min.js` is loaded without an `integrity` attribute. If the CDN is compromised or the package is re-published under the same version, malicious JavaScript would execute with full page privileges. An SRI hash must be added to any external script `<link>` hint or `<script>` tag. host locally.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in prior **AUDIT.md** S2 pass — verified 2026-05-26; no new code changes this step).
+
+**What was broken:** `script.cognito` pointed at `cdn.jsdelivr.net` with no SRI on preload or load. A compromised CDN could run arbitrary JS on auth pages.
+
+**Why it happened:** The Cognito UMD bundle was referenced as an external CDN URL in `assetMap.json` and `/log-in` `assetPreload` instead of the app origin.
+
+**What changed (already in repo):**
+- Copied `amazon-cognito-identity-js@6.3.15` UMD to `public/vendor/amazon-cognito-identity-6.3.15.min.js`.
+- `script.cognito` in `src/config/assetMap.json` and `public/config/assetMap.json` → `/vendor/amazon-cognito-identity-6.3.15.min.js` (development + production).
+- `/log-in` `assetPreload` uses `{ "flag": "script.cognito", ... }` — no hardcoded CDN `src`.
+- `scriptAvailabilityChecker.js` default Cognito URL matches the vendor path.
+- **P-07** uses `rel="preload" as="script"` for this UMD bundle (not `modulepreload`).
+
+**Why SRI was not added:** Same-origin vendor hosting removes third-party CDN trust; SRI on same-origin scripts is optional and is not required once the script is self-hosted (per audit recommendation: “host locally”).
+
+**Conflict check:** No override of preload refactor — flag-based `assetPreload` and section rollup unchanged; only URL origin moved off jsdelivr. **S-03** (preloadScript SRI/allowlist) remains open for *other* external scripts.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/cognitoScriptSelfHost.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open `/log-in`.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const { loadAssetMapConfig, getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+     await loadAssetMapConfig();
+     const cognitoUrl = getAssetUrl('script.cognito');
+     const vendorRequests = performance
+       .getEntriesByType('resource')
+       .filter((r) => r.name.includes('amazon-cognito-identity'));
+     const jsdelivr = performance
+       .getEntriesByType('resource')
+       .filter((r) => r.name.includes('jsdelivr.net'));
+     const preloadLink = document.querySelector(
+       'link[href*="amazon-cognito-identity"]'
+     );
+     console.log({
+       cognitoUrl,
+       isSameOrigin: cognitoUrl?.startsWith('/vendor/'),
+       vendorRequestCount: vendorRequests.length,
+       jsdelivrRequestCount: jsdelivr.length,
+       preloadRel: preloadLink?.rel,
+       preloadAs: preloadLink?.getAttribute('as'),
+       amazonCognitoGlobal: typeof window.AmazonCognitoIdentity
+     });
+   })();
+   ```
+3. **Expected:** `isSameOrigin: true`, `jsdelivrRequestCount: 0`, `vendorRequestCount >= 0` (may be 0 until preload/network runs — visit `/log-in` once first), `preloadRel: "preload"`, `preloadAs: "script"`, `amazonCognitoGlobal: "object"` or `"function"` after assets load.
 
 ---
 
@@ -777,17 +880,130 @@ Section-level and preload I/O boundaries (e.g. `preloadSectionAssets`, `preloadI
 **File:** `assetPreloader.js` lines 324–364  
 **Detail:** The `src` is taken directly from the route config and injected as `link.href`. There is no validation that the URL belongs to an allowlisted origin, and no `integrity` attribute is ever set. A misconfigured or injected route config entry could cause an attacker-controlled script URL to be preloaded.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `preloadScript` accepted any `src` and appended `<link href="…">` with no origin check and no `integrity` support.
+
+**Why it happened:** Preload helpers trusted route/asset-map URLs without a final injection guard.
+
+**What changed:**
+- Added `src/utils/assets/assertAllowedPreloadUrl.js` — blocks `javascript:`, `data:`, `blob:`, protocol-relative URLs; allows `/…`, `https:` on same-origin / localhost / `VITE_ASSET_ALLOWED_HOSTS`; `http:` only on localhost.
+- `preloadScript` calls the validator before reserving in-flight work; blocked URLs log `[blocked]` and return `Promise.resolve()` (no DOM injection).
+- Production external `https` scripts require `options.integrity` (same-origin `/vendor/…` exempt — **S-02** path).
+- `createScriptPreloadLink` sets `link.integrity` (+ `crossOrigin: anonymous` when needed) from `options.integrity`.
+
+**Conflict check:** Aligns with **S-02** self-hosted Cognito; does not change section `modulepreload` bundles. **S-04** extends the same validator to image/font/media/JSON preloaders.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/assertAllowedPreloadUrl.test.js tests/unit/preloadScript.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open `/log-in`.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const { preloadScript } = await import('/src/utils/assets/assetPreloader.js');
+     const before = document.querySelectorAll('link').length;
+     await preloadScript('javascript:alert(1)');
+     const afterBlocked = document.querySelectorAll('link').length;
+     await preloadScript('/vendor/amazon-cognito-identity-6.3.15.min.js');
+     const cognitoLink = document.querySelector(
+       'link[href="/vendor/amazon-cognito-identity-6.3.15.min.js"]'
+     );
+     console.log({
+       linksAddedByJavascript: afterBlocked - before,
+       cognitoPreloadRel: cognitoLink?.rel,
+       cognitoPreloadAs: cognitoLink?.getAttribute('as')
+     });
+   })();
+   ```
+3. **Expected:** `linksAddedByJavascript: 0`; Cognito link uses `rel: "preload"`, `as: "script"`.
+
 ---
 
 ### S-04 — `assetPreloader` functions inject arbitrary `src` values into the DOM without sanitization
 **Files:** `assetPreloader.js` — all preload functions  
 **Detail:** URL values flow from route config → `getAssetUrl` → `link.href` → `document.head.appendChild(link)` with no sanitization. A `javascript:` scheme or crafted `data:` URI in the config would be injected into the DOM. At minimum, URLs should be validated against an allowlist of schemes (`https:`, `/`).
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `preloadImage`, `preloadFont`, `preloadMedia`, and `preloadJSON` appended/fetched URLs with no scheme or host checks.
+
+**Why it happened:** Only **S-03** scope (`preloadScript`) was missing guards; other preloaders assumed trusted config.
+
+**What changed:**
+- Shared `resolveAllowedPreloadSrc()` in `assetPreloader.js` wraps `assertAllowedPreloadUrl()` (from **S-03**).
+- `preloadImage`, `preloadFont`, `preloadMedia` — blocked URLs skip DOM injection (`Promise.resolve()`).
+- `preloadJSON` — blocked URLs return `null` without `fetch()`.
+- `preloadScript` already validated in **S-03** (includes production external-script `integrity` rule).
+
+**Conflict check:** No change to section preload architecture or `getAssetUrl` flag resolution.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/preloadUrlGuard.test.js tests/unit/assertAllowedPreloadUrl.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const { preloadImage, preloadFont } = await import('/src/utils/assets/assetPreloader.js');
+     const before = document.querySelectorAll('link').length;
+     await preloadImage('data:image/png;base64,xx');
+     await preloadFont('javascript:void(0)');
+     const after = document.querySelectorAll('link').length;
+     await preloadFont('/assets/fonts/primary.woff2');
+     console.log({
+       linksAfterBlocked: after - before,
+       allowedFontLink: !!document.querySelector('link[href="/assets/fonts/primary.woff2"]')
+     });
+   })();
+   ```
+3. **Expected:** `linksAfterBlocked: 0` (blocked schemes add no `<link>`); `allowedFontLink` depends on that path existing in your map (may be `false` if font not deployed — blocked count should still be `0`).
+
 ---
 
 ### S-05 — `validateAssetMap` accepts `http://` URLs without warning
 **File:** `assetLibrary.js` lines 1015–1018  
 **Detail:** coverts to https if ot localhost.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `http://` URLs in `assetMap.json` were accepted silently; non-localhost HTTP could be used in production preloads.
+
+**Why it happened:** `validateAssetMap()` only checked prefix shape; `getAssetUrl()` returned URLs unchanged.
+
+**What changed:**
+- Added `normalizeAssetMapUrl()` in `assetLibrary.js` — upgrades `http://` → `https://` except `localhost` / `127.0.0.1` / `[::1]`.
+- `getAssetUrl()` applies normalization before caching and returning resolved URLs.
+- `validateAssetMap()` emits warnings for non-localhost `http://` entries (stricter message for `production`).
+
+**Conflict check:** Complements **S-03/S-04** URL guards; does not change preload architecture.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/normalizeAssetMapUrl.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const { normalizeAssetMapUrl } = await import('/src/utils/assets/assetLibrary.js');
+     const samples = {
+       remoteHttp: normalizeAssetMapUrl('http://cdn.example.com/x.png'),
+       localhostHttp: normalizeAssetMapUrl('http://localhost:8080/x.png'),
+       relative: normalizeAssetMapUrl('/assets/x.png')
+     };
+     const { validateAssetMap } = await import('/src/utils/assets/assetLibrary.js');
+     const validation = await validateAssetMap();
+     const httpWarnings = validation.warnings.filter((w) => w.includes('HTTP'));
+     console.log({ samples, httpWarningCount: httpWarnings.length, httpWarnings: httpWarnings.slice(0, 3) });
+   })();
+   ```
+3. **Expected:** `remoteHttp` starts with `https://`; `localhostHttp` stays `http://`; `relative` unchanged. `httpWarningCount` is `0` unless your map still contains non-localhost `http://` entries.
 
 ---
 
@@ -839,11 +1055,96 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 
 **Outcome:** Flag resolution and preloading only use URLs from a build-verified map, each URL passes scheme/host/type rules, external scripts require SRI, and a compromised static file cannot silently redirect the whole app.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass). Implements audit items **1**, **3**, and **5** (partial **2** via tests); **4** (SRI in map), **6** (CSP), and **7** (S-01 self-host) remain follow-ups.
+
+**What was broken:** Production trusted a runtime `fetch('/config/assetMap.json')` that could be swapped without verification. `getAssetUrl()` returned any resolved string with no final URL policy check.
+
+**Why it happened:** Network map was tried before the bundled import; no build-time hash was compared on fetch.
+
+**What changed:**
+- **`assetMapSource.js`** — bundled map clone, `shouldAllowRuntimeAssetMapFetch()`, SHA-256 verify of fetched JSON text.
+- **`vite.config.js`** — injects `__ASSET_MAP_SHA256__` from `src/config/assetMap.json` file bytes at build time.
+- **`loadAssetMapConfig()`** — production and default dev use **build-time bundled map only** (`bundled-production` / `bundled-dev`). Network fetch runs only when `VITE_ASSET_MAP_RUNTIME_OVERRIDE=true` in dev; mismatched hash is rejected and falls back to bundled.
+- **`getAssetUrl()`** — runs `assertAllowedPreloadUrl()` (from **S-03/S-04**) before caching/returning; blocked URLs return `null`.
+- **`validateAssetMap()`** — non-localhost `http://` in **production** is now an **error** (not only a warning).
+- Exported `loadAssetMapConfig`, `getAssetMapConfigSource`, `clearAssetMapConfigCache`.
+- CI tests: `assetMapSource.test.js`, `assetMapConfig.test.js`, `assetMapBuildValidation.test.js` (route `assetPreload` flags exist in map).
+
+**Conflict check:** Supersedes **L-10** fetch-first dev behavior — dev now defaults to bundled map (safer). **S-02** Cognito vendor path unchanged. **S-01** (ibb.co icons) still open — `i.ibb.co` remains on a temporary allowlist in `assertAllowedPreloadUrl` so `auth.background` and login AssetHandler keep working until icons are self-hosted.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/assetMapSource.test.js tests/unit/assetMapConfig.test.js tests/unit/assetMapBuildValidation.test.js tests/unit/cognitoScriptSelfHost.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open any page.
+2. DevTools → **Console** — paste this IIFE (no `import.meta` — that only works inside Vite modules, not the console):
+   ```js
+   (async () => {
+     const {
+       clearAssetMapConfigCache,
+       loadAssetMapConfig,
+       getAssetMapConfigSource,
+       getAssetUrl
+     } = await import('/src/utils/assets/assetLibrary.js');
+     const { shouldAllowRuntimeAssetMapFetch, getBundledAssetMapSha256 } = await import(
+       '/src/utils/assets/assetMapSource.js'
+     );
+     clearAssetMapConfigCache();
+     await loadAssetMapConfig();
+     const cognito = await getAssetUrl('script.cognito');
+     console.log({
+       source: getAssetMapConfigSource(),
+       cognito,
+       runtimeOverrideEnabled: shouldAllowRuntimeAssetMapFetch(),
+       bundledHashDefined: Boolean(getBundledAssetMapSha256())
+     });
+   })();
+   ```
+3. **Expected (default dev):** `source: "bundled-dev"`, `cognito: "/vendor/amazon-cognito-identity-6.3.15.min.js"`, `runtimeOverrideEnabled: false`, `bundledHashDefined: true` (hash is a 64-char hex string — restart dev server after `assetMap.json` edits).
+4. **Login smoke test:** on `/log-in`, `await getAssetUrl('auth.background')` should return the ibb.co URL (legacy host allowlisted until **S-01**), not `null` — otherwise AssetHandler throws “Asset at index 2 missing url”.
+5. **Optional dev override:** set `VITE_ASSET_MAP_RUNTIME_OVERRIDE=true` in `.env.local`, restart dev server — then `runtimeOverrideEnabled: true`; a tampered `/config/assetMap.json` should be rejected (hash mismatch) and logs show `bundled-fallback`.
+
 ---
 
 ### S-07 — `icon.globe` uses a malformed `i.ibb.co.com` URL
 **File:** `assetMap.json` line 9 (development) and line 51 (production)  
 **Detail:** `"icon.globe": "https://i.ibb.co.com/mF9x2JG0/..."` — the domain `i.ibb.co.com` does not exist and is not the correct `i.ibb.co` hostname. This URL will always 404. In production it could be registered by a third party to serve arbitrary content. The `.com` suffix should be removed.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `icon.globe` pointed at `https://i.ibb.co.com/...` (invalid host). Same typo in `AuthHeader.vue` fallback.
+
+**Why it happened:** Copy-paste error appended `.com` to the ImgBB host `i.ibb.co`.
+
+**What changed:**
+- `src/config/assetMap.json` and `public/config/assetMap.json` — `icon.globe` → `https://i.ibb.co/mF9x2JG0/svgviewer-png-output-85.webp` (development + production).
+- `src/templates/auth/AuthHeader.vue` — `FALLBACK_GLOBE_ICON` updated to the same URL.
+
+**Conflict check:** Does not change preload architecture. **S-01** (moving all icons off ibb.co) remains open; this only fixes the malformed hostname.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/iconGlobeUrl.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open `/log-in` (auth header shows globe icon).
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const { getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+     const globe = await getAssetUrl('icon.globe');
+     const img = document.querySelector('img[alt="globe"]');
+     console.log({
+       globeFromMap: globe,
+       imgSrc: img?.src,
+       hasMalformedHost:
+         (globe && globe.includes('i.ibb.co.com')) ||
+         (img?.src && img.src.includes('i.ibb.co.com'))
+     });
+   })();
+   ```
+3. **Expected:** `globeFromMap` contains `https://i.ibb.co/mF9x2JG0/...` (no `.com` after `ibb.co`); `hasMalformedHost: false`. Network tab: globe image request host is `i.ibb.co`, not `i.ibb.co.com`.
 
 ---
 

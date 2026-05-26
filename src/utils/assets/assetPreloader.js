@@ -3,6 +3,7 @@
 import { log } from '../common/logHandler';
 import { logError } from '../common/errorHandler.js';
 import { getAssetUrl } from './assetLibrary';
+import { assertAllowedPreloadUrl } from './assertAllowedPreloadUrl.js';
 import { getAssetPreloadEntriesForSection } from './getAssetPreloadEntriesForSection.js';
 import { usePreloadStore } from '../../stores/usePreloadStore.js';
 
@@ -58,7 +59,47 @@ function createScriptPreloadLink(src, options) {
     link.crossOrigin = options.crossOrigin;
   }
 
+  if (options.integrity) {
+    link.integrity = options.integrity;
+    if (!link.crossOrigin) {
+      link.crossOrigin = 'anonymous';
+    }
+  }
+
   return link;
+}
+
+/**
+ * @param {string} src
+ * @param {string} reason
+ * @param {string} method
+ */
+function logBlockedPreload(src, reason, method) {
+  log('assetPreloader.js', method, 'blocked', 'Preload blocked by URL policy', { src, reason });
+  window.performanceTracker?.step({
+    step: `${method}_blocked`,
+    file: 'assetPreloader.js',
+    method,
+    flag: 'blocked',
+    purpose: 'Preload blocked by URL policy',
+  });
+}
+
+/**
+ * @param {string} src
+ * @param {string} method
+ * @param {string} assetType
+ * @returns {string|null} Normalized URL or null when blocked
+ */
+function resolveAllowedPreloadSrc(src, method, assetType) {
+  const check = assertAllowedPreloadUrl(src, { assetType });
+
+  if (!check.ok) {
+    logBlockedPreload(src, check.reason, method);
+    return null;
+  }
+
+  return check.url;
 }
 
 /**
@@ -96,6 +137,12 @@ function reserveLinkPreload(src) {
  */
 export function preloadImage(src, options = {}) {
   const preloadStore = usePreloadStore();
+
+  const safeSrc = resolveAllowedPreloadSrc(src, 'preloadImage', 'image');
+  if (!safeSrc) {
+    return Promise.resolve();
+  }
+  src = safeSrc;
 
   log('assetPreloader.js', 'preloadImage', 'start', 'Preloading image', { src, options });
   window.performanceTracker.step({
@@ -194,6 +241,12 @@ export function preloadImage(src, options = {}) {
  */
 export function preloadFont(src, options = {}) {
   const preloadStore = usePreloadStore();
+
+  const safeSrc = resolveAllowedPreloadSrc(src, 'preloadFont', 'font');
+  if (!safeSrc) {
+    return Promise.resolve();
+  }
+  src = safeSrc;
 
   log('assetPreloader.js', 'preloadFont', 'start', 'Preloading font', { src, options });
   window.performanceTracker.step({
@@ -295,6 +348,12 @@ export function preloadFont(src, options = {}) {
 export function preloadMedia(src, type = 'video', options = {}) {
   const preloadStore = usePreloadStore();
 
+  const safeSrc = resolveAllowedPreloadSrc(src, 'preloadMedia', 'media');
+  if (!safeSrc) {
+    return Promise.resolve();
+  }
+  src = safeSrc;
+
   log('assetPreloader.js', 'preloadMedia', 'start', 'Preloading media', { src, type, options });
   window.performanceTracker.step({
     step: 'preloadMedia_start',
@@ -394,6 +453,19 @@ export function preloadMedia(src, type = 'video', options = {}) {
 export function preloadScript(src, options = {}) {
   const preloadStore = usePreloadStore();
 
+  const urlCheck = assertAllowedPreloadUrl(src, { assetType: 'script' });
+  if (!urlCheck.ok) {
+    logBlockedPreload(src, urlCheck.reason, 'preloadScript');
+    return Promise.resolve();
+  }
+
+  src = urlCheck.url;
+
+  if (urlCheck.requiresIntegrity && !options.integrity) {
+    logBlockedPreload(src, 'missing-integrity', 'preloadScript');
+    return Promise.resolve();
+  }
+
   log('assetPreloader.js', 'preloadScript', 'start', 'Preloading script', { src, options });
   window.performanceTracker.step({
     step: 'preloadScript_start',
@@ -487,6 +559,12 @@ const jsonDataCache = new Map();
  */
 export async function preloadJSON(src, options = {}) {
   const preloadStore = usePreloadStore();
+
+  const safeSrc = resolveAllowedPreloadSrc(src, 'preloadJSON', 'json');
+  if (!safeSrc) {
+    return null;
+  }
+  src = safeSrc;
 
   log('assetPreloader.js', 'preloadJSON', 'start', 'Preloading JSON', { src, options });
   window.performanceTracker.step({

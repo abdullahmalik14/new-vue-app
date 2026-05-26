@@ -47,4 +47,24 @@ describe('preloadScript (P-07)', () => {
     expect(link?.rel).toBe('modulepreload');
     expect(link?.getAttribute('as')).toBeNull();
   });
+
+  it('blocks javascript: URLs without injecting a link (S-03)', async () => {
+    autoResolveLinkPreloads();
+    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+
+    await preloadScript('javascript:alert(1)');
+
+    expect(document.querySelectorAll('link').length).toBe(0);
+  });
+
+  it('sets integrity when provided for allowed scripts (S-03)', async () => {
+    autoResolveLinkPreloads();
+    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+    const url = '/vendor/amazon-cognito-identity-6.3.15.min.js';
+
+    await preloadScript(url, { integrity: 'sha384-test' });
+
+    const link = document.querySelector(`link[href="${url}"]`);
+    expect(link?.integrity).toBe('sha384-test');
+  });
 });

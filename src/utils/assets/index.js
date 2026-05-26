@@ -49,6 +49,10 @@ export {
   getAssetsByCategory,
   preloadAssetUrls,
   validateAssetMap,
+  normalizeAssetMapUrl,
+  loadAssetMapConfig,
+  getAssetMapConfigSource,
+  clearAssetMapConfigCache,
   setEnvironment,
   getEnvironment
 } from './assetLibrary';
