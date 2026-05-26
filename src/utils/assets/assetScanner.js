@@ -39,15 +39,10 @@ export function extractAssetsFromComponent(component) {
       });
     }
 
-    // Check for assets in setup function return
-    if (component.setup) {
-      const setupResult = component.setup();
-      if (setupResult && setupResult.preloadAssets && Array.isArray(setupResult.preloadAssets)) {
-        assets.push(...setupResult.preloadAssets);
-        log('assetScanner.js', 'extractAssetsFromComponent', 'found-setup', 'Found assets in setup return', { 
-          count: setupResult.preloadAssets.length 
-        });
-      }
+    // Do not call component.setup() — requires an active Vue instance (inject/provide/lifecycle).
+    // Declare preloadAssets on the component options object or use PRELOAD_ASSETS instead.
+    if (component.setup && !component.preloadAssets && !component.PRELOAD_ASSETS) {
+      log('assetScanner.js', 'extractAssetsFromComponent', 'skip-setup', 'Skipping setup() scan — use static preloadAssets or PRELOAD_ASSETS', {});
     }
 
     // Check for PRELOAD_ASSETS constant
@@ -332,12 +327,13 @@ export function normalizeAssetDefinition(asset) {
       return normalized;
     }
 
-    // If object, ensure required fields
+    // Spread first so computed fallbacks win over null/undefined on the source object
+    const src = asset.src || asset.url || asset.path;
     const normalized = {
-      src: asset.src || asset.url || asset.path,
-      type: asset.type || inferAssetType(asset.src || asset.url || asset.path),
-      priority: asset.priority || 'low',
-      ...asset
+      ...asset,
+      src: src || '',
+      type: asset.type || inferAssetType(src),
+      priority: asset.priority || 'low'
     };
 
     log('assetScanner.js', 'normalizeAssetDefinition', 'normalized', 'Asset definition normalized', { normalized });

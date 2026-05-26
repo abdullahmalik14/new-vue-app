@@ -16,6 +16,39 @@ import { usePreloadStore } from '../../stores/usePreloadStore.js';
 // Track in-progress preloads to avoid duplicate requests
 const preloadInProgress = new Map();
 
+/** @type {Record<string, number>} Higher value = scheduled earlier in preloadAssets */
+const ASSET_PRELOAD_PRIORITY_MAP = { critical: 4, high: 3, medium: 2, low: 1 };
+
+function getAssetPreloadPriorityValue(priority) {
+  return ASSET_PRELOAD_PRIORITY_MAP[priority] || 1;
+}
+
+/**
+ * Reserve an in-flight preload slot before DOM/network work.
+ * Double-checks the map so concurrent callers share one promise (L-03).
+ * @param {string} src - Asset URL used as the in-progress key
+ * @returns {{ existing: Promise<void> } | { promise: Promise<void>, resolve: Function, reject: Function }}
+ */
+function reserveLinkPreload(src) {
+  if (preloadInProgress.has(src)) {
+    return { existing: preloadInProgress.get(src) };
+  }
+
+  let resolve;
+  let reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  if (preloadInProgress.has(src)) {
+    return { existing: preloadInProgress.get(src) };
+  }
+
+  preloadInProgress.set(src, promise);
+  return { promise, resolve, reject };
+}
+
 /**
  * @function preloadImage
  * @description Preload an image asset
@@ -44,19 +77,22 @@ export function preloadImage(src, options = {}) {
       flag: 'cache-hit',
       purpose: 'Image already preloaded'
     });
-    return Promise.resolve(null);
+    return Promise.resolve();
   }
 
-  if (preloadInProgress.has(src)) {
+  const reserved = reserveLinkPreload(src);
+  if (reserved.existing) {
     log('assetPreloader.js', 'preloadImage', 'in-progress', 'Image preload already in progress', { src });
-    return preloadInProgress.get(src);
+    return reserved.existing;
   }
 
-  // Check if a link with the same href already exists in the DOM
+  const { promise, resolve, reject } = reserved;
+
   const existingLink = document.querySelector(`link[rel="preload"][href="${src}"]`);
   if (existingLink) {
     log('assetPreloader.js', 'preloadImage', 'already-exists', 'Image preload link already exists in DOM', { src });
     preloadStore.addAsset(src);
+    preloadInProgress.delete(src);
     window.performanceTracker.step({
       step: 'preloadImage_dom_exists',
       file: 'assetPreloader.js',
@@ -64,55 +100,50 @@ export function preloadImage(src, options = {}) {
       flag: 'dom-exists',
       purpose: 'Image preload link already in DOM'
     });
-    return Promise.resolve(null);
+    resolve();
+    return promise;
   }
 
-  const promise = new Promise((resolve, reject) => {
-    // Use link preload instead of Image object for better browser caching
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = src;
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'image';
+  link.href = src;
 
-    if (options.crossOrigin) {
-      link.crossOrigin = options.crossOrigin;
-    }
+  if (options.crossOrigin) {
+    link.crossOrigin = options.crossOrigin;
+  }
 
-    link.onload = () => {
-      preloadStore.addAsset(src);
-      preloadInProgress.delete(src);
-      log('assetPreloader.js', 'preloadImage', 'success', 'Image preloaded successfully', { src });
-      window.performanceTracker.step({
-        step: 'preloadImage_complete',
-        file: 'assetPreloader.js',
-        method: 'preloadImage',
-        flag: 'success',
-        purpose: 'Image preload complete'
-      });
-      resolve();
-    };
+  link.onload = () => {
+    preloadStore.addAsset(src);
+    preloadInProgress.delete(src);
+    log('assetPreloader.js', 'preloadImage', 'success', 'Image preloaded successfully', { src });
+    window.performanceTracker.step({
+      step: 'preloadImage_complete',
+      file: 'assetPreloader.js',
+      method: 'preloadImage',
+      flag: 'success',
+      purpose: 'Image preload complete'
+    });
+    resolve();
+  };
 
-    link.onerror = (error) => {
-      preloadInProgress.delete(src);
-      log('assetPreloader.js', 'preloadImage', 'error', 'Image preload failed', {
-        src,
-        error: error.message || 'Load error'
-      });
-      window.performanceTracker.step({
-        step: 'preloadImage_error',
-        file: 'assetPreloader.js',
-        method: 'preloadImage',
-        flag: 'error',
-        purpose: 'Image preload failed'
-      });
-      reject(new Error(`Failed to preload image: ${src}`));
-    };
+  link.onerror = (error) => {
+    preloadInProgress.delete(src);
+    log('assetPreloader.js', 'preloadImage', 'error', 'Image preload failed', {
+      src,
+      error: error.message || 'Load error'
+    });
+    window.performanceTracker.step({
+      step: 'preloadImage_error',
+      file: 'assetPreloader.js',
+      method: 'preloadImage',
+      flag: 'error',
+      purpose: 'Image preload failed'
+    });
+    reject(new Error(`Failed to preload image: ${src}`));
+  };
 
-    // Append to document head to start preload
-    document.head.appendChild(link);
-  });
-
-  preloadInProgress.set(src, promise);
+  document.head.appendChild(link);
   return promise;
 }
 
@@ -147,57 +178,72 @@ export function preloadFont(src, options = {}) {
     return Promise.resolve();
   }
 
-  if (preloadInProgress.has(src)) {
+  const fontReserved = reserveLinkPreload(src);
+  if (fontReserved.existing) {
     log('assetPreloader.js', 'preloadFont', 'in-progress', 'Font preload already in progress', { src });
-    return preloadInProgress.get(src);
+    return fontReserved.existing;
   }
 
-  const promise = new Promise((resolve, reject) => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'font';
-    link.href = src;
-    link.type = options.type || 'font/woff2';
+  const { promise: fontPromise, resolve: resolveFont, reject: rejectFont } = fontReserved;
 
-    if (options.crossOrigin !== false) {
-      link.crossOrigin = 'anonymous';
-    }
+  const existingFontLink = document.querySelector(`link[rel="preload"][href="${src}"]`);
+  if (existingFontLink) {
+    log('assetPreloader.js', 'preloadFont', 'already-exists', 'Font preload link already exists in DOM', { src });
+    preloadStore.addAsset(src);
+    preloadInProgress.delete(src);
+    window.performanceTracker.step({
+      step: 'preloadFont_dom_exists',
+      file: 'assetPreloader.js',
+      method: 'preloadFont',
+      flag: 'dom-exists',
+      purpose: 'Font preload link already in DOM'
+    });
+    resolveFont();
+    return fontPromise;
+  }
 
-    link.onload = () => {
-      preloadStore.addAsset(src);
-      preloadInProgress.delete(src);
-      log('assetPreloader.js', 'preloadFont', 'success', 'Font preloaded successfully', { src });
-      window.performanceTracker.step({
-        step: 'preloadFont_complete',
-        file: 'assetPreloader.js',
-        method: 'preloadFont',
-        flag: 'success',
-        purpose: 'Font preload complete'
-      });
-      resolve();
-    };
+  const fontLink = document.createElement('link');
+  fontLink.rel = 'preload';
+  fontLink.as = 'font';
+  fontLink.href = src;
+  fontLink.type = options.type || 'font/woff2';
 
-    link.onerror = (error) => {
-      preloadInProgress.delete(src);
-      log('assetPreloader.js', 'preloadFont', 'error', 'Font preload failed', {
-        src,
-        error: error.message || 'Load error'
-      });
-      window.performanceTracker.step({
-        step: 'preloadFont_error',
-        file: 'assetPreloader.js',
-        method: 'preloadFont',
-        flag: 'error',
-        purpose: 'Font preload failed'
-      });
-      reject(new Error(`Failed to preload font: ${src}`));
-    };
+  if (options.crossOrigin !== false) {
+    fontLink.crossOrigin = 'anonymous';
+  }
 
-    document.head.appendChild(link);
-  });
+  fontLink.onload = () => {
+    preloadStore.addAsset(src);
+    preloadInProgress.delete(src);
+    log('assetPreloader.js', 'preloadFont', 'success', 'Font preloaded successfully', { src });
+    window.performanceTracker.step({
+      step: 'preloadFont_complete',
+      file: 'assetPreloader.js',
+      method: 'preloadFont',
+      flag: 'success',
+      purpose: 'Font preload complete'
+    });
+    resolveFont();
+  };
 
-  preloadInProgress.set(src, promise);
-  return promise;
+  fontLink.onerror = (error) => {
+    preloadInProgress.delete(src);
+    log('assetPreloader.js', 'preloadFont', 'error', 'Font preload failed', {
+      src,
+      error: error.message || 'Load error'
+    });
+    window.performanceTracker.step({
+      step: 'preloadFont_error',
+      file: 'assetPreloader.js',
+      method: 'preloadFont',
+      flag: 'error',
+      purpose: 'Font preload failed'
+    });
+    rejectFont(new Error(`Failed to preload font: ${src}`));
+  };
+
+  document.head.appendChild(fontLink);
+  return fontPromise;
 }
 
 /**
@@ -232,57 +278,72 @@ export function preloadMedia(src, type = 'video', options = {}) {
     return Promise.resolve();
   }
 
-  if (preloadInProgress.has(src)) {
+  const mediaReserved = reserveLinkPreload(src);
+  if (mediaReserved.existing) {
     log('assetPreloader.js', 'preloadMedia', 'in-progress', 'Media preload already in progress', { src });
-    return preloadInProgress.get(src);
+    return mediaReserved.existing;
   }
 
-  const promise = new Promise((resolve, reject) => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = type;
-    link.href = src;
+  const { promise: mediaPromise, resolve: resolveMedia, reject: rejectMedia } = mediaReserved;
 
-    if (options.type) {
-      link.type = options.type;
-    }
+  const existingMediaLink = document.querySelector(`link[rel="preload"][href="${src}"]`);
+  if (existingMediaLink) {
+    log('assetPreloader.js', 'preloadMedia', 'already-exists', 'Media preload link already exists in DOM', { src });
+    preloadStore.addAsset(src);
+    preloadInProgress.delete(src);
+    window.performanceTracker.step({
+      step: 'preloadMedia_dom_exists',
+      file: 'assetPreloader.js',
+      method: 'preloadMedia',
+      flag: 'dom-exists',
+      purpose: 'Media preload link already in DOM'
+    });
+    resolveMedia();
+    return mediaPromise;
+  }
 
-    link.onload = () => {
-      preloadStore.addAsset(src);
-      preloadInProgress.delete(src);
-      log('assetPreloader.js', 'preloadMedia', 'success', 'Media preloaded successfully', { src, type });
-      window.performanceTracker.step({
-        step: 'preloadMedia_complete',
-        file: 'assetPreloader.js',
-        method: 'preloadMedia',
-        flag: 'success',
-        purpose: 'Media preload complete'
-      });
-      resolve();
-    };
+  const mediaLink = document.createElement('link');
+  mediaLink.rel = 'preload';
+  mediaLink.as = type;
+  mediaLink.href = src;
 
-    link.onerror = (error) => {
-      preloadInProgress.delete(src);
-      log('assetPreloader.js', 'preloadMedia', 'error', 'Media preload failed', {
-        src,
-        type,
-        error: error.message || 'Load error'
-      });
-      window.performanceTracker.step({
-        step: 'preloadMedia_error',
-        file: 'assetPreloader.js',
-        method: 'preloadMedia',
-        flag: 'error',
-        purpose: 'Media preload failed'
-      });
-      reject(new Error(`Failed to preload ${type}: ${src}`));
-    };
+  if (options.type) {
+    mediaLink.type = options.type;
+  }
 
-    document.head.appendChild(link);
-  });
+  mediaLink.onload = () => {
+    preloadStore.addAsset(src);
+    preloadInProgress.delete(src);
+    log('assetPreloader.js', 'preloadMedia', 'success', 'Media preloaded successfully', { src, type });
+    window.performanceTracker.step({
+      step: 'preloadMedia_complete',
+      file: 'assetPreloader.js',
+      method: 'preloadMedia',
+      flag: 'success',
+      purpose: 'Media preload complete'
+    });
+    resolveMedia();
+  };
 
-  preloadInProgress.set(src, promise);
-  return promise;
+  mediaLink.onerror = (error) => {
+    preloadInProgress.delete(src);
+    log('assetPreloader.js', 'preloadMedia', 'error', 'Media preload failed', {
+      src,
+      type,
+      error: error.message || 'Load error'
+    });
+    window.performanceTracker.step({
+      step: 'preloadMedia_error',
+      file: 'assetPreloader.js',
+      method: 'preloadMedia',
+      flag: 'error',
+      purpose: 'Media preload failed'
+    });
+    rejectMedia(new Error(`Failed to preload ${type}: ${src}`));
+  };
+
+  document.head.appendChild(mediaLink);
+  return mediaPromise;
 }
 
 /**
@@ -316,55 +377,70 @@ export function preloadScript(src, options = {}) {
     return Promise.resolve();
   }
 
-  if (preloadInProgress.has(src)) {
+  const scriptReserved = reserveLinkPreload(src);
+  if (scriptReserved.existing) {
     log('assetPreloader.js', 'preloadScript', 'in-progress', 'Script preload already in progress', { src });
-    return preloadInProgress.get(src);
+    return scriptReserved.existing;
   }
 
-  const promise = new Promise((resolve, reject) => {
-    const link = document.createElement('link');
-    link.rel = 'modulepreload';
-    link.href = src;
+  const { promise: scriptPromise, resolve: resolveScript, reject: rejectScript } = scriptReserved;
 
-    if (options.crossOrigin) {
-      link.crossOrigin = options.crossOrigin;
-    }
+  const existingScriptLink = document.querySelector(`link[rel="modulepreload"][href="${src}"]`);
+  if (existingScriptLink) {
+    log('assetPreloader.js', 'preloadScript', 'already-exists', 'Script preload link already exists in DOM', { src });
+    preloadStore.addAsset(src);
+    preloadInProgress.delete(src);
+    window.performanceTracker.step({
+      step: 'preloadScript_dom_exists',
+      file: 'assetPreloader.js',
+      method: 'preloadScript',
+      flag: 'dom-exists',
+      purpose: 'Script preload link already in DOM'
+    });
+    resolveScript();
+    return scriptPromise;
+  }
 
-    link.onload = () => {
-      preloadStore.addAsset(src);
-      preloadInProgress.delete(src);
-      log('assetPreloader.js', 'preloadScript', 'success', 'Script preloaded successfully', { src });
-      window.performanceTracker.step({
-        step: 'preloadScript_complete',
-        file: 'assetPreloader.js',
-        method: 'preloadScript',
-        flag: 'success',
-        purpose: 'Script preload complete'
-      });
-      resolve();
-    };
+  const scriptLink = document.createElement('link');
+  scriptLink.rel = 'modulepreload';
+  scriptLink.href = src;
 
-    link.onerror = (error) => {
-      preloadInProgress.delete(src);
-      log('assetPreloader.js', 'preloadScript', 'error', 'Script preload failed', {
-        src,
-        error: error.message || 'Load error'
-      });
-      window.performanceTracker.step({
-        step: 'preloadScript_error',
-        file: 'assetPreloader.js',
-        method: 'preloadScript',
-        flag: 'error',
-        purpose: 'Script preload failed'
-      });
-      reject(new Error(`Failed to preload script: ${src}`));
-    };
+  if (options.crossOrigin) {
+    scriptLink.crossOrigin = options.crossOrigin;
+  }
 
-    document.head.appendChild(link);
-  });
+  scriptLink.onload = () => {
+    preloadStore.addAsset(src);
+    preloadInProgress.delete(src);
+    log('assetPreloader.js', 'preloadScript', 'success', 'Script preloaded successfully', { src });
+    window.performanceTracker.step({
+      step: 'preloadScript_complete',
+      file: 'assetPreloader.js',
+      method: 'preloadScript',
+      flag: 'success',
+      purpose: 'Script preload complete'
+    });
+    resolveScript();
+  };
 
-  preloadInProgress.set(src, promise);
-  return promise;
+  scriptLink.onerror = (error) => {
+    preloadInProgress.delete(src);
+    log('assetPreloader.js', 'preloadScript', 'error', 'Script preload failed', {
+      src,
+      error: error.message || 'Load error'
+    });
+    window.performanceTracker.step({
+      step: 'preloadScript_error',
+      file: 'assetPreloader.js',
+      method: 'preloadScript',
+      flag: 'error',
+      purpose: 'Script preload failed'
+    });
+    rejectScript(new Error(`Failed to preload script: ${src}`));
+  };
+
+  document.head.appendChild(scriptLink);
+  return scriptPromise;
 }
 
 // Cache for JSON data
@@ -408,7 +484,7 @@ export async function preloadJSON(src, options = {}) {
     return preloadInProgress.get(src);
   }
 
-  const promise = new Promise(async (resolve, reject) => {
+  const loadPromise = (async () => {
     try {
       log('assetPreloader.js', 'preloadJSON', 'fetching', 'Fetching JSON file', { src });
 
@@ -420,10 +496,8 @@ export async function preloadJSON(src, options = {}) {
 
       const data = await response.json();
 
-      // Cache the parsed JSON data
       jsonDataCache.set(src, data);
       preloadStore.addAsset(src);
-      preloadInProgress.delete(src);
 
       log('assetPreloader.js', 'preloadJSON', 'success', 'JSON loaded and cached successfully', { src });
       window.performanceTracker.step({
@@ -434,9 +508,8 @@ export async function preloadJSON(src, options = {}) {
         purpose: 'JSON preload complete'
       });
 
-      resolve(data);
+      return data;
     } catch (error) {
-      preloadInProgress.delete(src);
       log('assetPreloader.js', 'preloadJSON', 'error', 'JSON load failed', {
         src,
         error: error.message,
@@ -449,12 +522,14 @@ export async function preloadJSON(src, options = {}) {
         flag: 'error',
         purpose: 'JSON preload failed'
       });
-      reject(new Error(`Failed to preload JSON: ${src} - ${error.message}`));
+      throw new Error(`Failed to preload JSON: ${src} - ${error.message}`);
+    } finally {
+      preloadInProgress.delete(src);
     }
-  });
+  })();
 
-  preloadInProgress.set(src, promise);
-  return promise;
+  preloadInProgress.set(src, loadPromise);
+  return loadPromise;
 }
 
 /**
@@ -562,41 +637,37 @@ export async function preloadAssets(assets) {
     purpose: 'Preload multiple assets'
   });
 
-  try {
-    // Sort by priority (high first)
-    const sortedAssets = [...assets].sort((a, b) => {
-      const priorityMap = { high: 3, medium: 2, low: 1 };
-      const aPriority = priorityMap[a.priority] || 1;
-      const bPriority = priorityMap[b.priority] || 1;
-      return bPriority - aPriority;
-    });
+  // Sort by priority (high first), then preload tier-by-tier so high finishes before low starts
+  const sortedAssets = [...assets].sort((a, b) => {
+    return getAssetPreloadPriorityValue(b.priority) - getAssetPreloadPriorityValue(a.priority);
+  });
 
-    log('assetPreloader.js', 'preloadAssets', 'sorted', 'Assets sorted by priority', { count: sortedAssets.length });
+  log('assetPreloader.js', 'preloadAssets', 'sorted', 'Assets sorted by priority', { count: sortedAssets.length });
 
-    // Preload all assets in parallel
-    await Promise.allSettled(sortedAssets.map(asset => preloadAsset(asset)));
+  let tierIndex = 0;
+  while (tierIndex < sortedAssets.length) {
+    const tierPriority = getAssetPreloadPriorityValue(sortedAssets[tierIndex].priority);
+    const tierAssets = [];
 
-    log('assetPreloader.js', 'preloadAssets', 'success', 'All assets preloaded', { count: assets.length });
-    window.performanceTracker.step({
-      step: 'preloadAssets_complete',
-      file: 'assetPreloader.js',
-      method: 'preloadAssets',
-      flag: 'success',
-      purpose: 'Multiple assets preload complete'
-    });
-  } catch (error) {
-    log('assetPreloader.js', 'preloadAssets', 'error', 'Error preloading assets', {
-      error: error.message,
-      stack: error.stack
-    });
-    window.performanceTracker.step({
-      step: 'preloadAssets_error',
-      file: 'assetPreloader.js',
-      method: 'preloadAssets',
-      flag: 'error',
-      purpose: 'Multiple assets preload failed'
-    });
+    while (
+      tierIndex < sortedAssets.length &&
+      getAssetPreloadPriorityValue(sortedAssets[tierIndex].priority) === tierPriority
+    ) {
+      tierAssets.push(sortedAssets[tierIndex]);
+      tierIndex += 1;
+    }
+
+    await Promise.allSettled(tierAssets.map(asset => preloadAsset(asset)));
   }
+
+  log('assetPreloader.js', 'preloadAssets', 'success', 'All assets preloaded', { count: assets.length });
+  window.performanceTracker.step({
+    step: 'preloadAssets_complete',
+    file: 'assetPreloader.js',
+    method: 'preloadAssets',
+    flag: 'success',
+    purpose: 'Multiple assets preload complete'
+  });
 }
 
 /**

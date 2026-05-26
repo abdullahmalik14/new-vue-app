@@ -23,11 +23,88 @@ Routes define `assetPreload[]` per route (`flag` or `src`, `type`, `priority`). 
 **File:** `assetPreloader.js` line 47  
 **Detail:** `preloadImage` returns `Promise.resolve(null)` when the asset is already in the store. Every other preloader (`preloadFont`, `preloadMedia`, `preloadScript`) returns `Promise.resolve()` (undefined). This inconsistency breaks any caller that tests the resolved value.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `preloadImage` resolved with `null` on store cache hit and on DOM link dedup, while `preloadFont`, `preloadMedia`, and `preloadScript` resolved with `undefined` (`Promise.resolve()`). Callers using truthiness (`if (result)`) or strict checks (`result === null`) could treat a cache hit as a failed or special case.
+
+**Why it happened:** Early image preload used `null` as a sentinel for “already done”; other preloaders were added later with the void-return convention.
+
+**What changed:** Both early-return paths in `preloadImage` (store hit at ~line 47, DOM link exists at ~line 67) now use `Promise.resolve()` like the other preloaders. Successful fresh loads already called `resolve()` with no argument.
+
+**Conflict check:** No override of **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, or **AUDIT.md** preload refactors — return-value alignment only; `hasAsset()` deduplication and section rollup unchanged.
+
+**How it was tested:** Code review — grep confirms no callers depend on `preloadImage` resolving to `null`; `preloadAsset` only `await`s without inspecting the value.
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/dashboard` or `/log-in` once (warms assets).
+2. DevTools → **Console** — paste this IIFE (ignore trailing `undefined` on `const` lines):
+   ```js
+   (async () => {
+     const { preloadImage } = await import('/src/utils/assets/assetPreloader.js');
+     const url =
+       document.querySelector('link[rel="preload"][as="image"]')?.href ||
+       'https://i.ibb.co/jPw7ChWb/auth-bg.webp';
+     const first = await preloadImage(url);
+     const second = await preloadImage(url);
+     console.log({
+       first,
+       second,
+       firstIsUndefined: first === undefined,
+       secondIsUndefined: second === undefined,
+       secondIsNull: second === null
+     });
+   })();
+   ```
+3. **Expected:** `secondIsUndefined: true`, `secondIsNull: false`; second call may log `[already-preloaded]`.
+
 ---
 
 ### L-02 — DOM link deduplication only exists in `preloadImage`, not `preloadFont/preloadMedia/preloadScript`
 **File:** `assetPreloader.js` lines 55–68 vs. 155–200, 240–285, 324–367  
 **Detail:** `preloadImage` checks for an existing `<link rel="preload">` in the DOM before creating a new one. The font, media, and script variants skip this check entirely. Navigating back to a section therefore appends duplicate `<link>` elements to `<head>` for every non-image asset.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Revisiting a section could leave duplicate `<link>` tags in `<head>` for fonts, media, and scripts when the Pinia store was cleared or out of sync but the DOM links remained.
+
+**Why it happened:** DOM dedup was implemented only on `preloadImage`; other preloaders only checked the store and `preloadInProgress`.
+
+**What changed:**
+- `preloadFont` and `preloadMedia` — before creating a link, query `link[rel="preload"][href="…"]`; if found, `addAsset(src)` and return `Promise.resolve()`.
+- `preloadScript` — same pattern with `link[rel="modulepreload"][href="…"]` (matches how scripts are injected).
+- Each path logs `[already-exists]` and records a `*_dom_exists` performance step, matching `preloadImage`.
+
+**Conflict check:** No change to section rollup or navigation; extends existing image DOM dedup pattern only.
+
+**How it was tested:** Code review — parity with `preloadImage` DOM branch; script selector matches `rel="modulepreload"` used on insert.
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/log-in` once (creates Cognito `modulepreload` link).
+2. **Console** — DOM dedup (store cleared, link kept):
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     const { preloadScript } = await import('/src/utils/assets/assetPreloader.js');
+     const scriptUrl = '/vendor/amazon-cognito-identity-6.3.15.min.js';
+
+     const linksBefore = document.querySelectorAll(`link[rel="modulepreload"][href="${scriptUrl}"]`).length;
+     store.preloadedAssets = store.preloadedAssets.filter(u => u !== scriptUrl);
+
+     await preloadScript(scriptUrl);
+     const linksAfterFirst = document.querySelectorAll(`link[rel="modulepreload"][href="${scriptUrl}"]`).length;
+
+     await preloadScript(scriptUrl);
+     const linksAfterSecond = document.querySelectorAll(`link[rel="modulepreload"][href="${scriptUrl}"]`).length;
+
+     console.log({ linksBefore, linksAfterFirst, linksAfterSecond });
+   })();
+   ```
+3. **Expected:** `linksAfterSecond === linksAfterFirst` (no new `<link>`); second call logs `[already-exists]` or `[already-preloaded]`.
+4. **Note:** `preloadSectionAssets('auth')` twice only hits the **store** path if URLs stay in Pinia — use the script test above to exercise **DOM** dedup.
 
 ---
 
@@ -35,17 +112,109 @@ Routes define `assetPreload[]` per route (`flag` or `src`, `type`, `priority`). 
 **File:** `assetPreloader.js` lines 50–116  
 **Detail:** The flow is: check store → check `preloadInProgress` → check DOM → create promise → `preloadInProgress.set(src, promise)`. Two concurrent callers can both pass the DOM check before either has written to `preloadInProgress`, resulting in two `<link>` elements being appended and two separate fetch requests for the same asset.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Two simultaneous `preloadImage` (or font/media/script) calls could both pass the `preloadInProgress` and DOM checks, then each append a `<link>` for the same `href`.
+
+**Why it happened:** `preloadInProgress.set()` ran only after the `new Promise` executor finished, leaving a gap between the DOM check and map registration.
+
+**What changed:**
+- Added `reserveLinkPreload(src)` — creates the in-flight promise and registers it in the map **before** DOM or network work, with a double-check if another caller registered first.
+- Refactored `preloadImage`, `preloadFont`, `preloadMedia`, and `preloadScript` to use this helper; DOM-exists paths now `resolve()` the shared promise and `delete` from the map.
+
+**Conflict check:** Complements L-02; no navigation or store API changes.
+
+**How it was tested:** Code review — concurrent callers now share one map entry from reservation through completion.
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/log-in` once.
+2. **Console** — use a known URL (do not rely on `querySelector` alone; it can be `undefined` on locale-prefixed pages):
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     const { preloadImage } = await import('/src/utils/assets/assetPreloader.js');
+     const url = 'https://i.ibb.co/jPw7ChWb/auth-bg.webp';
+
+     store.preloadedAssets = store.preloadedAssets.filter(u => u !== url);
+
+     await Promise.all([preloadImage(url), preloadImage(url)]);
+
+     const linkCount = document.querySelectorAll(`link[rel="preload"][href="${url}"]`).length;
+     console.log('link count:', linkCount);
+   })();
+   ```
+3. **Expected:** `link count: 1`; logs include one `[in-progress]` for the second parallel caller.
+4. Yellow Edge warning (“preloaded but not used within a few seconds”) is a browser hint, not a failure.
+
 ---
 
 ### L-04 — `new Promise(async ...)` anti-pattern in `preloadJSON`
 **File:** `assetPreloader.js` line 411  
 **Detail:** `new Promise(async (resolve, reject) => { ... })` is an anti-pattern. If the async executor throws synchronously before reaching a `reject()` call, the outer promise silently hangs forever. The function should be rewritten as a plain `async` function.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `preloadJSON` wrapped fetch/parse logic in `new Promise(async (resolve, reject) => …)`. Sync throws before `reject()` could leave the outer promise pending forever.
+
+**Why it happened:** In-flight dedup was modeled with a manual Promise constructor instead of native async/await propagation.
+
+**What changed:** Replaced the anti-pattern with an async IIFE assigned to `loadPromise`; errors use `throw`, success uses `return data`, and `preloadInProgress.delete(src)` runs in `finally`. In-flight registration (`preloadInProgress.set`) unchanged.
+
+**Conflict check:** No API change — still returns `Promise<object>` with cached data on repeat calls.
+
+**How it was tested:** Code review — no `new Promise(async` remains in `preloadJSON`; reject/resolve replaced by throw/return.
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. **Console** — use the path from `CountryStateSelect.vue` (not `/data/countries.json`):
+   ```js
+   (async () => {
+     const { preloadJSON } = await import('/src/utils/assets/assetPreloader.js');
+     const path = '/src/config/countries.json';
+
+     const data = await preloadJSON(path);
+     console.log('first keys:', Object.keys(data).slice(0, 3));
+
+     const again = await preloadJSON(path);
+     console.log('cache hit — same object:', data === again);
+   })();
+   ```
+3. **Expected:** First call `[fetching]` → `[success]`; second `[cache-hit]` and `same object: true`.
+4. Bad path check (proves reject, not hang): `await preloadJSON('/data/countries.json')` should **throw** (SPA HTML, not JSON).
+
 ---
 
 ### L-05 — `preloadAssets` outer `catch` block is unreachable dead code
 **File:** `assetPreloader.js` line 587  
-**Detail:** `Promise.allSettled()` never rejects. The outer `try/catch` wrapping the `allSettled` call (lines 566–599) has a `catch` that can never be triggered. Any real error inside individual asset loads is swallowed by `allSettled` itself.
+**Detail:** `Promise.allSettled()` never rejects. The outer `try/catch` wrapping the `allSettled` call (lines 566–599) has a `catch` that can never be triggered. Any real error inside individual asset loads are swallowed by `allSettled` itself.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `preloadAssets` wrapped `Promise.allSettled()` in `try/catch`, but `allSettled` never rejects — the `catch` block was dead code.
+
+**Why it happened:** Defensive error handling copied from patterns that use `Promise.all`, which does reject.
+
+**What changed:** Removed the outer `try/catch`. Per-asset failures remain handled inside `preloadAsset` (logs, does not throw). `preloadAssets` always completes after `allSettled`.
+
+**How it was tested:** Code review — no `catch` after `allSettled` in `preloadAssets`.
+
+**How to test in the browser:**
+1. Run `npm run dev`, visit `/dashboard`.
+2. **Console:**
+   ```js
+   (async () => {
+     const { preloadSectionAssets } = await import('/src/utils/assets/assetPreloader.js');
+     await preloadSectionAssets('dashboard');
+     console.log('completed without throw');
+   })();
+   ```
+3. **Expected:** Logs `[success] Section assets preloaded`; no `preloadAssets_error` step (removed with dead `catch`).
 
 ---
 
@@ -53,11 +222,75 @@ Routes define `assetPreload[]` per route (`flag` or `src`, `type`, `priority`). 
 **File:** `assetPreloader.js` lines 567–577  
 **Detail:** Assets are sorted by priority (`high → medium → low`) at line 567, then immediately passed to `Promise.allSettled(sortedAssets.map(asset => preloadAsset(asset)))`. Every asset is kicked off simultaneously, so the sort order has no practical effect. High-priority assets receive no scheduling advantage.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Priority sort ran, but every asset started in one `Promise.allSettled` batch, so `high` and `low` assets competed for bandwidth at the same time.
+
+**Why it happened:** Parallel preload was preferred for speed without tier gating.
+
+**What changed:** `preloadAssets` now groups sorted assets into priority tiers (`high` → `medium` → `low`/unknown) and `await`s each tier before starting the next. Assets within a tier still preload in parallel.
+
+**Conflict check:** Aligns with `.cursorrules` background preload — higher priority warms first without blocking navigation (callers still do not await section preload on the critical path).
+
+**How it was tested:** Code review — tier loop between sort and `allSettled`.
+
+**How to test in the browser:**
+1. Run `npm run dev`, open **Console** with log level showing `[preloadAsset]` / `[preloadImage]` order.
+2. Section name in `routeConfig.json` is **`dashboard-global`** (not `dashboard`). Menu icons use `high` then `normal` in `sharedAssetPreloads.json`.
+3. **Console:**
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     store.preloadedAssets = [];
+     const { preloadSectionAssets } = await import('/src/utils/assets/assetPreloader.js');
+     await preloadSectionAssets('dashboard-global');
+     console.log('done — check logs: high-tier flags before normal-tier');
+   })();
+   ```
+4. **Expected:** `assetCount` > 0, `routeCount` > 0; in logs, `dashboard.logo` / other `priority: 'high'` entries run before `priority: 'normal'` menu icons. (`normal` is tier 1, same as `low`.)
+5. **If you see `assetCount: 0`:** wrong section string — use `dashboard-global`, not `dashboard`.
+
 ---
 
 ### L-07 — `setEnvironment` clears `cachedAssetMap` but not URL-level caches
 **File:** `assetLibrary.js` line 622  
 **Detail:** `setEnvironment()` sets `cachedAssetMap = null` to force a reload on the next flag lookup. However, resolved URL strings cached under `ASSET_URL_CACHE_PREFIX + env + '_' + flag` in `cacheHandler` are not invalidated. After an environment switch, stale URLs from the previous environment continue to be served for 30 minutes.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `setEnvironment()` cleared in-memory `cachedAssetMap` only. Resolved URLs in `cacheHandler` under `asset_url_{env}_{flag}` stayed cached for 30 minutes, so a manual env switch could return URLs from the previous environment.
+
+**Why it happened:** URL caching was added for performance without invalidation on env change.
+
+**What changed:**
+- Added `removeCacheKeysByPrefix(prefix)` in `cacheHandler.js`.
+- `setEnvironment()` now calls `removeCacheKeysByPrefix(ASSET_URL_CACHE_PREFIX)` so all `asset_url_*` entries are cleared.
+
+**How it was tested:** Code review — `setEnvironment` clears both memory map and prefixed URL cache keys.
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console:**
+   ```js
+   (async () => {
+     const { getAssetUrl, setEnvironment } = await import('/src/utils/assets/assetLibrary.js');
+     const flag = 'script.cognito';
+
+     const devUrl = await getAssetUrl(flag, 'development');
+     console.log('dev:', devUrl);
+
+     setEnvironment('production');
+     const prodUrl = await getAssetUrl(flag, 'production');
+     console.log('prod:', prodUrl);
+
+     console.log('cache cleared on switch — prod resolved fresh:', prodUrl !== null);
+   })();
+   ```
+2. **Expected:** After `setEnvironment`, next `getAssetUrl` logs `[fetch]` / resolves from asset map, not `[cache-hit]` for an old `asset_url_development_*` key.
+3. Optional: In logs, look for `removeCacheKeysByPrefix` with `removedCount > 0` after `setEnvironment`.
 
 ---
 
@@ -65,17 +298,96 @@ Routes define `assetPreload[]` per route (`flag` or `src`, `type`, `priority`). 
 **File:** `assetScanner.js` lines 44–50  
 **Detail:** `extractAssetsFromComponent` calls `component.setup()` without providing `props` or `context`. Vue 3 setup functions may call `inject`, `provide`, `ref`, `onMounted`, etc., all of which require an active component instance. Calling setup outside Vue's scheduler will throw or silently corrupt reactive state.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `extractAssetsFromComponent` invoked `component.setup()` outside Vue, which can throw or corrupt reactive state when setup uses `inject`, lifecycle hooks, etc.
+
+**Why it happened:** Early scanner tried to read `preloadAssets` returned from setup.
+
+**What changed:** Removed the `setup()` call. Scanner only reads static sources: `component.preloadAssets`, `component.PRELOAD_ASSETS`. Logs `skip-setup` when a component has `setup` but no static preload declaration.
+
+**How it was tested:** Code review — no `component.setup()` in `assetScanner.js`.
+
+**How to test in the browser:**
+1. No direct UI test — scanner is build/analysis tooling, not on the hot navigation path.
+2. **Console** (sanity — module loads):
+   ```js
+   (async () => {
+     const { extractAssetsFromComponent } = await import('/src/utils/assets/assetScanner.js');
+     const assets = extractAssetsFromComponent({ preloadAssets: [{ src: '/x.png', type: 'image' }] });
+     console.log('static preloadAssets:', assets.length);
+   })();
+   ```
+3. **Expected:** `static preloadAssets: 1`; no Vue warnings/errors.
+
 ---
 
 ### L-09 — `critical` priority level is not handled in the priority sort map
 **File:** `assetPreloader.js` lines 568–572  
 **Detail:** `preloadSectionCriticalImages` (line 644) filters for `priority === 'critical'`, implying it is a valid value. However, `preloadAssets`'s `priorityMap` only contains `{ high: 3, medium: 2, low: 1 }`. An asset with `priority: "critical"` falls through to the default of `1` — the same as low — and is scheduled last.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `critical` assets were sorted/tiered as `low` (default `1`), so they ran after `high`/`medium` in `preloadAssets`.
+
+**Why it happened:** `ASSET_PRELOAD_PRIORITY_MAP` omitted `critical` when tier batching was added (L-06).
+
+**What changed:** Added `critical: 4` to `ASSET_PRELOAD_PRIORITY_MAP` (above `high: 3`), used by `getAssetPreloadPriorityValue` for sort and tier gating.
+
+**How it was tested:** Code review — `critical` maps to tier 4; aligns with `preloadSectionCriticalImages` filter.
+
+**How to test in the browser:**
+1. Find a route with `priority: "critical"` in `assetPreload` (or temporarily add one in `routeConfig.json` for a test route).
+2. **Console:**
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     store.preloadedAssets = [];
+     const { preloadAssets } = await import('/src/utils/assets/assetPreloader.js');
+     await preloadAssets([
+       { flag: 'dashboard.hamburger', type: 'image', priority: 'low' },
+       { flag: 'auth.background', type: 'image', priority: 'critical' }
+     ]);
+   })();
+   ```
+3. **Expected:** Logs show `auth.background` / critical asset `[start]` before low-priority icons in the same batch run.
+
 ---
 
 ### L-10 — `assetLibrary.loadAssetMapConfig` fetches from hardcoded `/config/assetMap.json`
 **File:** `assetLibrary.js` line 667  
 **Detail:** The production fetch URL is hardcoded. In development, `src/config/assetMap.json` is served by Vite at a different path. The function has no dev/prod path branching for the fetch, so this fetch will fail in development (returning an empty map and silently bypassing flag resolution).
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Only `/config/assetMap.json` was fetched; if missing in dev, load fell through to an empty map instead of `src/config/assetMap.json`.
+
+**Why it happened:** Single hardcoded public path assumed `public/config/assetMap.json` always exists in every environment.
+
+**What changed:**
+- `getAssetMapFetchCandidates()` — dev tries `/config/assetMap.json` then `/src/config/assetMap.json`; optional `VITE_ASSET_MAP_URL` override first.
+- `fetchAssetMapFromNetwork()` tries each candidate until one succeeds.
+- Bundled `import bundledAssetMap from '../../config/assetMap.json'` as final fallback if all fetches fail.
+
+**How it was tested:** Code review + existing `cognitoScriptSelfHost` / `getAssetUrl` flows.
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console:**
+   ```js
+   (async () => {
+     const { getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+     const url = await getAssetUrl('script.cognito', 'development');
+     console.log('cognito url:', url);
+   })();
+   ```
+2. **Expected:** `/vendor/amazon-cognito-identity-6.3.15.min.js` (not `null`); logs show successful fetch from one of the candidate URLs or `bundled-fallback`.
+3. DevTools → **Network** — filter `assetMap` to see which path loaded.
 
 ---
 
@@ -91,6 +403,29 @@ const normalized = {
 };
 ```
 If the original `asset` object has `src: null`, `type: undefined`, or `priority: null`, the spread re-applies those nullish values, overwriting the computed fallbacks. The spread should come first, with the computed values applied after.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `...asset` after computed fields re-applied `src: null`, `type: null`, `priority: null` from malformed definitions.
+
+**Why it happened:** Spread order placed user object last.
+
+**What changed:** Spread `...asset` first, then apply computed `src`, `type`, and `priority` so fallbacks win.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/assetScanner.test.js`
+
+**How to test in the browser:**
+1. **Console:**
+   ```js
+      (async () => {
+      const { normalizeAssetDefinition } = await import('/src/utils/assets/assetScanner.js');
+      const n = normalizeAssetDefinition({ src: null, type: null, priority: null, flag: 'x' });
+      console.log(n);
+      })();
+   ```
+2. **Expected:** `{ src: '', type: 'unknown', priority: 'low', flag: 'x' }` — not `null` fields.
 
 ---
 

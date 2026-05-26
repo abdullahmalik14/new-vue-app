@@ -19,9 +19,15 @@
 
 import { log } from '../common/logHandler.js';
 import { logError } from '../common/errorHandler.js';
-import { getValueFromCache, setValueWithExpiration, clearAllCache } from '../common/cacheHandler.js';
+import {
+  getValueFromCache,
+  setValueWithExpiration,
+  clearAllCache,
+  removeCacheKeysByPrefix
+} from '../common/cacheHandler.js';
 import { loadSectionManifest, getSectionBundlePaths } from '../build/manifestLoader.js';
 import { getRouteConfiguration } from '../route/routeConfigLoader.js';
+import bundledAssetMap from '../../config/assetMap.json';
 
 // ============================================================================
 // SECTION-BASED ASSET LOADING
@@ -618,8 +624,9 @@ export function setEnvironment(env) {
   currentEnvironment = env;
   log('assetLibrary.js', 'setEnvironment', 'set', 'Environment manually set', { environment: env });
 
-  // Clear asset map cache when environment changes
+  // Clear asset map and resolved URL caches when environment changes
   cachedAssetMap = null;
+  removeCacheKeysByPrefix(ASSET_URL_CACHE_PREFIX);
 }
 
 /**
@@ -629,6 +636,64 @@ export function setEnvironment(env) {
  */
 export function getEnvironment() {
   return detectEnvironment();
+}
+
+/**
+ * Candidate URLs for runtime asset map fetch (dev may serve from public or /src).
+ * @returns {string[]}
+ */
+function getAssetMapFetchCandidates() {
+  const candidates = ['/config/assetMap.json'];
+
+  if (import.meta.env.DEV) {
+    candidates.push('/src/config/assetMap.json');
+  }
+
+  const override = import.meta.env.VITE_ASSET_MAP_URL;
+  if (override && typeof override === 'string') {
+    candidates.unshift(override);
+  }
+
+  return candidates;
+}
+
+/**
+ * Fetch asset map JSON from the first reachable candidate URL.
+ * @returns {Promise<object|null>}
+ */
+async function fetchAssetMapFromNetwork() {
+  for (const url of getAssetMapFetchCandidates()) {
+    try {
+      log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'fetch', 'Fetching asset map', { url });
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'warn', 'Asset map fetch failed for URL', {
+          url,
+          status: response.status
+        });
+        continue;
+      }
+
+      const assetMap = await response.json();
+
+      if (!assetMap || typeof assetMap !== 'object') {
+        log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'warn', 'Invalid asset map JSON', { url });
+        continue;
+      }
+
+      log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'success', 'Asset map loaded from network', { url });
+      return assetMap;
+    } catch (error) {
+      log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'warn', 'Asset map fetch error', {
+        url,
+        error: error.message
+      });
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -659,20 +724,20 @@ async function loadAssetMapConfig() {
     return assetMapLoadPromise;
   }
 
-  // Load from JSON file
+  // Load from network (public or dev /src path), then bundled src/config fallback
   assetMapLoadPromise = (async () => {
     try {
-      log('assetLibrary.js', 'loadAssetMapConfig', 'fetch', 'Fetching asset map from JSON file', {});
+      log('assetLibrary.js', 'loadAssetMapConfig', 'fetch', 'Loading asset map', {
+        candidates: getAssetMapFetchCandidates()
+      });
 
-      const response = await fetch('/config/assetMap.json');
+      let assetMap = await fetchAssetMapFromNetwork();
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch asset map: ${response.status} ${response.statusText}`);
+      if (!assetMap) {
+        log('assetLibrary.js', 'loadAssetMapConfig', 'bundled-fallback', 'Using bundled asset map', {});
+        assetMap = bundledAssetMap;
       }
 
-      const assetMap = await response.json();
-
-      // Validate structure
       if (!assetMap || typeof assetMap !== 'object') {
         throw new Error('Invalid asset map structure');
       }
