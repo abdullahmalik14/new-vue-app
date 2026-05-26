@@ -85,7 +85,7 @@
                           <span>
                             <span :data-value="store.subscribers?.daily?.new"
                               class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                                store.subscribers?.daily?.new || '--' }}</span>
+                                store.subscribers?.daily?.new ?? '--' }}</span>
                           </span>
 
                           <!-- right part only show when data are here -->
@@ -109,7 +109,7 @@
 
                           </div>
                         </div>
-                        <div class="w-full" v-if="store.subscribers?.daily?.new">
+                        <div class="w-full" v-if="store.subscribers?.daily?.new != null">
                           <SparkLine :data="[3, 4, 3, 5, 4, 6, 5, 7, 6, 8]" color="#22c55e" :height="28" />
                         </div>
                       </div>
@@ -130,7 +130,7 @@
                           <span>
                             <span :data-value="store.subscribers?.daily?.recurring"
                               class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                                store.subscribers?.daily?.recurring || '--' }}</span>
+                                store.subscribers?.daily?.recurring ?? '--' }}</span>
                           </span>
                           <!-- right part only show when data are here -->
                           <div v-if="
@@ -154,7 +154,7 @@
                             </div>
                           </div>
                         </div>
-                        <div v-if="store.subscribers?.daily?.recurring" class="w-full">
+                        <div v-if="store.subscribers?.daily?.recurring != null" class="w-full">
                           <SparkLine :data="[5, 6, 5, 4, 5, 6, 7, 6, 5, 6]" color="#22c55e" :width="70" :height="28" />
                         </div>
                       </div>
@@ -201,7 +201,7 @@
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="store.fans?.daily?.newFollowers"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
-                            {{ store.fans?.daily?.newFollowers || '--' }}</span>
+                            {{ store.fans?.daily?.newFollowers ?? '--' }}</span>
                           <div v-if="
                             store.fans?.daily?.newFollowersPercentage !== undefined &&
                             store.fans?.daily?.newFollowersPercentage !== null
@@ -223,7 +223,7 @@
 
                           </div>
                         </div>
-                        <div v-if="store.fans?.daily?.newFollowers" class="w-full">
+                        <div v-if="store.fans?.daily?.newFollowers != null" class="w-full">
                           <SparkLine :data="[8, 7, 6, 7, 5, 6, 4, 5, 4, 3]" color="#ef4444" :width="60" :height="24" />
                         </div>
                       </div>
@@ -236,7 +236,7 @@
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="store.fans?.daily?.profileVisit"
                             class="text-[1.875rem] font-semibold font-sans leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
-                            {{ store.fans?.daily?.profileVisit || '--' }}</span>
+                            {{ store.fans?.daily?.profileVisit ?? '--' }}</span>
                           <div v-if="
                             store.fans?.daily?.profileVisitPercentage !== undefined &&
                             store.fans?.daily?.profileVisitPercentage !== null
@@ -259,7 +259,7 @@
 
                           </div>
                         </div>
-                        <div v-if="store.fans?.daily?.profileVisit" class="w-full">
+                        <div v-if="store.fans?.daily?.profileVisit != null" class="w-full">
                           <SparkLine :data="[20, 22, 21, 24, 23, 26, 25, 28, 27, 31]" color="#ef4444" :width="60"
                             :height="24" />
                         </div>
@@ -300,13 +300,13 @@
                   <div class="flex justify-between items-end">
                     <span>
                       <span
-                        :data-value="(store.earnings?.daily && store.earnings.daily.length > 0) ? store.earnings.daily[store.earnings.daily.length - 1].total : ''"
+                        :data-value="store.earningsInsights?.daily?.total"
                         class="text-[2.25rem] font-semibold leading-[2.75rem] font-sans tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                          (store.earnings?.daily && store.earnings.daily.length > 0 && store.earnings.daily[store.earnings.daily.length - 1].total) ?
-                            Number(store.earnings.daily[store.earnings.daily.length - 1].total).toLocaleString('en-US') :
+                          store.earningsInsights?.daily?.total != null ?
+                            Number(store.earningsInsights.daily.total).toLocaleString('en-US') :
                             '--'
                         }}</span>
-                      <span v-if="(store.earnings?.daily && store.earnings.daily.length > 0 && store.earnings.daily[store.earnings.daily.length - 1].total)"
+                      <span v-if="store.earningsInsights?.daily?.total != null"
                         class="text-base font-medium leading-6 font-sans text-light-text-secondary dark:text-dark-text-secondary ml-1">USD</span>
                     </span>
                     <div v-if="store.earningsInsights?.daily?.percentage !== null"
@@ -327,7 +327,7 @@
 
                     </div>
                   </div>
-                  <div v-if="(store.earnings?.daily && store.earnings.daily.length > 0 && store.earnings.daily[store.earnings.daily.length - 1].total)" class="w-full mt-auto">
+                  <div v-if="store.earningsInsights?.daily?.total != null" class="w-full mt-auto">
                     <SparkLine :data="store.earningsInsights.daily.sparklineData" color="#22c55e" :height="28" />
                   </div>
                 </div>
@@ -370,7 +370,7 @@
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="store.likes?.media"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
-                            {{ store.likes?.media ? Number(store.likes.media).toLocaleString('en-US') : '--'
+                            {{ store.likes?.media != null ? Number(store.likes.media).toLocaleString('en-US') : '--'
                             }}</span>
                           <div v-if="
                             store.likes?.mediaPercentage !== undefined &&
@@ -393,7 +393,7 @@
                           </div>
 
                         </div>
-                        <div v-if="store.likes?.media" class="w-full">
+                        <div v-if="store.likes?.media != null" class="w-full">
                           <SparkLine :data="[95, 90, 88, 85, 82, 80, 78, 76]" color="#ef4444" :width="55"
                             :height="22" />
                         </div>
@@ -406,7 +406,7 @@
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="store.likes?.merch"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">{{
-                              store.likes?.merch || '--' }}</span>
+                              store.likes?.merch ?? '--' }}</span>
                           <div v-if="
                             store.likes?.merchPercentage !== undefined &&
                             store.likes?.merchPercentage !== null
@@ -428,7 +428,7 @@
                             </div>
                           </div>
                         </div>
-                        <div v-if="store.likes?.merch" class="w-full">
+                        <div v-if="store.likes?.merch != null" class="w-full">
                           <SparkLine :data="[5, 4, 4, 3, 3, 3, 2, 2]" color="#ef4444" :width="55" :height="22" />
                         </div>
                       </div>
@@ -448,7 +448,7 @@
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="store.likes?.profile"
                             class="text-[1.875rem] font-semibold font-sans leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">{{
-                              store.likes?.profile ? Number(store.likes.profile).toLocaleString('en-US') : '--'
+                              store.likes?.profile != null ? Number(store.likes.profile).toLocaleString('en-US') : '--'
                             }}</span>
                           <div v-if="
                             store.likes?.profilePercentage !== undefined &&
@@ -470,7 +470,7 @@
 
                           </div>
                         </div>
-                        <div v-if="store.likes?.profile" class="w-full">
+                        <div v-if="store.likes?.profile != null" class="w-full">
                           <SparkLine :data="[8000, 8500, 9000, 9500, 10000, 10500, 11000, 12000]" color="#22c55e"
                             :width="55" :height="22" />
                         </div>
@@ -483,7 +483,7 @@
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="store.likes?.feed"
                             class="text-[1.875rem] font-semibold leading-[2.375rem] font-sans text-light-text-primary dark:text-dark-text-primary">{{
-                              store.likes?.feed ? Number(store.likes.feed).toLocaleString('en-US') : '--'
+                              store.likes?.feed != null ? Number(store.likes.feed).toLocaleString('en-US') : '--'
                             }}</span>
                           <div v-if="
                             store.likes?.feedPercentage !== undefined &&
@@ -504,7 +504,7 @@
                             </div>
                           </div>
                         </div>
-                        <div v-if="store.likes?.feed" class="w-full">
+                        <div v-if="store.likes?.feed != null" class="w-full">
                           <SparkLine :data="[2800, 3000, 3200, 3500, 3700, 3900, 4200, 4500]" color="#22c55e"
                             :width="55" :height="22" />
                         </div>
