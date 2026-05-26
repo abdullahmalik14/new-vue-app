@@ -9,9 +9,25 @@ const routeCatalog = [
     componentPath: '@/templates/dashboard/page/role/Dashboard.vue'
   },
   {
-    slug: '/analytics',
+    slug: '/dashboard/analytics',
     enabled: true,
     componentPath: '@/templates/analytics/AnalyticsPage.vue'
+  },
+  {
+    slug: '/payout',
+    enabled: true,
+    componentPath: '@/templates/payout/PayoutPage.vue'
+  },
+  {
+    slug: '/dashboard/payout',
+    enabled: true,
+    customComponentPath: {
+      creator: { componentPath: '@/templates/dashboard/page/creator/DashboardPayoutCreator.vue' }
+    }
+  },
+  {
+    slug: '/analytics',
+    redirect: '/dashboard/analytics'
   },
   {
     slug: '/sign-up',
@@ -33,7 +49,12 @@ vi.mock('../../src/utils/section/sectionPreloadOrchestrator.js', () => ({
 }));
 
 vi.mock('../../src/utils/route/routeResolver.js', () => ({
-  resolveComponentPathForRoute: vi.fn((route) => route.componentPath)
+  resolveComponentPathForRoute: vi.fn((route) => {
+    if (route.customComponentPath?.creator) {
+      return route.customComponentPath.creator.componentPath;
+    }
+    return route.componentPath;
+  })
 }));
 
 vi.mock('../../src/utils/route/routeComponentLoader.js', () => ({
@@ -58,14 +79,40 @@ describe('routeComponentPrefetch (P10)', () => {
     expect(mockLoader).toHaveBeenCalledTimes(1);
   });
 
-  it('resolves /dashboard/analytics menu path to /analytics route', async () => {
+  it('prefetches /dashboard/analytics on exact prefixed menu path', async () => {
     const { prefetchRouteComponent } = await import('../../src/utils/route/routeComponentPrefetch.js');
     const { resolveComponentPathForRoute } = await import('../../src/utils/route/routeResolver.js');
 
     await prefetchRouteComponent('/dashboard/analytics');
 
     expect(resolveComponentPathForRoute).toHaveBeenCalledWith(
-      expect.objectContaining({ slug: '/analytics' }),
+      expect.objectContaining({ slug: '/dashboard/analytics' }),
+      expect.any(String)
+    );
+    expect(mockLoader).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves legacy /analytics hover to /dashboard/analytics route', async () => {
+    const { prefetchRouteComponent } = await import('../../src/utils/route/routeComponentPrefetch.js');
+    const { resolveComponentPathForRoute } = await import('../../src/utils/route/routeResolver.js');
+
+    await prefetchRouteComponent('/analytics');
+
+    expect(resolveComponentPathForRoute).toHaveBeenCalledWith(
+      expect.objectContaining({ slug: '/dashboard/analytics' }),
+      expect.any(String)
+    );
+    expect(mockLoader).toHaveBeenCalledTimes(1);
+  });
+
+  it('prefetches /payout shared page without aliasing to /dashboard/payout', async () => {
+    const { prefetchRouteComponent } = await import('../../src/utils/route/routeComponentPrefetch.js');
+    const { resolveComponentPathForRoute } = await import('../../src/utils/route/routeResolver.js');
+
+    await prefetchRouteComponent('/payout');
+
+    expect(resolveComponentPathForRoute).toHaveBeenCalledWith(
+      expect.objectContaining({ slug: '/payout' }),
       expect.any(String)
     );
     expect(mockLoader).toHaveBeenCalledTimes(1);

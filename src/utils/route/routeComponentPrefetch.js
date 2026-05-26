@@ -19,7 +19,7 @@ const prefetchInProgress = new Map();
 let routeBySlugCache = null;
 
 const PATH_ALIASES = {
-  '/shops': '/shop'
+  '/shops': '/shop',
 };
 
 /**
@@ -83,6 +83,8 @@ function buildPrefetchPathCandidates(menuPath) {
 
   if (menuPath.startsWith('/dashboard/')) {
     candidates.push(menuPath.slice('/dashboard'.length) || '/');
+  } else if (menuPath !== '/dashboard') {
+    candidates.push(`/dashboard${menuPath}`);
   }
 
   return [...new Set(candidates.filter(Boolean))];

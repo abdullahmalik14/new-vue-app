@@ -225,9 +225,14 @@ export function generateContentPathsForSection(sectionName, sectionMetadata, bas
     const contentPaths = [];
     const baseFolders = new Set();
 
-    // Add global layout components (navbar, footer, etc.) to EVERY section
-    // These are shared across all pages and need their styles in every section
+    // Shared chrome scanned into every section bundle (see Preloading Task 4 section CSS swap).
+    // Layout nav/footer plus dashboard shell used by routes outside dashboard-* sections
+    // (e.g. /dashboard/analytics, /payout in misc) so Tailwind utilities like hidden/md:block survive
+    // when unloadSectionCss removes the previous section stylesheet.
     contentPaths.push(`${baseDir}/components/layout/**/*.vue`);
+    contentPaths.push(`${baseDir}/components/dashboard/**/*.vue`);
+    contentPaths.push(`${baseDir}/templates/dashboard/DashboardSidebar.vue`);
+    contentPaths.push(`${baseDir}/templates/dashboard/HeaderResponsive.vue`);
     contentPaths.push(`${baseDir}/App.vue`);
 
     // Add component paths

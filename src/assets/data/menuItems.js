@@ -9,7 +9,7 @@ export const menuItems = [
     title: "Analytics", // Fallback text
     translationKey: "dashboard.menu.analytics", // Translation key
     image: "dashboard.menu.analytics", // Asset flag instead of hardcoded URL
-    route: "/analytics",
+    route: "/dashboard/analytics",
     parent: false,
     children: [],
     enabled: true

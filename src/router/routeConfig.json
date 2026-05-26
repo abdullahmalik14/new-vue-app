@@ -1087,15 +1087,19 @@
   },
   {
     "slug": "/payout",
-    "section": "misc",
+    "section": "dashboard-global",
+    "requiresAuth": true,
+    "redirectIfNotAuth": "/log-in",
     "componentPath": "@/templates/payout/PayoutPage.vue",
     "supportedRoles": [
       "all"
     ]
   },
   {
-    "slug": "/analytics",
-    "section": "misc",
+    "slug": "/dashboard/analytics",
+    "section": "dashboard-global",
+    "requiresAuth": true,
+    "redirectIfNotAuth": "/log-in",
     "componentPath": "@/templates/analytics/AnalyticsPage.vue",
     "supportedRoles": [
       "all"
