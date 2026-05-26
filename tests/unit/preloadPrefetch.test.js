@@ -37,6 +37,19 @@ describe('preload prefetch hint (M-03)', () => {
     expect(link?.getAttribute('fetchpriority')).toBe('low');
   });
 
+  it('uses rel=prefetch for normal-priority images (C-03)', async () => {
+    autoResolveLinkPreloads();
+    const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');
+    const url = '/assets/bg-normal.webp';
+
+    await preloadImage(url, { priority: 'normal' });
+
+    const link = document.querySelector(`link[href="${url}"]`);
+    expect(link?.rel).toBe('prefetch');
+    expect(link?.as).toBe('image');
+    expect(link?.getAttribute('fetchpriority')).toBe('auto');
+  });
+
   it('uses rel=preload for high-priority images', async () => {
     autoResolveLinkPreloads();
     const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');

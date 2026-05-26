@@ -7,6 +7,11 @@
 
 import { log } from '../common/logHandler.js';
 import { logError } from '../common/errorHandler.js';
+import sharedAssetPreloads from '../../router/sharedAssetPreloads.json';
+import {
+  validateAssetPreloadEntryShape,
+  validateRouteAssetPreloadRefs,
+} from '../assets/validateRouteAssetPreloadFlags.js';
 import { isValidRouteEnvAccess } from '../route/routeEnvAccess.js';
 import { findDuplicateRoutePathClaims } from '../route/routeAliases.js';
 
@@ -417,6 +422,42 @@ export function validateRouteConfig(routes) {
         message: `Route at index ${index} (${route.slug}) has invalid preloadExclude type`,
         expected: 'boolean',
         received: typeof route.preloadExclude
+      });
+    }
+
+    // C-09: inline assetPreload shape + assetPreloadRef keys (expanded flag checks run in routeConfigLoader)
+    if (route.assetPreloadRef) {
+      for (const message of validateRouteAssetPreloadRefs(route, sharedAssetPreloads)) {
+        errors.push({
+          type: 'INVALID_ASSET_PRELOAD_REF',
+          routeIndex: index,
+          field: 'assetPreloadRef',
+          message,
+          route,
+        });
+      }
+    }
+
+    if (Array.isArray(route.assetPreload)) {
+      route.assetPreload.forEach((entry, entryIndex) => {
+        for (const message of validateAssetPreloadEntryShape(entry, route.slug, entryIndex)) {
+          errors.push({
+            type: 'INVALID_ASSET_PRELOAD_ENTRY',
+            routeIndex: index,
+            field: 'assetPreload',
+            message,
+            route,
+          });
+        }
+      });
+    } else if (route.assetPreload !== undefined) {
+      errors.push({
+        type: 'INVALID_FIELD_TYPE',
+        routeIndex: index,
+        field: 'assetPreload',
+        message: `Route at index ${index} (${route.slug}) has invalid assetPreload type`,
+        expected: 'array',
+        received: typeof route.assetPreload,
       });
     }
 

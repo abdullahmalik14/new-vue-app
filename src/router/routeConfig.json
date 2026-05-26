@@ -922,7 +922,6 @@
     ],
     "enabled": true,
     "componentPath": "@/templates/shop/ShopWrapper.vue",
-    "assetPreloadRef": "dashboardMenuIcons",
     "preLoadSections": [
       "dashboard"
     ]

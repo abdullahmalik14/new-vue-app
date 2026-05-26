@@ -296,12 +296,23 @@ export function inheritConfigurationFromParentRoute(childRoute) {
   // Merge parent config with child config (child wins)
   const mergedConfig = deepMergePreferChild(resolvedParentRoute, childRoute);
 
+  // Concat assetPreload[] so child entries extend (not replace) inherited parent assets (C-02)
+  const parentAssets = Array.isArray(resolvedParentRoute.assetPreload)
+    ? resolvedParentRoute.assetPreload
+    : [];
+  const childAssets = Array.isArray(childRoute.assetPreload) ? childRoute.assetPreload : [];
+
+  if (parentAssets.length > 0 && childAssets.length > 0) {
+    mergedConfig.assetPreload = [...parentAssets, ...childAssets];
+  }
+
   log('routeResolver.js', 'inheritConfigurationFromParentRoute', 'success', 'Parent configuration inherited', {
     childSlug: childRoute.slug,
     parentSlug: parentRoute.slug,
     requiresAuth: mergedConfig.requiresAuth,
     redirectIfNotAuth: mergedConfig.redirectIfNotAuth,
     inheritedRequiresAuth: childRoute.requiresAuth === undefined && mergedConfig.requiresAuth === true,
+    inheritedAssetPreloadCount: Array.isArray(mergedConfig.assetPreload) ? mergedConfig.assetPreload.length : 0,
   });
 
   // Track merge completion
@@ -315,6 +326,24 @@ export function inheritConfigurationFromParentRoute(childRoute) {
 
   log('routeResolver.js', 'inheritConfigurationFromParentRoute', 'return', 'Returning merged configuration', { childSlug: childRoute.slug, parentSlug: parentRoute.slug });
   return mergedConfig;
+}
+
+/**
+ * Resolve inherited + inline assetPreload[] for section rollups and preload orchestration (C-02).
+ *
+ * @param {object} route
+ * @returns {object[]}
+ */
+export function resolveEffectiveAssetPreloadForRoute(route) {
+  if (!route) {
+    return [];
+  }
+
+  const effectiveRoute = route.inheritConfigFromParent
+    ? inheritConfigurationFromParentRoute(route)
+    : route;
+
+  return Array.isArray(effectiveRoute.assetPreload) ? effectiveRoute.assetPreload : [];
 }
 
 /**

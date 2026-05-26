@@ -1837,11 +1837,116 @@ Issues tied to `assetPreload[]` definitions and how they are merged — not sect
 **Files:** `assetPreloader.js`, `assetLibrary.js`, `assetScanner.js`, `routeConfig.json`  
 **Detail:** Routes with `enabled: false` are skipped for Vue Router registration but still appear in `getRouteConfiguration()`. Asset collectors never filter `enabled`, so disabled routes can still add icons/scripts to a section’s merged preload list.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Section `assetPreload[]` rollups merged entries from every route returned by `getRouteConfiguration()`, including routes with `enabled: false` that Vue Router never registers (e.g. `/about`, `/dashboard/social-linking`).
+
+**Why it happened:** `getAssetPreloadEntriesForSection()` filtered by section only; `enabled` was enforced at route generation (`generateRoutesFromConfig`) but not in the asset preload aggregation path used by `assetPreloader.js`, `assetLibrary.js`, and `assetScanner.js`.
+
+**What changed:**
+- `getAssetPreloadEntriesForSection.js` — added `isRouteEnabledForAssetPreload()`; section rollups now skip `enabled: false` routes before merging `assetPreload[]`.
+- Exported `isRouteEnabledForAssetPreload` and `routeBelongsToSection` from `assets/index.js` for diagnostics.
+- Unit test: disabled route with unique `assetPreload` flag is excluded from rollup.
+
+**Conflict check:** Aligns with **AUDIT.md B3** (disabled routes omitted at route generation). Does **not** override **Preloading.md** or **SECTION_PRELOAD_AUDIT.md** — section JS/CSS bundle preloading unchanged; only static `assetPreload[]` rollup filtering. Build-time flag validation (`validateRouteAssetPreloadFlags`) still scans all routes including disabled ones so config typos are caught before re-enable.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/getAssetPreloadEntriesForSection.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const { getRouteConfiguration } = await import('/src/utils/route/routeConfigLoader.js');
+     const {
+       getAssetPreloadEntriesForSection,
+       clearAssetPreloadSectionCache,
+       isRouteEnabledForAssetPreload,
+       routeBelongsToSection,
+     } = await import('/src/utils/assets/getAssetPreloadEntriesForSection.js');
+
+     const section = 'dashboard-global';
+     const routes = getRouteConfiguration();
+     const inSection = routes.filter((route) => routeBelongsToSection(route, section));
+     const enabledInSection = inSection.filter((route) => isRouteEnabledForAssetPreload(route));
+     const disabledInSection = inSection.filter((route) => route.enabled === false);
+
+     clearAssetPreloadSectionCache();
+     const rollup = getAssetPreloadEntriesForSection(section);
+
+     console.log({
+       section,
+       totalInSection: inSection.length,
+       enabledInSection: enabledInSection.length,
+       disabledInSection: disabledInSection.map((route) => route.slug),
+       rollupRouteCount: rollup.routeCount,
+       c01Pass: rollup.routeCount === enabledInSection.length,
+       note: 'rollupRouteCount must equal enabledInSection, not totalInSection',
+     });
+   })();
+   ```
+3. **Expected:** `disabledInSection` includes `/dashboard/social-linking`; `rollupRouteCount` equals `enabledInSection` (not `totalInSection`); `c01Pass: true`.
+
 ---
 
 ### C-02 — `inheritConfigFromParent` does not merge parent `assetPreload`
 **Files:** `routeResolver.js`, `assetPreloader.js`  
 **Detail:** `inheritConfigurationFromParentRoute()` is never applied before aggregation. Child routes do not inherit parent `assetPreload` entries; assets must be duplicated on every child route.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Section rollups read each route’s raw `assetPreload[]` only. Child routes with `inheritConfigFromParent: true` (e.g. `/dashboard/payout` in `dashboard-creator`) did not inherit `/dashboard` menu icons, so those assets were missing from role-specific section buckets unless duplicated in config.
+
+**Why it happened:** `inheritConfigurationFromParentRoute()` was wired for guards/preload orchestration (AUDIT **A2** / **S4**) but not called in `getAssetPreloadEntriesForSection()`. `deepMergePreferChild` also replaced the whole `assetPreload` array when a child defined its own entries (e.g. `/dashboard/overview` script).
+
+**What changed:**
+- `routeResolver.js` — when both parent and child define `assetPreload[]`, entries are **concatenated** (parent first, child second); dedupe still happens at section rollup (M-01).
+- `resolveEffectiveAssetPreloadForRoute()` — applies inheritance before reading preload entries; exported from `route/index.js`.
+- `getAssetPreloadEntriesForSection.js` — uses `resolveEffectiveAssetPreloadForRoute()` per route instead of raw `route.assetPreload`.
+
+**Conflict check:** Extends **AUDIT.md A2/S4** inheritance to asset preload only. Does not change section JS/CSS bundle preloading (**Preloading.md** / **SECTION_PRELOAD_AUDIT.md**). Complements **C-01** (disabled routes still excluded before inheritance runs).
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/routeInheritance.test.js tests/unit/getAssetPreloadEntriesForSection.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const { getRouteConfiguration } = await import('/src/utils/route/routeConfigLoader.js');
+     const { resolveEffectiveAssetPreloadForRoute } = await import('/src/utils/route/routeResolver.js');
+     const {
+       getAssetPreloadEntriesForSection,
+       clearAssetPreloadSectionCache,
+       routeBelongsToSection,
+     } = await import('/src/utils/assets/getAssetPreloadEntriesForSection.js');
+
+     const childSlug = '/dashboard/call-and-chat-settings';
+     const section = 'dashboard-creator';
+     const childRoute = getRouteConfiguration().find((route) => route.slug === childSlug);
+     const inherited = resolveEffectiveAssetPreloadForRoute(childRoute);
+     const inlineOnly = Array.isArray(childRoute?.assetPreload) ? childRoute.assetPreload.length : 0;
+
+     clearAssetPreloadSectionCache();
+     const rollup = getAssetPreloadEntriesForSection(section);
+     const rollupHasLogo = rollup.assets.some((entry) => entry.flag === 'dashboard.logo');
+
+     console.log({
+       childSlug,
+       section,
+       inlineOnly,
+       inheritedCount: inherited.length,
+       inheritedHasLogo: inherited.some((entry) => entry.flag === 'dashboard.logo'),
+       rollupHasLogo,
+       c02Pass: inherited.length > inlineOnly && inherited.some((entry) => entry.flag === 'dashboard.logo') && rollupHasLogo,
+     });
+   })();
+   ```
+3. **Expected:** `inheritedCount` > `inlineOnly` (child has no inline preload); `inheritedHasLogo: true`; `rollupHasLogo: true`; `c02Pass: true`.
 
 ---
 
@@ -1849,11 +1954,107 @@ Issues tied to `assetPreload[]` definitions and how they are merged — not sect
 **File:** `routeConfig.json` (`/dashboard`, `/shop`)  
 **Detail:** `preloadAssets()` only maps `high`, `medium`, `low` (and `critical` in a separate helper). `"normal"` behaves as low priority.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `sharedAssetPreloads.json` / `routeConfig.json` use `priority: "normal"` for menu icons (e.g. `dashboard.language`, `dashboard.help`). `ASSET_PRELOAD_PRIORITY_MAP` in `assetPreloader.js` omitted `normal`, so tier sorting and prefetch hints relied on implicit `|| 1` fallback — undocumented and inconsistent with M-02 fetch-priority mapping (`normal` → `auto`).
+
+**Why it happened:** Priority map was added for L-06 tier batching with `high` / `medium` / `low` / `critical` only; config already used `normal` in shared preload catalog.
+
+**What changed:**
+- `assetPreloader.js` — added `normal: 1` to `ASSET_PRELOAD_PRIORITY_MAP` (same tier as `low`, per L-06 browser test notes).
+- `shouldUsePrefetchHint()` — treats `normal` like `low` (`rel="prefetch"` idle hint, M-03).
+- `getAssetPreloadEntriesForSection.js` already had `normal: 1` for dedupe — now aligned with runtime preloader.
+
+**Conflict check:** No override of **Preloading.md** / **SECTION_PRELOAD_AUDIT.md**. Complements **L-06** tier batching and **M-02/M-03** fetch/prefetch hints. **C-04** (shop icon duplication) is separate config cleanup.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/preloadNormalPriority.test.js tests/unit/preloadPrefetch.test.js tests/unit/preloadFetchPriority.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const store = (await import('/src/stores/usePreloadStore.js')).usePreloadStore();
+     store.clearAssets();
+     document.head.innerHTML = '';
+
+     const originalCreateElement = document.createElement.bind(document);
+     document.createElement = function createElement(tag, options) {
+       const el = originalCreateElement(tag, options);
+       if (tag === 'link') queueMicrotask(() => el.onload?.());
+       return el;
+     };
+
+     const { preloadAssets } = await import('/src/utils/assets/assetPreloader.js');
+
+     await preloadAssets([
+       { src: '/assets/test-normal.png', type: 'image', priority: 'normal' },
+       { src: '/assets/test-high.png', type: 'image', priority: 'high' },
+     ]);
+
+     const links = [...document.querySelectorAll('link[href="/assets/test-normal.png"], link[href="/assets/test-high.png"]')];
+     const tierOrder = links.map((link) => (link.href.includes('test-high') ? 'high' : 'normal'));
+     const normalLink = document.querySelector('link[href="/assets/test-normal.png"]');
+
+     console.log({
+       tierOrder,
+       normalUsesPrefetch: normalLink?.rel === 'prefetch',
+       normalFetchPriority: normalLink?.getAttribute('fetchpriority'),
+       c03Pass: tierOrder[0] === 'high' && tierOrder[1] === 'normal' && normalLink?.rel === 'prefetch',
+     });
+   })();
+   ```
+3. **Expected:** `tierOrder: ['high', 'normal']`; `normalUsesPrefetch: true`; `normalFetchPriority: 'auto'`; `c03Pass: true`.
+
 ---
 
 ### C-04 — `/shop` duplicates dashboard icon flags in the wrong section bucket
 **File:** `routeConfig.json`  
 **Detail:** `/shop` repeats `dashboard.*` flags under `section: "shop"`, not `dashboard-global`. Same icons are preloaded separately per section; config drift risk.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `/shop` used `assetPreloadRef: "dashboardMenuIcons"`, merging ~20 `dashboard.*` icon flags into the **`shop`** section rollup. The same icons were also owned by `/dashboard` in **`dashboard-global`**, causing duplicate preload work and config drift if one list changed without the other.
+
+**Why it happened:** Shop layout reuses dashboard chrome; icons were copied into the shop route bucket instead of relying on section cross-preload.
+
+**What changed:**
+- **`routeConfig.json`** — removed `assetPreloadRef` from `/shop`. Shop section rollup is now shop-only (empty today).
+- **`preLoadSections: ["dashboard"]`** kept — resolves to `dashboard-global` and background-warms dashboard menu icons when visiting `/shop` (same as `/log-in` pattern).
+
+**Conflict check:** Aligns with section-based preload architecture (**Preloading.md**). **C-02** inheritance still supplies dashboard icons to dashboard child routes; shop uses `preLoadSections` instead of duplicating config. No override of prior preload refactor.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/shopAssetPreloadConfig.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const { getRouteConfiguration } = await import('/src/utils/route/routeConfigLoader.js');
+     const { getAssetPreloadEntriesForSection, clearAssetPreloadSectionCache } = await import('/src/utils/assets/getAssetPreloadEntriesForSection.js');
+
+     const shopRoute = getRouteConfiguration().find((route) => route.slug === '/shop');
+     clearAssetPreloadSectionCache();
+
+     const shopRollup = getAssetPreloadEntriesForSection('shop');
+     const dashboardRollup = getAssetPreloadEntriesForSection('dashboard-global');
+
+     console.log({
+       shopHasAssetPreloadRef: Boolean(shopRoute?.assetPreloadRef),
+       shopPreLoadSections: shopRoute?.preLoadSections,
+       shopDashboardFlags: shopRollup.assets.filter((entry) => entry.flag?.startsWith('dashboard.')).length,
+       dashboardGlobalLogo: dashboardRollup.assets.some((entry) => entry.flag === 'dashboard.logo'),
+       c04Pass: !shopRoute?.assetPreloadRef && shopRollup.assets.every((entry) => !entry.flag?.startsWith('dashboard.')) && dashboardRollup.assets.some((entry) => entry.flag === 'dashboard.logo'),
+     });
+   })();
+   ```
+3. **Expected:** `shopHasAssetPreloadRef: false`; `shopDashboardFlags: 0`; `dashboardGlobalLogo: true`; `c04Pass: true`.
+4. Navigate to `/shop` → Network tab should still show dashboard icon requests from **`preLoadSections`** background warm of `dashboard-global` (not from shop rollup).
 
 ---
 
@@ -1861,11 +2062,92 @@ Issues tied to `assetPreload[]` definitions and how they are merged — not sect
 **File:** `routeConfig.json`  
 **Detail:** Raw jsDelivr URL with `type: "script"` is preloaded via auth section rollup without SRI (see S-02, S-03).
 
+#### Resolution ✅
+
+**Status:** Resolved (already fixed in **S-02** audit pass; verified this pass).
+
+**What was broken (at audit time):** `/log-in` `assetPreload` used a raw jsDelivr Cognito CDN URL for `type: "script"`, preloaded via auth section rollup without SRI or same-origin control.
+
+**Why it happened:** Auth script was inlined in route config before self-hosting and flag-based preload.
+
+**What changed (S-02 + S-03, unchanged this pass):**
+- Cognito UMD bundle vendored under `public/vendor/amazon-cognito-identity-6.3.15.min.js`.
+- `assetMap.json` maps `script.cognito` → same-origin `/vendor/…` path (dev + production).
+- `/log-in` `assetPreload` uses `{ flag: "script.cognito", type: "script", priority: "high" }` — no raw CDN `src`.
+- `preloadScript` + `assertAllowedPreloadUrl()` enforce allowlist/SRI for external scripts (**S-03**).
+
+**Conflict check:** No new code changes this pass — **S-02/S-03** remain authoritative. Does not override **Preloading.md** section preload behavior.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/cognitoScriptSelfHost.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open `/log-in`.
+2. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const { getRouteConfiguration } = await import('/src/utils/route/routeConfigLoader.js');
+     const { getAssetPreloadEntriesForSection, clearAssetPreloadSectionCache } = await import('/src/utils/assets/getAssetPreloadEntriesForSection.js');
+     const { getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+
+     const loginRoute = getRouteConfiguration().find((route) => route.slug === '/log-in');
+     const cognitoEntry = loginRoute?.assetPreload?.find((entry) => entry.type === 'script');
+
+     clearAssetPreloadSectionCache();
+     const authRollup = getAssetPreloadEntriesForSection('auth');
+     const cognitoUrl = await getAssetUrl('script.cognito');
+
+     console.log({
+       cognitoEntry,
+       authRollupHasCognitoFlag: authRollup.assets.some((entry) => entry.flag === 'script.cognito'),
+       cognitoUrl,
+       usesJsDelivr: String(cognitoEntry?.src || cognitoUrl || '').includes('jsdelivr.net'),
+       c05Pass: cognitoEntry?.flag === 'script.cognito' && !cognitoEntry?.src && cognitoUrl?.startsWith('/vendor/'),
+     });
+   })();
+   ```
+3. **Expected:** `cognitoEntry.flag === 'script.cognito'`; no `src` on config entry; `cognitoUrl` starts with `/vendor/`; `usesJsDelivr: false`; `c05Pass: true`.
+
 ---
 
 ### C-06 — Dashboard components preload assets outside config
 **Files:** `DashboardSidebar.vue`, `HeaderResponsive.vue`  
 **Detail:** Hardcoded `preloadAsset({ flag, ... })` lists duplicate `/dashboard` `assetPreload` and bypass centralized rollup.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `DashboardSidebar.vue` called `preloadAsset()` for nine dashboard icon flags on mount. `HeaderResponsive.vue` resolved URLs via `getAssetUrl()` then called `preloadAssets()` again with those same URLs — duplicating `/dashboard` `assetPreloadRef: "dashboardMenuIcons"` work already done by section rollup + `preloadSectionAssets('dashboard-global')`.
+
+**Why it happened:** Components pre-dated centralized section `assetPreload[]` rollup; local preload was added for perceived faster paint.
+
+**What changed:**
+- **`DashboardSidebar.vue`** — `loadAllAssets()` now only resolves URLs via `getAssetUrl()` for template binding; removed `preloadAsset()` loop.
+- **`HeaderResponsive.vue`** — removed redundant Step 4 `preloadAssets(imageAssets)` after URLs are already loaded; removed unused `preloadAssets` import.
+
+**Conflict check:** Components still **display** icons via `getAssetUrl()` (lazy fallback if rollup missed). Centralized preload remains `/dashboard` config + section orchestration (**C-02**, **C-04**). No override of **Preloading.md** / **SECTION_PRELOAD_AUDIT.md**.
+
+**How it was tested:** Code review + existing unit tests (`tests/unit/getAssetPreloadEntriesForSection.test.js`, `tests/unit/routeInheritance.test.js`). No component preload imports remain in these files.
+
+**How to test in the browser:**
+1. Run `npm run dev`, open DevTools → **Network** (filter `Img` / `webp` / `png`).
+2. Hard refresh on `/dashboard`.
+3. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const sidebarSource = await fetch('/src/templates/dashboard/DashboardSidebar.vue').then((r) => r.text());
+     const headerSource = await fetch('/src/templates/dashboard/HeaderResponsive.vue').then((r) => r.text());
+
+     console.log({
+       sidebarCallsPreloadAsset: sidebarSource.includes('preloadAsset'),
+       headerCallsPreloadAssets: headerSource.includes('preloadAssets'),
+       headerStillUsesGetAssetUrl: headerSource.includes('getAssetUrl'),
+       c06Pass: !sidebarSource.includes('preloadAsset') && !headerSource.includes('preloadAssets'),
+     });
+   })();
+   ```
+4. **Expected:** `sidebarCallsPreloadAsset: false`; `headerCallsPreloadAssets: false`; `headerStillUsesGetAssetUrl: true`; `c06Pass: true`.
+5. Dashboard header/sidebar icons should still render — warmed by `dashboard-global` section preload from route config, not component-local preload.
 
 ---
 
@@ -1873,11 +2155,123 @@ Issues tied to `assetPreload[]` definitions and how they are merged — not sect
 **File:** `router/index.js` line 706  
 **Detail:** No check that all resolved URLs for the section are already in `usePreloadStore.preloadedAssets` before re-walking routes and re-resolving flags.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Every navigation to a section called `preloadSectionAssets()`, which always invoked `preloadAssets()` even when every resolved URL for that section was already in `usePreloadStore.preloadedAssets`. Per-asset preloads short-circuited inside `preloadImage`/`preloadScript`, but the section rollup + scheduling still ran on each visit.
+
+**Why it happened:** Section orchestration (`routeNavigationData.js`, `sectionPreloader.js`, intent prefetch) had no section-level URL completeness check before batch preload.
+
+**What changed:**
+- `assetPreloader.js` — `resolveAssetPreloadUrl()` resolves each rollup entry to a concrete URL; `areSectionAssetUrlsFullyPreloaded()` checks Pinia store membership; `preloadSectionAssets()` returns early with a cache-hit log when all URLs are warm.
+- Exported helpers from `assets/index.js` for diagnostics/tests.
+
+**Conflict check:** Complements per-URL store checks (L-03) without blocking navigation. Intent prefetch dedupe in `routeAssetPrefetch.js` unchanged. No override of **Preloading.md** / **SECTION_PRELOAD_AUDIT.md**.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/preloadSectionAssets.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, navigate to `/dashboard` once (warms `dashboard-global` assets).
+2. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const { usePreloadStore } = await import('/src/stores/usePreloadStore.js');
+     const {
+       getAssetPreloadEntriesForSection,
+       clearAssetPreloadSectionCache,
+     } = await import('/src/utils/assets/getAssetPreloadEntriesForSection.js');
+     const {
+       resolveAssetPreloadUrl,
+       areSectionAssetUrlsFullyPreloaded,
+       preloadSectionAssets,
+     } = await import('/src/utils/assets/assetPreloader.js');
+
+     const section = 'dashboard-global';
+     clearAssetPreloadSectionCache();
+     const { assets } = getAssetPreloadEntriesForSection(section);
+     const urls = (await Promise.all(assets.map((asset) => resolveAssetPreloadUrl(asset)))).filter(Boolean);
+     const store = usePreloadStore();
+
+     urls.forEach((url) => store.addAsset(url));
+
+     const beforeCount = store.preloadedAssetCount;
+     await preloadSectionAssets(section);
+     await preloadSectionAssets(section);
+
+     console.log({
+       section,
+       resolvedUrlCount: urls.length,
+       allWarmBeforeSecondCall: areSectionAssetUrlsFullyPreloaded(urls),
+       storeCountUnchanged: store.preloadedAssetCount === beforeCount,
+       c07Pass: areSectionAssetUrlsFullyPreloaded(urls),
+       note: 'Second preloadSectionAssets call should log cache-hit and not add duplicate link tags',
+     });
+   })();
+   ```
+3. **Expected:** `allWarmBeforeSecondCall: true`; `c07Pass: true`; console shows `preloadSectionAssets [cache-hit]` on the second call; no duplicate `<link>` tags for the same icon URLs.
+
 ---
 
 ### C-08 — `assetPreload` entries with extra fields are ignored
 **File:** `routeConfig.json` `/dashboard/overview`  
 **Detail:** `location`, `defer`, `async`, `flags` are not implemented in `preloadAsset()`.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `/dashboard/overview` declares a script entry with `name`, `location`, `defer`, `async`, and `flags`, but `preloadAsset()` → `preloadScript()` only injected `<link rel="preload">` hints and dropped execution metadata.
+
+**Why it happened:** Script preloader was link-hint only; executable script loading lived separately in `AssetHandler` / component code.
+
+**What changed:**
+- `shouldInjectExecutableScript()` — detects route-config execution metadata.
+- `injectExecutableScript()` — inserts a real `<script>` at `location` with `defer`/`async`, `data-asset-name`, and `data-asset-flags`.
+- `preloadScript()` delegates to executable injection when metadata is present; otherwise keeps existing link/modulepreload behavior (Cognito, etc.).
+
+**Conflict check:** Aligns with `DashboardOverviewCreator.vue` / `AssetHandler` metadata shape without removing component-level dependency loading. **S-03** URL guards still apply. No override of section bundle preloading.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/preloadScript.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const originalCreateElement = document.createElement.bind(document);
+     document.createElement = function createElement(tag, options) {
+       const el = originalCreateElement(tag, options);
+       if (tag === 'script') queueMicrotask(() => el.onload?.());
+       return el;
+     };
+
+     const { preloadScript } = await import('/src/utils/assets/assetPreloader.js');
+     const url = '/scripts/dashboard-metrics.js';
+
+     document.querySelectorAll(`script[src="${url}"]`).forEach((node) => node.remove());
+
+     await preloadScript(url, {
+       name: 'dashboard-metrics-lib',
+       location: 'head-last',
+       defer: true,
+       async: false,
+       flags: ['dashboard-metrics'],
+     });
+
+     const script = document.querySelector(`script[src="${url}"]`);
+
+     console.log({
+       usesScriptTag: Boolean(script),
+       defer: script?.defer,
+       async: script?.async,
+       assetName: script?.dataset.assetName,
+       assetFlags: script?.dataset.assetFlags,
+       c08Pass: script?.defer === true && script?.dataset.assetName === 'dashboard-metrics-lib',
+     });
+   })();
+   ```
+3. **Expected:** `usesScriptTag: true`; `defer: true`; `assetName: 'dashboard-metrics-lib'`; `assetFlags: 'dashboard-metrics'`; `c08Pass: true`.
 
 ---
 
@@ -1885,6 +2279,46 @@ Issues tied to `assetPreload[]` definitions and how they are merged — not sect
 **Files:** `jsonConfigValidator.js`, `routeConfig.json`, `assetMap.json`  
 **Detail:** Validator does not check `assetPreload` shape, flag existence, or allowed `priority` values (see M-04).
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Only flag existence was validated (M-04, dev startup). Entry **shape** (`type`, `flag|src`, `priority`, `defer`, `async`, `location`, `flags`) and `assetPreloadRef` catalog keys were not validated at build time via `jsonConfigValidator`.
+
+**Why it happened:** M-04 added runtime/dev flag cross-check; C-09 shape/priority/ref validation was explicitly deferred.
+
+**What changed:**
+- `validateRouteAssetPreloadFlags.js` — added `validateAssetPreloadEntryShape()`, `validateRouteAssetPreloadRefs()`, allowed type/priority sets; extended `validateRouteAssetPreloadFlags()` to accept optional `sharedCatalog`.
+- `jsonConfigValidator.js` — validates inline `assetPreload[]` shape and `assetPreloadRef` keys during `validateRouteConfig()` (build + bundler).
+- `routeConfigLoader.js` — dev startup now runs full validation (shape + refs + assetMap flags) on expanded routes.
+
+**Conflict check:** Extends **M-04** without replacing it. Does not change preload runtime behavior. **C-08** optional fields are now validated when present.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/validateRouteAssetPreloadFlags.test.js tests/unit/jsonConfigValidator.test.js tests/unit/assetMapBuildValidation.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev` — should start cleanly with current config.
+2. DevTools → **Console** — paste:
+   ```js
+   (async () => {
+     const { getRouteConfiguration } = await import('/src/utils/route/routeConfigLoader.js');
+     const assetMap = (await import('/src/config/assetMap.json')).default;
+     const sharedCatalog = (await import('/src/router/sharedAssetPreloads.json')).default;
+     const { validateRouteAssetPreloadFlags } = await import('/src/utils/assets/validateRouteAssetPreloadFlags.js');
+
+     const result = validateRouteAssetPreloadFlags(getRouteConfiguration(), assetMap, sharedCatalog);
+
+     console.log({
+       valid: result.valid,
+       errorCount: result.errors.length,
+       c09Pass: result.valid,
+     });
+   })();
+   ```
+3. **Expected:** `valid: true`; `c09Pass: true`.
+4. **Fail-fast test:** In `routeConfig.json`, change one `assetPreload` entry to `"priority": "urgent"` or add `"assetPreloadRef": "typo"`, restart `npm run dev` — startup/build validation should fail with a descriptive error. Revert afterward.
+
 ---
+
 
 *End of audit — asset preload only. Section/bundle preloading (`sectionPreloader`, `preLoadSections`, `section-manifest.json`) and general router/guard topics are documented in `src/router/AUDIT.md` and `src/router/ADDITIONAL_ISSUES.md`.*

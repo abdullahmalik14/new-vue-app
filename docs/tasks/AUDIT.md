@@ -1012,7 +1012,7 @@ No preload-refactor overlap. S1 env blocking unchanged — still enforced at rou
 - **L8** (`/dashboard/social-linking`, `enabled: false`) — still `/404` via route generation skip; L8 resolution text mentioning `guardCheckRouteEnabled` is historical (same user outcome, guard no longer checks `enabled`).
 - **S1** (`envAccess`) — unchanged; `guardCheckRouteEnvironmentAccess` still blocks dev-only routes in production (defense in depth).
 - **Preloading.md / SECTION_PRELOAD_AUDIT.md** — no conflicting `enabled: false` guard rules; preload orchestration untouched.
-- **ASSET_PRELOAD_AUDIT C-01** (pre-existing) — disabled routes may still contribute `assetPreload` to section merges via `getRouteConfiguration()`; not introduced by B3; separate follow-up if desired.
+- **ASSET_PRELOAD_AUDIT C-01** — resolved in asset preload audit pass: `getAssetPreloadEntriesForSection()` now skips `enabled: false` routes so disabled config entries do not contribute `assetPreload[]` to section rollups (see ASSET_PRELOAD_AUDIT.md C-01 resolution).
 
 ---
 

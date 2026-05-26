@@ -76,10 +76,14 @@ export function loadRouteConfigurationFromFile() {
         throw new Error(`Route componentPath validation failed:\n  - ${details}`);
       }
 
-      const flagValidation = validateRouteAssetPreloadFlags(loadedRouteConfig, assetMapData);
+      const flagValidation = validateRouteAssetPreloadFlags(
+        loadedRouteConfig,
+        assetMapData,
+        sharedAssetPreloads,
+      );
 
       if (!flagValidation.valid) {
-        throw new Error(`Asset preload flag validation failed:\n  - ${flagValidation.errors.join('\n  - ')}`);
+        throw new Error(`Asset preload validation failed:\n  - ${flagValidation.errors.join('\n  - ')}`);
       }
     }
 

@@ -74,4 +74,34 @@ describe('S4 — inheritConfigFromParent requiresAuth', () => {
 
     expect(inheritConfigurationFromParentRoute(route)).toEqual(route);
   });
+
+  it('inherits assetPreload from /dashboard for direct child routes (C-02)', () => {
+    const merged = inheritConfigurationFromParentRoute({
+      slug: '/dashboard/payout',
+      inheritConfigFromParent: true,
+      supportedRoles: ['creator'],
+    });
+
+    expect(Array.isArray(merged.assetPreload)).toBe(true);
+    expect(merged.assetPreload.some((entry) => entry.flag === 'dashboard.logo')).toBe(true);
+  });
+
+  it('concatenates parent and child assetPreload when child adds entries (C-02)', () => {
+    const merged = inheritConfigurationFromParentRoute({
+      slug: '/dashboard/overview',
+      inheritConfigFromParent: true,
+      supportedRoles: ['creator'],
+      assetPreload: [
+        {
+          name: 'dashboard-metrics-lib',
+          src: '/scripts/dashboard-metrics.js',
+          type: 'script',
+          priority: 'high',
+        },
+      ],
+    });
+
+    expect(merged.assetPreload.some((entry) => entry.flag === 'dashboard.logo')).toBe(true);
+    expect(merged.assetPreload.some((entry) => entry.src === '/scripts/dashboard-metrics.js')).toBe(true);
+  });
 });

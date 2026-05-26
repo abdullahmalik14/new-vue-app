@@ -29,7 +29,7 @@ const LINK_PRELOAD_MAX_RETRIES = 2;
 const LINK_PRELOAD_RETRY_BASE_MS = 400;
 
 /** @type {Record<string, number>} Higher value = scheduled earlier in preloadAssets */
-const ASSET_PRELOAD_PRIORITY_MAP = { critical: 4, high: 3, medium: 2, low: 1 };
+const ASSET_PRELOAD_PRIORITY_MAP = { critical: 4, high: 3, medium: 2, low: 1, normal: 1 };
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -155,7 +155,7 @@ function applyFetchPriorityToLink(link, options = {}) {
  * @returns {boolean}
  */
 function shouldUsePrefetchHint(options = {}) {
-  return options.priority === 'low';
+  return options.priority === 'low' || options.priority === 'normal';
 }
 
 /**
@@ -233,6 +233,164 @@ function createScriptPreloadLink(src, options) {
   applyFetchPriorityToLink(link, options);
 
   return link;
+}
+
+/**
+ * Script entries with route-config execution metadata (C-08).
+ *
+ * @param {object} [options]
+ * @returns {boolean}
+ */
+export function shouldInjectExecutableScript(options = {}) {
+  return Boolean(
+    options.location ||
+    options.defer ||
+    options.async ||
+    options.name ||
+    (Array.isArray(options.flags) && options.flags.length > 0),
+  );
+}
+
+/**
+ * @param {HTMLScriptElement} script
+ * @returns {Promise<void>}
+ */
+function waitForScriptElementLoad(script) {
+  return new Promise((resolve, reject) => {
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error(`Script failed to load: ${script.src}`));
+  });
+}
+
+/**
+ * @param {HTMLScriptElement} script
+ * @param {string} [location]
+ */
+function insertScriptElementAtLocation(script, location = 'head-last') {
+  if ((location.startsWith('footer') || location === 'body') && !document.body) {
+    document.head.appendChild(script);
+    return;
+  }
+
+  switch (location) {
+    case 'head-first':
+      document.head.insertBefore(script, document.head.firstChild);
+      break;
+    case 'footer-first':
+    case 'body-first':
+      document.body.insertBefore(script, document.body.firstChild);
+      break;
+    case 'footer-last':
+    case 'body-last':
+      document.body.appendChild(script);
+      break;
+    case 'head-last':
+    default:
+      document.head.appendChild(script);
+      break;
+  }
+}
+
+/**
+ * @param {string} src
+ * @returns {HTMLScriptElement | null}
+ */
+function findExistingExecutableScript(src) {
+  return document.querySelector(`script[src="${src}"]`);
+}
+
+/**
+ * Inject and execute a script using route-config metadata (C-08).
+ *
+ * @param {string} src
+ * @param {object} [options]
+ * @returns {Promise<void>}
+ */
+export function injectExecutableScript(src, options = {}) {
+  const preloadStore = usePreloadStore();
+
+  const urlCheck = assertAllowedPreloadUrl(src, { assetType: 'script' });
+  if (!urlCheck.ok) {
+    logBlockedPreload(src, urlCheck.reason, 'injectExecutableScript');
+    return Promise.resolve();
+  }
+
+  src = urlCheck.url;
+
+  if (urlCheck.requiresIntegrity && !options.integrity) {
+    logBlockedPreload(src, 'missing-integrity', 'injectExecutableScript');
+    return Promise.resolve();
+  }
+
+  if (preloadStore.hasAsset(src)) {
+    return Promise.resolve();
+  }
+
+  const existingScript = findExistingExecutableScript(src);
+  if (existingScript) {
+    preloadStore.addAsset(src);
+    return Promise.resolve();
+  }
+
+  const scriptReserved = reserveLinkPreload(src);
+  if (scriptReserved.existing) {
+    return scriptReserved.existing;
+  }
+
+  const { promise: scriptPromise, resolve: resolveScript, reject: rejectScript } = scriptReserved;
+
+  withPreloadRetry(async (attempt) => {
+    if (attempt > 0) {
+      document.querySelectorAll(`script[src="${src}"]`).forEach((element) => element.remove());
+    }
+
+    const script = document.createElement('script');
+    script.src = src;
+
+    if (options.name) {
+      script.dataset.assetName = options.name;
+    }
+
+    if (Array.isArray(options.flags) && options.flags.length > 0) {
+      script.dataset.assetFlags = options.flags.join(',');
+    }
+
+    if (options.defer && options.async) {
+      script.async = true;
+    } else {
+      if (options.defer) {
+        script.defer = true;
+      }
+      if (options.async) {
+        script.async = true;
+      }
+    }
+
+    if (options.crossOrigin) {
+      script.crossOrigin = options.crossOrigin;
+    }
+
+    if (options.integrity) {
+      script.integrity = options.integrity;
+      if (!script.crossOrigin) {
+        script.crossOrigin = 'anonymous';
+      }
+    }
+
+    insertScriptElementAtLocation(script, options.location);
+    await waitForScriptElementLoad(script);
+  })
+    .then(() => {
+      preloadStore.addAsset(src);
+      preloadInProgress.delete(src);
+      resolveScript();
+    })
+    .catch((error) => {
+      preloadInProgress.delete(src);
+      rejectScript(error);
+    });
+
+  return scriptPromise;
 }
 
 /**
@@ -638,6 +796,10 @@ export function preloadMedia(src, type = 'video', options = {}) {
  * @returns {Promise<void>} Completion promise
  */
 export function preloadScript(src, options = {}) {
+  if (shouldInjectExecutableScript(options)) {
+    return injectExecutableScript(src, options);
+  }
+
   const preloadStore = usePreloadStore();
 
   const urlCheck = assertAllowedPreloadUrl(src, { assetType: 'script' });
@@ -1049,6 +1211,37 @@ export async function preloadSectionCriticalImages(sectionName) {
 }
 
 /**
+ * Resolve a single assetPreload entry to a concrete URL (C-07).
+ *
+ * @param {object} asset
+ * @returns {Promise<string|null>}
+ */
+export async function resolveAssetPreloadUrl(asset) {
+  if (asset?.src) {
+    return asset.src;
+  }
+
+  if (asset?.flag) {
+    return getAssetUrl(asset.flag);
+  }
+
+  return null;
+}
+
+/**
+ * @param {string[]} urls
+ * @returns {boolean}
+ */
+export function areSectionAssetUrlsFullyPreloaded(urls) {
+  if (!Array.isArray(urls) || urls.length === 0) {
+    return false;
+  }
+
+  const preloadStore = usePreloadStore();
+  return urls.every((url) => preloadStore.hasAsset(url));
+}
+
+/**
  * @function preloadSectionAssets
  * @description Preload all assets for a specific section
  * @param {string} sectionName - Section name
@@ -1071,6 +1264,30 @@ export async function preloadSectionAssets(sectionName) {
       sectionName,
       routeCount
     });
+
+    const resolvedUrls = [];
+    for (const asset of allAssets) {
+      const url = await resolveAssetPreloadUrl(asset);
+      if (url) {
+        resolvedUrls.push(url);
+      }
+    }
+
+    if (areSectionAssetUrlsFullyPreloaded(resolvedUrls)) {
+      log('assetPreloader.js', 'preloadSectionAssets', 'cache-hit', 'All section asset URLs already preloaded — skipping', {
+        sectionName,
+        assetCount: allAssets.length,
+        resolvedUrlCount: resolvedUrls.length,
+      });
+      trackStep({
+        step: 'preloadSectionAssets_cache_hit',
+        file: 'assetPreloader.js',
+        method: 'preloadSectionAssets',
+        flag: 'cache-hit',
+        purpose: 'Section assets already in preload store',
+      });
+      return;
+    }
 
     log('assetPreloader.js', 'preloadSectionAssets', 'assets-collected', 'Assets collected for section', {
       sectionName,

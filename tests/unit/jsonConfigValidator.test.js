@@ -253,6 +253,23 @@ describe('jsonConfigValidator section (A6)', () => {
     expect(result.valid).toBe(true);
   });
 
+  it('validateRouteConfig rejects invalid assetPreload entry shape (C-09)', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+
+    const result = validateRouteConfig([
+      {
+        slug: '/dashboard/overview',
+        section: 'dashboard-creator',
+        componentPath: '@/templates/dashboard/page/creator/DashboardOverviewCreator.vue',
+        supportedRoles: ['creator'],
+        assetPreload: [{ flag: 'dashboard.logo', type: 'sprite', priority: 'urgent' }],
+      },
+    ]);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((error) => error.field === 'assetPreload')).toBe(true);
+  });
+
   it('production routeConfig has section on all navigable routes', async () => {
     const { validateRouteConfig } = await import(VALIDATOR_PATH);
     const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');

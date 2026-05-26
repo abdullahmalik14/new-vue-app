@@ -118,6 +118,66 @@ describe('getAssetPreloadEntriesForSection (P-06)', () => {
     expect(result.assets[0].priority).toBe('high');
   });
 
+  it('excludes enabled: false routes from section assetPreload rollups (C-01)', async () => {
+    getRouteConfiguration.mockReturnValue([
+      {
+        slug: '/dashboard',
+        section: 'dashboard-global',
+        enabled: true,
+        assetPreload: [{ flag: 'dashboard.logo', type: 'image' }],
+      },
+      {
+        slug: '/dashboard/social-linking',
+        section: 'dashboard-global',
+        enabled: false,
+        assetPreload: [{ flag: 'dashboard.disabled-only', type: 'image' }],
+      },
+      {
+        slug: '/dashboard/overview',
+        section: 'dashboard-global',
+        enabled: true,
+        assetPreload: [{ flag: 'dashboard.hamburger', type: 'image' }],
+      },
+    ]);
+
+    const { getAssetPreloadEntriesForSection } = await import(
+      '../../src/utils/assets/getAssetPreloadEntriesForSection.js'
+    );
+
+    const result = getAssetPreloadEntriesForSection('dashboard-global');
+
+    expect(result.routeCount).toBe(2);
+    expect(result.assets).toHaveLength(2);
+    expect(result.assets.some((entry) => entry.flag === 'dashboard.disabled-only')).toBe(false);
+  });
+
+  it('inherits parent assetPreload for child routes with inheritConfigFromParent (C-02)', async () => {
+    getRouteConfiguration.mockReturnValue([
+      {
+        slug: '/dashboard',
+        section: 'dashboard-global',
+        enabled: true,
+        assetPreload: [{ flag: 'dashboard.logo', type: 'image', priority: 'high' }],
+      },
+      {
+        slug: '/dashboard/payout',
+        section: { creator: 'dashboard-creator' },
+        inheritConfigFromParent: true,
+        enabled: true,
+        supportedRoles: ['creator'],
+      },
+    ]);
+
+    const { getAssetPreloadEntriesForSection } = await import(
+      '../../src/utils/assets/getAssetPreloadEntriesForSection.js'
+    );
+
+    const result = getAssetPreloadEntriesForSection('dashboard-creator');
+
+    expect(result.routeCount).toBe(1);
+    expect(result.assets.some((entry) => entry.flag === 'dashboard.logo')).toBe(true);
+  });
+
   it('clearAssetPreloadSectionCache forces a rebuild on next call', async () => {
     getRouteConfiguration.mockReturnValue([
       {

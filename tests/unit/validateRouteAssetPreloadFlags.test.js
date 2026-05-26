@@ -56,4 +56,41 @@ describe('validateRouteAssetPreloadFlags (M-04)', () => {
       'Route "/dashboard/overview": assetPreload flag "dashboard.typo.flag" not found in assetMap.json',
     ]);
   });
+
+  it('rejects invalid assetPreload entry shape and priority (C-09)', () => {
+    const routes = [
+      {
+        slug: '/dashboard/overview',
+        assetPreload: [
+          {
+            flag: 'dashboard.logo',
+            type: 'sprite',
+            priority: 'urgent',
+          },
+        ],
+      },
+    ];
+
+    const result = validateRouteAssetPreloadFlags(routes, assetMap);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((error) => error.includes('invalid or missing type'))).toBe(true);
+    expect(result.errors.some((error) => error.includes('invalid priority'))).toBe(true);
+  });
+
+  it('validates assetPreloadRef keys against shared catalog (C-09)', () => {
+    const routes = [
+      {
+        slug: '/shop',
+        assetPreloadRef: 'missingCatalogKey',
+      },
+    ];
+
+    const result = validateRouteAssetPreloadFlags(routes, null, {
+      dashboardMenuIcons: [{ flag: 'dashboard.logo', type: 'image' }],
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual(['Route "/shop": unknown assetPreloadRef "missingCatalogKey"']);
+  });
 });

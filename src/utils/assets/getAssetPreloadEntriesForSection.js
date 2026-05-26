@@ -1,4 +1,5 @@
 import { getRouteConfiguration } from '../route/routeConfigLoader.js';
+import { resolveEffectiveAssetPreloadForRoute } from '../route/routeResolver.js';
 import { log } from '../common/logHandler.js';
 
 /** @type {Map<string, { assets: object[], routeCount: number, rawAssetCount: number }>} */
@@ -78,6 +79,16 @@ export function routeBelongsToSection(route, sectionName) {
 }
 
 /**
+ * Disabled routes are omitted from Vue Router; they must not contribute assetPreload rollups (C-01).
+ *
+ * @param {object | null | undefined} route
+ * @returns {boolean}
+ */
+export function isRouteEnabledForAssetPreload(route) {
+  return Boolean(route) && route.enabled !== false;
+}
+
+/**
  * Clear memoized section assetPreload rollups (e.g. tests or route config reload).
  */
 export function clearAssetPreloadSectionCache() {
@@ -103,13 +114,13 @@ export function getAssetPreloadEntriesForSection(sectionName) {
   }
 
   const routes = getRouteConfiguration();
-  const sectionRoutes = routes.filter((route) => routeBelongsToSection(route, sectionName));
+  const sectionRoutes = routes.filter(
+    (route) => isRouteEnabledForAssetPreload(route) && routeBelongsToSection(route, sectionName),
+  );
 
   const rawAssets = [];
   for (const route of sectionRoutes) {
-    if (route.assetPreload && Array.isArray(route.assetPreload)) {
-      rawAssets.push(...route.assetPreload);
-    }
+    rawAssets.push(...resolveEffectiveAssetPreloadForRoute(route));
   }
 
   const assets = dedupeAssetPreloadEntries(rawAssets);

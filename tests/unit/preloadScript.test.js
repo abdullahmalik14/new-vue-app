@@ -67,4 +67,38 @@ describe('preloadScript (P-07)', () => {
     const link = document.querySelector(`link[href="${url}"]`);
     expect(link?.integrity).toBe('sha384-test');
   });
+
+  it('injects executable scripts with location/defer/flags metadata (C-08)', async () => {
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, 'createElement').mockImplementation((tag, options) => {
+      const el = originalCreateElement(tag, options);
+      if (tag === 'script') {
+        queueMicrotask(() => {
+          if (typeof el.onload === 'function') {
+            el.onload();
+          }
+        });
+      }
+      return el;
+    });
+
+    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+    const url = '/scripts/dashboard-metrics.js';
+
+    await preloadScript(url, {
+      name: 'dashboard-metrics-lib',
+      location: 'head-last',
+      defer: true,
+      async: false,
+      flags: ['dashboard-metrics'],
+    });
+
+    const script = document.querySelector(`script[src="${url}"]`);
+    expect(script).toBeTruthy();
+    expect(script?.defer).toBe(true);
+    expect(script?.async).toBeFalsy();
+    expect(script?.dataset.assetName).toBe('dashboard-metrics-lib');
+    expect(script?.dataset.assetFlags).toBe('dashboard-metrics');
+    expect(document.querySelectorAll(`link[href="${url}"]`).length).toBe(0);
+  });
 });

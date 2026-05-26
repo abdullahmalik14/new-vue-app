@@ -436,9 +436,7 @@ export default {
     },
     async loadAllAssets() {
       try {
-        const { preloadAsset } = await import("@/utils/assets/assetPreloader.js");
         const flags = ['dashboard.logo', 'dashboard.avatar', 'dashboard.notification', 'dashboard.logout', 'dashboard.language', 'dashboard.help', 'dashboard.close.desktop', 'dashboard.close.mobile', 'dashboard.more'];
-        await Promise.allSettled(flags.map(flag => preloadAsset({ flag, type: 'image', priority: 'normal' })));
         const urls = await Promise.all(flags.map(flag => this.loadAssetWithRetry(flag)));
         this.assets = {
           logo: urls[0], avatar: urls[1], notification: urls[2], logout: urls[3],
