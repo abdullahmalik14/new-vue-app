@@ -1,6 +1,7 @@
 // vueApp-main-new/src/utils/assets/assetScanner.js
 
 import { log } from '../common/logHandler';
+import { trackStep } from '../common/performanceTrackerAccess.js';
 import { getAssetPreloadEntriesForSection } from './getAssetPreloadEntriesForSection.js';
 
 /**
@@ -9,7 +10,7 @@ import { getAssetPreloadEntriesForSection } from './getAssetPreloadEntriesForSec
  * @purpose Extract asset preload configurations from components
  */
 
-// Performance tracker available globally as window.performanceTracker
+// Performance steps use trackStep() from performanceTrackerAccess.js (B-01)
 
 /**
  * @function extractAssetsFromComponent
@@ -21,7 +22,7 @@ export function extractAssetsFromComponent(component) {
   log('assetScanner.js', 'extractAssetsFromComponent', 'start', 'Extracting assets from component', { 
     hasComponent: !!component 
   });
-  window.performanceTracker.step({
+  trackStep({
     step: 'extractAssetsFromComponent_start',
     file: 'assetScanner.js',
     method: 'extractAssetsFromComponent',
@@ -57,7 +58,7 @@ export function extractAssetsFromComponent(component) {
     log('assetScanner.js', 'extractAssetsFromComponent', 'success', 'Assets extracted from component', { 
       totalCount: assets.length 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'extractAssetsFromComponent_complete',
       file: 'assetScanner.js',
       method: 'extractAssetsFromComponent',
@@ -71,7 +72,7 @@ export function extractAssetsFromComponent(component) {
       error: error.message, 
       stack: error.stack 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'extractAssetsFromComponent_error',
       file: 'assetScanner.js',
       method: 'extractAssetsFromComponent',
@@ -92,7 +93,7 @@ export function scanComponentForAssetReferences(template) {
   log('assetScanner.js', 'scanComponentForAssetReferences', 'start', 'Scanning template for assets', { 
     templateLength: template?.length 
   });
-  window.performanceTracker.step({
+  trackStep({
     step: 'scanComponentForAssetReferences_start',
     file: 'assetScanner.js',
     method: 'scanComponentForAssetReferences',
@@ -105,7 +106,7 @@ export function scanComponentForAssetReferences(template) {
 
     if (!template || typeof template !== 'string') {
       log('assetScanner.js', 'scanComponentForAssetReferences', 'invalid', 'Invalid template provided', {});
-      window.performanceTracker.step({
+      trackStep({
         step: 'scanComponentForAssetReferences_invalid',
         file: 'assetScanner.js',
         method: 'scanComponentForAssetReferences',
@@ -151,7 +152,7 @@ export function scanComponentForAssetReferences(template) {
     log('assetScanner.js', 'scanComponentForAssetReferences', 'success', 'Template scanning complete', { 
       totalFound: assets.length 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'scanComponentForAssetReferences_complete',
       file: 'assetScanner.js',
       method: 'scanComponentForAssetReferences',
@@ -165,7 +166,7 @@ export function scanComponentForAssetReferences(template) {
       error: error.message, 
       stack: error.stack 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'scanComponentForAssetReferences_error',
       file: 'assetScanner.js',
       method: 'scanComponentForAssetReferences',
@@ -184,7 +185,7 @@ export function scanComponentForAssetReferences(template) {
  */
 export async function scanSectionComponents(sectionName) {
   log('assetScanner.js', 'scanSectionComponents', 'start', 'Scanning section components', { sectionName });
-  window.performanceTracker.step({
+  trackStep({
     step: 'scanSectionComponents_start',
     file: 'assetScanner.js',
     method: 'scanSectionComponents',
@@ -204,7 +205,7 @@ export async function scanSectionComponents(sectionName) {
       sectionName, 
       assetCount: allAssets.length 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'scanSectionComponents_complete',
       file: 'assetScanner.js',
       method: 'scanSectionComponents',
@@ -219,7 +220,7 @@ export async function scanSectionComponents(sectionName) {
       error: error.message, 
       stack: error.stack 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'scanSectionComponents_error',
       file: 'assetScanner.js',
       method: 'scanSectionComponents',

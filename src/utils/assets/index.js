@@ -20,6 +20,11 @@ export {
   getPreloadedAssetsCount
 } from './assetPreloader';
 
+export {
+  getAssetPreloadEntriesForSection,
+  clearAssetPreloadSectionCache
+} from './getAssetPreloadEntriesForSection.js';
+
 // Export asset scanner functions
 export {
   extractAssetsFromComponent,

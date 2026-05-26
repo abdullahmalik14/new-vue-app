@@ -1154,11 +1154,80 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 **Files:** `assetPreloader.js`, `assetScanner.js`  
 **Detail:** Unlike `assetLibrary.js`, these files call `window.performanceTracker.step(...)` unconditionally. In SSR, unit tests, or when the tracker is not initialised, this throws `TypeError: Cannot read properties of undefined`.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `assetPreloader.js` and `assetScanner.js` called `window.performanceTracker.step()` directly. When the tracker was not on `window` (tests, SSR, early boot), those calls threw.
+
+**Why it happened:** `assetLibrary.js` already guarded with `if (window.performanceTracker)`; asset preload modules were written earlier without the shared accessor.
+
+**What changed:**
+- Replaced all `window.performanceTracker.step(...)` with `trackStep(...)` from `performanceTrackerAccess.js` (same pattern as `routeConfigLoader.js`).
+- `trackStep` no-ops when the tracker is missing or disabled — preload flow never throws from telemetry.
+
+**Conflict check:** No change to preload behavior, section rollup, or security fixes (S-03–S-07).
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/assetPerformanceTrackerGuards.test.js tests/unit/assetScanner.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open any page.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const tracker = window.performanceTracker;
+     const before = tracker?.steps?.length ?? 0;
+     delete window.performanceTracker;
+     const { preloadImage } = await import('/src/utils/assets/assetPreloader.js');
+     const { extractAssetsFromComponent } = await import('/src/utils/assets/assetScanner.js');
+     await preloadImage('/assets/logos/logo-staging.png');
+     extractAssetsFromComponent({ preloadAssets: [] });
+     window.performanceTracker = tracker;
+     console.log({ ranWithoutTracker: true, stepsWhileDeleted: (tracker?.steps?.length ?? 0) - before });
+   })();
+   ```
+3. **Expected:** `ranWithoutTracker: true` — no `TypeError` about `performanceTracker.step`.
+
 ---
 
 ### B-02 — Identical section-to-routes filter logic duplicated (asset rollup)
 **Files:** `assetPreloader.js`, `assetLibrary.js` (`getAssetPreloadConfigForSection`), `assetScanner.js`  
 **Detail:** The same `routes.filter(...)` by `section` is copy-pasted to merge `assetPreload[]`. Extract one helper: `getAssetPreloadEntriesForSection(sectionName)`.
+
+#### Resolution ✅
+
+**Status:** Resolved (completed in **P-06** audit pass — verified 2026-05-26; no additional code change this step).
+
+**What was broken:** Each of `preloadSectionAssets`, `preloadSectionCriticalImages`, `getAssetPreloadConfigForSection`, and `scanSectionComponents` independently loaded `routeConfig` and filtered routes by `section` to merge `assetPreload[]`.
+
+**Why it happened:** Section rollup logic was copy-pasted as each module was added.
+
+**What changed (P-06):**
+- `getAssetPreloadEntriesForSection.js` — shared `routeBelongsToSection`, memoized `{ assets, routeCount }`, `clearAssetPreloadSectionCache()`.
+- `assetPreloader.js`, `assetLibrary.js`, and `assetScanner.js` call the helper only (no remaining `routes.filter` for section rollup in those files).
+- Exported from `src/utils/assets/index.js`.
+
+**Conflict check:** Aligns with section-based preload architecture; security and B-01 changes do not alter rollup output.
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/getAssetPreloadEntriesForSection.test.js`
+
+**How to test in the browser:**
+1. Run `npm run dev`.
+2. DevTools → **Console** — paste this IIFE:
+   ```js
+   (async () => {
+     const { getAssetPreloadEntriesForSection, clearAssetPreloadSectionCache } = await import('/src/utils/assets/getAssetPreloadEntriesForSection.js');
+     clearAssetPreloadSectionCache();
+     const first = getAssetPreloadEntriesForSection('dashboard-global');
+     const second = getAssetPreloadEntriesForSection('dashboard-global');
+     console.log({
+       routeCount: first.routeCount,
+       assetCount: first.assets.length,
+       sameReference: first === second
+     });
+   })();
+   ```
+3. **Expected:** `routeCount > 0`, `assetCount > 0`, `sameReference: true` (memoized rollup).
 
 ---
 
@@ -1166,17 +1235,109 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 **File:** `assetPreloader.js` line 608  
 **Detail:** Function exists to preload high/critical **images** before paint, but nothing invokes it (router imports it unused). Critical dashboard icons from `assetPreload` are only loaded via post-navigation `preloadSectionAssets`.
 
+#### Resolution ✅
+
+**Status:** Resolved (2026-05-26).
+
+**What was broken:** `preloadSectionCriticalImages` was exported but never invoked after SECTION_PRELOAD_AUDIT B-07 removed the unused router import. Critical/high `assetPreload` images only ran with the full section rollup via `preloadSectionAssets` (post-navigation / background).
+
+**Why it happened:** Preload orchestration consolidated into `sectionPreloadOrchestrator` / `routeNavigationData.js`; the dedicated critical-image path was dropped.
+
+**What changed:**
+- `router/index.js` — `loadRouteComponent` runs `preloadSectionCriticalImages(sectionName)` in parallel with `loadViaGlob` via `Promise.all`, so high/critical images are warmed before the route component is returned (navigation guards still non-blocking).
+- Full section assets remain on `startCurrentSectionResourceLoads` → `preloadSectionAssets` and `sectionPreloader._doPreload`.
+
+**Conflict check:** SECTION_PRELOAD_AUDIT B-07 removed only an **unused** import; this re-wires the function at the component-load boundary (not duplicate `afterEach` blocking). Aligns with section-based preload: guards unchanged, component loader may await critical images only.
+
+**How it was tested:** Code review + existing `getAssetPreloadEntriesForSection` / priority map coverage; manual browser check below.
+
+**How to test in the browser:**
+1. Run `npm run dev`, hard-refresh, open DevTools → **Network** (Img filter).
+2. Navigate to a dashboard route (e.g. creator overview).
+3. **Console** — paste:
+   ```js
+   (async () => {
+     const { preloadSectionCriticalImages } = await import('/src/utils/assets/assetPreloader.js');
+     const { getAssetPreloadEntriesForSection } = await import('/src/utils/assets/getAssetPreloadEntriesForSection.js');
+     const { assets } = getAssetPreloadEntriesForSection('dashboard-global');
+     const critical = assets.filter(a => a.type === 'image' && (a.priority === 'high' || a.priority === 'critical'));
+     console.log({ criticalCount: critical.length, flags: critical.map(a => a.flag || a.src).slice(0, 5) });
+     await preloadSectionCriticalImages('dashboard-global');
+     console.log('preloadSectionCriticalImages done');
+   })();
+   ```
+4. **Expected:** `criticalCount > 0`; network shows image preloads for dashboard flags; no navigation errors.
+
 ---
 
 ### B-04 — `assetPreloader.js` uses module-level Maps as implicit singletons
 **Files:** `assetPreloader.js` lines 17, 371  
 **Detail:** `preloadInProgress` and `jsonDataCache` are module-level singletons. In tests or HMR, stale state can leak. Export reset helpers or tie lifecycle to `clearPreloadCache()`.
 
+#### Resolution ✅
+
+**Status:** Resolved (verified 2026-05-26; doc + test reinforcement).
+
+**What was broken:** Module-level `preloadInProgress` and `jsonDataCache` could retain stale entries across tests/HMR if callers only cleared Pinia.
+
+**Why it happened:** Maps predate P-03 SSOT work; lifecycle was implicit.
+
+**What changed:**
+- `clearPreloadCache()` already clears both maps (P-03); JSDoc now explicitly documents that contract.
+- `tests/unit/assetPreloadCache.test.js` — asserts `clearPreloadCache()` forces JSON re-fetch after cache clear (proves `jsonDataCache` reset).
+
+**Conflict check:** No change to `preloadedSections` / `buildHash` preservation (P-03).
+
+**How it was tested:** `npm run test:unit -- --run tests/unit/assetPreloadCache.test.js`
+
+**How to test in the browser:**
+1. DevTools → **Console**:
+   ```js
+   (async () => {
+     const { preloadJSON, clearPreloadCache, getPreloadedAssetsCount } = await import('/src/utils/assets/assetPreloader.js');
+     const path = '/src/config/countries.json';
+     await preloadJSON(path);
+     const before = getPreloadedAssetsCount();
+     clearPreloadCache();
+     console.log({ before, afterClear: getPreloadedAssetsCount() });
+   })();
+   ```
+2. **Expected:** `afterClear: 0` (Pinia URLs cleared; module maps cleared in same call).
+
 ---
 
 ### B-05 — `assetMap.json` mixes local relative paths (development) with external absolute URLs (production) without documentation
 **File:** `assetMap.json`  
 **Detail:** Development uses relative paths like `/assets/icons/cart-dev.svg` which depend on Vite dev-server file serving. Production uses absolute CDN URLs. Staging only partially overrides production. This divergence is undocumented, making it unclear which assets are actually served in each environment or whether the inheritance model is intentional.
+
+#### Resolution ✅
+
+**Status:** Resolved (2026-05-26).
+
+**What was broken:** Dev relative paths vs production CDN URLs and staging partial overrides were intentional in code (`getAssetUrl` inheritance) but not documented for editors of `assetMap.json`.
+
+**Why it happened:** Map grew organically; behavior lived only in `assetLibrary.js` comments.
+
+**What changed:**
+- `src/config/assetMap.README.md` — environment table, inheritance rules, dev vs production serving, edit/restart notes.
+- `assetLibrary.js` file header already references env inheritance; README is the editor-facing source of truth next to `assetMap.json`.
+
+**Conflict check:** Documentation only; no URL or allowlist behavior change (S-01 self-host migration still open).
+
+**How it was tested:** Doc review against `getAssetUrl` / `detectEnvironment` in `assetLibrary.js`.
+
+**How to test in the browser:**
+1. DevTools → **Console**:
+   ```js
+   (async () => {
+     const { getAssetUrl, getEnvironment, setEnvironment } = await import('/src/utils/assets/assetLibrary.js');
+     console.log({ env: getEnvironment(), devCart: await getAssetUrl('icon.cart') });
+     setEnvironment('production');
+     console.log({ prodCart: await getAssetUrl('icon.cart') });
+     setEnvironment('development');
+   })();
+   ```
+2. **Expected:** `devCart` is a `/assets/...` path (or inherited URL); `prodCart` is CDN `https://cdn.example.com/...` when production block defines it.
 
 ---
 

@@ -30,6 +30,7 @@ import {
 } from '../utils/translation/localeManager.js';
 import { resolveRoleSectionVariant } from '../utils/section/sectionResolver.js';
 import { preloadSection } from '../utils/section/sectionPreloader.js';
+import { preloadSectionCriticalImages } from '../utils/assets/assetPreloader.js';
 import {
   getRoutePreloadPlan,
   resolveEffectiveRouteConfig,
@@ -243,19 +244,22 @@ async function loadRouteComponent(route) {
   if (sectionName) {
     const pinia = getActivePinia();
     const store = pinia ? usePreloadStore(pinia) : null;
+    const sectionPreloaded = !!store?.hasSection(sectionName);
 
-    if (store?.hasSection(sectionName)) {
-      // FAST PATH: chunk is already in browser cache — import.meta.glob will be instant
+    // B-03: high/critical section images before component mount (parallel with chunk load)
+    const [componentModule] = await Promise.all([
+      loadViaGlob(route, userRole),
+      preloadSectionCriticalImages(sectionName),
+    ]);
+
+    if (sectionPreloaded) {
       log('router/index.js', 'loadRouteComponent', 'cache-hit', 'Section preloaded, fast load', { sectionName });
-      return loadViaGlob(route, userRole);
     } else {
-      // SLOW PATH: not preloaded — lazy load now, then kick off section preload in background
       log('router/index.js', 'loadRouteComponent', 'cache-miss', 'Section not preloaded, lazy load + background preload', { sectionName });
-      const componentModule = await loadViaGlob(route, userRole);
-      // Non-blocking: preload section AFTER component is already resolved
       preloadSection(sectionName).catch(() => {});
-      return componentModule;
     }
+
+    return componentModule;
   }
 
   // No section on this route — standard lazy load only

@@ -45,4 +45,23 @@ describe('asset preload cache SSOT (P-03)', () => {
     expect(second).toEqual(payload);
     expect(fetch).not.toHaveBeenCalled();
   });
+
+  it('clearPreloadCache clears jsonDataCache so JSON is re-fetched', async () => {
+    const path = '/src/config/countries.json';
+    const payload = { US: { name: 'United States' } };
+
+    fetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(payload),
+    });
+
+    const { preloadJSON, clearPreloadCache } = await import('../../src/utils/assets/assetPreloader.js');
+
+    await preloadJSON(path);
+    fetch.mockClear();
+    clearPreloadCache();
+    await preloadJSON(path);
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
 });

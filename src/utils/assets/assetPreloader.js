@@ -2,6 +2,7 @@
 
 import { log } from '../common/logHandler';
 import { logError } from '../common/errorHandler.js';
+import { trackStep } from '../common/performanceTrackerAccess.js';
 import { getAssetUrl } from './assetLibrary';
 import { assertAllowedPreloadUrl } from './assertAllowedPreloadUrl.js';
 import { getAssetPreloadEntriesForSection } from './getAssetPreloadEntriesForSection.js';
@@ -13,7 +14,7 @@ import { usePreloadStore } from '../../stores/usePreloadStore.js';
  * @purpose Preload assets per section to optimize performance
  */
 
-// Performance tracker available globally as window.performanceTracker
+// Performance steps use trackStep() from performanceTrackerAccess.js (B-01)
 
 // Track in-progress preloads to avoid duplicate requests
 const preloadInProgress = new Map();
@@ -76,7 +77,7 @@ function createScriptPreloadLink(src, options) {
  */
 function logBlockedPreload(src, reason, method) {
   log('assetPreloader.js', method, 'blocked', 'Preload blocked by URL policy', { src, reason });
-  window.performanceTracker?.step({
+  trackStep({
     step: `${method}_blocked`,
     file: 'assetPreloader.js',
     method,
@@ -145,7 +146,7 @@ export function preloadImage(src, options = {}) {
   src = safeSrc;
 
   log('assetPreloader.js', 'preloadImage', 'start', 'Preloading image', { src, options });
-  window.performanceTracker.step({
+  trackStep({
     step: 'preloadImage_start',
     file: 'assetPreloader.js',
     method: 'preloadImage',
@@ -155,7 +156,7 @@ export function preloadImage(src, options = {}) {
 
   if (preloadStore.hasAsset(src)) {
     log('assetPreloader.js', 'preloadImage', 'already-preloaded', 'Image already preloaded', { src });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadImage_cached',
       file: 'assetPreloader.js',
       method: 'preloadImage',
@@ -178,7 +179,7 @@ export function preloadImage(src, options = {}) {
     log('assetPreloader.js', 'preloadImage', 'already-exists', 'Image preload link already exists in DOM', { src });
     preloadStore.addAsset(src);
     preloadInProgress.delete(src);
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadImage_dom_exists',
       file: 'assetPreloader.js',
       method: 'preloadImage',
@@ -202,7 +203,7 @@ export function preloadImage(src, options = {}) {
     preloadStore.addAsset(src);
     preloadInProgress.delete(src);
     log('assetPreloader.js', 'preloadImage', 'success', 'Image preloaded successfully', { src });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadImage_complete',
       file: 'assetPreloader.js',
       method: 'preloadImage',
@@ -218,7 +219,7 @@ export function preloadImage(src, options = {}) {
       src,
       error: error.message || 'Load error'
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadImage_error',
       file: 'assetPreloader.js',
       method: 'preloadImage',
@@ -249,7 +250,7 @@ export function preloadFont(src, options = {}) {
   src = safeSrc;
 
   log('assetPreloader.js', 'preloadFont', 'start', 'Preloading font', { src, options });
-  window.performanceTracker.step({
+  trackStep({
     step: 'preloadFont_start',
     file: 'assetPreloader.js',
     method: 'preloadFont',
@@ -259,7 +260,7 @@ export function preloadFont(src, options = {}) {
 
   if (preloadStore.hasAsset(src)) {
     log('assetPreloader.js', 'preloadFont', 'already-preloaded', 'Font already preloaded', { src });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadFont_cached',
       file: 'assetPreloader.js',
       method: 'preloadFont',
@@ -282,7 +283,7 @@ export function preloadFont(src, options = {}) {
     log('assetPreloader.js', 'preloadFont', 'already-exists', 'Font preload link already exists in DOM', { src });
     preloadStore.addAsset(src);
     preloadInProgress.delete(src);
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadFont_dom_exists',
       file: 'assetPreloader.js',
       method: 'preloadFont',
@@ -307,7 +308,7 @@ export function preloadFont(src, options = {}) {
     preloadStore.addAsset(src);
     preloadInProgress.delete(src);
     log('assetPreloader.js', 'preloadFont', 'success', 'Font preloaded successfully', { src });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadFont_complete',
       file: 'assetPreloader.js',
       method: 'preloadFont',
@@ -323,7 +324,7 @@ export function preloadFont(src, options = {}) {
       src,
       error: error.message || 'Load error'
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadFont_error',
       file: 'assetPreloader.js',
       method: 'preloadFont',
@@ -355,7 +356,7 @@ export function preloadMedia(src, type = 'video', options = {}) {
   src = safeSrc;
 
   log('assetPreloader.js', 'preloadMedia', 'start', 'Preloading media', { src, type, options });
-  window.performanceTracker.step({
+  trackStep({
     step: 'preloadMedia_start',
     file: 'assetPreloader.js',
     method: 'preloadMedia',
@@ -365,7 +366,7 @@ export function preloadMedia(src, type = 'video', options = {}) {
 
   if (preloadStore.hasAsset(src)) {
     log('assetPreloader.js', 'preloadMedia', 'already-preloaded', 'Media already preloaded', { src });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadMedia_cached',
       file: 'assetPreloader.js',
       method: 'preloadMedia',
@@ -388,7 +389,7 @@ export function preloadMedia(src, type = 'video', options = {}) {
     log('assetPreloader.js', 'preloadMedia', 'already-exists', 'Media preload link already exists in DOM', { src });
     preloadStore.addAsset(src);
     preloadInProgress.delete(src);
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadMedia_dom_exists',
       file: 'assetPreloader.js',
       method: 'preloadMedia',
@@ -412,7 +413,7 @@ export function preloadMedia(src, type = 'video', options = {}) {
     preloadStore.addAsset(src);
     preloadInProgress.delete(src);
     log('assetPreloader.js', 'preloadMedia', 'success', 'Media preloaded successfully', { src, type });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadMedia_complete',
       file: 'assetPreloader.js',
       method: 'preloadMedia',
@@ -429,7 +430,7 @@ export function preloadMedia(src, type = 'video', options = {}) {
       type,
       error: error.message || 'Load error'
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadMedia_error',
       file: 'assetPreloader.js',
       method: 'preloadMedia',
@@ -467,7 +468,7 @@ export function preloadScript(src, options = {}) {
   }
 
   log('assetPreloader.js', 'preloadScript', 'start', 'Preloading script', { src, options });
-  window.performanceTracker.step({
+  trackStep({
     step: 'preloadScript_start',
     file: 'assetPreloader.js',
     method: 'preloadScript',
@@ -477,7 +478,7 @@ export function preloadScript(src, options = {}) {
 
   if (preloadStore.hasAsset(src)) {
     log('assetPreloader.js', 'preloadScript', 'already-preloaded', 'Script already preloaded', { src });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadScript_cached',
       file: 'assetPreloader.js',
       method: 'preloadScript',
@@ -500,7 +501,7 @@ export function preloadScript(src, options = {}) {
     log('assetPreloader.js', 'preloadScript', 'already-exists', 'Script preload link already exists in DOM', { src });
     preloadStore.addAsset(src);
     preloadInProgress.delete(src);
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadScript_dom_exists',
       file: 'assetPreloader.js',
       method: 'preloadScript',
@@ -517,7 +518,7 @@ export function preloadScript(src, options = {}) {
     preloadStore.addAsset(src);
     preloadInProgress.delete(src);
     log('assetPreloader.js', 'preloadScript', 'success', 'Script preloaded successfully', { src });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadScript_complete',
       file: 'assetPreloader.js',
       method: 'preloadScript',
@@ -533,7 +534,7 @@ export function preloadScript(src, options = {}) {
       src,
       error: error.message || 'Load error'
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadScript_error',
       file: 'assetPreloader.js',
       method: 'preloadScript',
@@ -567,7 +568,7 @@ export async function preloadJSON(src, options = {}) {
   src = safeSrc;
 
   log('assetPreloader.js', 'preloadJSON', 'start', 'Preloading JSON', { src, options });
-  window.performanceTracker.step({
+  trackStep({
     step: 'preloadJSON_start',
     file: 'assetPreloader.js',
     method: 'preloadJSON',
@@ -578,7 +579,7 @@ export async function preloadJSON(src, options = {}) {
   // SSOT: store tracks URL completion; jsonDataCache holds parsed content only
   if (preloadStore.hasAsset(src) && jsonDataCache.has(src)) {
     log('assetPreloader.js', 'preloadJSON', 'cache-hit', 'JSON already cached', { src });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadJSON_cached',
       file: 'assetPreloader.js',
       method: 'preloadJSON',
@@ -614,7 +615,7 @@ export async function preloadJSON(src, options = {}) {
       preloadStore.addAsset(src);
 
       log('assetPreloader.js', 'preloadJSON', 'success', 'JSON loaded and cached successfully', { src });
-      window.performanceTracker.step({
+      trackStep({
         step: 'preloadJSON_complete',
         file: 'assetPreloader.js',
         method: 'preloadJSON',
@@ -629,7 +630,7 @@ export async function preloadJSON(src, options = {}) {
         error: error.message,
         stack: error.stack
       });
-      window.performanceTracker.step({
+      trackStep({
         step: 'preloadJSON_error',
         file: 'assetPreloader.js',
         method: 'preloadJSON',
@@ -654,7 +655,7 @@ export async function preloadJSON(src, options = {}) {
  */
 export async function preloadAsset(asset) {
   log('assetPreloader.js', 'preloadAsset', 'start', 'Preloading asset', { asset });
-  window.performanceTracker.step({
+  trackStep({
     step: 'preloadAsset_start',
     file: 'assetPreloader.js',
     method: 'preloadAsset',
@@ -700,7 +701,7 @@ export async function preloadAsset(asset) {
         break;
       default:
         log('assetPreloader.js', 'preloadAsset', 'unknown-type', 'Unknown asset type', { src, type });
-        window.performanceTracker.step({
+        trackStep({
           step: 'preloadAsset_unknown_type',
           file: 'assetPreloader.js',
           method: 'preloadAsset',
@@ -711,7 +712,7 @@ export async function preloadAsset(asset) {
     }
 
     log('assetPreloader.js', 'preloadAsset', 'success', 'Asset preloaded', { src, type });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadAsset_complete',
       file: 'assetPreloader.js',
       method: 'preloadAsset',
@@ -724,7 +725,7 @@ export async function preloadAsset(asset) {
       error: error.message,
       stack: error.stack
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadAsset_error',
       file: 'assetPreloader.js',
       method: 'preloadAsset',
@@ -743,7 +744,7 @@ export async function preloadAsset(asset) {
  */
 export async function preloadAssets(assets) {
   log('assetPreloader.js', 'preloadAssets', 'start', 'Preloading multiple assets', { count: assets.length });
-  window.performanceTracker.step({
+  trackStep({
     step: 'preloadAssets_start',
     file: 'assetPreloader.js',
     method: 'preloadAssets',
@@ -775,7 +776,7 @@ export async function preloadAssets(assets) {
   }
 
   log('assetPreloader.js', 'preloadAssets', 'success', 'All assets preloaded', { count: assets.length });
-  window.performanceTracker.step({
+  trackStep({
     step: 'preloadAssets_complete',
     file: 'assetPreloader.js',
     method: 'preloadAssets',
@@ -792,7 +793,7 @@ export async function preloadAssets(assets) {
  */
 export async function preloadSectionCriticalImages(sectionName) {
   log('assetPreloader.js', 'preloadSectionCriticalImages', 'start', 'Preloading critical section images', { sectionName });
-  window.performanceTracker.step({
+  trackStep({
     step: 'preloadSectionCriticalImages_start',
     file: 'assetPreloader.js',
     method: 'preloadSectionCriticalImages',
@@ -826,7 +827,7 @@ export async function preloadSectionCriticalImages(sectionName) {
       sectionName,
       assetCount: criticalAssets.length
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadSectionCriticalImages_complete',
       file: 'assetPreloader.js',
       method: 'preloadSectionCriticalImages',
@@ -839,7 +840,7 @@ export async function preloadSectionCriticalImages(sectionName) {
       error: error.message,
       stack: error.stack
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadSectionCriticalImages_error',
       file: 'assetPreloader.js',
       method: 'preloadSectionCriticalImages',
@@ -858,7 +859,7 @@ export async function preloadSectionCriticalImages(sectionName) {
  */
 export async function preloadSectionAssets(sectionName) {
   log('assetPreloader.js', 'preloadSectionAssets', 'start', 'Preloading section assets', { sectionName });
-  window.performanceTracker.step({
+  trackStep({
     step: 'preloadSectionAssets_start',
     file: 'assetPreloader.js',
     method: 'preloadSectionAssets',
@@ -886,7 +887,7 @@ export async function preloadSectionAssets(sectionName) {
       sectionName,
       assetCount: allAssets.length
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadSectionAssets_complete',
       file: 'assetPreloader.js',
       method: 'preloadSectionAssets',
@@ -899,7 +900,7 @@ export async function preloadSectionAssets(sectionName) {
       error: error.message,
       stack: error.stack
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'preloadSectionAssets_error',
       file: 'assetPreloader.js',
       method: 'preloadSectionAssets',
@@ -911,14 +912,15 @@ export async function preloadSectionAssets(sectionName) {
 
 /**
  * @function clearPreloadCache
- * @description Clear resolved asset URL preload state and in-flight/content caches.
- * Section bundle preload state (preloadedSections) is preserved.
+ * @description Clear resolved asset URL preload state and module-level preload caches.
+ * Clears Pinia preloaded URLs (`clearAssets`), `preloadInProgress`, and `jsonDataCache`.
+ * Section bundle preload state (`preloadedSections`, `buildHash`) is preserved.
  * @returns {void}
  */
 export function clearPreloadCache() {
   const preloadStore = usePreloadStore();
   log('assetPreloader.js', 'clearPreloadCache', 'start', 'Clearing preload cache', { cacheSize: preloadStore.preloadedAssetCount });
-  window.performanceTracker.step({
+  trackStep({
     step: 'clearPreloadCache',
     file: 'assetPreloader.js',
     method: 'clearPreloadCache',
