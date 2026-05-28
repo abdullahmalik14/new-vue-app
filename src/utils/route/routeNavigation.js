@@ -8,10 +8,12 @@
 import { log } from '../common/logHandler.js';
 import { trackStep } from '../common/performanceTrackerAccess.js';
 import { deepClone } from '../common/objectSafety.js';
+import { getRouteChainForPath } from './routeResolver.js';
 
 // Navigation state
 let currentActiveRoute = null;
 let previousActiveRoute = null;
+let currentRouteChain = [];
 const fullNavigationHistory = [];
 
 // Maximum history entries to keep in memory
@@ -61,6 +63,11 @@ export function setCurrentActiveRoute(route) {
   // Set new current (snapshot — not shared with meta.routeConfig reference)
   currentActiveRoute = routeSnapshot;
 
+  // Parent chain for breadcrumbs / path introspection (A7)
+  currentRouteChain = route?.slug
+    ? getRouteChainForPath(route.slug).map(snapshotRouteConfig).filter(Boolean)
+    : [];
+
   // Add to history
   fullNavigationHistory.push({
     route: routeSnapshot,
@@ -76,7 +83,8 @@ export function setCurrentActiveRoute(route) {
   log('routeNavigation.js', 'setCurrentActiveRoute', 'success', 'Active route updated', {
     currentPath: route?.slug,
     previousPath: previousActiveRoute?.slug,
-    historySize: fullNavigationHistory.length
+    historySize: fullNavigationHistory.length,
+    routeChainLength: currentRouteChain.length
   });
 }
 
@@ -104,6 +112,22 @@ export function getCurrentActiveRoute() {
   });
   log('routeNavigation.js', 'getCurrentActiveRoute', 'return', 'Returning current active route', { slug: currentActiveRoute?.slug });
   return currentActiveRoute;
+}
+
+/**
+ * Get parent chain for the current active route (root → current).
+ *
+ * @returns {Array<object>} - Snapshot route objects from root to current
+ */
+export function getCurrentRouteChain() {
+  log('routeNavigation.js', 'getCurrentRouteChain', 'get', 'Getting current route chain', {
+    chainLength: currentRouteChain.length
+  });
+  log('routeNavigation.js', 'getCurrentRouteChain', 'return', 'Returning current route chain', {
+    chainLength: currentRouteChain.length,
+    slugs: currentRouteChain.map(route => route.slug)
+  });
+  return currentRouteChain;
 }
 
 /**
@@ -189,6 +213,7 @@ export function clearNavigationHistory() {
 
   currentActiveRoute = null;
   previousActiveRoute = null;
+  currentRouteChain = [];
   fullNavigationHistory.length = 0;
 
   log('routeNavigation.js', 'clearNavigationHistory', 'success', 'Navigation history cleared', {});

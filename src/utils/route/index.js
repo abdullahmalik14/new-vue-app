@@ -36,7 +36,10 @@ export {
   guardCheckAuthentication,
   guardCheckUserRole,
   guardCheckDependencies,
-  clearGuardNavigationHistory
+  clearGuardNavigationHistory,
+  markGuardRedirectNavigation,
+  consumeGuardRedirectNavigation,
+  shouldClearGuardLoopHistoryAfterNavigation
 } from './routeGuards.js';
 
 // Export navigation functions
@@ -44,6 +47,7 @@ export {
   setCurrentActiveRoute,
   getCurrentActivePath,
   getCurrentActiveRoute,
+  getCurrentRouteChain,
   getPreviousActivePath,
   getPreviousActiveRoute,
   getNavigationHistory,

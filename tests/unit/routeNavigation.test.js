@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   setCurrentActiveRoute,
   getCurrentActiveRoute,
+  getCurrentRouteChain,
   getPreviousActiveRoute,
   getNavigationHistory,
   clearNavigationHistory,
@@ -37,6 +38,16 @@ describe('routeNavigation snapshots (A8)', () => {
       supportedRoles: ['creator'],
     });
     expect(historyEntry.route).not.toBe(route);
+  });
+
+  it('stores parent route chain for nested paths (A7)', () => {
+    setCurrentActiveRoute({ slug: '/dashboard/settings/privacy-security' });
+
+    const chain = getCurrentRouteChain();
+
+    expect(chain.length).toBeGreaterThanOrEqual(2);
+    expect(chain[0].slug).toBe('/dashboard');
+    expect(chain[chain.length - 1].slug).toBe('/dashboard/settings/privacy-security');
   });
 
   it('keeps previous route snapshot when navigating again', () => {

@@ -1065,9 +1065,57 @@ export function guardCheckDependencies(route, context) {
   return result;
 }
 
+/** Set when beforeEach ends navigation via next(location) (locale inject or guard redirect). */
+let guardRedirectNavigationPending = false;
+
+/**
+ * Mark navigation as ending via a route-guard redirect (auth, dependency, etc.).
+ * Do not call for locale-inject redirects — those are user navigation normalization (L5).
+ *
+ * @returns {void}
+ */
+export function markGuardRedirectNavigation() {
+  guardRedirectNavigationPending = true;
+  log("routeGuards.js", "markGuardRedirectNavigation", "info", "Guard redirect flagged", {});
+}
+
+/**
+ * @returns {boolean} True if the completed navigation followed a guard/locale redirect.
+ */
+export function consumeGuardRedirectNavigation() {
+  const wasRedirect = guardRedirectNavigationPending;
+  guardRedirectNavigationPending = false;
+  log("routeGuards.js", "consumeGuardRedirectNavigation", "return", "Guard redirect flag consumed", {
+    wasRedirect,
+  });
+  return wasRedirect;
+}
+
+/**
+ * Whether afterEach should clear loop-detection history (L5).
+ *
+ * @param {string} fromPath
+ * @param {string} toPath
+ * @param {{ completedViaGuardRedirect?: boolean }} [options]
+ * @returns {boolean}
+ */
+export function shouldClearGuardLoopHistoryAfterNavigation(
+  fromPath,
+  toPath,
+  { completedViaGuardRedirect = false } = {},
+) {
+  if (completedViaGuardRedirect) {
+    return false;
+  }
+  if (!fromPath) {
+    return false;
+  }
+  return toPath !== fromPath;
+}
+
 /**
  * Clear guard redirect-loop detection history (not full navigation state).
- * Used by router afterEach on real route changes (L5) and in tests/logout flows.
+ * Used by router afterEach on user-initiated route changes (L5) and in tests/logout flows.
  *
  * @returns {void}
  */

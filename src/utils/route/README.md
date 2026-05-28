@@ -61,7 +61,7 @@ console.assert(routes !== routes3); // Should be new load
 - `resolveRouteFromPath(path)` - Find route by path
 - `resolveComponentPathForRoute(route, role)` - Get component path for role
 - `inheritConfigurationFromParentRoute(route)` - Merge parent config (used by router guards/preload via `resolveEffectiveRouteConfig`)
-- `getRouteChainForPath(path)` - Optional breadcrumb/path utility; **not** used in guard or preload pipeline
+- `getRouteChainForPath(path)` - Parent chain for breadcrumbs/path introspection; wired into `routeNavigation` on each navigation
 
 **Testing**:
 ```javascript

@@ -13,7 +13,10 @@ import {
   runAllRouteGuards,
   setCurrentActiveRoute,
   resolveComponentPathForRoute,
-  clearGuardNavigationHistory
+  clearGuardNavigationHistory,
+  markGuardRedirectNavigation,
+  consumeGuardRedirectNavigation,
+  shouldClearGuardLoopHistoryAfterNavigation
 } from '../utils/route/index.js';
 import { isRouteAccessibleInCurrentEnvironment } from '../utils/route/routeEnvAccess.js';
 import { log } from '../utils/common/logHandler.js';
@@ -409,6 +412,7 @@ router.beforeEach(async (to, from, next) => {
     // Redirect only when the target differs. Double-prefix loops are prevented by
     // stripLeadingLocaleFromPath + urlLocale from path; do not compare from.path (L14 fix).
     if (pathWithLocale !== to.path) {
+      // Locale inject is URL normalization, not a guard loop redirect (L5).
       return next({
         path: pathWithLocale,
         query: to.query,
@@ -497,6 +501,7 @@ router.beforeEach(async (to, from, next) => {
         });
 
     if (guardResult.redirectTo) {
+      markGuardRedirectNavigation();
       next(guardResult.redirectTo);
     } else {
       failNavigationProgress();
@@ -554,14 +559,26 @@ router.afterEach(async (to, from) => {
         purpose: `Navigation to ${to.path} completed`
       });
 
-  // Clear loop-detection history only after a real route change (L5).
-  // Unconditional clears after every afterEach wiped same-path redirect-loop history.
-  if (from.path && to.path !== from.path) {
+  // Clear loop-detection history only after user-initiated navigation settles (L5).
+  // Do not clear after guard/locale redirects so same-slug loop history can accumulate.
+  const completedViaGuardRedirect = consumeGuardRedirectNavigation();
+  if (
+    shouldClearGuardLoopHistoryAfterNavigation(from.path, to.path, {
+      completedViaGuardRedirect,
+    })
+  ) {
     clearGuardNavigationHistory();
 
-    log('router/index.js', 'afterEach', 'loop-reset', 'Navigation history cleared after route change', {
+    log('router/index.js', 'afterEach', 'loop-reset', 'Loop history cleared after user navigation', {
       from: from.path,
       to: to.path
+    });
+  } else if (from.path) {
+    log('router/index.js', 'afterEach', 'loop-reset-skip', 'Loop history retained', {
+      from: from.path,
+      to: to.path,
+      completedViaGuardRedirect,
+      samePath: to.path === from.path
     });
   }
 

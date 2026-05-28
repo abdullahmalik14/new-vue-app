@@ -36,12 +36,38 @@ describe('performanceTracker guards (S-05)', () => {
     });
   });
 
-  it('routeResolver resolveRouteFromPath works without performanceTracker', async () => {
+  it('routeResolver resolveRouteFromPath works without performanceTracker (A4)', async () => {
     const { resolveRouteFromPath } = await import('../../src/utils/route/routeResolver.js');
 
     const route = resolveRouteFromPath('/log-in');
 
     expect(route).toMatchObject({ slug: '/log-in', section: 'auth' });
+  });
+
+  it('trackStep and getPerformanceTracker are safe when window is undefined (SSR)', async () => {
+    const savedWindow = globalThis.window;
+    // @ts-expect-error simulate Node/SSR — no browser global
+    delete globalThis.window;
+
+    try {
+      const { trackStep, getPerformanceTracker } = await import(
+        '../../src/utils/common/performanceTrackerAccess.js'
+      );
+
+      expect(() =>
+        trackStep({
+          step: 'ssrSafe',
+          file: 'test',
+          method: 'test',
+          flag: 'test',
+          purpose: 'SSR guard check',
+        }),
+      ).not.toThrow();
+
+      expect(getPerformanceTracker().enabled).toBe(false);
+    } finally {
+      globalThis.window = savedWindow;
+    }
   });
 
   it('routeGuards runAllRouteGuards works without performanceTracker (B1)', async () => {

@@ -6,16 +6,14 @@
  * - Resolving role-based component paths
  * - Inheriting configurations from parent routes
  * 
- * All operations tracked with global window.performanceTracker.
+ * All operations tracked via trackStep() (SSR-safe performanceTracker access).
  */
 
 import { getRouteConfiguration } from './routeConfigLoader.js';
 import { log } from '../common/logHandler.js';
 import { deepMergePreferChild, safelyGetNestedProperty } from '../common/objectSafety.js';
 import { routeConfigMatchesPath } from './routeAliases.js';
-
-
-// Performance tracker available globally as window.performanceTracker
+import { trackStep } from '../common/performanceTrackerAccess.js';
 
 /**
  * Find a route by its slug path
@@ -26,7 +24,7 @@ import { routeConfigMatchesPath } from './routeAliases.js';
  */
 export function resolveRouteFromPath(targetPath) {
   log('routeResolver.js', 'resolveRouteFromPath', 'start', 'Finding route by path', { targetPath });
-  window.performanceTracker?.step({
+  trackStep({
     step: 'resolveRoute',
     file: 'route/routeResolver.js',
     method: 'resolveRouteFromPath',
@@ -46,7 +44,7 @@ export function resolveRouteFromPath(targetPath) {
       });
 
       // Track success
-      window.performanceTracker?.step({
+      trackStep({
         step: 'routeResolved',
         file: 'routeResolver.js',
         method: 'resolveRouteFromPath',
@@ -72,7 +70,7 @@ export function resolveRouteFromPath(targetPath) {
         });
 
         // Track success
-        window.performanceTracker?.step({
+        trackStep({
           step: 'routeResolved',
           file: 'routeResolver.js',
           method: 'resolveRouteFromPath',
@@ -90,7 +88,7 @@ export function resolveRouteFromPath(targetPath) {
   log('routeResolver.js', 'resolveRouteFromPath', 'not-found', 'No route match found for path', { targetPath });
 
   // Track miss
-  window.performanceTracker?.step({
+  trackStep({
     step: 'routeNotFound',
     file: 'routeResolver.js',
     method: 'resolveRouteFromPath',
@@ -180,7 +178,7 @@ export function resolveComponentPathForRoute(route, userRole) {
     slug: route.slug,
     userRole
   });
-  window.performanceTracker?.step({
+  trackStep({
     step: 'resolveComponentPath',
     file: 'route/routeResolver.js',
     method: 'resolveComponentPathForRoute',
@@ -209,7 +207,7 @@ export function resolveComponentPathForRoute(route, userRole) {
       });
 
       // Track resolution
-      window.performanceTracker?.step({
+      trackStep({
         step: 'componentPathResolved',
         file: 'routeResolver.js',
         method: 'resolveComponentPathForRoute',
@@ -229,7 +227,7 @@ export function resolveComponentPathForRoute(route, userRole) {
     });
 
     // Track resolution
-    window.performanceTracker?.step({
+    trackStep({
       step: 'componentPathResolved',
       file: 'routeResolver.js',
       method: 'resolveComponentPathForRoute',
@@ -269,7 +267,7 @@ export function inheritConfigurationFromParentRoute(childRoute) {
     log('routeResolver.js', 'inheritConfigurationFromParentRoute', 'return', 'Returning original route - no inheritance', { slug: childRoute.slug });
     return childRoute;
   }
-  window.performanceTracker?.step({
+  trackStep({
     step: 'inheritParentConfig',
     file: 'route/routeResolver.js',
     method: 'inheritConfigurationFromParentRoute',
@@ -316,7 +314,7 @@ export function inheritConfigurationFromParentRoute(childRoute) {
   });
 
   // Track merge completion
-  window.performanceTracker?.step({
+  trackStep({
     step: 'parentConfigInherited',
     file: 'routeResolver.js',
     method: 'inheritConfigurationFromParentRoute',
@@ -383,8 +381,8 @@ function findParentRouteBySlug(childSlug) {
 }
 
 /**
- * Get all matched routes for a path (including parent chain)
- * Optional utility for breadcrumbs and path introspection.
+ * Get all matched routes for a path (including parent chain).
+ * Used at runtime by `routeNavigation.setCurrentActiveRoute()` for breadcrumbs/path introspection.
  *
  * NOT used by the router guard/preload pipeline — config inheritance uses
  * `inheritConfigurationFromParentRoute()` / `resolveEffectiveRouteConfig()` instead.

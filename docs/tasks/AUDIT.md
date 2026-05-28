@@ -175,6 +175,33 @@ clearNavigationHistory(); // Wipes all history after every nav, loop guard never
 
 ---
 
+#### Revision (May 2026 — client follow-up)
+
+**Client note:** “Loop-history clearing was improved but still clears on route changes, including redirects.”
+
+**What was still wrong:** The first-pass fix still cleared whenever `to.path !== from.path`, which includes guard redirects (auth, `redirectIfLoggedIn`, dependency `fallbackSlug`, etc.). Locale-inject redirects were also briefly flagged the same way, so normal link clicks with a non-default locale looked like guard redirects and skipped the clear.
+
+**What the revision did:**
+
+- `src/utils/route/routeGuards.js`: Added `markGuardRedirectNavigation()`, `consumeGuardRedirectNavigation()`, and `shouldClearGuardLoopHistoryAfterNavigation()`. Clear policy: clear on user-settled path change only; do **not** clear when navigation completed after a guard `next(redirectTo)`.
+- `src/router/index.js` `beforeEach`: `markGuardRedirectNavigation()` only before guard-block `next(redirectTo)` — **not** locale-inject (locale normalization remains user navigation).
+- `src/router/index.js` `afterEach`: Uses the helpers above; logs `loop-reset` on clear and `loop-reset-skip` when history is retained.
+- `tests/unit/guardLoopHistoryClear.test.js`: Unit tests for clear policy and same-slug loop accumulation.
+
+**Clarification (clear vs count):** Loop **counting** still only happens when `to.slug === from.slug` (same-route redirect loops). Redirects that change slug (e.g. `/dashboard` → `/log-in`) are not counted. The revision only changes **when the counter is reset** — not whether redirects count as loops.
+
+**How to test in the browser**
+
+1. Ensure `VITE_ENABLE_LOGGER=true` in `.env.development` and run the dev server.
+2. Open DevTools → Console. Filter one term at a time (DevTools regex is unreliable): `loop-reset`, `loop-reset-skip`, `clearGuardNavigationHistory`.
+3. **Test A — Guard redirect (history retained):** Logged out, go to `/dashboard`. Expect `[beforeEach] [block]` with `redirectTo: '/log-in'`, then **`[afterEach] [loop-reset-skip]`** with `completedViaGuardRedirect: true`. Do **not** expect `[loop-reset]` or `clearGuardNavigationHistory` for that completion.
+4. **Test B — User navigation (history cleared):** Logged in with onboarding complete, go `/log-in` → `/dashboard` (link or post-login). Expect **`[afterEach] [loop-reset]`** with `Loop history cleared after user navigation`. Dependency redirect chains (e.g. incomplete onboarding `/dashboard` → `/sign-up/onboarding`) should **skip** clear like Test A. Locale-inject alone must not set the redirect flag.
+5. **Test C — Same-path completion (optional):** Navigate where `to.path === from.path` on completion. Expect `loop-reset-skip` with `samePath: true`, not `loop-reset`.
+
+**Automated:** `npm run test:unit -- tests/unit/guardLoopHistoryClear.test.js --run`
+
+---
+
 ### L6 — Role guard bypass via `dependencies` allows unauthorized access
 **File**: `src/utils/route/routeGuards.js` line 637
 
@@ -963,6 +990,14 @@ Every single guard, loader, and hook directly accesses `window.performanceTracke
 
 **Note:** Related finding **A4** (`routeNavigation.js` direct `window.performanceTracker` access) was resolved in the Additional Router Issues pass using the same `trackStep()` utility. `routeResolver.js` was already guarded in **SECTION_PRELOAD_AUDIT.md** S-05.
 
+#### Follow-up (2026-05-28) ✅
+
+**Trigger:** Client note — *"B1 / A4 — Some direct `window.performanceTracker` access still remains."*
+
+Re-audit confirmed B1-scoped files (`src/router/index.js`, `src/utils/route/routeGuards.js`, `src/utils/route/routeConfigLoader.js`) already use `trackStep()` — no further B1 changes required. Remaining gap was `routeResolver.js` (still used bare `window.performanceTracker?.step(...)`); completed in **A4 follow-up** below.
+
+**Router layer status after follow-up:** No direct `window.performanceTracker` references remain in `src/router/` or `src/utils/route/`.
+
 ---
 
 ### B2 — n/a
@@ -1366,6 +1401,26 @@ No preload-refactor overlap.
 2. Confirm navigation works with no console errors about `performanceTracker` or `.step`.
 3. Optional: in DevTools Console before navigating, run `delete window.performanceTracker`, then navigate again — page should still route; history helpers must not throw (tracker is optional in dev).
 
+#### Follow-up (2026-05-28) ✅
+
+**Status:** Resolved (follow-up pass — completes A4 for `routeResolver.js`).
+
+**What was still broken:** Prior A4 resolution left `routeResolver.js` on `window.performanceTracker?.step(...)` (9 calls). Optional chaining prevents crash when the **tracker** is missing, but bare `window` still throws `ReferenceError` in SSR/Node where `window` is undefined. Existing unit tests only ran `delete window.performanceTracker` (jsdom still provides `window`), so they did not catch the SSR case.
+
+**What changed:**
+- **`src/utils/route/routeResolver.js`** — replaced all 9 `window.performanceTracker?.step(...)` calls with `trackStep()` from `src/utils/common/performanceTrackerAccess.js` (same utility used by B1/A4 router files).
+- **`tests/unit/performanceTrackerGuards.test.js`** — renamed routeResolver case to `(A4)`; added SSR simulation test that deletes `globalThis.window` and confirms `trackStep()` / `getPerformanceTracker()` do not throw.
+
+**Note:** Other app modules (auth handlers, asset loaders, locale manager, etc.) still use direct `window.performanceTracker` access outside B1/A4 scope — not changed in this pass.
+
+**How it was tested:** Ran `npm run test:unit -- --run tests/unit/performanceTrackerGuards.test.js` (6 passed, including new SSR guard test).
+
+**How to test SSR safety (manual):**
+```bash
+node -e "delete globalThis.window; import('./src/utils/common/performanceTrackerAccess.js').then(m => { m.trackStep({step:'t',file:'f',method:'m',flag:'f',purpose:'p'}); console.log('OK'); })"
+```
+Should print `OK` with no throw.
+
 ---
 
 ## A5 — Route utilities README has incorrect async guard examples
@@ -1457,29 +1512,31 @@ Impact:
 
 #### Resolution ✅
 
-**Status:** Resolved (fixed in this audit pass — clarified scope + test coverage; no router pipeline change).
+**Status:** Resolved — wired into runtime navigation state.
 
 **What was broken:** `getRouteChainForPath()` was exported and documented as a route-chain helper, but nothing in the runtime app called it. That looked like unfinished parent-chain wiring, even though **A2 / L-11** already handle config inheritance via `inheritConfigurationFromParentRoute()` → `resolveEffectiveRouteConfig()` in `beforeEach` / preload orchestration.
 
 **Why it happened:** The helper was added for breadcrumbs/nested layouts (`RoutingExplained.md`) before inheritance was implemented through single-parent recursive merge. Two overlapping concepts (`getRouteChainForPath` vs `findParentRouteBySlug`) were never consolidated.
 
 **What changed:**
-- **`routeResolver.js`** — JSDoc clarifies `getRouteChainForPath` is an optional consumer utility (breadcrumbs/path introspection), **not** part of guard/preload/inheritance pipeline. Chain lookup now uses `resolveExactRouteFromPath()` (exact slug matches only) so catch-all `/:pathMatch(.*)*` does not pollute breadcrumb chains.
-- **`src/utils/route/README.md`** — same distinction under Key Methods.
+- **`routeResolver.js`** — Chain lookup uses `resolveExactRouteFromPath()` (exact slug matches only) so catch-all `/:pathMatch(.*)*` does not pollute breadcrumb chains.
+- **`routeNavigation.js`** — `setCurrentActiveRoute()` now calls `getRouteChainForPath(route.slug)` and stores immutable snapshots; new `getCurrentRouteChain()` accessor for UI/SEO consumers.
+- **`src/utils/route/index.js`** — exports `getCurrentRouteChain`.
 - **`tests/unit/routeChain.test.js`** — unit tests for chain resolution on nested dashboard paths, top-level routes, and unknown paths.
+- **`tests/unit/routeNavigation.test.js`** — verifies chain is populated when navigation state updates.
 
-No preload-refactor overlap; did **not** wire into router pipeline (would duplicate `resolveEffectiveRouteConfig` without adding behavior).
+No preload-refactor overlap; did **not** wire into guard/inheritance pipeline (would duplicate `resolveEffectiveRouteConfig` without adding behavior).
 
-**How it was tested:** Ran `npm run test:unit -- --run tests/unit/routeChain.test.js`.
+**How it was tested:** Ran `npm run test:unit -- --run tests/unit/routeChain.test.js tests/unit/routeNavigation.test.js`.
 
 **How to test in the browser:**
-1. Run `npm run dev`, open DevTools → **Console**.
-2. Run:
+1. Run `npm run dev`, navigate to `/dashboard/settings/privacy-security`.
+2. In DevTools → **Console**:
    ```js
-   const { getRouteChainForPath } = await import('/src/utils/route/routeResolver.js');
-   getRouteChainForPath('/dashboard/settings/privacy-security').map(r => r.slug);
+   const { getCurrentRouteChain } = await import('/src/utils/route/index.js');
+   getCurrentRouteChain().map(r => r.slug);
    ```
-3. Expect an array like `['/dashboard', '/dashboard/settings', '/dashboard/settings/privacy-security']` (only slugs that exist in `routeConfig.json`).
+3. Expect `['/dashboard', '/dashboard/settings', '/dashboard/settings/privacy-security']` after navigation (not from a manual `getRouteChainForPath` call).
 4. Confirm normal navigation/guards/preload still work — inheritance is unchanged (test unauthenticated redirect on `/dashboard/payout` per A2).
 
 ---
