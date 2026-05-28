@@ -764,10 +764,7 @@
     "requiresAuth": false,
     "enabled": true,
     "supportedRoles": [
-      "creator",
-      "fan",
-      "agent",
-      "vendor"
+      "all"
     ],
     "componentPath": "@/templates/auth/page/role/AuthFacebook.vue"
   },
@@ -777,10 +774,7 @@
     "requiresAuth": false,
     "enabled": true,
     "supportedRoles": [
-      "creator",
-      "fan",
-      "agent",
-      "vendor"
+      "all"
     ],
     "componentPath": "@/templates/auth/page/role/AuthGoogle.vue"
   },
@@ -790,10 +784,7 @@
     "requiresAuth": false,
     "enabled": true,
     "supportedRoles": [
-      "creator",
-      "fan",
-      "agent",
-      "vendor"
+      "all"
     ],
     "componentPath": "@/templates/auth/page/role/AuthTwitter.vue"
   },
@@ -803,10 +794,7 @@
     "requiresAuth": false,
     "enabled": true,
     "supportedRoles": [
-      "creator",
-      "fan",
-      "agent",
-      "vendor"
+      "all"
     ],
     "componentPath": "@/templates/auth/page/role/AuthTelegram.vue"
   },

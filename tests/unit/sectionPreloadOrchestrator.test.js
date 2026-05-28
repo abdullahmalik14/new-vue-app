@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { createPinia, setActivePinia } from 'pinia';
 
 const preloadSection = vi.fn();
 const resetSectionPreloadState = vi.fn();
@@ -13,6 +14,7 @@ vi.mock('../../src/utils/translation/translationLoader.js', () => ({
 }));
 
 beforeEach(() => {
+  setActivePinia(createPinia());
   vi.resetModules();
   preloadSection.mockReset();
   preloadSection.mockResolvedValue(true);

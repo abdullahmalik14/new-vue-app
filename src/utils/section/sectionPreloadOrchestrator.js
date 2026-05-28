@@ -10,7 +10,36 @@ import {
   resolveSectionIdentifier,
   resolveRoleSectionVariant
 } from './sectionResolver.js';
+import { usePreloadStore } from '../../stores/usePreloadStore.js';
 import { preloadSection, resetSectionPreloadState } from './sectionPreloader.js';
+
+/**
+ * Snapshot each section's preload state before any preload work begins.
+ *
+ * @param {Array<string>} sections
+ * @param {string|null|undefined} skipSection
+ * @returns {Array<{ section: string, skipped: boolean, willPreload: boolean, isPreloaded: boolean, inProgress: boolean, needsPreload: boolean }>}
+ */
+function buildSectionPreloadStatusSnapshot(sections, skipSection = null) {
+  const preloadStore = usePreloadStore();
+
+  return sections
+    .filter((section) => typeof section === 'string' && section.length > 0)
+    .map((section) => {
+      const skipped = Boolean(skipSection && section === skipSection);
+      const isPreloaded = preloadStore.hasSection(section);
+      const inProgress = preloadStore.isSectionInProgress(section);
+
+      return {
+        section,
+        skipped,
+        willPreload: !skipped,
+        isPreloaded,
+        inProgress,
+        needsPreload: !skipped && !isPreloaded && !inProgress
+      };
+    });
+}
 
 /**
  * Merge parent route config when inheritConfigFromParent is set (L-11).
@@ -54,6 +83,15 @@ export function getRoutePreloadPlan(routeConfig, userRole, { additionalSections 
     }
   }
 
+  log('sectionPreloadOrchestrator.js', 'getRoutePreloadPlan', 'config', 'Sections configured for preload from routeConfig', {
+    routeSlug: effectiveRouteConfig.slug ?? null,
+    userRole,
+    preLoadSections: effectiveRouteConfig.preLoadSections ?? null,
+    resolvedIdentifiers: identifiers,
+    resolvedSectionNames: resolved,
+    ...(additionalSections.length > 0 ? { additionalSections } : {})
+  });
+
   return { identifiers, resolved };
 }
 
@@ -92,6 +130,16 @@ export function shouldPreloadDefaultAuthSection({ isAuthenticated, currentPath, 
  */
 export function preloadDefaultAuthSection(logContext) {
   const { file, method } = logContext;
+  const preloadStore = usePreloadStore();
+  const isPreloaded = preloadStore.hasSection('auth');
+  const inProgress = preloadStore.isSectionInProgress('auth');
+
+  log(file, method, 'preload-status', 'Auth section preload status before default auth preload', {
+    section: 'auth',
+    isPreloaded,
+    inProgress,
+    needsPreload: !isPreloaded && !inProgress
+  });
 
   log(file, method, 'preload-default', 'Preloading default auth section', { section: 'auth' });
 
@@ -125,6 +173,24 @@ export function startBackgroundSectionPreloads({
   path = null
 }) {
   const { file, method } = logContext;
+  const sectionStatus = buildSectionPreloadStatusSnapshot(sections, skipSection);
+
+  log(file, method, 'preload-status', 'Section preload status before background preloads start', {
+    path,
+    configuredSections: sections,
+    skipSection: skipSection ?? null,
+    sectionStatus,
+    alreadyPreloaded: sectionStatus
+      .filter((entry) => entry.willPreload && entry.isPreloaded)
+      .map((entry) => entry.section),
+    needsPreload: sectionStatus
+      .filter((entry) => entry.needsPreload)
+      .map((entry) => entry.section),
+    skippedSections: sectionStatus
+      .filter((entry) => entry.skipped)
+      .map((entry) => entry.section)
+  });
+
   const promises = [];
 
   for (const section of sections) {
