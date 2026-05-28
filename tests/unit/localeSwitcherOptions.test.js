@@ -17,3 +17,29 @@ describe('getLocaleSwitcherOptions (L-08)', () => {
     expect(options.find((o) => o.code === 'zh-tw')?.traditionalName).toContain('繁');
   });
 });
+
+describe('getLocaleDisplayName (P-05)', () => {
+  it('returns curated labels for all supported locales', async () => {
+    const { getLocaleDisplayName, SUPPORTED_LOCALES } = await import(LOCALE_MANAGER_PATH);
+
+    for (const code of SUPPORTED_LOCALES) {
+      const name = getLocaleDisplayName(code);
+      expect(name).not.toBe(code);
+      expect(name.length).toBeGreaterThan(1);
+    }
+  });
+
+  it('uses Intl.DisplayNames fallback for locales outside the curated map', async () => {
+    const { getLocaleDisplayName } = await import(LOCALE_MANAGER_PATH);
+
+    const hawaiian = getLocaleDisplayName('haw');
+    expect(hawaiian).toBe('Hawaiian');
+  });
+
+  it('accepts displayLocale for Intl fallback path', async () => {
+    const { getLocaleDisplayName } = await import(LOCALE_MANAGER_PATH);
+
+    const frenchInGerman = getLocaleDisplayName('haw', 'de');
+    expect(frenchInGerman.toLowerCase()).toContain('hawai');
+  });
+});

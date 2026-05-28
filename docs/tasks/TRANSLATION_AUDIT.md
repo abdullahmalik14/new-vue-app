@@ -435,7 +435,7 @@ if (!translationsLoadingInProgress.has(loadingKey)) {
 
 **Conflict check:** No preload timing change — same dedupe/wait pattern; waiters now get an explicit failed outcome instead of a silent race.
 
-**How it was tested:** `tests/unit/translationLoader.test.js` — `translationLoader concurrent wait (L-07)` with parallel loads and failed HEAD validation.
+**How it was tested:** `tests/unit/translationLoader.test.js` — `translationLoader concurrent wait (L-07)` with parallel loads and failed GET validation.
 
 **How to test in the browser:**
 1. DevTools → **Network** → right-click `en.json` (e.g. `/i18n/section-auth/en.json`) → **Block request URL**, or use request blocking pattern `*/i18n/section-auth/en.json`.
@@ -518,6 +518,58 @@ if (!ct.includes('application/json')) { /* SPA fallback page */ return {}; }
 return await response.json();
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Every translation load issued a `HEAD` request via `validateTranslationFileExists`, then a separate `GET` in `loadTranslationFile`. A non-English cold load made **4** HTTP requests (HEAD en, GET en, HEAD locale, GET locale), doubling network round-trips on slow connections.
+
+**Why it happened:** HEAD was added to detect SPA 200-fallbacks (missing JSON returning `index.html`) before fetching body, but the same check can run on the GET response `Content-Type`.
+
+**What changed:**
+- `translationLoader.js` — removed `validateTranslationFileExists`.
+- `loadTranslationFile` — single GET per file; returns `{}` when `!response.ok` or `Content-Type` is not JSON (SPA fallback).
+- `loadTranslationsForSection` — loads English first via GET; missing English → `{}`; missing locale → English-only fallback; no duplicate existence probes.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Aligns with preload refactor performance rules (fewer duplicate requests). Translation preload / section preload still call `loadTranslationsForSection`; they now warm cache with half the HTTP calls on cold load. **SECTION_PRELOAD_AUDIT P-06** (blocking on HEAD+JSON) is further reduced — only GETs remain; router already avoids awaiting translation I/O in `beforeEach` per **AUDIT.md**.
+
+**How it was tested:** `tests/unit/translationLoader.test.js` — `translationLoader single GET per file (P-01)` (2 GETs for `vi`, no HEAD; non-JSON GET returns `{}`). Updated L-02/L-07/S-04 mocks to drop HEAD.
+
+**How to test in the browser:**
+1. Run `npm run dev`, open a page that loads section translations (e.g. `/log-in` or `/vi/log-in`).
+2. DevTools → **Network** → filter `i18n` → hard refresh (Ctrl+Shift+R). **Before fix:** 4 requests per section/locale (HEAD+GET × en+vi). **After fix:** 2 GETs only (`en.json`, `vi.json`).
+3. DevTools → **Console** (one paste — counts methods for a cold load):
+   ```js
+   (async () => {
+     const tl = await import('/src/utils/translation/translationLoader.js');
+     tl.clearTranslationCaches();
+     const section = window.__CURRENT_SECTION__ || 'auth';
+     const targetLocale = 'vi';
+     const calls = [];
+     const orig = window.fetch;
+     window.fetch = async (...args) => {
+       const [url, opts = {}] = args;
+       if (typeof url === 'string' && url.includes('/i18n/section-')) {
+         calls.push({ url, method: opts.method || 'GET' });
+       }
+       return orig(...args);
+     };
+     try {
+       await tl.loadTranslationsForSection(section, targetLocale);
+       console.table(calls);
+       console.log({
+         totalI18nRequests: calls.length,
+         headCount: calls.filter((c) => c.method === 'HEAD').length,
+         getCount: calls.filter((c) => c.method === 'GET').length,
+         expectedAfterFix: calls.length === 2 && calls.every((c) => c.method === 'GET')
+       });
+     } finally {
+       window.fetch = orig;
+     }
+   })();
+   ```
+4. **Expected after fix:** `totalI18nRequests: 2`, `headCount: 0`, `getCount: 2`, `expectedAfterFix: true`.
+
 ---
 
 ### P-02 — Translations loaded in both `beforeEach` and `afterEach`
@@ -529,6 +581,59 @@ The router loads translations in `beforeEach` (awaited, blocking navigation) and
 
 **Fix:** Remove the translation load from `afterEach` for sections that are already loaded for the current locale. Use `areTranslationsLoadedForSection` to guard the call.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** The audit originally described duplicate loads in `beforeEach` (awaited) and `afterEach`. After **Preloading.md Task 3**, the router no longer awaits translations in `beforeEach`, and current-section work moved to **`beforeResolve`** (`startCurrentSectionResourceLoads`). **L-03** then re-introduced a second load via `applyLocaleTemporarily(..., { loadTranslations: true })` in `beforeEach` for URL-locale paths. On first navigation that caused two parallel `loadTranslationsForSection` calls for the same section/locale; the second hit `translationsLoadingInProgress` and polled (100–500 ms waste). Background `afterEach` translation preloads could also re-schedule loads for sections already warm in cache.
+
+**Why it happened:** L-03 added translation fetch inside `applyLocaleTemporarily` for standalone callers without opting the router out; `beforeResolve` already loads the current section. The TRANSLATION_AUDIT finding predates that split.
+
+**What changed:**
+- `router/index.js` — `applyLocaleTemporarily(urlLocale, { routePath: to.path, loadTranslations: false })` so URL-locale handling only switches locale state; **one** current-section translation load runs in `beforeResolve`.
+- `routeNavigationData.js` — `startCurrentSectionResourceLoads` skips `loadTranslationsForSection` when `areTranslationsLoadedForSection(section, locale)` is true.
+- `sectionPreloadOrchestrator.js` — `startBackgroundSectionPreloads` (router `afterEach` + locale refresh) skips background translation preload when already loaded.
+
+**Conflict check:** Does **not** override **Preloading.md** / **SECTION_PRELOAD_AUDIT.md** P-08 — keeps translations off the blocking `beforeEach` path and preserves `beforeResolve` as the single current-section loader. Refines **L-03**: `applyLocaleTemporarily` still loads translations by default for standalone/preview callers; the router passes `loadTranslations: false` explicitly.
+
+**How it was tested:** `tests/unit/routeNavigationData.test.js` — skips translation fetch when already loaded. `tests/unit/sectionPreloadOrchestrator.test.js` — background translation preload skipped when cached. Existing `applyLocaleTemporarily` test confirms `loadTranslations: false` skips fetch.
+
+**How to test in the browser:**
+1. Run `npm run dev`, open DevTools → **Network**, filter `i18n`.
+2. Hard refresh on `/vi/log-in` — note request count for `section-auth` (`en.json` + `vi.json` = 2 GETs after P-01).
+3. Navigate in-app to another auth route (e.g. sign-up) — **no new** duplicate burst for the same section/locale if cache is warm.
+4. DevTools → **Console** (one paste after navigating to `/vi/log-in`):
+   ```js
+   (async () => {
+     const calls = [];
+     const orig = window.fetch;
+     window.fetch = async (...args) => {
+       const [url, opts = {}] = args;
+       if (typeof url === 'string' && url.includes('/i18n/section-auth/')) {
+         calls.push({ url, method: opts.method || 'GET', t: performance.now() });
+       }
+       return orig(...args);
+     };
+     const r = await import('/src/router/index.js');
+     const router = r.default;
+     const section = window.__CURRENT_SECTION__ || 'auth';
+     try {
+       calls.length = 0;
+       await router.push('/vi/sign-up');
+       await new Promise((r) => setTimeout(r, 800));
+       console.table(calls);
+       console.log({
+         authI18nFetchesOnSecondAuthNav: calls.length,
+         pass: calls.length === 0,
+         note: 'calls.length === 0 means beforeResolve skipped duplicate load (P-02)',
+       });
+     } finally {
+       window.fetch = orig;
+     }
+   })();
+   ```
+5. **Expected:** On second auth navigation with warm cache, `authI18nFetchesOnSecondAuthNav: 0`, `pass: true`. First cold load to `/vi/log-in` still fetches JSON normally.
+
 ---
 
 ### P-03 — `clearAllCache()` on locale switch may evict non-translation caches
@@ -539,6 +644,41 @@ The router loads translations in `beforeEach` (awaited, blocking navigation) and
 `clearTranslationCaches()` calls `clearAllCache()` from `cacheHandler`. If `cacheHandler` is a shared in-memory store used by other parts of the application (auth tokens, API responses, etc.), a locale switch will wipe them too.
 
 **Fix:** Use a translation-namespaced cache clear. Either pass a prefix to `clearAllCache('translation_')` or track cache keys locally and delete only those.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `clearTranslationCaches()` called `clearAllCache()`, wiping the shared `cacheHandler` store entirely on every locale switch. Other subsystems (asset URLs, JSON config, etc.) also use `cacheHandler` with their own key prefixes.
+
+**Why it happened:** Translation caching was added before prefix-scoped invalidation existed; locale switch reused the blunt clear-all helper.
+
+**What changed:** `translationLoader.js` — `clearTranslationCaches()` now calls `removeCacheKeysByPrefix(TRANSLATION_CACHE_KEY_PREFIX)` (`translation_`) instead of `clearAllCache()`. The in-memory `loadedTranslations` Map is still cleared. Uses the same prefix-clear API added for **ASSET_PRELOAD_AUDIT** (`removeCacheKeysByPrefix` in `cacheHandler.js`).
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md** — reuses the existing `removeCacheKeysByPrefix` pattern from asset env invalidation; only narrows translation cache clear scope.
+
+**How it was tested:** `tests/unit/translationLoader.test.js` — `translationLoader cache clear (P-03)` asserts `removeCacheKeysByPrefix('translation_')` is called and `clearAllCache` is not used.
+
+**How to test in the browser:**
+1. Run `npm run dev`, DevTools → **Console** (one paste):
+   ```js
+   (async () => {
+     const { setValueWithExpiration, getValueFromCache } = await import('/src/utils/common/cacheHandler.js');
+     const { clearTranslationCaches } = await import('/src/utils/translation/translationLoader.js');
+     setValueWithExpiration('asset_url_test_keep', 'survive-locale-switch');
+     setValueWithExpiration('translation_auth_vi', { demo: true });
+     clearTranslationCaches();
+     console.log({
+       assetSurvived: getValueFromCache('asset_url_test_keep') === 'survive-locale-switch',
+       translationCleared: getValueFromCache('translation_auth_vi') === null,
+       pass:
+         getValueFromCache('asset_url_test_keep') === 'survive-locale-switch' &&
+         getValueFromCache('translation_auth_vi') === null
+     });
+   })();
+   ```
+2. **Expected:** `assetSurvived: true`, `translationCleared: true`, `pass: true`.
+3. **Locale switch smoke test:** Use the language `<select>` on `/log-in` — translations reload for the new locale; asset/config caches are not globally wiped (no unexpected re-fetch storm beyond translation JSON).
 
 ---
 
@@ -563,6 +703,61 @@ inFlightPromises.set(loadingKey, promise);
 return promise;
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Concurrent `loadTranslationsForSection` calls for the same section/locale used `waitForTranslationLoad`, which polled every 100 ms for up to 5 s. That added latency and wasted timer/microtask work even when the lead fetch had already finished.
+
+**Why it happened:** Early dedupe used a `Set` plus polling waiter before Promise-based sharing was implemented.
+
+**What changed:** `translationLoader.js` — replaced `translationsLoadingInProgress` + `waitForTranslationLoad` with `inFlightPromises` (`Map` of shared promises). The map entry is registered synchronously before fetch work starts (safe under `Promise.all`). Concurrent callers `await` the same promise; `clearTranslationCaches()` clears the map. **L-07** failure sentinel (`null` in `loadedTranslations`, `{}` returned) unchanged.
+
+**Conflict check:** No override of **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md** — same dedupe semantics, faster concurrent waiters; complements **P-02** (fewer duplicate schedulers).
+
+**How it was tested:** `tests/unit/translationLoader.test.js` — `translationLoader in-flight promise (P-04)` (parallel callers, one fetch, no 100 ms `setTimeout` polls). Existing `translationLoader concurrent wait (L-07)` still passes.
+
+**How to test in the browser:**
+1. Run `npm run dev`, open `/log-in`, DevTools → **Console** (one paste):
+   ```js
+   (async () => {
+     const setTimeoutCalls = [];
+     const origSetTimeout = window.setTimeout;
+     window.setTimeout = function (...args) {
+       if (args[1] === 100) setTimeoutCalls.push({ delay: args[1] });
+       return origSetTimeout.apply(this, args);
+     };
+     const tl = await import('/src/utils/translation/translationLoader.js');
+     tl.clearTranslationCaches();
+     let release;
+     const gate = new Promise((r) => { release = r; });
+     const origFetch = window.fetch;
+     window.fetch = async (...args) => {
+       const [url] = args;
+       if (typeof url === 'string' && url.includes('/i18n/section-auth/en.json')) {
+         await gate;
+       }
+       return origFetch(...args);
+     };
+     try {
+       const p1 = tl.loadTranslationsForSection('auth', 'en');
+       const p2 = tl.loadTranslationsForSection('auth', 'en');
+       const pollsWhileInFlight = setTimeoutCalls.length;
+       release();
+       const [a, b] = await Promise.all([p1, p2]);
+       console.log({
+         pollsWhileInFlight,
+         sameResult: JSON.stringify(a) === JSON.stringify(b),
+         pass: pollsWhileInFlight === 0 && a && b
+       });
+     } finally {
+       window.fetch = origFetch;
+       window.setTimeout = origSetTimeout;
+     }
+   })();
+   ```
+2. **Expected:** `pollsWhileInFlight: 0`, `sameResult: true`, `pass: true`.
+
 ---
 
 ### P-05 — `getLocaleDisplayName` ignores 73 locales and doesn't use `Intl.DisplayNames`
@@ -582,6 +777,47 @@ export function getLocaleDisplayName(localeCode, displayLocale = 'en') {
 }
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass; partially addressed earlier by **L-08**).
+
+**What was broken:** Original `getLocaleDisplayName` only mapped `en` and `vi`; other locales returned raw codes (e.g. `"ar"`). **L-08** added `LOCALE_DISPLAY_METADATA` for all 75 `SUPPORTED_LOCALES` and wired the language switcher — but there was still no `Intl.DisplayNames` fallback for future/unknown codes.
+
+**Why it happened:** Display names were hardcoded incrementally before the shared metadata map existed.
+
+**What changed:**
+- **L-08 (prior):** `localeDisplayMetadata.js` + `getLocaleSwitcherOptions()` — curated `label` / `traditionalName` for every supported locale.
+- **P-05 (this pass):** `localeManager.js` — `resolveIntlLocaleDisplayName()` via `Intl.DisplayNames` (with BCP 47 normalization for regional codes like `zh-tw`). `getLocaleDisplayName(localeCode, displayLocale?)` uses curated metadata first, then Intl, then raw code. `getLocaleSwitcherOptions()` uses the same Intl fallback when metadata is missing.
+
+**Conflict check:** No override of preload work. Complements **L-08** — switcher keeps curated native-script names; Intl covers gaps if a locale is added before metadata is updated.
+
+**How it was tested:** `tests/unit/localeSwitcherOptions.test.js` — `getLocaleDisplayName (P-05)` (all supported codes have labels; `haw` resolves via Intl; `displayLocale` param works on Intl path).
+
+**How to test in the browser:**
+1. Run `npm run dev`, open any page with the language `<select>`.
+2. DevTools → **Console** (one paste):
+   ```js
+   (async () => {
+     const { getLocaleDisplayName, getLocaleSwitcherOptions, SUPPORTED_LOCALES } =
+       await import('/src/utils/translation/localeManager.js');
+     const options = getLocaleSwitcherOptions();
+     console.log({
+       supportedCount: SUPPORTED_LOCALES.length,
+       optionsCount: options.length,
+       arLabel: getLocaleDisplayName('ar'),
+       viLabel: getLocaleDisplayName('vi'),
+       intlFallback: getLocaleDisplayName('haw'),
+       allHaveLabels: options.every((o) => o.label !== o.code),
+       pass:
+         getLocaleDisplayName('ar') === 'Arabic' &&
+         getLocaleDisplayName('vi') === 'Vietnamese' &&
+         getLocaleDisplayName('haw') === 'Hawaiian' &&
+         options.every((o) => o.label !== o.code)
+     });
+   })();
+   ```
+3. **Expected:** `arLabel: 'Arabic'`, `viLabel: 'Vietnamese'`, `intlFallback: 'Hawaiian'`, `allHaveLabels: true`, `pass: true`. Dropdown shows human-readable names, not raw codes.
+
 ---
 
 ### P-06 — In-memory `loadedTranslations` Map grows unbounded
@@ -592,6 +828,45 @@ export function getLocaleDisplayName(localeCode, displayLocale = 'en') {
 The `loadedTranslations` Map accumulates all ever-loaded section/locale pairs for the lifetime of the page. After a user switches through several locales, many locale sets are in memory simultaneously with no eviction. `clearTranslationCaches()` does clear this map, but it is called on every locale switch which forces a full reload of all sections.
 
 **Fix:** Set a reasonable max-entries limit, or scope the map to only the currently active locale, evicting old locale entries on switch.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `loadedTranslations` kept every `{section}_{locale}` entry for the page lifetime until `clearTranslationCaches()` ran. Navigating or preloading many sections was bounded but switching locales during a long session could retain multiple locale snapshots in memory between explicit clears; there was no per-locale scope or overflow cap on the hot in-memory map.
+
+**Why it happened:** The map tracked concurrent-load outcomes (L-07) and cache-hit shortcuts without eviction policy.
+
+**What changed:** `translationLoader.js` — added `rememberLoadedTranslation()`:
+- On each in-memory write, **evicts entries for other locales** (keeps only the active locale’s section keys, e.g. `auth_vi` + `shop_vi`).
+- **Max 32 entries** safety cap (FIFO trim if exceeded).
+- `finishTranslationLoad` and cache-hit path use `rememberLoadedTranslation`. `clearTranslationCaches()` still full-clears on locale switch (with **P-03** prefix TTL clear).
+
+**Conflict check:** No override of preload or **P-03**/**P-04** work. TTL `cacheHandler` entries unchanged; `areTranslationsLoadedForSection` still reads TTL cache across locales. In-memory map is the bounded hot layer only.
+
+**How it was tested:** `tests/unit/translationLoader.test.js` — `translationLoader in-memory scope (P-06)` (other locales evicted on new locale load; multiple sections kept for same locale).
+
+**How to test in the browser:**
+1. Run `npm run dev`, open `/vi/log-in`.
+2. DevTools → **Console** (one paste):
+   ```js
+   (async () => {
+     const tl = await import('/src/utils/translation/translationLoader.js');
+     tl.clearTranslationCaches();
+     await tl.loadTranslationsForSection('auth', 'vi');
+     const afterVi = tl.getTranslationStatistics().loadedSections;
+     await tl.loadTranslationsForSection('auth', 'fr');
+     const afterFr = tl.getTranslationStatistics().loadedSections;
+     console.log({
+       afterVi,
+       afterFr,
+       viEvicted: !afterFr.includes('auth_vi'),
+       frPresent: afterFr.includes('auth_fr'),
+       pass: !afterFr.includes('auth_vi') && afterFr.includes('auth_fr')
+     });
+   })();
+   ```
+3. **Expected:** `viEvicted: true`, `frPresent: true`, `pass: true`.
 
 ---
 

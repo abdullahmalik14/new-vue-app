@@ -3,7 +3,7 @@
  */
 
 import { log } from '../common/logHandler.js';
-import { loadTranslationsForSection } from '../translation/translationLoader.js';
+import { loadTranslationsForSection, areTranslationsLoadedForSection } from '../translation/translationLoader.js';
 import { inheritConfigurationFromParentRoute } from '../route/routeResolver.js';
 import {
   getPreloadSectionsForRoute,
@@ -221,15 +221,23 @@ export function startBackgroundSectionPreloads({
     );
 
     if (preloadTranslations && locale) {
-      promises.push(
-        loadTranslationsForSection(section, locale).catch((err) => {
-          log(file, method, 'translation-error', 'Translation load failed (non-blocking)', {
-            section,
-            locale,
-            error: err.message
-          });
-        })
-      );
+      if (areTranslationsLoadedForSection(section, locale)) {
+        log(file, method, 'translation-skip', 'Translations already loaded for background section', {
+          section,
+          locale,
+          path
+        });
+      } else {
+        promises.push(
+          loadTranslationsForSection(section, locale).catch((err) => {
+            log(file, method, 'translation-error', 'Translation load failed (non-blocking)', {
+              section,
+              locale,
+              error: err.message
+            });
+          })
+        );
+      }
     }
   }
 

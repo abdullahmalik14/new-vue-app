@@ -6,7 +6,7 @@
 import { log } from '../common/logHandler.js';
 import { preloadSectionAssets } from '../assets/assetPreloader.js';
 import { loadSectionCss, unloadSectionCss } from '../section/sectionCssLoader.js';
-import { loadTranslationsForSection } from '../translation/translationLoader.js';
+import { loadTranslationsForSection, areTranslationsLoadedForSection } from '../translation/translationLoader.js';
 import { resolveRoleSectionVariant } from '../section/sectionResolver.js';
 
 /**
@@ -76,14 +76,21 @@ export function startCurrentSectionResourceLoads({
       });
     });
 
-    loadTranslationsForSection(resolvedCurrentSection, activeLocale).catch((err) => {
-      log(file, method, 'translation-error', 'Translation load failed (non-blocking)', {
-        originalSection: currentSection,
+    if (!areTranslationsLoadedForSection(resolvedCurrentSection, activeLocale)) {
+      loadTranslationsForSection(resolvedCurrentSection, activeLocale).catch((err) => {
+        log(file, method, 'translation-error', 'Translation load failed (non-blocking)', {
+          originalSection: currentSection,
+          resolvedSection: resolvedCurrentSection,
+          locale: activeLocale,
+          error: err.message,
+        });
+      });
+    } else {
+      log(file, method, 'translation-skip', 'Translations already loaded for section/locale', {
         resolvedSection: resolvedCurrentSection,
         locale: activeLocale,
-        error: err.message,
       });
-    });
+    }
 
     preloadSectionAssets(resolvedCurrentSection).catch((err) => {
       log(file, method, 'asset-preload-error', 'Current section asset preload failed (non-blocking)', {

@@ -1113,11 +1113,45 @@ export function getDefaultLocale() {
 }
 
 /**
- * Get locale display name
+ * Normalize app locale codes to BCP 47 tags for Intl APIs (e.g. zh-tw → zh-TW).
  *
- * @param {string} localeCode - Locale code
- * @returns {string} - Human-readable locale name
+ * @param {string} localeCode
+ * @returns {string}
  */
+function toIntlLocaleTag(localeCode) {
+  if (typeof localeCode !== 'string' || localeCode.length === 0) {
+    return localeCode;
+  }
+
+  const parts = localeCode.split('-');
+  if (parts.length === 1) {
+    return parts[0];
+  }
+
+  return `${parts[0]}-${parts.slice(1).join('-').toUpperCase()}`;
+}
+
+/**
+ * Resolve a human-readable language name via Intl.DisplayNames.
+ *
+ * @param {string} localeCode
+ * @param {string} [displayLocale='en']
+ * @returns {string|null}
+ */
+function resolveIntlLocaleDisplayName(localeCode, displayLocale = 'en') {
+  try {
+    const intlTag = toIntlLocaleTag(localeCode);
+    const name = new Intl.DisplayNames([displayLocale], { type: 'language' }).of(intlTag);
+    if (typeof name === 'string' && name.length > 0 && name !== localeCode) {
+      return name;
+    }
+  } catch {
+    // Intl unavailable or locale unsupported — fall through
+  }
+
+  return null;
+}
+
 /**
  * Options for locale switcher UI (codes follow SUPPORTED_LOCALES order).
  *
@@ -1126,23 +1160,34 @@ export function getDefaultLocale() {
 export function getLocaleSwitcherOptions() {
   return SUPPORTED_LOCALES.map((code) => {
     const meta = LOCALE_DISPLAY_METADATA[code];
+    const intlLabel = resolveIntlLocaleDisplayName(code, 'en');
     return {
       code,
-      label: meta?.label ?? code,
-      traditionalName: meta?.traditionalName ?? code,
+      label: meta?.label ?? intlLabel ?? code,
+      traditionalName: meta?.traditionalName ?? intlLabel ?? code,
     };
   });
 }
 
-export function getLocaleDisplayName(localeCode) {
+/**
+ * Get locale display name
+ *
+ * @param {string} localeCode - Locale code
+ * @param {string} [displayLocale='en'] - Locale used for the display name language
+ * @returns {string} - Human-readable locale name
+ */
+export function getLocaleDisplayName(localeCode, displayLocale = 'en') {
   const meta = LOCALE_DISPLAY_METADATA[localeCode];
-  const displayName = meta?.label || localeCode;
+  const displayName =
+    meta?.label ||
+    resolveIntlLocaleDisplayName(localeCode, displayLocale) ||
+    localeCode;
   log(
     "localeManager.js",
     "getLocaleDisplayName",
     "return",
     "Returning locale display name",
-    { localeCode, displayName }
+    { localeCode, displayLocale, displayName }
   );
   return displayName;
 }
