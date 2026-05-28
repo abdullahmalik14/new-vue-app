@@ -75,16 +75,16 @@ export function loadRouteConfigurationFromFile() {
         const details = componentValidation.errors.map((error) => error.message).join('\n  - ');
         throw new Error(`Route componentPath validation failed:\n  - ${details}`);
       }
+    }
 
-      const flagValidation = validateRouteAssetPreloadFlags(
-        loadedRouteConfig,
-        assetMapData,
-        sharedAssetPreloads,
-      );
+    const flagValidation = validateRouteAssetPreloadFlags(
+      loadedRouteConfig,
+      assetMapData,
+      sharedAssetPreloads,
+    );
 
-      if (!flagValidation.valid) {
-        throw new Error(`Asset preload validation failed:\n  - ${flagValidation.errors.join('\n  - ')}`);
-      }
+    if (!flagValidation.valid) {
+      throw new Error(`Asset preload validation failed:\n  - ${flagValidation.errors.join('\n  - ')}`);
     }
 
     log('routeConfigLoader.js', 'loadRouteConfigurationFromFile', 'success', 'Route configuration loaded', {

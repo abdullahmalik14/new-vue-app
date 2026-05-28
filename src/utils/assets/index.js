@@ -37,9 +37,20 @@ export {
   validateRouteAssetPreloadFlags,
   validateAssetPreloadEntryShape,
   validateRouteAssetPreloadRefs,
+  validateSharedCatalogAssetPreloadFlags,
   ALLOWED_ASSET_PRELOAD_TYPES,
   ALLOWED_ASSET_PRELOAD_PRIORITIES,
 } from './validateRouteAssetPreloadFlags.js';
+
+export {
+  getSharedCatalogEntriesByFlag,
+  getSharedComponentAssetMapping,
+  groupComponentSlotsByPreloadTier,
+  resolveSharedComponentAssets,
+  PRELOAD_TIER_ORDER,
+} from './resolveSharedComponentAssets.js';
+
+export { validateSharedComponentAssetMappings } from './validateSharedComponentAssetMappings.js';
 
 // Export asset scanner functions
 export {

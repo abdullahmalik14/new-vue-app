@@ -56,7 +56,7 @@ import { logError } from '../../utils/common/errorHandler.js';
 import routeConfigImport from '../../router/routeConfig.json';
 import { loadJsonConfigFromImport } from '../../utils/common/jsonConfigLoader.js';
 import { validateRouteConfig } from '../../utils/build/jsonConfigValidator.js';
-import { prefetchRouteComponent } from '../../utils/route/routeComponentPrefetch.js';
+import { createRoutePrefetchIntentHandler } from '../../utils/route/useRoutePrefetch.js';
 
 // Component name for logging
 const componentName = 'AppFooter';
@@ -198,7 +198,7 @@ function isCurrentRoute(routeSlug) {
 }
 
 function prefetchFooterRoute(routeSlug) {
-  prefetchRouteComponent(routeSlug);
+  createRoutePrefetchIntentHandler(routeSlug)();
 }
 
 /**

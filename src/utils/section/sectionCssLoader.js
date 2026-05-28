@@ -18,6 +18,7 @@ import { isTrustedBundlePath, escapeSelectorAttributeValue } from '../build/bund
 const loadedSectionCss = new Set();
 const activeSectionCss = new Map(); // section -> link element
 const preloadHintLinks = new Map(); // section -> preload hint link element
+const preloadHintPromises = new Map(); // section -> Promise that resolves on link.onload
 
 export function clearSectionCssPreloadHint(sectionName) {
   return removeSectionCssPreloadHint(sectionName);
@@ -25,6 +26,7 @@ export function clearSectionCssPreloadHint(sectionName) {
 
 function removeSectionCssPreloadHint(sectionName) {
   const hintLink = preloadHintLinks.get(sectionName);
+  preloadHintPromises.delete(sectionName);
 
   if (hintLink && hintLink.parentNode) {
     hintLink.parentNode.removeChild(hintLink);
@@ -269,59 +271,91 @@ export async function loadSectionCss(sectionName) {
 }
 
 /**
- * Preload CSS for a section (non-blocking)
- * Uses rel="preload" for faster subsequent loading
- * 
+ * Preload CSS for a section (background cache-warming).
+ * Uses rel="preload" so the browser starts downloading the stylesheet ahead of time.
+ *
+ * IMPORTANT: this Promise only resolves to `true` after `link.onload` fires, i.e. once
+ * the CSS file has actually been downloaded into the HTTP cache. Callers that need to
+ * mark a section as "fully preloaded" must await this — see sectionPreloader._doPreload.
+ *
  * @param {string} sectionName - Section name
- * @returns {Promise<boolean>} True if preloaded successfully
+ * @returns {Promise<boolean>} Resolves true after onload, false on validation failure (no bundle / untrusted path).
+ *                             Rejects on preloadLink.onerror so concurrent JS+CSS preloads can fail together.
  */
 export async function preloadSectionCss(sectionName) {
   log('sectionCssLoader.js', 'preloadSectionCss', 'start', 'Preloading CSS for section', { sectionName });
 
-  try {
-    // Skip if already loaded
-    if (loadedSectionCss.has(sectionName)) {
-      return true;
-    }
-
-    // Get CSS bundle info
-    const cssBundle = await getSectionCssBundle(sectionName);
-
-    if (!cssBundle) {
-      return false;
-    }
-
-    const { cssPath, integrity } = cssBundle;
-
-    // Check if preload link already exists
-    const existingPreload = document.querySelector(
-      `link[rel="preload"][href="${escapeSelectorAttributeValue(cssPath)}"]`
-    );
-    if (existingPreload) {
-      preloadHintLinks.set(sectionName, existingPreload);
-      return true;
-    }
-
-    // Create preload link
-    const preloadLink = document.createElement('link');
-    preloadLink.rel = 'preload';
-    preloadLink.as = 'style';
-    preloadLink.href = cssPath;
-    applyBundleLinkIntegrity(preloadLink, integrity);
-    preloadLink.setAttribute('data-section-preload', sectionName);
-
-    document.head.appendChild(preloadLink);
-    preloadHintLinks.set(sectionName, preloadLink);
-
-    log('sectionCssLoader.js', 'preloadSectionCss', 'success', 'CSS preloaded', { sectionName });
-
+  if (loadedSectionCss.has(sectionName)) {
     return true;
+  }
+
+  // Reuse the in-flight promise so concurrent callers share a single download.
+  if (preloadHintPromises.has(sectionName)) {
+    return preloadHintPromises.get(sectionName);
+  }
+
+  let cssBundle;
+  try {
+    cssBundle = await getSectionCssBundle(sectionName);
   } catch (error) {
-    logError('sectionCssLoader.js', 'preloadSectionCss', 'Error preloading CSS', error, {
+    logError('sectionCssLoader.js', 'preloadSectionCss', 'Error resolving CSS bundle', error, {
       sectionName
     });
     return false;
   }
+
+  if (!cssBundle) {
+    return false;
+  }
+
+  const { cssPath, integrity } = cssBundle;
+
+  // A link with the same href is already in the DOM (e.g. injected stylesheet
+  // from loadSectionCss, or a hint we lost track of). Trust that the browser
+  // is already downloading; we have no reliable way to attach onload here.
+  const existingPreload = document.querySelector(
+    `link[rel="preload"][href="${escapeSelectorAttributeValue(cssPath)}"]`
+  );
+  if (existingPreload) {
+    preloadHintLinks.set(sectionName, existingPreload);
+    return true;
+  }
+
+  const preloadLink = document.createElement('link');
+  preloadLink.rel = 'preload';
+  preloadLink.as = 'style';
+  preloadLink.href = cssPath;
+  applyBundleLinkIntegrity(preloadLink, integrity);
+  preloadLink.setAttribute('data-section-preload', sectionName);
+
+  const loadPromise = new Promise((resolve, reject) => {
+    preloadLink.onload = () => {
+      log('sectionCssLoader.js', 'preloadSectionCss', 'success', 'CSS preloaded', { sectionName, cssPath });
+      resolve(true);
+    };
+
+    preloadLink.onerror = () => {
+      const error = new Error(`Failed to preload CSS for section: ${sectionName}`);
+      logError('sectionCssLoader.js', 'preloadSectionCss', 'CSS preload onerror', error, {
+        sectionName,
+        cssPath
+      });
+
+      if (preloadLink.parentNode) {
+        preloadLink.parentNode.removeChild(preloadLink);
+      }
+      preloadHintLinks.delete(sectionName);
+      preloadHintPromises.delete(sectionName);
+
+      reject(error);
+    };
+  });
+
+  document.head.appendChild(preloadLink);
+  preloadHintLinks.set(sectionName, preloadLink);
+  preloadHintPromises.set(sectionName, loadPromise);
+
+  return loadPromise;
 }
 
 /**
@@ -393,6 +427,7 @@ export function clearAllSectionCss() {
     activeSectionCss.clear();
     loadedSectionCss.clear();
     preloadHintLinks.clear();
+    preloadHintPromises.clear();
 
     log('sectionCssLoader.js', 'clearAllSectionCss', 'success', 'All section CSS cleared', {});
   } catch (error) {

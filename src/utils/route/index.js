@@ -60,7 +60,7 @@ export {
 
 export {
   prefetchRouteComponent,
-  createRoutePrefetchIntentHandler,
+  createRoutePrefetchIntentHandler as createComponentPrefetchIntentHandler,
   normalizeTargetPath,
   resolveRouteForPrefetch,
 } from './routeComponentPrefetch.js';
@@ -71,7 +71,10 @@ export {
   resetRouteAssetPrefetchCache,
 } from './routeAssetPrefetch.js';
 
-export { useRoutePrefetch } from './useRoutePrefetch.js';
+export {
+  useRoutePrefetch,
+  createRoutePrefetchIntentHandler,
+} from './useRoutePrefetch.js';
 
 export {
   resolveRouteTransition,

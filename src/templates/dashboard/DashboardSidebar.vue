@@ -216,7 +216,7 @@ import NotificationPopup from "@/components/ui/popup/NotificationPopup.vue";
 import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js";
 import { getActiveLocale } from "@/utils/translation/localeManager.js";
 import { getI18nInstance } from "@/utils/translation/i18nInstance.js";
-import { prefetchRouteComponent } from "@/utils/route/routeComponentPrefetch.js";
+import { createRoutePrefetchIntentHandler } from "@/utils/route/useRoutePrefetch.js";
 
 export default {
   name: "Sidebar",
@@ -400,20 +400,6 @@ export default {
     }
   },
   methods: {
-    async loadAssetWithRetry(flag, maxRetries = 2) {
-      const { getAssetUrl } = await import("@/utils/assets/assetLibrary.js");
-      for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        try {
-          const url = await getAssetUrl(flag);
-          if (url) return url;
-          if (attempt < maxRetries) await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 100));
-        } catch (e) {
-          if (attempt === maxRetries) throw e;
-          await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 100));
-        }
-      }
-      return null;
-    },
     async loadTranslations() {
       try {
         const locale = getActiveLocale() || 'en';
@@ -436,11 +422,18 @@ export default {
     },
     async loadAllAssets() {
       try {
-        const flags = ['dashboard.logo', 'dashboard.avatar', 'dashboard.notification', 'dashboard.logout', 'dashboard.language', 'dashboard.help', 'dashboard.close.desktop', 'dashboard.close.mobile', 'dashboard.more'];
-        const urls = await Promise.all(flags.map(flag => this.loadAssetWithRetry(flag)));
+        const { resolveSharedComponentAssets } = await import('@/utils/assets/resolveSharedComponentAssets.js');
         this.assets = {
-          logo: urls[0], avatar: urls[1], notification: urls[2], logout: urls[3],
-          language: urls[4], help: urls[5], closeDesktop: urls[6], closeMobile: urls[7], more: urls[8]
+          logo: null,
+          avatar: null,
+          logout: null,
+          notification: null,
+          language: null,
+          help: null,
+          closeDesktop: null,
+          closeMobile: null,
+          more: null,
+          ...await resolveSharedComponentAssets('dashboardSidebarChrome'),
         };
       } catch (e) {
         console.error('[DashboardSidebar] Asset load failed', e);
@@ -497,7 +490,7 @@ export default {
     },
     prefetchMenuRoute(item) {
       if (item?.enabled && item?.route) {
-        prefetchRouteComponent(item.route);
+        createRoutePrefetchIntentHandler(item.route)();
       }
     },
     handleChildClick(child) {

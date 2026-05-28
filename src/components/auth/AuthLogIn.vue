@@ -112,7 +112,7 @@ import { browserUtility } from "@/lib/mock-api-demo/utilities/browserHelper.js";
 import { initiateTwitterLogin } from "@/utils/auth/socialAuthHandler.js";
 import { initiateTelegramLogin } from "@/utils/auth/telegramAuthHandler.js";
 import { authenticateOrSignUpTelegramUser } from "@/utils/auth/telegramCognitoHandler.js";
-import { createRoutePrefetchIntentHandler } from "@/utils/route/routeComponentPrefetch.js";
+import { createRoutePrefetchIntentHandler } from "@/utils/route/useRoutePrefetch.js";
 
 const { t, locale: i18nLocale } = useI18n();
 const route = useRoute();

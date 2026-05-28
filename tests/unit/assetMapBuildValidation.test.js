@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { resolveRouteAssetPreloads } from '../../src/utils/route/resolveRouteAssetPreloads.js';
 import { validateRouteAssetPreloadFlags } from '../../src/utils/assets/validateRouteAssetPreloadFlags.js';
+import { validateSharedComponentAssetMappings } from '../../src/utils/assets/validateSharedComponentAssetMappings.js';
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -33,5 +34,12 @@ describe('asset map build validation (S-06)', () => {
     expect(assetMap.production['script.cognito']).toBe(
       '/vendor/amazon-cognito-identity-6.3.15.min.js',
     );
+  });
+
+  it('dashboard component slot mappings stay aligned with dashboardMenuIcons (C-06)', () => {
+    const sharedCatalog = readJson('src/router/sharedAssetPreloads.json');
+    const errors = validateSharedComponentAssetMappings(sharedCatalog);
+
+    expect(errors, errors.join('\n')).toEqual([]);
   });
 });

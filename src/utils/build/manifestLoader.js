@@ -55,10 +55,15 @@ async function fetchProductionManifestWithRetry() {
         await sleep(delayMs);
       }
 
+      // Use 'no-cache' (not 'force-cache') so the browser revalidates against
+      // the server (via ETag / Last-Modified) on each load. With 'force-cache'
+      // and an unhashed manifest URL, a stale cached body from a prior build
+      // would mismatch the new build's <meta name="section-manifest-sri">
+      // hash and trigger an SRI failure after every rebuild.
       return await fetchVerifiedManifest(
         MANIFEST_URL,
         MANIFEST_INTEGRITY_META.section,
-        { cache: 'force-cache' }
+        { cache: 'no-cache' }
       );
     } catch (error) {
       lastError = error;

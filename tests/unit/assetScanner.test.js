@@ -5,6 +5,9 @@ import {
   shouldIgnoreComponent,
   scanComponentForAssetReferences,
   extractLiteralBoundAttribute,
+  extractBoundAttributeExpression,
+  scanScriptForAssetFlagReferences,
+  resolveAssetSlotFlagsFromScript,
 } from '../../src/utils/assets/assetScanner.js';
 import { getPreloadedAssetsCount } from '../../src/utils/assets/assetPreloader.js';
 
@@ -69,7 +72,66 @@ describe('assetScanner — scanComponentForAssetReferences (M-09)', () => {
   it('ignores variable-bound :src expressions without string literals', () => {
     const assets = scanComponentForAssetReferences('<img :src="imageUrl" alt="Var" />');
 
-    expect(assets).toEqual([]);
+    expect(assets).toEqual([
+      {
+        type: 'image',
+        auto: true,
+        unresolved: true,
+        expression: 'imageUrl',
+        tag: 'img',
+        binding: 'src',
+      },
+    ]);
+  });
+
+  it('detects getAssetUrl flags from script and assets.slot maps (M-09)', () => {
+    const template = `
+      <img :src="assets.logo" alt="Logo" />
+      <img :src="imageUrl" alt="Dynamic" />
+    `;
+    const script = `
+      const mapping = { logo: 'dashboard.logo' };
+      const url = await getAssetUrl('dashboard.avatar');
+      await getAssetUrls(['dashboard.notification', 'dashboard.language']);
+    `;
+
+    const assets = scanComponentForAssetReferences(template, script);
+
+    expect(assets).toEqual(
+      expect.arrayContaining([
+        { flag: 'dashboard.logo', type: 'image', auto: true, source: 'script-slot-map', slot: 'logo' },
+        { flag: 'dashboard.avatar', type: 'image', auto: true, source: 'script-getAssetUrl' },
+        { flag: 'dashboard.notification', type: 'image', auto: true, source: 'script-getAssetUrl' },
+        { flag: 'dashboard.language', type: 'image', auto: true, source: 'script-getAssetUrl' },
+        {
+          type: 'image',
+          auto: true,
+          unresolved: true,
+          expression: 'imageUrl',
+          tag: 'img',
+          binding: 'src',
+        },
+      ]),
+    );
+  });
+
+  it('extractBoundAttributeExpression matches non-literal bindings', () => {
+    expect(extractBoundAttributeExpression('<img :src="imageUrl">', 'src')).toBe('imageUrl');
+    expect(extractBoundAttributeExpression('<img :src="assets.logo">', 'src')).toBe('assets.logo');
+    expect(extractBoundAttributeExpression('<img :src="\'/b.png\'">', 'src')).toBeNull();
+  });
+
+  it('scanScriptForAssetFlagReferences extracts getAssetUrl flags', () => {
+    const flags = scanScriptForAssetFlagReferences(`
+      await getAssetUrl('dashboard.logo');
+      await getAssetUrls(['dashboard.help', 'dashboard.more']);
+    `);
+
+    expect(flags.map((entry) => entry.flag)).toEqual([
+      'dashboard.logo',
+      'dashboard.help',
+      'dashboard.more',
+    ]);
   });
 
   it('extractLiteralBoundAttribute matches static and bound attributes', () => {

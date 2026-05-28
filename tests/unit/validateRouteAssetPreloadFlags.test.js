@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { validateRouteAssetPreloadFlags, collectAssetMapFlags } from '../../src/utils/assets/validateRouteAssetPreloadFlags.js';
+import {
+  validateRouteAssetPreloadFlags,
+  collectAssetMapFlags,
+  validateSharedCatalogAssetPreloadFlags,
+} from '../../src/utils/assets/validateRouteAssetPreloadFlags.js';
 
 describe('validateRouteAssetPreloadFlags (M-04)', () => {
   const assetMap = {
@@ -92,5 +96,26 @@ describe('validateRouteAssetPreloadFlags (M-04)', () => {
 
     expect(result.valid).toBe(false);
     expect(result.errors).toEqual(['Route "/shop": unknown assetPreloadRef "missingCatalogKey"']);
+  });
+});
+
+describe('validateSharedCatalogAssetPreloadFlags (M-04 / C-09)', () => {
+  const assetMap = {
+    production: {
+      'dashboard.logo': 'https://cdn.example.com/logo.webp',
+    },
+  };
+
+  it('reports missing flags in shared preload catalog arrays', () => {
+    const errors = validateSharedCatalogAssetPreloadFlags(
+      {
+        dashboardMenuIcons: [{ flag: 'dashboard.logo', type: 'image' }, { flag: 'dashboard.typo', type: 'image' }],
+      },
+      assetMap,
+    );
+
+    expect(errors).toEqual([
+      'Shared catalog "dashboardMenuIcons": flag "dashboard.typo" not found in assetMap.json',
+    ]);
   });
 });

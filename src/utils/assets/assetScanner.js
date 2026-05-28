@@ -123,6 +123,146 @@ export function extractLiteralBoundAttribute(tag, attributeName) {
 }
 
 /**
+ * Extract a non-literal Vue binding expression from an attribute (M-09).
+ *
+ * @param {string} tag
+ * @param {string} attributeName
+ * @returns {string|null}
+ */
+export function extractBoundAttributeExpression(tag, attributeName) {
+  const match = tag.match(
+    new RegExp(`\\s(?::${attributeName}|v-bind:${attributeName})\\s*=\\s*"([^"]+)"`, 'i'),
+  );
+
+  if (!match?.[1]) {
+    return null;
+  }
+
+  const expression = match[1].trim();
+
+  if (extractLiteralBoundAttribute(tag, attributeName)) {
+    return null;
+  }
+
+  return expression;
+}
+
+/**
+ * @param {string} value
+ * @returns {boolean}
+ */
+function looksLikeAssetFlag(value) {
+  return typeof value === 'string' && /^[a-z][a-z0-9]*(?:\.[a-z][a-z0-9-]*)+$/i.test(value);
+}
+
+/**
+ * Resolve `assets.slot` template bindings to asset flags declared in script literals.
+ *
+ * @param {string} template
+ * @param {string} script
+ * @returns {Array<{ flag: string, type: string, auto: boolean, source: string, slot: string }>}
+ */
+export function resolveAssetSlotFlagsFromScript(template, script) {
+  if (!template || !script) {
+    return [];
+  }
+
+  const assets = [];
+  const slotPattern = /:(?:src|bind:src)\s*=\s*"assets\.(\w+)"/gi;
+  let slotMatch;
+
+  while ((slotMatch = slotPattern.exec(template)) !== null) {
+    const slot = slotMatch[1];
+    const flagPattern = new RegExp(`['"]?${slot}['"]?\\s*:\\s*['"]([^'"]+)['"]`, 'i');
+    const flagMatch = script.match(flagPattern);
+
+    if (flagMatch?.[1] && looksLikeAssetFlag(flagMatch[1])) {
+      assets.push({
+        flag: flagMatch[1],
+        type: 'image',
+        auto: true,
+        source: 'script-slot-map',
+        slot,
+      });
+    }
+  }
+
+  return assets;
+}
+
+/**
+ * Scan script for getAssetUrl/getAssetUrls flag references (M-09).
+ *
+ * @param {string} script
+ * @returns {Array<{ flag: string, type: string, auto: boolean, source: string }>}
+ */
+export function scanScriptForAssetFlagReferences(script) {
+  if (!script || typeof script !== 'string') {
+    return [];
+  }
+
+  const flags = new Set();
+  const assets = [];
+
+  const singleFlagPattern = /getAssetUrl\s*\(\s*['"]([^'"]+)['"]/g;
+  let match;
+
+  while ((match = singleFlagPattern.exec(script)) !== null) {
+    if (looksLikeAssetFlag(match[1])) {
+      flags.add(match[1]);
+    }
+  }
+
+  const multiFlagPattern = /getAssetUrls\s*\(\s*\[([\s\S]*?)\]\s*\)/g;
+
+  while ((match = multiFlagPattern.exec(script)) !== null) {
+    const quotedFlags = match[1].match(/['"]([^'"]+)['"]/g) || [];
+
+    for (const quoted of quotedFlags) {
+      const flag = quoted.slice(1, -1);
+
+      if (looksLikeAssetFlag(flag)) {
+        flags.add(flag);
+      }
+    }
+  }
+
+  for (const flag of flags) {
+    assets.push({
+      flag,
+      type: 'image',
+      auto: true,
+      source: 'script-getAssetUrl',
+    });
+  }
+
+  return assets;
+}
+
+/**
+ * @param {string} tag
+ * @param {string} tagName
+ * @param {'image'|'video'|'audio'} type
+ * @returns {Array<object>}
+ */
+function collectUnresolvedDynamicBindings(tag, tagName, type) {
+  const expression = extractBoundAttributeExpression(tag, 'src');
+
+  if (!expression) {
+    return [];
+  }
+
+  return [{
+    type,
+    auto: true,
+    unresolved: true,
+    expression,
+    tag: tagName,
+    binding: 'src',
+  }];
+}
+
+/**
  * @param {string} template
  * @param {string} tagName
  * @param {'image'|'video'|'audio'} type
@@ -134,26 +274,55 @@ function collectMediaAssetsFromTemplate(template, tagName, type) {
   let tagMatch;
 
   while ((tagMatch = tagRegex.exec(template)) !== null) {
-    const src = extractLiteralBoundAttribute(tagMatch[0], 'src');
+    const tag = tagMatch[0];
+    const src = extractLiteralBoundAttribute(tag, 'src');
 
-    if (!src || src.startsWith('data:') || src.startsWith('blob:')) {
+    if (src && !src.startsWith('data:') && !src.startsWith('blob:')) {
+      assets.push({ src, type, auto: true });
+      log('assetScanner.js', 'collectMediaAssetsFromTemplate', 'found', `Found ${type} reference`, { src, binding: tag.includes(':src') || tag.includes('v-bind:src') ? 'dynamic-literal' : 'static' });
       continue;
     }
 
-    assets.push({ src, type, auto: true });
-    log('assetScanner.js', 'collectMediaAssetsFromTemplate', 'found', `Found ${type} reference`, { src, binding: tagMatch[0].includes(':src') || tagMatch[0].includes('v-bind:src') ? 'dynamic-literal' : 'static' });
+    assets.push(...collectUnresolvedDynamicBindings(tag, tagName, type));
   }
 
   return assets;
 }
 
 /**
+ * @param {Array<object>} assets
+ * @returns {Array<object>}
+ */
+function dedupeScannedAssets(assets) {
+  const seen = new Set();
+  const deduped = [];
+
+  for (const asset of assets) {
+    const key = asset.src
+      ? `src:${asset.src}`
+      : asset.flag
+        ? `flag:${asset.flag}`
+        : `expr:${asset.expression}`;
+
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    deduped.push(asset);
+  }
+
+  return deduped;
+}
+
+/**
  * @function scanComponentForAssetReferences
  * @description Scan component template for asset URLs (images, etc.)
  * @param {string} template - Component template string
+ * @param {string} [script] - Optional component script for flag resolution (M-09)
  * @returns {Array<object>} Array of detected asset references
  */
-export function scanComponentForAssetReferences(template) {
+export function scanComponentForAssetReferences(template, script = '') {
   log('assetScanner.js', 'scanComponentForAssetReferences', 'start', 'Scanning template for assets', { 
     templateLength: template?.length 
   });
@@ -183,9 +352,13 @@ export function scanComponentForAssetReferences(template) {
     assets.push(...collectMediaAssetsFromTemplate(template, 'img', 'image'));
     assets.push(...collectMediaAssetsFromTemplate(template, 'video', 'video'));
     assets.push(...collectMediaAssetsFromTemplate(template, 'audio', 'audio'));
+    assets.push(...scanScriptForAssetFlagReferences(script));
+    assets.push(...resolveAssetSlotFlagsFromScript(template, script));
+
+    const dedupedAssets = dedupeScannedAssets(assets);
 
     log('assetScanner.js', 'scanComponentForAssetReferences', 'success', 'Template scanning complete', {
-      totalFound: assets.length 
+      totalFound: dedupedAssets.length 
     });
     trackStep({
       step: 'scanComponentForAssetReferences_complete',
@@ -195,7 +368,7 @@ export function scanComponentForAssetReferences(template) {
       purpose: 'Template scanning complete'
     });
 
-    return assets;
+    return dedupedAssets;
   } catch (error) {
     log('assetScanner.js', 'scanComponentForAssetReferences', 'error', 'Error scanning template', { 
       error: error.message, 

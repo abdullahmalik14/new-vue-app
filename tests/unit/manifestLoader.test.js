@@ -91,7 +91,7 @@ describe('manifestLoader unified manifest cache (B-01)', () => {
 
     await getSectionBundlePaths('auth');
 
-    expect(fetch).toHaveBeenCalledWith('/section-manifest.json', { cache: 'force-cache' });
+    expect(fetch).toHaveBeenCalledWith('/section-manifest.json', { cache: 'no-cache' });
   });
 
   it('persists fetched manifest to sessionStorage keyed by build hash', async () => {

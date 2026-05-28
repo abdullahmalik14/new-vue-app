@@ -270,6 +270,23 @@ describe('jsonConfigValidator section (A6)', () => {
     expect(result.errors.some((error) => error.field === 'assetPreload')).toBe(true);
   });
 
+  it('validateRouteConfig fails when assetPreload flags are missing from assetMap (M-04 / C-09)', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+
+    const result = validateRouteConfig([
+      {
+        slug: '/dashboard',
+        section: 'dashboard-global',
+        componentPath: '@/templates/dashboard/page/role/Dashboard.vue',
+        supportedRoles: ['all'],
+        assetPreload: [{ flag: 'dashboard.typo.flag', type: 'image' }],
+      },
+    ]);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((error) => error.type === 'INVALID_ASSET_PRELOAD_FLAG')).toBe(true);
+  });
+
   it('production routeConfig has section on all navigable routes', async () => {
     const { validateRouteConfig } = await import(VALIDATOR_PATH);
     const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');

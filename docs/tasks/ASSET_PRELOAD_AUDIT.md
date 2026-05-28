@@ -1539,8 +1539,9 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 **Why it happened:** `jsonConfigValidator` validated route shape but never cross-checked flag names against `assetMap.json`. **S-06** had a partial build test that read raw `routeConfig.json` without expanding `assetPreloadRef`.
 
 **What changed:**
-- `validateRouteAssetPreloadFlags.js` — `collectAssetMapFlags()` + `validateRouteAssetPreloadFlags(routes, assetMap)` with route slug in error messages.
-- `routeConfigLoader.js` — in **DEV**, fail fast after `resolveRouteAssetPreloads()` (same pattern as component path validation).
+- `validateRouteAssetPreloadFlags.js` — `collectAssetMapFlags()` + `validateRouteAssetPreloadFlags(routes, assetMap)` with route slug in error messages; added `validateSharedCatalogAssetPreloadFlags()` for shared preload catalog arrays.
+- `jsonConfigValidator.js` — `validateRouteConfig()` now expands `assetPreloadRef` and cross-checks all route + shared-catalog flags against bundled `assetMap.json` at **build time** (section bundler / CI), not only in dev startup.
+- `routeConfigLoader.js` — flag cross-check runs on **every** environment load (dev + production), not only `import.meta.env.DEV`; component path validation remains dev-only.
 - `assetMapBuildValidation.test.js` — build check now uses expanded routes + shared validator (**M-04** / **S-06** aligned).
 - Exported from `src/utils/assets/index.js` for console diagnostics.
 
@@ -1708,12 +1709,13 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 
 **What changed:**
 - `routeAssetPrefetch.js` — `prefetchSectionAssetsForRoute()` resolves the target route + role section, then calls `preloadSectionAssets()` non-blocking; dedupes by section name.
-- `useRoutePrefetch.js` — `prefetchOnIntent()` now triggers **both** component prefetch and section asset prefetch; split handlers `prefetchComponentOnIntent` / `prefetchAssetsOnIntent` also exported.
+- `useRoutePrefetch.js` — `createRoutePrefetchIntentHandler()` and `prefetchOnIntent()` trigger **both** component prefetch and section asset prefetch; split handlers `prefetchComponentOnIntent` / `prefetchAssetsOnIntent` also exported.
+- **Nav UI follow-up:** `DashboardSidebar.vue`, `AppFooter.vue`, and `AuthLogIn.vue` now use the combined `createRoutePrefetchIntentHandler()` from `useRoutePrefetch.js` instead of component-only prefetch. `src/utils/route/index.js` and `src/router/index.js` re-export the combined handler as the default.
 - Re-exported from `src/utils/route/index.js`.
 
 **Conflict check:** Complements **AUDIT.md P10** (component intent prefetch) without changing post-navigation preload. Does not add viewport observers (hover/focus only, matching existing component pattern).
 
-**How it was tested:** `npm run test:unit -- --run tests/unit/routeAssetPrefetch.test.js`
+**How it was tested:** `npm run test:unit -- --run tests/unit/routeAssetPrefetch.test.js tests/unit/useRoutePrefetch.test.js`
 
 **How to test in the browser:**
 1. Run `npm run dev`, open DevTools → **Network** → filter `Img` or `webp`.
@@ -1748,7 +1750,7 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
    - **One** `preloadSectionAssets [start]` log (second `/shop` call is deduped — no second start).
    - **One** `Section assets prefetched on intent` success log.
    - `linksAfter` may stay low (e.g. 3) if assets were already in `usePreloadStore` from an earlier visit — you will see many `preloadImage [already-preloaded]` lines instead of new `<link>` tags. That is correct.
-6. **Expected (hover on nav):** From `/log-in`, hover a link to a **different section** (e.g. `/shop` or `/dashboard`) — Network tab shows icon/webp requests **before** click. Hover **Sign up** on the login form only prefetches the **Vue component** today (`AuthLogIn.vue` uses `createRoutePrefetchIntentHandler` from component prefetch only); `/sign-up` is the same `auth` section as `/log-in`, so auth assets are usually already warm on that page.
+6. **Expected (hover on nav):** From `/log-in`, hover a link to a **different section** (e.g. `/shop` or `/dashboard`) — Network tab shows icon/webp requests **before** click. Hover **Sign up** on the login form prefetches both the **Vue component** and auth section assets (same `auth` section as `/log-in`, so asset requests may be store cache hits).
 
 ---
 
@@ -1766,8 +1768,11 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 
 **What changed:**
 - `extractLiteralBoundAttribute()` — matches `src`, `:src`, and `v-bind:src` when the value is a **string literal** (`'/path.png'`).
+- `extractBoundAttributeExpression()` — captures non-literal Vue bindings (`:src="imageUrl"`) and returns them as **unresolved** scan entries for audit tooling.
+- `scanScriptForAssetFlagReferences()` — resolves `getAssetUrl('flag')` / `getAssetUrls([...])` calls in component script.
+- `resolveAssetSlotFlagsFromScript()` — resolves `:src="assets.logo"` when script maps slot keys to asset flag literals.
 - `collectMediaAssetsFromTemplate()` — scans full tags for img/video/audio instead of one combined regex.
-- Variable expressions (`:src="imageUrl"`) are intentionally skipped — no static URL to preload without runtime evaluation.
+- `scanComponentForAssetReferences(template, script?)` — merges template + script results; pure runtime variables remain `unresolved: true` (no URL without evaluation).
 
 **Conflict check:** Scanner-only change; does not alter runtime `preloadSectionAssets` rollup from `routeConfig.json`.
 
@@ -2115,19 +2120,22 @@ Issues tied to `assetPreload[]` definitions and how they are merged — not sect
 
 #### Resolution ✅
 
-**Status:** Resolved (fixed in this audit pass).
+**Status:** Resolved (fixed in this audit pass; follow-up completed for hardcoded flag lists).
 
-**What was broken:** `DashboardSidebar.vue` called `preloadAsset()` for nine dashboard icon flags on mount. `HeaderResponsive.vue` resolved URLs via `getAssetUrl()` then called `preloadAssets()` again with those same URLs — duplicating `/dashboard` `assetPreloadRef: "dashboardMenuIcons"` work already done by section rollup + `preloadSectionAssets('dashboard-global')`.
+**What was broken:** `DashboardSidebar.vue` called `preloadAsset()` for nine dashboard icon flags on mount. `HeaderResponsive.vue` resolved URLs via `getAssetUrl()` then called `preloadAssets()` again with those same URLs — duplicating `/dashboard` `assetPreloadRef: "dashboardMenuIcons"` work already done by section rollup + `preloadSectionAssets('dashboard-global')`. After the initial pass, both components still maintained **duplicate hardcoded flag strings** (`dashboard.logo`, etc.) outside `sharedAssetPreloads.json`; `dashboard.hamburger` was only in the header component, not the central catalog.
 
-**Why it happened:** Components pre-dated centralized section `assetPreload[]` rollup; local preload was added for perceived faster paint.
+**Why it happened:** Components pre-dated centralized section `assetPreload[]` rollup; local preload and inline flag lists were added for perceived faster paint.
 
 **What changed:**
-- **`DashboardSidebar.vue`** — `loadAllAssets()` now only resolves URLs via `getAssetUrl()` for template binding; removed `preloadAsset()` loop.
-- **`HeaderResponsive.vue`** — removed redundant Step 4 `preloadAssets(imageAssets)` after URLs are already loaded; removed unused `preloadAssets` import.
+- **`DashboardSidebar.vue`** — `loadAllAssets()` now resolves URLs via `resolveSharedComponentAssets('dashboardSidebarChrome')`; removed `preloadAsset()` loop and inline flag array.
+- **`HeaderResponsive.vue`** — removed redundant Step 4 `preloadAssets(imageAssets)`; priority loading uses `groupComponentSlotsByPreloadTier('dashboardHeaderChrome', 'dashboardMenuIcons')` instead of inline `ASSET_FLAGS`.
+- **`sharedAssetPreloads.json`** — added `dashboard.hamburger` to `dashboardMenuIcons`; added `dashboardSidebarChrome` and `dashboardHeaderChrome` slot→flag mappings (single source of truth for component display assets).
+- **`resolveSharedComponentAssets.js`** — shared resolver for component slot mappings.
+- **`validateSharedComponentAssetMappings.js`** — CI check that component mappings only reference flags listed in `dashboardMenuIcons`.
 
-**Conflict check:** Components still **display** icons via `getAssetUrl()` (lazy fallback if rollup missed). Centralized preload remains `/dashboard` config + section orchestration (**C-02**, **C-04**). No override of **Preloading.md** / **SECTION_PRELOAD_AUDIT.md**.
+**Conflict check:** Components still **display** icons via centralized mappings + `getAssetUrl()` (lazy fallback if rollup missed). Centralized preload remains `/dashboard` config + section orchestration (**C-02**, **C-04**). No override of **Preloading.md** / **SECTION_PRELOAD_AUDIT.md**.
 
-**How it was tested:** Code review + existing unit tests (`tests/unit/getAssetPreloadEntriesForSection.test.js`, `tests/unit/routeInheritance.test.js`). No component preload imports remain in these files.
+**How it was tested:** `tests/unit/sharedComponentAssetMappings.test.js`; `tests/unit/assetMapBuildValidation.test.js` (component mapping alignment); existing unit tests (`getAssetPreloadEntriesForSection.test.js`, `routeInheritance.test.js`). No component-local flag strings or preload imports remain in these files.
 
 **How to test in the browser:**
 1. Run `npm run dev`, open DevTools → **Network** (filter `Img` / `webp` / `png`).
@@ -2137,17 +2145,24 @@ Issues tied to `assetPreload[]` definitions and how they are merged — not sect
    (async () => {
      const sidebarSource = await fetch('/src/templates/dashboard/DashboardSidebar.vue').then((r) => r.text());
      const headerSource = await fetch('/src/templates/dashboard/HeaderResponsive.vue').then((r) => r.text());
+     const sharedCatalog = (await import('/src/router/sharedAssetPreloads.json')).default;
 
      console.log({
        sidebarCallsPreloadAsset: sidebarSource.includes('preloadAsset'),
        headerCallsPreloadAssets: headerSource.includes('preloadAssets'),
-       headerStillUsesGetAssetUrl: headerSource.includes('getAssetUrl'),
-       c06Pass: !sidebarSource.includes('preloadAsset') && !headerSource.includes('preloadAssets'),
+       sidebarUsesSharedMapping: sidebarSource.includes('dashboardSidebarChrome'),
+       headerUsesSharedMapping: headerSource.includes('dashboardHeaderChrome'),
+       hamburgerInCentralCatalog: sharedCatalog.dashboardMenuIcons.some((e) => e.flag === 'dashboard.hamburger'),
+       c06Pass:
+         !sidebarSource.includes('preloadAsset') &&
+         !headerSource.includes('preloadAssets') &&
+         sidebarSource.includes('dashboardSidebarChrome') &&
+         headerSource.includes('dashboardHeaderChrome'),
      });
    })();
    ```
-4. **Expected:** `sidebarCallsPreloadAsset: false`; `headerCallsPreloadAssets: false`; `headerStillUsesGetAssetUrl: true`; `c06Pass: true`.
-5. Dashboard header/sidebar icons should still render — warmed by `dashboard-global` section preload from route config, not component-local preload.
+4. **Expected:** `sidebarCallsPreloadAsset: false`; `headerCallsPreloadAssets: false`; `sidebarUsesSharedMapping: true`; `headerUsesSharedMapping: true`; `hamburgerInCentralCatalog: true`; `c06Pass: true`.
+5. Dashboard header/sidebar icons should still render — warmed by `dashboard-global` section preload from route config, not component-local preload or hardcoded flag lists.
 
 ---
 
@@ -2288,9 +2303,9 @@ Issues tied to `assetPreload[]` definitions and how they are merged — not sect
 **Why it happened:** M-04 added runtime/dev flag cross-check; C-09 shape/priority/ref validation was explicitly deferred.
 
 **What changed:**
-- `validateRouteAssetPreloadFlags.js` — added `validateAssetPreloadEntryShape()`, `validateRouteAssetPreloadRefs()`, allowed type/priority sets; extended `validateRouteAssetPreloadFlags()` to accept optional `sharedCatalog`.
-- `jsonConfigValidator.js` — validates inline `assetPreload[]` shape and `assetPreloadRef` keys during `validateRouteConfig()` (build + bundler).
-- `routeConfigLoader.js` — dev startup now runs full validation (shape + refs + assetMap flags) on expanded routes.
+- `validateRouteAssetPreloadFlags.js` — added `validateAssetPreloadEntryShape()`, `validateRouteAssetPreloadRefs()`, allowed type/priority sets; extended `validateRouteAssetPreloadFlags()` to accept optional `sharedCatalog`; added `validateSharedCatalogAssetPreloadFlags()`.
+- `jsonConfigValidator.js` — validates inline `assetPreload[]` shape and `assetPreloadRef` keys during `validateRouteConfig()`; **also cross-checks expanded route flags + shared catalog flags against `assetMap.json` at build time** (M-04).
+- `routeConfigLoader.js` — startup runs full validation (shape + refs + assetMap flags) on expanded routes in all environments.
 
 **Conflict check:** Extends **M-04** without replacing it. Does not change preload runtime behavior. **C-08** optional fields are now validated when present.
 

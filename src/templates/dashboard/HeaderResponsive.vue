@@ -92,6 +92,10 @@ import { ref, onMounted } from "vue";
 import NotificationPopup from "@/components/ui/popup/NotificationPopup.vue";
 import AvatarProfilePopup from "@/components/ui/popup/AvatarProfilePopup.vue";
 import { getAssetUrl } from "@/utils/assets/assetLibrary.js";
+import {
+  getSharedComponentAssetMapping,
+  groupComponentSlotsByPreloadTier,
+} from "@/utils/assets/resolveSharedComponentAssets.js";
 import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js";
 import { getActiveLocale } from "@/utils/translation/localeManager.js";
 
@@ -99,26 +103,13 @@ const isNavOpen = ref(false);
 const isNotificationOpen = ref(false);
 const isProfileOpen = ref(false);
 
-// Asset flags for this component with priority levels
-const ASSET_FLAGS = {
-  logo: 'dashboard.logo',           // CRITICAL - must load first
-  avatar: 'dashboard.avatar',      // HIGH - important for UX
-  notification: 'dashboard.notification', // HIGH - important for UX
-  language: 'dashboard.language',  // NORMAL - less critical
-  hamburger: 'dashboard.hamburger' // NORMAL - less critical
-};
+const headerAssetSlots = getSharedComponentAssetMapping('dashboardHeaderChrome');
+const headerAssetSlotNames = Object.keys(headerAssetSlots);
 
-// Critical assets that must load before component renders
-const CRITICAL_ASSETS = [ASSET_FLAGS.logo];
-
-// Asset URLs loaded from assetLibrary
-const assets = ref({
-  logo: null,
-  language: null,
-  notification: null,
-  avatar: null,
-  hamburger: null
-});
+// Asset URLs loaded from sharedAssetPreloads.json via assetLibrary
+const assets = ref(
+  Object.fromEntries(headerAssetSlotNames.map((slot) => [slot, null])),
+);
 
 // Loading states for images
 const logoLoaded = ref(false);
@@ -161,30 +152,43 @@ async function loadAssetWithRetry(flag, maxRetries = 2) {
  */
 async function loadAssetsWithPriority() {
   try {
-    // Step 1: Load critical assets first (blocking - component waits)
-    const logoUrl = await loadAssetWithRetry(ASSET_FLAGS.logo, 2).catch(err => {
-      console.error(`[HeaderResponsive] Critical asset failed: ${ASSET_FLAGS.logo}`, err);
-      return null;
+    const tierGroups = groupComponentSlotsByPreloadTier(
+      'dashboardHeaderChrome',
+      'dashboardMenuIcons',
+    );
+
+    const logoEntry = tierGroups.high.find(({ slot }) => slot === 'logo')
+      || tierGroups.critical[0];
+
+    if (logoEntry) {
+      assets.value.logo = await loadAssetWithRetry(logoEntry.flag, 2).catch((err) => {
+        console.error(`[HeaderResponsive] Critical asset failed: ${logoEntry.flag}`, err);
+        return null;
+      });
+    }
+
+    const otherHighPriority = tierGroups.high.filter(({ slot }) => slot !== 'logo');
+    const highPriorityResults = await Promise.all(
+      otherHighPriority.map(({ slot, flag }) =>
+        loadAssetWithRetry(flag, 2)
+          .then((url) => [slot, url])
+          .catch(() => [slot, null]),
+      ),
+    );
+    highPriorityResults.forEach(([slot, url]) => {
+      assets.value[slot] = url;
     });
-    assets.value.logo = logoUrl;
 
-    // Step 2: Load high priority assets (avatar, notification)
-    const highPriorityFlags = [ASSET_FLAGS.avatar, ASSET_FLAGS.notification];
-    const highPriorityPromises = highPriorityFlags.map(flag =>
-      loadAssetWithRetry(flag, 2).catch(() => null)
+    const normalPriorityResults = await Promise.all(
+      tierGroups.normal.map(({ slot, flag }) =>
+        loadAssetWithRetry(flag, 1)
+          .then((url) => [slot, url])
+          .catch(() => [slot, null]),
+      ),
     );
-    const highPriorityResults = await Promise.all(highPriorityPromises);
-    assets.value.avatar = highPriorityResults[0];
-    assets.value.notification = highPriorityResults[1];
-
-    // Step 3: Load normal priority assets (non-blocking)
-    const normalPriorityFlags = [ASSET_FLAGS.language, ASSET_FLAGS.hamburger];
-    const normalPriorityPromises = normalPriorityFlags.map(flag =>
-      loadAssetWithRetry(flag, 1).catch(() => null)
-    );
-    const normalPriorityResults = await Promise.all(normalPriorityPromises);
-    assets.value.language = normalPriorityResults[0];
-    assets.value.hamburger = normalPriorityResults[1];
+    normalPriorityResults.forEach(([slot, url]) => {
+      assets.value[slot] = url;
+    });
 
     isAssetsLoading.value = false;
   } catch (error) {

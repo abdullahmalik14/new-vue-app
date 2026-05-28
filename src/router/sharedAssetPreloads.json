@@ -46,6 +46,11 @@
       "priority": "normal"
     },
     {
+      "flag": "dashboard.hamburger",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
       "flag": "dashboard.menu.analytics",
       "type": "image",
       "priority": "normal"
@@ -100,5 +105,23 @@
       "type": "image",
       "priority": "normal"
     }
-  ]
+  ],
+  "dashboardSidebarChrome": {
+    "logo": "dashboard.logo",
+    "avatar": "dashboard.avatar",
+    "notification": "dashboard.notification",
+    "logout": "dashboard.logout",
+    "language": "dashboard.language",
+    "help": "dashboard.help",
+    "closeDesktop": "dashboard.close.desktop",
+    "closeMobile": "dashboard.close.mobile",
+    "more": "dashboard.more"
+  },
+  "dashboardHeaderChrome": {
+    "logo": "dashboard.logo",
+    "avatar": "dashboard.avatar",
+    "notification": "dashboard.notification",
+    "language": "dashboard.language",
+    "hamburger": "dashboard.hamburger"
+  }
 }

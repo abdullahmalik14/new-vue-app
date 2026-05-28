@@ -249,11 +249,11 @@ async function loadRouteComponent(route) {
     const store = pinia ? usePreloadStore(pinia) : null;
     const sectionPreloaded = !!store?.hasSection(sectionName);
 
-    // B-03: high/critical section images before component mount (parallel with chunk load)
-    const [componentModule] = await Promise.all([
-      loadViaGlob(route, userRole),
-      preloadSectionCriticalImages(sectionName),
-    ]);
+    // B-03: kick off high/critical section image preloads in the background.
+    // Never await — preloading is non-blocking cache warming, navigation must not wait on image I/O.
+    preloadSectionCriticalImages(sectionName).catch(() => {});
+
+    const componentModule = await loadViaGlob(route, userRole);
 
     if (sectionPreloaded) {
       log('router/index.js', 'loadRouteComponent', 'cache-hit', 'Section preloaded, fast load', { sectionName });
@@ -700,4 +700,8 @@ router.onError((error) => {
 });
 
 export default router;
-export { prefetchRouteComponent, createRoutePrefetchIntentHandler } from '../utils/route/routeComponentPrefetch.js';
+export {
+  prefetchRouteComponent,
+  createRoutePrefetchIntentHandler,
+  prefetchSectionAssetsForRoute,
+} from '../utils/route/index.js';

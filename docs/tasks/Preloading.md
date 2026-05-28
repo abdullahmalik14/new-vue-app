@@ -154,27 +154,30 @@ The preload store and section preloader existed, but route component loading was
 
 #### How you fixed it
 
+Critical-image preload is fire-and-forget; navigation only ever awaits the component chunk.
+The background section preload is triggered after the component loads, only on cache miss.
+
 ```js
 async function loadRouteComponent(route) {
-  const authStore = useAuthStore();
-  const userRole = authStore.currentUser?.role || 'guest';
-  const { resolveRoleSectionVariant } = await import('../utils/section/sectionResolver.js');
+  const userRole = resolveUserRoleForComponentLoad();
   const sectionName = route.section
     ? resolveRoleSectionVariant(route.section, userRole)
     : null;
 
   if (sectionName) {
-    const { usePreloadStore } = await import('../stores/usePreloadStore.js');
-    const store = usePreloadStore();
+    const pinia = getActivePinia();
+    const store = pinia ? usePreloadStore(pinia) : null;
+    const sectionPreloaded = !!store?.hasSection(sectionName);
 
-    if (store.hasSection(sectionName)) {
-      return loadViaGlob(route, userRole);
-    }
+    // Background cache-warming — never blocks navigation
+    preloadSectionCriticalImages(sectionName).catch(() => {});
 
     const componentModule = await loadViaGlob(route, userRole);
-    import('../utils/section/sectionPreloader.js')
-      .then(({ preloadSection }) => preloadSection(sectionName))
-      .catch(() => {});
+
+    if (!sectionPreloaded) {
+      preloadSection(sectionName).catch(() => {});
+    }
+
     return componentModule;
   }
 
@@ -281,6 +284,8 @@ Preload completion was tracked too early, in-progress dedup returned a boolean, 
 
 #### How you fixed it
 
+`preloadSectionCss` now returns a Promise that resolves on `link.onload` and rejects on `link.onerror`, so JS + CSS in `Promise.all` are both genuinely cached before the store is updated:
+
 ```js
 await Promise.all([
   bundlePaths.js ? preloadJavaScriptBundle(bundlePaths.js, sectionName) : Promise.resolve(),
@@ -288,6 +293,25 @@ await Promise.all([
 ]);
 
 preloadStore.addSection(sectionName);
+```
+
+```js
+// sectionCssLoader.js — preloadSectionCss
+const loadPromise = new Promise((resolve, reject) => {
+  preloadLink.onload = () => resolve(true);
+  preloadLink.onerror = () => {
+    preloadLink.parentNode?.removeChild(preloadLink);
+    preloadHintLinks.delete(sectionName);
+    preloadHintPromises.delete(sectionName);
+    reject(new Error(`Failed to preload CSS for section: ${sectionName}`));
+  };
+});
+
+document.head.appendChild(preloadLink);
+preloadHintLinks.set(sectionName, preloadLink);
+preloadHintPromises.set(sectionName, loadPromise);
+
+return loadPromise;
 ```
 
 Concurrent callers now reuse the same promise:

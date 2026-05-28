@@ -8,10 +8,14 @@
 import { log } from '../common/logHandler.js';
 import { logError } from '../common/errorHandler.js';
 import sharedAssetPreloads from '../../router/sharedAssetPreloads.json';
+import assetMapData from '../../config/assetMap.json';
 import {
   validateAssetPreloadEntryShape,
   validateRouteAssetPreloadRefs,
+  validateRouteAssetPreloadFlags,
+  validateSharedCatalogAssetPreloadFlags,
 } from '../assets/validateRouteAssetPreloadFlags.js';
+import { resolveRouteAssetPreloads } from '../route/resolveRouteAssetPreloads.js';
 import { isValidRouteEnvAccess } from '../route/routeEnvAccess.js';
 import { findDuplicateRoutePathClaims } from '../route/routeAliases.js';
 
@@ -525,6 +529,27 @@ export function validateRouteConfig(routes) {
       path: duplicate.path,
       first: duplicate.first,
       second: duplicate.second,
+    });
+  }
+
+  const expandedRoutes = resolveRouteAssetPreloads(routes, sharedAssetPreloads);
+  const preloadFlagValidation = validateRouteAssetPreloadFlags(
+    expandedRoutes,
+    assetMapData,
+    sharedAssetPreloads,
+  );
+
+  for (const message of preloadFlagValidation.errors) {
+    errors.push({
+      type: 'INVALID_ASSET_PRELOAD_FLAG',
+      message,
+    });
+  }
+
+  for (const message of validateSharedCatalogAssetPreloadFlags(sharedAssetPreloads, assetMapData)) {
+    errors.push({
+      type: 'INVALID_SHARED_CATALOG_FLAG',
+      message,
     });
   }
 

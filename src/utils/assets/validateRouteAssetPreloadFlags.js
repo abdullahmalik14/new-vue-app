@@ -193,3 +193,50 @@ export function validateRouteAssetPreloadFlags(routes, assetMap = null, sharedCa
     missingCount: errors.length,
   };
 }
+
+/**
+ * Validate flags declared in shared preload catalog arrays against assetMap.json.
+ *
+ * @param {Record<string, unknown>} sharedCatalog
+ * @param {Record<string, Record<string, string>>} assetMap
+ * @returns {string[]}
+ */
+export function validateSharedCatalogAssetPreloadFlags(sharedCatalog, assetMap) {
+  const availableFlags = collectAssetMapFlags(assetMap);
+  const errors = [];
+  const reported = new Set();
+
+  if (!sharedCatalog || typeof sharedCatalog !== 'object') {
+    return errors;
+  }
+
+  for (const [catalogKey, entries] of Object.entries(sharedCatalog)) {
+    if (!Array.isArray(entries)) {
+      continue;
+    }
+
+    for (const entry of entries) {
+      const flag = entry?.flag;
+
+      if (!flag || typeof flag !== 'string') {
+        continue;
+      }
+
+      const reportKey = `${catalogKey}::${flag}`;
+
+      if (reported.has(reportKey)) {
+        continue;
+      }
+
+      reported.add(reportKey);
+
+      if (!availableFlags.has(flag)) {
+        errors.push(
+          `Shared catalog "${catalogKey}": flag "${flag}" not found in assetMap.json`,
+        );
+      }
+    }
+  }
+
+  return errors;
+}
