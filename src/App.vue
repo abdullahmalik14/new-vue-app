@@ -1,6 +1,7 @@
 <template>
   <div id="app" class="min-h-screen bg-gray-50 flex flex-col">
     <NavigationProgressBar />
+    <LanguageSwitcher />
 
     <!-- Global Header -->
     <!-- <AppHeader ref="appHeader" v-if="shouldShowLayout" /> -->
@@ -60,6 +61,7 @@ import AppFooter from './components/layout/AppFooter.vue';
 import AppShell from './components/layout/AppShell.vue';
 import NavigationProgressBar from './components/layout/NavigationProgressBar.vue';
 import RouteErrorBoundary from './components/layout/RouteErrorBoundary.vue';
+import LanguageSwitcher from './components/ui/nav/language/LanguageSwitcher.vue';
 
 // Get router instance
 const router = useRouter();

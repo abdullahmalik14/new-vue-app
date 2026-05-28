@@ -50,6 +50,86 @@ await loadTranslationsForSection(currentSection.value, finalLocale);
 const ok = await setActiveLocale(finalLocale, { updateUrl: true });
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `onChange` called `setActiveLocale` without `await`, so `ok` was always a truthy Promise and the falsy guard never ran. `loadTranslationsForSection` and `preloadTranslationsForSections` ran while `setActiveLocale` was still clearing caches, updating i18n, reloading the current section, and refreshing `preLoadSections` (via `refreshSectionPreloadsOnLocaleChange` inside `localeManager.js`).
+
+**Why it happened:** `setActiveLocale` is `async` but the switch handler treated it like a synchronous boolean return.
+
+**What changed:** `LanguageSwitcher.vue` line 188 — `const ok = await setActiveLocale(finalLocale, { updateUrl: true });` so steps 2–3 run only after locale persistence, URL rewrite, cache clear, and `setActiveLocale`'s internal translation/section preload refresh complete.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. It fixes ordering so the switcher respects work already added inside `setActiveLocale` (including section preload refresh on locale change). The switcher may still call `loadTranslationsForSection` / `preloadTranslationsForSections` afterward (duplicate but safe); removing that duplication is out of scope for L-01.
+
+**How it was tested:** Code review — `onChange` is already `async`; `setActiveLocale` returns `Promise<boolean>` per JSDoc in `localeManager.js`.
+
+**How to test in the browser:**
+
+> **Why the old console snippet looked the same on old and new code**  
+> That snippet only calls `setActiveLocale` from `localeManager.js`. It never runs `LanguageSwitcher.vue`. On **any** build you will always see `withoutAwaitIsPromise: true` (Promise is truthy) and `withAwaitIsBoolean: true` — that demonstrates async semantics, not whether the switcher awaits. Use the tests below instead.
+
+1. Run `npm run dev`, open a page with the language `<select>` (e.g. `/log-in` or `/dashboard`).
+
+2. **Confirm the fix is in your bundle** (DevTools → Console, one paste):
+   ```js
+   fetch('/src/components/ui/nav/language/LanguageSwitcher.vue').then(r=>r.text()).then(src=>console.log({hasAwaitSetActiveLocale:/await\s+setActiveLocale/.test(src),snippet:src.match(/setActiveLocale\([^)]+\)/)?.[0]}));
+   ```
+   **Expected on fixed code:** `hasAwaitSetActiveLocale: true`, snippet contains `await setActiveLocale`.
+
+3. **Prove ordering: buggy pattern vs fixed pattern** (same modules `LanguageSwitcher` uses; one paste):
+   ```js
+   (async () => {
+     const events = [];
+     const lm = await import('/src/utils/translation/localeManager.js');
+     const tl = await import('/src/utils/translation/translationLoader.js');
+     const section = window.__CURRENT_SECTION__ || 'auth';
+     const target = window.APP?.getLocale?.() === 'vi' ? 'en' : 'vi';
+     const oc = tl.clearTranslationCaches;
+     const ol = tl.loadTranslationsForSection;
+     tl.clearTranslationCaches = function () {
+       events.push({ op: 'clear', t: performance.now() });
+       return oc();
+     };
+     tl.loadTranslationsForSection = async function (s, l) {
+       events.push({ op: 'load', section: s, locale: l, t: performance.now() });
+       return ol(s, l);
+     };
+     const run = async (label, fn) => {
+       events.length = 0;
+       await fn();
+       const clear = events.find((e) => e.op === 'clear');
+       const firstLoad = events.find((e) => e.op === 'load');
+       return {
+         label,
+         eventOrder: events.map((e) => e.op),
+         clearBeforeFirstLoad: !!(clear && firstLoad && clear.t < firstLoad.t),
+       };
+     };
+     const buggy = await run('OLD LanguageSwitcher (no await)', async () => {
+       const p = lm.setActiveLocale(target, { updateUrl: false });
+       await tl.loadTranslationsForSection(section, target);
+       await p;
+     });
+     const fixed = await run('NEW LanguageSwitcher (await)', async () => {
+       await lm.setActiveLocale(target, { updateUrl: false });
+       await tl.loadTranslationsForSection(section, target);
+     });
+     console.table([buggy, fixed]);
+     console.log(
+       buggy.clearBeforeFirstLoad === false && fixed.clearBeforeFirstLoad === true
+         ? 'PASS: without await, first load can run before clear; with await, clear always precedes the switcher load.'
+         : 'Inspect eventOrder — network timing can occasionally blur edge cases; re-run once.',
+       { buggy, fixed }
+     );
+     tl.clearTranslationCaches = oc;
+     tl.loadTranslationsForSection = ol;
+   })();
+   ```
+   **Expected:** `OLD` row → `clearBeforeFirstLoad: false`, `eventOrder` often starts with `load` then `clear`. `NEW` row → `clearBeforeFirstLoad: true`, `eventOrder` starts with `clear` then `load`(s). Console ends with `PASS: without await…`.
+
+4. **UI check (real `<select>`):** Change English → Vietnamese (or back). **Expected:** URL locale prefix updates, `document.documentElement.lang` matches, copy updates. This is a smoke test only — both old and new code may look fine on fast networks; the ordering test in step 3 is the reliable proof.
+
 ---
 
 ### L-02 — Shallow merge loses nested fallback keys
@@ -72,6 +152,52 @@ This object is stored in the in-memory `loadedTranslations` Map and the cacheHan
 
 **Fix:** Use a deep-merge utility instead of a shallow spread for the cached `translations` object.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Non-English loads merged `englishTranslations` and `localeTranslations` with a shallow spread. Nested objects in the locale file replaced entire English subtrees in the value stored in `loadedTranslations` and `cacheHandler`, so callers reading the cached return missed English-only nested keys.
+
+**Why it happened:** Spread merge only combines top-level keys; nested locale objects win wholesale at their key path.
+
+**What changed:** `translationLoader.js` — import `deepMergePreferChild` from `objectSafety.js` and use `translations = deepMergePreferChild(englishTranslations, localeTranslations)` instead of `{ ...englishTranslations, ...localeTranslations }`. `applyTranslationsToI18n` still receives each file separately (vue-i18n fallback unchanged).
+
+**Conflict check:** No override of **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md** — same fetch/load timing; only the shape of the cached return object changes.
+
+**How it was tested:** `tests/unit/translationLoader.test.js` — `translationLoader locale merge (L-02)` asserts nested English `subtitle` / `button` survive when locale only overrides `title`.
+
+**How to test in the browser:**
+1. Run `npm run dev`, open a page with translated nested keys (e.g. `/vi/log-in` or switch to Vietnamese on auth).
+2. DevTools → **Console** — one paste (uses the same merge path as the loader; pick a section that exists on your route, default `auth`):
+   ```js
+   (async () => {
+     const { deepMergePreferChild } = await import('/src/utils/common/objectSafety.js');
+     const english = { auth: { login: { title: 'Login', subtitle: 'Welcome', button: 'Go' } } };
+     const locale = { auth: { login: { title: 'Đăng nhập' } } };
+     const shallow = { ...english, ...locale };
+     const deep = deepMergePreferChild(english, locale);
+     console.log({
+       shallowMissingSubtitle: shallow.auth?.login?.subtitle,
+       deepHasSubtitle: deep.auth?.login?.subtitle,
+       deepTitle: deep.auth?.login?.title,
+       pass: deep.auth?.login?.subtitle === 'Welcome' && deep.auth?.login?.title === 'Đăng nhập'
+     });
+   })();
+   ```
+3. **Expected:** `shallowMissingSubtitle: undefined`, `deepHasSubtitle: 'Welcome'`, `pass: true`.
+4. **Loader smoke test** (optional, after clearing site data or hard refresh): same console, then:
+   ```js
+   (async () => {
+     const { loadTranslationsForSection } = await import('/src/utils/translation/translationLoader.js');
+     const merged = await loadTranslationsForSection('auth', 'vi');
+     console.log({
+       sample: merged?.auth?.login,
+       hasNestedFallback: !!(merged?.auth?.login?.subtitle || merged?.auth?.login?.button)
+     });
+   })();
+   ```
+   **Expected:** `hasNestedFallback: true` when English auth JSON includes keys the Vietnamese file omits (real files must match your section name).
+
 ---
 
 ### L-03 — `applyLocaleTemporarily` does not load locale translations
@@ -83,6 +209,48 @@ This object is stored in the in-memory `loadedTranslations` Map and the cacheHan
 
 **Fix:** Either document clearly that `applyLocaleTemporarily` must always be followed by a translation load, or load translations inside it.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `applyLocaleTemporarily` updated in-memory locale and vue-i18n but never fetched section JSON. Standalone or preview callers would show the wrong language labels with missing strings until something else called `loadTranslationsForSection`.
+
+**Why it happened:** Router was expected to load translations separately (`beforeResolve` / `afterEach`), so the temporary-locale helper only switched display state.
+
+**What changed:**
+- `localeManager.js` — `resolveSectionFromRoutePath`, `loadTranslationsForTemporaryLocale`, and extended `applyLocaleTemporarily(locale, options)` with `sectionName`, `routePath`, `loadTranslations` (default `true`), `awaitTranslations` (default `false`). Translation fetch is **fire-and-forget** by default so `beforeEach` stays non-blocking per preload architecture.
+- `router/index.js` — `await applyLocaleTemporarily(urlLocale, { routePath: to.path })` so section resolution uses the **destination** path, not stale `window.location`.
+
+**Conflict check:** No override of **Preloading.md** / **SECTION_PRELOAD_AUDIT.md** — does not await translation I/O on the navigation critical path unless `awaitTranslations: true`. May overlap `startCurrentSectionResourceLoads` in `beforeResolve` (cache dedupes). **L-09** (wrong locale from `resolveActiveLocale()` during pending nav) remains a separate fix.
+
+**How it was tested:** `tests/unit/applyLocaleTemporarily.test.js` — translation load triggered with `routePath`, explicit `sectionName`, `awaitTranslations`, and `loadTranslations: false`.
+
+**How to test in the browser:**
+
+> **Why `authViLoaded: false` can still mean L-03 worked**  
+> The old snippet used `import('/src/utils/translation/translationLoader.js')` from the console. That can read a **different module instance** than the running app, so `loadedTranslations` looks empty even when `vi.json` loaded in Network. Locale (`vi`) and Network `vi.json` are the real signals. Use `window.APP` below (same instances as the app).
+
+1. Run `npm run dev`, hard-refresh, open `/log-in` (English).
+2. Navigate to `/vi/log-in` (in-app link is best; typing the URL and pressing Enter also works after full reload).
+3. DevTools → **Console** — one paste after the page shows Vietnamese (or stops loading):
+   ```js
+   (async () => {
+     const stats = await window.APP?.getTranslationStatistics?.();
+     console.log({
+       activeLocale: window.APP?.getLocale?.(),
+       langAttr: document.documentElement.lang,
+       loadedSections: stats?.loadedSections ?? [],
+       authViInMap: stats?.loadedSections?.includes('auth_vi'),
+       pass:
+         window.APP?.getLocale?.() === 'vi' &&
+         (stats?.loadedSections?.includes('auth_vi') ||
+           document.documentElement.lang === 'vi')
+     });
+   })();
+   ```
+4. **Expected:** `activeLocale: 'vi'`, `authViInMap: true` (or `loadedSections` contains `auth_vi`), `pass: true`; visible copy is Vietnamese.
+5. **Network check:** `vi.json` under `/i18n/section-auth/` — if present, translations were fetched (L-03 + router loads). Duplicate requests are OK (cache dedupes).
+
 ---
 
 ### L-04 — `initializeFromBrowser` in `useLocaleStore` is dead code
@@ -93,6 +261,35 @@ This object is stored in the in-memory `loadedTranslations` Map and the cacheHan
 `initializeFromBrowser` is defined on the Pinia store but is **never called anywhere**. Browser locale detection is handled separately in `localeManager.getBrowserLocale()`. This creates two parallel implementations of the same logic that can drift — e.g. the store version strips to base code only (`split('-')[0]`), losing `zh-tw` or `pt-pt` variants.
 
 **Fix:** Remove `initializeFromBrowser` from the store and consolidate browser-locale detection entirely in `localeManager.js`.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `useLocaleStore.initializeFromBrowser()` duplicated browser detection with outdated logic (base code only via `split('-')[0]`) but was never called, so it could mislead future callers and drift from `localeManager.getBrowserLocale()` (fixed in L-05).
+
+**Why it happened:** Store was written with its own browser-init path before `resolveActiveLocale()` / `getBrowserLocale()` became the single resolution chain.
+
+**What changed:** Removed `initializeFromBrowser` action from `src/stores/useLocaleStore.js`. Browser locale is resolved only via `localeManager.js` (`getBrowserLocale` → `resolveActiveLocale` priority chain). Store keeps `setLocale`, `resetToDefault`, and getters only.
+
+**Conflict check:** No preload impact. Complements **L-05** (one browser-detection implementation). Nothing in the repo called this action.
+
+**How it was tested:** `tests/unit/useLocaleStore.test.js` — store has no `initializeFromBrowser`; `setLocale` / `resetToDefault` remain. `grep initializeFromBrowser` — only audit doc and removed store code.
+
+**How to test in the browser:**
+1. DevTools → **Console** (one paste):
+   ```js
+   (async () => {
+     const { useLocaleStore } = await import('/src/stores/useLocaleStore.js');
+     const store = useLocaleStore();
+     console.log({
+       hasInitializeFromBrowser: typeof store.initializeFromBrowser === 'function',
+       hasSetLocale: typeof store.setLocale === 'function',
+       browserViaManager: window.APP.getLocalePreferenceOrder().find((o) => o.source === 'browser')
+     });
+   })();
+   ```
+2. **Expected:** `hasInitializeFromBrowser: false`, `hasSetLocale: true`, `browserViaManager` object present (browser detection still works through `localeManager`).
 
 ---
 
@@ -117,6 +314,53 @@ if (SUPPORTED_LOCALES.includes(base)) return base;
 return null;
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `getBrowserLocale()` always took only the first segment (`zh-TW` → `zh`), so supported regional locales (`zh-tw`, `pt-pt`, `fr-ca`, `es-mx`, `fa-af`) were never auto-selected from the browser.
+
+**Why it happened:** Early logic assumed base ISO codes only; regional tags were stripped before checking `SUPPORTED_LOCALES`.
+
+**What changed:** `localeManager.js` `getBrowserLocale()` — normalize full tag (`toLowerCase`, `_` → `-`), return it when listed; otherwise fall back to base code; otherwise `null`.
+
+**Conflict check:** No override of preload or L-03 work — only affects browser-priority step in `resolveActiveLocale()` when URL and store have no locale.
+
+**How it was tested:** `tests/unit/getBrowserLocale.test.js` — `zh-TW` → `zh-tw`, `pt-PT` → `pt-pt`, `fr_CA` → `fr-ca`, `en-US` → `en`.
+
+**How to test in the browser:**
+
+> **Why your console output looked “wrong” but L-05 is still correct**
+> - You were on a URL with a locale prefix (`/zh-tw/...`). `resolveActiveLocale()` **always prefers URL first**, so every `resolveActiveLocale()` call returned `zh-tw` — not the browser.
+> - `getLocalePreferenceOrder()` is the right tool: it lists each source separately. Your `browser: 'en'` row is `getBrowserLocale()` only; with `navigator.language` = `en-US` that correctly maps to `en` (base fallback). URL/persisted `zh-tw` are separate priorities.
+> - Do **not** use a loop with `resolveActiveLocale()` while a locale is in the path — that only re-tests URL priority.
+
+1. **Inspect browser detection only** (works on any page, one paste):
+   ```js
+   (() => {
+     const order = window.APP.getLocalePreferenceOrder();
+     const browser = order.find((o) => o.source === 'browser');
+     console.log({
+       navigatorLanguage: navigator.language,
+       browserStep: browser,
+       passEnUs: navigator.language === 'en-US' && browser?.value === 'en'
+     });
+   })();
+   ```
+   **On your machine (`en-US`):** `browserStep.value: 'en'`, `passEnUs: true` — **PASS for L-05** (regional tag not used because full `en-us` is not in `SUPPORTED_LOCALES`; base `en` is).
+
+2. **Prove regional tag `zh-TW` → `zh-tw`** — use a page **without** a locale prefix (e.g. `/log-in`, not `/zh-tw/log-in`), then temporarily override `navigator.language` and read **only** the browser row (URL must not be `zh-tw`):
+   ```js
+   (() => {
+     Object.defineProperty(navigator, 'language', { value: 'zh-TW', configurable: true });
+     const browser = window.APP.getLocalePreferenceOrder().find((o) => o.source === 'browser');
+     console.log({ navigatorLanguage: navigator.language, browserStep: browser, pass: browser?.value === 'zh-tw' });
+   })();
+   ```
+   **Expected:** `browserStep.value: 'zh-tw'`, `pass: true`. (If URL still has `/zh-tw/`, the `url` row will also be `zh-tw` — that is fine; we are checking the `browser` row.)
+
+3. **Authoritative check:** `npm run test:unit -- tests/unit/getBrowserLocale.test.js --run` — `zh-TW` → `zh-tw`, `pt-PT` → `pt-pt`, `fr_CA` → `fr-ca`, `en-US` → `en`.
+
 ---
 
 ### L-06 — `DEFAULT_LOCALE` defined in two separate files with no shared constant
@@ -127,6 +371,39 @@ return null;
 Both files define `const DEFAULT_LOCALE = 'en'` independently. If the default locale ever changes, it must be updated in two places and can silently diverge.
 
 **Fix:** Export `DEFAULT_LOCALE` from `localeManager.js` (or a shared constants file) and import it in `useLocaleStore.js`.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `DEFAULT_LOCALE = 'en'` was declared independently in `localeManager.js` and `useLocaleStore.js`, so a future change could update one file and miss the other.
+
+**Why it happened:** Store and manager were added separately without a shared constant export.
+
+**What changed:**
+- `localeManager.js` — `export const DEFAULT_LOCALE = 'en'` (single source of truth).
+- `useLocaleStore.js` — removed local `DEFAULT_LOCALE`; imports it from `localeManager.js`.
+- `src/utils/translation/index.js` — re-exports `DEFAULT_LOCALE` for app-wide imports.
+
+**Conflict check:** No preload impact. `src/router/index.js` still has its own `DEFAULT_LOCALE` (out of L-06 scope; can be consolidated in a later task).
+
+**How it was tested:** Code review + `grep` — `useLocaleStore.js` has no local `DEFAULT_LOCALE`; imports from `localeManager.js`. Existing unit tests that import locale modules still pass.
+
+**How to test in the browser:**
+1. DevTools → **Console** (one paste):
+   ```js
+   (async () => {
+     const lm = await import('/src/utils/translation/localeManager.js');
+     const idx = await import('/src/utils/translation/index.js');
+     console.log({
+       managerDefault: lm.DEFAULT_LOCALE,
+       indexDefault: idx.DEFAULT_LOCALE,
+       getDefaultLocale: lm.getDefaultLocale?.(),
+       sameReference: lm.DEFAULT_LOCALE === idx.DEFAULT_LOCALE
+     });
+   })();
+   ```
+2. **Expected:** all values `'en'`, `sameReference: true`, `getDefaultLocale()` returns `'en'`.
 
 ---
 
@@ -146,6 +423,30 @@ if (!translationsLoadingInProgress.has(loadingKey)) {
 
 **Fix:** Store a sentinel value in `loadedTranslations` on error (e.g. `null`) so waiters can detect failure and log/retry. Or replace the polling pattern with a Promise-based event (see P-04).
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** If the lead `loadTranslationsForSection` failed, `translationsLoadingInProgress` was cleared but `loadedTranslations` had no entry. Concurrent waiters in `waitForTranslationLoad` saw “finished but not in map” and returned `{}` with only a generic warn — indistinguishable from a successful empty load.
+
+**Why it happened:** Only successful loads wrote to `loadedTranslations`; failures left waiters polling until the in-progress flag cleared with no outcome recorded.
+
+**What changed:** `translationLoader.js` — added `finishTranslationLoad(loadingKey, result)`; failures store `null` in `loadedTranslations`; success stores the object. `waitForTranslationLoad` detects `null`, logs `Concurrent load failed`, returns `{}`. Failed loads no longer write to TTL cache. `areTranslationsLoadedForSection` treats `null` as not loaded.
+
+**Conflict check:** No preload timing change — same dedupe/wait pattern; waiters now get an explicit failed outcome instead of a silent race.
+
+**How it was tested:** `tests/unit/translationLoader.test.js` — `translationLoader concurrent wait (L-07)` with parallel loads and failed HEAD validation.
+
+**How to test in the browser:**
+1. DevTools → **Network** → right-click `en.json` (e.g. `/i18n/section-auth/en.json`) → **Block request URL**, or use request blocking pattern `*/i18n/section-auth/en.json`.
+2. Hard-refresh `/log-in` (or your auth route).
+3. **Expected console (L-07 working):**
+   - One lead path: `[loadTranslationsForSection] English translation file missing` or load error, then `finishTranslationLoad` with failure.
+   - Several `[waitForTranslationLoad] [start] Waiting… { loadingKey: 'auth_en' }` from `main.js`, `AuthLogIn.vue`, router (normal — deduped to one network load).
+   - Multiple `[waitForTranslationLoad] [warn] Concurrent load failed` + `Returning empty object after failed load` — **waiters correctly detected failure** (not the old silent “finished but not in map” only).
+4. **Expected UI:** Raw i18n keys such as `auth.login.button` — **not a regression**. No JSON was merged into vue-i18n, so `t()` has no messages. L-07 fixes waiter **logging/outcome**, not “show English anyway when the file is blocked.”
+5. Unblock `en.json` and refresh — keys should become normal copy again.
+
 ---
 
 ### L-08 — `localeOptions` in `LanguageSwitcher.vue` is a duplicate of `SUPPORTED_LOCALES`
@@ -156,6 +457,41 @@ if (!translationsLoadingInProgress.has(loadingKey)) {
 `SUPPORTED_LOCALES` in `localeManager.js` is the authoritative list of supported locale codes. `LanguageSwitcher.vue` maintains a separate 75-entry `localeOptions` array with the same codes plus labels. Adding, removing, or renaming a locale requires updating both files. Currently they are in sync but this is a maintenance hazard.
 
 **Fix:** Move locale metadata (label, traditionalName) into `localeManager.js` as a map alongside `SUPPORTED_LOCALES` and import from there.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `LanguageSwitcher.vue` duplicated 75 locale codes plus labels in a local `localeOptions` array, separate from `SUPPORTED_LOCALES` in `localeManager.js` — easy to drift when adding/removing locales.
+
+**Why it happened:** UI labels were inlined in the component for convenience.
+
+**What changed:**
+- `src/utils/translation/localeDisplayMetadata.js` — `LOCALE_DISPLAY_METADATA` map (label + traditionalName per code).
+- `localeManager.js` — `getLocaleSwitcherOptions()` builds options in `SUPPORTED_LOCALES` order; `getLocaleDisplayName()` uses the same map.
+- `LanguageSwitcher.vue` — removed inline list; uses `getLocaleSwitcherOptions()` and `SUPPORTED_LOCALES` for validation.
+- `src/utils/translation/index.js` — exports `getLocaleSwitcherOptions`.
+
+**Conflict check:** No preload impact — display-only refactor; switcher behavior unchanged.
+
+**How it was tested:** `tests/unit/localeSwitcherOptions.test.js` — option count/codes match `SUPPORTED_LOCALES`, sample labels present.
+
+**How to test in the browser:**
+1. Open any page with the language `<select>`.
+2. DevTools → **Console** (one paste):
+   ```js
+   (async () => {
+     const { getLocaleSwitcherOptions, SUPPORTED_LOCALES } = await import('/src/utils/translation/localeManager.js');
+     const options = getLocaleSwitcherOptions();
+     console.log({
+       supportedCount: SUPPORTED_LOCALES.length,
+       optionsCount: options.length,
+       codesMatch: options.every((o, i) => o.code === SUPPORTED_LOCALES[i]),
+       viLabel: options.find((o) => o.code === 'vi')?.label
+     });
+   })();
+   ```
+3. **Expected:** `codesMatch: true`, equal counts, `viLabel: 'Vietnamese'`. Dropdown still lists all languages with labels.
 
 ---
 

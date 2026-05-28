@@ -375,7 +375,7 @@ router.beforeEach(async (to, from, next) => {
     localeFromPath;
 
   if (urlLocale) {
-    await applyLocaleTemporarily(urlLocale);
+    await applyLocaleTemporarily(urlLocale, { routePath: to.path });
 
     log('router/index.js', 'beforeEach', 'locale-from-url', 'Locale applied temporarily from URL (not persisted)', {
       urlLocale,

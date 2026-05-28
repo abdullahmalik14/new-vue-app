@@ -9,6 +9,7 @@
 import { log } from '../common/logHandler.js';
 import { logError } from '../common/errorHandler.js';
 import { getValueFromCache, setValueWithExpiration, clearAllCache } from '../common/cacheHandler.js';
+import { deepMergePreferChild } from '../common/objectSafety.js';
 import { resolveActiveLocale } from './localeManager.js';
 import { getI18nInstance } from './i18nInstance.js';
 
@@ -35,8 +36,19 @@ function sanitizeSectionName(name) {
 // Track which translations are currently loading to prevent duplicates
 const translationsLoadingInProgress = new Set();
 
-// Track loaded translations
+// Track loaded translations; `null` value means load failed (see finishTranslationLoad)
 const loadedTranslations = new Map();
+
+/**
+ * Mark a section/locale load complete and notify concurrent waiters.
+ *
+ * @param {string} loadingKey
+ * @param {object|null} result - Translation object, or null if the load failed
+ */
+function finishTranslationLoad(loadingKey, result) {
+  translationsLoadingInProgress.delete(loadingKey);
+  loadedTranslations.set(loadingKey, result);
+}
 
 /**
  * Build the URL for a translation JSON file in the public directory.
@@ -170,12 +182,16 @@ export async function loadTranslationsForSection(sectionName, localeCode) {
   const cacheKey = TRANSLATION_CACHE_KEY_PREFIX + sectionName + '_' + targetLocale;
 
   // Check cache FIRST - avoid unnecessary validation requests
+  const loadingKey = `${sectionName}_${targetLocale}`;
+
   const cachedTranslations = getValueFromCache(cacheKey);
   if (cachedTranslations) {
     log('translationLoader.js', 'loadTranslationsForSection', 'cache-hit', 'Translations loaded from cache', {
       sectionName,
       localeCode: targetLocale
     });
+
+    loadedTranslations.set(loadingKey, cachedTranslations);
 
     if (window.performanceTracker) {
       window.performanceTracker.step({
@@ -192,7 +208,6 @@ export async function loadTranslationsForSection(sectionName, localeCode) {
   }
 
   // Check if already loading this translation - avoid duplicate requests
-  const loadingKey = `${sectionName}_${targetLocale}`;
   if (translationsLoadingInProgress.has(loadingKey)) {
     log('translationLoader.js', 'loadTranslationsForSection', 'in-progress', 'Translation load already in progress, waiting', {
       sectionName,
@@ -223,8 +238,7 @@ export async function loadTranslationsForSection(sectionName, localeCode) {
       });
       log('translationLoader.js', 'loadTranslationsForSection', 'return', 'Returning empty object due to missing English file', {});
 
-      // Remove from loading set before returning
-      translationsLoadingInProgress.delete(loadingKey);
+      finishTranslationLoad(loadingKey, null);
       return {};
     }
 
@@ -254,11 +268,8 @@ export async function loadTranslationsForSection(sectionName, localeCode) {
       const localeTranslations = await loadTranslationFile(sectionName, targetLocale);
       applyTranslationsToI18n(targetLocale, localeTranslations);
 
-      // Merge English (base) with locale (override)
-      translations = {
-        ...englishTranslations,
-        ...localeTranslations
-      };
+      // Deep-merge English (base) with locale (override) for cache/return value
+      translations = deepMergePreferChild(englishTranslations, localeTranslations);
 
       log('translationLoader.js', 'loadTranslationsForSection', 'merged', 'Translations loaded and merged', {
         sectionName,
@@ -280,17 +291,18 @@ export async function loadTranslationsForSection(sectionName, localeCode) {
     }
   } catch (error) {
     logError('translationLoader.js', 'loadTranslationsForSection', 'Failed to load translations', error, { sectionName, localeCode: targetLocale });
-    translations = {}; // Return empty object on error
+    finishTranslationLoad(loadingKey, null);
+    log('translationLoader.js', 'loadTranslationsForSection', 'return', 'Returning empty object after load failure', {
+      sectionName,
+      localeCode: targetLocale
+    });
+    return {};
   }
 
-  // Remove from loading set
-  translationsLoadingInProgress.delete(loadingKey);
+  finishTranslationLoad(loadingKey, translations);
 
   // Cache the loaded translations
   setValueWithExpiration(cacheKey, translations, TRANSLATION_CACHE_TTL);
-
-  // Store in memory map
-  loadedTranslations.set(loadingKey, translations);
 
   if (window.performanceTracker) {
     window.performanceTracker.step({
@@ -420,14 +432,19 @@ async function waitForTranslationLoad(loadingKey) {
     // Check if translation is now loaded
     if (loadedTranslations.has(loadingKey)) {
       const result = loadedTranslations.get(loadingKey);
+      if (result === null) {
+        log('translationLoader.js', 'waitForTranslationLoad', 'warn', 'Concurrent load failed; returning empty object', { loadingKey });
+        log('translationLoader.js', 'waitForTranslationLoad', 'return', 'Returning empty object after failed load', { loadingKey });
+        return {};
+      }
       log('translationLoader.js', 'waitForTranslationLoad', 'return', 'Returning loaded translation', { loadingKey });
       return result;
     }
 
-    // Check if loading has finished (even if failed)
+    // Check if loading has finished without recording an outcome (should not happen)
     if (!translationsLoadingInProgress.has(loadingKey)) {
-      log('translationLoader.js', 'waitForTranslationLoad', 'warn', 'Loading finished but not in map', { loadingKey });
-      log('translationLoader.js', 'waitForTranslationLoad', 'return', 'Returning empty object', {});
+      log('translationLoader.js', 'waitForTranslationLoad', 'warn', 'Loading finished without outcome in map', { loadingKey });
+      log('translationLoader.js', 'waitForTranslationLoad', 'return', 'Returning empty object', { loadingKey });
       return {};
     }
 
@@ -518,7 +535,10 @@ export async function preloadTranslationsForSections(sectionNames, localeCode) {
  */
 export function areTranslationsLoadedForSection(sectionName, localeCode) {
   const loadingKey = `${sectionName}_${localeCode}`;
-  const loaded = loadedTranslations.has(loadingKey);
+  const cacheKey = TRANSLATION_CACHE_KEY_PREFIX + sectionName + '_' + localeCode;
+  const inMemory = loadedTranslations.get(loadingKey);
+  const loaded =
+    (inMemory !== undefined && inMemory !== null) || getValueFromCache(cacheKey) != null;
   log('translationLoader.js', 'areTranslationsLoadedForSection', 'return', 'Returning loaded status', { sectionName, localeCode, loaded });
   return loaded;
 }

@@ -25,10 +25,11 @@ import {
   refreshSectionPreloadsOnLocaleChange,
 } from "../section/sectionPreloadOrchestrator.js";
 import { getI18nInstance } from "./i18nInstance.js";
+import { LOCALE_DISPLAY_METADATA } from "./localeDisplayMetadata.js";
 
 // Supported locales - exported as the single source of truth
 export const SUPPORTED_LOCALES = [ "af", "sq", "am", "ar", "hy", "az", "bn", "bs", "bg", "ca", "zh", "zh-tw", "hr", "cs", "da", "fa-af", "nl", "en", "et", "fa", "tl", "fi", "fr", "fr-ca", "ka", "de", "el", "gu", "ht", "ha", "he", "hi", "hu", "is", "id", "ga", "it", "ja", "kn", "kk", "ko", "lv", "lt", "mk", "ms", "ml", "mt", "mr", "mn", "no", "ps", "pl", "pt", "pt-pt", "pa", "ro", "ru", "sr", "si", "sk", "sl", "so", "es", "es-mx", "sw", "sv", "ta", "te", "th", "tr", "uk", "ur", "uz", "vi", "cy" ];
-const DEFAULT_LOCALE = "en";
+export const DEFAULT_LOCALE = "en";
 
 /**
  * First path segment if it is a supported locale (e.g. /vi/dashboard → vi).
@@ -342,17 +343,35 @@ function getBrowserLocale() {
       return null;
     }
 
-    // Extract base language code (e.g., 'en' from 'en-US')
-    const baseLanguage = browserLanguage.split("-")[0].toLowerCase();
+    const normalized = browserLanguage.toLowerCase().replace("_", "-");
 
-    // Check if supported
+    if (SUPPORTED_LOCALES.includes(normalized)) {
+      log(
+        "localeManager.js",
+        "getBrowserLocale",
+        "info",
+        "Browser locale is supported (full regional code)",
+        { browserLanguage, locale: normalized }
+      );
+      log(
+        "localeManager.js",
+        "getBrowserLocale",
+        "return",
+        "Returning browser locale",
+        { locale: normalized }
+      );
+      return normalized;
+    }
+
+    const baseLanguage = normalized.split("-")[0];
+
     if (SUPPORTED_LOCALES.includes(baseLanguage)) {
       log(
         "localeManager.js",
         "getBrowserLocale",
         "info",
-        "Browser locale is supported",
-        { locale: baseLanguage }
+        "Browser locale is supported (base code fallback)",
+        { browserLanguage, locale: baseLanguage }
       );
       log(
         "localeManager.js",
@@ -371,6 +390,8 @@ function getBrowserLocale() {
       "Browser locale not supported",
       {
         browserLanguage,
+        normalized,
+        baseLanguage,
         supportedLocales: SUPPORTED_LOCALES,
       }
     );
@@ -789,13 +810,150 @@ function updateUrlWithLocale(localeCode) {
 }
 
 /**
+ * Resolve section name from a route path for temporary locale translation loads.
+ *
+ * @param {string} [routePath] - Full path (e.g. /vi/dashboard); falls back to window.location.pathname
+ * @returns {Promise<string|null>}
+ */
+async function resolveSectionFromRoutePath(routePath) {
+  const rawPath =
+    routePath ||
+    (typeof window !== "undefined" ? window.location.pathname : null);
+
+  if (!rawPath) {
+    return null;
+  }
+
+  try {
+    const { resolveRouteFromPath } = await import("../route/routeResolver.js");
+    const routePath = stripLeadingLocaleFromPath(rawPath);
+    const currentRoute = resolveRouteFromPath(routePath);
+
+    if (!currentRoute?.section) {
+      return null;
+    }
+
+    let userRole = "guest";
+    try {
+      const authStore = useAuthStore();
+      userRole = authStore.currentUser?.role || "guest";
+    } catch {
+      // Auth store may be unavailable during early boot
+    }
+
+    const resolvedSection = resolveRoleSectionVariant(
+      currentRoute.section,
+      userRole
+    );
+
+    return typeof resolvedSection === "string" && resolvedSection
+      ? resolvedSection
+      : null;
+  } catch (error) {
+    log(
+      "localeManager.js",
+      "resolveSectionFromRoutePath",
+      "info",
+      "Could not resolve section from route path",
+      { routePath: rawPath, error: error?.message }
+    );
+    return null;
+  }
+}
+
+/**
+ * Load translations for a temporarily applied locale (non-blocking by default).
+ *
+ * @param {string} localeCode
+ * @param {object} options
+ * @param {string} [options.sectionName]
+ * @param {string} [options.routePath]
+ * @param {boolean} [options.awaitTranslations]
+ * @returns {Promise<void>}
+ */
+async function loadTranslationsForTemporaryLocale(
+  localeCode,
+  { sectionName, routePath, awaitTranslations }
+) {
+  try {
+    const { loadTranslationsForSection } = await import("./translationLoader.js");
+    const resolvedSection =
+      sectionName || (await resolveSectionFromRoutePath(routePath));
+
+    if (!resolvedSection) {
+      log(
+        "localeManager.js",
+        "loadTranslationsForTemporaryLocale",
+        "info",
+        "No section resolved for temporary locale translation load",
+        { localeCode, routePath }
+      );
+      return;
+    }
+
+    const loadPromise = loadTranslationsForSection(
+      resolvedSection,
+      localeCode
+    );
+
+    if (awaitTranslations) {
+      await loadPromise;
+      log(
+        "localeManager.js",
+        "loadTranslationsForTemporaryLocale",
+        "success",
+        "Translations loaded for temporary locale",
+        { localeCode, resolvedSection }
+      );
+      return;
+    }
+
+    loadPromise.catch((error) => {
+      log(
+        "localeManager.js",
+        "loadTranslationsForTemporaryLocale",
+        "warn",
+        "Failed to load translations for temporary locale",
+        {
+          localeCode,
+          resolvedSection,
+          error: error?.message,
+        }
+      );
+    });
+  } catch (error) {
+    log(
+      "localeManager.js",
+      "loadTranslationsForTemporaryLocale",
+      "warn",
+      "Translation loader unavailable for temporary locale",
+      { localeCode, error: error?.message }
+    );
+  }
+}
+
+/**
  * Apply locale temporarily without persisting to store
  * Used when URL has a locale - it overrides display but doesn't change saved preference
  *
+ * Also kicks off translation load for the resolved section (fire-and-forget by default)
+ * so standalone callers and router URL-locale paths have strings, not just locale labels.
+ *
  * @param {string} localeCode - Locale code to apply temporarily
+ * @param {object} [options]
+ * @param {string} [options.sectionName] - Section to load; skips path resolution when set
+ * @param {string} [options.routePath] - Destination path for section resolution (e.g. router `to.path`)
+ * @param {boolean} [options.loadTranslations=true] - Start translation fetch for resolved section
+ * @param {boolean} [options.awaitTranslations=false] - When true, await translation load (preview UIs)
  * @returns {Promise<void>}
  */
-export async function applyLocaleTemporarily(localeCode) {
+export async function applyLocaleTemporarily(localeCode, options = {}) {
+  const {
+    sectionName,
+    routePath,
+    loadTranslations = true,
+    awaitTranslations = false,
+  } = options;
   log(
     "localeManager.js",
     "applyLocaleTemporarily",
@@ -858,12 +1016,20 @@ export async function applyLocaleTemporarily(localeCode) {
     document.documentElement.setAttribute("lang", localeCode);
   }
 
+  if (loadTranslations) {
+    await loadTranslationsForTemporaryLocale(localeCode, {
+      sectionName,
+      routePath,
+      awaitTranslations,
+    });
+  }
+
   log(
     "localeManager.js",
     "applyLocaleTemporarily",
     "return",
     "Locale applied temporarily (not persisted)",
-    { localeCode }
+    { localeCode, loadTranslations, awaitTranslations }
   );
 }
 
@@ -952,13 +1118,25 @@ export function getDefaultLocale() {
  * @param {string} localeCode - Locale code
  * @returns {string} - Human-readable locale name
  */
-export function getLocaleDisplayName(localeCode) {
-  const localeNames = {
-    en: "English",
-    vi: "Tiếng Việt",
-  };
+/**
+ * Options for locale switcher UI (codes follow SUPPORTED_LOCALES order).
+ *
+ * @returns {Array<{ code: string, label: string, traditionalName: string }>}
+ */
+export function getLocaleSwitcherOptions() {
+  return SUPPORTED_LOCALES.map((code) => {
+    const meta = LOCALE_DISPLAY_METADATA[code];
+    return {
+      code,
+      label: meta?.label ?? code,
+      traditionalName: meta?.traditionalName ?? code,
+    };
+  });
+}
 
-  const displayName = localeNames[localeCode] || localeCode;
+export function getLocaleDisplayName(localeCode) {
+  const meta = LOCALE_DISPLAY_METADATA[localeCode];
+  const displayName = meta?.label || localeCode;
   log(
     "localeManager.js",
     "getLocaleDisplayName",

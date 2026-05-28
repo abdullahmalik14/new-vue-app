@@ -34,90 +34,12 @@ import {
   setActiveLocale,
   loadTranslationsForSection,
   preloadTranslationsForSections,
+  getLocaleSwitcherOptions,
+  SUPPORTED_LOCALES,
 } from '@/utils/translation';
 
-
-
-// --- Locales list (ALL lowercase codes) ---
-const localeOptions = [
-  { label: 'Afrikaans', code: 'af', traditionalName: 'Afrikaans' },
-  { label: 'Albanian', code: 'sq', traditionalName: 'Shqip' },
-  { label: 'Amharic', code: 'am', traditionalName: 'አማርኛ' },
-  { label: 'Arabic', code: 'ar', traditionalName: 'العربية' },
-  { label: 'Armenian', code: 'hy', traditionalName: 'Հայերեն' },
-  { label: 'Azerbaijani', code: 'az', traditionalName: 'Azərbaycanca' },
-  { label: 'Bengali', code: 'bn', traditionalName: 'বাংলা' },
-  { label: 'Bosnian', code: 'bs', traditionalName: 'Bosanski' },
-  { label: 'Bulgarian', code: 'bg', traditionalName: 'Български' },
-  { label: 'Catalan', code: 'ca', traditionalName: 'Català' },
-  { label: 'Chinese (Simplified)', code: 'zh', traditionalName: '中文 (简体)' },
-  { label: 'Chinese (Traditional)', code: 'zh-tw', traditionalName: '中文 (繁體)' },
-  { label: 'Croatian', code: 'hr', traditionalName: 'Hrvatski' },
-  { label: 'Czech', code: 'cs', traditionalName: 'Čeština' },
-  { label: 'Danish', code: 'da', traditionalName: 'Dansk' },
-  { label: 'Dari', code: 'fa-af', traditionalName: 'دری' },
-  { label: 'Dutch', code: 'nl', traditionalName: 'Nederlands' },
-  { label: 'English', code: 'en', traditionalName: 'English' },
-  { label: 'Estonian', code: 'et', traditionalName: 'Eesti' },
-  { label: 'Farsi (Persian)', code: 'fa', traditionalName: 'فارسی' },
-  { label: 'Filipino, Tagalog', code: 'tl', traditionalName: 'Tagalog' },
-  { label: 'Finnish', code: 'fi', traditionalName: 'Suomi' },
-  { label: 'French', code: 'fr', traditionalName: 'Français' },
-  { label: 'French (Canada)', code: 'fr-ca', traditionalName: 'Français (Canada)' },
-  { label: 'Georgian', code: 'ka', traditionalName: 'ქართული' },
-  { label: 'German', code: 'de', traditionalName: 'Deutsch' },
-  { label: 'Greek', code: 'el', traditionalName: 'Ελληνικά' },
-  { label: 'Gujarati', code: 'gu', traditionalName: 'ગુજરાતી' },
-  { label: 'Haitian Creole', code: 'ht', traditionalName: 'Kreyòl ayisyen' },
-  { label: 'Hausa', code: 'ha', traditionalName: 'Hausa' },
-  { label: 'Hebrew', code: 'he', traditionalName: 'עברית' },
-  { label: 'Hindi', code: 'hi', traditionalName: 'हिन्दी' },
-  { label: 'Hungarian', code: 'hu', traditionalName: 'Magyar' },
-  { label: 'Icelandic', code: 'is', traditionalName: 'Íslenska' },
-  { label: 'Indonesian', code: 'id', traditionalName: 'Bahasa Indonesia' },
-  { label: 'Irish', code: 'ga', traditionalName: 'Gaeilge' },
-  { label: 'Italian', code: 'it', traditionalName: 'Italiano' },
-  { label: 'Japanese', code: 'ja', traditionalName: '日本語' },
-  { label: 'Kannada', code: 'kn', traditionalName: 'ಕನ್ನಡ' },
-  { label: 'Kazakh', code: 'kk', traditionalName: 'Қазақша' },
-  { label: 'Korean', code: 'ko', traditionalName: '한국어' },
-  { label: 'Latvian', code: 'lv', traditionalName: 'Latviešu' },
-  { label: 'Lithuanian', code: 'lt', traditionalName: 'Lietuvių' },
-  { label: 'Macedonian', code: 'mk', traditionalName: 'Македонски' },
-  { label: 'Malay', code: 'ms', traditionalName: 'Bahasa Melayu' },
-  { label: 'Malayalam', code: 'ml', traditionalName: 'മലയാളം' },
-  { label: 'Maltese', code: 'mt', traditionalName: 'Malti' },
-  { label: 'Marathi', code: 'mr', traditionalName: 'मराठी' },
-  { label: 'Mongolian', code: 'mn', traditionalName: 'Монгол' },
-  { label: 'Norwegian (Bokmål)', code: 'no', traditionalName: 'Norsk (bokmål)' },
-  { label: 'Pashto', code: 'ps', traditionalName: 'پښتو' },
-  { label: 'Polish', code: 'pl', traditionalName: 'Polski' },
-  { label: 'Portuguese (Brazil)', code: 'pt', traditionalName: 'Português (Brasil)' },
-  { label: 'Portuguese (Portugal)', code: 'pt-pt', traditionalName: 'Português (Portugal)' },
-  { label: 'Punjabi', code: 'pa', traditionalName: 'ਪੰਜਾਬੀ' },
-  { label: 'Romanian', code: 'ro', traditionalName: 'Română' },
-  { label: 'Russian', code: 'ru', traditionalName: 'Русский' },
-  { label: 'Serbian', code: 'sr', traditionalName: 'Српски' },
-  { label: 'Sinhala', code: 'si', traditionalName: 'සිංහල' },
-  { label: 'Slovak', code: 'sk', traditionalName: 'Slovenčina' },
-  { label: 'Slovenian', code: 'sl', traditionalName: 'Slovenščina' },
-  { label: 'Somali', code: 'so', traditionalName: 'Soomaali' },
-  { label: 'Spanish', code: 'es', traditionalName: 'Español' },
-  { label: 'Spanish (Mexico)', code: 'es-mx', traditionalName: 'Español (México)' },
-  { label: 'Swahili', code: 'sw', traditionalName: 'Kiswahili' },
-  { label: 'Swedish', code: 'sv', traditionalName: 'Svenska' },
-  { label: 'Tamil', code: 'ta', traditionalName: 'தமிழ்' },
-  { label: 'Telugu', code: 'te', traditionalName: 'Telugu' },
-  { label: 'Thai', code: 'th', traditionalName: 'ไทย' },
-  { label: 'Turkish', code: 'tr', traditionalName: 'Türkçe' },
-  { label: 'Ukrainian', code: 'uk', traditionalName: 'Українська' },
-  { label: 'Urdu', code: 'ur', traditionalName: 'اردو' },
-  { label: 'Uzbek', code: 'uz', traditionalName: 'Oʻzbekcha' },
-  { label: 'Vietnamese', code: 'vi', traditionalName: 'Tiếng Việt' },
-  { label: 'Welsh', code: 'cy', traditionalName: 'Cymraeg' },
-];
-
-const supportedCodes = new Set(localeOptions.map(o => o.code));
+const localeOptions = getLocaleSwitcherOptions();
+const supportedCodes = new Set(SUPPORTED_LOCALES);
 
 // DOM refs with validation before use
 const formRef = ref(null);
@@ -185,7 +107,7 @@ async function onChange(ev) {
 
   try {
     // 1) Persist + rewrite URL path segment (handled by your util)
-    const ok = setActiveLocale(finalLocale, { updateUrl: true });
+    const ok = await setActiveLocale(finalLocale, { updateUrl: true });
     if (!ok) {
       console.warn('[LanguageSwitcher] setActiveLocale returned falsy; aborting.');
       return;

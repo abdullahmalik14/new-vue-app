@@ -80,3 +80,88 @@ describe('translationLoader section name validation (S-04)', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 });
+
+describe('translationLoader locale merge (L-02)', () => {
+  it('deep-merges nested English keys into cached return value for non-English locales', async () => {
+    const english = {
+      auth: {
+        login: {
+          title: 'Login',
+          subtitle: 'Welcome back',
+          button: 'Sign in'
+        }
+      }
+    };
+    const vietnamese = {
+      auth: {
+        login: {
+          title: 'Đăng nhập'
+        }
+      }
+    };
+
+    fetch.mockImplementation(async (url, options = {}) => {
+      if (options.method === 'HEAD') {
+        return {
+          ok: true,
+          headers: {
+            get: (name) => (name.toLowerCase() === 'content-type' ? 'application/json' : null)
+          }
+        };
+      }
+
+      if (url === '/i18n/section-auth/en.json') {
+        return { ok: true, json: async () => english };
+      }
+      if (url === '/i18n/section-auth/vi.json') {
+        return { ok: true, json: async () => vietnamese };
+      }
+
+      throw new Error(`Unexpected fetch: ${url}`);
+    });
+
+    const { loadTranslationsForSection } = await import(LOADER_PATH);
+    const result = await loadTranslationsForSection('auth', 'vi');
+
+    expect(result.auth.login.title).toBe('Đăng nhập');
+    expect(result.auth.login.subtitle).toBe('Welcome back');
+    expect(result.auth.login.button).toBe('Sign in');
+  });
+});
+
+describe('translationLoader loaded-state (L-03 browser test helper)', () => {
+  it('areTranslationsLoadedForSection is true after a successful load', async () => {
+    mockTranslationFetch({ title: 'Đăng nhập' });
+
+    const { loadTranslationsForSection, areTranslationsLoadedForSection } =
+      await import(LOADER_PATH);
+
+    await loadTranslationsForSection('auth', 'vi');
+
+    expect(areTranslationsLoadedForSection('auth', 'vi')).toBe(true);
+  });
+});
+
+describe('translationLoader concurrent wait (L-07)', () => {
+  it('waiter receives empty object when lead load fails (null sentinel)', async () => {
+    fetch.mockImplementation(async (url, options = {}) => {
+      if (options.method === 'HEAD') {
+        return {
+          ok: false,
+          headers: { get: () => null }
+        };
+      }
+      throw new Error(`Unexpected GET: ${url}`);
+    });
+
+    const { loadTranslationsForSection } = await import(LOADER_PATH);
+
+    const [first, second] = await Promise.all([
+      loadTranslationsForSection('auth', 'vi'),
+      loadTranslationsForSection('auth', 'vi')
+    ]);
+
+    expect(first).toEqual({});
+    expect(second).toEqual({});
+  });
+});

@@ -2,15 +2,13 @@
 
 import { defineStore } from 'pinia';
 import { log } from '../utils/common/logHandler';
-import { SUPPORTED_LOCALES } from '../utils/translation/localeManager.js';
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '../utils/translation/localeManager.js';
 
 /**
  * @file useLocaleStore.js
  * @description Pinia store for locale/language preference management
  * @purpose Manages user locale preference with persistence across browser sessions
  */
-
-const DEFAULT_LOCALE = 'en';
 
 export const useLocaleStore = defineStore('locale', {
   state: () => ({
@@ -117,57 +115,6 @@ export const useLocaleStore = defineStore('locale', {
       log('useLocaleStore.js', 'resetToDefault', 'return', 'Returning success', {});
 
       return true;
-    },
-
-    /**
-     * @action initializeFromBrowser
-     * @description Initialize locale from browser language if not already set
-     * @returns {string} Initialized locale
-     */
-    initializeFromBrowser() {
-      log('useLocaleStore.js', 'initializeFromBrowser', 'start', 'Initializing locale from browser', {});
-
-      // If already set (from persistence), don't override
-      if (this.locale) {
-        log('useLocaleStore.js', 'initializeFromBrowser', 'info', 'Locale already set, skipping browser init', {
-          locale: this.locale
-        });
-        log('useLocaleStore.js', 'initializeFromBrowser', 'return', 'Returning existing locale', { locale: this.locale });
-        return this.locale;
-      }
-
-      // Try to get browser language
-      try {
-        const browserLanguage = navigator.language || navigator.userLanguage;
-
-        if (browserLanguage) {
-          // Extract base language code (e.g., 'en' from 'en-US')
-          const baseLanguage = browserLanguage.split('-')[0].toLowerCase();
-
-          // Check if supported
-          if (SUPPORTED_LOCALES.includes(baseLanguage)) {
-            this.locale = baseLanguage;
-            log('useLocaleStore.js', 'initializeFromBrowser', 'success', 'Initialized from browser', {
-              locale: baseLanguage
-            });
-            log('useLocaleStore.js', 'initializeFromBrowser', 'return', 'Returning browser locale', {
-              locale: baseLanguage
-            });
-            return baseLanguage;
-          }
-        }
-      } catch (error) {
-        log('useLocaleStore.js', 'initializeFromBrowser', 'error', 'Error getting browser locale', { error });
-      }
-
-      // Fallback to default
-      this.locale = DEFAULT_LOCALE;
-      log('useLocaleStore.js', 'initializeFromBrowser', 'info', 'Using default locale', { locale: DEFAULT_LOCALE });
-      log('useLocaleStore.js', 'initializeFromBrowser', 'return', 'Returning default locale', {
-        locale: DEFAULT_LOCALE
-      });
-
-      return DEFAULT_LOCALE;
     }
   },
 

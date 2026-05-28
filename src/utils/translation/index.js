@@ -17,6 +17,7 @@ export {
 
 // Export locale manager functions and constants
 export {
+  DEFAULT_LOCALE,
   SUPPORTED_LOCALES,
   resolveActiveLocale,
   setActiveLocale,
@@ -25,6 +26,7 @@ export {
   isLocaleSupported,
   getDefaultLocale,
   getLocaleDisplayName,
+  getLocaleSwitcherOptions,
   switchToLocale,
   resetLocaleToDefault,
   getLocalePreferenceOrder
