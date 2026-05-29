@@ -1,7 +1,11 @@
 <template>
   <div id="app" class="min-h-screen bg-gray-50 flex flex-col">
     <NavigationProgressBar />
-    <LanguageSwitcher />
+    <TemporaryLocaleBanner />
+    <div class="fixed top-2 right-2 z-[90] flex flex-col items-end gap-2">
+      <LanguageSwitcher @locale-changed="onLocaleChanged" @locale-change-error="onLocaleChangeError" />
+      <TranslatePageControl />
+    </div>
 
     <!-- Global Header -->
     <!-- <AppHeader ref="appHeader" v-if="shouldShowLayout" /> -->
@@ -62,6 +66,8 @@ import AppShell from './components/layout/AppShell.vue';
 import NavigationProgressBar from './components/layout/NavigationProgressBar.vue';
 import RouteErrorBoundary from './components/layout/RouteErrorBoundary.vue';
 import LanguageSwitcher from './components/ui/nav/language/LanguageSwitcher.vue';
+import TranslatePageControl from './components/ui/nav/language/TranslatePageControl.vue';
+import TemporaryLocaleBanner from './components/ui/nav/language/TemporaryLocaleBanner.vue';
 
 // Get router instance
 const router = useRouter();
@@ -73,6 +79,16 @@ const routeTransition = computed(() => resolveRouteTransition(route));
 const skipRouteTransition = computed(
   () => isInitialRouteRender.value || routeTransition.value.disabled,
 );
+
+function onLocaleChanged(payload) {
+  if (import.meta.env.DEV) {
+    console.log('[App] locale-changed', payload);
+  }
+}
+
+function onLocaleChangeError(payload) {
+  console.warn('[App] locale-change-error', payload);
+}
 
 const shouldShowLayout = computed(() => {
   // Check meta config first

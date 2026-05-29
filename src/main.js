@@ -17,6 +17,7 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import { useDashboardAnalytics } from "./stores/DashboardAnalytics";
 import flowRefreshManager from "@/services/flow-system/flowRefreshManager";
 import { createI18n } from "vue-i18n";
+import "./assets/styles/rtl-foundation.css";
 import App from "./App.vue";
 import router from "./router/index.js";
 import { log } from "./utils/common/logHandler.js";
@@ -25,7 +26,11 @@ import {
   resolveActiveLocale,
   stripLeadingLocaleFromPath,
   applyDocumentLocaleAttributes,
+  clearTemporaryPageLocaleOnReload,
+  applyProfileLocaleToStoreIfAuthenticated,
 } from "./utils/translation/localeManager.js";
+
+clearTemporaryPageLocaleOnReload();
 import {
   I18N_DATETIME_FORMATS,
   I18N_NUMBER_FORMATS,
@@ -371,6 +376,17 @@ const authStore = useAuthStore();
 authStore.refreshFromStorage();
 
 if (authStore.isAuthenticated) {
+  const profileLocale = applyProfileLocaleToStoreIfAuthenticated();
+  if (profileLocale) {
+    if (i18n.global.locale.value !== profileLocale) {
+      i18n.global.locale.value = profileLocale;
+    }
+    applyDocumentLocaleAttributes(profileLocale);
+    log("main.js", "init", "locale-profile", "Applied Cognito profile locale after auth restore", {
+      locale: profileLocale,
+    });
+  }
+
   log("main.js", "init", "auth-success", "Session restored successfully", {
     email: authStore.currentUser?.email,
     role: authStore.currentUser?.role,

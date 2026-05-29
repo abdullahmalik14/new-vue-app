@@ -1724,6 +1724,83 @@ The `pinia-plugin-persistedstate` config claims 90-day TTL in a comment but this
 - Deserializer that returns `{ locale: null }` if `Date.now() > expiresAt`, allowing `resolveActiveLocale()` to fall through to browser detection.
 - The expiry period should be configurable (e.g. via an env var or a constant).
 
+#### Resolution ✅
+
+**Status:** Resolved (implemented with **B-01** in this audit pass; no additional code conflict with preload work).
+
+**What was broken:** The product docs and a stale comment claimed a 90-day TTL for saved locale preference, but `pinia-plugin-persistedstate` v4 persisted `{ locale }` indefinitely with no `expiresAt`.
+
+**Why it happened:** TTL was treated as a plugin feature; v4 only serializes JSON and does not expire entries.
+
+**What changed:**
+- `useLocaleStore.js` — `serializeLocalePersistedState` / `deserializeLocalePersistedState` on the Pinia `persist.serializer`; wraps `{ data, expiresAt }`. Expired blobs hydrate as `{ locale: null }` so `resolveActiveLocale()` skips persisted preference and uses URL → browser → default. Legacy plain `{ locale }` values still deserialize until the next write re-wraps them with TTL.
+- `LOCALE_PREFERENCE_TTL_MS` — default 90 days; override with `VITE_LOCALE_PREFERENCE_TTL_MS` (milliseconds). Documented in `.env.example`.
+- Same fix as **B-01** (best-practice violation); one implementation covers both findings.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. `usePreloadStore` uses a separate persist serializer (Sets + build-hash). Locale TTL only affects `locale_preference` in `localStorage`.
+
+**How it was tested:** `npm run test:unit -- tests/unit/useLocaleStore.test.js --run` — `useLocaleStore persistence TTL (B-01)` (serialize wrap, valid/expired deserialize, legacy blob, invalid JSON).
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, open any page (e.g. `/log-in`).
+
+2. **Confirm fix is in bundle** (DevTools → Console, one paste):
+   ```js
+   fetch('/src/stores/useLocaleStore.js').then(r=>r.text()).then(src=>console.log({hasTtlSerializer:/serializeLocalePersistedState/.test(src)&&/expiresAt/.test(src),hasEnvTtl:/VITE_LOCALE_PREFERENCE_TTL_MS/.test(src),hasFalseTtlComment:/handled by the storage mechanism automatically/.test(src)}));
+   ```
+   **Expected:** `hasTtlSerializer: true`, `hasEnvTtl: true`, `hasFalseTtlComment: false`.
+
+3. **TTL wrap + expiry simulation** (one paste — same serializer as the store; does not change your real preference):
+   ```js
+   (async () => {
+     const {
+       serializeLocalePersistedState,
+       deserializeLocalePersistedState,
+       LOCALE_PREFERENCE_TTL_MS,
+     } = await import('/src/stores/useLocaleStore.js');
+     const fresh = JSON.parse(serializeLocalePersistedState({ locale: 'vi' }));
+     const valid = deserializeLocalePersistedState(JSON.stringify(fresh));
+     const expired = deserializeLocalePersistedState(JSON.stringify({
+       data: { locale: 'vi' },
+       expiresAt: Date.now() - 1,
+     }));
+     const legacy = deserializeLocalePersistedState(JSON.stringify({ locale: 'vi' }));
+     console.log({
+       ttlDays: LOCALE_PREFERENCE_TTL_MS / (24 * 60 * 60 * 1000),
+       freshHasExpiresAt: typeof fresh.expiresAt === 'number',
+       validLocale: valid.locale,
+       expiredLocale: expired.locale,
+       legacyLocale: legacy.locale,
+       pass:
+         typeof fresh.expiresAt === 'number' &&
+         valid.locale === 'vi' &&
+         expired.locale === null &&
+         legacy.locale === 'vi',
+     });
+   })();
+   ```
+   **Expected:** `ttlDays: 90` (unless you set `VITE_LOCALE_PREFERENCE_TTL_MS`), `freshHasExpiresAt: true`, `validLocale: 'vi'`, `expiredLocale: null`, `legacyLocale: 'vi'`, `pass: true`.
+
+4. **Live localStorage after a locale change** — use the language `<select>` or `await window.APP.setLocale('vi')`, then:
+   ```js
+   (() => {
+     const raw = localStorage.getItem('locale_preference');
+     const parsed = raw ? JSON.parse(raw) : null;
+     console.log({
+       key: 'locale_preference',
+       hasExpiresAt: typeof parsed?.expiresAt === 'number',
+       storedLocale: parsed?.data?.locale ?? parsed?.locale ?? null,
+       expiresInDays: parsed?.expiresAt
+         ? Math.round((parsed.expiresAt - Date.now()) / (24 * 60 * 60 * 1000))
+         : null,
+     });
+   })();
+   ```
+   **Expected:** `hasExpiresAt: true`, `storedLocale` matches your choice, `expiresInDays` ≈ 90.
+
+5. **Expiry behavior (optional):** DevTools → Application → Local Storage → set `locale_preference` `expiresAt` to a past timestamp → hard refresh. **Expected:** persisted locale ignored; active locale from URL/browser/default (check `window.APP.getLocalePreferenceOrder()` — `persisted` should be absent or null).
+
 ---
 
 ### F-02 — No locale setting from user profile / config API
@@ -1742,6 +1819,55 @@ Currently locale is stored only in `localStorage`. If a user logs in on a differ
 - In `setActiveLocale`, optionally POST/PATCH the new locale to the user profile API when the user is authenticated.
 - The `LanguageSwitcher` component should call an API endpoint (e.g. `PATCH /users/me { preferredLocale: 'vi' }`) after a successful locale change.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Locale preference lived only in `localStorage`; logging in on another device did not restore the user's saved language, and UI changes were not written back to the profile API.
+
+**Why it happened:** No user-profile integration existed for `preferredLocale`; auth only decoded JWT fields.
+
+**What changed:**
+- **Production (Cognito):** `custom:preferred_locale` on the user pool — read from the ID token on login (`useAuthStore.setTokenAndDecode`) and written via `updateUserProfile()` / `savePreferredLocaleToCognito()` when the locale changes (`cognitoLocaleProfile.js`, `userLocaleProfile.js`).
+- **Development / mock API:** `userLocaleApi.js` — GET/PATCH `/users/me` with `mock_users_me_profile` in `localStorage` when the dev auth handler is active.
+- `userLocaleProfile.js` — `resolvePreferredLocaleForAuth()`, `applyUserPreferredLocaleOnAuth()`, `syncPreferredLocaleToProfile()` (Cognito vs API based on auth handler).
+- `localeManager.js` — `setActiveLocale(..., { syncProfile: true })` syncs profile when authenticated.
+- `SettingsLanguageField.vue` — settings-form styled control (`UnifiedSelect` `variant="dashboard"`) in `Settings.vue` Account Information tab.
+- `mockApi.config.js` + `MockApi.patch` — mock GET/PATCH `/users/me` for offline dev only.
+
+**Cognito setup (production):** Add a custom attribute `preferred_locale` (mutable, string, max length ≥ 10) to the Cognito user pool so the app can read/write `custom:preferred_locale` on the ID token.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Profile sync is a separate API call after locale persistence; preload orchestration unchanged.
+
+**How it was tested:** `npm run test:unit -- tests/unit/userLocaleProfile.test.js --run`.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, sign in (e.g. `/log-in`).
+2. **Save locale (production Cognito)** — sign in with `VITE_AUTH_DEV_SHIM=cognito`, change language in Settings or the header switcher, then check the ID token claim (after Cognito propagates, re-login or refresh token may be needed):
+   ```js
+   (() => {
+     const token = localStorage.getItem('idToken');
+     const payload = token ? JSON.parse(atob(token.split('.')[1])) : null;
+     console.log({
+       activeLocale: window.APP?.getLocale?.(),
+       cognitoPreferredLocale: payload?.['custom:preferred_locale'],
+       pass: payload?.['custom:preferred_locale'] === window.APP?.getLocale?.(),
+     });
+   })();
+   ```
+   **Expected (Cognito):** `cognitoPreferredLocale` matches active locale after attribute propagates to a new token.
+
+   **Dev / mock offline** — same step using `mock_users_me_profile` in localStorage instead of the token claim.
+3. **Simulate new device** — DevTools → Application → Local Storage → delete `locale_preference` only → hard refresh while still logged in:
+   ```js
+   (async () => {
+     await new Promise((r) => setTimeout(r, 1500));
+     console.log({ locale: window.APP?.getLocale?.(), order: window.APP?.getLocalePreferenceOrder?.() });
+   })();
+   ```
+   **Expected:** locale matches profile `preferredLocale` (not browser default), assuming profile was saved in step 2.
+
 ---
 
 ### F-03 — No "Translate this page" (one-time translation without persistence)
@@ -1759,6 +1885,48 @@ The user requirement specifies a one-time page translation: the user can transla
 3. Set a session-level flag (e.g. `sessionStorage.setItem('temp_locale', locale)`) so that navigating within the same tab preserves the temporary translation, but a new tab or reload reverts to the persisted preference.
 4. Show a "You are viewing a translated version. Switch back to [original language]" banner.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `applyLocaleTemporarily` was router-only; no UI, no `sessionStorage` continuity across in-app navigation, no restore banner.
+
+**Why it happened:** Temporary translation was treated as URL-preview only, not a user-facing feature.
+
+**What changed:**
+- `localeManager.js` — `translateCurrentPageTemporarily`, `clearTemporaryPageLocaleAndRestore`, `reapplyTemporaryPageLocaleForRoute`, `sessionStorage` keys `app_temp_locale` / `app_temp_locale_base`; `clearTemporaryPageLocaleOnReload()` on reload in `main.js`.
+- `router/index.js` — re-applies session temp locale on navigations without URL locale prefix.
+- `TranslatePageControl.vue` — secondary control (separate from persistent switcher) in `App.vue`.
+- `TemporaryLocaleBanner.vue` — banner with “Switch back to [language]”.
+- `public/i18n/base/en.json` + `vi.json` — `ui.translateThisPage`, `ui.translatePageAction`.
+
+**Conflict check:** Does **not** override preload work. Temp locale does not write Pinia `locale_preference` or profile PATCH; section translation loads use existing loader (non-blocking where configured).
+
+**How it was tested:** `npm run test:unit -- tests/unit/temporaryPageLocale.test.js --run`.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, open `/log-in`, set persistent language to English via the main `<select>`.
+2. Use **Translate** control (second dropdown + button, top-right). Pick `vi` → **Translate**.
+3. One paste:
+   ```js
+   (() => {
+     const temp = sessionStorage.getItem('app_temp_locale');
+     const base = sessionStorage.getItem('app_temp_locale_base');
+     const persisted = JSON.parse(localStorage.getItem('locale_preference') || 'null');
+     console.log({
+       tempLocale: temp,
+       baseLocale: base,
+       active: window.APP?.getLocale?.(),
+       persistedLocale: persisted?.data?.locale ?? persisted?.locale,
+       bannerVisible: !!document.querySelector('[role="status"]'),
+       pass: temp === 'vi' && persisted?.data?.locale !== 'vi' && persisted?.locale !== 'vi',
+     });
+   })();
+   ```
+   **Expected:** `tempLocale: 'vi'`, `active: 'vi'`, persisted locale still `en`, `bannerVisible: true`, `pass: true`.
+4. Navigate to another route in the same tab — copy stays Vietnamese until you click **Switch back** on the banner or hard-reload (reload clears temp keys).
+
 ---
 
 ### F-04 — Language setting from a user-facing form (Settings page)
@@ -1773,9 +1941,28 @@ The user requirement specifies a one-time page translation: the user can transla
 - Show the currently active locale as the selected value.
 - Provide a "Reset to browser default" option that calls `resetLocaleToDefault()`.
 
----
+#### Resolution ✅
 
+**Status:** Resolved (fixed in this audit pass).
 
+**What was broken:** `Settings.vue` had only a `<!-- choose-language -->` nav placeholder with no working language form.
+
+**Why it happened:** Settings template was static markup without locale wiring.
+
+**What changed:**
+- `SettingsLanguageField.vue` + `Settings.vue` (Account Information tab) — dashboard-styled `UnifiedSelect` (same pattern as Country/State fields), description text, and **Reset to browser default**; uses `setActiveLocale` + Cognito/API profile sync (F-02).
+- Nav `<!-- choose-language -->` icon placeholder left as-is; functional control is in the settings form per requirement.
+
+**Conflict check:** Reuses `LanguageSwitcher` and F-02 profile sync; no preload architecture changes.
+
+**How it was tested:** Code review + manual path to settings route (see browser steps).
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, navigate to the settings page (route using `Settings.vue`, e.g. from `routeConfig.json` settings path).
+2. Open **Account Information** tab → **Language** section.
+3. Change the `<select>` to Vietnamese — **Expected:** URL/copy update; if logged in, `mock_users_me_profile.preferredLocale` becomes `vi` (same check as F-02).
+4. Click **Reset to browser default** — **Expected:** locale returns to `en` (or browser-mapped default); `window.APP.getLocale()` reflects reset.
 
 ---
 
@@ -1795,6 +1982,40 @@ For slow connections a locale switch can take several seconds with no visual fee
 - Emit a `locale-changed` event that a parent toast/notification system can listen to.
 - On catch, show an error state and restore the previous selection.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** During locale switch the `<select>` disabled with no spinner, no events for toasts, and failed switches could leave the wrong value selected.
+
+**Why it happened:** Only `isBusy` + `disabled` existed; no emit contract or error rollback.
+
+**What changed:**
+- `LanguageSwitcher.vue` — `<Spinner size="sm">` beside select while `isBusy`; `defineEmits(['locale-changed', 'locale-change-error'])`; restores previous `<select>` value on failure; dispatches `app-locale-changed` custom event on success.
+- `App.vue` / `Settings.vue` — listen for emits (dev log / warn hooks ready for a toast system).
+
+**Conflict check:** UI-only; no change to translation preload or persistence order.
+
+**How it was tested:** Code review of `onChange` try/catch/finally and `restoreSelectValue`.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, open `/log-in`.
+2. **Spinner** — throttle Network (Slow 3G), change language — **Expected:** small spinner appears beside the `<select>` until load completes.
+3. One paste (listeners + rollback probe):
+   ```js
+   (() => {
+     let changed = null;
+     let errored = null;
+     const onOk = (e) => { changed = e.detail; };
+     const onErr = (e) => { errored = e.detail; };
+     window.addEventListener('app-locale-changed', onOk, { once: true });
+     document.querySelector('form[aria-label] select')?.addEventListener('change', () => setTimeout(() => console.log({ changed, errored, selectValue: document.querySelector('form[aria-label] select')?.value }), 3000), { once: true });
+     console.log('Change the language select now; watch console in ~3s');
+   })();
+   ```
+   **Expected:** after successful switch, `changed` has `{ locale, previousLocale }`; on failure, select value matches `previousLocale`.
+
 ---
 
 ### F-07 — No RTL layout support (see also B-03)
@@ -1809,6 +2030,40 @@ Beyond just setting `dir="rtl"` on the root element (B-03), full RTL support req
 
 This is a significant undertaking and should be planned as a dedicated sprint if Arabic/Hebrew/Persian/Urdu users are a target audience.
 
+#### Resolution ✅ (foundation — full sprint remains)
+
+**Status:** Partially resolved — root `dir` was fixed in **B-03**; this pass adds an RTL **foundation layer**. App-wide logical properties, mirrored icons, and per-component RTL QA are still a dedicated sprint.
+
+**What was broken:** Beyond missing `html[dir]`, the codebase uses many physical LTR assumptions (`text-left`, non-logical margins, non-mirrored icons).
+
+**Why it happened:** RTL was not a target during initial layout; B-03 only addressed document direction.
+
+**What changed:**
+- `src/assets/styles/rtl-foundation.css` — imported from `main.js`: `mirror-in-rtl` utility, logical spacing helpers (`ps-logical-*`, `pe-logical-*`), `text-align: start` under `html[dir='rtl']`, RTL font stacks for `ar` / `he` / `fa` / `ur` / `ps`.
+- **B-03** (unchanged) — `RTL_LOCALES`, `applyDocumentLocaleAttributes`, `getDocumentDirection`.
+- **Not in scope:** migrating every Tailwind `ml-*` / `mr-*` / `text-left` across all templates (track as sprint).
+
+**Conflict check:** CSS-only additive layer; does **not** alter preload, router, or locale persistence.
+
+**How it was tested:** Existing `tests/unit/applyLocaleTemporarily.test.js` (B-03 `dir`); manual `dir` check below.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`.
+2. One paste:
+   ```js
+   (async () => {
+     const { applyDocumentLocaleAttributes, getDocumentDirection } = await import('/src/utils/translation/localeManager.js');
+     applyDocumentLocaleAttributes('ar');
+     const rtl = { lang: document.documentElement.lang, dir: document.documentElement.dir, expectedDir: getDocumentDirection('ar') };
+     applyDocumentLocaleAttributes('en');
+     const ltr = { lang: document.documentElement.lang, dir: document.documentElement.dir };
+     const cssLoaded = [...document.styleSheets].some((s) => s.href?.includes('rtl-foundation') || true);
+     console.log({ rtl, ltr, pass: rtl.dir === 'rtl' && ltr.dir === 'ltr' });
+   })();
+   ```
+   **Expected:** `pass: true`; Arabic step sets `dir: 'rtl'`. Inspect Elements → `<html lang="ar" dir="rtl">` and verify font family in Computed styles for RTL locales.
+3. **Sprint reminder:** migrate high-traffic screens to `margin-inline-*` / `padding-inline-*` and add `mirror-in-rtl` on directional icons as follow-up.
 
 ## 6. Additional Issues Found
 

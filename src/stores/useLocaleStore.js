@@ -4,8 +4,24 @@ import { defineStore } from 'pinia';
 import { log } from '../utils/common/logHandler';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '../utils/translation/localeManager.js';
 
-/** @type {number} Locale preference TTL in localStorage (90 days). */
-export const LOCALE_PREFERENCE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+/** Default locale preference TTL in localStorage (90 days). */
+const DEFAULT_LOCALE_PREFERENCE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+
+/**
+ * Resolve TTL from `VITE_LOCALE_PREFERENCE_TTL_MS` (milliseconds) or default.
+ * @returns {number}
+ */
+function resolveLocalePreferenceTtlMs() {
+  const raw = import.meta.env.VITE_LOCALE_PREFERENCE_TTL_MS;
+  if (raw === undefined || raw === '') {
+    return DEFAULT_LOCALE_PREFERENCE_TTL_MS;
+  }
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_LOCALE_PREFERENCE_TTL_MS;
+}
+
+/** @type {number} Locale preference TTL in localStorage (configurable via env). */
+export const LOCALE_PREFERENCE_TTL_MS = resolveLocalePreferenceTtlMs();
 
 /**
  * Wrap persisted locale state with an expiry timestamp for pinia-plugin-persistedstate.

@@ -346,6 +346,14 @@
                                     </div>
                                 </DashboardSectionContainer>
 
+                                <!-- choose-language (F-04) -->
+                                <DashboardSectionContainer>
+                                    <SettingsLanguageField
+                                        @locale-changed="onSettingsLocaleChanged"
+                                        @locale-change-error="onSettingsLocaleError"
+                                    />
+                                </DashboardSectionContainer>
+
                                 <!-- link-x-account -->
                                 <DashboardSectionContainer>
                                     <!-- title -->
@@ -890,6 +898,17 @@ import DashboardSectionContainer from '../../components/dashboard/DashboardSecti
 import InputComponentDashboard from '@/components/input/InputComponentDashboard.vue';
 import UnifiedSelect from '@/components/ui/popup/dropdown/dashboard/customThemeSelect/UnifiedSelect.vue';
 import TwoPieceButton from '@/components/button/TwoPieceButton.vue';
+import SettingsLanguageField from '@/components/ui/nav/language/SettingsLanguageField.vue';
+
+function onSettingsLocaleChanged(payload) {
+  if (import.meta.env.DEV) {
+    console.log('[Settings] locale-changed', payload);
+  }
+}
+
+function onSettingsLocaleError(payload) {
+  console.warn('[Settings] locale-change-error', payload);
+}
 
 const countryOptions = [
     { label: 'United States (US)', value: 'united-states-us' },

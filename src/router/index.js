@@ -28,6 +28,7 @@ import {
   SUPPORTED_LOCALES,
   resolveActiveLocale,
   applyLocaleTemporarily,
+  reapplyTemporaryPageLocaleForRoute,
   getLeadingLocaleFromPath,
   stripLeadingLocaleFromPath,
 } from '../utils/translation/localeManager.js';
@@ -388,6 +389,7 @@ router.beforeEach(async (to, from, next) => {
       note: 'Store preference unchanged - only language switcher changes store'
     });
   } else {
+    await reapplyTemporaryPageLocaleForRoute(to.path);
     if (localeInParams && !SUPPORTED_LOCALES.includes(localeInParams)) {
       log('router/index.js', 'beforeEach', 'invalid-locale', 'Invalid locale in path, treating as route path', {
         invalidLocale: localeInParams,

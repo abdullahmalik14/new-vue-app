@@ -88,6 +88,9 @@ export class APIHandler {
                     case 'POST':
                         mockResponse = await this.mockApi.post(apiBaseUrl, requestData, mockOptions);
                         break;
+                    case 'PATCH':
+                        mockResponse = await this.mockApi.patch(apiBaseUrl, requestData, mockOptions);
+                        break;
                     case 'DELETE':
                         mockResponse = await this.mockApi.delete(apiBaseUrl, mockOptions);
                         break;

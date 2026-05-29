@@ -1,6 +1,11 @@
 {
   "ui": {
     "languageSelector": "Bộ chọn ngôn ngữ",
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "translateThisPage": "Dịch trang này",
+    "translatePageAction": "Dịch",
+    "languageSettings": "Ngôn ngữ",
+    "languageSettingsDescription": "Chọn ngôn ngữ ưu tiên. Được lưu vào tài khoản khi đã đăng nhập.",
+    "resetLanguageToBrowser": "Đặt lại theo trình duyệt"
   }
 }

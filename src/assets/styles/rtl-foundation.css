@@ -1,0 +1,51 @@
+/**
+ * RTL layout foundation (F-07).
+ * B-03 sets html[dir]; this file adds baseline patterns for new and migrated UI.
+ * Full app-wide logical-property migration remains a dedicated sprint.
+ */
+
+html[dir='rtl'] {
+  text-align: start;
+}
+
+html[dir='rtl'] .mirror-in-rtl {
+  transform: scaleX(-1);
+}
+
+/* Prefer logical spacing in components that opt in via these utilities */
+.ms-logical-auto {
+  margin-inline-start: auto;
+}
+
+.me-logical-auto {
+  margin-inline-end: auto;
+}
+
+.ps-logical-2 {
+  padding-inline-start: 0.5rem;
+}
+
+.pe-logical-2 {
+  padding-inline-end: 0.5rem;
+}
+
+html[dir='rtl'] [class*='text-left']:not([class*='text-left-']) {
+  text-align: start;
+}
+
+html[dir='rtl'] [class*='text-right']:not([class*='text-right-']) {
+  text-align: end;
+}
+
+/* RTL-friendly font stacks when RTL locales are active */
+html[dir='rtl'][lang='ar'],
+html[dir='rtl'][lang='fa'],
+html[dir='rtl'][lang='fa-af'],
+html[dir='rtl'][lang='ur'],
+html[dir='rtl'][lang='ps'] {
+  font-family: 'Segoe UI', 'Noto Sans Arabic', 'Tahoma', sans-serif;
+}
+
+html[dir='rtl'][lang='he'] {
+  font-family: 'Segoe UI', 'Noto Sans Hebrew', 'Arial', sans-serif;
+}

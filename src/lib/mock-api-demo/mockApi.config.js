@@ -1016,6 +1016,59 @@ const mockApiConfig = {
         },
       },
     },
+
+    "/users/me": {
+      description: "Authenticated user profile (preferred locale sync).",
+      methods: {
+        GET: {
+          description: "Read current user profile including preferredLocale.",
+          enabled: true,
+          delayMs: 150,
+          requiresAuth: true,
+          scenarios: [
+            {
+              name: "success",
+              status: 200,
+              body: {
+                email: "dev@test.com",
+                preferredLocale: null,
+              },
+            },
+          ],
+          defaultScenario: "success",
+        },
+        PATCH: {
+          description: "Update user profile fields such as preferredLocale.",
+          enabled: true,
+          delayMs: 200,
+          requiresAuth: true,
+          requiredFields: ["preferredLocale"],
+          characterLimits: {
+            preferredLocale: { min: 2, max: 10 },
+          },
+          scenarios: [
+            {
+              name: "success",
+              status: 200,
+              body: {
+                success: true,
+                preferredLocale: "{{request.body.preferredLocale}}",
+              },
+            },
+            {
+              name: "validationError",
+              status: 422,
+              body: {
+                errors: {
+                  preferredLocale: "preferredLocale is required.",
+                },
+              },
+            },
+          ],
+          defaultScenario: "success",
+        },
+      },
+    },
   },
 };
 

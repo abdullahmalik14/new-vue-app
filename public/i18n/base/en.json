@@ -1,6 +1,11 @@
 {
   "ui": {
     "languageSelector": "Language selector",
-    "language": "Language"
+    "language": "Language",
+    "translateThisPage": "Translate this page",
+    "translatePageAction": "Translate",
+    "languageSettings": "Language",
+    "languageSettingsDescription": "Choose your preferred language. This is saved to your account when signed in.",
+    "resetLanguageToBrowser": "Reset to browser default"
   }
 }

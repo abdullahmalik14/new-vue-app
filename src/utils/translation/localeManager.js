@@ -3,9 +3,10 @@
  *
  * Handles locale selection with priority chain:
  * 1. URL (path or query parameter)
- * 2. User manual selection (cached)
- * 3. Browser default
- * 4. Fallback to English
+ * 2. Authenticated user profile (Cognito custom:preferred_locale)
+ * 3. User manual selection (cached in Pinia / localStorage)
+ * 4. Browser default
+ * 5. Fallback to English
  *
  * All operations tracked with global window.performanceTracker.
  */
@@ -89,6 +90,65 @@ export function stripLeadingLocaleFromPath(path, supportedLocales = SUPPORTED_LO
 // Current active locale
 let currentActiveLocale = null;
 
+const COGNITO_PREFERRED_LOCALE_ATTR = "custom:preferred_locale";
+
+/**
+ * Read preferred locale from authenticated user (Cognito JWT / store mirror).
+ * @returns {string | null}
+ */
+function getProfilePreferredLocaleFromAuth() {
+  try {
+    const authStore = useAuthStore();
+    if (!authStore.isAuthenticated) {
+      return null;
+    }
+
+    const fromUser = authStore.currentUser?.preferredLocale;
+    const fromToken = authStore.currentUser?.raw?.[COGNITO_PREFERRED_LOCALE_ATTR];
+    const raw =
+      typeof fromUser === "string"
+        ? fromUser
+        : typeof fromToken === "string"
+          ? fromToken
+          : "";
+    const code = raw.toLowerCase().trim();
+
+    return SUPPORTED_LOCALES.includes(code) ? code : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Align Pinia persisted locale with the resolved code.
+ * @param {string} localeCode
+ */
+function syncLocaleStoreWithCode(localeCode) {
+  try {
+    const localeStore = useLocaleStore();
+    if (localeStore.locale !== localeCode) {
+      localeStore.setLocale(localeCode);
+    }
+  } catch {
+    // Store may be unavailable during early boot
+  }
+}
+
+/**
+ * After auth restore, apply Cognito profile locale to store + in-memory active locale.
+ * @returns {string | null}
+ */
+export function applyProfileLocaleToStoreIfAuthenticated() {
+  const profileLocale = getProfilePreferredLocaleFromAuth();
+  if (!profileLocale) {
+    return null;
+  }
+
+  syncLocaleStoreWithCode(profileLocale);
+  currentActiveLocale = profileLocale;
+  return profileLocale;
+}
+
 /**
  * Resolve the active locale using priority chain
  *
@@ -152,7 +212,31 @@ export function resolveActiveLocale() {
       return urlLocale;
     }
 
-    // 2. Check persisted user selection (from Pinia store)
+    // 2. Authenticated profile (Cognito) — beats stale localStorage on other devices
+    const profileLocale = getProfilePreferredLocaleFromAuth();
+    if (profileLocale) {
+      syncLocaleStoreWithCode(profileLocale);
+
+      log(
+        "localeManager.js",
+        "resolveActiveLocale",
+        "info",
+        "Locale resolved from user profile",
+        { locale: profileLocale }
+      );
+
+      currentActiveLocale = profileLocale;
+      log(
+        "localeManager.js",
+        "resolveActiveLocale",
+        "return",
+        "Returning profile locale",
+        { locale: profileLocale }
+      );
+      return profileLocale;
+    }
+
+    // 3. Check persisted user selection (from Pinia store)
     try {
       const localeStore = useLocaleStore();
       const persistedLocale = localeStore.locale;
@@ -197,7 +281,7 @@ export function resolveActiveLocale() {
       );
     }
 
-    // 3. Check browser language
+    // 4. Check browser language
     const browserLocale = getBrowserLocale();
     if (browserLocale) {
       log(
@@ -229,7 +313,7 @@ export function resolveActiveLocale() {
       return browserLocale;
     }
 
-    // 4. Use default fallback
+    // 5. Use default fallback
     log(
       "localeManager.js",
       "resolveActiveLocale",
@@ -492,7 +576,7 @@ export async function setActiveLocale(localeCode, options = {}) {
   }
 
   // Default options
-  const { updateUrl = true } = options;
+  const { updateUrl = true, syncProfile = true } = options;
 
   // Resolve user role for section resolution
   let userRole = "guest";
@@ -730,6 +814,21 @@ export async function setActiveLocale(localeCode, options = {}) {
     updateUrlWithLocale(localeCode);
   }
 
+  if (syncProfile) {
+    try {
+      const { syncPreferredLocaleToProfile } = await import("./userLocaleProfile.js");
+      await syncPreferredLocaleToProfile(localeCode);
+    } catch (error) {
+      log(
+        "localeManager.js",
+        "setActiveLocale",
+        "warn",
+        "Failed to sync locale to user profile",
+        { localeCode, error: error?.message }
+      );
+    }
+  }
+
   if (window.performanceTracker) {
     window.performanceTracker.step({
       step: "localeSet",
@@ -739,6 +838,8 @@ export async function setActiveLocale(localeCode, options = {}) {
       purpose: `Locale updated to: ${localeCode}`,
     });
   }
+
+  notifyLocaleUiChanged(localeCode);
 
   log("localeManager.js", "setActiveLocale", "return", "Returning success", {
     localeCode,
@@ -1058,12 +1159,189 @@ export async function applyLocaleTemporarily(localeCode, options = {}) {
     });
   }
 
+  notifyLocaleUiChanged(localeCode, { temporary: true });
+
   log(
     "localeManager.js",
     "applyLocaleTemporarily",
     "return",
     "Locale applied temporarily (not persisted)",
     { localeCode, loadTranslations, awaitTranslations }
+  );
+}
+
+/** sessionStorage key for one-time page translation (F-03). */
+export const TEMP_LOCALE_SESSION_KEY = "app_temp_locale";
+
+/** sessionStorage key for locale to restore after temporary translation ends. */
+export const TEMP_LOCALE_BASE_KEY = "app_temp_locale_base";
+
+/**
+ * Clear temporary translation keys after a full page reload (new tab starts empty).
+ */
+export function clearTemporaryPageLocaleOnReload() {
+  if (typeof window === "undefined" || typeof sessionStorage === "undefined") {
+    return;
+  }
+
+  const nav = performance.getEntriesByType?.("navigation")?.[0];
+  if (nav?.type === "reload") {
+    sessionStorage.removeItem(TEMP_LOCALE_SESSION_KEY);
+    sessionStorage.removeItem(TEMP_LOCALE_BASE_KEY);
+  }
+}
+
+/**
+ * @returns {string|null}
+ */
+export function getTemporaryPageLocale() {
+  if (typeof sessionStorage === "undefined") {
+    return null;
+  }
+  const locale = sessionStorage.getItem(TEMP_LOCALE_SESSION_KEY);
+  return locale && SUPPORTED_LOCALES.includes(locale) ? locale : null;
+}
+
+/**
+ * @returns {string|null}
+ */
+export function getTemporaryPageLocaleBase() {
+  if (typeof sessionStorage === "undefined") {
+    return null;
+  }
+  const locale = sessionStorage.getItem(TEMP_LOCALE_BASE_KEY);
+  return locale && SUPPORTED_LOCALES.includes(locale) ? locale : null;
+}
+
+/**
+ * Whether the user is viewing a temporary page translation (not persisted preference).
+ * @returns {boolean}
+ */
+export function isTemporaryPageLocaleActive() {
+  return Boolean(getTemporaryPageLocale());
+}
+
+/**
+ * Translate the current page once without changing persisted locale preference.
+ * @param {string} localeCode
+ * @param {{ sectionName?: string, routePath?: string }} [options]
+ * @returns {Promise<void>}
+ */
+export async function translateCurrentPageTemporarily(
+  localeCode,
+  { sectionName, routePath } = {}
+) {
+  if (!SUPPORTED_LOCALES.includes(localeCode)) {
+    return;
+  }
+
+  const baseLocale = getActiveLocale() || resolveActiveLocale();
+  if (typeof sessionStorage !== "undefined") {
+    sessionStorage.setItem(TEMP_LOCALE_BASE_KEY, baseLocale);
+    sessionStorage.setItem(TEMP_LOCALE_SESSION_KEY, localeCode);
+  }
+
+  await applyLocaleTemporarily(localeCode, {
+    sectionName,
+    routePath,
+    loadTranslations: true,
+    awaitTranslations: true,
+  });
+}
+
+/**
+ * End temporary page translation and restore the persisted/saved locale.
+ * @returns {Promise<boolean>}
+ */
+export async function clearTemporaryPageLocaleAndRestore() {
+  const baseLocale =
+    getTemporaryPageLocaleBase() ||
+    (() => {
+      try {
+        const localeStore = useLocaleStore();
+        return localeStore.locale || DEFAULT_LOCALE;
+      } catch {
+        return DEFAULT_LOCALE;
+      }
+    })();
+
+  if (typeof sessionStorage !== "undefined") {
+    sessionStorage.removeItem(TEMP_LOCALE_SESSION_KEY);
+    sessionStorage.removeItem(TEMP_LOCALE_BASE_KEY);
+  }
+
+  return setActiveLocale(baseLocale, { updateUrl: true, syncProfile: false });
+}
+
+/**
+ * Re-apply session temporary locale during in-app navigation (same tab).
+ * @param {string} routePath
+ * @returns {Promise<void>}
+ */
+export async function reapplyTemporaryPageLocaleForRoute(routePath) {
+  const tempLocale = getTemporaryPageLocale();
+  if (!tempLocale) {
+    return;
+  }
+
+  await applyLocaleTemporarily(tempLocale, {
+    routePath,
+    loadTranslations: true,
+    awaitTranslations: false,
+  });
+}
+
+/**
+ * Normalize a locale code from a select value or UnifiedSelect option object.
+ * @param {unknown} raw
+ * @returns {string}
+ */
+export function extractLocaleSelection(raw) {
+  if (raw == null) {
+    return "";
+  }
+  if (typeof raw === "string") {
+    return raw.toLowerCase().trim();
+  }
+  if (typeof raw === "object") {
+    const value = raw.value ?? raw.code ?? raw.locale;
+    if (typeof value === "string") {
+      return value.toLowerCase().trim();
+    }
+  }
+  return "";
+}
+
+/**
+ * Locale for UI controls: visible browser URL wins (pushState updates this before
+ * Vue Router's route.path), then router path, then in-memory active locale.
+ * @param {string} [routePath]
+ * @returns {string}
+ */
+export function getDisplayedLocale(routePath) {
+  const browserPath =
+    typeof window !== "undefined" ? window.location.pathname : "";
+  const path = browserPath || routePath || "";
+  const fromUrl = getLeadingLocaleFromPath(path);
+  if (fromUrl) {
+    return fromUrl;
+  }
+  return getActiveLocale();
+}
+
+/**
+ * Notify locale switcher components to refresh their displayed value.
+ * @param {string} localeCode
+ * @param {Record<string, unknown>} [detail]
+ */
+export function notifyLocaleUiChanged(localeCode, detail = {}) {
+  if (typeof window === "undefined") {
+    return;
+  }
+  window.dispatchEvent(
+    new CustomEvent("app-locale-changed", {
+      detail: { locale: localeCode, ...detail },
+    })
   );
 }
 
@@ -1081,7 +1359,37 @@ export function getActiveLocale() {
     {}
   );
 
-  // If not set, resolve it
+  try {
+    const localeStore = useLocaleStore();
+    if (localeStore.locale && SUPPORTED_LOCALES.includes(localeStore.locale)) {
+      currentActiveLocale = localeStore.locale;
+      log(
+        "localeManager.js",
+        "getActiveLocale",
+        "return",
+        "Returning locale from Pinia store",
+        { locale: localeStore.locale }
+      );
+      return localeStore.locale;
+    }
+  } catch {
+    // Store may be unavailable during early boot
+  }
+
+  const profileLocale = getProfilePreferredLocaleFromAuth();
+  if (profileLocale) {
+    syncLocaleStoreWithCode(profileLocale);
+    currentActiveLocale = profileLocale;
+    log(
+      "localeManager.js",
+      "getActiveLocale",
+      "return",
+      "Returning locale from user profile",
+      { locale: profileLocale }
+    );
+    return profileLocale;
+  }
+
   if (!currentActiveLocale) {
     currentActiveLocale = resolveActiveLocale();
   }
@@ -1334,19 +1642,24 @@ export function getLocalePreferenceOrder() {
       priority: 1,
     },
     {
+      source: "profile",
+      value: getProfilePreferredLocaleFromAuth(),
+      priority: 2,
+    },
+    {
       source: "persisted",
       value: persistedLocale,
-      priority: 2,
+      priority: 3,
     },
     {
       source: "browser",
       value: getBrowserLocale(),
-      priority: 3,
+      priority: 4,
     },
     {
       source: "default",
       value: DEFAULT_LOCALE,
-      priority: 4,
+      priority: 5,
     },
   ];
 

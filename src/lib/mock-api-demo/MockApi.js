@@ -50,6 +50,10 @@ class MockApi {
     return this._handleRequest("POST", urlKey, body || {}, options || {});
   }
 
+  patch(urlKey, body, options) {
+    return this._handleRequest("PATCH", urlKey, body || {}, options || {});
+  }
+
   delete(urlKey, options) {
     return this._handleRequest("DELETE", urlKey, null, options || {});
   }

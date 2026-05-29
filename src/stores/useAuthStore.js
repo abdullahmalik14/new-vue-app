@@ -4,6 +4,10 @@ import { defineStore } from 'pinia';
 import { jwtDecode } from 'jwt-decode';
 import { authHandler } from '../utils/auth/authHandler';
 import { log } from '../utils/common/logHandler';
+import {
+  getPreferredLocaleFromTokenClaims,
+  normalizePreferredLocaleCode,
+} from '../utils/translation/cognitoLocaleProfile.js';
 /**
  * @file useAuthStore.js
  * @description Pinia store for authentication state management
@@ -138,6 +142,12 @@ export const useAuthStore = defineStore('auth', {
           ? kycPassedFromToken
           : (this.currentUser?.kycPassed ?? false);
 
+        const preferredFromToken = getPreferredLocaleFromTokenClaims(decoded);
+        const preferredLocaleResolved =
+          preferredFromToken ??
+          normalizePreferredLocaleCode(this.currentUser?.preferredLocale) ??
+          null;
+
         // Merge token data with existing currentUser to preserve locally set attributes
         // This ensures that attributes set locally (via updateUserAttributesLocally) are preserved
         // even if they're not yet in the token (Cognito propagation delay)
@@ -148,6 +158,7 @@ export const useAuthStore = defineStore('auth', {
           email: decoded.email,
           role: roleResolved,
           kycPassed: kycPassedResolved,
+          preferredLocale: preferredLocaleResolved,
           // treat onboarding as complete if token says so, otherwise if a role exists (Step 1 was saved in Cognito)
           onboardingPassed: onboardingResolved,
           // Always use latest token raw data
@@ -170,6 +181,10 @@ export const useAuthStore = defineStore('auth', {
             kycPassed: decoded['custom:kyc'] === undefined && this.currentUser.kycPassed !== undefined
           }
         });
+
+        void import('../utils/translation/userLocaleProfile.js').then(({ applyUserPreferredLocaleOnAuth }) =>
+          applyUserPreferredLocaleOnAuth()
+        );
 
         window.performanceTracker.step({
           step: 'setTokenAndDecode_complete',
