@@ -893,6 +893,41 @@ if (typeof window !== 'undefined' && import.meta.env.DEV) {
 }
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `localeManager.js` attached `window.APP.setLocale`, `switchLocale`, `testLocalePersistence`, etc. on every build. In production, any injected script or extension could call those helpers and overwrite the persisted locale in `localStorage` — an XSS-adjacent attack surface.
+
+**Why it happened:** Console helpers were added for QA/dev browser testing without an environment guard.
+
+**What changed:** Wrapped the entire developer console block in `if (typeof window !== 'undefined' && import.meta.env.DEV)`. Production bundles no longer register locale mutation/statistics helpers on `window.APP`. Dev workflow unchanged (`npm run dev`).
+
+**Conflict check:** No override of preload or performance audit work. **TRANSLATION_AUDIT** browser snippets that use `window.APP` are dev-only by design. Auth-related `window.APP` helpers in `authHandler.js` / `authHandlerDev.js` are unchanged (out of S-01 scope).
+
+**How it was tested:** `tests/unit/localeManagerWindowApi.test.js` — APIs present when `DEV=true`, absent when `DEV=false`.
+
+**How to test in the browser:**
+1. **`npm run dev`** — Console (one paste):
+   ```js
+   console.log({
+     devMode: import.meta.env.DEV,
+     hasSetLocale: typeof window.APP?.setLocale === 'function',
+     pass: import.meta.env.DEV && typeof window.APP?.setLocale === 'function'
+   });
+   ```
+   **Expected:** `hasSetLocale: true`, `pass: true`.
+
+2. **`npm run build` && `npm run preview`** — open preview URL, Console (one paste):
+   ```js
+   console.log({
+     devMode: import.meta.env.DEV,
+     hasSetLocale: typeof window.APP?.setLocale === 'function',
+     pass: !window.APP?.setLocale
+   });
+   ```
+   **Expected:** `hasSetLocale: false`, `pass: true` (locale switcher UI still works; only console mutation API is gone).
+
 ---
 
 ### S-02 — `vif.json` typo file causes silent English fallback for Vietnamese shop users
@@ -907,6 +942,39 @@ The file is named `vif.json` instead of `vi.json`. Vietnamese (`vi`) users navig
 
 **Fix:** Rename `vif.json` → `vi.json` in both `public/i18n/section-shop/` and `public/i18n/`.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Translation files were named `vif.json` instead of `vi.json` in `public/i18n/section-shop/` and `public/i18n/`. The loader requests `/i18n/section-shop/vi.json` for Vietnamese shop users; the typo file was never fetched, so shop copy silently fell back to English.
+
+**Why it happened:** Filename typo (`vif` vs `vi`) in static assets.
+
+**What changed:** Renamed `public/i18n/section-shop/vif.json` → `vi.json` and `public/i18n/vif.json` → `vi.json`. No loader code change — **P-01** already uses GET + `Content-Type` check; missing `vi.json` previously returned `{}` and English fallback.
+
+**Conflict check:** No override of preload or **P-01**/**S-01** work — data fix only.
+
+**How it was tested:** File rename verified on disk; `grep vif.json` — no remaining asset paths (audit doc references only).
+
+**How to test in the browser:**
+1. Run `npm run dev`, open `/vi/shop` (or shop route with Vietnamese locale).
+2. DevTools → **Network** — filter `i18n/section-shop` — confirm **`vi.json`** loads (200, `Content-Type: application/json`), not a missing `vi.json` + English-only fallback.
+3. DevTools → **Console** (one paste):
+   ```js
+   (async () => {
+     const res = await fetch('/i18n/section-shop/vi.json');
+     const ct = res.headers.get('content-type') || '';
+     const body = res.ok && ct.includes('application/json') ? await res.json() : null;
+     console.log({
+       status: res.status,
+       isJson: ct.includes('application/json'),
+       keyCount: body ? Object.keys(body).length : 0,
+       pass: res.ok && ct.includes('application/json') && body && Object.keys(body).length > 0
+     });
+   })();
+   ```
+4. **Expected:** `status: 200`, `isJson: true`, `keyCount > 0`, `pass: true`. Shop UI shows Vietnamese strings where keys exist.
+
 ---
 
 ### S-03 — Translation keys used with `v-html` risk XSS
@@ -917,6 +985,63 @@ If any component renders a translated string using `v-html` (e.g. for rich-text 
 
 **Action:** Audit all components for `v-html` usage that receives translated strings. Prefer `i18n-t` component with slots for rich-text translations.
 
+#### Resolution ✅
+
+**Status:** Resolved (audit complete; no code change required for i18n path).
+
+**What was broken:** Potential XSS if translated strings were rendered with `v-html`, bypassing vue-i18n’s default HTML escaping.
+
+**Why it happened:** Rich-text patterns sometimes tempt `v-html` + `$t()` — none were found in this codebase.
+
+**What changed:**
+- Full audit of `src/**/*.vue` — **no** `v-html` bound to `$t()` / `t()` / i18n output.
+- **Two** unrelated `v-html` usages remain (API/demo HTML, not translation JSON):
+  - `TierCard.vue` — `tier.footer.buttonText` (tier/API data)
+  - `SubscriptionCard.vue` — `cardData.fullDescription` / features (props/demo data)
+- Added `tests/unit/translationSecurityAudit.test.js` — fails CI if any Vue file combines `v-html` with i18n translation calls.
+
+**Conflict check:** No preload impact. Does not change TierCard/SubscriptionCard markup (out of scope — not i18n-sourced).
+
+**How it was tested:** `npm run test:unit -- run tests/unit/translationSecurityAudit.test.js`
+
+**How to test in the browser:**
+
+> **Why `fetch('/src/...TierCard.vue')` shows `tierCardHasVHtml: false`**  
+> That URL is not a static file in dev/prod — the server often returns `index.html` (SPA fallback) or HTML without the `.vue` source. Use Vite **`?raw`** imports below (dev only), or rely on `npm run test:unit -- run tests/unit/translationSecurityAudit.test.js`.
+
+1. Run `npm run dev`, DevTools → **Console** (one paste — scans TierCard + SubscriptionCard sources):
+   ```js
+   (async () => {
+     const i18nVHtml = /v-html\s*=\s*["'][^"']*(\$t\s*\(|[^a-zA-Z_]t\s*\(\s*['"`])/;
+     const files = [
+       ['/src/components/ui/card/dashboard/TierCard.vue', 'TierCard'],
+       ['/src/templates/profileAbdullah/components/SubscriptionCard.vue', 'SubscriptionCard'],
+     ];
+     const results = [];
+     for (const [path, label] of files) {
+       try {
+         const src = (await import(`${path}?raw`)).default;
+         results.push({
+           label,
+           hasVHtml: /v-html/.test(src),
+           vHtmlWithI18n: i18nVHtml.test(src),
+         });
+       } catch (e) {
+         results.push({ label, error: e.message });
+       }
+     }
+     console.table(results);
+     console.log({
+       pass:
+         results.every((r) => r.hasVHtml && !r.vHtmlWithI18n) &&
+         results.length === 2,
+     });
+   })();
+   ```
+2. **Expected:** both rows `hasVHtml: true`, `vHtmlWithI18n: false`, `pass: true`. No project-wide `v-html` + `$t()` (CI test covers all `src/**/*.vue`).
+
+3. **Optional — live auth page:** open `/log-in`, pick a translated label in Elements — text nodes from `$t()` should **not** be under an element rendered via `v-html` (auth components use `{{ $t(...) }}` / `:text`, not `v-html`).
+
 ---
 
 ### S-04 — No Subresource Integrity for translation JSON
@@ -926,6 +1051,43 @@ If any component renders a translated string using `v-html` (e.g. for rich-text 
 Translation files are fetched from the same origin (`/i18n/...`) so a CDN or reverse-proxy compromise could serve modified translations. There is no hash-based integrity check on the fetched JSON.
 
 **Note:** This is a general CDN security concern, not specific to i18n. Mention it to the infrastructure team if translation files are ever moved to a CDN.
+
+#### Resolution ✅
+
+**Status:** Resolved (accepted for current architecture; documented).
+
+**What was broken:** `fetch('/i18n/...')` has no Subresource Integrity hash — a compromised CDN or reverse proxy could serve altered JSON if assets leave same-origin hosting.
+
+**Why it happened:** Translation JSON is served as same-origin static files from `public/i18n/`; `fetch()` has no built-in SRI (unlike `<script integrity="...">`). Section **JS/CSS bundles** already use manifest SRI per **SECTION_PRELOAD_AUDIT S-01/S-02** — translation JSON is a separate asset class.
+
+**What changed:**
+- `translationLoader.js` — documented trust boundary in code comment (S-04): same-origin static JSON today; add build-time hash verification **if** `/i18n/` moves to external CDN.
+- No runtime SRI added — out of scope for same-origin Vite `public/` assets; mitigations are HTTPS, deploy integrity, and `Content-Type` validation (**P-01**).
+- Infrastructure note: if i18n files move to CDN, follow section-bundle manifest pattern (`integrity` map + verify before merge).
+
+**Conflict check:** Does not override **SECTION_PRELOAD_AUDIT** bundle SRI work — applies only to translation JSON fetch path.
+
+**How it was tested:** `tests/unit/translationSecurityAudit.test.js` — S-04 policy comment present; URLs remain under `/i18n/section-*`.
+
+**How to test in the browser:**
+1. Run `npm run dev`, open `/log-in`, DevTools → **Network** → click `en.json` under `/i18n/section-auth/`.
+2. Confirm **Request URL** is same-origin (`localhost` or your dev host), **not** a third-party CDN.
+3. Console (one paste):
+   ```js
+   (async () => {
+     const url = '/i18n/section-auth/en.json';
+     const res = await fetch(url);
+     const origin = new URL(url, location.origin).origin;
+     console.log({
+       pageOrigin: location.origin,
+       jsonOrigin: origin,
+       sameOrigin: origin === location.origin,
+       contentType: res.headers.get('content-type'),
+       pass: origin === location.origin && (res.headers.get('content-type') || '').includes('json')
+     });
+   })();
+   ```
+4. **Expected:** `sameOrigin: true`, `pass: true`. If i18n is ever CDN-hosted, require infra to add hash manifest before migration.
 
 ---
 

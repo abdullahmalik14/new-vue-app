@@ -1327,10 +1327,10 @@ export function getLocalePreferenceOrder() {
 }
 
 // =================================================================
-// DEVELOPER CONSOLE API
+// DEVELOPER CONSOLE API (dev only — S-01)
 // =================================================================
-// Expose locale management functions to window for testing
-if (typeof window !== "undefined") {
+// Expose locale management functions to window for local testing
+if (typeof window !== "undefined" && import.meta.env.DEV) {
   window.APP = window.APP || {};
   window.APP.setLocale = setActiveLocale;
   window.APP.getLocale = getActiveLocale;

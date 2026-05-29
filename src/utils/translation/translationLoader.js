@@ -354,6 +354,8 @@ async function loadTranslationFile(sectionName, localeCode) {
 
     // Single GET per file — validate status and Content-Type on the response
     // SPA servers often return 200 OK with index.html for missing files
+    // S-04: Same-origin static JSON (/i18n/...) — no SRI on fetch(); integrity is
+    // enforced by deploy pipeline + HTTPS. Add hash verification if files move to CDN.
     const response = await fetch(jsonUrl);
 
     if (!response.ok) {
