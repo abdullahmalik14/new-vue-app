@@ -43,3 +43,38 @@ describe('getLocaleDisplayName (P-05)', () => {
     expect(frenchInGerman.toLowerCase()).toContain('hawai');
   });
 });
+
+describe('LanguageSwitcher selectId (B-04)', () => {
+  it('uses useId instead of Math.random for stable accessibility ids', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { join, dirname } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
+    const source = readFileSync(
+      join(projectRoot, 'src/components/ui/nav/language/LanguageSwitcher.vue'),
+      'utf8'
+    );
+
+    expect(source).toMatch(/import\s*\{[^}]*\buseId\b[^}]*\}\s*from\s*['"]vue['"]/);
+    expect(source).toMatch(/const selectId = 'language-switcher-' \+ useId\(\)/);
+    expect(source).not.toMatch(/Math\.random\(\)/);
+  });
+});
+
+describe('LanguageSwitcher a11y labels (B-05)', () => {
+  it('uses translated ui keys instead of hardcoded English labels', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { join, dirname } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
+    const source = readFileSync(
+      join(projectRoot, 'src/components/ui/nav/language/LanguageSwitcher.vue'),
+      'utf8'
+    );
+
+    expect(source).toMatch(/:aria-label="\$t\('ui\.languageSelector'\)"/);
+    expect(source).toMatch(/\{\{\s*\$t\('ui\.language'\)\s*\}\}/);
+    expect(source).not.toMatch(/aria-label="Language selector"/);
+    expect(source).not.toMatch(/class="sr-only">Language</);
+  });
+});

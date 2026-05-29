@@ -31,6 +31,30 @@ import { LOCALE_DISPLAY_METADATA } from "./localeDisplayMetadata.js";
 export const SUPPORTED_LOCALES = [ "af", "sq", "am", "ar", "hy", "az", "bn", "bs", "bg", "ca", "zh", "zh-tw", "hr", "cs", "da", "fa-af", "nl", "en", "et", "fa", "tl", "fi", "fr", "fr-ca", "ka", "de", "el", "gu", "ht", "ha", "he", "hi", "hu", "is", "id", "ga", "it", "ja", "kn", "kk", "ko", "lv", "lt", "mk", "ms", "ml", "mt", "mr", "mn", "no", "ps", "pl", "pt", "pt-pt", "pa", "ro", "ru", "sr", "si", "sk", "sl", "so", "es", "es-mx", "sw", "sv", "ta", "te", "th", "tr", "uk", "ur", "uz", "vi", "cy" ];
 export const DEFAULT_LOCALE = "en";
 
+/** Locales that require right-to-left document layout. */
+export const RTL_LOCALES = new Set(["ar", "he", "fa", "fa-af", "ur", "ps"]);
+
+/**
+ * @param {string} localeCode
+ * @returns {'rtl'|'ltr'}
+ */
+export function getDocumentDirection(localeCode) {
+  return RTL_LOCALES.has(localeCode) ? "rtl" : "ltr";
+}
+
+/**
+ * Sync `<html lang>` and `<html dir>` for accessibility, SEO, and RTL layout.
+ * @param {string} localeCode
+ */
+export function applyDocumentLocaleAttributes(localeCode) {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  document.documentElement.setAttribute("lang", localeCode);
+  document.documentElement.setAttribute("dir", getDocumentDirection(localeCode));
+}
+
 /**
  * First path segment if it is a supported locale (e.g. /vi/dashboard → vi).
  *
@@ -542,19 +566,19 @@ export async function setActiveLocale(localeCode, options = {}) {
     }
   }
 
-  // Update document language attribute for accessibility/SEO
-  if (typeof document !== "undefined") {
-    document.documentElement.setAttribute("lang", localeCode);
-  }
+  // Update document language and text direction for accessibility/SEO/RTL
+  applyDocumentLocaleAttributes(localeCode);
 
   // Clear translation caches and reload current section for new locale
   try {
     // Dynamic import to avoid circular dependency
     const {
       clearTranslationCaches,
+      loadBaseTranslations,
       loadTranslationsForSection,
     } = await import("./translationLoader.js");
     clearTranslationCaches();
+    await loadBaseTranslations(localeCode);
     log(
       "localeManager.js",
       "setActiveLocale",
@@ -772,6 +796,12 @@ function updateUrlWithLocale(localeCode) {
     // Update URL without page reload (using pushState)
     window.history.pushState({}, "", newUrl);
 
+    import("./hreflangTags.js")
+      .then(({ syncHreflangTagsForPath }) => {
+        syncHreflangTagsForPath(newPath, { enabled: true });
+      })
+      .catch(() => {});
+
     log(
       "localeManager.js",
       "updateUrlWithLocale",
@@ -876,11 +906,18 @@ async function loadTranslationsForTemporaryLocale(
   { sectionName, routePath, awaitTranslations }
 ) {
   try {
-    const { loadTranslationsForSection } = await import("./translationLoader.js");
+    const { loadBaseTranslations, loadTranslationsForSection } = await import(
+      "./translationLoader.js"
+    );
+    const basePromise = loadBaseTranslations(localeCode);
+
     const resolvedSection =
       sectionName || (await resolveSectionFromRoutePath(routePath));
 
     if (!resolvedSection) {
+      if (awaitTranslations) {
+        await basePromise;
+      }
       log(
         "localeManager.js",
         "loadTranslationsForTemporaryLocale",
@@ -891,9 +928,8 @@ async function loadTranslationsForTemporaryLocale(
       return;
     }
 
-    const loadPromise = loadTranslationsForSection(
-      resolvedSection,
-      localeCode
+    const loadPromise = basePromise.then(() =>
+      loadTranslationsForSection(resolvedSection, localeCode)
     );
 
     if (awaitTranslations) {
@@ -1011,10 +1047,8 @@ export async function applyLocaleTemporarily(localeCode, options = {}) {
     }
   }
 
-  // Update document language attribute for accessibility/SEO
-  if (typeof document !== "undefined") {
-    document.documentElement.setAttribute("lang", localeCode);
-  }
+  // Update document language and text direction for accessibility/SEO/RTL
+  applyDocumentLocaleAttributes(localeCode);
 
   if (loadTranslations) {
     await loadTranslationsForTemporaryLocale(localeCode, {
@@ -1118,7 +1152,7 @@ export function getDefaultLocale() {
  * @param {string} localeCode
  * @returns {string}
  */
-function toIntlLocaleTag(localeCode) {
+export function toIntlLocaleTag(localeCode) {
   if (typeof localeCode !== 'string' || localeCode.length === 0) {
     return localeCode;
   }

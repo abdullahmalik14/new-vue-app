@@ -112,6 +112,170 @@ function getTranslationUrl(sectionName, localeCode) {
   return `/i18n/section-${safeSectionName}/${localeCode}.json`;
 }
 
+/** Global UI strings shared across routes (B-05 / F-11 base bundle). */
+const BASE_TRANSLATION_LOADING_PREFIX = '__base__';
+
+function getBaseTranslationUrl(localeCode) {
+  if (typeof localeCode !== 'string' || localeCode.length === 0) {
+    throw new Error(`Invalid base locale code: ${localeCode}`);
+  }
+
+  return `/i18n/base/${localeCode}.json`;
+}
+
+/**
+ * Fetch and validate a translation JSON file from a URL.
+ *
+ * @param {string} jsonUrl
+ * @param {object} logContext
+ * @returns {Promise<object>}
+ */
+async function fetchTranslationJson(jsonUrl, logContext) {
+  const response = await fetch(jsonUrl);
+
+  if (!response.ok) {
+    log('translationLoader.js', 'fetchTranslationJson', 'file-missing', 'Translation file not found', {
+      ...logContext,
+      status: response.status,
+      jsonUrl,
+    });
+    return {};
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    log('translationLoader.js', 'fetchTranslationJson', 'file-missing', 'Translation response is not JSON (likely SPA fallback)', {
+      ...logContext,
+      contentType,
+      jsonUrl,
+    });
+    return {};
+  }
+
+  const translations = await response.json();
+
+  log('translationLoader.js', 'fetchTranslationJson', 'success', 'Translation file loaded successfully', {
+    ...logContext,
+    jsonUrl,
+    keyCount: Object.keys(translations).length,
+  });
+
+  return translations;
+}
+
+/**
+ * Load global/base UI translations (always loaded at startup and on locale change).
+ *
+ * @param {string} [localeCode] - Target locale; defaults to resolveActiveLocale()
+ * @returns {Promise<object>}
+ */
+export async function loadBaseTranslations(localeCode) {
+  const targetLocale =
+    (typeof localeCode === 'string' && localeCode.length > 0
+      ? localeCode
+      : resolveActiveLocale()) || 'en';
+  const loadingKey = `${BASE_TRANSLATION_LOADING_PREFIX}${targetLocale}`;
+
+  log('translationLoader.js', 'loadBaseTranslations', 'start', 'Loading base translations', {
+    localeCode: targetLocale,
+  });
+
+  const cached = loadedTranslations.get(loadingKey);
+  if (cached !== undefined && cached !== null) {
+    log('translationLoader.js', 'loadBaseTranslations', 'cache-hit', 'Returning cached base translations', {
+      localeCode: targetLocale,
+      keyCount: Object.keys(cached).length,
+    });
+    return cached;
+  }
+
+  if (inFlightPromises.has(loadingKey)) {
+    return inFlightPromises.get(loadingKey);
+  }
+
+  let resolveLoad;
+  const loadPromise = new Promise((resolve) => {
+    resolveLoad = resolve;
+  });
+  inFlightPromises.set(loadingKey, loadPromise);
+
+  (async () => {
+    try {
+      const englishBase = await loadBaseTranslationFile('en');
+
+      if (Object.keys(englishBase).length === 0) {
+        log('translationLoader.js', 'loadBaseTranslations', 'warn', 'English base translation file missing', {
+          localeCode: targetLocale,
+        });
+        finishTranslationLoad(loadingKey, null);
+        resolveLoad({});
+        return;
+      }
+
+      applyTranslationsToI18n('en', englishBase);
+
+      let translations = englishBase;
+
+      if (targetLocale !== 'en') {
+        const localeBase = await loadBaseTranslationFile(targetLocale);
+
+        if (Object.keys(localeBase).length === 0) {
+          log('translationLoader.js', 'loadBaseTranslations', 'fallback-english', 'Base locale file missing, using English via fallbackLocale', {
+            requestedLocale: targetLocale,
+          });
+        } else {
+          applyTranslationsToI18n(targetLocale, localeBase);
+          translations = deepMergePreferChild(englishBase, localeBase);
+        }
+      }
+
+      finishTranslationLoad(loadingKey, translations);
+      resolveLoad(translations);
+    } catch (error) {
+      logError('translationLoader.js', 'loadBaseTranslations', 'Failed to load base translations', error, {
+        localeCode: targetLocale,
+      });
+      finishTranslationLoad(loadingKey, null);
+      resolveLoad({});
+    } finally {
+      inFlightPromises.delete(loadingKey);
+    }
+  })();
+
+  return loadPromise;
+}
+
+/**
+ * Load the global/base translation JSON for a locale.
+ *
+ * @param {string} localeCode
+ * @returns {Promise<object>}
+ */
+async function loadBaseTranslationFile(localeCode) {
+  log('translationLoader.js', 'loadBaseTranslationFile', 'start', 'Loading base translation file', {
+    localeCode,
+  });
+
+  try {
+    const jsonUrl = getBaseTranslationUrl(localeCode);
+    const translations = await fetchTranslationJson(jsonUrl, {
+      bundle: 'base',
+      localeCode,
+    });
+
+    log('translationLoader.js', 'loadBaseTranslationFile', 'return', 'Returning base translations', {
+      localeCode,
+      keyCount: Object.keys(translations).length,
+    });
+    return translations;
+  } catch (error) {
+    logError('translationLoader.js', 'loadBaseTranslationFile', 'Failed to load base translation file', error, {
+      localeCode,
+    });
+    return {};
+  }
+}
+
 /**
  * Merge translations into the global i18n instance (if available).
  *
@@ -136,10 +300,10 @@ function applyTranslationsToI18n(localeCode, messages) {
       global.mergeLocaleMessage(localeCode, messages);
     } else if (typeof global.setLocaleMessage === 'function') {
       const existing = global.getLocaleMessage(localeCode) || {};
-      global.setLocaleMessage(localeCode, {
-        ...existing,
-        ...messages
-      });
+      global.setLocaleMessage(
+        localeCode,
+        deepMergePreferChild(existing, messages)
+      );
     }
   } catch (error) {
     logError('translationLoader.js', 'applyTranslationsToI18n', 'Failed to merge translations into i18n', error, {
@@ -356,36 +520,15 @@ async function loadTranslationFile(sectionName, localeCode) {
     // SPA servers often return 200 OK with index.html for missing files
     // S-04: Same-origin static JSON (/i18n/...) — no SRI on fetch(); integrity is
     // enforced by deploy pipeline + HTTPS. Add hash verification if files move to CDN.
-    const response = await fetch(jsonUrl);
+    const translations = await fetchTranslationJson(jsonUrl, {
+      sectionName,
+      localeCode,
+    });
 
-    if (!response.ok) {
-      log('translationLoader.js', 'loadTranslationFile', 'file-missing', 'Translation file not found', {
-        sectionName,
-        localeCode,
-        status: response.status
-      });
+    if (Object.keys(translations).length === 0) {
       log('translationLoader.js', 'loadTranslationFile', 'return', 'Returning empty object due to missing file', {});
       return {};
     }
-
-    const contentType = response.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      log('translationLoader.js', 'loadTranslationFile', 'file-missing', 'Translation response is not JSON (likely SPA fallback)', {
-        sectionName,
-        localeCode,
-        contentType
-      });
-      log('translationLoader.js', 'loadTranslationFile', 'return', 'Returning empty object due to non-JSON response', {});
-      return {};
-    }
-
-    const translations = await response.json();
-
-    log('translationLoader.js', 'loadTranslationFile', 'success', 'Translation file loaded successfully', {
-      sectionName,
-      localeCode,
-      keyCount: Object.keys(translations).length
-    });
 
     if (window.performanceTracker) {
       window.performanceTracker.step({

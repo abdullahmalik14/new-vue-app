@@ -1,7 +1,7 @@
 <!-- File: src/components/ui/global/nav/language/LanguageSwitcher.vue -->
 <template>
-  <form ref="formRef" class="inline-flex items-center gap-2" aria-label="Language selector" @submit.prevent>
-    <label :for="selectId" class="sr-only">Language</label>
+  <form ref="formRef" class="inline-flex items-center gap-2" :aria-label="$t('ui.languageSelector')" @submit.prevent>
+    <label :for="selectId" class="sr-only">{{ $t('ui.language') }}</label>
     <select :id="selectId" ref="selectRef" class="border rounded px-2 py-1 text-sm" :disabled="isBusy"
       :value="currentLocale" @change="onChange" aria-live="polite">
       <option v-for="opt in localeOptions" :key="opt.code" :value="opt.code">
@@ -23,7 +23,7 @@
 
 
 
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, useId } from 'vue';
 import { useRoute } from 'vue-router';
 
 
@@ -48,8 +48,8 @@ const selectRef = ref(null);
 // simple busy lock to avoid concurrent loads
 const isBusy = ref(false);
 
-// unique id for accessibility
-const selectId = 'language-switcher-' + Math.random().toString(36).slice(2, 9);
+// Stable unique id for accessibility (SSR/hydration-safe)
+const selectId = 'language-switcher-' + useId();
 
 // route access for current section and preload list
 const route = useRoute();
@@ -98,7 +98,7 @@ async function onChange(ev) {
   if (!supportedCodes.has(next)) {
     // Unsupported -> optional behavior: coerce to 'en'
     // You may also choose to show a toast and early return instead.
-    console.warn('[LanguageSwitcher] Unsupported locale "${next}", coercing to "en".');
+    console.warn(`[LanguageSwitcher] Unsupported locale "${next}", coercing to "en".`);
   }
   const finalLocale = supportedCodes.has(next) ? next : 'en';
 

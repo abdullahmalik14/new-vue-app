@@ -24,8 +24,13 @@ import PerfTracker from "./utils/common/performanceTracker.js";
 import {
   resolveActiveLocale,
   stripLeadingLocaleFromPath,
+  applyDocumentLocaleAttributes,
 } from "./utils/translation/localeManager.js";
-import { loadTranslationsForSection } from "./utils/translation/translationLoader.js";
+import {
+  I18N_DATETIME_FORMATS,
+  I18N_NUMBER_FORMATS,
+} from "./utils/translation/localeFormatConfig.js";
+import { loadTranslationsForSection, loadBaseTranslations } from "./utils/translation/translationLoader.js";
 import { useAuthStore } from "./stores/useAuthStore.js";
 import { useLocaleStore } from "./stores/useLocaleStore.js";
 import {
@@ -226,6 +231,8 @@ const i18n = createI18n({
   legacy: false, // Use Composition API mode
   locale: activeLocale,
   fallbackLocale: "en",
+  numberFormats: I18N_NUMBER_FORMATS,
+  datetimeFormats: I18N_DATETIME_FORMATS,
   messages: {
     // Messages will be loaded lazily per section
     en: {},
@@ -249,7 +256,7 @@ if (i18n.global.locale.value !== initialLocale) {
 }
 
 if (typeof document !== "undefined") {
-  document.documentElement.setAttribute("lang", initialLocale);
+  applyDocumentLocaleAttributes(initialLocale);
 }
 
 watch(
@@ -264,7 +271,7 @@ watch(
     }
 
     if (typeof document !== "undefined") {
-      document.documentElement.setAttribute("lang", newLocale);
+      applyDocumentLocaleAttributes(newLocale);
     }
   },
   { immediate: false },
@@ -584,6 +591,17 @@ async function mountApplication() {
     startStartupPreloadForCurrentRoute();
   } catch (err) {
     log("main.js", "init", "router-ready-error", "Error waiting for router ready", {
+      error: err.message,
+    });
+  }
+
+  try {
+    await loadBaseTranslations(localeStore.locale || activeLocale);
+    log("main.js", "init", "base-translations", "Base UI translations loaded", {
+      locale: localeStore.locale || activeLocale,
+    });
+  } catch (err) {
+    log("main.js", "init", "base-translations-error", "Base UI translation load failed (non-blocking)", {
       error: err.message,
     });
   }

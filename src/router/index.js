@@ -56,6 +56,7 @@ import {
   createRedirectFromRouteRecords,
 } from '../utils/route/routeAliases.js';
 import { startCurrentSectionResourceLoads, resolveCurrentSectionForNavigation } from '../utils/route/routeNavigationData.js';
+import { syncHreflangTagsForPath, clearHreflangTags } from '../utils/translation/hreflangTags.js';
 
 const DEFAULT_LOCALE = 'en';
 
@@ -588,6 +589,9 @@ router.afterEach(async (to, from) => {
   // Update active route in navigation tracker
   if (to.meta?.routeConfig) {
     setCurrentActiveRoute(to.meta.routeConfig);
+    syncHreflangTagsForPath(to.path, { enabled: true });
+  } else {
+    clearHreflangTags();
   }
 
   const routeConfig = to.meta?.routeConfig;

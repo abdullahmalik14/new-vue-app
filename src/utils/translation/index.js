@@ -9,6 +9,7 @@
 // Export translation loader functions
 export {
   loadTranslationsForSection,
+  loadBaseTranslations,
   preloadTranslationsForSections,
   areTranslationsLoadedForSection,
   clearTranslationCaches,
@@ -31,4 +32,22 @@ export {
   resetLocaleToDefault,
   getLocalePreferenceOrder
 } from './localeManager.js';
+
+export {
+  formatLocaleNumber,
+  formatLocaleCurrency,
+  formatLocaleDate,
+} from './localeFormatting.js';
+
+export {
+  I18N_NUMBER_FORMATS,
+  I18N_DATETIME_FORMATS,
+} from './localeFormatConfig.js';
+
+export {
+  buildLocalePrefixedPath,
+  buildHreflangAlternateUrls,
+  syncHreflangTagsForPath,
+  clearHreflangTags,
+} from './hreflangTags.js';
 

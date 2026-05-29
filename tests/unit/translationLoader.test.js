@@ -300,3 +300,96 @@ describe('translationLoader in-memory scope (P-06)', () => {
     expect(sections).toContain('shop_vi');
   });
 });
+
+describe('translationLoader base bundle (B-05)', () => {
+  it('loads /i18n/base/en.json and merges locale override for non-English', async () => {
+    fetch.mockImplementation(async (url) => {
+      if (url === '/i18n/base/en.json') {
+        return {
+          ok: true,
+          headers: {
+            get: (name) => (name.toLowerCase() === 'content-type' ? 'application/json' : null)
+          },
+          json: async () => ({
+            ui: { languageSelector: 'Language selector', language: 'Language' }
+          })
+        };
+      }
+      if (url === '/i18n/base/vi.json') {
+        return {
+          ok: true,
+          headers: {
+            get: (name) => (name.toLowerCase() === 'content-type' ? 'application/json' : null)
+          },
+          json: async () => ({
+            ui: { languageSelector: 'Bộ chọn ngôn ngữ', language: 'Ngôn ngữ' }
+          })
+        };
+      }
+      throw new Error(`Unexpected fetch: ${url}`);
+    });
+
+    const { loadBaseTranslations } = await import(LOADER_PATH);
+    const merged = await loadBaseTranslations('vi');
+
+    expect(fetch).toHaveBeenCalledWith('/i18n/base/en.json');
+    expect(fetch).toHaveBeenCalledWith('/i18n/base/vi.json');
+    expect(merged.ui.languageSelector).toBe('Bộ chọn ngôn ngữ');
+    expect(merged.ui.language).toBe('Ngôn ngữ');
+  });
+});
+
+describe('applyTranslationsToI18n setLocaleMessage fallback (B-06)', () => {
+  it('deep-merges nested keys when mergeLocaleMessage is unavailable', async () => {
+    const localeMessages = {
+      en: {
+        auth: {
+          login: {
+            title: 'Login',
+            subtitle: 'Welcome',
+            button: 'Go',
+          },
+        },
+      },
+    };
+    const setLocaleMessage = vi.fn((code, messages) => {
+      localeMessages[code] = messages;
+    });
+
+    const { getI18nInstance } = await import('../../src/utils/translation/i18nInstance.js');
+    getI18nInstance.mockReturnValue({
+      global: {
+        getLocaleMessage: (code) => localeMessages[code] || {},
+        setLocaleMessage,
+      },
+    });
+
+    fetch.mockImplementation(async (url) => {
+      if (url === '/i18n/section-auth/en.json') {
+        return {
+          ok: true,
+          headers: {
+            get: (name) => (name.toLowerCase() === 'content-type' ? 'application/json' : null),
+          },
+          json: async () => ({
+            auth: {
+              login: {
+                title: 'Welcome Back',
+              },
+            },
+          }),
+        };
+      }
+      throw new Error(`Unexpected fetch: ${url}`);
+    });
+
+    const { loadTranslationsForSection } = await import(LOADER_PATH);
+    await loadTranslationsForSection('auth', 'en');
+
+    expect(setLocaleMessage).toHaveBeenCalled();
+    const merged = setLocaleMessage.mock.calls.at(-1)[1];
+    expect(merged.auth.login.title).toBe('Welcome Back');
+    expect(merged.auth.login.subtitle).toBe('Welcome');
+    expect(merged.auth.login.button).toBe('Go');
+  });
+});

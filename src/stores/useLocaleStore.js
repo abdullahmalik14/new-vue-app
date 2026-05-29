@@ -4,6 +4,48 @@ import { defineStore } from 'pinia';
 import { log } from '../utils/common/logHandler';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '../utils/translation/localeManager.js';
 
+/** @type {number} Locale preference TTL in localStorage (90 days). */
+export const LOCALE_PREFERENCE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+
+/**
+ * Wrap persisted locale state with an expiry timestamp for pinia-plugin-persistedstate.
+ * @param {{ locale: string | null }} value
+ * @returns {string}
+ */
+export function serializeLocalePersistedState(value) {
+  return JSON.stringify({
+    data: value,
+    expiresAt: Date.now() + LOCALE_PREFERENCE_TTL_MS,
+  });
+}
+
+/**
+ * Restore locale state from localStorage; expired or invalid entries reset to null.
+ * Accepts legacy plain `{ locale }` blobs written before TTL support.
+ * @param {string} raw
+ * @returns {{ locale: string | null }}
+ */
+export function deserializeLocalePersistedState(raw) {
+  try {
+    const parsed = JSON.parse(raw);
+
+    if (parsed && typeof parsed.expiresAt === 'number') {
+      if (Date.now() > parsed.expiresAt) {
+        return { locale: null };
+      }
+      return parsed.data ?? { locale: null };
+    }
+
+    if (parsed && typeof parsed === 'object' && 'locale' in parsed) {
+      return parsed;
+    }
+
+    return { locale: null };
+  } catch {
+    return { locale: null };
+  }
+}
+
 /**
  * @file useLocaleStore.js
  * @description Pinia store for locale/language preference management
@@ -118,12 +160,14 @@ export const useLocaleStore = defineStore('locale', {
     }
   },
 
-  // Enable persistence
   persist: {
     key: 'locale_preference',
     storage: localStorage,
-    paths: ['locale'], // Only persist the locale field
-    // 90 days TTL is handled by the storage mechanism automatically
+    paths: ['locale'],
+    serializer: {
+      serialize: serializeLocalePersistedState,
+      deserialize: deserializeLocalePersistedState,
+    },
   }
 });
 

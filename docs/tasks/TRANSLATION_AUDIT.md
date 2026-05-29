@@ -1140,6 +1140,82 @@ persist: {
 }
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `pinia-plugin-persistedstate` v4 stores plain JSON in `localStorage` with no expiry. The comment claiming “90 days TTL is handled automatically” was false — locale preference persisted indefinitely until the user cleared storage.
+
+**Why it happened:** TTL was assumed to be built into the persistence plugin; v4 only read/writes JSON and does not implement expiry.
+
+**What changed:**
+- `useLocaleStore.js` — added `LOCALE_PREFERENCE_TTL_MS` (90 days), `serializeLocalePersistedState`, and `deserializeLocalePersistedState`. Persist config now uses a custom `serializer` that wraps `{ data, expiresAt }`. Expired entries deserialize to `{ locale: null }` so `resolveActiveLocale()` falls through to URL/browser/default. Legacy plain `{ locale }` blobs (pre-fix) are still accepted and re-wrapped with TTL on the next write.
+- Also satisfies **F-01** (persistence expiry missing feature).
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Preload persistence (`usePreloadStore`) uses its own serializer for Sets/build-hash invalidation — unrelated to locale TTL.
+
+**How it was tested:** `tests/unit/useLocaleStore.test.js` — `useLocaleStore persistence TTL (B-01)` covers serialize wrap, valid expiry, expired reset, legacy migration, and invalid JSON.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, open any page (e.g. `/log-in`).
+
+2. **Confirm fix is in bundle** (DevTools → Console, one paste):
+   ```js
+   fetch('/src/stores/useLocaleStore.js').then(r=>r.text()).then(src=>console.log({hasTtlSerializer:/serializeLocalePersistedState/.test(src)&&/expiresAt/.test(src),hasFalseTtlComment:/handled by the storage mechanism automatically/.test(src)}));
+   ```
+   **Expected:** `hasTtlSerializer: true`, `hasFalseTtlComment: false`.
+
+3. **TTL wrap + expiry simulation** (one paste — uses same serializer as the store; does not mutate your real preference until step 4):
+   ```js
+   (async () => {
+     const {
+       serializeLocalePersistedState,
+       deserializeLocalePersistedState,
+       LOCALE_PREFERENCE_TTL_MS,
+     } = await import('/src/stores/useLocaleStore.js');
+     const fresh = JSON.parse(serializeLocalePersistedState({ locale: 'vi' }));
+     const valid = deserializeLocalePersistedState(JSON.stringify(fresh));
+     const expired = deserializeLocalePersistedState(JSON.stringify({
+       data: { locale: 'vi' },
+       expiresAt: Date.now() - 1,
+     }));
+     const legacy = deserializeLocalePersistedState(JSON.stringify({ locale: 'vi' }));
+     console.log({
+       ttlDays: LOCALE_PREFERENCE_TTL_MS / (24 * 60 * 60 * 1000),
+       freshHasExpiresAt: typeof fresh.expiresAt === 'number',
+       validLocale: valid.locale,
+       expiredLocale: expired.locale,
+       legacyLocale: legacy.locale,
+       pass:
+         typeof fresh.expiresAt === 'number' &&
+         valid.locale === 'vi' &&
+         expired.locale === null &&
+         legacy.locale === 'vi',
+     });
+   })();
+   ```
+   **Expected:** `ttlDays: 90`, `freshHasExpiresAt: true`, `validLocale: 'vi'`, `expiredLocale: null`, `legacyLocale: 'vi'`, `pass: true`.
+
+4. **Live localStorage check** — switch language via UI or `window.APP.setLocale('vi')`, then:
+   ```js
+   (() => {
+     const raw = localStorage.getItem('locale_preference');
+     const parsed = raw ? JSON.parse(raw) : null;
+     console.log({
+       key: 'locale_preference',
+       hasExpiresAt: typeof parsed?.expiresAt === 'number',
+       storedLocale: parsed?.data?.locale ?? parsed?.locale ?? null,
+       expiresInDays: parsed?.expiresAt
+         ? Math.round((parsed.expiresAt - Date.now()) / (24 * 60 * 60 * 1000))
+         : null,
+     });
+   })();
+   ```
+   **Expected after a locale change on fixed code:** `hasExpiresAt: true`, `storedLocale: 'vi'` (or your choice), `expiresInDays` ≈ 90.
+
+5. **Optional — expiry behavior:** DevTools → Application → Local Storage → edit `locale_preference` so `expiresAt` is in the past → hard refresh. **Expected:** persisted locale ignored; app resolves locale from URL/browser/default (same as a first-time visitor without a saved preference).
+
 ---
 
 ### B-02 — Template literal bug in `LanguageSwitcher.vue` warning message
@@ -1160,6 +1236,43 @@ console.warn('[LanguageSwitcher] Unsupported locale "${next}", coercing to "en".
 console.warn(`[LanguageSwitcher] Unsupported locale "${next}", coercing to "en".`);
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** The unsupported-locale warning used a single-quoted string, so `${next}` was printed literally instead of interpolating the selected locale code.
+
+**Why it happened:** Copy-paste or typo — regular string quotes instead of backtick template literal.
+
+**What changed:** `LanguageSwitcher.vue` — `console.warn` now uses a backtick template literal so `"${next}"` in the message is the actual locale value.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Logging-only change; no preload or locale pipeline behavior affected.
+
+**How it was tested:** Code review — grep confirms backtick form; single-quoted `${next}` pattern removed from source.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, open a page with the language `<select>` (e.g. `/log-in`).
+
+2. **Confirm fix is in bundle** (DevTools → Console, one paste):
+   ```js
+   fetch('/src/components/ui/nav/language/LanguageSwitcher.vue').then(r=>r.text()).then(src=>{const m=src.match(/console\.warn\(([`'"])[\s\S]*?Unsupported locale[\s\S]*?\1\)/);console.log({usesBacktickTemplate:m?.[1]==='`',hasBrokenSingleQuote:/console\.warn\('\[LanguageSwitcher\] Unsupported locale "\$\{next\}"'/.test(src),snippet:m?.[0]?.slice(0,80)});});
+   ```
+   **Expected:** `usesBacktickTemplate: true`, `hasBrokenSingleQuote: false`.
+
+3. **Prove interpolation** (one paste — simulates old vs new warn text; does not touch the UI):
+   ```js
+   (() => {
+     const next = 'xx-invalid';
+     const broken = '[LanguageSwitcher] Unsupported locale "${next}", coercing to "en".';
+     const fixed = `[LanguageSwitcher] Unsupported locale "${next}", coercing to "en".`;
+     console.log({ broken, fixed, pass: broken.includes('${next}') && fixed.includes('xx-invalid') && !fixed.includes('${next}') });
+   })();
+   ```
+   **Expected:** `broken` contains literal `${next}`; `fixed` contains `xx-invalid`; `pass: true`.
+
+4. **Optional UI trigger:** Hard to hit in normal use (options come from `supportedCodes`). To exercise the real warn path, temporarily add a fake `<option value="xx">` in DevTools or patch `supportedCodes` in a breakpoint — not required if steps 2–3 pass.
+
 ---
 
 ### B-03 — No RTL (Right-to-Left) layout support for 6 RTL locales
@@ -1176,6 +1289,64 @@ document.documentElement.setAttribute('dir', RTL_LOCALES.has(localeCode) ? 'rtl'
 ```
 
 CSS logical properties (`margin-inline-start`, `padding-inline-end`) should be preferred over physical (`margin-left`, `padding-right`) throughout the app.
+
+#### Resolution ✅
+
+**Status:** Resolved (root `dir` attribute; full CSS RTL sprint out of scope).
+
+**What was broken:** RTL locales (`ar`, `he`, `fa`, `fa-af`, `ur`, `ps`) set `<html lang>` correctly but never set `<html dir>`, so layout stayed LTR and RTL scripts rendered incorrectly.
+
+**Why it happened:** Only `lang` was updated in locale application paths; text direction was not part of the locale pipeline.
+
+**What changed:**
+- `localeManager.js` — added `RTL_LOCALES`, `getDocumentDirection()`, and `applyDocumentLocaleAttributes()` (sets both `lang` and `dir`). Used in `setActiveLocale` and `applyLocaleTemporarily`.
+- `main.js` — bootstrap and Pinia locale watch now call `applyDocumentLocaleAttributes` so persisted or URL-resolved RTL locales get correct `dir` on first paint.
+- Does **not** implement app-wide CSS logical properties, mirrored icons, or RTL font stacks (**F-07** remains a separate sprint).
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Document attributes only; translation/section preload timing unchanged.
+
+**How it was tested:** `tests/unit/applyLocaleTemporarily.test.js` — `document RTL direction (B-03)` covers `getDocumentDirection` and `applyLocaleTemporarily` updating `<html dir>`.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, open any page (e.g. `/log-in`).
+
+2. **Confirm fix is in bundle** (DevTools → Console, one paste):
+   ```js
+   fetch('/src/utils/translation/localeManager.js').then(r=>r.text()).then(src=>console.log({hasRtlLocales:/export const RTL_LOCALES/.test(src),hasApplyDocumentLocaleAttributes:/function applyDocumentLocaleAttributes/.test(src),setsDirInSetActive:/applyDocumentLocaleAttributes\(localeCode\)/.test(src)}));
+   ```
+   **Expected:** all three flags `true`.
+
+3. **RTL vs LTR on `<html>`** (one paste — uses same helpers as production; no persistence):
+   ```js
+   (async () => {
+     const lm = await import('/src/utils/translation/localeManager.js');
+     const read = () => ({
+       lang: document.documentElement.getAttribute('lang'),
+       dir: document.documentElement.getAttribute('dir'),
+     });
+     const before = read();
+     await lm.applyLocaleTemporarily('ar', { loadTranslations: false });
+     const rtl = read();
+     await lm.applyLocaleTemporarily('en', { loadTranslations: false });
+     const ltr = read();
+     console.log({
+       before,
+       rtl,
+       ltr,
+       pass: rtl.lang === 'ar' && rtl.dir === 'rtl' && ltr.lang === 'en' && ltr.dir === 'ltr',
+     });
+   })();
+   ```
+   **Expected:** `pass: true`; after Arabic step `dir: 'rtl'`, after English step `dir: 'ltr'`.
+
+4. **Persisted locale switch** (optional): `await window.APP.setLocale('ar')` then inspect:
+   ```js
+   console.log({ lang: document.documentElement.lang, dir: document.documentElement.dir });
+   ```
+   **Expected:** `lang: 'ar'`, `dir: 'rtl'`. Switch back with `await window.APP.setLocale('en')` → `dir: 'ltr'`.
+
+5. **URL locale** (optional): navigate to `/ar/log-in` (or another RTL-prefixed route if configured). **Expected:** `<html lang="ar" dir="rtl">` in Elements panel.
 
 ---
 
@@ -1196,6 +1367,50 @@ import { useId } from 'vue';
 const selectId = 'language-switcher-' + useId();
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `selectId` was built with `Math.random()`, producing a new id on every component instance creation. That is non-deterministic and would cause SSR/hydration mismatches if the app is ever server-rendered.
+
+**Why it happened:** Quick unique-id pattern before Vue 3.5's built-in `useId()` was adopted.
+
+**What changed:** `LanguageSwitcher.vue` — import `useId` from `vue` and set `const selectId = 'language-switcher-' + useId()` for a stable, hydration-safe id per component instance.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Accessibility id only; no locale or preload behavior changed.
+
+**How it was tested:** `tests/unit/localeSwitcherOptions.test.js` — `LanguageSwitcher selectId (B-04)` asserts `useId` import, assignment pattern, and no `Math.random()` in source.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, open a page with the language `<select>` (e.g. `/log-in`).
+
+2. **Confirm fix is in bundle** (DevTools → Console, one paste):
+   ```js
+   fetch('/src/components/ui/nav/language/LanguageSwitcher.vue').then(r=>r.text()).then(src=>console.log({usesUseId:/\buseId\b/.test(src)&&/language-switcher-'\s*\+\s*useId\(\)/.test(src),usesMathRandom:/Math\.random\(\)/.test(src)}));
+   ```
+   **Expected:** `usesUseId: true`, `usesMathRandom: false`.
+
+3. **Label ↔ select association + id stability** (one paste):
+   ```js
+   (() => {
+     const select = document.querySelector('select[id^="language-switcher-"]');
+     const label = select?.id ? document.querySelector(`label[for="${select.id}"]`) : null;
+     const id1 = select?.id ?? null;
+     const id2 = select?.id ?? null;
+     console.log({
+       selectFound: !!select,
+       labelMatchesSelect: !!label,
+       idPrefix: id1?.startsWith('language-switcher-') ?? false,
+       idStableOnReRead: id1 === id2 && !!id1,
+       pass: !!select && !!label && id1?.startsWith('language-switcher-') && id1 === id2,
+     });
+   })();
+   ```
+   **Expected:** `pass: true`, `labelMatchesSelect: true`, `idStableOnReRead: true`.
+
+4. **Optional — remount check:** Navigate away and back to a page with the switcher; the id may change on remount (new instance) but should still start with `language-switcher-` and keep label `for` in sync (inspect Elements).
+
 ---
 
 ### B-05 — Accessibility label on language switcher is hardcoded in English
@@ -1214,6 +1429,80 @@ For a non-English user, the accessible name of the language selector is always `
 ```html
 <form :aria-label="$t('ui.languageSelector')" ...>
 ```
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass; partial **F-11** base-bundle foundation).
+
+**What was broken:** The language switcher `aria-label` and screen-reader label were hardcoded English (`"Language selector"`, `"Language"`), so non-English users always heard English accessible names.
+
+**Why it happened:** Labels were static HTML strings; global UI keys were not defined or loaded at runtime (**F-11** — root bundles unused).
+
+**What changed:**
+- `LanguageSwitcher.vue` — `:aria-label="$t('ui.languageSelector')"` and label text `{{ $t('ui.language') }}`.
+- `public/i18n/base/en.json` and `public/i18n/base/vi.json` — new global `ui` namespace with selector labels.
+- `translationLoader.js` — `loadBaseTranslations()` fetches `/i18n/base/{locale}.json` (English required, target locale merged when present; otherwise vue-i18n `fallbackLocale: 'en'` applies).
+- `main.js` — loads base translations once before `app.mount()` (small fetch, does not block router/preload orchestration).
+- `localeManager.js` — `setActiveLocale` and temporary locale paths reload base bundle after cache clear.
+- `index.js` — exports `loadBaseTranslations`.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Adds one lightweight `/i18n/base/` fetch at startup and on locale switch; section preload remains non-blocking. Full **F-11** (all locales, deprecating orphan `public/i18n/en.json`, CI rules) is still open.
+
+**How it was tested:** `tests/unit/translationLoader.test.js` — `translationLoader base bundle (B-05)`; `tests/unit/localeSwitcherOptions.test.js` — `LanguageSwitcher a11y labels (B-05)`; `tests/unit/applyLocaleTemporarily.test.js` — base loads before section translations.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, open `/log-in`.
+
+2. **Confirm fix is in bundle** (DevTools → Console, one paste):
+   ```js
+   Promise.all([
+     fetch('/src/components/ui/nav/language/LanguageSwitcher.vue').then(r=>r.text()),
+     fetch('/src/utils/translation/translationLoader.js').then(r=>r.text()),
+   ]).then(([vueSrc, loaderSrc])=>console.log({
+     usesTranslatedAria:/\$t\('ui\.languageSelector'\)/.test(vueSrc),
+     usesTranslatedLabel:/\$t\('ui\.language'\)/.test(vueSrc),
+     hasLoadBaseTranslations:/export async function loadBaseTranslations/.test(loaderSrc),
+   }));
+   ```
+   **Expected:** all three flags `true`.
+
+3. **Base bundle + i18n messages** (one paste):
+   ```js
+   (async () => {
+     const { loadBaseTranslations } = await import('/src/utils/translation/translationLoader.js');
+     const { getI18nInstance } = await import('/src/utils/translation/i18nInstance.js');
+     await loadBaseTranslations('vi');
+     const i18n = getI18nInstance();
+     console.log({
+       viSelector: i18n.global.t('ui.languageSelector'),
+       viLanguage: i18n.global.t('ui.language'),
+       pass:
+         i18n.global.t('ui.languageSelector') === 'Bộ chọn ngôn ngữ' &&
+         i18n.global.t('ui.language') === 'Ngôn ngữ',
+     });
+   })();
+   ```
+   **Expected:** Vietnamese strings; `pass: true`.
+
+4. **Live DOM accessible names** — switch to Vietnamese via UI or `await window.APP.setLocale('vi')`, then:
+   ```js
+   (() => {
+     const select = document.querySelector('select[id^="language-switcher-"]');
+     const form = select?.closest('form');
+     const label = select?.id ? document.querySelector(`label[for="${select.id}"]`) : null;
+     console.log({
+       ariaLabel: form?.getAttribute('aria-label'),
+       labelText: label?.textContent?.trim(),
+       pass:
+         form?.getAttribute('aria-label') === 'Bộ chọn ngôn ngữ' &&
+         label?.textContent?.trim() === 'Ngôn ngữ',
+     });
+   })();
+   ```
+   **Expected:** `pass: true` when locale is `vi`. English locale → `"Language selector"` / `"Language"`.
+
+5. **Network smoke test:** DevTools → Network → filter `base` — on refresh expect `/i18n/base/en.json` and `/i18n/base/vi.json` when active locale is Vietnamese.
 
 ---
 
@@ -1234,6 +1523,53 @@ global.setLocaleMessage(localeCode, {
 
 **Fix:** Use a deep-merge when falling back to `setLocaleMessage`.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** When `mergeLocaleMessage` is unavailable, the fallback used a shallow spread into `setLocaleMessage`. A new section/base load could replace entire top-level namespaces (e.g. `auth.login`) and drop nested keys already present in the i18n message bag.
+
+**Why it happened:** Defensive fallback path copied the same shallow-merge pattern that L-02 fixed for cached return values.
+
+**What changed:** `translationLoader.js` — `applyTranslationsToI18n` now calls `deepMergePreferChild(existing, messages)` before `setLocaleMessage` (same utility as L-02). Primary path still uses `mergeLocaleMessage` when present (vue-i18n v11).
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Only affects the rare `setLocaleMessage` fallback path; fetch/preload timing unchanged.
+
+**How it was tested:** `tests/unit/translationLoader.test.js` — `applyTranslationsToI18n setLocaleMessage fallback (B-06)` pre-seeds nested `auth.login` keys, loads a partial auth JSON, asserts `subtitle` / `button` survive alongside updated `title`.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, open `/log-in`.
+
+2. **Confirm fix is in bundle** (DevTools → Console, one paste):
+   ```js
+   fetch('/src/utils/translation/translationLoader.js').then(r=>r.text()).then(src=>console.log({
+     usesDeepMergeFallback:/setLocaleMessage\([\s\S]*deepMergePreferChild\(existing,\s*messages\)/.test(src),
+     hasShallowSpreadFallback:/setLocaleMessage\(localeCode,\s*\{\s*\.\.\.existing,\s*\.\.\.messages\s*\}\)/.test(src),
+   }));
+   ```
+   **Expected:** `usesDeepMergeFallback: true`, `hasShallowSpreadFallback: false`.
+
+3. **Simulate fallback merge** (one paste — mirrors production merge utility; primary vue-i18n v11 path uses `mergeLocaleMessage` instead):
+   ```js
+   (async () => {
+     const { deepMergePreferChild } = await import('/src/utils/common/objectSafety.js');
+     const existing = { auth: { login: { title: 'Login', subtitle: 'Welcome', button: 'Go' } } };
+     const incoming = { auth: { login: { title: 'Welcome Back' } } };
+     const shallow = { ...existing, ...incoming };
+     const deep = deepMergePreferChild(existing, incoming);
+     console.log({
+       shallowMissingSubtitle: shallow.auth?.login?.subtitle,
+       deepHasSubtitle: deep.auth?.login?.subtitle,
+       deepTitle: deep.auth?.login?.title,
+       pass: deep.auth?.login?.subtitle === 'Welcome' && deep.auth?.login?.title === 'Welcome Back',
+     });
+   })();
+   ```
+   **Expected:** `shallowMissingSubtitle: undefined`, `deepHasSubtitle: 'Welcome'`, `pass: true`.
+
+4. **Runtime smoke test:** With normal vue-i18n v11, `$t('auth.login.subtitle')` on `/log-in` after switching locales should still resolve nested keys (primary path unchanged). This is a regression smoke test only.
+
 ---
 
 ### B-07 — No number, date, or currency locale formatting
@@ -1244,6 +1580,68 @@ global.setLocaleMessage(localeCode, {
 
 **Fix:** Use `useI18n().n()` and `useI18n().d()` for any numeric, date, or currency display.
 
+#### Resolution ✅
+
+**Status:** Resolved (formatting foundation; component migration deferred).
+
+**What was broken:** No vue-i18n `numberFormats` / `datetimeFormats` and no shared helpers — components used hardcoded `toLocaleString('en-US')` or `Intl.NumberFormat('en-US', …)`, so non-English locales saw US formatting.
+
+**Why it happened:** i18n work focused on string `$t()` keys; numeric/date display was not wired to the active locale.
+
+**What changed:**
+- `localeFormatConfig.js` — `I18N_NUMBER_FORMATS` and `I18N_DATETIME_FORMATS` for `en` and `vi` (decimal, currency, percent; short/long dates).
+- `localeFormatting.js` — `formatLocaleNumber`, `formatLocaleCurrency`, `formatLocaleDate` (vue-i18n `n()` / `d()` first, `Intl` + `toIntlLocaleTag` fallback for other locales).
+- `main.js` — passes format configs into `createI18n`.
+- `localeManager.js` — exports `toIntlLocaleTag` for BCP 47 mapping (`zh-tw` → `zh-TW`).
+- `index.js` — re-exports formatting helpers and config.
+
+**Out of scope (follow-up):** Replacing existing `toLocaleString('en-US')` / `Intl.NumberFormat('en-US')` in analytics, profile, date pickers, etc. Use the new helpers or `useI18n().n()` / `d()` when touching those files.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Static i18n config only; no preload timing changes.
+
+**How it was tested:** `tests/unit/localeFormatting.test.js` — config presence, en vs vi number output, currency, dates, Intl fallback.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, open `/log-in`.
+
+2. **Confirm fix is in bundle** (DevTools → Console, one paste):
+   ```js
+   Promise.all([
+     fetch('/src/utils/translation/localeFormatting.js').then(r=>r.text()),
+     fetch('/src/main.js').then(r=>r.text()),
+   ]).then(([fmtSrc, mainSrc])=>console.log({
+     hasFormatLocaleNumber:/export function formatLocaleNumber/.test(fmtSrc),
+     mainUsesNumberFormats:/numberFormats:\s*I18N_NUMBER_FORMATS/.test(mainSrc),
+     mainUsesDatetimeFormats:/datetimeFormats:\s*I18N_DATETIME_FORMATS/.test(mainSrc),
+   }));
+   ```
+   **Expected:** all three flags `true`.
+
+3. **en vs vi number formatting** (one paste):
+   ```js
+   (async () => {
+     const { formatLocaleNumber, formatLocaleCurrency, formatLocaleDate } = await import('/src/utils/translation/localeFormatting.js');
+     const sample = 1234567.89;
+     const date = new Date('2026-05-29T12:00:00Z');
+     console.log({
+       enDecimal: formatLocaleNumber(sample, { localeCode: 'en' }),
+       viDecimal: formatLocaleNumber(sample, { localeCode: 'vi' }),
+       enCurrency: formatLocaleCurrency(sample, { localeCode: 'en' }),
+       viCurrency: formatLocaleCurrency(sample, { localeCode: 'vi' }),
+       enDate: formatLocaleDate(date, { localeCode: 'en' }),
+       viDate: formatLocaleDate(date, { localeCode: 'vi' }),
+       pass: formatLocaleNumber(sample, { localeCode: 'en' }) !== formatLocaleNumber(sample, { localeCode: 'vi' }),
+     });
+   })();
+   ```
+   **Expected:** `pass: true`; `enDecimal` / `viDecimal` use different grouping/separator conventions.
+
+4. **After locale switch** — `await window.APP.setLocale('vi')`, re-run step 3 with `localeCode` omitted (uses active locale) or compare to hardcoded baseline:
+   ```js
+   (() => console.log({ hardcodedEnUS: (1234567.89).toLocaleString('en-US'), useHelpers: 'Run step 3 after setLocale("vi") for vi conventions' }))();
+   ```
+
 ---
 
 ### B-08 — No `<link rel="alternate" hreflang>` tags for SEO
@@ -1253,6 +1651,61 @@ global.setLocaleMessage(localeCode, {
 The app supports 75 locales with locale-prefixed URLs (e.g. `/vi/dashboard`). Search engines expect `<link rel="alternate" hreflang="vi" href="...">` tags for each alternate language version. Without them, search engines may index only the English version or create duplicate-content penalties.
 
 **Fix:** Use `vue-router`'s navigation hooks or a head-management library (e.g. `@vueuse/head`) to inject hreflang tags per route.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Locale-prefixed URLs existed (`/vi/dashboard`, unprefixed `en`) but `<head>` had no `<link rel="alternate" hreflang="…">` tags, so search engines lacked explicit language alternates.
+
+**Why it happened:** SEO head tags were not part of the i18n/router pipeline.
+
+**What changed:**
+- `hreflangTags.js` — `buildLocalePrefixedPath`, `buildHreflangAlternateUrls`, `syncHreflangTagsForPath`, `clearHreflangTags`. Emits one alternate per `SUPPORTED_LOCALES` entry (BCP 47 via `toIntlLocaleTag`) plus `x-default` pointing at the unprefixed English path.
+- `router/index.js` — `afterEach` syncs hreflang when `to.meta.routeConfig` exists; clears on 404/catch-all routes without config.
+- `localeManager.js` — after `updateUrlWithLocale` (language switcher), re-syncs hreflang for the new pathname.
+- `index.js` — re-exports hreflang helpers.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. DOM `<head>` injection only; navigation and preload timing unchanged.
+
+**How it was tested:** `tests/unit/hreflangTags.test.js` — path building, alternate URL list, DOM inject/clear.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, navigate to `/log-in` (or `/vi/log-in`).
+
+2. **Confirm fix is in bundle** (DevTools → Console, one paste):
+   ```js
+   Promise.all([
+     fetch('/src/utils/translation/hreflangTags.js').then(r=>r.text()),
+     fetch('/src/router/index.js').then(r=>r.text()),
+   ]).then(([hrefSrc, routerSrc])=>console.log({
+     hasSyncHreflang:/export function syncHreflangTagsForPath/.test(hrefSrc),
+     routerCallsSync:/syncHreflangTagsForPath\(to\.path/.test(routerSrc),
+     hasXDefault:/x-default/.test(hrefSrc),
+   }));
+   ```
+   **Expected:** all three flags `true`.
+
+3. **Inspect injected tags** (one paste):
+   ```js
+   (() => {
+     const links = [...document.querySelectorAll('link[rel="alternate"][data-app-hreflang]')];
+     const vi = links.find((l) => l.hreflang === 'vi');
+     const xDefault = links.find((l) => l.hreflang === 'x-default');
+     console.log({
+       count: links.length,
+       viHref: vi?.href ?? null,
+       xDefaultHref: xDefault?.href ?? null,
+       pass: links.length > 0 && !!vi?.href?.includes('/vi/log-in') && !!xDefault?.href?.includes('/log-in') && !xDefault?.href?.includes('/vi/'),
+     });
+   })();
+   ```
+   **Expected on `/log-in`:** `pass: true`, `count` ≈ `SUPPORTED_LOCALES.length + 1` (76 with current list).
+
+4. **After locale switch:** `await window.APP.setLocale('vi')` on `/log-in` — re-run step 3 on `/vi/log-in`. **Expected:** `viHref` contains `/vi/log-in`, `xDefaultHref` still points to unprefixed `/log-in`.
+
+5. **404 cleanup:** navigate to a unknown path that hits your 404 route. **Expected:** `document.querySelectorAll('link[data-app-hreflang]').length === 0`.
 
 ---
 
