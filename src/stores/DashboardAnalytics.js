@@ -82,11 +82,23 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
   }),
 
   getters: {
-    // Subscribers card: daily ka sabse latest entry
+    // Helper: find most recent entry with non-zero values
+    _findLatestNonZero: () => (arr, valueKeys) => {
+      if (!arr || arr.length === 0) return { latest: {}, prev: {} }
+      // Check from the end, skip entries where all valueKeys are 0
+      for (let i = arr.length - 1; i >= 0; i--) {
+        const entry = arr[i]
+        const hasData = valueKeys.some(k => entry[k] && entry[k] !== 0)
+        if (hasData) return { latest: entry, prev: arr[i - 1] || {} }
+      }
+      // All zeros, fall back to last entry
+      return { latest: arr[arr.length - 1] || {}, prev: arr[arr.length - 2] || {} }
+    },
+
+    // Subscribers card: show most recent day with actual data
     subscribers(state) {
       const daily = state.subscriptionsBundle.daily || []
-      const latest = daily[daily.length - 1] || {}
-      const prev = daily[daily.length - 2] || {}
+      const { latest, prev } = this._findLatestNonZero(daily, ['sub', 'tip', 'total'])
 
       // Percentage calculate karo (prev se compare)
       const calcPct = (curr, prev) => {
@@ -140,8 +152,7 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
     // Earnings card logic
     earningsInsights(state) {
       const daily = state.earnings.daily || []
-      const latest = daily[daily.length - 1] || {}
-      const prev = daily[daily.length - 2] || {}
+      const { latest, prev } = this._findLatestNonZero(daily, ['total'])
 
       const calcPct = (curr, prev) => {
         if (curr == null || curr === 0) return null
@@ -232,8 +243,16 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
                 profileVisitPercentage: null,
                 topCountries: [],
               }
-            const latest = arr[arr.length - 1] || {}
-            const prev = arr[arr.length - 2] || {}
+            // Find most recent entry with non-zero data
+            let latestIdx = arr.length - 1
+            for (let i = arr.length - 1; i >= 0; i--) {
+              if ((arr[i].newFollowers && arr[i].newFollowers !== 0) || (arr[i].profileVisits && arr[i].profileVisits !== 0)) {
+                latestIdx = i
+                break
+              }
+            }
+            const latest = arr[latestIdx] || {}
+            const prev = arr[latestIdx - 1] || {}
             const topCountries = (countriesArr || [])
               .map((c, i) => ({ rank: c.rank || i + 1, country: c.country, visits: c.views || 0 }))
             return {
@@ -275,8 +294,16 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
             return Math.round(((curr - prev) / prev) * 100)
           }
           const arr = bundle.likes.daily || bundle.likes.weekly || bundle.likes.monthly || []
-          const latest = arr[arr.length - 1] || {}
-          const prev = arr[arr.length - 2] || {}
+          // Find most recent entry with non-zero data
+          let latestIdx = arr.length - 1
+          for (let i = arr.length - 1; i >= 0; i--) {
+            if ((arr[i].media && arr[i].media !== 0) || (arr[i].merch && arr[i].merch !== 0) || (arr[i].profile && arr[i].profile !== 0) || (arr[i].feed && arr[i].feed !== 0)) {
+              latestIdx = i
+              break
+            }
+          }
+          const latest = arr[latestIdx] || {}
+          const prev = arr[latestIdx - 1] || {}
           this.likes = {
             media: latest.media ?? null,
             merch: latest.merch ?? null,
