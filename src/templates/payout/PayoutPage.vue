@@ -27,7 +27,7 @@ const payoutRows = [
 ];
 
 const tableTheme = {
-  container: 'flex flex-col w-full',
+  container: 'hidden md:flex flex-col w-full',
   header: 'hidden md:flex items-center w-full',
   headerRow: 'flex items-center w-full',
   headerCell: 'flex items-center min-h-[2.625rem] border-b border-[#667085] dark:border-[#655e53]',

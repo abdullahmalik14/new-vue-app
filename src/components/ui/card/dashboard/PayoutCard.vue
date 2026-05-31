@@ -36,8 +36,11 @@
                               <div class="flex justify-between items-center gap-1">
                                 <div class="flex items-center gap-1">
                                   <span class="text-2xl font-medium tracking-[-0.045rem] text-white md:text-4xl md:leading-[2.75rem] md:text-black">$</span>
-                                  <span class="text-2xl font-medium tracking-[-0.045rem] text-white md:text-4xl md:leading-[2.75rem] md:text-black">30054.40</span>
-                                  <img src="https://i.ibb.co.com/675rpz03/eye.webp" alt="eye" class="w-6 h-6 md:[filter:brightness(0)_saturate(100)]"/>
+                                  <span class="text-2xl font-medium tracking-[-0.045rem] text-white md:text-4xl md:leading-[2.75rem] md:text-black">
+                                    {{ isBalanceVisible ? '30054.40' : '********' }}
+                                  </span>
+                                  <img v-if="isBalanceVisible" @click="isBalanceVisible = false" src="https://i.ibb.co.com/675rpz03/eye.webp" alt="eye" class="w-6 h-6 cursor-pointer md:[filter:brightness(0)_saturate(100)]"/>
+                                  <EyeSlashIcon v-else @click="isBalanceVisible = true" class="w-6 h-6 cursor-pointer text-white md:text-black" />
                                 </div>
     
                                 <!-- credit-card-download-icon -->
@@ -80,3 +83,10 @@
                     </div> -->
                   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue';
+import EyeSlashIcon from "@heroicons/vue/24/outline/EyeSlashIcon";
+
+const isBalanceVisible = ref(true);
+</script>

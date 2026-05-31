@@ -11,6 +11,7 @@
         
         <PayoutSettingsStep1 v-if="engine.step === 1" :engine="engine" @close="handleClose" />
         <PayoutSettingsStep2 v-if="engine.step === 2" :engine="engine" @close="handleClose" />
+        <PayoutSettingsStep3 v-if="engine.step === 3" :engine="engine" @close="handleClose" />
     </div>
   </PopupHandler>
 </template>
@@ -21,6 +22,7 @@ import { createStepStateEngine } from "@/utils/stateEngine";
 import { onMounted } from 'vue';
 import PayoutSettingsStep1 from "./PayoutSettingsSteps/PayoutSettingsStep1.vue";
 import PayoutSettingsStep2 from "./PayoutSettingsSteps/PayoutSettingsStep2.vue";
+import PayoutSettingsStep3 from "./PayoutSettingsSteps/PayoutSettingsStep3.vue";
 
 const props = defineProps({
   modelValue: {
@@ -45,7 +47,21 @@ const engine = createStepStateEngine({
     flowId: 'payout-settings-popup-flow',
     initialStep: 1,
     urlSync: 'none',
-    defaults: {}
+    defaults: {
+        currentMode: 'auto-withdraw',
+        autoWithdrawMethod: 'every-month',
+        targetAmount: '',
+        selectedPayoutMethodValue: '',
+        selectedCountryValue: null,
+        selectedPayoutCountryOption: null,
+        isSaved: false,
+        savedPayoutMethods: [],
+        cardDesign: {
+            mode: 'premium',
+            premiumBg: 'https://i.ibb.co.com/f6bTQ59/premium-design-1.webp',
+            color: '#F72485'
+        }
+    }
 });
 
 onMounted(() => {
