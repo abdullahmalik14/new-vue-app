@@ -49,6 +49,8 @@ const assetsLoadingPromises = new Map();
 
 // Track loaded section bundle metadata in memory (NOT per-URL preload completion; see usePreloadStore.hasAsset)
 const loadedAssets = new Map();
+/** @type {Map<string, object>} In-memory category snapshots (P-07); mirrors cacheHandler TTL entries */
+const categoryAssetsMemoryCache = new Map();
 
 // In-memory manifest cache
 let cachedManifest = null;
@@ -59,15 +61,46 @@ let cachedManifest = null;
 
 // Cache configuration for asset map
 const ASSET_MAP_CACHE_KEY = 'asset_map_config';
+const ASSET_MAP_SOURCE_CACHE_KEY = 'asset_map_config_source';
 const ASSET_MAP_CACHE_TTL = 3600000; // 1 hour
 const ASSET_URL_CACHE_PREFIX = 'asset_url_';
 const ASSET_URL_CACHE_TTL = 1800000; // 30 minutes
+const ASSET_CATEGORY_CACHE_PREFIX = 'asset_category_';
+const ASSET_CATEGORY_CACHE_TTL = ASSET_MAP_CACHE_TTL;
 
 // In-memory cache for asset map
 let cachedAssetMap = null;
 let assetMapLoadPromise = null;
-/** @type {'bundled-production'|'bundled-dev'|'bundled-fallback'|'runtime-verified'|null} */
+/** @type {'bundled-production'|'bundled-dev'|'bundled-fallback'|'runtime-verified'|'cache-restored'|null} */
 let assetMapConfigSource = null;
+
+/**
+ * Default map source when only the map body was cached (legacy TTL entries).
+ * @returns {string}
+ */
+function resolveDefaultAssetMapConfigSource() {
+  if (import.meta.env.PROD) {
+    return 'bundled-production';
+  }
+
+  if (shouldAllowRuntimeAssetMapFetch()) {
+    return 'runtime-verified';
+  }
+
+  return 'bundled-dev';
+}
+
+/**
+ * Restore {@link assetMapConfigSource} from TTL cache or infer for legacy entries.
+ * @returns {void}
+ */
+function restoreAssetMapConfigSourceFromCache() {
+  const cachedSource = getValueFromCache(ASSET_MAP_SOURCE_CACHE_KEY);
+  assetMapConfigSource =
+    typeof cachedSource === 'string' && cachedSource
+      ? cachedSource
+      : resolveDefaultAssetMapConfigSource();
+}
 
 // Current environment
 let currentEnvironment = null;
@@ -158,6 +191,7 @@ export function loadAssetsForSection(sectionName) {
   // Check cache first
   const cachedAssets = getValueFromCache(cacheKey);
   if (cachedAssets) {
+    loadedAssets.set(sectionName, cachedAssets);
     log('assetLibrary.js', 'loadAssetsForSection', 'cache-hit', 'Assets loaded from cache', { sectionName });
 
     if (window.performanceTracker) {
@@ -245,6 +279,13 @@ export function loadAssetsForSection(sectionName) {
  * @returns {Promise<object>} - Map of section name to assets
  */
 export async function preloadAssetsForSections(sectionNames) {
+  if (!Array.isArray(sectionNames)) {
+    log('assetLibrary.js', 'preloadAssetsForSections', 'error', 'Invalid section names array', {
+      sectionNames
+    });
+    return {};
+  }
+
   log('assetLibrary.js', 'preloadAssetsForSections', 'start', 'Preloading assets for sections', {
     sectionCount: sectionNames.length,
     sections: sectionNames
@@ -260,12 +301,41 @@ export async function preloadAssetsForSections(sectionNames) {
     });
   }
 
-  // Load all sections in parallel
-  const loadPromises = sectionNames.map(sectionName =>
+  const assetsMap = {};
+  const sectionsToLoad = [];
+
+  for (const sectionName of sectionNames) {
+    if (typeof sectionName !== 'string' || sectionName.trim().length === 0) {
+      continue;
+    }
+
+    if (areAssetsLoadedForSection(sectionName)) {
+      const existing = getAssetsForSection(sectionName);
+      if (existing) {
+        assetsMap[sectionName] = existing;
+        continue;
+      }
+    }
+
+    sectionsToLoad.push(sectionName);
+  }
+
+  const skippedCount = sectionNames.length - sectionsToLoad.length;
+
+  if (skippedCount > 0) {
+    log('assetLibrary.js', 'preloadAssetsForSections', 'skip', 'Skipped already-loaded sections', {
+      skippedCount,
+      sectionsToLoad
+    });
+  }
+
+  const loadPromises = sectionsToLoad.map((sectionName) =>
     loadAssetsForSection(sectionName)
-      .then(assets => ({ sectionName, assets, success: true }))
-      .catch(error => {
-        logError('assetLibrary.js', 'preloadAssetsForSections', 'Section asset load failed', error, { sectionName });
+      .then((assets) => ({ sectionName, assets, success: true }))
+      .catch((error) => {
+        logError('assetLibrary.js', 'preloadAssetsForSections', 'Section asset load failed', error, {
+          sectionName
+        });
         return {
           sectionName,
           assets: {
@@ -281,22 +351,20 @@ export async function preloadAssetsForSections(sectionNames) {
       })
   );
 
-  // Wait for all loads to complete
   const results = await Promise.all(loadPromises);
 
-  // Build result map
-  const assetsMap = {};
-  results.forEach(result => {
+  results.forEach((result) => {
     assetsMap[result.sectionName] = result.assets;
   });
 
-  // Count successes
-  const successCount = results.filter(r => r.success).length;
+  const successCount = results.filter((r) => r.success).length;
 
   log('assetLibrary.js', 'preloadAssetsForSections', 'info', 'Batch asset preload completed', {
     totalSections: sectionNames.length,
+    skipped: skippedCount,
+    loaded: sectionsToLoad.length,
     successful: successCount,
-    failed: sectionNames.length - successCount
+    failed: sectionsToLoad.length - successCount
   });
 
   if (window.performanceTracker) {
@@ -411,6 +479,7 @@ export function clearAssetCaches() {
 
   // Reset in-memory asset map + in-flight load (see L-01 / clearAssetMapConfigCache)
   clearAssetMapConfigCache();
+  clearAssetLibraryInitState();
 
   // Also clear cacheHandler (which has TTL-based caching)
   clearAllCache();
@@ -618,6 +687,7 @@ export function setEnvironment(env) {
 
   clearAssetMapConfigCache();
   removeCacheKeysByPrefix(ASSET_URL_CACHE_PREFIX);
+  removeCacheKeysByPrefix(ASSET_CATEGORY_CACHE_PREFIX);
 }
 
 /**
@@ -713,7 +783,72 @@ export function clearAssetMapConfigCache() {
   cachedAssetMap = null;
   assetMapLoadPromise = null;
   assetMapConfigSource = null;
+  categoryAssetsMemoryCache.clear();
   removeFromCache(ASSET_MAP_CACHE_KEY);
+  removeFromCache(ASSET_MAP_SOURCE_CACHE_KEY);
+  removeCacheKeysByPrefix(ASSET_CATEGORY_CACHE_PREFIX);
+}
+
+/**
+ * @param {string} env
+ * @param {string} category
+ * @returns {string}
+ */
+function getAssetCategoryCacheKey(env, category) {
+  return `${ASSET_CATEGORY_CACHE_PREFIX}${env}_${category}`;
+}
+
+/**
+ * @param {string} env
+ * @param {string} category
+ * @returns {string}
+ */
+function getCategoryMemoryCacheKey(env, category) {
+  return `${env}:${category}`;
+}
+
+/**
+ * Whether category assets are cached for the environment (memory or cacheHandler).
+ *
+ * @param {string} category
+ * @param {string} [environment]
+ * @returns {boolean}
+ */
+export function isAssetCategoryCached(category, environment = null) {
+  if (!category || typeof category !== 'string') {
+    return false;
+  }
+
+  const env = environment || detectEnvironment();
+  const memoryKey = getCategoryMemoryCacheKey(env, category);
+
+  if (categoryAssetsMemoryCache.has(memoryKey)) {
+    return true;
+  }
+
+  return getValueFromCache(getAssetCategoryCacheKey(env, category)) !== null;
+}
+
+/**
+ * Build flag → URL map for a category prefix from a loaded asset map.
+ *
+ * @param {object} assetMap
+ * @param {string} env
+ * @param {string} category
+ * @returns {object}
+ */
+function buildAssetsByCategoryFromMap(assetMap, env, category) {
+  const categoryPrefix = category.endsWith('.') ? category : `${category}.`;
+  const resolvedMap = resolveAssetMapForEnvironment(assetMap, env);
+  const matchingAssets = {};
+
+  Object.entries(resolvedMap).forEach(([flag, url]) => {
+    if (flag.startsWith(categoryPrefix)) {
+      matchingAssets[flag] = url;
+    }
+  });
+
+  return matchingAssets;
 }
 
 /**
@@ -728,6 +863,10 @@ export function loadAssetMapConfig() {
 
   // Return cached map if available
   if (cachedAssetMap) {
+    if (!assetMapConfigSource) {
+      restoreAssetMapConfigSourceFromCache();
+    }
+
     log('assetLibrary.js', 'loadAssetMapConfig', 'memory-hit', 'Returning cached asset map from memory', {
       source: assetMapConfigSource
     });
@@ -737,10 +876,12 @@ export function loadAssetMapConfig() {
   // Check cache
   const cachedConfig = getValueFromCache(ASSET_MAP_CACHE_KEY);
   if (cachedConfig) {
+    cachedAssetMap = cachedConfig;
+    restoreAssetMapConfigSourceFromCache();
+
     log('assetLibrary.js', 'loadAssetMapConfig', 'cache-hit', 'Asset map loaded from cache', {
       source: assetMapConfigSource
     });
-    cachedAssetMap = cachedConfig;
     return Promise.resolve(cachedConfig);
   }
 
@@ -793,6 +934,7 @@ export function loadAssetMapConfig() {
       cachedAssetMap = assetMap;
       assetMapConfigSource = source;
       setValueWithExpiration(ASSET_MAP_CACHE_KEY, assetMap, ASSET_MAP_CACHE_TTL);
+      setValueWithExpiration(ASSET_MAP_SOURCE_CACHE_KEY, source, ASSET_MAP_CACHE_TTL);
 
       return assetMap;
     } catch (error) {
@@ -835,6 +977,99 @@ function inferAssetTypeFromFlag(flag) {
 }
 
 /**
+ * Resolve a flag against an already-loaded map (no cache I/O).
+ *
+ * @param {string} flag
+ * @param {string} env
+ * @param {object} assetMap
+ * @returns {string|null}
+ */
+function resolveFlagUrlFromLoadedMap(flag, env, assetMap) {
+  let url = assetMap[env]?.[flag];
+
+  if (!url && env !== 'production') {
+    url = assetMap.production?.[flag];
+  }
+
+  if (!url) {
+    return null;
+  }
+
+  const normalizedUrl = normalizeAssetMapUrl(url);
+  const urlCheck = assertAllowedPreloadUrl(normalizedUrl, {
+    assetType: inferAssetTypeFromFlag(flag),
+  });
+
+  if (!urlCheck.ok) {
+    return null;
+  }
+
+  return urlCheck.url;
+}
+
+/**
+ * URL cache lookup + map resolution for one flag (P-04 shared path).
+ *
+ * @param {string} flag
+ * @param {string} env
+ * @param {object} assetMap
+ * @param {{ logDetail?: boolean }} [options]
+ * @returns {string|null}
+ */
+function resolveAndCacheFlagUrl(flag, env, assetMap, options = {}) {
+  const { logDetail = false } = options;
+  const cacheKey = `${ASSET_URL_CACHE_PREFIX}${env}_${flag}`;
+  const cachedUrl = getValueFromCache(cacheKey);
+
+  if (cachedUrl) {
+    if (logDetail) {
+      log('assetLibrary.js', 'getAssetUrl', 'cache-hit', 'Asset URL from cache', { flag, url: cachedUrl });
+    }
+    return cachedUrl;
+  }
+
+  const rawUrl = assetMap[env]?.[flag];
+  const usedInheritance = !rawUrl && env !== 'production' && assetMap.production?.[flag];
+
+  if (logDetail && usedInheritance) {
+    log('assetLibrary.js', 'getAssetUrl', 'inheritance', 'Using production fallback', {
+      flag,
+      requestedEnv: env,
+      fallbackEnv: 'production',
+    });
+  }
+
+  const safeUrl = resolveFlagUrlFromLoadedMap(flag, env, assetMap);
+
+  if (!safeUrl) {
+    if (logDetail) {
+      const hadRaw = rawUrl || (env !== 'production' && assetMap.production?.[flag]);
+      if (hadRaw) {
+        log('assetLibrary.js', 'getAssetUrl', 'blocked', 'Resolved URL blocked by policy', { flag, environment: env });
+      } else {
+        log('assetLibrary.js', 'getAssetUrl', 'not-found', 'Asset flag not found in any environment', {
+          flag,
+          environment: env,
+          availableEnvironments: Object.keys(assetMap),
+        });
+      }
+    }
+    return null;
+  }
+
+  if (logDetail) {
+    log('assetLibrary.js', 'getAssetUrl', 'success', 'Asset URL resolved', {
+      flag,
+      url: safeUrl,
+      environment: env,
+    });
+  }
+
+  setValueWithExpiration(cacheKey, safeUrl, ASSET_URL_CACHE_TTL);
+  return safeUrl;
+}
+
+/**
  * Get asset URL for a given flag with environment inheritance
  * 
  * @param {string} flag - Asset flag (e.g., "icon.cart")
@@ -849,80 +1084,11 @@ export async function getAssetUrl(flag, environment = null) {
     return null;
   }
 
-  // Determine environment
   const env = environment || detectEnvironment();
 
-  // Resolution cache only (flag → URL). Does not mean the URL was preloaded in the browser.
-  const cacheKey = `${ASSET_URL_CACHE_PREFIX}${env}_${flag}`;
-  const cachedUrl = getValueFromCache(cacheKey);
-  if (cachedUrl) {
-    log('assetLibrary.js', 'getAssetUrl', 'cache-hit', 'Asset URL from cache', { flag, url: cachedUrl });
-    return cachedUrl;
-  }
-
   try {
-    // Load asset map
     const assetMap = await loadAssetMapConfig();
-
-    // Try current environment first
-    let url = assetMap[env]?.[flag];
-
-    // If not found and not production, try production (inheritance)
-    if (!url && env !== 'production') {
-      url = assetMap.production?.[flag];
-      log('assetLibrary.js', 'getAssetUrl', 'inheritance', 'Using production fallback', {
-        flag,
-        requestedEnv: env,
-        fallbackEnv: 'production'
-      });
-    }
-
-    if (url) {
-      const normalizedUrl = normalizeAssetMapUrl(url);
-
-      if (normalizedUrl !== url) {
-        log('assetLibrary.js', 'getAssetUrl', 'normalize', 'Upgraded HTTP asset URL to HTTPS', {
-          flag,
-          original: url,
-          normalized: normalizedUrl,
-          environment: env,
-        });
-      }
-
-      log('assetLibrary.js', 'getAssetUrl', 'success', 'Asset URL resolved', {
-        flag,
-        url: normalizedUrl,
-        environment: env,
-      });
-
-      const urlCheck = assertAllowedPreloadUrl(normalizedUrl, {
-        assetType: inferAssetTypeFromFlag(flag),
-      });
-
-      if (!urlCheck.ok) {
-        log('assetLibrary.js', 'getAssetUrl', 'blocked', 'Resolved URL blocked by policy', {
-          flag,
-          url: normalizedUrl,
-          reason: urlCheck.reason,
-        });
-        return null;
-      }
-
-      const safeUrl = urlCheck.url;
-
-      setValueWithExpiration(cacheKey, safeUrl, ASSET_URL_CACHE_TTL);
-
-      return safeUrl;
-    }
-
-    log('assetLibrary.js', 'getAssetUrl', 'not-found', 'Asset flag not found in any environment', {
-      flag,
-      environment: env,
-      availableEnvironments: Object.keys(assetMap)
-    });
-
-    return null;
-
+    return resolveAndCacheFlagUrl(flag, env, assetMap, { logDetail: true });
   } catch (error) {
     logError('assetLibrary.js', 'getAssetUrl', 'Error getting asset URL', error, { flag, environment: env });
     return null;
@@ -937,39 +1103,39 @@ export async function getAssetUrl(flag, environment = null) {
  * @returns {Promise<object>} - Map of flag to URL
  */
 export async function getAssetUrls(flags, environment = null) {
-  log('assetLibrary.js', 'getAssetUrls', 'start', 'Getting multiple asset URLs', {
-    flagCount: flags.length,
-    flags
-  });
-
   if (!Array.isArray(flags)) {
     log('assetLibrary.js', 'getAssetUrls', 'error', 'Invalid flags array', { flags });
     return {};
   }
 
+  log('assetLibrary.js', 'getAssetUrls', 'start', 'Getting multiple asset URLs', {
+    flagCount: flags.length,
+    flags,
+  });
+
+  const env = environment || detectEnvironment();
+
   try {
-    // Load all URLs in parallel
-    const urlPromises = flags.map(async (flag) => {
-      const url = await getAssetUrl(flag, environment);
-      return { flag, url };
-    });
-
-    const results = await Promise.all(urlPromises);
-
-    // Build result map
+    const assetMap = await loadAssetMapConfig();
     const urlMap = {};
-    results.forEach(({ flag, url }) => {
-      urlMap[flag] = url;
-    });
+
+    for (const flag of flags) {
+      if (!flag || typeof flag !== 'string') {
+        urlMap[flag] = null;
+        continue;
+      }
+
+      urlMap[flag] = resolveAndCacheFlagUrl(flag, env, assetMap);
+    }
 
     log('assetLibrary.js', 'getAssetUrls', 'success', 'Multiple asset URLs resolved', {
       total: flags.length,
       resolved: Object.values(urlMap).filter(Boolean).length,
-      missing: Object.values(urlMap).filter(url => !url).length
+      missing: Object.values(urlMap).filter((url) => !url).length,
+      mapLoad: 'single-pass',
     });
 
     return urlMap;
-
   } catch (error) {
     logError('assetLibrary.js', 'getAssetUrls', 'Error getting multiple asset URLs', error, { flags });
     return {};
@@ -1066,20 +1232,42 @@ export async function getAssetsByCategory(category, environment = null) {
 
   try {
     const env = environment || detectEnvironment();
-    const assetMap = await loadAssetMapConfig();
-    const categoryPrefix = category.endsWith('.') ? category : `${category}.`;
-    const resolvedMap = resolveAssetMapForEnvironment(assetMap, env);
-    const matchingAssets = {};
+    const memoryKey = getCategoryMemoryCacheKey(env, category);
+    const memoryCached = categoryAssetsMemoryCache.get(memoryKey);
 
-    Object.entries(resolvedMap).forEach(([flag, url]) => {
-      if (flag.startsWith(categoryPrefix)) {
-        matchingAssets[flag] = url;
-      }
-    });
+    if (memoryCached) {
+      log('assetLibrary.js', 'getAssetsByCategory', 'cache-hit', 'Category assets from memory cache', {
+        category,
+        environment: env,
+        count: Object.keys(memoryCached).length
+      });
+      return memoryCached;
+    }
+
+    const cacheKey = getAssetCategoryCacheKey(env, category);
+    const cachedCategory = getValueFromCache(cacheKey);
+
+    if (cachedCategory) {
+      categoryAssetsMemoryCache.set(memoryKey, cachedCategory);
+      log('assetLibrary.js', 'getAssetsByCategory', 'cache-hit', 'Category assets from cache', {
+        category,
+        environment: env,
+        count: Object.keys(cachedCategory).length
+      });
+      return cachedCategory;
+    }
+
+    const assetMap = await loadAssetMapConfig();
+    const matchingAssets = buildAssetsByCategoryFromMap(assetMap, env, category);
+
+    categoryAssetsMemoryCache.set(memoryKey, matchingAssets);
+    setValueWithExpiration(cacheKey, matchingAssets, ASSET_CATEGORY_CACHE_TTL);
 
     log('assetLibrary.js', 'getAssetsByCategory', 'success', 'Assets by category retrieved', {
       category,
-      count: Object.keys(matchingAssets).length
+      environment: env,
+      count: Object.keys(matchingAssets).length,
+      cached: true
     });
 
     return matchingAssets;
@@ -1088,6 +1276,110 @@ export async function getAssetsByCategory(category, environment = null) {
     logError('assetLibrary.js', 'getAssetsByCategory', 'Error getting assets by category', error, { category });
     return {};
   }
+}
+
+// Eager startup init (P-01 / M-02) — deduped across callers
+let assetLibraryInitPromise = null;
+
+/**
+ * Reset init promise (tests / clearAssetCaches).
+ * @returns {void}
+ */
+function clearAssetLibraryInitState() {
+  assetLibraryInitPromise = null;
+}
+
+/**
+ * All flags for the active environment from the loaded map (map must be loaded first).
+ *
+ * @param {string} [environment] - Optional environment override
+ * @returns {string[]}
+ */
+export function getKnownGlobalFlags(environment = null) {
+  const env = environment || detectEnvironment();
+
+  if (!cachedAssetMap) {
+    return [];
+  }
+
+  return Object.keys(resolveAssetMapForEnvironment(cachedAssetMap, env)).sort();
+}
+
+/**
+ * Whether {@link initAssetLibrary} has been started (may still be in flight until awaited).
+ * @returns {boolean}
+ */
+export function isAssetLibraryInitialized() {
+  return assetLibraryInitPromise !== null;
+}
+
+/**
+ * Eager startup: detect environment, load asset map, warm flag→URL resolution cache.
+ *
+ * @param {object} [options]
+ * @param {string[]} [options.flags] - Explicit flags to warm (default: all flags for environment)
+ * @param {boolean} [options.warmFlags=true] - When false, only loads the map
+ * @returns {Promise<{ environment: string, flagCount: number, warmedCount: number, mapSource: string|null }>}
+ */
+export function initAssetLibrary(options = {}) {
+  if (assetLibraryInitPromise) {
+    return assetLibraryInitPromise;
+  }
+
+  const { flags: flagsOverride = null, warmFlags = true } = options;
+
+  assetLibraryInitPromise = (async () => {
+    const environment = detectEnvironment();
+
+    if (window.performanceTracker) {
+      window.performanceTracker.step({
+        step: 'initAssetLibrary_start',
+        file: 'assetLibrary.js',
+        method: 'initAssetLibrary',
+        flag: 'asset-init',
+        purpose: 'Eager asset map and URL cache warm-up',
+      });
+    }
+
+    await loadAssetMapConfig();
+
+    const flags =
+      Array.isArray(flagsOverride) && flagsOverride.length > 0
+        ? flagsOverride
+        : getKnownGlobalFlags(environment);
+
+    let warmedCount = 0;
+    if (warmFlags && flags.length > 0) {
+      warmedCount = await preloadAssetUrls(flags, environment);
+    }
+
+    const result = {
+      environment,
+      flagCount: flags.length,
+      warmedCount,
+      mapSource: getAssetMapConfigSource(),
+    };
+
+    log('assetLibrary.js', 'initAssetLibrary', 'ready', 'Asset library initialised', result);
+
+    if (window.performanceTracker) {
+      window.performanceTracker.step({
+        step: 'initAssetLibrary_ready',
+        file: 'assetLibrary.js',
+        method: 'initAssetLibrary',
+        flag: 'asset-init',
+        purpose: `Asset library ready (${warmedCount}/${flags.length} URLs warmed)`,
+      });
+    }
+
+    return result;
+  })().catch((error) => {
+    assetLibraryInitPromise = null;
+    logError('assetLibrary.js', 'initAssetLibrary', 'Asset library init failed', error);
+    throw error;
+  });
+
+  return assetLibraryInitPromise;
 }
 
 /**

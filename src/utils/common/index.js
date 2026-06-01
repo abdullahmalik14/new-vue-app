@@ -15,8 +15,10 @@ export {
   getValueFromCache,
   hasValidCacheEntry,
   removeFromCache,
+  removeCacheKeysByPrefix,
   clearAllCache,
-  getCacheStatistics
+  getCacheStatistics,
+  sweepExpiredCacheEntries
 } from './cacheHandler.js';
 
 // Export all log handler functions

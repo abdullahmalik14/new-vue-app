@@ -30,6 +30,29 @@ describe('loadAssetMapConfig (S-06)', () => {
     fetchSpy.mockRestore();
   });
 
+  it('restores mapSource when asset map is loaded from TTL cache (P-01)', async () => {
+    vi.stubEnv('PROD', 'true');
+    vi.stubEnv('DEV', '');
+
+    const {
+      clearAssetMapConfigCache,
+      loadAssetMapConfig,
+      getAssetMapConfigSource,
+    } = await import('../../src/utils/assets/assetLibrary.js');
+
+    clearAssetMapConfigCache();
+    await loadAssetMapConfig();
+    expect(getAssetMapConfigSource()).toBe('bundled-production');
+
+    clearAssetMapConfigCache();
+    const mapFromCache = await loadAssetMapConfig();
+
+    expect(mapFromCache.production?.['script.cognito']).toBe(
+      '/vendor/amazon-cognito-identity-6.3.15.min.js',
+    );
+    expect(getAssetMapConfigSource()).toBe('bundled-production');
+  });
+
   it('clearAssetCaches drops stale in-memory asset map (L-01)', async () => {
     vi.stubEnv('PROD', 'true');
     vi.stubEnv('DEV', '');

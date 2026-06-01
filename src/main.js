@@ -70,6 +70,7 @@ import { useCartStore } from "./stores/useCartStore";
 import { useChatStore } from "./stores/useChatStore";
 import { usePreloadStore } from "./stores/usePreloadStore.js";
 import { syncPreloadStoreBuildHash } from "./utils/build/appBuildHash.js";
+import { initAssetLibrary } from "./utils/assets/assetLibrary.js";
 
 // Initialize the mock cart backend interceptor
 initMockCartApi();
@@ -599,6 +600,34 @@ function startStartupPreloadForCurrentRoute() {
 }
 
 async function mountApplication() {
+  if (window.performanceTracker) {
+    window.performanceTracker.step({
+      step: "initAssetLibrary_start",
+      file: "main.js",
+      method: "mountApplication",
+      flag: "asset-init",
+      purpose: "Eager asset map and URL cache warm-up before mount",
+    });
+  }
+
+  try {
+    const assetInit = await initAssetLibrary();
+    log("main.js", "init", "asset-library", "Asset library initialized before mount", assetInit);
+    if (window.performanceTracker) {
+      window.performanceTracker.step({
+        step: "initAssetLibrary_complete",
+        file: "main.js",
+        method: "mountApplication",
+        flag: "asset-init",
+        purpose: `Asset library ready (${assetInit.warmedCount} URLs warmed)`,
+      });
+    }
+  } catch (err) {
+    log("main.js", "init", "asset-library-error", "Asset library init failed (non-blocking)", {
+      error: err.message,
+    });
+  }
+
   if (window.performanceTracker) {
     window.performanceTracker.step({
       step: "mountApp_start",

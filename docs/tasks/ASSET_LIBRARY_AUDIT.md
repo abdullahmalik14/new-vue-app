@@ -559,6 +559,59 @@ await initAssetLibrary();
 app.mount('#app');
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass). Also closes **M-02** (same eager startup requirement).
+
+**What was broken:** The asset map and per-flag URL cache were populated only on the first `getAssetUrl` call. Dashboard (and similar) mounts could race on `loadAssetMapConfig()` and render before any URLs were cached.
+
+**Why it happened:** Lazy loading by design; no startup hook in `main.js`.
+
+**What changed:**
+- `initAssetLibrary()` — `detectEnvironment()`, `loadAssetMapConfig()`, `preloadAssetUrls(getKnownGlobalFlags())` with deduped promise; reset via `clearAssetCaches()`.
+- `getKnownGlobalFlags()` — merged flags for the active environment from the loaded map.
+- `main.js` — `await initAssetLibrary()` at the start of `mountApplication()` (before `router.isReady()` and `app.mount()`).
+- Barrel exports: `initAssetLibrary`, `getKnownGlobalFlags`, `isAssetLibraryInitialized`.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md** — section/DOM preloads stay fire-and-forget; this only warms the flag→URL map cache used by `getAssetUrl` / `resolveAssetPreloadUrl`. Per-route section map warm-up (M-02 step 4) and `validateAssetMap()` at startup (**A-M02** / **M-04**) remain separate.
+
+**How it was tested:** `npm run test:unit -- tests/unit/initAssetLibrary.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, hard refresh, **Console** (one paste):
+   ```js
+   (async () => {
+     const {
+       initAssetLibrary,
+       getAssetUrl,
+       getAssetMapConfigSource,
+       isAssetLibraryInitialized,
+     } = await import('/src/utils/assets/assetLibrary.js');
+     const before = isAssetLibraryInitialized();
+     const init = await initAssetLibrary();
+     const url = await getAssetUrl('icon.cart');
+     console.log({
+       before,
+       init,
+       mapSource: getAssetMapConfigSource(),
+       iconCart: url,
+     mapSource: getAssetMapConfigSource(),
+     pass:
+       init.flagCount > 0 &&
+       init.warmedCount > 0 &&
+       url !== null &&
+       Boolean(init.mapSource || getAssetMapConfigSource()),
+   });
+   })();
+   ```
+2. **Expected:** `pass: true`, `init.warmedCount > 0` (may be less than `flagCount` when some URLs are blocked by preload policy), `iconCart` is a non-null URL, `mapSource` is non-null (`bundled-dev`, `runtime-verified`, `bundled-fallback`, or `bundled-production` after a fresh load; `runtime-verified` is typical in dev with `VITE_ASSET_MAP_RUNTIME_OVERRIDE`). On a cold load, Network should not show a burst of map fetches when the dashboard mounts (map already warm). Check console for `Asset library initialised` from `initAssetLibrary` **before** first paint if logger is on.
+
+**Note:** If you previously saw `pass: false` with `mapSource: null` while `icon.cart` resolved, the map was loaded from TTL cache without restoring `assetMapConfigSource` — fixed by persisting source alongside the map cache.
+
+**How this test connects to the issue:** P-01 requires eager init before components render. The script runs the same startup path as `main.js` and confirms the map and URL cache are warm.
+
+**How the result proves the fix:** `warmedCount > 0` and immediate `getAssetUrl('icon.cart')` without a prior component lookup show startup warm-up; `main.js` awaits this before `app.mount()`. See also **M-02** resolution (same implementation).
+
 ---
 
 ### P-02 — `usePreloadStore.hasAsset` / `addAsset` use `Array.includes` — O(n) per check
@@ -575,11 +628,106 @@ actions: {
 }
 ```
 
+#### Resolution ✅
+
+**Status:** Already resolved (asset preload audit **P-01** in `ASSET_PRELOAD_AUDIT.md`). No code change in this pass.
+
+**What was broken:** `preloadedAssets` was a plain array with O(n) `includes` on every `hasAsset` check.
+
+**What is in place:** `preloadedAssets` is a Pinia `Set`; `hasAsset` / `addAsset` use `Set.has` / `Set.add`; persist serializer converts Set ↔ array for `localStorage` only.
+
+**Conflict check:** Aligns with **ASSET_PRELOAD_AUDIT.md** SSOT for preloaded URLs — no preload-architecture change.
+
+**How it was tested:** `npm run test:unit -- tests/unit/usePreloadStore.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste):
+   ```js
+   (async () => {
+     const { usePreloadStore } = await import('/src/stores/usePreloadStore.js');
+     const store = usePreloadStore();
+     const url = 'https://example.com/p02-test.svg';
+     store.addAsset(url);
+     console.log({
+       isSet: store.preloadedAssets instanceof Set,
+       hasUrl: store.hasAsset(url),
+       count: store.preloadedAssetCount,
+       pass:
+         store.preloadedAssets instanceof Set &&
+         store.hasAsset(url) &&
+         store.preloadedAssetCount >= 1,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `isSet: true`.
+
+**How this test connects to the issue:** P-02 is O(1) URL membership for preload dedup.
+
+**How the result proves the fix:** `instanceof Set` and `hasAsset` true after one `addAsset` prove Set-backed storage (not array scan).
+
 ---
 
 ### P-03 — `getValueFromCache` and `setValueWithExpiration` generate two `log()` calls each on every hit
 **File:** `cacheHandler.js` lines 52–57, 106–108  
 **Detail:** Every cache read fires two log entries (`'start'` + `'return'`). Every cache write fires two. For a 40-flag dashboard preload, that is 160+ log entries just from cache operations. Reduce to one log per operation and gate behind a debug flag for production.
+
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass).
+
+**What was broken:** Each cache get/set logged twice (`start` + outcome/`return`), multiplying noise during asset-map and URL warm-up (40+ flags → 160+ lines).
+
+**Why it happened:** Verbose trace-style logging on every cache path.
+
+**What changed:** `cacheHandler.js` — `logCache()` helper: **one log per operation** (hit/miss/expired/success/warn); logs only when `import.meta.env.DEV` **or** `VITE_ENABLE_LOGGER === 'true'` (silent in production builds without explicit logger). Applied to all cacheHandler exports.
+
+**Conflict check:** Does **not** change cache semantics or TTL; translation/asset preload timing unchanged. Complements **TRANSLATION_AUDIT** cache-prefix clears.
+
+**How it was tested:** `npm run test:unit -- tests/unit/cacheHandlerLogging.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev` with `VITE_ENABLE_LOGGER=true`, **Console** (one paste):
+
+   **Do not patch `logHandler.log`** — `cacheHandler` already imported `log` at app startup, so reassignment on the module object does not change what runs (you would see `setCount: 0` while logs still print). Count `[cacheHandler.js]` lines via `console.log` instead:
+
+   ```js
+   (async () => {
+     const cacheLines = [];
+     const origLog = console.log;
+     console.log = (...args) => {
+       const first = args[0];
+       if (typeof first === 'string' && first.includes('[cacheHandler.js]')) {
+         cacheLines.push(first);
+       }
+       return origLog.apply(console, args);
+     };
+     try {
+       const { clearAllCache, setValueWithExpiration, getValueFromCache } = await import(
+         '/src/utils/common/cacheHandler.js',
+       );
+       clearAllCache();
+       cacheLines.length = 0;
+       setValueWithExpiration('p03_browser', { ok: 1 }, 60000);
+       const setLines = cacheLines.filter((line) => line.includes('[setValueWithExpiration]'));
+       cacheLines.length = 0;
+       const value = getValueFromCache('p03_browser');
+       const getLines = cacheLines.filter((line) => line.includes('[getValueFromCache]'));
+       console.log({
+         value,
+         setLineCount: setLines.length,
+         getLineCount: getLines.length,
+         pass: setLines.length === 1 && getLines.length === 1 && value?.ok === 1,
+       });
+     } finally {
+       console.log = origLog;
+     }
+   })();
+   ```
+2. **Expected:** `pass: true`, `setLineCount: 1`, `getLineCount: 1` (not 2+ per operation). You may still see one extra `clearAllCache` line **before** the counter resets — that is expected.
+
+**How this test connects to the issue:** P-03 is log volume per cache operation during warm-up.
+
+**How the result proves the fix:** Intercepting console output shows exactly one `[setValueWithExpiration]` and one `[getValueFromCache]` line for the measured operations (previously two each: `start` + `return`).
 
 ---
 
@@ -587,11 +735,130 @@ actions: {
 **File:** `assetLibrary.js` lines 804–808  
 **Detail:** `getAssetUrls(flags)` launches one `getAssetUrl` call per flag in parallel via `Promise.all`. Each `getAssetUrl` calls `loadAssetMapConfig()` which correctly returns the shared promise/cache. However, the per-flag URL cache check (lines 738–742) happens before the map is available. After the map loads, each parallel caller performs a redundant `cacheHandler.getValueFromCache` and `cacheHandler.setValueWithExpiration` separately. A single-pass `getAssetUrls` implementation that calls `loadAssetMapConfig()` once and then resolves all flags from the loaded map in a synchronous loop would be significantly faster.
 
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass). Also fixes **A-L02** (`flags.length` before `Array.isArray` guard).
+
+**What was broken:** `getAssetUrls` used `Promise.all(flags.map(() => getAssetUrl()))`, causing N parallel map loads (deduped by promise but still redundant work) and N× cache round-trips after the map was warm.
+
+**Why it happened:** Reused single-flag API for batch without a dedicated batch resolver.
+
+**What changed:**
+- `resolveFlagUrlFromLoadedMap()` / `resolveAndCacheFlagUrl()` — shared resolution + URL cache for one flag.
+- `getAssetUrls()` — validates input first, `await loadAssetMapConfig()` **once**, synchronous loop over flags.
+- `getAssetUrl()` — uses the same resolver (detailed logging kept for single-flag path).
+
+**Conflict check:** No change to map source, env inheritance, or URL policy (`assertAllowedPreloadUrl`). `preloadAssetUrls` still calls `getAssetUrls` and benefits from single map load.
+
+**How it was tested:** `npm run test:unit -- tests/unit/getAssetUrlsBatch.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste):
+
+   Count `[loadAssetMapConfig]` log lines during the batch (do not reassign `loadAssetMapConfig` on the import object — internal calls use the module binding, same as P-03 / `logHandler`):
+
+   ```js
+   (async () => {
+     const loadLines = [];
+     const origLog = console.log;
+     console.log = (...args) => {
+       const first = args[0];
+       if (typeof first === 'string' && first.includes('[loadAssetMapConfig]')) {
+         loadLines.push(first);
+       }
+       return origLog.apply(console, args);
+     };
+     try {
+       const { clearAssetCaches, getAssetUrls } = await import('/src/utils/assets/assetLibrary.js');
+       clearAssetCaches();
+       loadLines.length = 0;
+       const urlMap = await getAssetUrls(['icon.cart', 'script.cognito', 'dashboard.logo']);
+       const mapLoadStarts = loadLines.filter(
+         (l) => l.includes('[loadAssetMapConfig]') && l.includes('[start]'),
+       );
+       const mapLoadSuccess = loadLines.filter(
+         (l) =>
+           l.includes('[loadAssetMapConfig]') &&
+           (l.includes('[success]') || l.includes('[memory-hit]') || l.includes('[cache-hit]')),
+       );
+       const resolved = Object.values(urlMap).filter(Boolean).length;
+       console.log({
+         urlMap,
+         mapLoadLogLines: loadLines.length,
+         mapLoadStarts: mapLoadStarts.length,
+         mapLoadSuccess: mapLoadSuccess.length,
+         resolved,
+         pass: mapLoadStarts.length === 1 && mapLoadSuccess.length === 1 && resolved >= 2,
+       });
+     } finally {
+       console.log = origLog;
+     }
+   })();
+   ```
+2. **Expected:** `pass: true`, `mapLoadStarts: 1`, `mapLoadSuccess: 1`, `resolved: 3` (after `clearAssetCaches`). One cold load logs **three** `[loadAssetMapConfig]` lines (`start` → `fetch` → `success`) — that is still a **single** load; do not use `loadLogCount <= 2` (that falsely fails when logging is verbose).
+
+   On a **warm** repeat (no `clearAssetCaches`), expect `mapLoadStarts: 0` or `1` with `[memory-hit]` / `[cache-hit]` only — still `pass` if `resolved >= 2`.
+
+**How this test connects to the issue:** P-04 requires one map load per batch, not per flag.
+
+**How the result proves the fix:** Exactly one `[loadAssetMapConfig] [start]` (and one terminal hit) for three flags, plus `mapLoad: 'single-pass'` in `[getAssetUrls] [success]`, proves batch resolution — not three parallel single-flag loaders.
+
 ---
 
 ### P-05 — `preloadAssetsForSections` launches section loads in parallel but ignores partial cache hits
 **File:** `assetLibrary.js` lines 326–346  
 **Detail:** this may have been patched already check before you do anything.... `sectionNames.map(name => loadAssetsForSection(name))` fires all loads simultaneously. For sections already in `loadedAssets` (memory hit), the shortcut at line 162 (`getValueFromCache`) returns immediately. But for sections partially cached (some routes loaded, manifest stale), the whole section reloads. A smarter implementation should check `areAssetsLoadedForSection` first, skip already-loaded sections, and only load the missing ones.
+
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass). Also fixes **A-B02** (cache-hit rehydrates `loadedAssets`) and **A-B05** (array guard).
+
+**What was broken:** Every section in the batch always called `loadAssetsForSection`, even when TTL/memory already had metadata. `loadAssetsForSection` cache hits did not repopulate `loadedAssets`, so skip logic was unreliable.
+
+**What changed:**
+- `preloadAssetsForSections()` — `Array.isArray` guard; for each section, if `areAssetsLoadedForSection` → reuse `getAssetsForSection`; only missing sections go to parallel `loadAssetsForSection`.
+- `loadAssetsForSection()` — on `cacheHandler` hit, `loadedAssets.set(sectionName, cachedAssets)` (aligns with L-04 / A-B02).
+
+**Conflict check:** Complements **L-04** / **L-05** (cache-aware loaded checks and unload). Does not change section preload orchestration in `sectionPreloader.js` — only batch metadata loading in `assetLibrary`.
+
+**How it was tested:** `npm run test:unit -- tests/unit/preloadAssetsForSections.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste):
+   ```js
+   (async () => {
+     const { clearAssetCaches, preloadAssetsForSections, loadAssetsForSection, getAssetsForSection } =
+       await import('/src/utils/assets/assetLibrary.js');
+     const loadLines = [];
+     const origLog = console.log;
+     console.log = (...args) => {
+       const first = args[0];
+       if (typeof first === 'string' && first.includes('[loadAssetsForSection]') && first.includes('[start]')) {
+         loadLines.push(first);
+       }
+       return origLog.apply(console, args);
+     };
+     try {
+       clearAssetCaches();
+       await loadAssetsForSection('auth');
+       loadLines.length = 0;
+       const map = await preloadAssetsForSections(['auth', 'shop']);
+       console.log({
+         authFromCache: getAssetsForSection('auth')?.sectionName,
+         shopLoaded: map.shop?.sectionName,
+         loadStarts: loadLines.length,
+         pass: loadLines.length === 1 && map.auth?.sectionName === 'auth' && map.shop?.sectionName === 'shop',
+       });
+     } finally {
+       console.log = origLog;
+     }
+   })();
+   ```
+2. **Expected:** `pass: true`, `loadStarts: 1` (only `shop` loads; `auth` skipped).
+
+**How this test connects to the issue:** P-05 is about not reloading sections that are already cached.
+
+**How the result proves the fix:** One `[loadAssetsForSection] [start]` for two sections means `auth` was served from cache/memory without a second load.
 
 ---
 
@@ -599,13 +866,105 @@ actions: {
 **File:** `cacheHandler.js` lines 97–103  
 **Detail:** Expired entries are only evicted on access (`getValueFromCache`). Entries for unused flags/sections silently consume memory until accessed. Add a periodic sweep (e.g. every 10 minutes via `setInterval`) or a LRU eviction policy. Alternatively cap `cacheStorage` size.
 
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass).
+
+**What was broken:** Expired TTL entries stayed in the `Map` until the same key was read again, so unused keys held memory indefinitely.
+
+**What changed:**
+- `sweepExpiredCacheEntries()` — scans and deletes all expired entries; exported from `cacheHandler.js` / `utils/common/index.js`.
+- Browser: 10-minute `setInterval` sweep (guarded by `globalThis.__cacheHandlerSweepIntervalId` so HMR does not stack timers).
+- Shared `isCacheEntryExpired()` used by get/has/stats/sweep.
+
+**Conflict check:** Does not change TTL semantics on read (still evicts on access). Translation/asset caches share the same store — sweep only removes **expired** keys, not valid entries.
+
+**How it was tested:** `npm run test:unit -- tests/unit/cacheHandlerSweep.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste):
+   ```js
+   (async () => {
+     const { clearAllCache, setValueWithExpiration, getValueFromCache, sweepExpiredCacheEntries, getCacheStatistics } =
+       await import('/src/utils/common/cacheHandler.js');
+     clearAllCache();
+     setValueWithExpiration('p06_test', { x: 1 }, 1);
+     await new Promise((r) => setTimeout(r, 10));
+     const before = getCacheStatistics().totalEntries;
+     const removed = sweepExpiredCacheEntries();
+     const after = getCacheStatistics().totalEntries;
+     console.log({
+       before,
+       removed,
+       after,
+       stillThere: getValueFromCache('p06_test'),
+       pass: before === 1 && removed === 1 && after === 0 && getValueFromCache('p06_test') === null,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `removed: 1`, `after: 0`.
+
+**How this test connects to the issue:** P-06 is proactive eviction of dead TTL rows.
+
+**How the result proves the fix:** `sweepExpiredCacheEntries()` drops the expired key without needing a read on that key first.
+
+---
+
+### A-B02 — `loadAssetsForSection` cache-hit path does not rehydrate `loadedAssets` memory map
+**File:** `assetLibrary.js` lines 160–176  
+**Detail:** On cache hit, function returns cached object immediately but never writes `loadedAssets.set(sectionName, cachedAssets)`. This keeps memory/cached state inconsistent and worsens behavior of APIs that rely on `loadedAssets` (for example `areAssetsLoadedForSection`).
+
+#### Resolution ✅
+
+**Status:** Resolved with **P-05** (`loadedAssets.set` on cache hit in `loadAssetsForSection`).
+
 ---
 
 ### P-07 — `getAssetsByCategory` re-loads the full asset map and iterates all keys every call
 **File:** `assetLibrary.js` lines 903–946  
 **Detail:** Every call to `getAssetsByCategory('dashboard')` awaits `loadAssetMapConfig()` (cache hit, fast) then iterates every key in `assetMap[env]`. No category result is cached. With 35 dashboard flags, this is trivially fast today but will degrade as `assetMap` grows. Cache category results under `asset_category_<env>_<category>`.
 
+#### Resolution ✅
 
+**Status:** Resolved (this audit pass).
+
+**What was broken:** Each `getAssetsByCategory` call re-scanned the full merged map even when the same `(environment, category)` was requested repeatedly (e.g. dashboard menu building).
+
+**What changed:**
+- `getAssetCategoryCacheKey()` — `asset_category_<env>_<category>` in `cacheHandler` (same TTL as asset map).
+- `categoryAssetsMemoryCache` — in-process Map mirroring category TTL entries (same pattern as `loadedAssets`).
+- `isAssetCategoryCached()` — browser-safe cache probe via `assetLibrary` (avoids duplicate `cacheHandler` instances in dev console).
+- `buildAssetsByCategoryFromMap()` — shared scan logic used on cache miss.
+- `getAssetsByCategory()` — memory or handler cache hit returns immediately; miss loads map once, caches result.
+- `clearAssetMapConfigCache()` / `setEnvironment()` — clear category prefix so map/env changes do not serve stale category snapshots.
+
+**Conflict check:** Category cache stores raw map URLs (same as before P-07). Flag→URL resolution for components still uses `getAssetUrl` / URL cache. Complements **L-07** (`resolveAssetMapForEnvironment`).
+
+**How it was tested:** `npm run test:unit -- tests/unit/getAssetsByCategoryCache.test.js tests/unit/resolveAssetMapForEnvironment.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste). Use **`isAssetCategoryCached`** from `assetLibrary` only — a separate `import('/src/utils/common/cacheHandler.js')` can be a different module instance in dev, so `getValueFromCache` may show `cache-miss` even when P-07 is working.
+   ```js
+   (async () => {
+     const { clearAssetCaches, getAssetsByCategory, isAssetCategoryCached } = await import('/src/utils/assets/assetLibrary.js');
+     clearAssetCaches();
+     const a = await getAssetsByCategory('dashboard', 'development');
+     const b = await getAssetsByCategory('dashboard', 'development');
+     console.log({
+       count: Object.keys(a).length,
+       cached: isAssetCategoryCached('dashboard', 'development'),
+       sameReference: a === b,
+       pass: Object.keys(a).length > 0 && isAssetCategoryCached('dashboard', 'development') && a === b && JSON.stringify(a) === JSON.stringify(b),
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `cached: true`, `count > 0`, `sameReference: true`. Second call logs `[getAssetsByCategory] [cache-hit]` (memory or handler) when logger is on.
+
+**How this test connects to the issue:** P-07 avoids re-iterating the full map for repeated category queries.
+
+**How the result proves the fix:** After the first call, `isAssetCategoryCached` is true; the second call returns the same object reference without reloading the map (cache-hit log).
+
+---
 
 ### S-03 — `loadAssetMapConfig` trusts the fetched JSON with only a shallow `typeof` check
 **File:** `assetLibrary.js` lines 676–683  
@@ -755,6 +1114,10 @@ log('assetLibrary.js', 'getAssetUrl', 'not-found', `Flag not found`, {
 3. Pre-warm URL cache for all known global flags (no network request — just resolves from the already-loaded map)
 4. Optionally pre-warm section map for the initial route's section
 5. Log the ready state with flag count and environment
+
+#### Resolution ✅
+
+**Status:** Resolved with **P-01** (steps 1–3 and 5). Step 4 (per-section map for initial route) is **not** implemented — per-section maps are **M-03**.
 
 ---
 

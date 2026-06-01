@@ -10,6 +10,71 @@ import { log } from './logHandler.js';
 // Cache storage - Map for O(1) lookups
 const cacheStorage = new Map();
 
+/** @type {number} Lazy expiry sweep interval in the browser (P-06) */
+const CACHE_SWEEP_INTERVAL_MS = 10 * 60 * 1000;
+
+/**
+ * @param {{ expirationTimestamp: number|null }} entry
+ * @param {number} [now]
+ * @returns {boolean}
+ */
+function isCacheEntryExpired(entry, now = Date.now()) {
+  return Boolean(entry.expirationTimestamp && now > entry.expirationTimestamp);
+}
+
+/**
+ * Remove all TTL-expired entries (P-06). Safe to call from tests or periodic sweep.
+ * @returns {number} Entries removed
+ */
+export function sweepExpiredCacheEntries() {
+  const now = Date.now();
+  let removedCount = 0;
+
+  for (const [key, entry] of cacheStorage.entries()) {
+    if (isCacheEntryExpired(entry, now)) {
+      cacheStorage.delete(key);
+      removedCount += 1;
+    }
+  }
+
+  if (removedCount > 0) {
+    logCache('sweepExpiredCacheEntries', 'success', 'Expired cache entries removed', {
+      removedCount,
+      remaining: cacheStorage.size
+    });
+  }
+
+  return removedCount;
+}
+
+if (typeof window !== 'undefined' && !globalThis.__cacheHandlerSweepIntervalId) {
+  globalThis.__cacheHandlerSweepIntervalId = setInterval(() => {
+    sweepExpiredCacheEntries();
+  }, CACHE_SWEEP_INTERVAL_MS);
+}
+
+/**
+ * Cache operation logs are verbose; emit only in dev or when logger is explicitly on (P-03).
+ * @returns {boolean}
+ */
+function shouldLogCacheOperations() {
+  return import.meta.env.DEV || import.meta.env.VITE_ENABLE_LOGGER === 'true';
+}
+
+/**
+ * @param {string} method
+ * @param {string} flag
+ * @param {string} description
+ * @param {object} [data]
+ */
+function logCache(method, flag, description, data = {}) {
+  if (!shouldLogCacheOperations()) {
+    return;
+  }
+
+  log('cacheHandler.js', method, flag, description, data);
+}
+
 /**
  * Set a value in cache with optional expiration time
  * 
@@ -19,8 +84,6 @@ const cacheStorage = new Map();
  * @returns {void}
  */
 export function setValueWithExpiration(key, value, timeToLiveMilliseconds = 0) {
-  log('cacheHandler.js', 'setValueWithExpiration', 'start', 'Setting value in cache', { key, hasTTL: timeToLiveMilliseconds > 0 });
-
   if (window.performanceTracker) {
     window.performanceTracker.step({
       step: 'cacheSet',
@@ -31,30 +94,28 @@ export function setValueWithExpiration(key, value, timeToLiveMilliseconds = 0) {
     });
   }
 
-  // Validate key is provided
   if (!key || typeof key !== 'string') {
-    log('cacheHandler.js', 'setValueWithExpiration', 'warn', 'Invalid cache key provided, skipping set operation', { key, keyType: typeof key });
-    log('cacheHandler.js', 'setValueWithExpiration', 'return', 'Returning early due to invalid key', {});
+    logCache('setValueWithExpiration', 'warn', 'Invalid cache key — set skipped', {
+      key,
+      keyType: typeof key
+    });
     return;
   }
 
-  // Calculate expiration timestamp if TTL is provided
   const expirationTimestamp = timeToLiveMilliseconds > 0 
     ? Date.now() + timeToLiveMilliseconds 
     : null;
 
-  // Store value with metadata
   cacheStorage.set(key, {
     value,
     expirationTimestamp
   });
 
-  log('cacheHandler.js', 'setValueWithExpiration', 'success', 'Value cached successfully', { 
+  logCache('setValueWithExpiration', 'success', 'Value cached', { 
     key, 
+    hasTTL: timeToLiveMilliseconds > 0,
     expiresAt: expirationTimestamp ? new Date(expirationTimestamp).toISOString() : 'never' 
   });
-  
-  log('cacheHandler.js', 'setValueWithExpiration', 'return', 'Cache set complete', { key });
 }
 
 /**
@@ -64,8 +125,6 @@ export function setValueWithExpiration(key, value, timeToLiveMilliseconds = 0) {
  * @returns {any|null} - Cached value or null if not found or expired
  */
 export function getValueFromCache(key) {
-  log('cacheHandler.js', 'getValueFromCache', 'start', 'Getting value from cache', { key });
-
   if (window.performanceTracker) {
     window.performanceTracker.step({
       step: 'cacheGet',
@@ -76,35 +135,25 @@ export function getValueFromCache(key) {
     });
   }
 
-  // Validate key is provided
   if (!key || typeof key !== 'string') {
-    log('cacheHandler.js', 'getValueFromCache', 'warn', 'Invalid cache key provided', { key, keyType: typeof key });
-    log('cacheHandler.js', 'getValueFromCache', 'return', 'Returning null due to invalid key', { key });
+    logCache('getValueFromCache', 'warn', 'Invalid cache key', { key, keyType: typeof key });
     return null;
   }
 
-  // Check if key exists in cache
   if (!cacheStorage.has(key)) {
-    log('cacheHandler.js', 'getValueFromCache', 'cache-miss', 'Key not found in cache', { key });
-    log('cacheHandler.js', 'getValueFromCache', 'return', 'Returning null - key not found', { key });
+    logCache('getValueFromCache', 'cache-miss', 'Key not found', { key });
     return null;
   }
 
-  // Get cached entry
   const cachedEntry = cacheStorage.get(key);
 
-  // Check if entry has expired
-  if (cachedEntry.expirationTimestamp && Date.now() > cachedEntry.expirationTimestamp) {
-    // Remove expired entry
+  if (isCacheEntryExpired(cachedEntry)) {
     cacheStorage.delete(key);
-    log('cacheHandler.js', 'getValueFromCache', 'expired', 'Cached value expired, removed', { key });
-    log('cacheHandler.js', 'getValueFromCache', 'return', 'Returning null - value expired', { key });
+    logCache('getValueFromCache', 'expired', 'Cached value expired — removed', { key });
     return null;
   }
 
-  // Return cached value
-  log('cacheHandler.js', 'getValueFromCache', 'cache-hit', 'Cache hit, returning value', { key });
-  log('cacheHandler.js', 'getValueFromCache', 'return', 'Returning cached value', { key });
+  logCache('getValueFromCache', 'cache-hit', 'Returning cached value', { key });
   return cachedEntry.value;
 }
 
@@ -115,31 +164,23 @@ export function getValueFromCache(key) {
  * @returns {boolean} - True if key exists and is not expired
  */
 export function hasValidCacheEntry(key) {
-  log('cacheHandler.js', 'hasValidCacheEntry', 'start', 'Checking if cache has valid entry', { key });
-
-  // Validate key
   if (!key || typeof key !== 'string') {
-    log('cacheHandler.js', 'hasValidCacheEntry', 'return', 'Returning false - invalid key', { key });
     return false;
   }
 
-  // Check existence
   if (!cacheStorage.has(key)) {
-    log('cacheHandler.js', 'hasValidCacheEntry', 'return', 'Returning false - key not found', { key });
+    logCache('hasValidCacheEntry', 'cache-miss', 'No valid entry', { key });
     return false;
   }
 
-  // Check expiration
   const cachedEntry = cacheStorage.get(key);
-  if (cachedEntry.expirationTimestamp && Date.now() > cachedEntry.expirationTimestamp) {
-    // Expired - remove it
+  if (isCacheEntryExpired(cachedEntry)) {
     cacheStorage.delete(key);
-    log('cacheHandler.js', 'hasValidCacheEntry', 'expired', 'Entry expired and removed', { key });
-    log('cacheHandler.js', 'hasValidCacheEntry', 'return', 'Returning false - entry expired', { key });
+    logCache('hasValidCacheEntry', 'expired', 'Entry expired — removed', { key });
     return false;
   }
 
-  log('cacheHandler.js', 'hasValidCacheEntry', 'return', 'Returning true - valid entry exists', { key });
+  logCache('hasValidCacheEntry', 'cache-hit', 'Valid entry exists', { key });
   return true;
 }
 
@@ -150,22 +191,19 @@ export function hasValidCacheEntry(key) {
  * @returns {boolean} - True if key was removed, false if not found
  */
 export function removeFromCache(key) {
-  log('cacheHandler.js', 'removeFromCache', 'start', 'Removing value from cache', { key });
-
   if (!key || typeof key !== 'string') {
-    log('cacheHandler.js', 'removeFromCache', 'return', 'Returning false - invalid key', { key });
+    logCache('removeFromCache', 'warn', 'Invalid cache key', { key });
     return false;
   }
 
   const existed = cacheStorage.has(key);
   if (existed) {
     cacheStorage.delete(key);
-    log('cacheHandler.js', 'removeFromCache', 'success', 'Cache entry removed', { key });
+    logCache('removeFromCache', 'success', 'Cache entry removed', { key });
   } else {
-    log('cacheHandler.js', 'removeFromCache', 'not-found', 'Cache entry not found', { key });
+    logCache('removeFromCache', 'not-found', 'Cache entry not found', { key });
   }
 
-  log('cacheHandler.js', 'removeFromCache', 'return', 'Returning removal status', { key, existed });
   return existed;
 }
 
@@ -176,10 +214,8 @@ export function removeFromCache(key) {
  * @returns {number} - Number of entries removed
  */
 export function removeCacheKeysByPrefix(prefix) {
-  log('cacheHandler.js', 'removeCacheKeysByPrefix', 'start', 'Removing cache entries by prefix', { prefix });
-
   if (!prefix || typeof prefix !== 'string') {
-    log('cacheHandler.js', 'removeCacheKeysByPrefix', 'return', 'Returning 0 - invalid prefix', { prefix });
+    logCache('removeCacheKeysByPrefix', 'warn', 'Invalid prefix', { prefix });
     return 0;
   }
 
@@ -192,11 +228,10 @@ export function removeCacheKeysByPrefix(prefix) {
     }
   }
 
-  log('cacheHandler.js', 'removeCacheKeysByPrefix', 'success', 'Cache entries removed by prefix', {
+  logCache('removeCacheKeysByPrefix', 'success', 'Entries removed by prefix', {
     prefix,
     removedCount
   });
-  log('cacheHandler.js', 'removeCacheKeysByPrefix', 'return', 'Returning removed count', { removedCount });
 
   return removedCount;
 }
@@ -207,13 +242,10 @@ export function removeCacheKeysByPrefix(prefix) {
  * @returns {number} - Number of entries cleared
  */
 export function clearAllCache() {
-  log('cacheHandler.js', 'clearAllCache', 'start', 'Clearing all cache entries', {});
-
   const count = cacheStorage.size;
   cacheStorage.clear();
 
-  log('cacheHandler.js', 'clearAllCache', 'success', 'All cache entries cleared', { clearedCount: count });
-  log('cacheHandler.js', 'clearAllCache', 'return', 'Returning cleared count', { count });
+  logCache('clearAllCache', 'success', 'All cache entries cleared', { clearedCount: count });
   
   return count;
 }
@@ -224,15 +256,12 @@ export function clearAllCache() {
  * @returns {object} - Cache statistics { totalEntries, expiredEntries }
  */
 export function getCacheStatistics() {
-  log('cacheHandler.js', 'getCacheStatistics', 'start', 'Getting cache statistics', {});
-
   const now = Date.now();
   let expiredCount = 0;
 
-  // Count expired entries
-  for (const [key, entry] of cacheStorage.entries()) {
-    if (entry.expirationTimestamp && now > entry.expirationTimestamp) {
-      expiredCount++;
+  for (const [, entry] of cacheStorage.entries()) {
+    if (isCacheEntryExpired(entry, now)) {
+      expiredCount += 1;
     }
   }
 
@@ -242,6 +271,6 @@ export function getCacheStatistics() {
     validEntries: cacheStorage.size - expiredCount
   };
 
-  log('cacheHandler.js', 'getCacheStatistics', 'return', 'Returning cache statistics', stats);
+  logCache('getCacheStatistics', 'info', 'Cache statistics', stats);
   return stats;
 }
