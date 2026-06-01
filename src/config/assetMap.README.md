@@ -9,14 +9,14 @@
 | Key | When used | URL style | Required? |
 |-----|-----------|-----------|-----------|
 | `production` | `import.meta.env.PROD` (deploy builds) | Absolute `https://` CDN URLs, same-origin `/vendor/...`, allowlisted hosts | **Yes — baseline for every flag** |
-| `development` | `import.meta.env.DEV` or localhost | Often `/assets/...` (Vite) or temporary external hosts (`i.ibb.co`) | Optional overrides; missing flags inherit **production** |
+| `development` | `import.meta.env.DEV` or localhost | Prefer local `/assets/...` or same-origin `/images/...` | Optional overrides; missing flags inherit **production** |
 | `staging` | `MODE === 'staging'` or hostname contains `staging` / `stg` | Usually sparse overrides only | Optional; missing flags inherit **production** |
 
 ## Inheritance (intentional)
 
 1. **Lookup order:** current environment → **`production` fallback** if the flag is missing in dev/staging.
 2. **Staging** only overrides a few flags (e.g. `icon.cart`, `logo.main`); everything else comes from `production`.
-3. **Development** may use **relative paths** (`/assets/icons/cart-dev.svg`) served by the Vite dev server; **production** must define the real CDN URL for the same logical asset (or rely on production-only flags).
+3. **Development** should only override flags that need local file paths; all other flags inherit `production` URLs.
 
 Relative paths in dev do **not** imply the same path works in production — set production URLs explicitly.
 
@@ -27,7 +27,7 @@ Relative paths in dev do **not** imply the same path works in production — set
 | Same-origin path | `/assets/icons/cart-dev.svg` | `development` | Served from `public/` or Vite; fast local iteration |
 | Same-origin vendor | `/vendor/amazon-cognito-identity-6.3.15.min.js` | all envs | Self-hosted scripts |
 | CDN absolute | `https://cdn.example.com/icons/cart.svg` | `production` | Preferred for deploy |
-| Legacy external image | `https://i.ibb.co/...` | dev/prod until self-hosted | Allowlisted in `assertAllowedPreloadUrl.js` |
+| Legacy external image | `https://i.ibb.co/...` | prod only (dev should inherit prod) | Allowlisted in `assertAllowedPreloadUrl.js` |
 
 **Do not** put non-localhost `http://` in `production` — `validateAssetMap()` fails CI-style checks.
 

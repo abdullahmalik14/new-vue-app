@@ -2202,11 +2202,64 @@ export function useAssetUrl(flag, sectionName = null) {
 **File:** `assetMap.json` lines 43–46  
 **Detail:** `staging` defines only `icon.cart` and `logo.main`. All other staging flags fall back to production. This appears intentional (staging mostly uses production URLs) but is undocumented. Developers adding new flags may not realise they need to add them to staging or that staging silently inherits production values.
 
+#### Resolution ✅
+
+**Status:** Resolved with **C-01** — documented in `src/config/assetMap.README.md`.
+
+**What was broken:** Staging overrides were sparse but undocumented.
+
+**Why it happened:** The inheritance model lived only in code, not in the config docs.
+
+**What changed:** Added explicit staging inheritance notes in `assetMap.README.md`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+  const stagingCart = await getAssetUrl('icon.cart', { environment: 'staging' });
+  const stagingHome = await getAssetUrl('icon.home', { environment: 'staging' }); // production fallback
+  console.log({
+    stagingCart,
+    stagingHome,
+    pass: Boolean(stagingCart) && Boolean(stagingHome),
+  });
+})();
+```
+
+**Expected:** `pass: true` with `stagingHome` resolving via production fallback.
+
 ---
 
 ### C-02 — `development` environment mixes local relative paths and external `i.ibb.co` URLs
 **File:** `assetMap.json` lines 1–35  
 **Detail:** Some development icons use `/assets/icons/...` (requires Vite dev server) while most use `https://i.ibb.co/...` (external). This means local development partially depends on internet connectivity. All development icons should be local relative paths so the app functions fully offline.
+
+#### Resolution ✅
+
+**Status:** Resolved with **C-02** — dev overrides now only use local relative paths; external URLs are inherited from production when needed.
+
+**What was broken:** Dev overrides contained a mix of local and external URLs.
+
+**Why it happened:** Duplicated production entries were left in the dev map.
+
+**What changed:** Removed external URLs from the `development` map and documented that dev should override only local paths; all other flags inherit from `production`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { loadAssetMapConfig } = await import('/src/utils/assets/assetLibrary.js');
+  const map = await loadAssetMapConfig();
+  const devEntries = Object.values(map.development || {});
+  const hasExternal = devEntries.some((url) => typeof url === 'string' && url.startsWith('https://'));
+  console.log({
+    devEntryCount: devEntries.length,
+    hasExternal,
+    pass: hasExternal === false,
+  });
+})();
+```
+
+**Expected:** `pass: true` — dev overrides are local-only.
 
 ---
 
@@ -2217,11 +2270,64 @@ export function useAssetUrl(flag, sectionName = null) {
 **File:** `assetMap.json`  
 **Detail:** `production` defines `icon.home`, `icon.settings`, `icon.logout`, `logo.footer`, `image.banner`, `font.primary`, `font.secondary` — none of which exist in `development`. Developers testing production-only routes in development will get `null` from `getAssetUrl` for these flags (production fallback does not apply when environment is `development`). These flags must either be added to `development` or the inheritance model must be clarified.
 
+#### Resolution ✅
+
+**Status:** Resolved with **C-04** — clarified and enforced production fallback in docs; dev inherits production for missing flags.
+
+**What was broken:** The fallback behavior was undocumented, leading to confusion about missing dev entries.
+
+**Why it happened:** The inheritance model is implemented in `assetLibrary.js` but was not clearly documented.
+
+**What changed:** Documented that dev inherits production for missing flags; no extra dev overrides needed.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+  const home = await getAssetUrl('icon.home', { environment: 'development' });
+  const footer = await getAssetUrl('logo.footer', { environment: 'development' });
+  console.log({
+    home,
+    footer,
+    pass: Boolean(home) && Boolean(footer),
+  });
+})();
+```
+
+**Expected:** `pass: true` — production fallback resolves in dev.
+
 ---
 
 ### C-05 — `auth.background` and most `dashboard.*` flags are duplicated identically in `development` and `production`
 **File:** `assetMap.json`  
 **Detail:** Many flags have the same `i.ibb.co` URL in both environments. Duplicating them across environments doubles the maintenance surface. Flags that genuinely need no environment-specific override should be defined only in `production` (the inheritance base) and left absent from `development`/`staging`.
+
+#### Resolution ✅
+
+**Status:** Resolved with **C-05** — removed duplicated dev entries that match production.
+
+**What was broken:** Dev map duplicated many production URLs, creating extra maintenance.
+
+**Why it happened:** The dev map grew without pruning once production URLs were stable.
+
+**What changed:** Removed duplicated `auth.background` and `dashboard.*` entries from `development` so they inherit from `production`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { loadAssetMapConfig, getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+  const map = await loadAssetMapConfig();
+  const devHasAuthBg = Boolean(map.development?.['auth.background']);
+  const dashboardUrl = await getAssetUrl('dashboard.logo', { environment: 'development' });
+  console.log({
+    devHasAuthBg,
+    dashboardUrl,
+    pass: devHasAuthBg === false && Boolean(dashboardUrl),
+  });
+})();
+```
+
+**Expected:** `pass: true` — dev overrides are removed and production fallback still resolves.
 
 ---
 
