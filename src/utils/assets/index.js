@@ -90,6 +90,3 @@ export {
   getEnvironment
 } from './assetLibrary';
 
-// Export asset injector (DOM-based asset loading)
-export { default as AssetInjector } from './assetInjector';
-

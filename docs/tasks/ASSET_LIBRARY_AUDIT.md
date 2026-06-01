@@ -41,6 +41,38 @@ export function clearAssetCaches() {
 }
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `clearAssetCaches()` cleared `loadedAssets`, `cachedManifest`, and the shared `cacheHandler`, but left module-level `cachedAssetMap` and `assetMapLoadPromise` set. The next `loadAssetMapConfig()` hit the memory fast path and returned a stale map; cache clears had no effect on flag resolution until a full reload.
+
+**Why it happened:** Asset-map caching was split between `cacheHandler` and module memory; only `setEnvironment()` was later wired to `clearAssetMapConfigCache()` from the asset-preload refactor, not the global clear API.
+
+**What changed:**
+- `clearAssetCaches()` now calls existing `clearAssetMapConfigCache()` (same as `setEnvironment()`), which sets `cachedAssetMap = null`, `assetMapLoadPromise = null`, `assetMapConfigSource = null`, and removes `ASSET_MAP_CACHE_KEY` before `clearAllCache()`.
+- No conflict with section/asset preload work — reuses the helper added for S-06 / `setEnvironment`, does not change preload orchestration.
+
+**How it was tested:** `npm run test:unit -- tests/unit/assetMapConfig.test.js --run` (new L-01 case).
+
+**How to test in the browser:**
+1. Run `npm run dev`, open the app, **Console** (one paste):
+   ```js
+   (async () => {
+     const { loadAssetMapConfig, clearAssetCaches } = await import('/src/utils/assets/assetLibrary.js');
+     const map1 = await loadAssetMapConfig();
+     map1.development['audit.l01.stale'] = 'https://example.com/stale';
+     clearAssetCaches();
+     const map2 = await loadAssetMapConfig();
+     console.log({
+       staleGone: map2.development['audit.l01.stale'] === undefined,
+       newObject: map1 !== map2,
+       pass: map2.development['audit.l01.stale'] === undefined && map1 !== map2,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true` — after `clearAssetCaches()`, the map is reloaded (mutation gone; `map1 !== map2` if a fresh object was loaded).
+
 ---
 
 ### L-02 — `waitForAssetLoad` uses a busy-polling loop instead of a shared Promise
@@ -60,17 +92,143 @@ assetsLoadingPromises.set(sectionName, promise);
 try { return await promise; } finally { assetsLoadingPromises.delete(sectionName); }
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Concurrent `loadAssetsForSection(section)` callers used `waitForAssetLoad`, which polled `loadedAssets` every 100ms for up to 5s. That added latency jitter, wasted timers, and could return `timeout` / `error` even when the primary load succeeded.
+
+**Why it happened:** Early dedup used a `Set` membership flag instead of sharing the in-flight `Promise` (unlike `assetMapLoadPromise` and `sectionPreloader`’s shared-promise pattern).
+
+**What changed:**
+- Replaced `assetsLoadingInProgress` (`Set`) with `assetsLoadingPromises` (`Map<sectionName, Promise>`).
+- Concurrent callers `return assetsLoadingPromises.get(sectionName)` directly; removed `waitForAssetLoad`.
+- `loadAssetsForSection` is a plain function (not `async`) so it returns the same `Promise` reference as `preloadSection` — an `async` wrapper would break `p1 === p2`.
+- `clearAssetCaches()` now calls `assetsLoadingPromises.clear()` (partially addresses A-L04 in-flight tracking).
+- Aligns with section preload refactor (`sectionPreloader.js` “sharing promise”) — no override of preload orchestration.
+
+**How it was tested:** `npm run test:unit -- tests/unit/loadAssetsForSectionDedup.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open the app, **Console** (one paste):
+   ```js
+   (async () => {
+     const { loadAssetsForSection, getAssetStatistics } = await import('/src/utils/assets/assetLibrary.js');
+     const t0 = performance.now();
+     const p1 = loadAssetsForSection('auth');
+     const p2 = loadAssetsForSection('auth');
+     const [a, b] = await Promise.all([p1, p2]);
+     console.log({
+       samePromise: p1 === p2,
+       sameResult: a === b,
+       sectionName: a?.sectionName,
+       loadMs: Math.round(performance.now() - t0),
+       inProgressAfter: getAssetStatistics().loadingInProgress,
+       pass: p1 === p2 && a === b && a?.sectionName === 'auth' && getAssetStatistics().loadingInProgress.length === 0,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `sameResult: true`, `inProgressAfter: []`, and no repeated `[waitForAssetLoad]` log lines (function removed).
+
 ---
 
 ### L-03 — `assetMapLoadPromise` is set to `null` in `finally` before all waiters have consumed it
 **File:** `assetLibrary.js` lines 663–715  
 **Detail:** The load flow is: check `cachedAssetMap` → check `cacheHandler` → check `assetMapLoadPromise` → if none, create the IIFE and assign to `assetMapLoadPromise`. The `finally` block sets `assetMapLoadPromise = null` when the fetch resolves. A caller that picks up the promise (line 659) and awaits it is fine; but a new caller that arrives between the resolve settling and the `finally` running may see `assetMapLoadPromise = null` and start a duplicate fetch race. This is a classic "promise nulled too early" race. The fix is to keep `assetMapLoadPromise` alive until after `cachedAssetMap` is written (move null-assignment after `cachedAssetMap = assetMap`).
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `loadAssetMapConfig` cleared `assetMapLoadPromise` in an inner `finally` on the load IIFE. That could null the in-flight pointer before `cachedAssetMap` was visible to a new caller, allowing a duplicate map load/fetch race.
+
+**Why it happened:** The dedup pointer was cleared in the async IIFE’s `finally` instead of after cache population, and `loadAssetMapConfig` was `async` (extra promise wrapper).
+
+**What changed:**
+- Removed inner `finally { assetMapLoadPromise = null }`; `cachedAssetMap` is set in `try`/`catch` before the load promise settles.
+- Track loads with `sharedPromise = loadPromise.finally(() => { assetMapLoadPromise = null })` so the dedup pointer stays until the shared load fully completes.
+- `loadAssetMapConfig` is a plain function returning `Promise.resolve(cached)` or the shared promise (same pattern as L-02 / `preloadSection`).
+- No conflict with asset-preload / S-06 work — complements existing `clearAssetMapConfigCache()` (A-L09 already clears `assetMapLoadPromise` on env switch).
+
+**How it was tested:** `npm run test:unit -- tests/unit/assetMapConfig.test.js --run` (new L-03 case).
+
+**How to test in the browser:**
+1. Run `npm run dev` with `VITE_ASSET_MAP_RUNTIME_OVERRIDE=true`, open the app, **Console** (one paste):
+   ```js
+   (async () => {
+     const { clearAssetMapConfigCache, loadAssetMapConfig } = await import('/src/utils/assets/assetLibrary.js');
+     clearAssetMapConfigCache();
+     const t0 = performance.now();
+     const p1 = loadAssetMapConfig();
+     const p2 = loadAssetMapConfig();
+     const [m1, m2] = await Promise.all([p1, p2]);
+     console.log({
+       samePromise: p1 === p2,
+       sameMap: m1 === m2,
+       cognito: m1?.production?.['script.cognito'],
+       loadMs: Math.round(performance.now() - t0),
+       pass: p1 === p2 && m1 === m2 && !!m1?.production?.['script.cognito'],
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `samePromise: true`; Network tab shows at most one `assetMap.json` fetch for the pair; logs show `[waiting]` on the second call, not a second `[fetch]`.
+
 ---
 
 ### L-04 — `areAssetsLoadedForSection` only checks the in-memory `loadedAssets` Map, not `cacheHandler`
 **File:** `assetLibrary.js` line 415–419  
 **Detail:** `loadedAssets` is a module-level in-memory `Map` that is lost on page reload. After a reload, even if `cacheHandler` holds a valid TTL entry for the section, `areAssetsLoadedForSection` returns `false`, causing components to incorrectly believe the section needs reloading and triggering redundant work. `getAssetsForSection` correctly checks both memory and cache (lines 394–403); `areAssetsLoadedForSection` should call `getAssetsForSection(sectionName) !== null` for consistency.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `areAssetsLoadedForSection` only called `loadedAssets.has(sectionName)`. After a full page reload, TTL entries in `cacheHandler` could still hold section metadata, but this API reported “not loaded” and callers triggered redundant `loadAssetsForSection` work.
+
+**Why it happened:** Memory map and TTL cache were updated on load, but the boolean check ignored the cache layer that survives reloads (until expiry).
+
+**What changed:**
+- `areAssetsLoadedForSection` now uses `getAssetsForSection(sectionName) !== null`, matching `getAssetLoadingState` and rehydrating `loadedAssets` from cache on hit (partially helps **A-B02** for callers of this API).
+- No conflict with section/asset preload refactors — read-only consistency fix.
+
+**How it was tested:** `npm run test:unit -- tests/unit/areAssetsLoadedForSection.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open the app, load a section once (e.g. navigate to login/auth), then **Console** (one paste):
+   ```js
+   (async () => {
+     const {
+       loadAssetsForSection,
+       areAssetsLoadedForSection,
+       getAssetStatistics,
+       clearAssetCaches,
+     } = await import('/src/utils/assets/assetLibrary.js');
+     await loadAssetsForSection('auth');
+     const statsBefore = getAssetStatistics().loadedSections;
+     clearAssetCaches();
+     const { setValueWithExpiration } = await import('/src/utils/common/cacheHandler.js');
+     setValueWithExpiration('asset_metadata_auth', {
+       sectionName: 'auth',
+       bundlePaths: { js: '/x.js', css: '/x.css' },
+       assetPreloadConfigs: [],
+       state: 'loaded',
+     }, 3600000);
+     console.log({
+       memoryEmptyAfterClear: getAssetStatistics().loadedSections.length === 0,
+       loadedViaCheck: areAssetsLoadedForSection('auth'),
+       rehydratedInMemory: getAssetStatistics().loadedSections.includes('auth'),
+       pass:
+         getAssetStatistics().loadedSections.length === 0 &&
+         areAssetsLoadedForSection('auth') &&
+         getAssetStatistics().loadedSections.includes('auth'),
+     });
+   })();
+   ```
+2. **Expected:** `pass: true` — check returns `true` from TTL cache even when memory was cleared; `loadedSections` includes `auth` after the check.
+
+**How this test connects to the issue:** L-04 was about `areAssetsLoadedForSection` ignoring `cacheHandler`. The script clears memory with `clearAssetCaches`, seeds only the TTL key for `auth`, then calls the fixed boolean API.
+
+**How the result proves the fix:** If the API still read only `loadedAssets`, `loadedViaCheck` would be `false` after memory was cleared. `pass: true` with `loadedViaCheck: true` and `rehydratedInMemory: true` shows the check reads TTL cache via `getAssetsForSection` and repopulates memory — the L-04 behavior.
 
 ---
 
@@ -87,11 +245,113 @@ keysToDelete.forEach(sectionName => {
 });
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `unloadUnusedSections` deleted section metadata from the in-memory `loadedAssets` map but left TTL entries in `cacheHandler` (`asset_metadata_{section}`). After unload, `areAssetsLoadedForSection` / `getAssetsForSection` could still find the section in cache (especially after L-04), so “unloaded” sections were not actually evicted until the 1-hour TTL expired.
+
+**Why it happened:** A stale comment claimed `cacheHandler` had no per-key delete API; `cacheKey` was computed but never passed to `removeFromCache`.
+
+**What changed:**
+- Each evicted section now calls `removeFromCache(ASSET_CACHE_KEY_PREFIX + sectionName)` alongside `loadedAssets.delete`.
+- Removed the incorrect comment.
+- **M-07** (per-flag `asset_url_*` eviction on section unload) remains a separate follow-up.
+
+**How it was tested:** `npm run test:unit -- tests/unit/unloadUnusedSections.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open the app, **Console** (one paste):
+   ```js
+   (async () => {
+     const { setValueWithExpiration, getValueFromCache } = await import('/src/utils/common/cacheHandler.js');
+     const {
+       clearAssetCaches,
+       getAssetsForSection,
+       unloadUnusedSections,
+       areAssetsLoadedForSection,
+     } = await import('/src/utils/assets/assetLibrary.js');
+     clearAssetCaches();
+     setValueWithExpiration('asset_metadata_auth', { sectionName: 'auth', state: 'loaded', bundlePaths: {}, assetPreloadConfigs: [] }, 3600000);
+     setValueWithExpiration('asset_metadata_shop', { sectionName: 'shop', state: 'loaded', bundlePaths: {}, assetPreloadConfigs: [] }, 3600000);
+     getAssetsForSection('auth');
+     getAssetsForSection('shop');
+     unloadUnusedSections(['auth']);
+     console.log({
+       authStillLoaded: areAssetsLoadedForSection('auth'),
+       shopLoadedAfterUnload: areAssetsLoadedForSection('shop'),
+       shopCacheKeyGone: getValueFromCache('asset_metadata_shop') === null,
+       authCacheKeyRemains: getValueFromCache('asset_metadata_auth') !== null,
+       pass:
+         areAssetsLoadedForSection('auth') &&
+         !areAssetsLoadedForSection('shop') &&
+         getValueFromCache('asset_metadata_shop') === null &&
+         getValueFromCache('asset_metadata_auth') !== null,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `shopCacheKeyGone: true`, `shopLoadedAfterUnload: false`, `authStillLoaded: true`.
+
+**How this test connects to the issue:** The bug was a split brain between memory and TTL cache on unload. This script loads `auth` and `shop` into both layers, runs `unloadUnusedSections(['auth'])` (the API under test), then checks whether `shop` is gone from **both** the boolean loader API and the raw `cacheHandler` key `asset_metadata_shop`.
+
+**How the result proves the fix:** Before the fix, `shopLoadedAfterUnload` could still be `true` and `shopCacheKeyGone` `false` because TTL cache kept `asset_metadata_shop` for up to an hour. After the fix, a successful run must show `shop` not loaded and its cache key `null`, while `auth` remains in cache — proving eviction calls `removeFromCache`, not only `loadedAssets.delete`.
+
 ---
 
 ### L-06 — `setEnvironment` does not invalidate per-flag URL cache entries in `cacheHandler`
 **File:** `assetLibrary.js` lines 612–623  
 **Detail:** `setEnvironment(env)` sets `cachedAssetMap = null` to force a map reload. However, resolved URLs are cached individually under keys like `asset_url_development_icon.cart` in `cacheHandler` with a 30-minute TTL. After switching environments these stale entries are served without re-resolving against the new environment. All `ASSET_URL_CACHE_PREFIX + '*'` keys must be evicted on environment change — use a prefix-scan or a version/generation counter pattern.
+
+#### Resolution ✅
+
+**Status:** Already resolved (asset preload refactor — see `ASSET_PRELOAD_AUDIT.md` L-07). No additional code change in this pass.
+
+**What was broken:** `setEnvironment()` cleared in-memory `cachedAssetMap` only. Resolved URLs under `asset_url_{env}_{flag}` in `cacheHandler` could be served for 30 minutes after an env switch, so `getAssetUrl` could return URLs resolved for the previous environment.
+
+**Why it happened:** URL resolution caching was added without invalidation on manual environment changes.
+
+**What is in place now (do not re-implement):**
+- `removeCacheKeysByPrefix()` in `cacheHandler.js` (from preload work).
+- `setEnvironment()` calls `clearAssetMapConfigCache()` and `removeCacheKeysByPrefix(ASSET_URL_CACHE_PREFIX)` in `assetLibrary.js`.
+
+**How it was tested:** `npm run test:unit -- tests/unit/setEnvironmentUrlCache.test.js --run` (regression guard for this audit).
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste). Use `icon.cart` — dev and production URLs differ in `assetMap.json` (`cart-dev.svg` vs CDN). Do **not** use `script.cognito` for this test: it is the same path in both envs, so `prodUrl !== cachedBeforeSwitch` fails even when cache clearing works.
+   ```js
+   (async () => {
+     const { getAssetUrl, setEnvironment } = await import('/src/utils/assets/assetLibrary.js');
+     const { getValueFromCache } = await import('/src/utils/common/cacheHandler.js');
+     const flag = 'icon.cart';
+     const devKey = `asset_url_development_${flag}`;
+
+     const devUrl = await getAssetUrl(flag, 'development');
+     const cachedBeforeSwitch = getValueFromCache(devKey);
+
+     setEnvironment('production');
+     const cachedAfterSwitch = getValueFromCache(devKey);
+     const prodUrl = await getAssetUrl(flag, 'production');
+
+     console.log({
+       devUrl,
+       prodUrl,
+       hadDevCacheBeforeSwitch: cachedBeforeSwitch !== null,
+       devCacheClearedAfterSwitch: cachedAfterSwitch === null,
+       urlsDifferByEnv: devUrl !== prodUrl,
+       pass:
+         cachedBeforeSwitch !== null &&
+         cachedAfterSwitch === null &&
+         devUrl !== null &&
+         prodUrl !== null &&
+         devUrl !== prodUrl,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `devCacheClearedAfterSwitch: true`, `urlsDifferByEnv: true`, `devUrl` contains `cart-dev`, `prodUrl` contains `cdn.example.com`. Logs after `setEnvironment` should show `removeCacheKeysByPrefix` with `prefix: 'asset_url_'` and `removedCount > 0`.
+
+**How this test connects to the issue:** L-06 is about stale **per-flag URL** entries (`asset_url_*`), not the asset map. The script resolves `icon.cart` in `development` (populating `asset_url_development_icon.cart`), switches env with `setEnvironment`, then checks whether that dev key was removed and production resolves from the map (not a leftover dev cache hit).
+
+**How the result proves the fix:** If URL caches were not cleared, `devCacheClearedAfterSwitch` would be `false` and production could return the dev-cached URL (`cart-dev.svg`). Your run already showed the fix working when `devCacheClearedAfterSwitch: true` and logs showed `removeCacheKeysByPrefix` — the old `pass: false` was only because `script.cognito` shares one URL in both environments. With `icon.cart`, `pass: true` also confirms production resolved a different URL after the cache wipe.
 
 ---
 
@@ -99,11 +359,88 @@ keysToDelete.forEach(sectionName => {
 **File:** `assetLibrary.js` lines 917–934  
 **Detail:** `getAvailableAssetFlags` adds production flags first and then overlays env-specific flags (correct inheritance). `getAssetsByCategory` does the reverse: it reads `assetMap[env]` first, then fills gaps from production (also correct), but it never applies the `env` override if a flag exists in **both** staging and production — staging/dev entries would overwrite production ones only if the outer condition (`!matchingAssets[flag]`) is not triggered. Actually the logic here is inverted: it sets the env value first, then checks `!matchingAssets[flag]` for production, which is correct. However it is inconsistent with `getAvailableAssetFlags` which adds production first. The two functions should share the same resolution helper to avoid future divergence.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** Flag inheritance was implemented twice (Set union vs env-then-fill-gaps). Behavior was mostly equivalent today, but the duplicate logic risked future drift if one path changed.
+
+**Why it happened:** APIs were added at different times without a shared “production base + env override” merge.
+
+**What changed:**
+- Added private `resolveAssetMapForEnvironment(assetMap, env)` — copies `production`, then overlays `assetMap[env]` when `env !== 'production'`.
+- `getAvailableAssetFlags` and `getAssetsByCategory` both use this helper.
+- No conflict with preload refactors — read-only map resolution only.
+
+**How it was tested:** `npm run test:unit -- tests/unit/resolveAssetMapForEnvironment.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste):
+   ```js
+   (async () => {
+     const { getAssetsByCategory, getAvailableAssetFlags } = await import('/src/utils/assets/assetLibrary.js');
+     const stagingIcons = await getAssetsByCategory('icon', 'staging');
+     const stagingFlags = await getAvailableAssetFlags('staging');
+     const iconFlagKeys = stagingFlags.filter((f) => f.startsWith('icon.')).sort();
+     console.log({
+       cartIsStaging: stagingIcons['icon.cart'] === '/assets/icons/cart-staging.svg',
+       userFromProduction: stagingIcons['icon.user'] === 'https://cdn.example.com/assets/icons/user.svg',
+       categoryKeysMatchFlags: Object.keys(stagingIcons).sort().join() === iconFlagKeys.join(),
+       pass:
+         stagingIcons['icon.cart'] === '/assets/icons/cart-staging.svg' &&
+         stagingIcons['icon.user'] === 'https://cdn.example.com/assets/icons/user.svg' &&
+         Object.keys(stagingIcons).sort().join() === iconFlagKeys.join(),
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `cartIsStaging: true`, `userFromProduction: true` — staging `icon.cart` overrides production; `icon.user` only exists in production and is inherited.
+
+**How this test connects to the issue:** L-07 is about **consistent env inheritance** across APIs. Staging defines only `icon.cart` and `logo.main`, but production has many `icon.*` flags. The test checks that `getAssetsByCategory('icon', 'staging')` returns staging cart **and** inherited production icons, and that those keys match `getAvailableAssetFlags('staging')` for the `icon.` prefix.
+
+**How the result proves the fix:** If merge logic diverged, you could get wrong URLs (e.g. production `icon.cart` CDN URL instead of `cart-staging.svg`) or mismatched flag sets between the two functions. `pass: true` with `cartIsStaging` and `categoryKeysMatchFlags` proves both APIs use the same production-base + staging-override merge via `resolveAssetMapForEnvironment`.
+
 ---
 
 ### L-08 — `validateAssetMap` accepts a broken `icon.globe` URL without raising an error
 **File:** `assetMap.json` lines 9 (dev) and 51 (prod); `assetLibrary.js` line 1016  
 **Detail:** The URL `https://i.ibb.co.com/mF9x2JG0/...` contains the typo `co.com` instead of `co`. The validator only checks that the string starts with `/`, `http://`, or `https://` — it does not check that the hostname is structurally valid or that it resolves. This URL will always return a 404 and, worse, could be registered by a third party to serve hostile content.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `icon.globe` used `https://i.ibb.co.com/...` (invalid host). `validateAssetMap()` only checked URL prefix shape, so the typo shipped without an error.
+
+**Why it happened:** No hostname validation on remote asset URLs; config typo (`co.com` vs `co`).
+
+**What changed:**
+- **Config:** `icon.globe` already corrected to `https://i.ibb.co/...` in `src/config/assetMap.json` and `public/config/assetMap.json` (also covered by `ASSET_PRELOAD_AUDIT.md` S-07 — not re-done here).
+- **Validator:** Added `validateRemoteAssetUrl()` — flags `.co.com` double-TLD hosts and invalid ImgBB hosts (`ibb.co` but not exactly `i.ibb.co`). `validateAssetMap()` now pushes **errors** for those URLs on `http://` and `https://` entries.
+
+**How it was tested:** `npm run test:unit -- tests/unit/validateAssetMapHostname.test.js tests/unit/iconGlobeUrl.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste):
+   ```js
+   (async () => {
+     const { validateAssetMap, getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+     const validation = await validateAssetMap();
+     const globe = await getAssetUrl('icon.globe');
+     const hostname = globe ? new URL(globe).hostname : null;
+     console.log({
+       mapValid: validation.valid,
+       globeUrl: globe,
+       globeHostname: hostname,
+       noGlobeErrors: !validation.errors.some((e) => e.includes('icon.globe')),
+       pass: validation.valid && hostname === 'i.ibb.co' && !validation.errors.some((e) => e.includes('icon.globe')),
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `globeHostname: 'i.ibb.co'`, `mapValid: true` — current map is clean and validator reports no `icon.globe` errors.
+
+**How this test connects to the issue:** L-08 is two parts: (1) bad `icon.globe` data, (2) validator blind to hostname typos. The script runs `validateAssetMap()` on your real map and resolves `icon.globe` to confirm the live config uses a valid host.
+
+**How the result proves the fix:** Before config fix, `globeHostname` would be `i.ibb.co.com` (404 risk). Before validator fix, `mapValid` could stay `true` even with `co.com` in JSON. `pass: true` with `hostname === 'i.ibb.co'` and no `icon.globe` errors proves both the corrected map and the new hostname rules. Unit tests additionally prove a mocked `i.ibb.co.com` URL makes `validateAssetMap().valid === false`.
 
 ---
 
@@ -111,11 +448,90 @@ keysToDelete.forEach(sectionName => {
 **File:** `src/utils/assets/index.js` line 57  
 **Detail:** `export { default as AssetInjector } from './assetInjector'` — `assetInjector.js` is absent from disk. Any import of `AssetInjector` from the assets barrel will throw a module-not-found error at runtime (or bundle-time with Vite). Export must be removed.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** The assets barrel re-exported `./assetInjector`, but that file does not exist. Any `import { AssetInjector } from '@/utils/assets'` (or similar) failed at bundle or runtime.
+
+**Why it happened:** Stale export left after a removed or never-added module.
+
+**What changed:** Removed the `AssetInjector` export from `src/utils/assets/index.js`. DOM asset loading remains via `assetPreloader.js` exports (`preloadImage`, etc.) — no conflict with preload refactor.
+
+**How it was tested:** `npm run test:unit -- tests/unit/assetsIndexExports.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste):
+   ```js
+   (async () => {
+     const assets = await import('/src/utils/assets/index.js');
+     console.log({
+       barrelLoads: typeof assets.getAssetUrl === 'function',
+       assetInjectorRemoved: !('AssetInjector' in assets),
+       pass: typeof assets.getAssetUrl === 'function' && !('AssetInjector' in assets),
+     });
+   })();
+   ```
+2. **Expected:** `pass: true` — no “Failed to resolve import ./assetInjector” error; barrel exposes `getAssetUrl` but not `AssetInjector`.
+
+**How this test connects to the issue:** L-09 is a broken barrel export. Importing the whole assets module is what would have triggered Vite’s missing-file error for anyone using `AssetInjector`.
+
+**How the result proves the fix:** Before the fix, the same import could fail module resolution. `pass: true` with `assetInjectorRemoved: true` proves the barrel loads cleanly without referencing a missing file.
+
 ---
 
 ### L-10 — `loadAssetMapConfig` always fetches from `/config/assetMap.json` regardless of environment
 **File:** `assetLibrary.js` line 667  
 **Detail:** In development, Vite serves files from `src/` via its dev-server and does not expose `public/config/assetMap.json` at that path by default (unless `public/` is configured). This silent empty-map fallback (lines 701–708) means all flag lookups return `null` during local development unless the developer happens to have the right file in `public/`. The fetch URL should be configurable via `import.meta.env.VITE_ASSET_MAP_URL` with a sensible per-mode default.
+
+#### Resolution ✅
+
+**Status:** Already resolved (asset preload refactor — S-06 / `ASSET_PRELOAD_AUDIT.md` M-10). Small hardening in this pass: deduped fetch candidates via `Set`.
+
+**What was broken:** Only `/config/assetMap.json` was tried; dev could miss `src/config/assetMap.json`, and there was no `VITE_ASSET_MAP_URL` override.
+
+**Why it happened:** Single hardcoded fetch path before the section-preload / asset-map source refactor.
+
+**What is in place now (do not re-implement):**
+- `getAssetMapFetchCandidates()` — `VITE_ASSET_MAP_URL` (optional), `/config/assetMap.json`, `/src/config/assetMap.json` in dev.
+- `shouldAllowRuntimeAssetMapFetch()` — network only when `VITE_ASSET_MAP_RUNTIME_OVERRIDE=true` in dev; production uses bundled map by default.
+- Failed fetch falls back to **bundled** map (not empty) when override is enabled.
+- **This pass:** candidate list built in clear order and deduped with `Set`.
+
+**How it was tested:** `npm run test:unit -- tests/unit/assetMapUrl.test.js tests/unit/assetMapConfig.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev` (`.env.development` has `VITE_ASSET_MAP_RUNTIME_OVERRIDE=true`), **Console** (one paste):
+   ```js
+   (async () => {
+     const {
+       getAssetMapFetchCandidates,
+       getAssetMapConfigSource,
+       loadAssetMapConfig,
+       clearAssetMapConfigCache,
+       getAssetUrl,
+     } = await import('/src/utils/assets/assetLibrary.js');
+     clearAssetMapConfigCache();
+     const candidates = getAssetMapFetchCandidates();
+     await loadAssetMapConfig();
+     const cognito = await getAssetUrl('script.cognito');
+     console.log({
+       candidates,
+       hasSrcFallback: candidates.includes('/src/config/assetMap.json'),
+       source: getAssetMapConfigSource(),
+       cognitoResolved: cognito !== null,
+       pass:
+         candidates.includes('/src/config/assetMap.json') &&
+         cognito !== null &&
+         ['runtime-verified', 'bundled-fallback', 'bundled-dev'].includes(getAssetMapConfigSource()),
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `hasSrcFallback: true`, `cognitoResolved: true`. With override on, `source` is usually `runtime-verified` or `bundled-fallback` (if hash rejects `/config/`). Optional: set `VITE_ASSET_MAP_URL=/src/config/assetMap.json` in `.env.local` and confirm it appears first in `candidates` after restart.
+
+**How this test connects to the issue:** L-10 is about dev being able to load the map from the right path(s), not only `public/config`. The script prints fetch candidates, loads the map, and resolves a real flag.
+
+**How the result proves the fix:** Without `/src/config/assetMap.json` in candidates (and bundled fallback), dev could get `null` URLs when `public/` copy is missing. `hasSrcFallback: true` and `cognitoResolved: true` prove multi-path + bundled fallback behavior from the preload refactor; optional `VITE_ASSET_MAP_URL` is verified in unit tests.
 
 ---
 
@@ -251,7 +667,7 @@ Resolution order for `getAssetUrl(flag, { section: 'dashboard' })`:
 
 | Layer | What | Scope | Cleared by |
 |-------|------|-------|-----------|
-| `cachedAssetMap` | Full asset map object | Module memory | `clearAssetCaches()` (broken — see L-01) |
+| `cachedAssetMap` | Full asset map object | Module memory | `clearAssetCaches()` via `clearAssetMapConfigCache()` (L-01 ✅) |
 | `cacheHandler` TTL entries | Map config + per-flag URLs | Module memory | `clearAllCache()` |
 | `loadedAssets` Map | Section metadata objects | Module memory | `clearAssetCaches()` |
 | `usePreloadStore.preloadedAssets` | Preloaded URLs | localStorage | `clearPreloadCache()` |

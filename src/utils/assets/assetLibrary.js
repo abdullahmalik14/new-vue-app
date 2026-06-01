@@ -44,8 +44,8 @@ import {
 const ASSET_CACHE_KEY_PREFIX = 'asset_metadata_';
 const ASSET_CACHE_TTL = 3600000; // 1 hour
 
-// Track which assets are currently loading to prevent duplicates
-const assetsLoadingInProgress = new Set();
+// In-flight section metadata loads — shared Promise per section (see L-02)
+const assetsLoadingPromises = new Map();
 
 // Track loaded section bundle metadata in memory (NOT per-URL preload completion; see usePreloadStore.hasAsset)
 const loadedAssets = new Map();
@@ -134,7 +134,7 @@ function getAssetPreloadConfigForSection(sectionName) {
  * @param {string} sectionName - Section to load assets for
  * @returns {Promise<object>} - Asset metadata object
  */
-export async function loadAssetsForSection(sectionName) {
+export function loadAssetsForSection(sectionName) {
   log('assetLibrary.js', 'loadAssetsForSection', 'start', 'Loading assets for section', { sectionName });
 
   if (typeof sectionName !== 'string' || sectionName.trim().length === 0) {
@@ -173,129 +173,68 @@ export async function loadAssetsForSection(sectionName) {
     return cachedAssets;
   }
 
-  // Check if already loading
-  const loadingKey = `asset_${sectionName}`;
-  if (assetsLoadingInProgress.has(loadingKey)) {
-    log('assetLibrary.js', 'loadAssetsForSection', 'in-progress', 'Asset load already in progress, waiting', { sectionName });
-
-    // Wait for existing load to complete
-    const result = await waitForAssetLoad(loadingKey);
-    return result;
-  }
-
-  // Mark as loading
-  assetsLoadingInProgress.add(loadingKey);
-
-  try {
-    // Load manifest to get bundle paths
-    const manifest = await getManifest();
-    const bundlePaths = await getSectionBundlePaths(sectionName, manifest);
-
-    // Get asset preload configurations
-    const assetPreloadConfigs = getAssetPreloadConfigForSection(sectionName);
-
-    // Build asset metadata
-    const assets = {
-      sectionName,
-      bundlePaths: bundlePaths || { js: null, css: null },
-      assetPreloadConfigs: assetPreloadConfigs || [],
-      manifestEntry: manifest[sectionName] || null,
-      loadedAt: new Date().toISOString(),
-      state: 'loaded'
-    };
-
-    log('assetLibrary.js', 'loadAssetsForSection', 'success', 'Assets loaded for section', {
-      sectionName,
-      hasBundle: !!bundlePaths,
-      preloadAssetCount: assetPreloadConfigs.length
+  if (assetsLoadingPromises.has(sectionName)) {
+    log('assetLibrary.js', 'loadAssetsForSection', 'in-progress', 'Asset load already in progress — sharing promise', {
+      sectionName
     });
-
-    // Cache the loaded assets
-    setValueWithExpiration(cacheKey, assets, ASSET_CACHE_TTL);
-
-    // Store in memory map
-    loadedAssets.set(sectionName, assets);
-
-    if (window.performanceTracker) {
-      window.performanceTracker.step({
-        step: 'assetsLoaded',
-        file: 'assetLibrary.js',
-        method: 'loadAssetsForSection',
-        flag: 'load-complete',
-        purpose: `Assets loaded for ${sectionName}`
-      });
-    }
-
-    return assets;
-
-  } catch (error) {
-    logError('assetLibrary.js', 'loadAssetsForSection', 'Failed to load assets', error, { sectionName });
-    return {
-      sectionName,
-      bundlePaths: { js: null, css: null },
-      assetPreloadConfigs: [],
-      manifestEntry: null,
-      loadedAt: new Date().toISOString(),
-      state: 'error',
-      error: error.message
-    };
-  } finally {
-    // Remove from loading set
-    assetsLoadingInProgress.delete(loadingKey);
+    return assetsLoadingPromises.get(sectionName);
   }
-}
 
-/**
- * Wait for an in-progress asset load to complete
- * 
- * @param {string} loadingKey - Key of asset being loaded
- * @returns {Promise<object>} - Loaded assets
- */
-async function waitForAssetLoad(loadingKey) {
-  log('assetLibrary.js', 'waitForAssetLoad', 'start', 'Waiting for asset load', { loadingKey });
+  const loadPromise = (async () => {
+    try {
+      const manifest = await getManifest();
+      const bundlePaths = await getSectionBundlePaths(sectionName, manifest);
+      const assetPreloadConfigs = getAssetPreloadConfigForSection(sectionName);
 
-  // Extract section name from loading key
-  const sectionName = loadingKey.replace('asset_', '');
+      const assets = {
+        sectionName,
+        bundlePaths: bundlePaths || { js: null, css: null },
+        assetPreloadConfigs: assetPreloadConfigs || [],
+        manifestEntry: manifest[sectionName] || null,
+        loadedAt: new Date().toISOString(),
+        state: 'loaded'
+      };
 
-  // Poll until asset is loaded or timeout
-  const maxWaitTime = 5000; // 5 seconds
-  const pollInterval = 100; // 100ms
-  let waitedTime = 0;
+      log('assetLibrary.js', 'loadAssetsForSection', 'success', 'Assets loaded for section', {
+        sectionName,
+        hasBundle: !!bundlePaths,
+        preloadAssetCount: assetPreloadConfigs.length
+      });
 
-  while (waitedTime < maxWaitTime) {
-    // Check if asset is now loaded
-    if (loadedAssets.has(sectionName)) {
-      const result = loadedAssets.get(sectionName);
-      log('assetLibrary.js', 'waitForAssetLoad', 'return', 'Returning loaded asset', { sectionName });
-      return result;
-    }
+      setValueWithExpiration(cacheKey, assets, ASSET_CACHE_TTL);
+      loadedAssets.set(sectionName, assets);
 
-    // Check if loading has finished (even if failed)
-    if (!assetsLoadingInProgress.has(loadingKey)) {
-      log('assetLibrary.js', 'waitForAssetLoad', 'warn', 'Loading finished but not in map', { loadingKey });
+      if (window.performanceTracker) {
+        window.performanceTracker.step({
+          step: 'assetsLoaded',
+          file: 'assetLibrary.js',
+          method: 'loadAssetsForSection',
+          flag: 'load-complete',
+          purpose: `Assets loaded for ${sectionName}`
+        });
+      }
+
+      return assets;
+    } catch (error) {
+      logError('assetLibrary.js', 'loadAssetsForSection', 'Failed to load assets', error, { sectionName });
       return {
         sectionName,
         bundlePaths: { js: null, css: null },
         assetPreloadConfigs: [],
         manifestEntry: null,
-        state: 'error'
+        loadedAt: new Date().toISOString(),
+        state: 'error',
+        error: error.message
       };
     }
+  })();
 
-    // Wait before checking again
-    await new Promise(resolve => setTimeout(resolve, pollInterval));
-    waitedTime += pollInterval;
-  }
+  const sharedPromise = loadPromise.finally(() => {
+    assetsLoadingPromises.delete(sectionName);
+  });
 
-  // Timeout - return empty object
-  log('assetLibrary.js', 'waitForAssetLoad', 'warn', 'Asset load timeout', { loadingKey, waitedTime });
-  return {
-    sectionName,
-    bundlePaths: { js: null, css: null },
-    assetPreloadConfigs: [],
-    manifestEntry: null,
-    state: 'timeout'
-  };
+  assetsLoadingPromises.set(sectionName, sharedPromise);
+  return sharedPromise;
 }
 
 /**
@@ -412,7 +351,7 @@ export function getAssetsForSection(sectionName) {
  * @returns {boolean} - True if section bundle metadata is loaded
  */
 export function areAssetsLoadedForSection(sectionName) {
-  const loaded = loadedAssets.has(sectionName);
+  const loaded = getAssetsForSection(sectionName) !== null;
   log('assetLibrary.js', 'areAssetsLoadedForSection', 'return', 'Returning loaded status', { sectionName, loaded });
   return loaded;
 }
@@ -426,9 +365,7 @@ export function areAssetsLoadedForSection(sectionName) {
 export function getAssetLoadingState(sectionName) {
   log('assetLibrary.js', 'getAssetLoadingState', 'start', 'Getting asset loading state', { sectionName });
 
-  // Check if loading
-  const loadingKey = `asset_${sectionName}`;
-  if (assetsLoadingInProgress.has(loadingKey)) {
+  if (assetsLoadingPromises.has(sectionName)) {
     log('assetLibrary.js', 'getAssetLoadingState', 'return', 'Assets are loading', { sectionName, state: 'loading' });
     return 'loading';
   }
@@ -467,9 +404,13 @@ export function clearAssetCaches() {
   // Clear in-memory Map
   const mapCount = loadedAssets.size;
   loadedAssets.clear();
+  assetsLoadingPromises.clear();
 
   // Clear cached manifest
   cachedManifest = null;
+
+  // Reset in-memory asset map + in-flight load (see L-01 / clearAssetMapConfigCache)
+  clearAssetMapConfigCache();
 
   // Also clear cacheHandler (which has TTL-based caching)
   clearAllCache();
@@ -489,7 +430,7 @@ export function getAssetStatistics() {
   const stats = {
     loadedCount: loadedAssets.size,
     loadedSections: Array.from(loadedAssets.keys()),
-    loadingInProgress: Array.from(assetsLoadingInProgress).map(key => key.replace('asset_', '')),
+    loadingInProgress: Array.from(assetsLoadingPromises.keys()),
     manifestCached: !!cachedManifest
   };
 
@@ -533,11 +474,7 @@ export function unloadUnusedSections(sectionsToKeep = []) {
   // Unload sections
   keysToDelete.forEach(sectionName => {
     loadedAssets.delete(sectionName);
-
-    // Also clear from cache
-    const cacheKey = ASSET_CACHE_KEY_PREFIX + sectionName;
-    // Note: cacheHandler doesn't expose individual key deletion, but TTL will handle it
-
+    removeFromCache(ASSET_CACHE_KEY_PREFIX + sectionName);
     unloadedCount++;
   });
 
@@ -567,6 +504,34 @@ export function unloadUnusedSections(sectionsToKeep = []) {
 function isLocalhostHostname(hostname) {
   const host = String(hostname).toLowerCase();
   return host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+}
+
+/**
+ * Remote URL hostname checks (L-08 / S-07 — e.g. i.ibb.co.com typo).
+ * @param {string} url
+ * @returns {string|null} Error message or null if OK
+ */
+function validateRemoteAssetUrl(url) {
+  if (typeof url !== 'string' || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+    return null;
+  }
+
+  try {
+    const { hostname } = new URL(url);
+    const host = hostname.toLowerCase();
+
+    if (host.endsWith('.co.com') || host.includes('.ibb.co.com')) {
+      return `malformed hostname (invalid double TLD): ${hostname}`;
+    }
+
+    if (host.includes('ibb.co') && host !== 'i.ibb.co') {
+      return `invalid ImgBB hostname "${hostname}"; expected i.ibb.co`;
+    }
+
+    return null;
+  } catch {
+    return 'malformed absolute URL';
+  }
 }
 
 /**
@@ -665,22 +630,27 @@ export function getEnvironment() {
 }
 
 /**
- * Candidate URLs for runtime asset map fetch (dev may serve from public or /src).
+ * Candidate URLs for runtime asset map fetch (L-10 / S-06).
+ * Order: optional `VITE_ASSET_MAP_URL`, then `public/config`, then `src/config` in dev.
+ * Network fetch runs only when `shouldAllowRuntimeAssetMapFetch()` is true (dev override flag).
+ *
  * @returns {string[]}
  */
 export function getAssetMapFetchCandidates() {
-  const candidates = ['/config/assetMap.json'];
+  const candidates = [];
+
+  const override = import.meta.env.VITE_ASSET_MAP_URL;
+  if (override && typeof override === 'string' && override.trim()) {
+    candidates.push(override.trim());
+  }
+
+  candidates.push('/config/assetMap.json');
 
   if (import.meta.env.DEV) {
     candidates.push('/src/config/assetMap.json');
   }
 
-  const override = import.meta.env.VITE_ASSET_MAP_URL;
-  if (override && typeof override === 'string') {
-    candidates.unshift(override);
-  }
-
-  return candidates;
+  return [...new Set(candidates)];
 }
 
 /**
@@ -753,7 +723,7 @@ export function getAssetMapConfigSource() {
   return assetMapConfigSource;
 }
 
-export async function loadAssetMapConfig() {
+export function loadAssetMapConfig() {
   log('assetLibrary.js', 'loadAssetMapConfig', 'start', 'Loading asset map configuration', {});
 
   // Return cached map if available
@@ -761,7 +731,7 @@ export async function loadAssetMapConfig() {
     log('assetLibrary.js', 'loadAssetMapConfig', 'memory-hit', 'Returning cached asset map from memory', {
       source: assetMapConfigSource
     });
-    return cachedAssetMap;
+    return Promise.resolve(cachedAssetMap);
   }
 
   // Check cache
@@ -771,7 +741,7 @@ export async function loadAssetMapConfig() {
       source: assetMapConfigSource
     });
     cachedAssetMap = cachedConfig;
-    return cachedConfig;
+    return Promise.resolve(cachedConfig);
   }
 
   // If already loading, wait for existing promise
@@ -780,7 +750,7 @@ export async function loadAssetMapConfig() {
     return assetMapLoadPromise;
   }
 
-  assetMapLoadPromise = (async () => {
+  const loadPromise = (async () => {
     try {
       let assetMap;
       let source;
@@ -837,12 +807,15 @@ export async function loadAssetMapConfig() {
       cachedAssetMap = emptyMap;
       assetMapConfigSource = 'bundled-fallback';
       return emptyMap;
-    } finally {
-      assetMapLoadPromise = null;
     }
   })();
 
-  return assetMapLoadPromise;
+  const sharedPromise = loadPromise.finally(() => {
+    assetMapLoadPromise = null;
+  });
+
+  assetMapLoadPromise = sharedPromise;
+  return sharedPromise;
 }
 
 /**
@@ -1004,6 +977,28 @@ export async function getAssetUrls(flags, environment = null) {
 }
 
 /**
+ * Production base map with environment-specific overrides (L-07).
+ * Same inheritance rules for flag lists and category lookups.
+ *
+ * @param {object} assetMap - Full asset map config
+ * @param {string} env - Target environment
+ * @returns {object} Merged flag → URL map
+ */
+function resolveAssetMapForEnvironment(assetMap, env) {
+  const merged = {};
+
+  if (assetMap?.production && typeof assetMap.production === 'object') {
+    Object.assign(merged, assetMap.production);
+  }
+
+  if (env !== 'production' && assetMap?.[env] && typeof assetMap[env] === 'object') {
+    Object.assign(merged, assetMap[env]);
+  }
+
+  return merged;
+}
+
+/**
  * Get all available asset flags for current environment
  * 
  * @param {string} [environment] - Optional environment override
@@ -1015,21 +1010,7 @@ export async function getAvailableAssetFlags(environment = null) {
   try {
     const env = environment || detectEnvironment();
     const assetMap = await loadAssetMapConfig();
-
-    // Combine flags from current environment and production (for inheritance)
-    const flags = new Set();
-
-    // Add production flags (base)
-    if (assetMap.production) {
-      Object.keys(assetMap.production).forEach(flag => flags.add(flag));
-    }
-
-    // Add environment-specific flags
-    if (assetMap[env]) {
-      Object.keys(assetMap[env]).forEach(flag => flags.add(flag));
-    }
-
-    const flagArray = Array.from(flags).sort();
+    const flagArray = Object.keys(resolveAssetMapForEnvironment(assetMap, env)).sort();
 
     log('assetLibrary.js', 'getAvailableAssetFlags', 'success', 'Available flags retrieved', {
       environment: env,
@@ -1086,27 +1067,15 @@ export async function getAssetsByCategory(category, environment = null) {
   try {
     const env = environment || detectEnvironment();
     const assetMap = await loadAssetMapConfig();
-
     const categoryPrefix = category.endsWith('.') ? category : `${category}.`;
+    const resolvedMap = resolveAssetMapForEnvironment(assetMap, env);
     const matchingAssets = {};
 
-    // Check current environment
-    if (assetMap[env]) {
-      Object.entries(assetMap[env]).forEach(([flag, url]) => {
-        if (flag.startsWith(categoryPrefix)) {
-          matchingAssets[flag] = url;
-        }
-      });
-    }
-
-    // Check production for inheritance
-    if (env !== 'production' && assetMap.production) {
-      Object.entries(assetMap.production).forEach(([flag, url]) => {
-        if (flag.startsWith(categoryPrefix) && !matchingAssets[flag]) {
-          matchingAssets[flag] = url;
-        }
-      });
-    }
+    Object.entries(resolvedMap).forEach(([flag, url]) => {
+      if (flag.startsWith(categoryPrefix)) {
+        matchingAssets[flag] = url;
+      }
+    });
 
     log('assetLibrary.js', 'getAssetsByCategory', 'success', 'Assets by category retrieved', {
       category,
@@ -1190,6 +1159,11 @@ export async function validateAssetMap() {
         // Check URL format
         if (!url.startsWith('/') && !url.startsWith('http://') && !url.startsWith('https://')) {
           warnings.push(`URL for flag "${flag}" in environment "${env}" may be invalid: ${url}`);
+        }
+
+        const hostnameIssue = validateRemoteAssetUrl(url);
+        if (hostnameIssue) {
+          errors.push(`Flag "${flag}" in environment "${env}": ${hostnameIssue}`);
         }
 
         if (url.startsWith('http://')) {
