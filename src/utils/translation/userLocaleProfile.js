@@ -51,6 +51,14 @@ export async function resolvePreferredLocaleForAuth() {
 
 /**
  * Apply server-stored locale after login/session restore when URL has no locale prefix.
+ *
+ * L-17: This function is called asynchronously from `setTokenAndDecode` (fire-and-forget).
+ * It races with router navigation, so `window.location.pathname` may be stale.
+ * If the locale store already holds an explicit user preference, trust it over the
+ * JWT claim — the JWT `custom:preferred_locale` can be stale until the token is
+ * refreshed. Only apply the profile locale when no local preference exists
+ * (e.g., fresh login on a new device).
+ *
  * @returns {Promise<void>}
  */
 export async function applyUserPreferredLocaleOnAuth() {
@@ -66,13 +74,30 @@ export async function applyUserPreferredLocaleOnAuth() {
     }
   }
 
+  const current = getActiveLocale();
+  if (current && SUPPORTED_LOCALES.includes(current) && current !== 'en') {
+    authStore.updateUserAttributesLocally({ preferredLocale: current });
+    return;
+  }
+
+  const { useLocaleStore } = await import('@/stores/useLocaleStore.js');
+  try {
+    const localeStore = useLocaleStore();
+    if (localeStore.locale && SUPPORTED_LOCALES.includes(localeStore.locale)) {
+      authStore.updateUserAttributesLocally({ preferredLocale: localeStore.locale });
+      return;
+    }
+  } catch {
+    // Store unavailable during early boot
+  }
+
   const preferredLocale = await resolvePreferredLocaleForAuth();
   if (!preferredLocale || !SUPPORTED_LOCALES.includes(preferredLocale)) {
     return;
   }
 
-  const current = getActiveLocale();
-  if (current === preferredLocale) {
+  const currentActive = getActiveLocale();
+  if (currentActive === preferredLocale) {
     authStore.updateUserAttributesLocally({ preferredLocale });
     return;
   }

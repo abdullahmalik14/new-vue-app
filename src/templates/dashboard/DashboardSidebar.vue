@@ -213,8 +213,6 @@ import { menuItems, resolveMenuItemsWithAssets } from "../../assets/data/menuIte
 import PopupHandler from "@/components/ui/popup/PopupHandler.vue";
 import AvatarProfilePopup from "@/components/ui/popup/AvatarProfilePopup.vue";
 import NotificationPopup from "@/components/ui/popup/NotificationPopup.vue";
-import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js";
-import { getActiveLocale } from "@/utils/translation/localeManager.js";
 import { getI18nInstance } from "@/utils/translation/i18nInstance.js";
 import { createRoutePrefetchIntentHandler } from "@/utils/route/useRoutePrefetch.js";
 
@@ -375,7 +373,6 @@ export default {
     await this.loadAllAssets();
   },
   async mounted() {
-    await this.loadTranslations();
     await this.resolveMenuItems();
     
     // Initial calculation
@@ -400,14 +397,6 @@ export default {
     }
   },
   methods: {
-    async loadTranslations() {
-      try {
-        const locale = getActiveLocale() || 'en';
-        await loadTranslationsForSection('dashboard-global', locale);
-      } catch (e) {
-        console.warn('[DashboardSidebar] Translation load failed', e);
-      }
-    },
     async resolveMenuItems() {
       try {
         this.resolvedMenuItems = await resolveMenuItemsWithAssets(menuItems);
@@ -416,7 +405,6 @@ export default {
       }
     },
     async handleLocaleChange() {
-      await this.loadTranslations();
       await this.resolveMenuItems();
       this.calculateOverflow();
     },

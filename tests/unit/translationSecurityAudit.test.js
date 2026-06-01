@@ -65,12 +65,16 @@ describe('translation security audit (S-03)', () => {
   });
 });
 
-describe('translation JSON integrity policy (S-04)', () => {
+describe('translation JSON integrity policy (S-04 / S-05)', () => {
   it('documents same-origin translation fetch boundary in translationLoader', () => {
     const loaderPath = join(projectRoot, 'src/utils/translation/translationLoader.js');
     const loaderSource = readFileSync(loaderPath, 'utf8');
 
-    expect(loaderSource).toContain('`/i18n/section-${safeSectionName}/${localeCode}.json`');
+    expect(loaderSource).toContain('encodeURIComponent(safeSectionName)');
+    expect(loaderSource).toContain('encodeURIComponent(localeCode)');
     expect(loaderSource).toMatch(/S-04.*CDN|same-origin static JSON/i);
+    expect(loaderSource).toMatch(/isAllowlistedSectionName|getKnownTranslationSections/);
+    expect(loaderSource).toMatch(/isSupportedTranslationLocale|SUPPORTED_LOCALES/);
+    expect(loaderSource).toMatch(/localeConstants\.js/);
   });
 });

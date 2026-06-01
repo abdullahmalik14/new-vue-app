@@ -89,7 +89,6 @@ import { ref, onMounted, watch, computed, onBeforeUnmount, inject } from "vue";
 import { RouterLink, useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { getActiveLocale } from "@/utils/translation/localeManager.js";
-import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { authHandler } from "@/utils/auth/authHandler";
 import { getAssetUrl } from "@/utils/assets/assetLibrary";
@@ -224,13 +223,6 @@ watch(i18nLocale, async (newLocale, oldLocale) => {
 
   console.log(`[LOGIN] Locale changed from '${oldLocale}' to '${newLocale}'`);
 
-  // Reload translations for the new locale
-  try {
-    await loadTranslationsForSection("auth", newLocale);
-  } catch (err) {
-    console.error("[LOGIN] Failed to reload translations:", err);
-  }
-
   // Update validation configs in field states (validationConfig is stored at registration)
   const emailState = interactionsEngine.getFieldState(emailConfig.value);
   const passwordState = interactionsEngine.getFieldState(passwordConfig.value);
@@ -312,13 +304,6 @@ onMounted(async () => {
   // Load icons independently (dynamic)
   xIcon.value = await getAssetUrl("icon.social.x");
   telegramIcon.value = await getAssetUrl("icon.social.telegram");
-
-  // Load translations for auth section
-  try {
-    await loadTranslationsForSection("auth", locale.value);
-  } catch (translationError) {
-    console.error("[LOGIN] Failed to load translations:", translationError);
-  }
 
   // Load critical assets using AssetHandler
   try {

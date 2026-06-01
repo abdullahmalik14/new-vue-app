@@ -21,6 +21,9 @@ export {
   DEFAULT_LOCALE,
   SUPPORTED_LOCALES,
   resolveActiveLocale,
+  resolveActiveLocaleForNavigation,
+  registerLocaleRouter,
+  syncCurrentActiveLocaleFromStore,
   setActiveLocale,
   getActiveLocale,
   getDisplayedLocale,
@@ -40,9 +43,15 @@ export {
   getTemporaryPageLocale,
   getTemporaryPageLocaleBase,
   isTemporaryPageLocaleActive,
+  getPersistedLocalePreference,
+  syncTemporaryPageLocaleFromUrl,
+  resolveLocaleForUrlInjection,
   reapplyTemporaryPageLocaleForRoute,
   clearTemporaryPageLocaleOnReload,
   applyProfileLocaleToStoreIfAuthenticated,
+  getLeadingLocaleFromPath,
+  stripLeadingLocaleFromPath,
+  normalizeLocalizedPath,
 } from './localeManager.js';
 
 export {

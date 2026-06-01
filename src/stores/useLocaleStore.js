@@ -2,7 +2,7 @@
 
 import { defineStore } from 'pinia';
 import { log } from '../utils/common/logHandler';
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '../utils/translation/localeManager.js';
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '../utils/translation/localeConstants.js';
 
 /** Default locale preference TTL in localStorage (90 days). */
 const DEFAULT_LOCALE_PREFERENCE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
@@ -123,7 +123,9 @@ export const useLocaleStore = defineStore('locale', {
   actions: {
     /**
      * @action setLocale
-     * @description Set the active locale
+     * @description Set the active locale in Pinia (persisted). For UI/settings changes,
+     * prefer `setActiveLocale` from localeManager (URL, i18n, translations, preload).
+     * Direct store writes sync in-memory locale via main.js → syncCurrentActiveLocaleFromStore (L-12).
      * @param {string} localeCode - Locale code to set
      * @returns {boolean} True if locale was set successfully
      */
@@ -152,6 +154,15 @@ export const useLocaleStore = defineStore('locale', {
 
       // Set locale in state (persisted automatically)
       this.locale = localeCode;
+
+      // Fallback manual persistence to guarantee localStorage is updated
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('locale_preference', serializeLocalePersistedState({ locale: localeCode }));
+        }
+      } catch (e) {
+        console.warn('Failed to manually persist locale:', e);
+      }
 
       log('useLocaleStore.js', 'setLocale', 'success', 'Locale set successfully', { localeCode });
       log('useLocaleStore.js', 'setLocale', 'return', 'Returning success', { localeCode });

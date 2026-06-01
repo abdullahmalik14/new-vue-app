@@ -9,7 +9,7 @@ vi.mock('../../src/utils/common/cacheHandler.js', () => ({
 }));
 
 vi.mock('../../src/utils/translation/localeManager.js', () => ({
-  resolveActiveLocale: vi.fn(() => 'en')
+  resolveActiveLocale: vi.fn(() => 'en'),
 }));
 
 vi.mock('../../src/utils/translation/i18nInstance.js', () => ({
@@ -43,7 +43,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('translationLoader section name validation (S-04)', () => {
+describe('translationLoader section name validation (S-04 / S-05)', () => {
   it('loads translations for allowlisted section names', async () => {
     mockTranslationFetch({ title: 'Auth' });
 
@@ -72,6 +72,54 @@ describe('translationLoader section name validation (S-04)', () => {
     await expect(loadTranslationsForSection('auth extra', 'en')).resolves.toEqual({});
 
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('rejects unknown but syntactically valid section names (S-05 allowlist)', async () => {
+    const { loadTranslationsForSection } = await import(LOADER_PATH);
+
+    const result = await loadTranslationsForSection('not-a-real-section', 'en');
+
+    expect(result).toEqual({});
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('rejects unsupported locale codes without fetching (S-05)', async () => {
+    const { loadTranslationsForSection } = await import(LOADER_PATH);
+
+    const result = await loadTranslationsForSection('auth', 'vif');
+
+    expect(result).toEqual({});
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('encodes locale path segments in fetch URLs (S-05)', async () => {
+    fetch.mockImplementation(async (url) => {
+      if (url === '/i18n/section-auth/en.json') {
+        return {
+          ok: true,
+          headers: {
+            get: (name) => (name.toLowerCase() === 'content-type' ? 'application/json' : null),
+          },
+          json: async () => ({ title: 'Login' }),
+        };
+      }
+      if (url === '/i18n/section-auth/zh-tw.json') {
+        return {
+          ok: true,
+          headers: {
+            get: (name) => (name.toLowerCase() === 'content-type' ? 'application/json' : null),
+          },
+          json: async () => ({ title: '登录' }),
+        };
+      }
+
+      throw new Error(`Unexpected fetch: ${url}`);
+    });
+
+    const { loadTranslationsForSection } = await import(LOADER_PATH);
+    await loadTranslationsForSection('auth', 'zh-tw');
+
+    expect(fetch).toHaveBeenCalledWith('/i18n/section-auth/zh-tw.json');
   });
 });
 

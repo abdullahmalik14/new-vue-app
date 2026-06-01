@@ -3,7 +3,7 @@
     <NavigationProgressBar />
     <TemporaryLocaleBanner />
     <div class="fixed top-2 right-2 z-[90] flex flex-col items-end gap-2">
-      <LanguageSwitcher @locale-changed="onLocaleChanged" @locale-change-error="onLocaleChangeError" />
+      <!-- <LanguageSwitcher @locale-changed="onLocaleChanged" @locale-change-error="onLocaleChangeError" /> -->
       <TranslatePageControl />
     </div>
 

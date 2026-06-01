@@ -94,7 +94,6 @@ import { ref, onMounted, watch, computed, onBeforeUnmount, inject } from "vue";
 import { RouterLink, useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { getActiveLocale } from "@/utils/translation/localeManager.js";
-import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js";
 import { authHandler, getCurrentAuthMode } from "@/utils/auth/authHandler";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getAssetUrl } from "@/utils/assets/assetLibrary";
@@ -132,11 +131,7 @@ const popupGoBack = inject('popupGoBack', null);
 
 onMounted(() => {
   if (route.query.error === 'user_not_found') {
-    error.value = t('User not found. Please create an account.');
-    // Or just a hardcoded message if translation key missing
-    if (error.value === 'User not found. Please create an account.') {
-      error.value = "Account not found. Please sign up first.";
-    }
+    error.value = t('auth.register.accountNotFoundPrompt');
   }
 });
 
@@ -330,13 +325,6 @@ watch(i18nLocale, async (newLocale, oldLocale) => {
 
   console.log(`[SIGNUP] Locale changed from '${oldLocale}' to '${newLocale}'`);
 
-  // Reload translations for the new locale
-  try {
-    await loadTranslationsForSection("auth", newLocale);
-  } catch (err) {
-    console.error("[SIGNUP] Failed to reload translations:", err);
-  }
-
   // Update validation configs in field states
   const emailState = interactionsEngine.getFieldState(emailConfig.value);
   const passwordState = interactionsEngine.getFieldState(passwordConfig.value);
@@ -444,13 +432,6 @@ onMounted(async () => {
   // Load icons independently (dynamic)
   xIcon.value = await getAssetUrl("icon.social.x");
   telegramIcon.value = await getAssetUrl("icon.social.telegram");
-
-  // Load translations for auth section
-  try {
-    await loadTranslationsForSection("auth", locale.value);
-  } catch (error) {
-    console.error("[SIGNUP] Failed to load translations:", error);
-  }
 
   // Load critical assets using AssetHandler
   try {

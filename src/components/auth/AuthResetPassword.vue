@@ -61,7 +61,6 @@ import { ref, onMounted, computed, onBeforeUnmount, watch, inject } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { useI18n } from "vue-i18n"
 import { getActiveLocale } from "@/utils/translation/localeManager.js"
-import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js"
 import { authHandler } from "@/utils/auth/authHandler"
 import { getAssetUrl } from "@/utils/assets/assetLibrary"
 import { createAssetHandler } from "@/utils/assets/assetHandlerFactory.js"
@@ -214,13 +213,6 @@ watch(i18nLocale, async (newLocale, oldLocale) => {
 
   console.log(`[RESET PASSWORD] Locale changed from '${oldLocale}' to '${newLocale}'`)
 
-  // Reload translations for the new locale
-  try {
-    await loadTranslationsForSection('auth', newLocale)
-  } catch (err) {
-    console.error('[RESET PASSWORD] Failed to reload translations:', err)
-  }
-
   // Update validation configs in field states
   const emailState = interactionsEngine.getFieldState(emailConfig.value)
   const codeState = interactionsEngine.getFieldState(codeConfig.value)
@@ -315,13 +307,6 @@ onMounted(async () => {
     name: 'AuthResetPassword',
     debug: true
   })
-
-  // Load translations for auth section
-  try {
-    await loadTranslationsForSection('auth', locale.value)
-  } catch (err) {
-    console.error('[RESET PASSWORD] Failed to load translations:', err)
-  }
 
   // Load critical assets using AssetHandler
   try {

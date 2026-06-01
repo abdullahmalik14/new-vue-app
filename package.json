@@ -17,7 +17,8 @@
     "test:unit": "vitest",
     "validate-env": "node ./build/validate-env.js",
     "validate-env:dev": "cross-env NODE_ENV=development node ./build/validate-env.js",
-    "validate-env:prod": "cross-env NODE_ENV=production node ./build/validate-env.js"
+    "validate-env:prod": "cross-env NODE_ENV=production node ./build/validate-env.js",
+    "validate:i18n": "node ./build/validateI18n.js"
   },
   "dependencies": {
     "@amcharts/amcharts5": "^5.17.2",

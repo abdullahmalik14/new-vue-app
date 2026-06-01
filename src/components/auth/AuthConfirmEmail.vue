@@ -70,7 +70,6 @@ import { ref, onMounted, computed, watch, onBeforeUnmount, inject } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { useI18n } from "vue-i18n"
 import { getActiveLocale } from "@/utils/translation/localeManager.js"
-import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js"
 import { authHandler } from "@/utils/auth/authHandler"
 import { useAuthStore } from "@/stores/useAuthStore"
 import { createAssetHandler } from "@/utils/assets/assetHandlerFactory.js"
@@ -237,13 +236,6 @@ onMounted(async () => {
     name: 'AuthConfirmEmail',
     debug: true
   })
-
-  // Load translations for auth section
-  try {
-    await loadTranslationsForSection('auth', locale.value)
-  } catch (translationError) {
-    console.error('[CONFIRM_EMAIL] Failed to load translations:', translationError)
-  }
 
   // Pre-fill email from sessionStorage or URL query
   const pendingEmail = sessionStorage.getItem('pendingSignupEmail') || route.query.email

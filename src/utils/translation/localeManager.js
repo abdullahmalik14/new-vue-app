@@ -26,22 +26,21 @@ import {
   refreshSectionPreloadsOnLocaleChange,
 } from "../section/sectionPreloadOrchestrator.js";
 import { getI18nInstance } from "./i18nInstance.js";
-import { LOCALE_DISPLAY_METADATA } from "./localeDisplayMetadata.js";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_DISPLAY_METADATA,
+  RTL_LOCALES,
+  SUPPORTED_LOCALES,
+  getDocumentDirection,
+} from "./localeConstants.js";
 
-// Supported locales - exported as the single source of truth
-export const SUPPORTED_LOCALES = [ "af", "sq", "am", "ar", "hy", "az", "bn", "bs", "bg", "ca", "zh", "zh-tw", "hr", "cs", "da", "fa-af", "nl", "en", "et", "fa", "tl", "fi", "fr", "fr-ca", "ka", "de", "el", "gu", "ht", "ha", "he", "hi", "hu", "is", "id", "ga", "it", "ja", "kn", "kk", "ko", "lv", "lt", "mk", "ms", "ml", "mt", "mr", "mn", "no", "ps", "pl", "pt", "pt-pt", "pa", "ro", "ru", "sr", "si", "sk", "sl", "so", "es", "es-mx", "sw", "sv", "ta", "te", "th", "tr", "uk", "ur", "uz", "vi", "cy" ];
-export const DEFAULT_LOCALE = "en";
-
-/** Locales that require right-to-left document layout. */
-export const RTL_LOCALES = new Set(["ar", "he", "fa", "fa-af", "ur", "ps"]);
-
-/**
- * @param {string} localeCode
- * @returns {'rtl'|'ltr'}
- */
-export function getDocumentDirection(localeCode) {
-  return RTL_LOCALES.has(localeCode) ? "rtl" : "ltr";
-}
+export {
+  DEFAULT_LOCALE,
+  LOCALE_DISPLAY_METADATA,
+  RTL_LOCALES,
+  SUPPORTED_LOCALES,
+  getDocumentDirection,
+} from "./localeConstants.js";
 
 /**
  * Sync `<html lang>` and `<html dir>` for accessibility, SEO, and RTL layout.
@@ -58,6 +57,7 @@ export function applyDocumentLocaleAttributes(localeCode) {
 
 /**
  * First path segment if it is a supported locale (e.g. /vi/dashboard → vi).
+ * L-14: Case-insensitive matching (e.g., /VI/dashboard, /En/dashboard → vi, en)
  *
  * @param {string} path
  * @param {string[]} [supportedLocales=SUPPORTED_LOCALES]
@@ -65,14 +65,18 @@ export function applyDocumentLocaleAttributes(localeCode) {
  */
 export function getLeadingLocaleFromPath(path, supportedLocales = SUPPORTED_LOCALES) {
   const segments = String(path || "").split("/").filter(Boolean);
-  if (segments.length > 0 && supportedLocales.includes(segments[0])) {
-    return segments[0];
+  if (segments.length > 0) {
+    const firstSegmentLower = segments[0].toLowerCase();
+    if (supportedLocales.includes(firstSegmentLower)) {
+      return firstSegmentLower;
+    }
   }
   return null;
 }
 
 /**
  * Remove a leading locale segment from a path (L14 — avoid /vi/vi/... double prefix).
+ * L-14: Case-insensitive matching for locale detection.
  *
  * @param {string} path
  * @param {string[]} [supportedLocales=SUPPORTED_LOCALES]
@@ -80,17 +84,66 @@ export function getLeadingLocaleFromPath(path, supportedLocales = SUPPORTED_LOCA
  */
 export function stripLeadingLocaleFromPath(path, supportedLocales = SUPPORTED_LOCALES) {
   const segments = String(path || "").split("/").filter(Boolean);
-  if (segments.length > 0 && supportedLocales.includes(segments[0])) {
-    const rest = segments.slice(1);
-    return rest.length ? `/${rest.join("/")}` : "/";
+  if (segments.length > 0) {
+    const firstSegmentLower = segments[0].toLowerCase();
+    if (supportedLocales.includes(firstSegmentLower)) {
+      const rest = segments.slice(1);
+      return rest.length ? `/${rest.join("/")}` : "/";
+    }
   }
   return path || "/";
+}
+
+/**
+ * Strip a supported locale prefix before route-config slug lookup (L-11).
+ * Alias for {@link stripLeadingLocaleFromPath} — use before `resolveRouteFromPath`.
+ *
+ * @param {string} path
+ * @param {string[]} [supportedLocales=SUPPORTED_LOCALES]
+ * @returns {string}
+ */
+export function normalizeLocalizedPath(path, supportedLocales = SUPPORTED_LOCALES) {
+  return stripLeadingLocaleFromPath(path, supportedLocales);
 }
 
 // Current active locale
 let currentActiveLocale = null;
 
+/** @type {import('vue-router').Router | null} */
+let localeRouter = null;
+
 const COGNITO_PREFERRED_LOCALE_ATTR = "custom:preferred_locale";
+
+/**
+ * Register the Vue Router instance for locale URL updates (L-10).
+ * Called once from main.js after app.use(router).
+ *
+ * @param {import('vue-router').Router} router
+ * @returns {void}
+ */
+export function registerLocaleRouter(router) {
+  localeRouter = router;
+}
+
+/**
+ * Keep localeManager's in-memory locale aligned with Pinia (L-12).
+ * Wired from main.js whenever `localeStore.locale` changes.
+ *
+ * @param {string|null|undefined} localeCode
+ * @returns {void}
+ */
+export function syncCurrentActiveLocaleFromStore(localeCode) {
+  if (typeof localeCode === "string" && SUPPORTED_LOCALES.includes(localeCode)) {
+    currentActiveLocale = localeCode;
+    log(
+      "localeManager.js",
+      "syncCurrentActiveLocaleFromStore",
+      "info",
+      "Synced in-memory active locale from store",
+      { localeCode }
+    );
+  }
+}
 
 /**
  * Read preferred locale from authenticated user (Cognito JWT / store mirror).
@@ -136,12 +189,36 @@ function syncLocaleStoreWithCode(localeCode) {
 
 /**
  * After auth restore, apply Cognito profile locale to store + in-memory active locale.
+ *
+ * If the locale store already holds a valid persisted preference, it takes priority
+ * over the Cognito JWT claim. The JWT `custom:preferred_locale` can be stale
+ * (Cognito attribute is updated via `savePreferredLocaleToCognito`, but the local
+ * JWT is not re-issued until the next token refresh). Overriding a fresh
+ * localStorage value with a stale token claim caused L-17 (language revert on reload).
+ *
  * @returns {string | null}
  */
 export function applyProfileLocaleToStoreIfAuthenticated() {
   const profileLocale = getProfilePreferredLocaleFromAuth();
   if (!profileLocale) {
     return null;
+  }
+
+  try {
+    const localeStore = useLocaleStore();
+    if (localeStore.locale && SUPPORTED_LOCALES.includes(localeStore.locale)) {
+      currentActiveLocale = localeStore.locale;
+      log(
+        "localeManager.js",
+        "applyProfileLocaleToStoreIfAuthenticated",
+        "info",
+        "Persisted store locale takes priority over Cognito JWT claim (L-17)",
+        { storedLocale: localeStore.locale, profileLocale }
+      );
+      return localeStore.locale;
+    }
+  } catch {
+    // Store unavailable during early boot — fall through to profile locale
   }
 
   syncLocaleStoreWithCode(profileLocale);
@@ -212,16 +289,38 @@ export function resolveActiveLocale() {
       return urlLocale;
     }
 
-    // 2. Authenticated profile (Cognito) — beats stale localStorage on other devices
+    // 2. Authenticated profile (Cognito)
+    // L-17: Only use profile locale when the local store has no explicit preference.
+    // The JWT `custom:preferred_locale` can be stale until the token is refreshed,
+    // so an explicitly persisted store value (from a user-initiated setLocale call)
+    // takes priority over the Cognito claim.
     const profileLocale = getProfilePreferredLocaleFromAuth();
     if (profileLocale) {
+      try {
+        const localeStore = useLocaleStore();
+        const storedLocale = localeStore.locale;
+        if (storedLocale && SUPPORTED_LOCALES.includes(storedLocale)) {
+          log(
+            "localeManager.js",
+            "resolveActiveLocale",
+            "info",
+            "Persisted store locale takes priority over Cognito profile (L-17)",
+            { storedLocale, profileLocale }
+          );
+          currentActiveLocale = storedLocale;
+          return storedLocale;
+        }
+      } catch {
+        // Store unavailable — fall through to use profile locale
+      }
+
       syncLocaleStoreWithCode(profileLocale);
 
       log(
         "localeManager.js",
         "resolveActiveLocale",
         "info",
-        "Locale resolved from user profile",
+        "Locale resolved from user profile (no local preference)",
         { locale: profileLocale }
       );
 
@@ -361,8 +460,61 @@ export function resolveActiveLocale() {
 }
 
 /**
- * Get locale from URL path
- * Checks first path segment only (e.g., /vi/dashboard → 'vi')
+ * Resolve locale for resource loading during a pending Vue Router navigation.
+ * Uses the destination route (`to.path` / `to.params.locale`), not
+ * `window.location.pathname` (still the previous URL until navigation commits).
+ *
+ * @param {{ path?: string, params?: { locale?: string } }} to - Destination route location
+ * @returns {string}
+ */
+export function resolveActiveLocaleForNavigation(to) {
+  const paramLocale = to?.params?.locale;
+  if (
+    typeof paramLocale === "string" &&
+    SUPPORTED_LOCALES.includes(paramLocale)
+  ) {
+    log(
+      "localeManager.js",
+      "resolveActiveLocaleForNavigation",
+      "return",
+      "Returning locale from route params",
+      { locale: paramLocale, path: to?.path }
+    );
+    return paramLocale;
+  }
+
+  const pathLocale = getLeadingLocaleFromPath(to?.path);
+  if (pathLocale) {
+    log(
+      "localeManager.js",
+      "resolveActiveLocaleForNavigation",
+      "return",
+      "Returning locale from destination path",
+      { locale: pathLocale, path: to?.path }
+    );
+    return pathLocale;
+  }
+
+  const tempLocale = getTemporaryPageLocale();
+  if (tempLocale) {
+    log(
+      "localeManager.js",
+      "resolveActiveLocaleForNavigation",
+      "return",
+      "Returning temporary page locale",
+      { locale: tempLocale, path: to?.path }
+    );
+    return tempLocale;
+  }
+
+  return resolveActiveLocale();
+}
+
+/**
+ * Get locale from URL path or query parameter
+ * Checks first: query parameter (?locale=vi)
+ * Then: first path segment (e.g., /vi/dashboard → 'vi')
+ * (L-13: Implemented query parameter support matching documented behavior)
  *
  * @returns {string|null} - Locale code or null if not found
  */
@@ -376,6 +528,39 @@ function getLocaleFromUrl() {
   );
 
   try {
+    // L-13: Check query parameter first (?locale=vi)
+    if (typeof window !== "undefined" && window.location.search) {
+      const searchParams = new URLSearchParams(window.location.search);
+      const queryLocale = searchParams.get("locale");
+      if (queryLocale) {
+        const normalizedQueryLocale = queryLocale.toLowerCase().trim();
+        if (SUPPORTED_LOCALES.includes(normalizedQueryLocale)) {
+          log(
+            "localeManager.js",
+            "getLocaleFromUrl",
+            "info",
+            "Found locale in query parameter",
+            { locale: normalizedQueryLocale }
+          );
+          log(
+            "localeManager.js",
+            "getLocaleFromUrl",
+            "return",
+            "Returning query locale",
+            { locale: normalizedQueryLocale }
+          );
+          return normalizedQueryLocale;
+        }
+        log(
+          "localeManager.js",
+          "getLocaleFromUrl",
+          "warn",
+          "Invalid locale in query parameter",
+          { queryLocale, supportedLocales: SUPPORTED_LOCALES }
+        );
+      }
+    }
+
     const pathLocale = getLeadingLocaleFromPath(window.location.pathname);
 
     if (pathLocale) {
@@ -653,6 +838,11 @@ export async function setActiveLocale(localeCode, options = {}) {
   // Update document language and text direction for accessibility/SEO/RTL
   applyDocumentLocaleAttributes(localeCode);
 
+  // Update URL before translation I/O so router guards use persisted locale (L-10)
+  if (updateUrl) {
+    await updateUrlWithLocale(localeCode);
+  }
+
   // Clear translation caches and reload current section for new locale
   try {
     // Dynamic import to avoid circular dependency
@@ -809,11 +999,6 @@ export async function setActiveLocale(localeCode, options = {}) {
     );
   }
 
-  // Update URL if requested
-  if (updateUrl) {
-    updateUrlWithLocale(localeCode);
-  }
-
   if (syncProfile) {
     try {
       const { syncPreferredLocaleToProfile } = await import("./userLocaleProfile.js");
@@ -849,14 +1034,130 @@ export async function setActiveLocale(localeCode, options = {}) {
 }
 
 /**
+ * Get the Vite base URL from import.meta.env.BASE_URL.
+ * L-15: Handles subpath deployments correctly.
+ * @returns {string}
+ */
+function getBaseUrl() {
+  try {
+    return import.meta.env.BASE_URL || "/";
+  } catch {
+    return "/";
+  }
+}
+
+/**
+ * Strip base URL from path if present.
+ * L-15: Helper to handle subpath deployments.
+ * @param {string} path
+ * @returns {string}
+ */
+function stripBaseUrlFromPath(path) {
+  const baseUrl = getBaseUrl();
+  if (baseUrl && baseUrl !== "/" && path.startsWith(baseUrl)) {
+    return path.slice(baseUrl.length - 1) || "/"; // Keep leading slash
+  }
+  return path;
+}
+
+/**
+ * Build a pathname with the locale prefix applied or removed.
+ * L-15: Uses Vue Router resolution when available to respect BASE_URL in subpath deployments.
+ *
+ * @param {string} currentPath
+ * @param {string} localeCode
+ * @returns {string}
+ */
+function buildPathWithLocalePrefix(currentPath, localeCode) {
+  // L-15: Strip base URL before processing to avoid double-prefixing in subpath deployments
+  const baseUrl = getBaseUrl();
+  const pathWithoutBase = stripBaseUrlFromPath(currentPath);
+  const pathParts = pathWithoutBase.split("/").filter((part) => part.length > 0);
+  const hasLocaleInPath = Boolean(getLeadingLocaleFromPath(pathWithoutBase));
+
+  let resultPath;
+  if (localeCode === DEFAULT_LOCALE) {
+    resultPath = hasLocaleInPath
+      ? stripLeadingLocaleFromPath(pathWithoutBase)
+      : pathWithoutBase;
+  } else if (hasLocaleInPath) {
+    pathParts[0] = localeCode;
+    resultPath = "/" + pathParts.join("/");
+  } else {
+    resultPath = "/" + localeCode + pathWithoutBase;
+  }
+
+  // L-15: Prepend base URL back for non-router fallback cases
+  // When using router.replace(), router handles base URL automatically
+  // For window.history.pushState fallback, we need to include base URL
+  if (baseUrl && baseUrl !== "/" && !localeRouter) {
+    return baseUrl.replace(/\/$/, "") + resultPath;
+  }
+
+  return resultPath;
+}
+
+/**
+ * Path used for locale URL rewrites. Vue Router optional `/:locale?` routes often expose
+ * `route.path` as the slug only (`/log-in`) while `params.locale` holds the prefix (`vi`)
+ * and the browser URL is `/vi/log-in`. Using `route.path` alone skips `router.replace`
+ * when switching back to the default locale (L-10 follow-up).
+ * L-15: Handles base URL correctly for subpath deployments.
+ *
+ * @param {{ path?: string, params?: { locale?: string }, fullPath?: string } | undefined} route
+ * @returns {string}
+ */
+function resolveLocalizedPathFromRoute(route) {
+  const locationPath =
+    typeof window !== "undefined" ? window.location.pathname : "";
+
+  // L-15: Strip base URL to get the actual route path for locale detection
+  const locationPathWithoutBase = stripBaseUrlFromPath(locationPath);
+
+  // Visible browser URL wins — route.path may be slug-only while URL still has /vi/…
+  if (getLeadingLocaleFromPath(locationPathWithoutBase)) {
+    return locationPathWithoutBase;
+  }
+
+  if (!route) {
+    return locationPathWithoutBase || "/";
+  }
+
+  // L-14: Case-insensitive locale param matching
+  const localeParam = route.params?.locale;
+  const basePath = stripLeadingLocaleFromPath(route.path || "/") || "/";
+
+  if (typeof localeParam === "string") {
+    const normalizedLocale = localeParam.toLowerCase();
+    if (SUPPORTED_LOCALES.includes(normalizedLocale)) {
+      if (normalizedLocale === DEFAULT_LOCALE) {
+        return basePath;
+      }
+      return basePath === "/" ? `/${normalizedLocale}` : `/${normalizedLocale}${basePath}`;
+    }
+  }
+
+  if (getLeadingLocaleFromPath(route.path)) {
+    return route.path;
+  }
+
+  const fullPath = route.fullPath?.split("?")[0]?.split("#")[0];
+  if (fullPath && getLeadingLocaleFromPath(fullPath)) {
+    return fullPath;
+  }
+
+  return route.path || locationPathWithoutBase || "/";
+}
+
+/**
  * Update URL with locale in path
  * Injects or updates locale as first path segment (e.g., /dashboard → /vi/dashboard)
  * For default locale (en), removes locale prefix from URL
  *
  * @param {string} localeCode - Locale code
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function updateUrlWithLocale(localeCode) {
+async function updateUrlWithLocale(localeCode) {
   log(
     "localeManager.js",
     "updateUrlWithLocale",
@@ -866,55 +1167,62 @@ function updateUrlWithLocale(localeCode) {
   );
 
   try {
-    const currentPath = window.location.pathname;
-    const pathParts = currentPath.split("/").filter((part) => part.length > 0);
-    const hasLocaleInPath = Boolean(getLeadingLocaleFromPath(currentPath));
+    const currentRoute = localeRouter?.currentRoute?.value;
+    const currentPath = resolveLocalizedPathFromRoute(currentRoute);
+    const newPath = buildPathWithLocalePrefix(currentPath, localeCode);
+    const browserPath =
+      typeof window !== "undefined" ? window.location.pathname : currentPath;
+    const browserPathWithoutBase = stripBaseUrlFromPath(browserPath);
 
-    let newPath;
-
-    // If switching to default locale (en), remove locale prefix
-    if (localeCode === DEFAULT_LOCALE) {
-      newPath = hasLocaleInPath
-        ? stripLeadingLocaleFromPath(currentPath)
-        : currentPath;
-    } else {
-      // Non-default locale - add or replace locale prefix
-      if (hasLocaleInPath) {
-        // Replace existing locale
-        pathParts[0] = localeCode;
-        newPath = "/" + pathParts.join("/");
-      } else {
-        // Insert locale at the beginning
-        newPath = "/" + localeCode + currentPath;
+    if (localeRouter && currentRoute) {
+      if (browserPathWithoutBase !== newPath || currentPath !== newPath) {
+        await localeRouter.replace({
+          path: newPath,
+          query: currentRoute.query,
+          hash: currentRoute.hash,
+        });
       }
+
+      log(
+        "localeManager.js",
+        "updateUrlWithLocale",
+        "success",
+        "URL updated via Vue Router replace",
+        {
+          localeCode,
+          oldPath: currentPath,
+          newPath,
+          isDefaultLocale: localeCode === DEFAULT_LOCALE,
+        }
+      );
+    } else {
+      const search = window.location.search;
+      const hash = window.location.hash;
+      // L-15: newPath already includes base URL when localeRouter is not available
+      const newUrl = newPath + search + hash;
+
+      window.history.pushState({}, "", newUrl);
+
+      import("./hreflangTags.js")
+        .then(({ syncHreflangTagsForPath }) => {
+          syncHreflangTagsForPath(newPath, { enabled: true });
+        })
+        .catch(() => {});
+
+      log(
+        "localeManager.js",
+        "updateUrlWithLocale",
+        "success",
+        "URL updated with locale in path (pushState fallback)",
+        {
+          localeCode,
+          oldPath: currentPath,
+          newPath: newUrl,
+          isDefaultLocale: localeCode === DEFAULT_LOCALE,
+        }
+      );
     }
 
-    // Preserve query string and hash
-    const search = window.location.search;
-    const hash = window.location.hash;
-    const newUrl = newPath + search + hash;
-
-    // Update URL without page reload (using pushState)
-    window.history.pushState({}, "", newUrl);
-
-    import("./hreflangTags.js")
-      .then(({ syncHreflangTagsForPath }) => {
-        syncHreflangTagsForPath(newPath, { enabled: true });
-      })
-      .catch(() => {});
-
-    log(
-      "localeManager.js",
-      "updateUrlWithLocale",
-      "success",
-      "URL updated with locale in path",
-      {
-        localeCode,
-        oldPath: currentPath,
-        newPath: newUrl,
-        isDefaultLocale: localeCode === DEFAULT_LOCALE,
-      }
-    );
     log(
       "localeManager.js",
       "updateUrlWithLocale",
@@ -1222,6 +1530,66 @@ export function isTemporaryPageLocaleActive() {
 }
 
 /**
+ * Persisted locale preference (store/profile), without URL or temporary overrides.
+ * @returns {string}
+ */
+export function getPersistedLocalePreference() {
+  try {
+    const localeStore = useLocaleStore();
+    if (localeStore.locale && SUPPORTED_LOCALES.includes(localeStore.locale)) {
+      return localeStore.locale;
+    }
+  } catch {
+    // Store may be unavailable during early boot
+  }
+
+  const profileLocale = getProfilePreferredLocaleFromAuth();
+  if (profileLocale) {
+    return profileLocale;
+  }
+
+  return DEFAULT_LOCALE;
+}
+
+/**
+ * Keep session temporary locale in sync when the URL carries a locale prefix.
+ * URL locale that differs from persisted preference is treated as temporary (F-03).
+ * @param {string} urlLocale
+ */
+export function syncTemporaryPageLocaleFromUrl(urlLocale) {
+  if (!SUPPORTED_LOCALES.includes(urlLocale)) {
+    return;
+  }
+
+  if (typeof sessionStorage === "undefined") {
+    return;
+  }
+
+  const persistedLocale = getPersistedLocalePreference();
+
+  if (urlLocale !== persistedLocale) {
+    sessionStorage.setItem(TEMP_LOCALE_BASE_KEY, persistedLocale);
+    sessionStorage.setItem(TEMP_LOCALE_SESSION_KEY, urlLocale);
+  } else {
+    sessionStorage.removeItem(TEMP_LOCALE_SESSION_KEY);
+    sessionStorage.removeItem(TEMP_LOCALE_BASE_KEY);
+  }
+}
+
+/**
+ * Locale for router URL injection when the destination has no locale prefix.
+ * Temporary page locale overrides persisted preference (F-03).
+ * @returns {string}
+ */
+export function resolveLocaleForUrlInjection() {
+  const tempLocale = getTemporaryPageLocale();
+  if (tempLocale) {
+    return tempLocale;
+  }
+  return getActiveLocale();
+}
+
+/**
  * Translate the current page once without changing persisted locale preference.
  * @param {string} localeCode
  * @param {{ sectionName?: string, routePath?: string }} [options]
@@ -1313,8 +1681,7 @@ export function extractLocaleSelection(raw) {
 }
 
 /**
- * Locale for UI controls: visible browser URL wins (pushState updates this before
- * Vue Router's route.path), then router path, then in-memory active locale.
+ * Locale for UI controls: URL path (browser or router), then in-memory active locale.
  * @param {string} [routePath]
  * @returns {string}
  */

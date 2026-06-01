@@ -27,8 +27,12 @@ import { usePreloadStore } from '../stores/usePreloadStore.js';
 import {
   SUPPORTED_LOCALES,
   resolveActiveLocale,
+  resolveActiveLocaleForNavigation,
+  getActiveLocale,
   applyLocaleTemporarily,
   reapplyTemporaryPageLocaleForRoute,
+  syncTemporaryPageLocaleFromUrl,
+  resolveLocaleForUrlInjection,
   getLeadingLocaleFromPath,
   stripLeadingLocaleFromPath,
 } from '../utils/translation/localeManager.js';
@@ -63,14 +67,18 @@ const DEFAULT_LOCALE = 'en';
 
 /**
  * Locale for config redirects (L16) — params first, then leading path segment.
+ * L-14: Case-insensitive locale matching.
  * @param {import('vue-router').RouteLocationNormalized} to
  * @param {string[]} supportedLocales
  * @returns {string|null}
  */
 function resolveLocaleFromRouteLocation(to, supportedLocales) {
   const paramLocale = to.params?.locale;
-  if (paramLocale && supportedLocales.includes(paramLocale)) {
-    return paramLocale;
+  if (paramLocale) {
+    const normalizedParamLocale = (Array.isArray(paramLocale) ? paramLocale[0] : String(paramLocale)).toLowerCase();
+    if (supportedLocales.includes(normalizedParamLocale)) {
+      return normalizedParamLocale;
+    }
   }
   return getLeadingLocaleFromPath(to.path, supportedLocales);
 }
@@ -370,10 +378,13 @@ router.beforeEach(async (to, from, next) => {
     to: to.path
   });
 
-  const localeInParams = to.params.locale;
+  const localeInParams = to.params?.locale;
+  // L-13: Check query parameter (?locale=vi) with case-insensitive normalization
+  const localeInQuery = to.query?.locale?.toLowerCase?.();
   const localeFromPath = getLeadingLocaleFromPath(to.path, SUPPORTED_LOCALES);
   const urlLocale =
     (localeInParams && SUPPORTED_LOCALES.includes(localeInParams) ? localeInParams : null) ||
+    (localeInQuery && SUPPORTED_LOCALES.includes(localeInQuery) ? localeInQuery : null) ||
     localeFromPath;
 
   if (urlLocale) {
@@ -381,13 +392,35 @@ router.beforeEach(async (to, from, next) => {
       routePath: to.path,
       loadTranslations: false,
     });
+    syncTemporaryPageLocaleFromUrl(urlLocale);
 
     log('router/index.js', 'beforeEach', 'locale-from-url', 'Locale applied temporarily from URL (not persisted)', {
       urlLocale,
       fromParams: localeInParams === urlLocale,
+      fromQuery: localeInQuery === urlLocale,
       fromPath: localeFromPath === urlLocale,
       note: 'Store preference unchanged - only language switcher changes store'
     });
+
+    // L-13: If locale came from query parameter, redirect to inject it into the path
+    // (e.g., /dashboard?locale=vi → /vi/dashboard)
+    if (localeInQuery === urlLocale && !localeFromPath) {
+      const basePath = stripLeadingLocaleFromPath(to.path, SUPPORTED_LOCALES);
+      const pathWithLocale = urlLocale === DEFAULT_LOCALE
+        ? basePath
+        : `/${urlLocale}${basePath}`;
+
+      if (pathWithLocale !== to.path || 'locale' in to.query) {
+        // Strip locale from query since it's now in the path
+        const { locale: _, ...remainingQuery } = to.query;
+        return next({
+          path: pathWithLocale,
+          query: remainingQuery,
+          hash: to.hash,
+          replace: true
+        });
+      }
+    }
   } else {
     await reapplyTemporaryPageLocaleForRoute(to.path);
     if (localeInParams && !SUPPORTED_LOCALES.includes(localeInParams)) {
@@ -397,7 +430,7 @@ router.beforeEach(async (to, from, next) => {
       });
     }
 
-    const resolvedLocale = resolveActiveLocale();
+    const resolvedLocale = resolveLocaleForUrlInjection();
     const basePath = stripLeadingLocaleFromPath(to.path, SUPPORTED_LOCALES);
 
     let pathWithLocale;
@@ -527,7 +560,7 @@ router.beforeResolve((to, from) => {
 
   const authStore = useAuthStore();
   const userRole = authStore.currentUser?.role || 'guest';
-  const activeLocale = resolveActiveLocale();
+  const activeLocale = resolveActiveLocaleForNavigation(to);
 
   startCurrentSectionResourceLoads({
     to,

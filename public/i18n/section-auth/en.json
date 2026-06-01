@@ -49,8 +49,18 @@
         "title": "Verify Your Identity",
         "description": "Complete creator verification to access the dashboard.",
         "button": "Confirm & Proceed",
-        "logout": "Logout & Exit"
-      }
+        "logout": "Logout & Exit",
+        "error": "Failed to complete KYC verification",
+        "status": {
+          "title": "KYC Status",
+          "description": "Your identity verification status",
+          "done": "COMPLETED",
+          "pending": "PENDING"
+        }
+      },
+      "success": "Account created successfully",
+      "userNotFound": "User not found. Please create an account.",
+      "accountNotFoundPrompt": "Account not found. Please sign up first."
     },
     "confirmEmail": {
       "title": "Confirm Email",
@@ -62,7 +72,31 @@
       "codeLabel": "Confirmation Code",
       "codePlaceholder": "6-digit code",
       "error": "Confirmation failed",
-      "autoLoginError": "Email confirmed, but auto-login failed. Please log in manually."
+      "autoLoginError": "Email confirmed, but auto-login failed. Please log in manually.",
+      "resending": "Sending...",
+      "resendCode": "Resend code",
+      "emailRequired": "Please enter your email address",
+      "resendSuccess": "Confirmation code sent! Check your email.",
+      "resendError": "Failed to resend code. Please try again."
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your current password and a new password to update your credentials.",
+      "setNewPassword": "Set Password",
+      "button": "Reset Password",
+      "success": "Password successfully updated."
+    },
+    "fields": {
+      "currentPasswordPlaceholder": "Current Password",
+      "currentPasswordLabel": "Current Password",
+      "newPasswordPlaceholder": "New Password",
+      "newPasswordLabel": "New Password",
+      "confirmNewPasswordPlaceholder": "Confirm New Password",
+      "confirmNewPasswordLabel": "Confirm New Password"
+    },
+    "error": {
+      "fixErrors": "Please fix the errors above.",
+      "unknown": "An error occurred."
     },
     "reset": {
       "title": "Reset Password",
@@ -183,6 +217,10 @@
     "messages": {
       "comingSoon": "More products coming soon!"
     }
+  },
+  "pages": {
+    "dashboard": "Dashboard",
+    "contact": "Contact"
   },
   "common": {
     "loading": "Loading...",

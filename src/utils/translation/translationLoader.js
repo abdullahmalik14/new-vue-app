@@ -1,9 +1,13 @@
 /**
  * TranslationLoader - Lazy load translations per section with caching
- * 
+ *
  * Loads translation files dynamically based on section and locale.
  * Always loads English first as fallback, then user's preferred locale.
- * All operations tracked with global window.performanceTracker.
+ *
+ * Bundle architecture (F-11):
+ * - Global UI keys → `/i18n/base/{locale}.json` via loadBaseTranslations()
+ * - Route/section keys → `/i18n/section-{name}/{locale}.json` via loadTranslationsForSection()
+ * - Legacy root `/i18n/{locale}.json` files are not loaded; use base/ or section-* only.
  */
 
 import { log } from '../common/logHandler.js';
@@ -11,7 +15,10 @@ import { logError } from '../common/errorHandler.js';
 import { getValueFromCache, setValueWithExpiration, removeCacheKeysByPrefix } from '../common/cacheHandler.js';
 import { deepMergePreferChild } from '../common/objectSafety.js';
 import { resolveActiveLocale } from './localeManager.js';
+import { SUPPORTED_LOCALES } from './localeConstants.js';
 import { getI18nInstance } from './i18nInstance.js';
+import { getRouteConfiguration } from '../route/routeConfigLoader.js';
+import { collectKnownSectionNames } from '../build/jsonConfigValidator.js';
 
 // Cache configuration for translations
 const TRANSLATION_CACHE_KEY_PREFIX = 'translation_';
@@ -19,8 +26,44 @@ const TRANSLATION_CACHE_TTL = 3600000; // 1 hour
 
 const SECTION_NAME_PATTERN = /^[a-z0-9-]+$/i;
 
-/** In-memory hot cache — scoped per active locale (P-06) */
-const MAX_LOADED_TRANSLATIONS_ENTRIES = 32;
+/** Route-config section names allowed in translation fetch URLs (S-05). */
+let knownTranslationSections = null;
+
+/**
+ * @returns {Set<string>}
+ */
+function getKnownTranslationSections() {
+  if (!knownTranslationSections) {
+    const routes = getRouteConfiguration();
+    knownTranslationSections = collectKnownSectionNames(routes);
+  }
+
+  return knownTranslationSections;
+}
+
+/**
+ * @param {string} sectionName
+ * @returns {boolean}
+ */
+function isAllowlistedSectionName(sectionName) {
+  if (typeof sectionName !== 'string' || !SECTION_NAME_PATTERN.test(sectionName)) {
+    return false;
+  }
+
+  return getKnownTranslationSections().has(sectionName);
+}
+
+/**
+ * @param {string} localeCode
+ * @returns {boolean}
+ */
+function isSupportedTranslationLocale(localeCode) {
+  return (
+    typeof localeCode === 'string'
+    && localeCode.length > 0
+    && SUPPORTED_LOCALES.includes(localeCode)
+  );
+}
 
 /**
  * Allowlist section names before they are embedded in fetch URLs.
@@ -29,7 +72,7 @@ const MAX_LOADED_TRANSLATIONS_ENTRIES = 32;
  * @returns {string}
  */
 function sanitizeSectionName(name) {
-  if (typeof name !== 'string' || !SECTION_NAME_PATTERN.test(name)) {
+  if (!isAllowlistedSectionName(name)) {
     throw new Error(`Invalid section name: ${name}`);
   }
 
@@ -38,6 +81,9 @@ function sanitizeSectionName(name) {
 
 // Shared in-flight load promises per section/locale (P-04)
 const inFlightPromises = new Map();
+
+/** In-memory hot cache — scoped per active locale (P-06) */
+const MAX_LOADED_TRANSLATIONS_ENTRIES = 32;
 
 // Track loaded translations; `null` value means load failed (see finishTranslationLoad)
 const loadedTranslations = new Map();
@@ -108,19 +154,23 @@ function finishTranslationLoad(loadingKey, result) {
  * @returns {string} - URL to the translation file
  */
 function getTranslationUrl(sectionName, localeCode) {
+  if (!isSupportedTranslationLocale(localeCode)) {
+    throw new Error(`Invalid locale code: ${localeCode}`);
+  }
+
   const safeSectionName = sanitizeSectionName(sectionName);
-  return `/i18n/section-${safeSectionName}/${localeCode}.json`;
+  return `/i18n/section-${encodeURIComponent(safeSectionName)}/${encodeURIComponent(localeCode)}.json`;
 }
 
 /** Global UI strings shared across routes (B-05 / F-11 base bundle). */
 const BASE_TRANSLATION_LOADING_PREFIX = '__base__';
 
 function getBaseTranslationUrl(localeCode) {
-  if (typeof localeCode !== 'string' || localeCode.length === 0) {
+  if (!isSupportedTranslationLocale(localeCode)) {
     throw new Error(`Invalid base locale code: ${localeCode}`);
   }
 
-  return `/i18n/base/${localeCode}.json`;
+  return `/i18n/base/${encodeURIComponent(localeCode)}.json`;
 }
 
 /**
@@ -175,6 +225,13 @@ export async function loadBaseTranslations(localeCode) {
       ? localeCode
       : resolveActiveLocale()) || 'en';
   const loadingKey = `${BASE_TRANSLATION_LOADING_PREFIX}${targetLocale}`;
+
+  if (!isSupportedTranslationLocale(targetLocale)) {
+    log('translationLoader.js', 'loadBaseTranslations', 'warn', 'Rejected base translation load — invalid locale', {
+      localeCode: targetLocale,
+    });
+    return {};
+  }
 
   log('translationLoader.js', 'loadBaseTranslations', 'start', 'Loading base translations', {
     localeCode: targetLocale,
@@ -328,6 +385,14 @@ export async function loadTranslationsForSection(sectionName, localeCode) {
   });
 
   const targetLocale = localeCode || resolveActiveLocale() || 'en';
+
+  if (!isAllowlistedSectionName(sectionName) || !isSupportedTranslationLocale(targetLocale)) {
+    log('translationLoader.js', 'loadTranslationsForSection', 'warn', 'Rejected translation load — invalid section or locale', {
+      sectionName,
+      localeCode: targetLocale,
+    });
+    return {};
+  }
 
   if (window.performanceTracker) {
     window.performanceTracker.step({

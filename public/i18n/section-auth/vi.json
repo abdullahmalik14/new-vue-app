@@ -2,6 +2,7 @@
   "auth": {
     "login": {
       "title": "Chào mừng trở lại",
+      "subtitle": "Vui lòng nhập thông tin đăng nhập để tiếp tục.",
       "button": "Đăng nhập",
       "emailLabel": "Email",
       "emailPlaceholder": "Nhập email của bạn",
@@ -17,7 +18,9 @@
     },
     "register": {
       "title": "Tạo tài khoản",
+      "subtitle": "Tạo tài khoản của bạn để tiếp tục.",
       "button": "Đăng ký",
+      "firstNameLabel": "Tên",
       "firstName": "Tên",
       "emailLabel": "Email",
       "emailAddress": "Địa chỉ email",
@@ -28,6 +31,8 @@
       "confirmPasswordPlaceholder": "Xác nhận mật khẩu",
       "haveAccount": "Đã có tài khoản? Đăng nhập",
       "success": "Tạo tài khoản thành công",
+      "userNotFound": "Không tìm thấy người dùng. Vui lòng tạo tài khoản.",
+      "accountNotFoundPrompt": "Không tìm thấy tài khoản. Vui lòng đăng ký trước.",
       "Onboarding": {
         "title": "Hoàn thiện hồ sơ",
         "description": "Chọn vai trò và tên người dùng của bạn để tiếp tục.",
@@ -67,7 +72,31 @@
       "codeLabel": "Mã xác nhận",
       "codePlaceholder": "Mã 6 chữ số",
       "error": "Xác nhận thất bại",
-      "autoLoginError": "Email đã được xác nhận, nhưng đăng nhập tự động thất bại. Vui lòng đăng nhập thủ công."
+      "autoLoginError": "Email đã được xác nhận, nhưng đăng nhập tự động thất bại. Vui lòng đăng nhập thủ công.",
+      "resending": "Đang gửi...",
+      "resendCode": "Gửi lại mã",
+      "emailRequired": "Vui lòng nhập địa chỉ email của bạn",
+      "resendSuccess": "Mã xác nhận đã được gửi! Kiểm tra email của bạn.",
+      "resendError": "Không thể gửi lại mã. Vui lòng thử lại."
+    },
+    "resetPassword": {
+      "title": "Đặt lại mật khẩu",
+      "subtitle": "Nhập mật khẩu hiện tại và mật khẩu mới để cập nhật thông tin đăng nhập.",
+      "setNewPassword": "Đặt mật khẩu",
+      "button": "Đặt lại mật khẩu",
+      "success": "Cập nhật mật khẩu thành công."
+    },
+    "fields": {
+      "currentPasswordPlaceholder": "Mật khẩu hiện tại",
+      "currentPasswordLabel": "Mật khẩu hiện tại",
+      "newPasswordPlaceholder": "Mật khẩu mới",
+      "newPasswordLabel": "Mật khẩu mới",
+      "confirmNewPasswordPlaceholder": "Xác nhận mật khẩu mới",
+      "confirmNewPasswordLabel": "Xác nhận mật khẩu mới"
+    },
+    "error": {
+      "fixErrors": "Vui lòng sửa các lỗi ở trên.",
+      "unknown": "Đã xảy ra lỗi."
     },
     "reset": {
       "title": "Đặt lại mật khẩu",
@@ -188,6 +217,10 @@
     "messages": {
       "comingSoon": "Sẽ có thêm sản phẩm sớm!"
     }
+  },
+  "pages": {
+    "dashboard": "Bảng điều khiển",
+    "contact": "Liên hệ"
   },
   "common": {
     "loading": "Đang tải...",

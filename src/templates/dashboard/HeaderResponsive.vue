@@ -96,8 +96,6 @@ import {
   getSharedComponentAssetMapping,
   groupComponentSlotsByPreloadTier,
 } from "@/utils/assets/resolveSharedComponentAssets.js";
-import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js";
-import { getActiveLocale } from "@/utils/translation/localeManager.js";
 
 const isNavOpen = ref(false);
 const isNotificationOpen = ref(false);
@@ -200,15 +198,6 @@ async function loadAssetsWithPriority() {
 
 // Load all assets from assetLibrary with priority and retry logic
 onMounted(async () => {
-  // Load translations for dashboard section
-  try {
-    const locale = getActiveLocale() || 'en';
-    await loadTranslationsForSection('dashboard-global', locale);
-  } catch (error) {
-    console.warn('[HeaderResponsive] Failed to load translations', error);
-    // Continue without translations - will use fallback
-  }
-
   await loadAssetsWithPriority();
 });
 

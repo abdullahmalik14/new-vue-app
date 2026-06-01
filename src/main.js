@@ -24,10 +24,12 @@ import { log } from "./utils/common/logHandler.js";
 import PerfTracker from "./utils/common/performanceTracker.js";
 import {
   resolveActiveLocale,
-  stripLeadingLocaleFromPath,
+  normalizeLocalizedPath,
   applyDocumentLocaleAttributes,
   clearTemporaryPageLocaleOnReload,
   applyProfileLocaleToStoreIfAuthenticated,
+  registerLocaleRouter,
+  syncCurrentActiveLocaleFromStore,
 } from "./utils/translation/localeManager.js";
 
 clearTemporaryPageLocaleOnReload();
@@ -256,6 +258,8 @@ if (!localeStore.locale) {
   localeStore.setLocale(initialLocale);
 }
 
+syncCurrentActiveLocaleFromStore(localeStore.locale || initialLocale);
+
 if (i18n.global.locale.value !== initialLocale) {
   i18n.global.locale.value = initialLocale;
 }
@@ -270,6 +274,8 @@ watch(
     if (!newLocale) {
       return;
     }
+
+    syncCurrentActiveLocaleFromStore(newLocale);
 
     if (i18n.global.locale.value !== newLocale) {
       i18n.global.locale.value = newLocale;
@@ -310,6 +316,7 @@ if (window.performanceTracker) {
 }
 
 app.use(router);
+registerLocaleRouter(router);
 app.use(InteractionsPlugin);
 
 // Register global breakpoints utility
@@ -427,7 +434,7 @@ if (window.performanceTracker) {
 // Preload sections based on current route (non-blocking — after router.isReady, before/after mount)
 function startStartupPreloadForCurrentRoute() {
   const rawPath = router.currentRoute.value.path;
-  const currentPath = stripLeadingLocaleFromPath(rawPath);
+  const currentPath = normalizeLocalizedPath(rawPath);
   const currentRoute = resolveRouteFromPath(currentPath);
   const userRoleForPreload = authStore.currentUser?.role || "guest";
 

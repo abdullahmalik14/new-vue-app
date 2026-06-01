@@ -184,13 +184,7 @@ export const menuItems = [
  */
 export async function resolveMenuItemsWithAssets(items = menuItems) {
   const { getAssetUrls } = await import("@/utils/assets/assetLibrary.js");
-  const { loadTranslationsForSection } = await import("@/utils/translation/translationLoader.js");
   const { getI18nInstance } = await import("@/utils/translation/i18nInstance.js");
-  const { getActiveLocale } = await import("@/utils/translation/localeManager.js");
-
-  // Load translations for dashboard section
-  const locale = getActiveLocale() || 'en';
-  await loadTranslationsForSection('dashboard-global', locale);
 
   // Get i18n instance for translation
   const i18nInstance = getI18nInstance();

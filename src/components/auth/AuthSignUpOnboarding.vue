@@ -102,7 +102,6 @@ import { interactionsEngine } from "@/utils/validation/interactionsEngine.js"
 import { InformationCircleIcon } from "@heroicons/vue/24/outline"
 import { useI18n } from "vue-i18n"
 import { getActiveLocale } from "@/utils/translation/localeManager.js"
-import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js"
 import Heading from "@/components/default/Heading.vue"
 import Paragraph from "@/components/default/Paragraph.vue"
 import InputAuthComponent from "@/components/input/InputAuthComponent.vue"
@@ -281,13 +280,6 @@ watch(i18nLocale, async (newLocale, oldLocale) => {
 
   console.log(`[ONBOARDING] Locale changed from '${oldLocale}' to '${newLocale}'`)
 
-  // Reload translations for the new locale
-  try {
-    await loadTranslationsForSection('auth', newLocale)
-  } catch (err) {
-    console.error('[ONBOARDING] Failed to reload translations:', err)
-  }
-
   // Update validation configs in field states
   const roleState = interactionsEngine.getFieldState(roleConfig.value)
   const usernameState = interactionsEngine.getFieldState(usernameConfig.value)
@@ -363,13 +355,6 @@ onMounted(async () => {
     name: 'AuthOnboarding',
     debug: true
   })
-
-  // Load translations for auth section
-  try {
-    await loadTranslationsForSection('auth', locale.value)
-  } catch (err) {
-    console.error('[ONBOARDING] Failed to load translations:', err)
-  }
 
   // Load critical assets using AssetHandler
   try {

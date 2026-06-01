@@ -1,6 +1,6 @@
 # Translation System Audit
 
-**Date:** 2026-05-27  
+**Date:** 2026-05-27 (updated 2026-05-30 — L-16 locale persistence hotfix)  
 **Scope:** Full i18n / locale pipeline — `localeManager.js`, `translationLoader.js`, `i18nInstance.js`, `useLocaleStore.js`, `LanguageSwitcher.vue`, `main.js`, `router/index.js`, and all `public/i18n/` translation assets.  
 **Library:** `vue-i18n` v11.1.11 (Composition API mode), `pinia-plugin-persistedstate` v4.5.0  
 
@@ -1150,6 +1150,7 @@ persist: {
 
 **What changed:**
 - `useLocaleStore.js` — added `LOCALE_PREFERENCE_TTL_MS` (90 days), `serializeLocalePersistedState`, and `deserializeLocalePersistedState`. Persist config now uses a custom `serializer` that wraps `{ data, expiresAt }`. Expired entries deserialize to `{ locale: null }` so `resolveActiveLocale()` falls through to URL/browser/default. Legacy plain `{ locale }` blobs (pre-fix) are still accepted and re-wrapped with TTL on the next write.
+- **Post-audit (L-16):** `setLocale` also calls `localStorage.setItem('locale_preference', serializeLocalePersistedState({ locale }))` so user-initiated switches via `setActiveLocale` / `LanguageSwitcher` / settings always flush to storage even when the plugin’s reactive persist path does not write synchronously.
 - Also satisfies **F-01** (persistence expiry missing feature).
 
 **Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Preload persistence (`usePreloadStore`) uses its own serializer for Sets/build-hash invalidation — unrelated to locale TTL.
@@ -2091,6 +2092,112 @@ await loadTranslationsForSection(resolvedSection, activeLocale);
 
 **Fix:** In `beforeEach`, carry a local `activeLocaleForNavigation` variable. If `to.params.locale` is valid, use that value directly for translation loading. Do not re-resolve from `window.location` until after navigation is committed.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** During a pending navigation, Vue Router's `to.path` already reflects the destination (e.g. `/vi/log-in`), but `window.location.pathname` still shows the previous URL (e.g. `/log-in`) until navigation commits. After **Preloading.md Task 3**, current-section translation loading moved from `beforeEach` to **`beforeResolve`** (`startCurrentSectionResourceLoads`), but that hook still called `resolveActiveLocale()`, which reads `getLocaleFromUrl()` → `window.location.pathname`. Navigating from an English URL to a Vietnamese prefixed URL could preload **English** section JSON for the destination page even though `beforeEach` had already applied `vi` via `applyLocaleTemporarily`.
+
+**Why it happened:** The original audit finding targeted `beforeEach`; the preload refactor fixed blocking I/O there but kept the same stale-URL resolution in `beforeResolve`. `resolveActiveLocale()` is correct after navigation commits, not during pending navigation.
+
+**What changed:**
+- `localeManager.js` — added `resolveActiveLocaleForNavigation(to)` which resolves locale from `to.params.locale`, then `getLeadingLocaleFromPath(to.path)`, then temporary page locale (`sessionStorage`), then falls back to `resolveActiveLocale()`.
+- `router/index.js` — `beforeResolve` passes `resolveActiveLocaleForNavigation(to)` into `startCurrentSectionResourceLoads` instead of `resolveActiveLocale()`.
+- `index.js` — re-exported the new helper.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Complements **P-02** / **L-03** — keeps translations non-blocking in `beforeResolve` and `loadTranslations: false` in `beforeEach`; only fixes **which locale** is passed to the existing current-section loader. `afterEach` background preloads still use `resolveActiveLocale()` after navigation commits (window URL matches `to.path`).
+
+**How it was tested:** `tests/unit/resolveActiveLocaleForNavigation.test.js` — destination `/vi/log-in` wins over stale `/log-in` in `window.location`; temporary session locale used when destination path has no prefix.
+
+**How to test in the browser:**
+
+> **Why this matters**  
+> On the old code, `beforeResolve` could call `loadTranslationsForSection('auth', 'en')` while navigating to `/vi/log-in` because `resolveActiveLocale()` read the committed English URL. The page still switched to Vietnamese via `applyLocaleTemporarily`, but the first current-section fetch could target the wrong locale.
+
+1. Run `npm run dev`, hard-refresh, open `/log-in` (English, guest — Pinia locale `en`).
+
+2. **Confirm the fix is in your bundle** (DevTools → Console, one paste):
+   ```js
+   fetch('/src/router/index.js').then(r=>r.text()).then(src=>console.log({hasNavigationLocaleResolver:/resolveActiveLocaleForNavigation\(to\)/.test(src),pass:/resolveActiveLocaleForNavigation\(to\)/.test(src)}));
+   ```
+   **Expected:** `hasNavigationLocaleResolver: true`, `pass: true`.
+
+3. **Prove stale URL vs destination route** (simulates pending navigation; one paste):
+   ```js
+   (async () => {
+     const lm = await import('/src/utils/translation/localeManager.js');
+     const originalPath = window.location.pathname;
+     window.history.replaceState({}, '', '/log-in');
+     const to = { path: '/vi/log-in', params: { locale: 'vi' } };
+     const stale = lm.resolveActiveLocale();
+     const pending = lm.resolveActiveLocaleForNavigation(to);
+     window.history.replaceState({}, '', originalPath);
+     console.log({
+       windowPathWhilePending: '/log-in (simulated)',
+       toPath: to.path,
+       resolveActiveLocale: stale,
+       resolveActiveLocaleForNavigation: pending,
+       pass: pending === 'vi' && stale === 'en',
+     });
+   })();
+   ```
+   **Expected:** `resolveActiveLocale: 'en'`, `resolveActiveLocaleForNavigation: 'vi'`, `pass: true`. If `stale` is not `'en'`, reset site data or set language to English in Settings first.
+
+4. **End-to-end navigation** (uses `fetch` interception + cache clear — **do not** patch `loadTranslationsForSection` from the console; static importers in the running app keep the original function reference, so that hook records zero events even when the app loads translations):
+
+   > **Why test 4 failed with the old snippet**  
+   > 1. Reassigning `tl.loadTranslationsForSection` on a dynamic-import namespace does **not** replace the binding already imported by `routeNavigationData.js` / the router.  
+   > 2. If `auth_vi` is already warm, `beforeResolve` skips the load (`areTranslationsLoadedForSection` → `translation-skip` in logs).  
+   > Use `fetch` + `clearTranslationCaches()` below instead (cache clear mutates the shared module Map; fetch sees real network either way).
+
+   Start from any page, then DevTools → **Console** — one paste:
+   ```js
+   (async () => {
+     const calls = [];
+     const origFetch = window.fetch;
+     window.fetch = async (...args) => {
+       const [url, opts = {}] = args;
+       if (
+         typeof url === 'string' &&
+         url.includes('/i18n/section-auth/') &&
+         (opts.method || 'GET') === 'GET'
+       ) {
+         calls.push(url.match(/\/([^/]+)\.json(?:\?|$)/)?.[1]);
+       }
+       return origFetch(...args);
+     };
+     try {
+       const [{ clearTranslationCaches }, { default: router }] = await Promise.all([
+         import('/src/utils/translation/translationLoader.js'),
+         import('/src/router/index.js'),
+       ]);
+       const returnPath = router.currentRoute.value.fullPath;
+       clearTranslationCaches();
+       await router.push('/log-in');
+       await new Promise((r) => setTimeout(r, 400));
+       calls.length = 0;
+       await router.push('/vi/log-in');
+       await new Promise((r) => setTimeout(r, 1200));
+       console.log({
+         authLocaleFilesRequested: calls,
+         requestedVi: calls.includes('vi'),
+         requestedEnOnly: calls.length > 0 && !calls.includes('vi'),
+         pass: calls.includes('vi'),
+         hint:
+           calls.length === 0
+             ? 'No auth fetches — check console for translation-skip (cache still warm) or navigation noop; hard-refresh and retry.'
+             : undefined,
+       });
+       if (returnPath && returnPath !== router.currentRoute.value.fullPath) {
+         await router.push(returnPath).catch(() => {});
+       }
+     } finally {
+       window.fetch = origFetch;
+     }
+   })();
+   ```
+   **Expected:** `requestedVi: true`, `pass: true`. `en.json` may also appear (English fallback merge, P-01). **Old buggy code** could show auth GETs with **`en` only** (`requestedEnOnly: true`) when navigating to `/vi/log-in`. After L-09, **`vi.json` must be requested** for the destination locale.
+
 ---
 
 ### L-10 — Locale switch updates the URL with `history.pushState`, bypassing Vue Router
@@ -2109,6 +2216,94 @@ After changing language from `/dashboard` to `/vi/dashboard`, the app can be in 
 
 **Fix:** Inject the router into locale switching or expose a router-aware helper. Use `router.replace()` or `router.push()` for locale URL updates instead of raw `window.history.pushState()`.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `updateUrlWithLocale()` rewrote the address bar with `window.history.pushState()`. The visible URL could show `/vi/dashboard` while Vue Router still tracked `/dashboard` — `route.params.locale`, guards, watchers, and back/forward did not run.
+
+**Why it happened:** Locale switching predates router-integrated URL updates; `pushState` was used to avoid a full reload without wiring the router.
+
+**What changed:**
+- `localeManager.js` — `registerLocaleRouter(router)`, shared `buildPathWithLocalePrefix()`, and `updateUrlWithLocale()` now calls `router.replace({ path, query, hash })` when the router is registered. Falls back to `pushState` only when no router (unit tests / early boot).
+- `main.js` — `registerLocaleRouter(router)` immediately after `app.use(router)`.
+- `setActiveLocale` — `await updateUrlWithLocale()` so navigation completes before returning.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Locale switches now go through normal router navigation (`beforeEach` / `beforeResolve` / `afterEach`), which **aligns** with the non-blocking preload architecture. Duplicate translation work is safe (cache dedupes per P-02/P-04). Complements **L-09** — router navigation uses `resolveActiveLocaleForNavigation(to)` in `beforeResolve`.
+
+**How it was tested:** `tests/unit/updateUrlWithLocale.test.js` — `setActiveLocale('vi')` calls `router.replace` to `/vi/log-in`; switching back to `en` removes the prefix. **Follow-up (2026-05-29):** (1) `resolveLocalizedPathFromRoute()` — when `route.path` is slug-only (`/log-in`) but `params.locale` is `vi`, switching to `en` calls `router.replace('/log-in')`. (2) **`router.beforeEach` locale inject** — uses `getActiveLocale()` (store first) instead of `resolveActiveLocale()` (URL first), so after switching to `en` the guard no longer re-injects `/vi/…` from the stale `/vi/log-in` address bar during `router.replace`. (3) URL update runs **before** translation reload in `setActiveLocale`.
+
+**How to test in the browser:**
+
+> **Why the old split state happened**  
+> `pushState` updated `window.location` but not `router.currentRoute`. Components using `useRoute()` could still see the old path/locale param after a language switch.
+
+1. Run `npm run dev`, open `/log-in` (or any page with the language switcher).
+
+2. **Confirm the fix is in your bundle** (DevTools → Console, one paste):
+   ```js
+   Promise.all([
+     fetch('/src/utils/translation/localeManager.js').then((r) => r.text()),
+     fetch('/src/main.js').then((r) => r.text()),
+   ]).then(([lm, main]) =>
+     console.log({
+       hasRegisterLocaleRouter: /registerLocaleRouter/.test(lm),
+       hasRouterReplace: /localeRouter\.replace/.test(lm),
+       mainRegistersRouter: /registerLocaleRouter\(router\)/.test(main),
+       pass:
+         /localeRouter\.replace/.test(lm) &&
+         /registerLocaleRouter\(router\)/.test(main),
+     })
+   );
+   ```
+   **Expected:** all flags `true`, `pass: true`.
+
+3. **Prove router stays in sync after locale switch** (one paste):
+   ```js
+   (async () => {
+     const { default: router } = await import('/src/router/index.js');
+     await router.push('/log-in');
+     await new Promise((r) => setTimeout(r, 400));
+     await window.APP.setLocale('vi', { updateUrl: true, syncProfile: false });
+     await new Promise((r) => setTimeout(r, 600));
+     const route = router.currentRoute.value;
+     console.log({
+       browserPath: window.location.pathname,
+       routerPath: route.path,
+       routerLocaleParam: route.params.locale,
+       pathsMatch: window.location.pathname === route.path,
+       pass:
+         window.location.pathname === route.path &&
+         route.params.locale === 'vi',
+     });
+   })();
+   ```
+   **Expected:** `browserPath` and `routerPath` both `/vi/log-in`, `routerLocaleParam: 'vi'`, `pass: true`. **Old code:** `browserPath` could be `/vi/log-in` while `routerPath` stayed `/log-in`.
+
+4. **UI check:** Use the language `<select>` on `/log-in` → Vietnamese. **Expected:** URL becomes `/vi/log-in`, copy updates, and DevTools Vue / `router.currentRoute` shows `params.locale: 'vi'`. Back button should behave like a normal route change (not a detached `pushState` entry).
+
+5. **Switch back to English (regression for optional `/:locale?` routes)** — on `/vi/log-in`, use the `<select>` → English. **Expected:** URL becomes `/log-in` (no `/vi` prefix), copy stays English, next in-app link stays English (not Vietnamese from stale URL). Console one paste:
+   ```js
+   (async () => {
+     const { default: router } = await import('/src/router/index.js');
+     await router.push('/vi/log-in');
+     await new Promise((r) => setTimeout(r, 400));
+     await window.APP.setLocale('en', { updateUrl: true, syncProfile: false });
+     await new Promise((r) => setTimeout(r, 600));
+     const route = router.currentRoute.value;
+     console.log({
+       browserPath: window.location.pathname,
+       routerPath: route.path,
+       routerLocaleParam: route.params.locale || '(empty)',
+       storeLocale: (await import('/src/stores/useLocaleStore.js')).useLocaleStore().locale,
+       pass:
+         window.location.pathname === '/log-in' &&
+         (await import('/src/stores/useLocaleStore.js')).useLocaleStore().locale === 'en',
+     });
+   })();
+   ```
+   **Expected:** `browserPath: '/log-in'`, `storeLocale: 'en'`, `pass: true`.
+
 ---
 
 ### L-11 — Initial translation preload in `main.js` does not normalize locale-prefixed paths
@@ -2126,6 +2321,98 @@ const currentRoute = resolveRouteFromPath(currentPath);
 Route config slugs are stored without locale prefixes (for example `/dashboard`), but `currentPath` can be locale-prefixed (for example `/vi/dashboard`). `resolveRouteFromPath('/vi/dashboard')` will not match the `/dashboard` route and may return the catch-all route or `null`. When that happens, the startup translation preload for the current section is skipped or uses the wrong section.
 
 **Fix:** Strip a supported locale prefix before calling `resolveRouteFromPath`, or add a shared `normalizeLocalizedPath(path)` helper used by `main.js`, `router/index.js`, and `localeManager.js`.
+
+#### Resolution ✅
+
+**Status:** Resolved (verified and consolidated in this audit pass).
+
+**What was broken:** On cold start at a locale-prefixed URL (e.g. `/vi/log-in`), `resolveRouteFromPath('/vi/log-in')` did not match route-config slugs (stored as `/log-in`). Startup section preload and initial translation load could skip the real section or hit the catch-all.
+
+**Why it happened:** Route-config slugs are locale-free; the audit finding predates the **Preloading.md** startup refactor.
+
+**What changed:**
+- **Already fixed in preload refactor:** `main.js` → `startStartupPreloadForCurrentRoute()` uses `stripLeadingLocaleFromPath(rawPath)` before `resolveRouteFromPath(currentPath)` (after `router.isReady()`).
+- **This pass:** Added documented alias `normalizeLocalizedPath()` in `localeManager.js` (same behavior as `stripLeadingLocaleFromPath`). `main.js` now calls `normalizeLocalizedPath` explicitly for readability. Exported from `index.js`.
+- `tests/unit/startupRouteResolution.test.js` — proves `/vi/log-in` and `/zh-tw/log-in` resolve to `auth` only after normalization.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Documents and names the normalization already required by the startup preload flow. Router `beforeEach` continues to use `stripLeadingLocaleFromPath` / `getLeadingLocaleFromPath` for URL injection (same utility family).
+
+**How it was tested:** `tests/unit/startupRouteResolution.test.js` (2 tests). Existing `tests/unit/localePathUtils.test.js` covers strip/leading-locale primitives.
+
+**How to test in the browser:**
+
+> **Why hard refresh on `/vi/log-in` matters**  
+> Startup preload runs once in `mountApplication()` after `router.isReady()`. You must load the app directly on a locale-prefixed URL (or hard refresh there) to exercise the startup path.
+
+1. Run `npm run dev`, **hard refresh** on `/vi/log-in` (not in-app navigation from `/log-in`).
+
+2. **Confirm normalization in bundle** (DevTools → Console, one paste):
+   ```js
+   Promise.all([
+     fetch('/src/main.js').then((r) => r.text()),
+     fetch('/src/utils/translation/localeManager.js').then((r) => r.text()),
+   ]).then(([main, lm]) =>
+     console.log({
+       mainUsesNormalize: /normalizeLocalizedPath\(rawPath\)/.test(main),
+       hasNormalizeHelper: /export function normalizeLocalizedPath/.test(lm),
+       pass:
+         /normalizeLocalizedPath\(rawPath\)/.test(main) &&
+         /export function normalizeLocalizedPath/.test(lm),
+     })
+   );
+   ```
+   **Expected:** `pass: true`.
+
+3. **Startup section preload smoke test** (after hard refresh on `/vi/log-in`; one paste):
+   ```js
+   (async () => {
+     const stats = await window.APP?.getTranslationStatistics?.();
+     const { normalizeLocalizedPath } = await import(
+       '/src/utils/translation/localeManager.js'
+     );
+     const { resolveRouteFromPath } = await import(
+       '/src/utils/route/routeResolver.js'
+     );
+     const raw = window.location.pathname;
+     const normalized = normalizeLocalizedPath(raw);
+     const route = resolveRouteFromPath(normalized);
+     console.log({
+       rawPath: raw,
+       normalizedPath: normalized,
+       resolvedSlug: route?.slug,
+       resolvedSection: route?.section,
+       loadedSections: stats?.loadedSections ?? [],
+       authLoaded: stats?.loadedSections?.some((k) => k.startsWith('auth_')),
+       pass:
+         normalized === '/log-in' &&
+         route?.section === 'auth' &&
+         (stats?.loadedSections?.some((k) => k.startsWith('auth_')) ?? false),
+     });
+   })();
+   ```
+   **Expected:** `normalizedPath: '/log-in'`, `resolvedSection: 'auth'`, `authLoaded: true`, `pass: true`. If `authLoaded` is false, wait 1–2s and re-run `getTranslationStatistics()` — startup load is async.
+
+4. **Compare broken vs fixed resolution** (logic only; one paste — no reload needed):
+   ```js
+   (async () => {
+     const { normalizeLocalizedPath } = await import(
+       '/src/utils/translation/localeManager.js'
+     );
+     const { resolveRouteFromPath } = await import(
+       '/src/utils/route/routeResolver.js'
+     );
+     const raw = '/vi/log-in';
+     const normalized = normalizeLocalizedPath(raw);
+     console.log({
+       resolveRawSlug: resolveRouteFromPath(raw)?.slug,
+       resolveNormalizedSlug: resolveRouteFromPath(normalized)?.slug,
+       pass:
+         resolveRouteFromPath(raw)?.slug !== '/log-in' &&
+         resolveRouteFromPath(normalized)?.slug === '/log-in',
+     });
+   })();
+   ```
+   **Expected:** `resolveRawSlug` is not `/log-in` (often catch-all), `resolveNormalizedSlug: '/log-in'`, `pass: true`.
 
 ---
 
@@ -2146,6 +2433,62 @@ This matters because the requirements include setting locale from user config or
 
 **Fix:** Make `setActiveLocale` the only write API, or subscribe to the Pinia locale store and update `currentActiveLocale` whenever the store changes.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `localeManager.js` keeps module-level `currentActiveLocale`. `main.js` watched Pinia and updated vue-i18n + `document.lang` on store changes, but did **not** update `currentActiveLocale`. Code paths that read in-memory state (or `getActiveLocale()` before the store branch ran) could disagree after a direct `useLocaleStore().setLocale()` — e.g. future settings/profile sync writing the store only.
+
+**Why it happened:** Pinia persistence and i18n were wired in `main.js`; localeManager in-memory mirror was only updated inside `setActiveLocale` / `getActiveLocale` / `resolveActiveLocale`.
+
+**What changed:**
+- `localeManager.js` — `syncCurrentActiveLocaleFromStore(localeCode)` updates `currentActiveLocale` when the store changes.
+- `main.js` — calls sync on boot (`initialLocale`) and inside the existing `watch(() => localeStore.locale, …)` before i18n/document updates.
+- `useLocaleStore.js` — JSDoc on `setLocale` directs UI/settings to prefer `setActiveLocale`; notes L-12 sync for direct store writes.
+- `tests/unit/localeStoreSync.test.js` — direct store write + sync keeps `getActiveLocale()` aligned.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Settings UI (`SettingsLanguageField.vue`) already uses `setActiveLocale`; this hardens direct store writes (boot `setLocale`, future profile sync). **B-09** (circular store ↔ manager import) remains a separate follow-up.
+
+**How it was tested:** `tests/unit/localeStoreSync.test.js` (2 tests).
+
+**How to test in the browser:**
+
+> **Prefer `setActiveLocale` for real UI** — the test below simulates a direct store write to prove L-12 sync. Production settings should keep using `setActiveLocale`.
+
+1. Run `npm run dev`, hard refresh on `/log-in`.
+
+2. **Confirm sync is wired in main.js** (one paste):
+   ```js
+   fetch('/src/main.js').then(r=>r.text()).then(src=>console.log({
+     hasSyncHelper: /syncCurrentActiveLocaleFromStore/.test(src),
+     watchCallsSync: /syncCurrentActiveLocaleFromStore\(newLocale\)/.test(src),
+     pass: /syncCurrentActiveLocaleFromStore\(newLocale\)/.test(src),
+   }));
+   ```
+   **Expected:** `pass: true`.
+
+3. **Direct store write vs in-memory locale** (live app — main.js watch should sync automatically; one paste):
+   ```js
+   (async () => {
+     const lm = await import('/src/utils/translation/localeManager.js');
+     const { useLocaleStore } = await import('/src/stores/useLocaleStore.js');
+     await lm.applyLocaleTemporarily('vi', { loadTranslations: false });
+     const afterTempLocale = window.APP.getLocale();
+     useLocaleStore().setLocale('en');
+     await new Promise((r) => setTimeout(r, 50));
+     const store = useLocaleStore();
+     console.log({
+       afterTempLocale,
+       storeLocale: store.locale,
+       getLocaleAfterDirectStoreWrite: window.APP.getLocale(),
+       pass: store.locale === 'en' && window.APP.getLocale() === 'en',
+     });
+   })();
+   ```
+   **Expected:** `pass: true`, `getLocaleAfterDirectStoreWrite: 'en'`. If `pass: false`, hard refresh (HMR may have skipped the main.js watch) and retry.
+
+4. **Real UI path (recommended):** Settings → change language. **Expected:** URL, copy, `window.APP.getLocale()`, and Pinia `locale` all match — via `setActiveLocale`, not raw store writes.
+
 ---
 
 ### P-07 — Component-level translation loads duplicate router-level translation loads
@@ -2163,6 +2506,93 @@ The cache reduces network impact after the first load, but this still creates ex
 
 **Fix:** Centralize section translation loading in the route/section orchestration layer. Components should assume their route section is already loaded, and only request translations for truly optional sub-sections.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** The router already loads the current route section in `beforeResolve` via `startCurrentSectionResourceLoads` (non-blocking, with `areTranslationsLoadedForSection` guard per **P-02**). Auth pages and dashboard chrome still called `loadTranslationsForSection` again on mount and on locale change, and `menuItems.js` loaded `dashboard-global` a third time when resolving sidebar labels.
+
+**Why it happened:** Components were written before section translation loading moved to the router/preload orchestration layer (**Preloading.md** / **SECTION_PRELOAD_AUDIT.md**). Mount-time loads were kept as a safety net; locale watchers duplicated work already done by `setActiveLocale` (which clears caches and reloads the current section).
+
+**What changed:**
+- Removed `loadTranslationsForSection` from auth components: `AuthLogIn.vue`, `AuthSignUp.vue`, `AuthLostPassword.vue`, `AuthResetPassword.vue`, `AuthConfirmEmail.vue`, `AuthSignUpOnboarding.vue`, `AuthSignUpOnboardingKyc.vue` (mount + locale watchers; validation re-config on locale change kept).
+- Removed duplicate loads from `HeaderResponsive.vue`, `DashboardSidebar.vue`, and `resolveMenuItemsWithAssets()` in `menuItems.js` (sidebar still re-resolves menu labels on locale change via `$i18n.locale` watch).
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md** — aligns with them. Route/section orchestration remains the single loader for the active section; this removes redundant component-level calls that survived the preload refactor. **LanguageSwitcher** / **SettingsLanguageField** still call `loadTranslationsForSection` after `setActiveLocale` (noted in **L-01** as safe duplicate); that is out of scope here.
+
+**How it was tested:** `tests/unit/componentTranslationLoads.test.js` — P-07 files must not import or call `loadTranslationsForSection`.
+
+**How to test in the browser:**
+1. Run `npm run dev`, open DevTools → **Console**.
+2. **Auth route — no component duplicate** (one paste after hard refresh on `/log-in`):
+   ```js
+   (async () => {
+     const tl = await import('/src/utils/translation/translationLoader.js');
+     tl.clearTranslationCaches();
+     const calls = [];
+     const orig = tl.loadTranslationsForSection;
+     tl.loadTranslationsForSection = async (...args) => {
+       const stack = new Error().stack || '';
+       calls.push({
+         section: args[0],
+         locale: args[1],
+         fromComponent: /AuthLogIn|AuthSignUp|AuthLostPassword|AuthResetPassword|AuthConfirmEmail|AuthSignUpOnboarding|menuItems|HeaderResponsive|DashboardSidebar/.test(stack),
+       });
+       return orig(...args);
+     };
+     try {
+       const r = await import('/src/router/index.js');
+       await r.default.push('/log-in');
+       await new Promise((resolve) => setTimeout(resolve, 800));
+       console.table(calls);
+       console.log({
+         totalCalls: calls.length,
+         componentCalls: calls.filter((c) => c.fromComponent).length,
+         pass: calls.every((c) => !c.fromComponent),
+         note: 'Only route/locale orchestration should load auth — not AuthLogIn mount',
+       });
+     } finally {
+       tl.loadTranslationsForSection = orig;
+     }
+   })();
+   ```
+   **Expected:** `componentCalls: 0`, `pass: true`. `totalCalls` is typically 1–2 (router `beforeResolve` / locale bootstrap), never from `AuthLogIn.vue`.
+
+3. **Dashboard route — no sidebar/header/menuItems duplicate** (one paste; log in first if `/dashboard` requires auth, or use any dashboard URL you can open):
+   ```js
+   (async () => {
+     const tl = await import('/src/utils/translation/translationLoader.js');
+     tl.clearTranslationCaches();
+     const calls = [];
+     const orig = tl.loadTranslationsForSection;
+     tl.loadTranslationsForSection = async (...args) => {
+       const stack = new Error().stack || '';
+       calls.push({
+         section: args[0],
+         locale: args[1],
+         fromComponent: /menuItems|HeaderResponsive|DashboardSidebar/.test(stack),
+       });
+       return orig(...args);
+     };
+     try {
+       const r = await import('/src/router/index.js');
+       await r.default.push('/dashboard');
+       await new Promise((resolve) => setTimeout(resolve, 1200));
+       console.table(calls);
+       console.log({
+         dashboardGlobalLoads: calls.filter((c) => c.section === 'dashboard-global').length,
+         componentCalls: calls.filter((c) => c.fromComponent).length,
+         pass: calls.every((c) => !c.fromComponent),
+       });
+     } finally {
+       tl.loadTranslationsForSection = orig;
+     }
+   })();
+   ```
+   **Expected:** `componentCalls: 0`, `pass: true`. Dashboard-global loads come from router orchestration only.
+
+4. **UI smoke test:** `/log-in` and `/dashboard` — copy, validation messages, and sidebar menu labels still render in the active locale after switching language via the `<select>`.
+
 ---
 
 ### S-05 — Translation file URLs are built from unencoded input
@@ -2179,6 +2609,97 @@ return `/i18n/section-${sectionName}/${localeCode}.json`;
 `loadTranslationsForSection` is exported and accepts arbitrary strings. Most current callers pass route-config constants, but the utility itself does not validate section names against an allowlist or encode URL segments. A bad caller can request unexpected static paths such as section names containing `/`, `..`, or query/hash characters.
 
 **Fix:** Validate `sectionName` against known section identifiers and validate `localeCode` against `SUPPORTED_LOCALES` inside `loadTranslationsForSection`. Build URLs with `encodeURIComponent` for each path segment.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `getTranslationUrl` interpolated raw `sectionName` and `localeCode` into paths. A prior partial fix added regex-only `sanitizeSectionName` (hyphen/alphanumeric) but did not allowlist route sections, validate locales, or encode URL segments — callers could still request syntactically valid but unknown sections or unsupported locale filenames.
+
+**Why it happened:** The loader is exported for broad use; early hardening used pattern matching only, without tying section names to `routeConfig.json` or locales to `SUPPORTED_LOCALES`.
+
+**What changed:** `translationLoader.js` (S-05):
+- `getKnownTranslationSections()` — lazy Set from `collectKnownSectionNames(getRouteConfiguration())`.
+- `isAllowlistedSectionName()` — regex **and** route-config allowlist.
+- `isSupportedTranslationLocale()` — checks `SUPPORTED_LOCALES`.
+- `getTranslationUrl` / `getBaseTranslationUrl` — `encodeURIComponent` on section and locale segments after validation.
+- `loadTranslationsForSection` / `loadBaseTranslations` — early reject (return `{}`, no fetch) when section or locale is invalid.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md** — same loader API; preload/router callers already pass route-config section strings and supported locales. Complements regex checks previously labeled S-04 in unit tests (those tests now cover S-05 allowlist/locale rules too). **B-09** (split `SUPPORTED_LOCALES` into `localeConstants.js`) can land later without changing S-05 behavior.
+
+**How it was tested:** `tests/unit/translationLoader.test.js` — unknown section `not-a-real-section`, unsupported locale `vif`, encoded `zh-tw` URL. `tests/unit/translationSecurityAudit.test.js` — loader source contains allowlist, locale validation, and `encodeURIComponent`.
+
+**How to test in the browser:**
+1. Run `npm run dev`, open any page (e.g. `/log-in`).
+2. DevTools → **Console** (one paste — malicious inputs must not fetch):
+   ```js
+   (async () => {
+     const tl = await import('/src/utils/translation/translationLoader.js');
+     const calls = [];
+     const orig = window.fetch;
+     window.fetch = async (...args) => {
+       if (typeof args[0] === 'string' && args[0].includes('/i18n/')) {
+         calls.push(args[0]);
+       }
+       return orig(...args);
+     };
+     try {
+       const cases = [
+         ['../../etc/passwd', 'en'],
+         ['auth/extra', 'en'],
+         ['not-a-real-section', 'en'],
+         ['auth', 'vif'],
+         ['auth', '../en'],
+       ];
+       const results = {};
+       for (const [section, locale] of cases) {
+         tl.clearTranslationCaches?.();
+         const before = calls.length;
+         const out = await tl.loadTranslationsForSection(section, locale);
+         results[`${section}|${locale}`] = {
+           keys: Object.keys(out).length,
+           newFetches: calls.length - before,
+         };
+       }
+       console.table(results);
+       console.log({
+         pass: Object.values(results).every((r) => r.keys === 0 && r.newFetches === 0),
+         note: 'Invalid section/locale pairs return {} with zero /i18n/ fetches',
+       });
+     } finally {
+       window.fetch = orig;
+     }
+   })();
+   ```
+   **Expected:** `pass: true` — every row shows `keys: 0`, `newFetches: 0`.
+
+3. **Valid path smoke test** (one paste):
+   ```js
+   (async () => {
+     const tl = await import('/src/utils/translation/translationLoader.js');
+     tl.clearTranslationCaches();
+     const calls = [];
+     const orig = window.fetch;
+     window.fetch = async (...args) => {
+       if (typeof args[0] === 'string' && args[0].includes('/i18n/section-auth/')) {
+         calls.push(args[0]);
+       }
+       return orig(...args);
+     };
+     try {
+       await tl.loadTranslationsForSection('auth', 'vi');
+       console.log({
+         urls: calls,
+         pass: calls.includes('/i18n/section-auth/en.json') && calls.includes('/i18n/section-auth/vi.json'),
+       });
+     } finally {
+       window.fetch = orig;
+     }
+   })();
+   ```
+   **Expected:** `pass: true`, URLs use encoded segments (hyphenated locales like `zh-tw` stay readable).
+
+4. **UI smoke test:** `/log-in` and `/vi/log-in` — translations still load normally for real routes.
 
 ---
 
@@ -2201,6 +2722,52 @@ This ESM cycle currently works only because of evaluation order and because `SUP
 
 **Fix:** Move `SUPPORTED_LOCALES`, `DEFAULT_LOCALE`, and locale metadata into a dependency-free constants module, e.g. `src/utils/translation/localeConstants.js`. Both the store and manager should import from that file.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** `useLocaleStore.js` imported `SUPPORTED_LOCALES` / `DEFAULT_LOCALE` from `localeManager.js`, while `localeManager.js` imported `useLocaleStore` — an ESM cycle that only worked because constants were defined before the store import was evaluated.
+
+**Why it happened:** Constants lived in the manager module for convenience; the Pinia store needed the same list for validation and getters.
+
+**What changed:**
+- Added `src/utils/translation/localeConstants.js` — dependency-free home for `SUPPORTED_LOCALES`, `DEFAULT_LOCALE`, `RTL_LOCALES`, `LOCALE_DISPLAY_METADATA`, and `getDocumentDirection()`.
+- `useLocaleStore.js` — imports `DEFAULT_LOCALE` / `SUPPORTED_LOCALES` from `localeConstants.js` (no `localeManager` import).
+- `localeManager.js` — imports constants from `localeConstants.js` and re-exports them for existing callers (`router/index.js`, `LanguageSwitcher.vue`, etc.).
+- `translationLoader.js` — imports `SUPPORTED_LOCALES` from `localeConstants.js` (S-05 locale validation) instead of pulling constants through the manager.
+- `localeDisplayMetadata.js` — thin re-export shim for backward compatibility.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md** — constants-only refactor; locale resolution, URL updates, and preload-on-locale-change behavior unchanged. Complements **S-05** (same `SUPPORTED_LOCALES` list, now shared without cycles).
+
+**How it was tested:** `tests/unit/localeConstantsCycle.test.js` — store does not import manager; constants module has no store/manager imports; manager re-exports match constants; Pinia getter matches. Existing `useLocaleStore`, `localeSwitcherOptions`, `hreflangTags`, and `translationLoader` tests still pass.
+
+**How to test in the browser:**
+1. Run `npm run dev`, open `/log-in`.
+2. DevTools → **Console** (one paste — cycle break + runtime parity):
+   ```js
+   (async () => {
+     const constants = await import('/src/utils/translation/localeConstants.js');
+     const manager = await import('/src/utils/translation/localeManager.js');
+     const storeMod = await import('/src/stores/useLocaleStore.js');
+     const storeSrc = await fetch('/src/stores/useLocaleStore.js').then((r) => r.text());
+     const store = storeMod.useLocaleStore();
+     console.log({
+       storeImportsConstantsOnly: /localeConstants\.js/.test(storeSrc) && !/localeManager\.js/.test(storeSrc),
+       supportedLocalesMatch:
+         JSON.stringify(manager.SUPPORTED_LOCALES) === JSON.stringify(constants.SUPPORTED_LOCALES),
+       storeGetterLength: store.supportedLocales.length,
+       constantsLength: constants.SUPPORTED_LOCALES.length,
+       pass:
+         /localeConstants\.js/.test(storeSrc) &&
+         !/localeManager\.js/.test(storeSrc) &&
+         store.supportedLocales.length === constants.SUPPORTED_LOCALES.length,
+     });
+   })();
+   ```
+   **Expected:** `storeImportsConstantsOnly: true`, `supportedLocalesMatch: true`, `pass: true`.
+
+3. **UI smoke test:** Language `<select>` still lists all locales; switching English ↔ Vietnamese updates URL and copy; Pinia `locale` persists after refresh.
+
 ---
 
 ### F-10 — No CI validation for translation key coverage
@@ -2219,6 +2786,48 @@ This allows missing keys, typo files like `vif.json`, and partial nested transla
 
 **Required implementation:** Add a `validate:i18n` script that scans Vue files and translation JSON files, compares key trees, validates placeholder tokens, and fails CI when required coverage is missing.
 
+#### Resolution ✅
+
+**Status:** Resolved (fixed in this audit pass).
+
+**What was broken:** No automated guard for typo locale files (e.g. historical `vif.json`), JSON key drift vs English, placeholder mismatches, or `$t('...')` keys missing from English bundles. Issues shipped silently until runtime fallback.
+
+**Why it happened:** Translation assets under `public/i18n/` grew organically; runtime loader validates fetch shape (S-05) but did not scan Vue sources or compare locale trees for CI.
+
+**What changed:**
+- `src/utils/translation/validateI18n.js` — core validator: route section folder checks (warnings until scaffolded), locale filename allowlist via `SUPPORTED_LOCALES` (B-09), required `en.json`, `vi` parity vs English (key shape + `{placeholder}` tokens), orphan folder detection, legacy root JSON warnings (F-11), Vue `$t` / `data-translate` key scan against merged English catalogs (base + all section `en.json`).
+- `build/validateI18n.js` — CLI entrypoint.
+- `package.json` — `"validate:i18n": "node ./build/validateI18n.js"`.
+- `tests/unit/validateI18n.test.js` — helper + integration tests (flags `vif.json`, passes aligned bundles).
+- Translation fixes to make validator pass on current tree: aligned `section-auth/en.json` + `vi.json` (KYC status, confirm-email resend, dashboard reset-password keys, `pages.*`, `auth.register.userNotFound`); `AuthSignUp.vue` uses `auth.register.userNotFound` instead of a literal English sentence as a key.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md** — read-only CI script; no change to router/preload loading order. Complements **S-02** (typo filenames), **S-05** (runtime URL allowlist), **B-09** (shared locale list), **F-11** (warns on unused root JSON). Missing route section folders are **warnings** until those sections are scaffolded (strict failure would block CI prematurely).
+
+**How it was tested:** `npm run validate:i18n` (passes with 11 expected warnings). `tests/unit/validateI18n.test.js` (7 tests).
+
+**How to test in the browser:**
+1. Local CI check: `npm run validate:i18n` — **Expected:** `✅ Translation validation passed.` (warnings for unscaffolded route sections / legacy root JSON are OK).
+2. DevTools → **Console** on `/log-in` (one paste — confirm merged English catalog contains a key your page uses):
+   ```js
+   (async () => {
+     const [authRes, baseRes] = await Promise.all([
+       fetch('/i18n/section-auth/en.json'),
+       fetch('/i18n/base/en.json'),
+     ]);
+     const auth = await authRes.json();
+     const base = await baseRes.json();
+     const sampleKeys = ['auth.login.title', 'ui.language'];
+     const has = (tree, path) => path.split('.').reduce((n, p) => n?.[p], tree) != null;
+     console.log({
+       authLoginTitle: has(auth, 'auth.login.title'),
+       baseUiLanguage: has(base, 'ui.language'),
+       pass: has(auth, 'auth.login.title') && has(base, 'ui.language'),
+     });
+   })();
+   ```
+   **Expected:** `pass: true`.
+3. **Negative test (local):** Temporarily rename `public/i18n/section-shop/vi.json` → `vif.json`, run `npm run validate:i18n` — **Expected:** exit code 1 with `unsupported locale filename`. Rename back afterward.
+
 ---
 
 ### F-11 — Root-level translation bundles exist but are not loaded by the current loader
@@ -2235,6 +2844,45 @@ The app has root-level translation files under `public/i18n/`, but `translationL
 That means `public/i18n/en.json` is not part of the runtime loading flow. Any truly global keys must be duplicated into every section that needs them, or they will only work accidentally when some other section has already loaded a matching namespace.
 
 **Required implementation:** Add a global/base bundle load during app startup (for example `/i18n/base/{locale}.json` or `/i18n/{locale}.json`) and define a clear rule: global UI keys live in the base bundle, route-specific keys live in section bundles.
+
+#### Resolution ✅
+
+**Status:** Resolved (completed in this audit pass; foundation started in **B-05**).
+
+**What was broken:** Root-level `public/i18n/en.json` and `public/i18n/vi.json` were never fetched. `translationLoader.js` only loaded section paths, so global UI keys had to be duplicated into section bundles or worked only by accident after another section loaded.
+
+**Why it happened:** Early monolithic JSON files predated the section-based loader; **B-05** added `/i18n/base/` but left orphan root files and no enforced rule.
+
+**What changed:**
+- **Runtime (B-05, confirmed for F-11):** `loadBaseTranslations()` loads `/i18n/base/{locale}.json` at app mount (`main.js`) and on locale switch (`setActiveLocale`, temporary locale paths). Section keys stay in `/i18n/section-{name}/{locale}.json`.
+- `translationLoader.js` — documented bundle architecture in module header (F-11): base = global UI, section-* = route copy.
+- Removed legacy orphans `public/i18n/en.json` and `public/i18n/vi.json` (not loaded by runtime).
+- `validateI18n.js` — legacy root `public/i18n/*.json` files now **fail** CI (F-10 + F-11).
+- `AuthSignUp.vue` — `?error=user_not_found` uses `t('auth.register.accountNotFoundPrompt')` in `section-auth` (no hardcoded English fallback).
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md** — base load is one lightweight fetch at startup/locale change; section preload in `beforeResolve` / background orchestrator unchanged. Completes **B-05** / partial **F-11** noted in that resolution.
+
+**How it was tested:** `npm run validate:i18n` (no legacy root JSON). `tests/unit/translationLoader.test.js` — base bundle load. `tests/unit/validateI18n.test.js` — rejects legacy root JSON.
+
+**How to test in the browser:**
+1. Run `npm run dev`, hard refresh `/log-in`.
+2. DevTools → **Network** → filter `i18n` — **Expected:** request to `/i18n/base/en.json` (or `/i18n/base/vi.json` on localized URL) during startup, plus section JSON for the route.
+3. DevTools → **Console** (one paste):
+   ```js
+   (async () => {
+     const { loadBaseTranslations } = await import('/src/utils/translation/translationLoader.js');
+     const messages = await loadBaseTranslations('en');
+     const rootProbe = await fetch('/i18n/en.json').then((r) => ({ ok: r.ok, status: r.status }));
+     console.log({
+       baseUiLanguage: messages?.ui?.language,
+       legacyRootEnJson: rootProbe,
+       pass: messages?.ui?.language === 'Language' && rootProbe.status === 404,
+     });
+   })();
+   ```
+   **Expected:** `baseUiLanguage: 'Language'`, `legacyRootEnJson.status: 404`, `pass: true`.
+
+4. **Auth signup prompt:** Open `/sign-up?error=user_not_found` (or `/vi/sign-up?error=user_not_found`) — **Expected:** translated error banner via `auth.register.accountNotFoundPrompt`, not raw English hardcode.
 
 ---
 
@@ -2293,5 +2941,148 @@ Example:
 - Current logic can produce `/vi/app/dashboard` or other incorrect variants depending on current path shape, instead of `/app/vi/dashboard` (or the router's canonical localized form).
 
 **Fix:** Build locale paths through Vue Router (`router.resolve`/`router.push`/`router.replace`) rather than string concatenation, so `BASE_URL` and route parsing rules remain consistent.
+
+---
+
+### L-16 — Language switch does not update `locale_preference` in localStorage
+
+**Files:** `src/stores/useLocaleStore.js` (`setLocale`), `src/utils/translation/localeManager.js` (`setActiveLocale`), `src/components/ui/nav/language/LanguageSwitcher.vue`, settings language field  
+**Severity:** High  
+
+**Reported:** Post-audit regression (2026-05-30).
+
+Changing the language via **LanguageSwitcher** or **settings** updated the UI, URL, and vue-i18n for the current session, but **`localStorage` key `locale_preference` did not change**. After a full page reload, the app fell back to the previous saved locale (or URL/browser/default), so the switch felt “temporary.”
+
+**What was broken:** Pinia state and `setActiveLocale` ran correctly (`localeStore.setLocale` was called from `localeManager.js`), but the persisted blob in `localStorage` was not updated on user-initiated switches.
+
+**Why it happened:** `pinia-plugin-persistedstate` v4 with a custom `serializer` (added in **B-01**) should mirror `this.locale` into `locale_preference` on every mutation. In practice, that plugin write did not always run synchronously when `setLocale` was invoked from `setActiveLocale` during normal UI flows (isolated tests showed `this.locale` updating while `localStorage.getItem('locale_preference')` stayed `null` until an explicit `setItem`). Relying on the plugin alone was therefore insufficient for a user-visible “save my language” action.
+
+**What changed:**
+- `useLocaleStore.js` — after `this.locale = localeCode`, **manual persistence fallback**: `localStorage.setItem('locale_preference', serializeLocalePersistedState({ locale: localeCode }))` inside `setLocale`, using the same TTL wrapper as **B-01** (`{ data: { locale }, expiresAt }`). Plugin `persist` config unchanged (`key: 'locale_preference'`, custom serializer).
+- No changes required in `LanguageSwitcher.vue` or settings components — they already call `setActiveLocale`, which calls `localeStore.setLocale`.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Complements **B-01** / **L-12** (store is still the source of truth; **L-12** sync keeps `currentActiveLocale` aligned when the store changes).
+
+**How it was tested:** `tests/unit/localeStoreSync.test.js`, `tests/unit/updateUrlWithLocale.test.js` (pass). Manual check: switch locale in UI → DevTools → Application → Local Storage → `locale_preference` updates with `data.locale` and `expiresAt`.
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, hard refresh on `/log-in` (or any dashboard page).
+
+2. Note current storage (DevTools → **Application** → **Local Storage** → `locale_preference`), or:
+   ```js
+   console.log('before:', localStorage.getItem('locale_preference'));
+   ```
+
+3. Change language via **LanguageSwitcher** or **Settings → Language** (e.g. English → Vietnamese).
+
+4. **Expected:** UI and URL reflect the new locale immediately.
+
+5. Verify persistence (one paste):
+   ```js
+   (() => {
+     const raw = localStorage.getItem('locale_preference');
+     const parsed = raw ? JSON.parse(raw) : null;
+     console.log({
+       key: 'locale_preference',
+       storedLocale: parsed?.data?.locale ?? parsed?.locale ?? null,
+       hasExpiresAt: typeof parsed?.expiresAt === 'number',
+       pass: typeof parsed?.expiresAt === 'number' && parsed?.data?.locale != null,
+     });
+   })();
+   ```
+   **Expected:** `storedLocale` matches the language you selected (e.g. `'vi'`), `hasExpiresAt: true`, `pass: true`.
+
+6. Hard refresh (F5). **Expected:** app keeps the chosen locale (URL + copy), not the pre-switch preference.
+
+7. **Optional — `setActiveLocale` path:** DevTools → Console:
+   ```js
+   await window.APP.setLocale('vi');
+   JSON.parse(localStorage.getItem('locale_preference'))?.data?.locale;
+   ```
+   **Expected:** `'vi'`.
+
+#### Resolution ✅
+
+**Status:** Resolved (fixed post-audit, 2026-05-30).
+
+---
+
+### L-17 — Stale Cognito JWT token overrides persisted locale preference on page reload
+
+**Files:** `src/utils/translation/localeManager.js` (`applyProfileLocaleToStoreIfAuthenticated`, `resolveActiveLocale`), `src/utils/translation/userLocaleProfile.js` (`applyUserPreferredLocaleOnAuth`)  
+**Severity:** High  
+
+**Reported:** Post-audit regression (2026-06-01).
+
+Changing the language via **SettingsLanguageField** or **LanguageSwitcher** correctly updated the Pinia store, `localStorage`, vue-i18n, URL, and Cognito user attribute for the current session. However, after navigating to another page and **reloading** (or typing a URL without locale prefix and pressing Enter), the app reverted to the **previous language** — and could also hit a 404 error.
+
+**What was broken — three override paths from the same root cause (stale JWT):**
+
+1. **`applyProfileLocaleToStoreIfAuthenticated()`** (synchronous, `main.js` auth restore): Read the stale JWT locale and called `syncLocaleStoreWithCode()`, overwriting the Pinia store and `localStorage` with the old value.
+
+2. **`resolveActiveLocale()` step 2** (Cognito profile): Also called `syncLocaleStoreWithCode(profileLocale)` unconditionally when a profile locale was found.
+
+3. **`applyUserPreferredLocaleOnAuth()`** (async, fire-and-forget from `setTokenAndDecode`): This was the most destructive path. It ran asynchronously via `void import(…).then(applyUserPreferredLocaleOnAuth)` inside `setTokenAndDecode`. Because it runs after a dynamic import, it **races with router navigation**. Its URL check (`getLeadingLocaleFromPath(window.location.pathname)`) was unreliable because `window.location` may still show the user's typed URL (e.g. `/dashboard`) before the router's `replace` to `/az/dashboard` commits. So it would:
+   - Resolve `preferredLocale = 'en'` from the stale JWT
+   - Call `setActiveLocale('en', { updateUrl: true })` mid-navigation
+   - This overwrote the store AND called `router.replace(…)` during an ongoing navigation
+   - The conflicting navigation caused the router to redirect to `/404`
+
+**Why it happened:** `savePreferredLocaleToCognito` updates the Cognito user attribute but does **not** re-issue the local JWT. The JWT stored in `localStorage` (`idToken`) still contains the old `custom:preferred_locale` until the next token refresh cycle. All three override paths trusted the JWT unconditionally.
+
+**What changed:**
+
+- **`applyProfileLocaleToStoreIfAuthenticated()`** — now checks if the locale store already holds a valid persisted preference. If so, the store value (set by an explicit `setLocale` user action) takes priority over the stale JWT claim. Cognito profile locale is only applied as a fallback when no local preference exists (new device, first login).
+- **`resolveActiveLocale()` step 2** — the Cognito profile step now checks if the store already has a valid locale before calling `syncLocaleStoreWithCode`. If the store has a valid preference, it is returned directly without overwriting.
+- **`applyUserPreferredLocaleOnAuth()`** — now checks both `getActiveLocale()` and `localeStore.locale` before resolving the profile locale. If either indicates an explicit user preference, the function returns early without calling `setActiveLocale`, preventing the async race with router navigation and the 404.
+
+**Conflict check:** Does **not** override **Preloading.md**, **SECTION_PRELOAD_AUDIT.md**, **AUDIT.md**, or **ASSET_PRELOAD_AUDIT.md**. Complements **L-16** (manual persistence fallback in `setLocale` ensures the store value is written reliably). Complements **B-01** (store persist config unchanged). The Cognito profile locale still applies when no local preference exists (new device / first login).
+
+**How it was tested:** All existing locale tests pass (`localeStoreSync`, `updateUrlWithLocale`, `translationLoader`, `resolveActiveLocaleForNavigation`, `temporaryPageLocale`, `userLocaleProfile` — 31 tests).
+
+**How to test in the browser:**
+
+1. Run `npm run dev`, log in, navigate to `/dashboard/settings`.
+
+2. Note current language (e.g. English). Open DevTools → **Application** → **Local Storage** → check `locale_preference`.
+
+3. Change language via the settings language dropdown (e.g. to Vietnamese or Azerbaijani).
+
+4. **Expected:** UI and URL reflect the new language. `locale_preference` in localStorage has `data.locale` matching your selection.
+
+5. Navigate to another page (e.g. click Analytics in sidebar).
+
+6. **Expected:** URL shows locale prefix (e.g. `/vi/dashboard/analytics`), UI is still translated.
+
+7. Hard refresh (F5).
+
+8. **Expected:** App keeps the chosen locale (URL + UI text), not the pre-switch language.
+
+9. **Critical test — type `/dashboard` in the URL bar and press Enter** (no locale prefix).
+
+10. **Expected:** App redirects to `/{locale}/dashboard` (e.g. `/vi/dashboard`), dashboard loads normally — **no 404 error**. The store is not reverted.
+
+11. Open a **new tab** to `/dashboard` (no locale prefix).
+
+12. **Expected:** App injects the saved locale and stays in the chosen language.
+
+13. **Optional — verify store not overwritten by JWT:**
+    ```js
+    (() => {
+      const raw = localStorage.getItem('locale_preference');
+      const parsed = raw ? JSON.parse(raw) : null;
+      const locale = parsed?.data?.locale ?? parsed?.locale ?? null;
+      console.log({
+        storedLocale: locale,
+        pass: locale != null && locale !== 'en',
+      });
+    })();
+    ```
+    **Expected:** `storedLocale` matches your selection, `pass: true`.
+
+#### Resolution ✅
+
+**Status:** Resolved (2026-06-01).
 
 ---

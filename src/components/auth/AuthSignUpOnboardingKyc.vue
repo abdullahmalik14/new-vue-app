@@ -32,7 +32,6 @@ import { useAuthStore } from "@/stores/useAuthStore"
 import { authHandler } from "@/utils/auth/authHandler"
 import { useI18n } from "vue-i18n"
 import { getActiveLocale } from "@/utils/translation/localeManager.js"
-import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js"
 import Heading from "@/components/default/Heading.vue"
 import Paragraph from "@/components/default/Paragraph.vue"
 import ButtonComponent from "@/components/button/ButtonComponent.vue"
@@ -48,16 +47,8 @@ const isLoading = ref(false)
 // Get active locale from localeManager
 const locale = computed(() => getActiveLocale())
 
-// Preload auth section translations
-onMounted(async () => {
+onMounted(() => {
   console.log(`[KYC] Component mounted, current locale: ${locale.value}`)
-
-  // Load translations for auth section
-  try {
-    await loadTranslationsForSection('auth', locale.value)
-  } catch (err) {
-    console.error('[KYC] Failed to load translations:', err)
-  }
 })
 
 function handleLogout() {
