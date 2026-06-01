@@ -1717,7 +1717,88 @@ log('assetLibrary.js', 'getAssetUrl', 'not-found', `Flag not found`, {
 
 #### Resolution ✅
 
-**Status:** Resolved with **B-01** (steps 1–3 and 5). Step 4 partial: `getAssetUrls` / `preloadAssetUrls` accept `section`; `getAssetsByCategory` / `validateAssetMap` still global-only (**A-P05**).
+**Status:** Fully resolved with **B-01** and **M-01** implementation (all steps 1–5).
+
+**What was broken:**
+- `getAssetsByCategory()` and `validateAssetMap()` only operated on the global asset map
+- No way to validate or retrieve category assets with section overrides applied
+- This was identified in the audit as **A-P05** (step 4 partial)
+
+**Why it happened:**
+- Initial implementation focused on core flag resolution (`getAssetUrl`, `getAssetUrls`)
+- Category and validation features were left as global-only operations
+- Section-first architecture needed completion
+
+**What changed:**
+1. **Added `buildAssetsByCategoryWithSectionOverride()` helper** (lines ~1063-1086):
+   - Merges section category assets over global category assets
+   - Section flags take precedence over global flags
+   
+2. **Updated `getAssetsByCategory(category, environmentOrOptions)`** (lines ~1554-1635):
+   - Now accepts `{ environment, section }` options object (same pattern as `getAssetUrl`)
+   - Loads section asset map when section is provided
+   - Uses merged global + section maps for category building
+   - Updated cache keys to include section for proper isolation
+   - Updated logging to include section context
+   
+3. **Updated `validateAssetMap({ section })`** (lines ~1823-1942):
+   - Now accepts optional `{ section }` options object
+   - Added `mergeSectionAssetMapForValidation()` helper for merging maps
+   - Validates merged map when section is provided
+   - Tracks and reports which flags originated from section vs global map
+   - Summary includes `sectionFlagCount` and `merged` flag
+
+**How to test in browser:**
+
+```javascript
+// Open browser console and run:
+(async () => {
+  const { getAssetsByCategory, validateAssetMap, loadSectionAssetMap } = await import('/src/utils/assets/assetLibrary.js');
+  
+  console.log('=== Test 1: Global-only category (no section) ===');
+  const globalIcons = await getAssetsByCategory('icon');
+  console.log('Global icons:', Object.keys(globalIcons));
+  
+  console.log('\n=== Test 2: Category with section override ===');
+  // Assuming you have src/config/assetMap.auth.json with icon overrides
+  const authIcons = await getAssetsByCategory('icon', { section: 'auth' });
+  console.log('Auth section icons (merged):', Object.keys(authIcons));
+  
+  console.log('\n=== Test 3: Validation - global only ===');
+  const globalValidation = await validateAssetMap();
+  console.log('Global validation:', { 
+    valid: globalValidation.valid, 
+    errors: globalValidation.errors.length,
+    warnings: globalValidation.warnings.length 
+  });
+  
+  console.log('\n=== Test 4: Validation with section ===');
+  const authValidation = await validateAssetMap({ section: 'auth' });
+  console.log('Auth validation:', { 
+    valid: authValidation.valid, 
+    section: authValidation.summary.section,
+    sectionFlagCount: authValidation.summary.sectionFlagCount,
+    merged: authValidation.summary.merged
+  });
+  
+  console.log('\n=== Test 5: Cache isolation verification ===');
+  // Call same category with different sections - should get different results
+  const icons1 = await getAssetsByCategory('icon', { section: 'auth' });
+  const icons2 = await getAssetsByCategory('icon', { section: 'dashboard' });
+  const icons3 = await getAssetsByCategory('icon'); // global
+  console.log('Auth icons:', Object.keys(icons1).length);
+  console.log('Dashboard icons:', Object.keys(icons2).length);
+  console.log('Global icons:', Object.keys(icons3).length);
+  console.log('Different results (cache isolation works):', 
+    JSON.stringify(Object.keys(icons1)) !== JSON.stringify(Object.keys(icons3)));
+})();
+```
+
+**Expected results:**
+- Section category calls return merged results (section overrides global)
+- Validation shows `merged: true` and `sectionFlagCount > 0` when section map has flags
+- Cache isolation: different sections return different cached results
+- No errors in console
 
 ---
 
@@ -1734,6 +1815,35 @@ log('assetLibrary.js', 'getAssetUrl', 'not-found', `Flag not found`, {
 
 **Status:** Resolved with **P-01** (steps 1–3 and 5). Step 4 (per-section map for initial route) is **not** implemented — per-section maps are **M-03**.
 
+**What was broken:** No startup warm-up; the first `getAssetUrl` call would fetch/resolve the map lazily.
+
+**Why it happened:** `initAssetLibrary()` did not exist, and `main.js` never preloaded the map.
+
+**What changed:** Implemented in **P-01** — `initAssetLibrary()` loads the map + warms flag URLs, and `main.js` awaits it before `app.mount()`. (This entry remains a reference to that resolved work; no new code changes here.)
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const {
+    initAssetLibrary,
+    getAssetUrl,
+    isAssetLibraryInitialized,
+  } = await import('/src/utils/assets/assetLibrary.js');
+  const before = isAssetLibraryInitialized();
+  const init = await initAssetLibrary();
+  const url = await getAssetUrl('icon.cart');
+  console.log({
+    before,
+    flagCount: init.flagCount,
+    warmedCount: init.warmedCount,
+    iconCart: url,
+    pass: init.flagCount > 0 && url !== null,
+  });
+})();
+```
+
+**Expected:** `pass: true`, `warmedCount > 0`, `iconCart` resolves without waiting for a component to call `getAssetUrl`.
+
 ---
 
 ### M-03 — No per-section asset map files exist or are loaded
@@ -1744,17 +1854,113 @@ log('assetLibrary.js', 'getAssetUrl', 'not-found', `Flag not found`, {
 
 **Status:** Resolved with **B-01** — `src/config/assetMap.auth.json`, `loadSectionAssetMap()`, build-time glob + `public/config` sync.
 
+**What was broken:** No per-section asset map files were available, and no loader existed.
+
+**Why it happened:** The asset map pipeline only supported a single global map.
+
+**What changed:** **B-01** added section map files (`assetMap.<section>.json`) and `loadSectionAssetMap()` with cache + dev runtime fetch.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const {
+    loadSectionAssetMap,
+    getAssetUrl,
+    getKnownBundledSectionNames,
+  } = await import('/src/utils/assets/assetLibrary.js');
+  const known = getKnownBundledSectionNames();
+  const section = known[0] || 'auth';
+  const map = await loadSectionAssetMap(section);
+  const url = await getAssetUrl('icon.cart', { section });
+  console.log({
+    knownSections: known,
+    section,
+    sectionLoaded: map !== null,
+    urlFromSection: url,
+    pass: map !== null,
+  });
+})();
+```
+
+**Expected:** `sectionLoaded: true` (if the section map exists) and `knownSections` includes your bundled section names (e.g., `auth`). `urlFromSection` should resolve if the flag exists in that section or in the global fallback.
+
 ---
 
 ### M-04 — No startup cross-validation: flags in `routeConfig.assetPreload` vs. entries in `assetMap.json`
 **Files:** `assetLibrary.js`, `routeConfig.json`, `assetMap.json`  
 **Detail:** When a route declares `{ "flag": "dashboard.hamburger", "type": "image" }` but the flag is absent from `assetMap.json`, `getAssetUrl` silently returns `null` and the preload is skipped with a warn-level log that is easy to miss. A startup validation call (or a Vite plugin) should cross-reference every flag used in `routeConfig.assetPreload` against `assetMap.json` and surface missing flags at start-up or CI time.
 
+#### Resolution ✅
+
+**Status:** Resolved with **B-04** — `validateRouteAssetPreloadFlags()` runs during route config load + build config validation.
+
+**What was broken:** Missing asset flags in `routeConfig.assetPreload` were only logged at runtime, so invalid flags were easy to miss.
+
+**Why it happened:** No startup validation tied to `routeConfig` or CI for asset preload flags.
+
+**What changed:** `validateRouteAssetPreloadFlags()` now validates `routeConfig.json` (including shared preload catalog refs) against `assetMap.json` during `loadRouteConfigurationFromFile()` and `validateRouteConfig()` (build-time JSON validator).
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { validateRouteAssetPreloadFlags } = await import('/src/utils/assets/validateRouteAssetPreloadFlags.js');
+  const { resolveRouteAssetPreloads } = await import('/src/utils/route/resolveRouteAssetPreloads.js');
+  const routes = (await import('/src/router/routeConfig.json')).default;
+  const shared = (await import('/src/router/sharedAssetPreloads.json')).default;
+  const assetMap = (await import('/src/config/assetMap.json')).default;
+  const expandedRoutes = resolveRouteAssetPreloads(routes, shared);
+  const result = validateRouteAssetPreloadFlags(expandedRoutes, assetMap, shared);
+  console.log({
+    valid: result.valid,
+    missingCount: result.missingCount,
+    errors: result.errors.slice(0, 5),
+    pass: result.valid,
+  });
+})();
+```
+
+**Expected:** `pass: true` and `missingCount: 0`. If you intentionally remove a flag from `assetMap.json`, this reports errors with the missing flag names.
+
 ---
 
 ### M-05 — No version/build-hash invalidation for `usePreloadStore` localStorage data
 **File:** `usePreloadStore.js` lines 62–66  
 **Detail:** Preloaded asset URLs are persisted indefinitely. After a deploy that changes asset filenames (content hashing), the stored URLs point to stale or 404 paths but `hasAsset(url)` still returns `true`, causing the app to believe assets are preloaded when they are not. Add a `storeVersion` field tied to `import.meta.env.VITE_APP_VERSION` or a build hash; clear and re-preload when the version changes.
+
+#### Resolution ✅
+
+**Status:** Resolved with **B-05** — build-hash invalidation via `syncPreloadStoreBuildHash()`.
+
+**What was broken:** Persisted preload state could survive across deploys and claim assets were preloaded when the URLs changed.
+
+**Why it happened:** The preload store was persisted without a build/deploy version check.
+
+**What changed:** Added `buildHash` to `usePreloadStore` and `syncPreloadStoreBuildHash()` (from `appBuildHash.js`) to clear state when `VITE_BUILD_HASH` changes. `afterHydrate()` now runs the sync and logs invalidation.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { usePreloadStore } = await import('/src/stores/usePreloadStore.js');
+  const { syncPreloadStoreBuildHash, getAppBuildHash } = await import('/src/utils/build/appBuildHash.js');
+  const store = usePreloadStore();
+  const currentHash = getAppBuildHash();
+  const before = store.buildHash;
+  if (!currentHash) {
+    console.warn('VITE_BUILD_HASH not set; set it and restart to fully test invalidation.');
+  }
+  store.buildHash = currentHash ? `${currentHash}-old` : 'fake-old';
+  const sync = syncPreloadStoreBuildHash(store);
+  console.log({
+    currentHash,
+    before,
+    after: store.buildHash,
+    invalidated: sync.invalidated,
+    pass: currentHash ? sync.invalidated : true,
+  });
+})();
+```
+
+**Expected:** When `VITE_BUILD_HASH` is set, `invalidated: true` and `after` equals the current hash; the store clears its preload state.
 
 ---
 
@@ -1769,11 +1975,66 @@ log('assetLibrary.js', 'getAssetUrl', 'not-found', `Flag not found`, {
 
 **Status:** Resolved with **B-03** — use `resetAssetLibrary()` / `resetAssetSystem()`.
 
+**What was broken:** Cache resets required multiple manual calls across different modules.
+
+**Why it happened:** Cache layers were added incrementally without a single orchestrator.
+
+**What changed:** `resetAssetLibrary()` now clears asset map caches, preload caches, and optional section rollup caches, and reports before/after stats. `resetAssetSystem()` is an alias.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { resetAssetLibrary } = await import('/src/utils/assets/resetAssetLibrary.js');
+  const summary = resetAssetLibrary();
+  console.log({
+    before: summary.before,
+    after: summary.after,
+    sectionRollupCacheCleared: summary.sectionRollupCacheCleared,
+    pass: summary.after.cacheHandlerEntries === 0,
+  });
+})();
+```
+
+**Expected:** `pass: true` and `after` counts are lower than `before`.
+
 ---
 
 ### M-07 — `unloadUnusedSections` does not evict per-flag URL cache entries for unloaded sections
 **File:** `assetLibrary.js` lines 508–561  
 **Detail:** When a section is unloaded, its section-metadata cache entry is left in `cacheHandler` (see L-05). Additionally, any `asset_url_<env>_<flag>` entries that belong to that section's flags are never evicted. Over a long session with many section transitions, the URL cache grows without bound. Section flags should be tracked on load so they can be individually evicted on unload.
+
+#### Resolution ✅
+
+**Status:** Resolved with **M-07** — `unloadUnusedSections()` now clears section URL cache keys.
+
+**What was broken:** Section metadata was removed, but section-scoped URL cache entries (`asset_url_s_<section>_*`) remained.
+
+**Why it happened:** The unload path only cleared section metadata (`loadedAssets` + `asset_metadata_*`) and skipped URL cache cleanup.
+
+**What changed:** Added section URL cache prefix removal when a section is unloaded.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetUrl, unloadUnusedSections, getEnvironment } = await import('/src/utils/assets/assetLibrary.js');
+  const { getValueFromCache } = await import('/src/utils/common/cacheHandler.js');
+  const section = 'auth';
+  const env = getEnvironment();
+  await getAssetUrl('icon.cart', { section });
+  const cacheKey = `asset_url_s_${section}_${env}_icon.cart`;
+  const before = getValueFromCache(cacheKey) !== null;
+  unloadUnusedSections([]); // unload all sections
+  const after = getValueFromCache(cacheKey) !== null;
+  console.log({
+    cacheKey,
+    before,
+    after,
+    pass: before === true && after === false,
+  });
+})();
+```
+
+**Expected:** `pass: true` — the section-scoped URL cache entry is removed after unloading.
 
 ---
 
@@ -1797,11 +2058,76 @@ export function useAssetUrl(flag, sectionName = null) {
 }
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved with **M-08** — `src/composables/useAssetUrl.js` added.
+
+**What was broken:** Components had to re-implement async URL state handling every time.
+
+**Why it happened:** No composable existed to wrap `getAssetUrl` into reactive state.
+
+**What changed:** Added `useAssetUrl(flag, sectionName)` composable that returns `{ url, loading, error }` and resolves on mount.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { createApp, h } = await import('/node_modules/vue/dist/vue.esm-bundler.js');
+  const { useAssetUrl } = await import('/src/composables/useAssetUrl.js');
+  const mountId = 'asset-url-test';
+  const mountNode = document.createElement('div');
+  mountNode.id = mountId;
+  document.body.appendChild(mountNode);
+  createApp({
+    setup() {
+      return useAssetUrl('icon.cart');
+    },
+    render() {
+      return h('pre', JSON.stringify({
+        url: this.url,
+        loading: this.loading,
+        error: this.error ? String(this.error) : null,
+      }, null, 2));
+    },
+  }).mount(`#${mountId}`);
+})();
+```
+
+**Expected:** A small `<pre>` block renders on the page with `loading: false` and a non-null `url` after the async load completes.
+
 ---
 
 ### M-09 — No `cacheHandler` size cap or LRU eviction; unbounded memory growth
 **File:** `cacheHandler.js`  
 **Detail:** `cacheStorage` is an unconstrained `Map`. In a long-running SPA session, every unique flag + environment combination adds an entry. With section maps (once added), the number of distinct `asset_url_*` keys multiplies by the number of sections. Add a configurable max-size (e.g. 500 entries) with LRU eviction so the cache stays bounded.
+
+#### Resolution ✅
+
+**Status:** Resolved with **M-09** — LRU eviction + max size (`VITE_CACHE_HANDLER_MAX_ENTRIES`, default 500).
+
+**What was broken:** Cache size could grow without bound in long sessions.
+
+**Why it happened:** No maximum size or eviction policy existed in `cacheHandler`.
+
+**What changed:** Added LRU eviction in `cacheHandler.js`; cache hits now refresh LRU order, and writes evict oldest entries when `CACHE_MAX_ENTRIES` is exceeded.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { setValueWithExpiration, getCacheStatistics } = await import('/src/utils/common/cacheHandler.js');
+  console.log('maxEntries:', getCacheStatistics().maxEntries);
+  for (let i = 0; i < 20; i += 1) {
+    setValueWithExpiration(`lru_test_${i}`, i, 60000);
+  }
+  const stats = getCacheStatistics();
+  console.log({
+    totalEntries: stats.totalEntries,
+    maxEntries: stats.maxEntries,
+    pass: stats.totalEntries <= stats.maxEntries,
+  });
+})();
+```
+
+**Expected:** `pass: true`. For a tighter test, set `VITE_CACHE_HANDLER_MAX_ENTRIES=5` in `.env.local`, restart dev server, then re-run the snippet (total entries should cap at 5).
 
 ---
 
@@ -1809,11 +2135,64 @@ export function useAssetUrl(flag, sectionName = null) {
 **File:** `assetLibrary.js` lines 663–715  
 **Detail:** After the fetch, only `response.ok` is checked. A server misconfiguration serving HTML (e.g. an error page) at `/config/assetMap.json` would cause `response.json()` to throw; the catch block returns an empty map silently. The `Content-Type` should be validated (`application/json`) before attempting to parse.
 
+#### Resolution ✅
+
+**Status:** Resolved with **M-10** — fetch rejects non‑JSON `Content-Type`.
+
+**What was broken:** HTML responses could be parsed as JSON and silently fail.
+
+**Why it happened:** `fetchAssetMapFromNetwork()` trusted `response.ok` without validating content type.
+
+**What changed:** Added `Content-Type` checks that only accept `application/json` (or `+json`), otherwise the candidate URL is skipped with a warning.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetMapFetchCandidates, loadAssetMapConfig, getAssetMapConfigSource } = await import('/src/utils/assets/assetLibrary.js');
+  console.log('candidates:', getAssetMapFetchCandidates());
+  const map = await loadAssetMapConfig();
+  console.log({
+    mapLoaded: Boolean(map && Object.keys(map).length),
+    source: getAssetMapConfigSource(),
+  });
+})();
+```
+
+**Expected:** If you set `VITE_ASSET_MAP_URL=/index.html` in `.env.local` and restart, the loader should skip that HTML response and fall back to the next candidate (source should not be `runtime-verified` from the HTML endpoint).
+
 ---
 
 ### M-11 — No TTL configuration per asset type; all flags use the same 30-minute URL cache TTL
 **File:** `assetLibrary.js` line 51  
 **Detail:** Critical brand assets (logos, auth backgrounds) rarely change and could be cached for hours. Third-party CDN URLs that rotate may need shorter TTLs. A per-type or per-flag TTL override in `assetMap.json` (e.g. `{ "url": "...", "ttl": 86400000 }`) would allow fine-grained cache control without hardcoding constants.
+
+#### Resolution ✅
+
+**Status:** Resolved with **M-11** — asset map entries can now specify `{ url, ttl }`.
+
+**What was broken:** All flag URLs used the same 30‑minute TTL.
+
+**Why it happened:** Asset map entries were modeled as raw strings only.
+
+**What changed:** `assetMap.json` entries now accept an object form: `{ url: "...", ttl: <ms> }`. `getAssetUrl()` respects the per‑flag TTL when caching.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { loadAssetMapConfig, getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+  const { getValueFromCache } = await import('/src/utils/common/cacheHandler.js');
+  const map = await loadAssetMapConfig();
+  map.development['ttl.test'] = { url: '/assets/icons/cart-dev.svg', ttl: 1000 };
+  const url = await getAssetUrl('ttl.test', { environment: 'development' });
+  const cacheKey = 'asset_url_g_development_ttl.test';
+  const before = getValueFromCache(cacheKey) !== null;
+  await new Promise((resolve) => setTimeout(resolve, 1200));
+  const after = getValueFromCache(cacheKey) !== null;
+  console.log({ url, before, after, pass: before === true && after === false });
+})();
+```
+
+**Expected:** `pass: true` — the cached entry expires after the custom TTL.
 
 ---
 

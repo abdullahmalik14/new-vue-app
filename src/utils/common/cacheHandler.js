@@ -12,6 +12,20 @@ const cacheStorage = new Map();
 
 /** @type {number} Lazy expiry sweep interval in the browser (P-06) */
 const CACHE_SWEEP_INTERVAL_MS = 10 * 60 * 1000;
+const DEFAULT_CACHE_MAX_ENTRIES = 500;
+
+/**
+ * @returns {number}
+ */
+function resolveCacheMaxEntries() {
+  const raw = Number(import.meta.env.VITE_CACHE_HANDLER_MAX_ENTRIES);
+  if (Number.isFinite(raw) && raw > 0) {
+    return Math.floor(raw);
+  }
+  return DEFAULT_CACHE_MAX_ENTRIES;
+}
+
+const CACHE_MAX_ENTRIES = resolveCacheMaxEntries();
 
 /**
  * @param {{ expirationTimestamp: number|null }} entry
@@ -76,6 +90,50 @@ function logCache(method, flag, description, data = {}) {
 }
 
 /**
+ * Mark a cache entry as most recently used (M-09).
+ *
+ * @param {string} key
+ * @param {object} entry
+ */
+function touchCacheEntry(key, entry) {
+  cacheStorage.delete(key);
+  cacheStorage.set(key, entry);
+}
+
+/**
+ * Enforce a max cache size with LRU eviction (M-09).
+ *
+ * @returns {number} Entries evicted
+ */
+function enforceCacheMaxEntries() {
+  if (!CACHE_MAX_ENTRIES || cacheStorage.size <= CACHE_MAX_ENTRIES) {
+    return 0;
+  }
+
+  sweepExpiredCacheEntries();
+
+  let evicted = 0;
+  while (cacheStorage.size > CACHE_MAX_ENTRIES) {
+    const oldestKey = cacheStorage.keys().next().value;
+    if (!oldestKey) {
+      break;
+    }
+    cacheStorage.delete(oldestKey);
+    evicted += 1;
+  }
+
+  if (evicted > 0) {
+    logCache('enforceCacheMaxEntries', 'evict', 'LRU eviction completed', {
+      maxEntries: CACHE_MAX_ENTRIES,
+      evicted,
+      remaining: cacheStorage.size,
+    });
+  }
+
+  return evicted;
+}
+
+/**
  * Set a value in cache with optional expiration time
  * 
  * @param {string} key - Unique identifier for the cached value
@@ -106,10 +164,16 @@ export function setValueWithExpiration(key, value, timeToLiveMilliseconds = 0) {
     ? Date.now() + timeToLiveMilliseconds 
     : null;
 
+  if (cacheStorage.has(key)) {
+    cacheStorage.delete(key);
+  }
+
   cacheStorage.set(key, {
     value,
     expirationTimestamp
   });
+
+  enforceCacheMaxEntries();
 
   logCache('setValueWithExpiration', 'success', 'Value cached', { 
     key, 
@@ -153,6 +217,7 @@ export function getValueFromCache(key) {
     return null;
   }
 
+  touchCacheEntry(key, cachedEntry);
   logCache('getValueFromCache', 'cache-hit', 'Returning cached value', { key });
   return cachedEntry.value;
 }
@@ -180,6 +245,7 @@ export function hasValidCacheEntry(key) {
     return false;
   }
 
+  touchCacheEntry(key, cachedEntry);
   logCache('hasValidCacheEntry', 'cache-hit', 'Valid entry exists', { key });
   return true;
 }
@@ -268,7 +334,8 @@ export function getCacheStatistics() {
   const stats = {
     totalEntries: cacheStorage.size,
     expiredEntries: expiredCount,
-    validEntries: cacheStorage.size - expiredCount
+    validEntries: cacheStorage.size - expiredCount,
+    maxEntries: CACHE_MAX_ENTRIES
   };
 
   logCache('getCacheStatistics', 'info', 'Cache statistics', stats);

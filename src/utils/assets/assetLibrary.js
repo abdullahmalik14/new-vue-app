@@ -102,6 +102,8 @@ const ASSET_URL_CACHE_PREFIX = 'asset_url_';
 const ASSET_URL_CACHE_TTL = 1800000; // 30 minutes
 const ASSET_CATEGORY_CACHE_PREFIX = 'asset_category_';
 const ASSET_CATEGORY_CACHE_TTL = ASSET_MAP_CACHE_TTL;
+/** @type {Set<string>} Section names with cached flag URLs (M-07) */
+const sectionUrlCacheSections = new Set();
 
 // In-memory cache for asset map
 let cachedAssetMap = null;
@@ -539,6 +541,7 @@ export function clearAssetCaches() {
   clearAssetMapConfigCache();
   environmentOverride = null;
   clearAssetLibraryInitState();
+  sectionUrlCacheSections.clear();
 
   // Also clear cacheHandler (which has TTL-based caching)
   clearAllCache();
@@ -603,8 +606,18 @@ export function unloadUnusedSections(sectionsToKeep = []) {
   keysToDelete.forEach(sectionName => {
     loadedAssets.delete(sectionName);
     removeFromCache(getSectionAssetCacheKey(sectionName));
+    removeCacheKeysByPrefix(getSectionAssetUrlCachePrefix(sectionName));
+    sectionUrlCacheSections.delete(sectionName);
     unloadedCount++;
   });
+
+  // Also clear section URL caches that may have been created without loading section metadata (M-07)
+  for (const sectionName of sectionUrlCacheSections) {
+    if (!sectionsToKeep.includes(sectionName) && !keysToDelete.includes(sectionName)) {
+      removeCacheKeysByPrefix(getSectionAssetUrlCachePrefix(sectionName));
+      sectionUrlCacheSections.delete(sectionName);
+    }
+  }
 
   log('assetLibrary.js', 'unloadUnusedSections', 'success', 'Unused sections unloaded', {
     unloadedCount,
@@ -814,6 +827,19 @@ async function fetchAssetMapFromNetwork() {
         continue;
       }
 
+      const contentType = response.headers.get('content-type') || '';
+      if (
+        contentType &&
+        !contentType.includes('application/json') &&
+        !contentType.includes('+json')
+      ) {
+        log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'warn', 'Asset map rejected due to Content-Type', {
+          url,
+          contentType,
+        });
+        continue;
+      }
+
       const rawText = await response.text();
 
       if (!(await verifyFetchedAssetMapText(rawText))) {
@@ -929,6 +955,16 @@ function getAssetUrlCacheKey(flag, env, section) {
 }
 
 /**
+ * Prefix for clearing section-specific URL caches (M-07).
+ *
+ * @param {string} sectionName
+ * @returns {string}
+ */
+function getSectionAssetUrlCachePrefix(sectionName) {
+  return `${ASSET_URL_CACHE_PREFIX}s_${sectionName}_`;
+}
+
+/**
  * Load optional per-section asset map overrides (404 / missing file → null).
  *
  * @param {string} sectionName
@@ -1014,22 +1050,31 @@ function getCategoryMemoryCacheKey(env, category) {
  * Whether category assets are cached for the environment (memory or cacheHandler).
  *
  * @param {string} category
- * @param {string} [environment]
+ * @param {string|{ environment?: string, section?: string }} [environmentOrOptions] - Environment or options
  * @returns {boolean}
  */
-export function isAssetCategoryCached(category, environment = null) {
+export function isAssetCategoryCached(category, environmentOrOptions = null) {
   if (!category || typeof category !== 'string') {
     return false;
   }
 
+  const { environment, section } = normalizeGetAssetUrlArgs('', environmentOrOptions);
   const env = environment || detectEnvironment();
-  const memoryKey = getCategoryMemoryCacheKey(env, category);
+  
+  // Include section in cache key for proper isolation (M-01)
+  const memoryKey = section
+    ? `${getCategoryMemoryCacheKey(env, category)}:section:${section}`
+    : getCategoryMemoryCacheKey(env, category);
 
   if (categoryAssetsMemoryCache.has(memoryKey)) {
     return true;
   }
 
-  return getValueFromCache(getAssetCategoryCacheKey(env, category)) !== null;
+  const cacheKey = section
+    ? `${getAssetCategoryCacheKey(env, category)}:section:${section}`
+    : getAssetCategoryCacheKey(env, category);
+
+  return getValueFromCache(cacheKey) !== null;
 }
 
 /**
@@ -1050,14 +1095,39 @@ function buildAssetsByCategoryFromMap(assetMap, env, category) {
       return;
     }
 
-    const safeUrl = resolveFlagUrlFromLoadedMap(flag, env, assetMap);
+    const resolved = resolveFlagUrlFromLoadedMap(flag, env, assetMap);
 
-    if (safeUrl) {
-      matchingAssets[flag] = safeUrl;
+    if (resolved?.url) {
+      matchingAssets[flag] = resolved.url;
     }
   });
 
   return matchingAssets;
+}
+
+/**
+ * Build flag → URL map for a category with section overrides (M-01 step 4).
+ * Section flags take precedence over global flags.
+ *
+ * @param {object} globalMap
+ * @param {object|null} sectionMap
+ * @param {string} env
+ * @param {string} category
+ * @returns {object}
+ */
+function buildAssetsByCategoryWithSectionOverride(globalMap, sectionMap, env, category) {
+  // Start with global category assets
+  const globalAssets = buildAssetsByCategoryFromMap(globalMap, env, category);
+
+  if (!sectionMap) {
+    return globalAssets;
+  }
+
+  // Get section category assets (these override global)
+  const sectionAssets = buildAssetsByCategoryFromMap(sectionMap, env, category);
+
+  // Merge: section takes precedence over global
+  return { ...globalAssets, ...sectionAssets };
 }
 
 /**
@@ -1191,20 +1261,40 @@ function inferAssetTypeFromFlag(flag) {
  * @param {string} flag
  * @param {string} env
  * @param {object} assetMap
- * @returns {string|null}
+ * @returns {{ url: string, ttl: number|null }|null}
  */
-function resolveFlagUrlFromLoadedMap(flag, env, assetMap) {
-  let url = assetMap[env]?.[flag];
-
-  if (!url && env !== 'production') {
-    url = assetMap.production?.[flag];
+function normalizeAssetMapEntry(entry) {
+  if (typeof entry === 'string') {
+    return { url: entry, ttl: null };
   }
 
-  if (!url) {
+  if (entry && typeof entry === 'object' && typeof entry.url === 'string') {
+    const rawTtl = entry.ttl ?? entry.ttlMs ?? null;
+    let ttl = null;
+    if (rawTtl !== null && rawTtl !== undefined) {
+      const parsed = Number(rawTtl);
+      ttl = Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+    }
+    return { url: entry.url, ttl };
+  }
+
+  return null;
+}
+
+function resolveFlagUrlFromLoadedMap(flag, env, assetMap) {
+  let entry = assetMap[env]?.[flag];
+
+  if (!entry && env !== 'production') {
+    entry = assetMap.production?.[flag];
+  }
+
+  const normalizedEntry = normalizeAssetMapEntry(entry);
+
+  if (!normalizedEntry) {
     return null;
   }
 
-  const normalizedUrl = normalizeAssetMapUrl(url);
+  const normalizedUrl = normalizeAssetMapUrl(normalizedEntry.url);
   const urlCheck = assertAllowedPreloadUrl(normalizedUrl, {
     assetType: inferAssetTypeFromFlag(flag),
   });
@@ -1213,7 +1303,10 @@ function resolveFlagUrlFromLoadedMap(flag, env, assetMap) {
     return null;
   }
 
-  return urlCheck.url;
+  return {
+    url: urlCheck.url,
+    ttl: normalizedEntry.ttl,
+  };
 }
 
 /**
@@ -1223,24 +1316,24 @@ function resolveFlagUrlFromLoadedMap(flag, env, assetMap) {
  * @param {string} env
  * @param {object} globalMap
  * @param {object|null} sectionMap
- * @returns {{ url: string|null, source: string|null }}
+ * @returns {{ url: string|null, ttl: number|null, source: string|null }}
  */
 function resolveFlagUrlWithSectionOverride(flag, env, globalMap, sectionMap) {
   if (sectionMap) {
-    const sectionUrl = resolveFlagUrlFromLoadedMap(flag, env, sectionMap);
+    const sectionEntry = resolveFlagUrlFromLoadedMap(flag, env, sectionMap);
 
-    if (sectionUrl) {
-      return { url: sectionUrl, source: 'section-map' };
+    if (sectionEntry) {
+      return { url: sectionEntry.url, ttl: sectionEntry.ttl, source: 'section-map' };
     }
   }
 
-  const globalUrl = resolveFlagUrlFromLoadedMap(flag, env, globalMap);
+  const globalEntry = resolveFlagUrlFromLoadedMap(flag, env, globalMap);
 
-  if (globalUrl) {
-    return { url: globalUrl, source: 'global-map' };
+  if (globalEntry) {
+    return { url: globalEntry.url, ttl: globalEntry.ttl, source: 'global-map' };
   }
 
-  return { url: null, source: null };
+  return { url: null, ttl: null, source: null };
 }
 
 /**
@@ -1322,7 +1415,7 @@ function resolveAndCacheFlagUrl(flag, env, globalMap, options = {}) {
     removeFromCache(cacheKey);
   }
 
-  const { url: safeUrl, source } = resolveFlagUrlWithSectionOverride(
+  const { url: safeUrl, ttl, source } = resolveFlagUrlWithSectionOverride(
     flag,
     env,
     globalMap,
@@ -1360,7 +1453,11 @@ function resolveAndCacheFlagUrl(flag, env, globalMap, options = {}) {
     });
   }
 
-  setValueWithExpiration(cacheKey, safeUrl, ASSET_URL_CACHE_TTL);
+  const ttlMs = Number.isFinite(ttl) && ttl > 0 ? ttl : ASSET_URL_CACHE_TTL;
+  setValueWithExpiration(cacheKey, safeUrl, ttlMs);
+  if (section) {
+    sectionUrlCacheSections.add(section);
+  }
   return safeUrl;
 }
 
@@ -1555,11 +1652,17 @@ export async function hasAssetFlag(flag, environmentOrOptions = null) {
  * Get all assets for a specific category (e.g., all "icon.*" flags)
  * 
  * @param {string} category - Category prefix (e.g., "icon", "logo", "image")
- * @param {string} [environment] - Optional environment override
+ * @param {string|{ environment?: string, section?: string }} [environmentOrOptions] - Environment or options
  * @returns {Promise<object>} - Map of flag to URL for matching category
  */
-export async function getAssetsByCategory(category, environment = null) {
-  log('assetLibrary.js', 'getAssetsByCategory', 'start', 'Getting assets by category', { category, environment });
+export async function getAssetsByCategory(category, environmentOrOptions = null) {
+  const { environment, section } = normalizeGetAssetUrlArgs('', environmentOrOptions);
+
+  log('assetLibrary.js', 'getAssetsByCategory', 'start', 'Getting assets by category', { 
+    category, 
+    environment,
+    section: section || null
+  });
 
   if (!category || typeof category !== 'string') {
     log('assetLibrary.js', 'getAssetsByCategory', 'error', 'Invalid category', { category });
@@ -1568,19 +1671,26 @@ export async function getAssetsByCategory(category, environment = null) {
 
   try {
     const env = environment || detectEnvironment();
-    const memoryKey = getCategoryMemoryCacheKey(env, category);
+    // Include section in cache key for proper isolation (M-01)
+    const memoryKey = section 
+      ? `${getCategoryMemoryCacheKey(env, category)}:section:${section}`
+      : getCategoryMemoryCacheKey(env, category);
     const memoryCached = categoryAssetsMemoryCache.get(memoryKey);
 
     if (memoryCached) {
       log('assetLibrary.js', 'getAssetsByCategory', 'cache-hit', 'Category assets from memory cache', {
         category,
         environment: env,
+        section: section || null,
         count: Object.keys(memoryCached).length
       });
       return memoryCached;
     }
 
-    const cacheKey = getAssetCategoryCacheKey(env, category);
+    // Include section in cache key for proper isolation (M-01)
+    const cacheKey = section
+      ? `${getAssetCategoryCacheKey(env, category)}:section:${section}`
+      : getAssetCategoryCacheKey(env, category);
     const cachedCategory = getValueFromCache(cacheKey);
 
     if (cachedCategory) {
@@ -1588,13 +1698,17 @@ export async function getAssetsByCategory(category, environment = null) {
       log('assetLibrary.js', 'getAssetsByCategory', 'cache-hit', 'Category assets from cache', {
         category,
         environment: env,
+        section: section || null,
         count: Object.keys(cachedCategory).length
       });
       return cachedCategory;
     }
 
-    const assetMap = await loadAssetMapConfig();
-    const matchingAssets = buildAssetsByCategoryFromMap(assetMap, env, category);
+    const globalMap = await loadAssetMapConfig();
+    const sectionMap = section ? await loadSectionAssetMap(section) : null;
+    
+    // Merge section over global: section takes precedence (M-01)
+    const matchingAssets = buildAssetsByCategoryWithSectionOverride(globalMap, sectionMap, env, category);
 
     categoryAssetsMemoryCache.set(memoryKey, matchingAssets);
     setValueWithExpiration(cacheKey, matchingAssets, ASSET_CATEGORY_CACHE_TTL);
@@ -1602,14 +1716,19 @@ export async function getAssetsByCategory(category, environment = null) {
     log('assetLibrary.js', 'getAssetsByCategory', 'success', 'Assets by category retrieved', {
       category,
       environment: env,
+      section: section || null,
       count: Object.keys(matchingAssets).length,
-      cached: true
+      cached: true,
+      source: sectionMap ? 'merged-section-global' : 'global-only'
     });
 
     return matchingAssets;
 
   } catch (error) {
-    logError('assetLibrary.js', 'getAssetsByCategory', 'Error getting assets by category', error, { category });
+    logError('assetLibrary.js', 'getAssetsByCategory', 'Error getting assets by category', error, { 
+      category,
+      section: section || null
+    });
     return {};
   }
 }
@@ -1771,19 +1890,44 @@ export async function preloadAssetUrls(flags, environmentOrOptions = null) {
 /**
  * Validate asset map configuration
  * 
+ * @param {object} [options] - Validation options
+ * @param {string} [options.section] - Optional section name to validate with section overrides
  * @returns {Promise<object>} - Validation result with errors and warnings
  */
-export async function validateAssetMap() {
-  log('assetLibrary.js', 'validateAssetMap', 'start', 'Validating asset map configuration', {});
+export async function validateAssetMap(options = {}) {
+  const { section = null } = options;
+  
+  log('assetLibrary.js', 'validateAssetMap', 'start', 'Validating asset map configuration', {
+    section: section || null
+  });
 
   try {
-    const assetMap = await loadAssetMapConfig();
+    const globalMap = await loadAssetMapConfig();
+    const sectionMap = section ? await loadSectionAssetMap(section) : null;
+    
+    // Use merged map for validation: section takes precedence (M-01)
+    const assetMap = sectionMap 
+      ? mergeSectionAssetMapForValidation(globalMap, sectionMap)
+      : globalMap;
+    
     const errors = [];
     const warnings = [];
+    const sectionFlags = new Set(); // Track which flags came from section map
 
     // Check if production environment exists
     if (!assetMap.production || Object.keys(assetMap.production).length === 0) {
       errors.push('Production environment is missing or empty');
+    }
+
+    // Track section-originated flags for reporting
+    if (sectionMap?.production) {
+      Object.keys(sectionMap.production).forEach(flag => sectionFlags.add(flag));
+    }
+    if (sectionMap?.development) {
+      Object.keys(sectionMap.development).forEach(flag => sectionFlags.add(flag));
+    }
+    if (sectionMap?.staging) {
+      Object.keys(sectionMap.staging).forEach(flag => sectionFlags.add(flag));
     }
 
     // Check for valid URLs
@@ -1794,39 +1938,55 @@ export async function validateAssetMap() {
       }
 
       Object.entries(assets).forEach(([flag, url]) => {
-        if (typeof url !== 'string' || url.trim().length === 0) {
-          errors.push(`Invalid URL for flag "${flag}" in environment "${env}"`);
+        const source = sectionFlags.has(flag) ? 'section' : 'global';
+        const normalized = normalizeAssetMapEntry(url);
+
+        if (!normalized || !normalized.url.trim()) {
+          errors.push(`Invalid URL for flag "${flag}" in environment "${env}" (${source})`);
+          return;
         }
+
+        if (url && typeof url === 'object') {
+          const rawTtl = url.ttl ?? url.ttlMs;
+          if (rawTtl !== undefined && rawTtl !== null) {
+            const parsedTtl = Number(rawTtl);
+            if (!Number.isFinite(parsedTtl) || parsedTtl <= 0) {
+              warnings.push(`Flag "${flag}" in "${env}" has invalid ttl "${rawTtl}" (${source})`);
+            }
+          }
+        }
+
+        const resolvedUrl = normalized.url;
 
         // Check URL format
-        if (!url.startsWith('/') && !url.startsWith('http://') && !url.startsWith('https://')) {
-          warnings.push(`URL for flag "${flag}" in environment "${env}" may be invalid: ${url}`);
+        if (!resolvedUrl.startsWith('/') && !resolvedUrl.startsWith('http://') && !resolvedUrl.startsWith('https://')) {
+          warnings.push(`URL for flag "${flag}" in environment "${env}" may be invalid: ${resolvedUrl} (${source})`);
         }
 
-        const hostnameIssue = validateRemoteAssetUrl(url);
+        const hostnameIssue = validateRemoteAssetUrl(resolvedUrl);
         if (hostnameIssue) {
-          errors.push(`Flag "${flag}" in environment "${env}": ${hostnameIssue}`);
+          errors.push(`Flag "${flag}" in environment "${env}": ${hostnameIssue} (${source})`);
         }
 
-        if (url.startsWith('http://')) {
+        if (resolvedUrl.startsWith('http://')) {
           try {
-            const parsed = new URL(url);
+            const parsed = new URL(resolvedUrl);
 
             if (!isLocalhostHostname(parsed.hostname)) {
-              const upgraded = normalizeAssetMapUrl(url);
+              const upgraded = normalizeAssetMapUrl(resolvedUrl);
 
               if (env === 'production') {
                 errors.push(
-                  `Production flag "${flag}" uses HTTP; use HTTPS (${upgraded})`,
+                  `Production flag "${flag}" uses HTTP; use HTTPS (${upgraded}) (${source})`,
                 );
               } else {
                 warnings.push(
-                  `Flag "${flag}" in "${env}" uses HTTP; will be upgraded to HTTPS at runtime (${upgraded})`,
+                  `Flag "${flag}" in "${env}" uses HTTP; will be upgraded to HTTPS at runtime (${upgraded}) (${source})`,
                 );
               }
             }
           } catch {
-            warnings.push(`HTTP URL for flag "${flag}" in environment "${env}" is malformed: ${url}`);
+            warnings.push(`HTTP URL for flag "${flag}" in environment "${env}" is malformed: ${resolvedUrl} (${source})`);
           }
         }
       });
@@ -1836,8 +1996,9 @@ export async function validateAssetMap() {
     ['development', 'staging'].forEach(env => {
       if (assetMap[env]) {
         Object.keys(assetMap[env]).forEach(flag => {
+          const source = sectionFlags.has(flag) ? 'section' : 'global';
           if (!assetMap.production?.[flag]) {
-            warnings.push(`Flag "${flag}" exists in ${env} but not in production (no fallback)`);
+            warnings.push(`Flag "${flag}" exists in ${env} but not in production (no fallback) (${source})`);
           }
         });
       }
@@ -1850,7 +2011,10 @@ export async function validateAssetMap() {
       summary: {
         totalErrors: errors.length,
         totalWarnings: warnings.length,
-        environments: Object.keys(assetMap).length
+        environments: Object.keys(assetMap).length,
+        section: section || null,
+        sectionFlagCount: sectionFlags.size,
+        merged: !!sectionMap
       }
     };
 
@@ -1859,7 +2023,7 @@ export async function validateAssetMap() {
     return result;
 
   } catch (error) {
-    logError('assetLibrary.js', 'validateAssetMap', 'Error validating asset map', error);
+    logError('assetLibrary.js', 'validateAssetMap', 'Error validating asset map', error, { section });
     return {
       valid: false,
       errors: [`Failed to load asset map: ${error.message}`],
@@ -1867,9 +2031,50 @@ export async function validateAssetMap() {
       summary: {
         totalErrors: 1,
         totalWarnings: 0,
-        environments: 0
+        environments: 0,
+        section: section || null,
+        sectionFlagCount: 0,
+        merged: false
       }
     };
   }
+}
+
+/**
+ * Merge section asset map over global for validation purposes (M-01).
+ * Section flags take precedence over global flags.
+ * 
+ * @param {object} globalMap
+ * @param {object} sectionMap
+ * @returns {object} Merged map
+ */
+function mergeSectionAssetMapForValidation(globalMap, sectionMap) {
+  const merged = {};
+  
+  // Get all environment keys from both maps
+  const environments = new Set([
+    ...Object.keys(globalMap),
+    ...Object.keys(sectionMap)
+  ]);
+  
+  environments.forEach(env => {
+    const globalEnv = globalMap[env] || {};
+    const sectionEnv = sectionMap[env] || {};
+    
+    // Section takes precedence: spread global first, then section overrides
+    merged[env] = { ...globalEnv, ...sectionEnv };
+  });
+  
+  // Handle production fallback for environments missing in section map
+  // but present in global map
+  ['development', 'staging'].forEach(env => {
+    if (globalMap[env] && !sectionMap[env] && sectionMap.production) {
+      // If section has production but not this env, merge section production over global env
+      const globalEnv = globalMap[env] || {};
+      merged[env] = { ...globalEnv, ...sectionMap.production };
+    }
+  });
+  
+  return merged;
 }
 
