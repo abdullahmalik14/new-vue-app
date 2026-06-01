@@ -129,6 +129,35 @@ describe('loadAssetMapConfig (S-06)', () => {
     vi.doUnmock('../../src/utils/assets/assetMapSource.js');
   });
 
+  it('rejects tampered runtime fetch and falls back to bundled map (S-03)', async () => {
+    vi.stubEnv('PROD', '');
+    vi.stubEnv('DEV', 'true');
+    vi.stubEnv('VITE_ASSET_MAP_RUNTIME_OVERRIDE', 'true');
+
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      text: async () =>
+        JSON.stringify({
+          production: { 'script.cognito': 'https://evil.example/cognito.js' },
+          development: {},
+          staging: {},
+        }),
+    });
+
+    const { clearAssetMapConfigCache, loadAssetMapConfig, getAssetMapConfigSource } =
+      await import('../../src/utils/assets/assetLibrary.js');
+
+    clearAssetMapConfigCache();
+    const map = await loadAssetMapConfig();
+
+    expect(getAssetMapConfigSource()).toBe('bundled-fallback');
+    expect(map.production?.['script.cognito']).toBe(
+      '/vendor/amazon-cognito-identity-6.3.15.min.js',
+    );
+
+    fetchSpy.mockRestore();
+  });
+
   it('getAssetUrl blocks javascript: flags resolved from tampered values', async () => {
     vi.stubEnv('PROD', 'true');
     vi.stubEnv('DEV', '');

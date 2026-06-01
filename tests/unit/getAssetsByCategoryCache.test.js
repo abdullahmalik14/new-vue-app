@@ -35,6 +35,24 @@ describe('getAssetsByCategory category cache (P-07)', () => {
     expect(second).toEqual(first);
   });
 
+  it('omits flags whose URLs fail allowlist (S-04)', async () => {
+    vi.stubEnv('DEV', 'true');
+
+    const { clearAssetCaches, loadAssetMapConfig, getAssetsByCategory } = await import(
+      '../../src/utils/assets/assetLibrary.js',
+    );
+
+    clearAssetCaches();
+    const map = await loadAssetMapConfig();
+    map.development['icon.evil'] = 'javascript:alert(1)';
+    map.development['icon.safe'] = '/assets/icons/safe.svg';
+
+    const result = await getAssetsByCategory('icon', 'development');
+
+    expect(result['icon.evil']).toBeUndefined();
+    expect(result['icon.safe']).toBe('/assets/icons/safe.svg');
+  });
+
   it('clears category cache when asset map cache is cleared', async () => {
     vi.stubEnv('PROD', 'true');
 

@@ -28,3 +28,11 @@ export {
   createSectionCssBuilderPlugin
 } from './sectionCssPlugin.js';
 
+// Export asset map sync plugin (S-05)
+export {
+  syncAssetMapToPublic,
+  createSyncAssetMapPlugin,
+  ASSET_MAP_SRC_REL,
+  ASSET_MAP_PUBLIC_REL,
+} from './syncAssetMapPlugin.js';
+

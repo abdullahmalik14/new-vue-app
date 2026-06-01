@@ -69,6 +69,8 @@ export {
   preloadAssetsForSections,
   getAssetsForSection,
   areAssetsLoadedForSection,
+  isSectionAssetMetadataInMemory,
+  isSectionAssetMetadataCached,
   getAssetLoadingState,
   clearAssetCaches,
   getAssetStatistics,
@@ -87,10 +89,15 @@ export {
   validateAssetMap,
   normalizeAssetMapUrl,
   loadAssetMapConfig,
+  loadSectionAssetMap,
+  getKnownBundledSectionNames,
+  normalizeGetAssetUrlArgs,
   getAssetMapConfigSource,
   clearAssetMapConfigCache,
   getAssetMapFetchCandidates,
   setEnvironment,
   getEnvironment
 } from './assetLibrary';
+
+export { resetAssetLibrary, resetAssetSystem } from './resetAssetLibrary.js';
 

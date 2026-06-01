@@ -32,7 +32,9 @@
     "dashboard.menu.settings": "https://i.ibb.co/w5pz6GM/svgviewer-png-output-49.webp",
     "dashboard.menu.xrepost": "https://i.ibb.co/Fkh7SSXw/svgviewer-png-output-50.webp",
     "dashboard.menu.blog": "https://i.ibb.co/JWyS5PwL/svgviewer-png-output-51.webp",
-    "dashboard.submenu.back": "https://i.ibb.co/yc4yx8NT/svgviewer-png-output-55.webp"
+    "dashboard.submenu.back": "https://i.ibb.co/yc4yx8NT/svgviewer-png-output-55.webp",
+    "dashboard.submenu.front": "https://i.ibb.co/yc4yx8NT/svgviewer-png-output-58.webp"
+
   },
   "staging": {
     "icon.cart": "/assets/icons/cart-staging.svg",

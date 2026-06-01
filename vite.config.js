@@ -13,7 +13,8 @@ import vueDevTools from 'vite-plugin-vue-devtools';
 import {
   createSectionBundlerPlugin,
   createManifestGeneratorPlugin,
-  createSectionCssBuilderPlugin
+  createSectionCssBuilderPlugin,
+  createSyncAssetMapPlugin,
 } from './build/vite/index.js';
 import { sha256HexFromText } from './build/vite/manifestIntegrityNode.js';
 
@@ -35,6 +36,7 @@ export default defineConfig(({ mode }) => {
   return {
     // Plugins
     plugins: [
+      createSyncAssetMapPlugin(),
       vue(),
       vueDevTools(),
       sectionBundler,

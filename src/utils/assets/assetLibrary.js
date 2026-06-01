@@ -35,6 +35,12 @@ import {
   shouldAllowRuntimeAssetMapFetch,
   verifyFetchedAssetMapText,
 } from './assetMapSource.js';
+import {
+  fetchSectionAssetMapFromNetwork,
+  getBundledSectionAssetMap,
+  getKnownBundledSectionNames as listKnownBundledSectionNames,
+  isValidSectionAssetMapName,
+} from './sectionAssetMapSource.js';
 
 // ============================================================================
 // SECTION-BASED ASSET LOADING
@@ -43,6 +49,35 @@ import {
 // Cache configuration for asset metadata
 const ASSET_CACHE_KEY_PREFIX = 'asset_metadata_';
 const ASSET_CACHE_TTL = 3600000; // 1 hour
+
+/**
+ * @param {string} sectionName
+ * @returns {string}
+ */
+function getSectionAssetCacheKey(sectionName) {
+  return ASSET_CACHE_KEY_PREFIX + sectionName;
+}
+
+/**
+ * Lazy TTL persist: memory is canonical during session; cacheHandler repopulated on read (B-06).
+ *
+ * @param {string} sectionName
+ * @returns {boolean} Whether a new cache entry was written
+ */
+function persistSectionAssetsToHandlerCache(sectionName) {
+  if (!loadedAssets.has(sectionName)) {
+    return false;
+  }
+
+  const cacheKey = getSectionAssetCacheKey(sectionName);
+
+  if (getValueFromCache(cacheKey) !== null) {
+    return false;
+  }
+
+  setValueWithExpiration(cacheKey, loadedAssets.get(sectionName), ASSET_CACHE_TTL);
+  return true;
+}
 
 // In-flight section metadata loads — shared Promise per section (see L-02)
 const assetsLoadingPromises = new Map();
@@ -74,6 +109,13 @@ let assetMapLoadPromise = null;
 /** @type {'bundled-production'|'bundled-dev'|'bundled-fallback'|'runtime-verified'|'cache-restored'|null} */
 let assetMapConfigSource = null;
 
+const SECTION_ASSET_MAP_CACHE_PREFIX = 'section_asset_map_';
+const SECTION_ASSET_MAP_CACHE_TTL = ASSET_MAP_CACHE_TTL;
+/** @type {Map<string, object>} */
+const sectionAssetMapsMemory = new Map();
+/** @type {Map<string, Promise<object|null>>} */
+const sectionAssetMapLoadPromises = new Map();
+
 /**
  * Default map source when only the map body was cached (legacy TTL entries).
  * @returns {string}
@@ -102,8 +144,8 @@ function restoreAssetMapConfigSourceFromCache() {
       : resolveDefaultAssetMapConfigSource();
 }
 
-// Current environment
-let currentEnvironment = null;
+/** Manual override from `setEnvironment` only; auto-detect does not cache here (B-07). */
+let environmentOverride = null;
 
 /**
  * Get or load the section manifest
@@ -185,8 +227,7 @@ export function loadAssetsForSection(sectionName) {
     });
   }
 
-  // Create cache key
-  const cacheKey = ASSET_CACHE_KEY_PREFIX + sectionName;
+  const cacheKey = getSectionAssetCacheKey(sectionName);
 
   // Check cache first
   const cachedAssets = getValueFromCache(cacheKey);
@@ -235,7 +276,6 @@ export function loadAssetsForSection(sectionName) {
         preloadAssetCount: assetPreloadConfigs.length
       });
 
-      setValueWithExpiration(cacheKey, assets, ASSET_CACHE_TTL);
       loadedAssets.set(sectionName, assets);
 
       if (window.performanceTracker) {
@@ -392,12 +432,12 @@ export function getAssetsForSection(sectionName) {
   // Check memory first
   if (loadedAssets.has(sectionName)) {
     const assets = loadedAssets.get(sectionName);
+    persistSectionAssetsToHandlerCache(sectionName);
     log('assetLibrary.js', 'getAssetsForSection', 'memory-hit', 'Assets found in memory', { sectionName });
     return assets;
   }
 
-  // Check cache
-  const cacheKey = ASSET_CACHE_KEY_PREFIX + sectionName;
+  const cacheKey = getSectionAssetCacheKey(sectionName);
   const cachedAssets = getValueFromCache(cacheKey);
 
   if (cachedAssets) {
@@ -422,6 +462,24 @@ export function areAssetsLoadedForSection(sectionName) {
   const loaded = getAssetsForSection(sectionName) !== null;
   log('assetLibrary.js', 'areAssetsLoadedForSection', 'return', 'Returning loaded status', { sectionName, loaded });
   return loaded;
+}
+
+/**
+ * Whether section metadata is in the in-memory map (B-06 browser probe).
+ * @param {string} sectionName
+ * @returns {boolean}
+ */
+export function isSectionAssetMetadataInMemory(sectionName) {
+  return loadedAssets.has(sectionName);
+}
+
+/**
+ * Whether section metadata is in cacheHandler TTL (same module instance as assetLibrary).
+ * @param {string} sectionName
+ * @returns {boolean}
+ */
+export function isSectionAssetMetadataCached(sectionName) {
+  return getValueFromCache(getSectionAssetCacheKey(sectionName)) !== null;
 }
 
 /**
@@ -451,9 +509,9 @@ export function getAssetLoadingState(sectionName) {
 }
 
 /**
- * Clear all asset caches
- * Useful for development or testing
- * 
+ * Clear asset map, section metadata, and cacheHandler TTL caches.
+ * For a full reset including preload store URLs, use {@link resetAssetLibrary} from `resetAssetLibrary.js`.
+ *
  * @returns {void}
  */
 export function clearAssetCaches() {
@@ -479,6 +537,7 @@ export function clearAssetCaches() {
 
   // Reset in-memory asset map + in-flight load (see L-01 / clearAssetMapConfigCache)
   clearAssetMapConfigCache();
+  environmentOverride = null;
   clearAssetLibraryInitState();
 
   // Also clear cacheHandler (which has TTL-based caching)
@@ -543,7 +602,7 @@ export function unloadUnusedSections(sectionsToKeep = []) {
   // Unload sections
   keysToDelete.forEach(sectionName => {
     loadedAssets.delete(sectionName);
-    removeFromCache(ASSET_CACHE_KEY_PREFIX + sectionName);
+    removeFromCache(getSectionAssetCacheKey(sectionName));
     unloadedCount++;
   });
 
@@ -633,41 +692,51 @@ export function normalizeAssetMapUrl(url) {
 }
 
 /**
+ * Resolve environment from Vite `import.meta.env` and hostname (never cached — B-07).
+ *
+ * @returns {string} - Environment name: 'development', 'staging', or 'production'
+ */
+function resolveEnvironmentFromImportMeta() {
+  if (import.meta.env.DEV) {
+    return 'development';
+  }
+  if (import.meta.env.MODE === 'staging') {
+    return 'staging';
+  }
+  if (import.meta.env.PROD) {
+    return 'production';
+  }
+
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.')) {
+    return 'development';
+  }
+  if (hostname.includes('staging') || hostname.includes('stg')) {
+    return 'staging';
+  }
+  return 'production';
+}
+
+/**
  * Detect the current environment
- * 
+ *
  * @returns {string} - Environment name: 'development', 'staging', or 'production'
  */
 function detectEnvironment() {
-  if (currentEnvironment) {
-    return currentEnvironment;
+  if (environmentOverride !== null) {
+    return environmentOverride;
   }
 
-  // Check Vite environment variables
-  if (import.meta.env.DEV) {
-    currentEnvironment = 'development';
-  } else if (import.meta.env.MODE === 'staging') {
-    currentEnvironment = 'staging';
-  } else if (import.meta.env.PROD) {
-    currentEnvironment = 'production';
-  } else {
-    // Fallback: check hostname patterns
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.')) {
-      currentEnvironment = 'development';
-    } else if (hostname.includes('staging') || hostname.includes('stg')) {
-      currentEnvironment = 'staging';
-    } else {
-      currentEnvironment = 'production';
-    }
-  }
+  const environment = resolveEnvironmentFromImportMeta();
 
   log('assetLibrary.js', 'detectEnvironment', 'detected', 'Environment detected', {
-    environment: currentEnvironment,
+    environment,
     hostname: window.location.hostname,
-    mode: import.meta.env.MODE
+    mode: import.meta.env.MODE,
+    source: 'import.meta.env',
   });
 
-  return currentEnvironment;
+  return environment;
 }
 
 /**
@@ -682,8 +751,11 @@ export function setEnvironment(env) {
     return;
   }
 
-  currentEnvironment = env;
-  log('assetLibrary.js', 'setEnvironment', 'set', 'Environment manually set', { environment: env });
+  environmentOverride = env;
+  log('assetLibrary.js', 'setEnvironment', 'set', 'Environment manually set', {
+    environment: env,
+    source: 'manual-override',
+  });
 
   clearAssetMapConfigCache();
   removeCacheKeysByPrefix(ASSET_URL_CACHE_PREFIX);
@@ -784,9 +856,140 @@ export function clearAssetMapConfigCache() {
   assetMapLoadPromise = null;
   assetMapConfigSource = null;
   categoryAssetsMemoryCache.clear();
+  sectionAssetMapsMemory.clear();
+  sectionAssetMapLoadPromises.clear();
   removeFromCache(ASSET_MAP_CACHE_KEY);
   removeFromCache(ASSET_MAP_SOURCE_CACHE_KEY);
   removeCacheKeysByPrefix(ASSET_CATEGORY_CACHE_PREFIX);
+  removeCacheKeysByPrefix(SECTION_ASSET_MAP_CACHE_PREFIX);
+  removeCacheKeysByPrefix(ASSET_URL_CACHE_PREFIX);
+}
+
+/**
+ * @param {unknown} value
+ * @returns {value is { environment?: string, section?: string }}
+ */
+function isGetAssetUrlOptions(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+
+  return 'section' in value || 'environment' in value;
+}
+
+/**
+ * Normalize {@link getAssetUrl} / {@link getAssetUrls} arguments (flag + env string or options).
+ *
+ * @param {string} flag
+ * @param {string|{ environment?: string, section?: string }|null} [environmentOrOptions]
+ * @returns {{ flag: string, environment: string|null, section: string|null }}
+ */
+export function normalizeGetAssetUrlArgs(flag, environmentOrOptions = null) {
+  if (isGetAssetUrlOptions(environmentOrOptions)) {
+    const section =
+      typeof environmentOrOptions.section === 'string' &&
+      isValidSectionAssetMapName(environmentOrOptions.section)
+        ? environmentOrOptions.section.trim()
+        : null;
+
+    return {
+      flag,
+      environment:
+        typeof environmentOrOptions.environment === 'string'
+          ? environmentOrOptions.environment
+          : null,
+      section,
+    };
+  }
+
+  return {
+    flag,
+    environment: typeof environmentOrOptions === 'string' ? environmentOrOptions : null,
+    section: null,
+  };
+}
+
+/**
+ * @param {string} sectionName
+ * @returns {string}
+ */
+function getSectionAssetMapCacheKey(sectionName) {
+  return `${SECTION_ASSET_MAP_CACHE_PREFIX}${sectionName}`;
+}
+
+/**
+ * @param {string} flag
+ * @param {string} env
+ * @param {string|null} section
+ * @returns {string}
+ */
+function getAssetUrlCacheKey(flag, env, section) {
+  const scope = section ? `s_${section}` : 'g';
+  return `${ASSET_URL_CACHE_PREFIX}${scope}_${env}_${flag}`;
+}
+
+/**
+ * Load optional per-section asset map overrides (404 / missing file → null).
+ *
+ * @param {string} sectionName
+ * @returns {Promise<object|null>}
+ */
+export function loadSectionAssetMap(sectionName) {
+  if (!isValidSectionAssetMapName(sectionName)) {
+    return Promise.resolve(null);
+  }
+
+  const section = sectionName.trim();
+
+  if (sectionAssetMapsMemory.has(section)) {
+    return Promise.resolve(sectionAssetMapsMemory.get(section));
+  }
+
+  const cached = getValueFromCache(getSectionAssetMapCacheKey(section));
+
+  if (cached) {
+    sectionAssetMapsMemory.set(section, cached);
+    return Promise.resolve(cached);
+  }
+
+  if (sectionAssetMapLoadPromises.has(section)) {
+    return sectionAssetMapLoadPromises.get(section);
+  }
+
+  const loadPromise = (async () => {
+    let assetMap = getBundledSectionAssetMap(section);
+
+    if (!assetMap && shouldAllowRuntimeAssetMapFetch()) {
+      assetMap = await fetchSectionAssetMapFromNetwork(section);
+    }
+
+    if (!assetMap) {
+      return null;
+    }
+
+    sectionAssetMapsMemory.set(section, assetMap);
+    setValueWithExpiration(getSectionAssetMapCacheKey(section), assetMap, SECTION_ASSET_MAP_CACHE_TTL);
+
+    log('assetLibrary.js', 'loadSectionAssetMap', 'success', 'Section asset map loaded', {
+      section,
+      environments: Object.keys(assetMap),
+    });
+
+    return assetMap;
+  })().finally(() => {
+    sectionAssetMapLoadPromises.delete(section);
+  });
+
+  sectionAssetMapLoadPromises.set(section, loadPromise);
+  return loadPromise;
+}
+
+/**
+ * Bundled section override map names (from `assetMap.<section>.json` glob).
+ * @returns {string[]}
+ */
+export function getKnownBundledSectionNames() {
+  return listKnownBundledSectionNames();
 }
 
 /**
@@ -842,9 +1045,15 @@ function buildAssetsByCategoryFromMap(assetMap, env, category) {
   const resolvedMap = resolveAssetMapForEnvironment(assetMap, env);
   const matchingAssets = {};
 
-  Object.entries(resolvedMap).forEach(([flag, url]) => {
-    if (flag.startsWith(categoryPrefix)) {
-      matchingAssets[flag] = url;
+  Object.keys(resolvedMap).forEach((flag) => {
+    if (!flag.startsWith(categoryPrefix)) {
+      return;
+    }
+
+    const safeUrl = resolveFlagUrlFromLoadedMap(flag, env, assetMap);
+
+    if (safeUrl) {
+      matchingAssets[flag] = safeUrl;
     }
   });
 
@@ -1008,60 +1217,146 @@ function resolveFlagUrlFromLoadedMap(flag, env, assetMap) {
 }
 
 /**
- * URL cache lookup + map resolution for one flag (P-04 shared path).
+ * Section-first, then global resolution (B-01).
  *
  * @param {string} flag
  * @param {string} env
- * @param {object} assetMap
- * @param {{ logDetail?: boolean }} [options]
+ * @param {object} globalMap
+ * @param {object|null} sectionMap
+ * @returns {{ url: string|null, source: string|null }}
+ */
+function resolveFlagUrlWithSectionOverride(flag, env, globalMap, sectionMap) {
+  if (sectionMap) {
+    const sectionUrl = resolveFlagUrlFromLoadedMap(flag, env, sectionMap);
+
+    if (sectionUrl) {
+      return { url: sectionUrl, source: 'section-map' };
+    }
+  }
+
+  const globalUrl = resolveFlagUrlFromLoadedMap(flag, env, globalMap);
+
+  if (globalUrl) {
+    return { url: globalUrl, source: 'global-map' };
+  }
+
+  return { url: null, source: null };
+}
+
+/**
+ * Single structured log line per {@link getAssetUrl} outcome (B-04).
+ *
+ * @param {object} params
+ * @param {string} params.flag
+ * @param {string} params.url
+ * @param {'section-cache'|'section-map'|'global-cache'|'global-map'} params.source
+ * @param {string} params.environment
+ * @param {string|null} params.section
+ * @param {boolean} params.cacheHit
+ */
+function logGetAssetUrlResolved({ flag, url, source, environment, section, cacheHit }) {
+  log('assetLibrary.js', 'getAssetUrl', 'resolved', 'Flag resolved', {
+    flag,
+    url,
+    source,
+    environment,
+    section: section || null,
+    cacheHit,
+  });
+}
+
+/**
+ * @param {object} params
+ * @param {string} params.flag
+ * @param {string} params.environment
+ * @param {string|null} params.section
+ * @param {'not-found'|'blocked'} params.reason
+ */
+function logGetAssetUrlMiss({ flag, environment, section, reason }) {
+  log(
+    'assetLibrary.js',
+    'getAssetUrl',
+    reason,
+    reason === 'blocked' ? 'URL blocked by policy' : 'Flag not found',
+    {
+      flag,
+      environment,
+      section: section || null,
+    },
+  );
+}
+
+/**
+ * URL cache lookup + map resolution for one flag (P-04 / B-01).
+ *
+ * @param {string} flag
+ * @param {string} env
+ * @param {object} globalMap
+ * @param {{ logResolution?: boolean, section?: string|null, sectionMap?: object|null }} [options]
  * @returns {string|null}
  */
-function resolveAndCacheFlagUrl(flag, env, assetMap, options = {}) {
-  const { logDetail = false } = options;
-  const cacheKey = `${ASSET_URL_CACHE_PREFIX}${env}_${flag}`;
+function resolveAndCacheFlagUrl(flag, env, globalMap, options = {}) {
+  const { logResolution = false, section = null, sectionMap = null } = options;
+  const cacheKey = getAssetUrlCacheKey(flag, env, section);
   const cachedUrl = getValueFromCache(cacheKey);
 
   if (cachedUrl) {
-    if (logDetail) {
-      log('assetLibrary.js', 'getAssetUrl', 'cache-hit', 'Asset URL from cache', { flag, url: cachedUrl });
-    }
-    return cachedUrl;
-  }
-
-  const rawUrl = assetMap[env]?.[flag];
-  const usedInheritance = !rawUrl && env !== 'production' && assetMap.production?.[flag];
-
-  if (logDetail && usedInheritance) {
-    log('assetLibrary.js', 'getAssetUrl', 'inheritance', 'Using production fallback', {
-      flag,
-      requestedEnv: env,
-      fallbackEnv: 'production',
+    const cachedCheck = assertAllowedPreloadUrl(normalizeAssetMapUrl(cachedUrl), {
+      assetType: inferAssetTypeFromFlag(flag),
     });
-  }
 
-  const safeUrl = resolveFlagUrlFromLoadedMap(flag, env, assetMap);
-
-  if (!safeUrl) {
-    if (logDetail) {
-      const hadRaw = rawUrl || (env !== 'production' && assetMap.production?.[flag]);
-      if (hadRaw) {
-        log('assetLibrary.js', 'getAssetUrl', 'blocked', 'Resolved URL blocked by policy', { flag, environment: env });
-      } else {
-        log('assetLibrary.js', 'getAssetUrl', 'not-found', 'Asset flag not found in any environment', {
+    if (cachedCheck.ok) {
+      if (logResolution) {
+        logGetAssetUrlResolved({
           flag,
+          url: cachedCheck.url,
+          source: section ? 'section-cache' : 'global-cache',
           environment: env,
-          availableEnvironments: Object.keys(assetMap),
+          section,
+          cacheHit: true,
         });
       }
+      return cachedCheck.url;
+    }
+
+    removeFromCache(cacheKey);
+  }
+
+  const { url: safeUrl, source } = resolveFlagUrlWithSectionOverride(
+    flag,
+    env,
+    globalMap,
+    sectionMap,
+  );
+
+  if (!safeUrl) {
+    if (logResolution) {
+      const hadSectionRaw =
+        sectionMap &&
+        (sectionMap[env]?.[flag] ||
+          (env !== 'production' && sectionMap.production?.[flag]));
+      const hadGlobalRaw =
+        globalMap[env]?.[flag] ||
+        (env !== 'production' && globalMap.production?.[flag]);
+
+      logGetAssetUrlMiss({
+        flag,
+        environment: env,
+        section,
+        reason: hadSectionRaw || hadGlobalRaw ? 'blocked' : 'not-found',
+      });
     }
     return null;
   }
 
-  if (logDetail) {
-    log('assetLibrary.js', 'getAssetUrl', 'success', 'Asset URL resolved', {
+  if (logResolution) {
+    logGetAssetUrlResolved({
       flag,
       url: safeUrl,
+      source,
       environment: env,
+      section,
+      cacheHit: false,
     });
   }
 
@@ -1071,13 +1366,24 @@ function resolveAndCacheFlagUrl(flag, env, assetMap, options = {}) {
 
 /**
  * Get asset URL for a given flag with environment inheritance
- * 
+ *
  * @param {string} flag - Asset flag (e.g., "icon.cart")
- * @param {string} [environment] - Optional environment override
+ * @param {string|{ environment?: string, section?: string }} [environmentOrOptions] - Environment or options
  * @returns {Promise<string|null>} - Asset URL or null if not found
  */
-export async function getAssetUrl(flag, environment = null) {
-  log('assetLibrary.js', 'getAssetUrl', 'start', 'Getting asset URL', { flag, environment });
+export async function getAssetUrl(flag, environmentOrOptions = null) {
+  const { environment, section } = normalizeGetAssetUrlArgs(flag, environmentOrOptions);
+
+  if (environment && typeof environment === 'object') {
+    logError(
+      'assetLibrary.js',
+      'getAssetUrl',
+      'Invalid environment argument — pass a string or { environment, section }. Restart dev server if you recently pulled B-01.',
+      new Error('environment must be a string'),
+      { flag, environmentOrOptions },
+    );
+    return null;
+  }
 
   if (!flag || typeof flag !== 'string') {
     log('assetLibrary.js', 'getAssetUrl', 'error', 'Invalid flag', { flag });
@@ -1087,36 +1393,59 @@ export async function getAssetUrl(flag, environment = null) {
   const env = environment || detectEnvironment();
 
   try {
-    const assetMap = await loadAssetMapConfig();
-    return resolveAndCacheFlagUrl(flag, env, assetMap, { logDetail: true });
+    const globalMap = await loadAssetMapConfig();
+    const sectionMap = section ? await loadSectionAssetMap(section) : null;
+
+    return resolveAndCacheFlagUrl(flag, env, globalMap, {
+      logResolution: true,
+      section,
+      sectionMap,
+    });
   } catch (error) {
-    logError('assetLibrary.js', 'getAssetUrl', 'Error getting asset URL', error, { flag, environment: env });
+    logError('assetLibrary.js', 'getAssetUrl', 'Error getting asset URL', error, {
+      flag,
+      environment: env,
+      section,
+    });
     return null;
   }
 }
 
 /**
  * Get multiple asset URLs at once
- * 
+ *
  * @param {Array<string>} flags - Array of asset flags
- * @param {string} [environment] - Optional environment override
+ * @param {string|{ environment?: string, section?: string }} [environmentOrOptions] - Environment or options
  * @returns {Promise<object>} - Map of flag to URL
  */
-export async function getAssetUrls(flags, environment = null) {
+export async function getAssetUrls(flags, environmentOrOptions = null) {
   if (!Array.isArray(flags)) {
     log('assetLibrary.js', 'getAssetUrls', 'error', 'Invalid flags array', { flags });
     return {};
   }
 
+  const section =
+    environmentOrOptions &&
+    typeof environmentOrOptions === 'object' &&
+    !Array.isArray(environmentOrOptions)
+      ? normalizeGetAssetUrlArgs('', environmentOrOptions).section
+      : null;
+  const environment =
+    typeof environmentOrOptions === 'string'
+      ? environmentOrOptions
+      : environmentOrOptions?.environment ?? null;
+
   log('assetLibrary.js', 'getAssetUrls', 'start', 'Getting multiple asset URLs', {
     flagCount: flags.length,
     flags,
+    section,
   });
 
   const env = environment || detectEnvironment();
 
   try {
-    const assetMap = await loadAssetMapConfig();
+    const globalMap = await loadAssetMapConfig();
+    const sectionMap = section ? await loadSectionAssetMap(section) : null;
     const urlMap = {};
 
     for (const flag of flags) {
@@ -1125,7 +1454,7 @@ export async function getAssetUrls(flags, environment = null) {
         continue;
       }
 
-      urlMap[flag] = resolveAndCacheFlagUrl(flag, env, assetMap);
+      urlMap[flag] = resolveAndCacheFlagUrl(flag, env, globalMap, { section, sectionMap });
     }
 
     log('assetLibrary.js', 'getAssetUrls', 'success', 'Multiple asset URLs resolved', {
@@ -1133,6 +1462,7 @@ export async function getAssetUrls(flags, environment = null) {
       resolved: Object.values(urlMap).filter(Boolean).length,
       missing: Object.values(urlMap).filter((url) => !url).length,
       mapLoad: 'single-pass',
+      section,
     });
 
     return urlMap;
@@ -1198,11 +1528,17 @@ export async function getAvailableAssetFlags(environment = null) {
  * @param {string} [environment] - Optional environment override
  * @returns {Promise<boolean>} - True if flag exists
  */
-export async function hasAssetFlag(flag, environment = null) {
-  log('assetLibrary.js', 'hasAssetFlag', 'start', 'Checking if asset flag exists', { flag, environment });
+export async function hasAssetFlag(flag, environmentOrOptions = null) {
+  const { environment, section } = normalizeGetAssetUrlArgs(flag, environmentOrOptions);
+
+  log('assetLibrary.js', 'hasAssetFlag', 'start', 'Checking if asset flag exists', {
+    flag,
+    environment,
+    section,
+  });
 
   try {
-    const url = await getAssetUrl(flag, environment);
+    const url = await getAssetUrl(flag, { environment, section });
     const exists = !!url;
 
     log('assetLibrary.js', 'hasAssetFlag', 'return', 'Asset flag existence check', { flag, exists });
@@ -1386,13 +1722,25 @@ export function initAssetLibrary(options = {}) {
  * Preload asset URLs into cache
  * 
  * @param {Array<string>} flags - Array of asset flags to preload
- * @param {string} [environment] - Optional environment override
+ * @param {string|{ environment?: string, section?: string }} [environmentOrOptions] - Environment or options
  * @returns {Promise<number>} - Number of assets preloaded
  */
-export async function preloadAssetUrls(flags, environment = null) {
+export async function preloadAssetUrls(flags, environmentOrOptions = null) {
+  const section =
+    environmentOrOptions &&
+    typeof environmentOrOptions === 'object' &&
+    !Array.isArray(environmentOrOptions)
+      ? normalizeGetAssetUrlArgs('', environmentOrOptions).section
+      : null;
+  const environment =
+    typeof environmentOrOptions === 'string'
+      ? environmentOrOptions
+      : environmentOrOptions?.environment ?? null;
+
   log('assetLibrary.js', 'preloadAssetUrls', 'start', 'Preloading asset URLs', {
     flagCount: flags.length,
-    environment
+    environment,
+    section,
   });
 
   if (!Array.isArray(flags)) {
@@ -1401,8 +1749,10 @@ export async function preloadAssetUrls(flags, environment = null) {
   }
 
   try {
-    // Load all URLs (this will cache them)
-    const urlMap = await getAssetUrls(flags, environment);
+    const urlMap = await getAssetUrls(
+      flags,
+      section || environment ? { environment, section } : environment,
+    );
     const preloadedCount = Object.values(urlMap).filter(Boolean).length;
 
     log('assetLibrary.js', 'preloadAssetUrls', 'success', 'Asset URLs preloaded', {

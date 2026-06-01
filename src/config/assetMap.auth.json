@@ -1,0 +1,7 @@
+{
+  "development": {
+    "auth.background": "/assets/images/auth-section-override-dev.webp"
+  },
+  "staging": {},
+  "production": {}
+}

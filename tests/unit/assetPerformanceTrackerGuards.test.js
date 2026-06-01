@@ -16,7 +16,7 @@ function autoResolveLinkPreloads() {
   });
 }
 
-describe('asset modules performanceTracker guards (B-01)', () => {
+describe('assetPreloader performanceTracker guards (B-02)', () => {
   beforeEach(() => {
     vi.resetModules();
     setActivePinia(createPinia());
@@ -28,6 +28,20 @@ describe('asset modules performanceTracker guards (B-01)', () => {
     autoResolveLinkPreloads();
     const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');
     await expect(preloadImage('/assets/test-icon.webp')).resolves.toBeUndefined();
+  });
+
+  it('preloadScript does not throw when performanceTracker is missing', async () => {
+    autoResolveLinkPreloads();
+    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+    await expect(
+      preloadScript('/vendor/amazon-cognito-identity-6.3.15.min.js'),
+    ).resolves.toBeUndefined();
+  });
+
+  it('preloadSectionAssets does not throw when performanceTracker is missing', async () => {
+    autoResolveLinkPreloads();
+    const { preloadSectionAssets } = await import('../../src/utils/assets/assetPreloader.js');
+    await expect(preloadSectionAssets('auth')).resolves.toBeUndefined();
   });
 
   it('extractAssetsFromComponent does not throw when performanceTracker is missing', async () => {

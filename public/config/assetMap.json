@@ -5,6 +5,7 @@
     "icon.search": "/assets/icons/search.svg",
     "icon.input.right": "https://i.ibb.co/xSCKFrhW/svgviewer-png-output-82.webp",
     "icon.social.x": "https://i.ibb.co/KjN9R5cr/svgviewer-png-output-83.webp",
+    "icon.social.telegram": "/images/telegram.svg",
     "icon.globe": "https://i.ibb.co/mF9x2JG0/svgviewer-png-output-85.webp",
     "auth.background": "https://i.ibb.co/jPw7ChWb/auth-bg.webp",
     "script.cognito": "/vendor/amazon-cognito-identity-6.3.15.min.js",
@@ -31,7 +32,9 @@
     "dashboard.menu.settings": "https://i.ibb.co/w5pz6GM/svgviewer-png-output-49.webp",
     "dashboard.menu.xrepost": "https://i.ibb.co/Fkh7SSXw/svgviewer-png-output-50.webp",
     "dashboard.menu.blog": "https://i.ibb.co/JWyS5PwL/svgviewer-png-output-51.webp",
-    "dashboard.submenu.back": "https://i.ibb.co/yc4yx8NT/svgviewer-png-output-55.webp"
+    "dashboard.submenu.back": "https://i.ibb.co/yc4yx8NT/svgviewer-png-output-55.webp",
+    "dashboard.submenu.front": "https://i.ibb.co/yc4yx8NT/svgviewer-png-output-58.webp"
+
   },
   "staging": {
     "icon.cart": "/assets/icons/cart-staging.svg",
@@ -46,6 +49,7 @@
     "icon.logout": "https://cdn.example.com/assets/icons/logout.svg",
     "icon.input.right": "https://i.ibb.co/xSCKFrhW/svgviewer-png-output-82.webp",
     "icon.social.x": "https://i.ibb.co/KjN9R5cr/svgviewer-png-output-83.webp",
+    "icon.social.telegram": "/images/telegram.svg",
     "icon.globe": "https://i.ibb.co/mF9x2JG0/svgviewer-png-output-85.webp",
     "auth.background": "https://i.ibb.co/jPw7ChWb/auth-bg.webp",
     "logo.main": "https://i.ibb.co/jZQNHC2t/svgviewer-png-output-4.webp",

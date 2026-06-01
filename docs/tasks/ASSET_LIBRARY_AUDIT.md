@@ -970,11 +970,126 @@ actions: {
 **File:** `assetLibrary.js` lines 676–683  
 **Detail:** The only validation after `fetch('/config/assetMap.json')` is `typeof assetMap !== 'object'`. A cache-poisoned, MITM-swapped, or misconfigured CDN response that returns a valid JSON object with attacker-controlled URLs passes this check and becomes the authoritative source for all flag → URL resolution across the entire app. See S-04 for the injection path. The fix is to import `assetMap.json` at build time (zero-cost, cannot be swapped at runtime) and use runtime fetch only for optional development overrides.
 
+#### Resolution ✅
+
+**Status:** Resolved (implemented in asset-preload security pass; documented here for **ASSET_LIBRARY_AUDIT**).
+
+**What was broken:** Production and default dev treated a runtime `fetch('/config/assetMap.json')` as authoritative after only `typeof assetMap === 'object'`. A swapped JSON object could redirect every flag → URL in the app.
+
+**Why it happened:** The map lived under `public/config/` and was fetched on first `getAssetUrl` / `loadAssetMapConfig` with no build-time binding or integrity check.
+
+**What changed:**
+- **`assetMapSource.js`** — `import` of `src/config/assetMap.json` at build time; `getBundledAssetMap()` returns a `structuredClone` so callers cannot mutate the bundle artifact.
+- **`vite.config.js`** — injects `__ASSET_MAP_SHA256__` from `src/config/assetMap.json` file bytes at build time.
+- **`loadAssetMapConfig()`** — production and default dev use bundled map only (`bundled-production` / `bundled-dev`). Network fetch runs only when `VITE_ASSET_MAP_RUNTIME_OVERRIDE=true` in dev; `fetchAssetMapFromNetwork()` rejects JSON whose SHA-256 does not match the build hash (`verifyFetchedAssetMapText`) and falls back to bundled (`bundled-fallback`).
+- **`getAssetMapConfigSource()`** — exposes how the map was loaded (for debugging and browser tests).
+- Defense in depth for poisoned *values* inside a map object is **`getAssetUrl()` → `assertAllowedPreloadUrl()`** (see **S-04**, not required to close S-03).
+
+**Conflict check:** Does **not** override section/asset preload refactors (`initAssetLibrary`, `preloadAssetsForSections`, `usePreloadStore`). Preload still resolves flags via `getAssetUrl`; only the **source** of the map is locked down. Same implementation as **S-06** in `docs/tasks/ASSET_PRELOAD_AUDIT.md` (trusted config + hash verify). **L-10** dev fetch candidates remain for optional override only, not production.
+
+**How it was tested:** `npm run test:unit -- tests/unit/assetMapSource.test.js tests/unit/assetMapConfig.test.js --run` (includes S-03 tampered-fetch → `bundled-fallback` case).
+
+**How to test in the browser:**
+1. Run `npm run dev`, open any page, **Console** (one paste):
+   ```js
+   (async () => {
+     const {
+       clearAssetMapConfigCache,
+       loadAssetMapConfig,
+       getAssetMapConfigSource,
+       getAssetUrl,
+     } = await import('/src/utils/assets/assetLibrary.js');
+     const { shouldAllowRuntimeAssetMapFetch, getBundledAssetMapSha256 } = await import(
+       '/src/utils/assets/assetMapSource.js'
+     );
+     clearAssetMapConfigCache();
+     await loadAssetMapConfig();
+     const cognito = await getAssetUrl('script.cognito');
+     console.log({
+       source: getAssetMapConfigSource(),
+       cognito,
+       runtimeOverrideEnabled: shouldAllowRuntimeAssetMapFetch(),
+       bundledHashDefined: Boolean(getBundledAssetMapSha256()),
+       pass:
+         (getAssetMapConfigSource() === 'bundled-dev' ||
+           getAssetMapConfigSource() === 'bundled-production') &&
+         cognito === '/vendor/amazon-cognito-identity-6.3.15.min.js' &&
+         !shouldAllowRuntimeAssetMapFetch() &&
+         Boolean(getBundledAssetMapSha256()),
+     });
+   })();
+   ```
+2. **Expected (default dev, no override):** `pass: true`, `source: "bundled-dev"`, `runtimeOverrideEnabled: false`, `bundledHashDefined: true`, `cognito: "/vendor/amazon-cognito-identity-6.3.15.min.js"` — no Network request to `/config/assetMap.json` on cold load.
+3. **Optional tamper test:** set `VITE_ASSET_MAP_RUNTIME_OVERRIDE=true` in `.env.local`, edit `public/config/assetMap.json` (change any URL), restart dev server, run the same snippet — **Expected:** `source: "bundled-fallback"` (or still bundled if fetch fails), `cognito` still `/vendor/...` (evil URL rejected by hash mismatch).
+
+**How this test connects to the issue:** S-03 is about not trusting an unverified runtime JSON file as the canonical map.
+
+**How the result proves the fix:** Default dev uses `bundled-dev` with no override fetch; with override enabled, a edited `public/config/assetMap.json` does not change `script.cognito` because hash verification rejects the tampered file.
+
 ---
 
 ### S-04 — `getAssetUrl` returns attacker-controlled URLs that flow directly into DOM injection without sanitization
 **File:** `assetLibrary.js` → `assetPreloader.js` → `document.head.appendChild(link)`  
 **Detail:** The resolution chain is: `assetMap.json` (fetched at runtime) → `getAssetUrl(flag)` → `assetHandlerFactory.createAssetHandler` → `assetsHandlerNew.AssetHandler` → DOM injection. At no point is the returned URL validated for scheme, host, or type. A `javascript:` scheme, `data:` URI, or arbitrary external host in the map flows through unmodified. All URLs returned from `getAssetUrl` must be validated against an allowlist of permitted schemes (`https:`, `/`) and permitted hosts before they can be used by any consumer.
+
+#### Resolution ✅
+
+**Status:** Resolved (core allowlist in asset-preload pass; this pass adds cache re-check + category path alignment).
+
+**What was broken:** Resolved flag URLs from `assetMap.json` were returned and injected into the DOM (`<link>`, `<img>`, CSS `url()`) with no scheme/host policy. `getAssetsByCategory` copied raw map strings and skipped the same checks (**A-P05**).
+
+**Why it happened:** Trust boundary was the map file only; no shared validator at resolution or preload injection.
+
+**What changed:**
+- **`assertAllowedPreloadUrl.js`** — blocks `javascript:`, `data:`, `blob:`, `//`; allows `/…` paths; `https:` only for same-origin, localhost, `VITE_ASSET_ALLOWED_HOSTS`, and legacy `i.ibb.co` (until **S-01**); production external scripts require integrity flag.
+- **`resolveFlagUrlFromLoadedMap()`** — `normalizeAssetMapUrl()` + `assertAllowedPreloadUrl()` before any URL is cached or returned from `getAssetUrl` / `getAssetUrls`.
+- **`resolveAndCacheFlagUrl()`** — re-validates TTL cache hits; evicts and re-resolves when a stale/bad URL is in cache.
+- **`buildAssetsByCategoryFromMap()`** — uses `resolveFlagUrlFromLoadedMap()` so category batches omit blocked flags (partial **A-P05** fix).
+- **`assetPreloader.js`** — `resolveAllowedPreloadSrc()` on all preloaders (see **S-04** in `ASSET_PRELOAD_AUDIT.md`).
+- **`assetHandlerFactory.js`** — still calls `getAssetUrl()` (inherits policy).
+
+**Conflict check:** Does not override preload orchestration or **S-03** bundled map. Complements **S-03** (trusted source) with URL policy at resolution/injection. **A-S02** (CSS/attr escaping at Vue call sites) remains a separate follow-up.
+
+**How it was tested:** `npm run test:unit -- tests/unit/assertAllowedPreloadUrl.test.js tests/unit/getAssetUrlAllowlist.test.js tests/unit/assetMapConfig.test.js tests/unit/getAssetsByCategoryCache.test.js tests/unit/preloadUrlGuard.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open any page, **Console** (one paste):
+   ```js
+   (async () => {
+     const { clearAssetCaches, loadAssetMapConfig, getAssetUrl, getAssetsByCategory } =
+       await import('/src/utils/assets/assetLibrary.js');
+     const { preloadImage } = await import('/src/utils/assets/assetPreloader.js');
+     clearAssetCaches();
+     const map = await loadAssetMapConfig();
+     map.development['audit.s04.evil'] = 'javascript:alert(1)';
+     map.development['audit.s04.safe'] = '/vendor/amazon-cognito-identity-6.3.15.min.js';
+     const linksBefore = document.querySelectorAll('link').length;
+     const url = await getAssetUrl('audit.s04.evil', 'development');
+     const safe = await getAssetUrl('audit.s04.safe', 'development');
+     const category = await getAssetsByCategory('audit.s04', 'development');
+     await preloadImage('data:image/png;base64,xx');
+     const linksAfter = document.querySelectorAll('link').length;
+     console.log({
+       evilUrl: url,
+       safeUrl: safe,
+       categoryEvil: category['audit.s04.evil'],
+       categorySafe: category['audit.s04.safe'],
+       linksAddedByBlockedPreload: linksAfter - linksBefore,
+       pass:
+         url === null &&
+         safe === '/vendor/amazon-cognito-identity-6.3.15.min.js' &&
+         category['audit.s04.evil'] === undefined &&
+         category['audit.s04.safe'] === '/vendor/amazon-cognito-identity-6.3.15.min.js' &&
+         linksAfter - linksBefore === 0,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `evilUrl: null`, `categoryEvil: undefined`, `linksAddedByBlockedPreload: 0`.
+3. **Login smoke:** `await getAssetUrl('auth.background', 'development')` should still return the ibb.co URL (legacy allowlist until **S-01**), not `null`.
+
+**How this test connects to the issue:** S-04 requires blocked schemes/hosts at resolution and preload injection, not only at map load.
+
+**How the result proves the fix:** Tampered in-memory flags return `null` / are omitted from category maps; `preloadImage('data:…')` adds no `<link>`.
 
 ---
 
@@ -982,11 +1097,103 @@ actions: {
 **Files:** `src/config/assetMap.json`, `public/config/assetMap.json`  
 **Detail:** Both files exist with identical content. The app fetches from `public/config/assetMap.json` at runtime; `src/config/assetMap.json` appears to be an authoritative copy but changes to one are not automatically reflected in the other. This creates a drift risk where developers edit the wrong file. There should be a single source of truth — either a build step that copies `src/` → `public/`, or removal of the `src/` copy in favour of importing the `public/` file via Vite's `?url` or `?raw` import.
 
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass).
+
+**What was broken:** Two copies of `assetMap.json` could drift; developers might edit `public/` while the bundled import and SHA-256 hash use `src/config/assetMap.json`.
+
+**Why it happened:** Historical layout — `public/` for static fetch, `src/` for IDE reference — with no automated sync after **S-03** moved the canonical map to a build-time import from `src/`.
+
+**What changed:**
+- **Source of truth:** `src/config/assetMap.json` only (also used by `assetMapSource.js`, `vite.config.js` hash).
+- **`build/vite/syncAssetMapPlugin.js`** — `syncAssetMapToPublic()` + Vite plugin `vite-plugin-sync-asset-map` runs on every `buildStart` (dev + production build).
+- **`npm run sync:asset-map`** — manual CLI copy when needed without starting Vite.
+- **`public/config/README.md`** — marks `public/config/assetMap.json` as generated; do not edit by hand.
+- **`src/config/assetMap.README.md`** — updated editing instructions.
+
+**Conflict check:** Does not remove `public/` copy (still required for **L-10** / `VITE_ASSET_MAP_RUNTIME_OVERRIDE` hash-verified dev fetch). Does not change preload or bundled-map behavior (**S-03**). **B-08** (src never imported) is obsolete — `src` is now the bundled import path.
+
+**How it was tested:** `npm run test:unit -- tests/unit/syncAssetMapToPublic.test.js --run`; `npm run sync:asset-map` then byte-compare hashes.
+
+**How to test in the browser:**
+1. Edit **only** `src/config/assetMap.json` (add a dev-only flag), run `npm run sync:asset-map` or restart `npm run dev`.
+2. **Console** (one paste, with `VITE_ASSET_MAP_RUNTIME_OVERRIDE=true` if testing fetch path):
+   ```js
+   (async () => {
+     const src = await fetch('/config/assetMap.json', { cache: 'no-store' }).then((r) => r.text());
+     const { loadAssetMapConfig, getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+     const map = await loadAssetMapConfig();
+     const testFlag = 'audit.s05.sync';
+     const inBundled = map?.development?.[testFlag] ?? map?.production?.[testFlag];
+     const fromFetch = src.includes(testFlag);
+     console.log({
+       testFlag,
+       inBundled: inBundled ?? null,
+       fromFetch,
+       pass: Boolean(inBundled) && fromFetch,
+     });
+   })();
+   ```
+3. **Expected:** After sync + restart, `pass: true` if you added `audit.s05.sync` to `src` and re-synced — fetch body and bundled map both contain the flag.
+
+**How this test connects to the issue:** S-05 requires one authoritative file and an automatic mirror for `/config/assetMap.json`.
+
+**How the result proves the fix:** A change in `src` appears in both the bundled map and the served `public/` copy after sync/dev start.
+
 ---
 
 ### S-06 — `validateAssetMap` accepts `http://` URLs in production without error
 **File:** `assetLibrary.js` lines 1015–1018  
 **Detail:** The validator flags `http://` URLs only as a warning. In production environments, serving assets over plain HTTP exposes them to MITM, mixed-content warnings, and browser blocking (in strict HTTPS contexts). HTTP URLs in `production` should be hard errors, not warnings.
+
+#### Resolution ✅
+
+**Status:** Resolved (asset-preload pass + verified this audit pass).
+
+**What was broken:** Non-localhost `http://` URLs in the `production` block were only warned, so CI/startup validation could pass with insecure asset URLs.
+
+**Why it happened:** Early validator treated all HTTP as soft warnings; runtime `normalizeAssetMapUrl()` upgraded http→https but validation did not fail the config.
+
+**What changed:**
+- **`validateAssetMap()`** — non-localhost `http://` in **`production`** → **`errors`** (`Production flag "…" uses HTTP; use HTTPS (…)`). Same host rules as **`normalizeAssetMapUrl()`** / **`isLocalhostHostname()`**.
+- **Dev/staging** — non-localhost HTTP remains **`warnings`** (runtime still upgrades to HTTPS via **ASSET_PRELOAD_AUDIT** S-05).
+- **Localhost HTTP** in production — allowed (no error/warning; local dev tooling only).
+
+**Conflict check:** Aligns with **`getAssetUrl()`** / **`assertAllowedPreloadUrl()`** (**S-04**); does not change preload orchestration. Canonical map has no raw `http://` in production today.
+
+**How it was tested:** `npm run test:unit -- tests/unit/validateAssetMapHttpProduction.test.js tests/unit/validateAssetMapHostname.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste):
+   ```js
+   (async () => {
+     const { clearAssetMapConfigCache, loadAssetMapConfig, validateAssetMap } =
+       await import('/src/utils/assets/assetLibrary.js');
+     clearAssetMapConfigCache();
+     const map = await loadAssetMapConfig();
+     const saved = map.production['audit.s06.http'];
+     map.production['audit.s06.http'] = 'http://cdn.example.com/insecure.png';
+     const bad = await validateAssetMap();
+     delete map.production['audit.s06.http'];
+     if (saved !== undefined) map.production['audit.s06.http'] = saved;
+     const good = await validateAssetMap();
+     const httpErrors = bad.errors.filter((e) => e.includes('audit.s06.http'));
+     console.log({
+       badValid: bad.valid,
+       httpErrorCount: httpErrors.length,
+       sampleError: httpErrors[0],
+       goodValid: good.valid,
+       pass: bad.valid === false && httpErrors.length > 0 && good.valid === true,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `badValid: false`, `sampleError` mentions `Production` and `HTTP`.
+3. **Real map:** `await validateAssetMap()` on the unmodified bundled map should return `valid: true` and `httpErrorCount: 0` for production HTTP (no `http://` entries in `src/config/assetMap.json`).
+
+**How this test connects to the issue:** S-06 requires production HTTP (non-localhost) to fail validation, not only warn.
+
+**How the result proves the fix:** Injecting `http://cdn.example.com/…` into `production` makes `valid: false`; removing it restores `valid: true`.
 
 ---
 
@@ -1012,11 +1219,119 @@ Resolution order for `getAssetUrl(flag, { section: 'dashboard' })`:
 
 **Section takes precedence over global at every level.** The merged result is cached per `(section, env, flag)` triple.
 
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass). Also closes **M-01** (merge API) and **M-03** (section map files + loader); **M-02** step 4 (warm initial-route section map) remains optional follow-up.
+
+**What was broken:** One flat global map only; no `assetMap.<section>.json` overrides; `getAssetUrl(flag)` could not prefer section-specific URLs; duplicate `src/` / `public/` section files would drift.
+
+**Why it happened:** Original design used a single `assetMap.json`; section preload only rolled up flags, not per-section URL libraries.
+
+**What changed:**
+- **`src/config/assetMap.auth.json`** — example section override (`auth.background` dev path); add more as `assetMap.<section>.json`.
+- **`sectionAssetMapSource.js`** — build-time glob for `assetMap.*.json`; `loadSectionAssetMap`, bundled + optional dev fetch (404 → no section map).
+- **`assetLibrary.js`** — `normalizeGetAssetUrlArgs()`; `getAssetUrl` / `getAssetUrls` / `hasAssetFlag` / `preloadAssetUrls` accept `{ section, environment }`; `resolveFlagUrlWithSectionOverride()` (section env → section production → global env → global production); URL cache keys scoped `g_` / `s_<section>_` per `(section, env, flag)`.
+- **`assetPreloader.js`** — `preloadSectionAssets` / `preloadSectionCriticalImages` tag assets with `section`; `resolveAssetPreloadUrl(asset, sectionName)` passes section into `getAssetUrl`.
+- **`syncAssetMapPlugin.js`** — copies all `src/config/assetMap*.json` → `public/config/`.
+- **Exports** — `loadSectionAssetMap`, `getKnownBundledSectionNames`, `normalizeGetAssetUrlArgs` from `index.js`.
+
+**Conflict check:** Does not change section preload orchestration or bundle loading — only flag→URL resolution when `section` is passed. Global callers unchanged (`getAssetUrl('icon.cart')` still uses global map). Complements **S-03/S-04/S-05**. **`getAssetsByCategory`** still uses global merged map only (**A-P05** follow-up).
+
+**How it was tested:** `npm run test:unit -- tests/unit/sectionAssetMapMerge.test.js tests/unit/syncAssetMapToPublic.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev` (syncs `assetMap.auth.json` to `public/config/`), open any page, **Console** (one paste):
+   ```js
+   (async () => {
+     const lib = await import('/src/utils/assets/assetLibrary.js');
+     const { clearAssetCaches, getAssetUrl, getKnownBundledSectionNames, normalizeGetAssetUrlArgs } = lib;
+     const b01Loaded =
+       typeof normalizeGetAssetUrlArgs === 'function' &&
+       typeof getKnownBundledSectionNames === 'function';
+     if (!b01Loaded) {
+       console.error('Stale module — stop dev server, run npm run dev, hard-refresh the tab, then re-run.');
+       return;
+     }
+     clearAssetCaches();
+     const globalUrl = await getAssetUrl('auth.background', 'development');
+     const authUrl = await getAssetUrl('auth.background', {
+       section: 'auth',
+       environment: 'development',
+     });
+     const bundledSections = getKnownBundledSectionNames();
+     console.log({
+       b01Loaded,
+       bundledSections,
+       globalUrl,
+       authUrl,
+       pass:
+         b01Loaded &&
+         bundledSections.includes('auth') &&
+         globalUrl === 'https://i.ibb.co/jPw7ChWb/auth-bg.webp' &&
+         authUrl === '/assets/images/auth-section-override-dev.webp' &&
+         authUrl !== globalUrl,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `b01Loaded: true`, `bundledSections` includes `"auth"`. Logs should show `section: "auth"` on the second `[getAssetUrl] [start]` and cache keys `asset_url_g_…` / `asset_url_s_auth_…` (not `asset_url_[object Object]_…`). If you see `[object Object]` in cache keys, restart `npm run dev` and hard-refresh.
+3. **Login smoke:** On `/log-in`, components using plain `getAssetUrl('auth.background')` still get the global URL unless you update them to pass `{ section: 'auth' }`.
+
+**How this test connects to the issue:** B-01 requires section libraries to override global entries when `section` is provided.
+
+**How the result proves the fix:** Same flag resolves to different URLs with vs without `{ section: 'auth' }`, proving merge order and separate cache scopes.
+
 ---
 
 ### B-02 — `window.performanceTracker.step()` called unconditionally in `assetPreloader.js`
 **File:** `assetPreloader.js` lines 30–36 (and throughout)  
 **Detail:** Unlike `assetLibrary.js` which guards with `if (window.performanceTracker)`, `assetPreloader.js` calls `window.performanceTracker.step(...)` directly. In unit tests, SSR, or when the tracker is not yet initialised, this throws `TypeError: Cannot read properties of undefined (reading 'step')`. Add the same null guard throughout.
+
+#### Resolution ✅
+
+**Status:** Resolved (asset-preload audit pass; verified this audit pass). No direct `window.performanceTracker` calls remain in `assetPreloader.js`.
+
+**What was broken:** Preload helpers called `window.performanceTracker.step()` without checking that the tracker existed, causing `TypeError` in unit tests, SSR, or before `main.js` initialised the tracker.
+
+**Why it happened:** `assetLibrary.js` used `if (window.performanceTracker)` guards; `assetPreloader.js` was written with raw global access.
+
+**What changed:**
+- **`assetPreloader.js`** — all ~40 performance steps use **`trackStep()`** from `performanceTrackerAccess.js` (null-safe `getPerformanceTracker()` + try/catch).
+- **`performanceTrackerAccess.js`** — shared accessor used by preload, scanner, and route loaders.
+- **Tests** — `tests/unit/assetPerformanceTrackerGuards.test.js` (preloadImage, preloadScript, preloadSectionAssets without tracker).
+
+**Conflict check:** Does not change preload orchestration or DOM injection. **`assetLibrary.js`** still uses inline `if (window.performanceTracker)` (separate follow-up if you want full dedup to `trackStep` everywhere).
+
+**How it was tested:** `npm run test:unit -- tests/unit/assetPerformanceTrackerGuards.test.js tests/unit/preloadUrlGuard.test.js tests/unit/preloadSectionAssets.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open any page, **Console** (one paste):
+   ```js
+   (async () => {
+     const tracker = window.performanceTracker;
+     delete window.performanceTracker;
+     let threw = false;
+     try {
+       const { preloadImage, preloadScript } = await import('/src/utils/assets/assetPreloader.js');
+       await preloadImage('data:image/png;base64,xx');
+       await preloadScript('javascript:void(0)');
+     } catch (e) {
+       threw = true;
+     } finally {
+       if (tracker) window.performanceTracker = tracker;
+     }
+     console.log({
+       ranWithoutTracker: !threw,
+       trackerRestored: Boolean(window.performanceTracker),
+       pass: !threw,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `ranWithoutTracker: true` — no `Cannot read properties of undefined (reading 'step')`.
+3. **Optional:** With tracker present, preloads still run; blocked URLs add no `<link>` (see **S-04**).
+
+**How this test connects to the issue:** B-02 is about preload code not throwing when `window.performanceTracker` is absent.
+
+**How the result proves the fix:** Removing the tracker and calling `preloadImage` / `preloadScript` completes without error.
 
 ---
 
@@ -1032,6 +1347,68 @@ Resolution order for `getAssetUrl(flag, { section: 'dashboard' })`:
 | `usePreloadStore.preloadedAssets` | Preloaded URLs | localStorage | `clearPreloadCache()` |
 
 None of these systems know about each other's state. `clearAssetCaches()` does not clear `usePreloadStore`; `clearPreloadCache()` does not clear `cacheHandler`. A unified `resetAssetLibrary()` function should coordinate all layers.
+
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass). Also closes **M-06** (`resetAssetSystem` alias).
+
+**What was broken:** Four cache layers were cleared by separate APIs; calling only one left stale flag URLs, map config, or preload-store entries.
+
+**Why it happened:** `assetLibrary` and `assetPreloader` evolved independently; Pinia preload state was intentionally separate from TTL `cacheHandler`.
+
+**What changed:**
+- **`resetAssetLibrary.js`** — single entry point:
+  1. `clearAssetCaches()` — `cachedAssetMap`, section maps, `loadedAssets`, manifest, `cacheHandler`, init promise
+  2. `clearPreloadCache()` — `usePreloadStore` preloaded URLs, `preloadInProgress`, `jsonDataCache`
+  3. `clearAssetPreloadSectionCache()` — memoized route `assetPreload` rollups (default on)
+- Returns `{ before, after, sectionRollupCacheCleared }` and logs a summary.
+- **`resetAssetSystem`** — alias for `resetAssetLibrary`.
+- Exported from `src/utils/assets/index.js`.
+- **`clearAssetCaches()`** JSDoc points to `resetAssetLibrary` for full resets.
+
+**Preserves (by design):** `usePreloadStore.preloadedSections` and `buildHash` — section **bundle** preload SSOT, not flag URL cache.
+
+**Conflict check:** Does not change preload orchestration or when preloads run; debugging/CI helper only.
+
+**How it was tested:** `npm run test:unit -- tests/unit/resetAssetLibrary.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, open any page, **Console** (one paste):
+   ```js
+   (async () => {
+     const { usePreloadStore } = await import('/src/stores/usePreloadStore.js');
+     const { getValueFromCache, setValueWithExpiration } = await import(
+       '/src/utils/common/cacheHandler.js'
+     );
+     const { resetAssetLibrary } = await import('/src/utils/assets/resetAssetLibrary.js');
+     const store = usePreloadStore();
+     setValueWithExpiration('b03_browser_probe', { x: 1 }, 60_000);
+     store.addAsset('https://example.com/b03-probe.png');
+     const before = {
+       cache: getValueFromCache('b03_browser_probe'),
+       urls: store.preloadedAssetCount,
+     };
+     const summary = resetAssetLibrary();
+     console.log({
+       before,
+       summary,
+       afterCache: getValueFromCache('b03_browser_probe'),
+       afterUrls: store.preloadedAssetCount,
+       pass:
+         before.cache !== null &&
+         before.urls >= 1 &&
+         summary.after.cacheHandlerEntries === 0 &&
+         summary.after.preloadedUrls === 0 &&
+         getValueFromCache('b03_browser_probe') === null &&
+         store.preloadedAssetCount === 0,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `summary.after` all zeros for library/preload URL layers.
+
+**How this test connects to the issue:** B-03 needs one call to wipe coordinated layers instead of guessing which clear API to use.
+
+**How the result proves the fix:** Probe entries exist before reset and are gone after, with a logged before/after summary.
 
 ---
 
@@ -1056,11 +1433,111 @@ log('assetLibrary.js', 'getAssetUrl', 'not-found', `Flag not found`, {
 });
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass).
+
+**What was broken:** Each `getAssetUrl` call logged `[start]`, `cacheHandler` chatter, `[cache-hit]` or `[success]` separately — no single line with flag, URL, source, and cache hit.
+
+**Why it happened:** Logging grew per internal step (`resolveAndCacheFlagUrl`, `cacheHandler`) without a terminal summary line.
+
+**What changed:**
+- **`logGetAssetUrlResolved()`** — one `[getAssetUrl] [resolved]` line: `flag`, `url`, `source` (`section-cache` | `section-map` | `global-cache` | `global-map`), `environment`, `section`, `cacheHit`.
+- **`logGetAssetUrlMiss()`** — `[not-found]` or `[blocked]` with flag/env/section (no URL).
+- Removed per-call `[getAssetUrl] [start]`; batch `getAssetUrls` still skips per-flag resolution logs (`logResolution: false`).
+- **`cacheHandler`** already quiet in production unless `VITE_ENABLE_LOGGER` (P-03).
+
+**Conflict check:** Does not change resolution or preload behavior. **B-01** section sources appear in `resolved.source`.
+
+**How it was tested:** `npm run test:unit -- tests/unit/getAssetUrlResolutionLogging.test.js --run`
+
+**How to test in the browser:**
+1. Enable logging: `VITE_ENABLE_LOGGER=true` in `.env.local` (or use dev mode), restart `npm run dev`.
+2. **Console** (one paste):
+   ```js
+   (async () => {
+     const origLog = console.log;
+     const lines = [];
+     console.log = (...args) => {
+       const line = args.map((a) => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
+       if (line.includes('[getAssetUrl]')) lines.push(line);
+       origLog.apply(console, args);
+     };
+     const { getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+     const { resetAssetLibrary } = await import('/src/utils/assets/resetAssetLibrary.js');
+     resetAssetLibrary();
+     lines.length = 0;
+     await getAssetUrl('script.cognito', 'development');
+     await getAssetUrl('script.cognito', 'development');
+     await getAssetUrl('flag.missing.xyz', 'development');
+     console.log = origLog;
+     const resolved = lines.filter((l) => l.includes('[resolved]'));
+     const notFound = lines.filter((l) => l.includes('[not-found]'));
+     const starts = lines.filter((l) => l.includes('[start]') && l.includes('[getAssetUrl]'));
+     console.log({
+       resolvedCount: resolved.length,
+       notFoundCount: notFound.length,
+       startCount: starts.length,
+       firstResolved: resolved[0],
+       secondResolved: resolved[1],
+       pass:
+         resolved.length === 2 &&
+         notFound.length === 1 &&
+         starts.length === 0 &&
+         resolved[0]?.includes('global-map') &&
+         resolved[0]?.includes('"cacheHit":false') &&
+         resolved[1]?.includes('global-cache') &&
+         resolved[1]?.includes('"cacheHit":true'),
+     });
+   })();
+   ```
+3. **Expected:** `pass: true`, `startCount: 0`, two `resolved` (map then cache), one `not-found`.
+
+**How this test connects to the issue:** B-04 is operator-visible proof: one terminal line per outcome, with source and cacheHit.
+
+**How the result proves the fix:** Exactly two `resolved` logs for two lookups of the same flag (map + cache), no `[getAssetUrl] [start]`, and a single `not-found` for a missing flag.
+
 ---
 
 ### B-05 — `assetMap.json` mixes local relative paths and external absolute URLs with no documentation of the model
 **File:** `assetMap.json`  
 **Detail:** `development` uses paths like `/assets/icons/cart-dev.svg` (Vite dev-server) while `production` uses absolute `https://...` CDN URLs. `staging` has only 2 entries, both overrides. The inheritance model (dev/staging fall back to production) is undocumented in the file. Operators editing the map have no guidance on which environment a flag must exist in to be valid, or that production is the required baseline.
+
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass). JSON cannot hold comments; documentation lives beside the source file.
+
+**What was broken:** Operators had no in-repo guide for env blocks, production-as-baseline, or when to use `/assets/...` vs `https://cdn...`.
+
+**What changed:**
+- **`src/config/assetMap.README.md`** — expanded with env table, inheritance rules, relative vs absolute table, operator checklist, links to `validateAssetMap()` and sync workflow (S-05 / B-01).
+- **`public/config/README.md`** — points editors to `assetMap.README.md`.
+
+**Conflict check:** Does not change map contents or resolution logic.
+
+**How it was tested:** `npm run test:unit -- tests/unit/assetMapReadme.test.js --run`
+
+**How to test in the browser:**
+1. Open `src/config/assetMap.README.md` in the IDE.
+2. **Console** (one paste):
+   ```js
+   (async () => {
+     const { validateAssetMap } = await import('/src/utils/assets/assetLibrary.js');
+     const validation = await validateAssetMap();
+     console.log({
+       valid: validation.valid,
+       errors: validation.errors.length,
+       warnings: validation.warnings.length,
+       environments: validation.summary.environments,
+       pass: validation.valid && validation.errors.length === 0,
+     });
+   })();
+   ```
+3. **Expected:** `pass: true` on the current map (production populated; no HTTP errors in production).
+
+**How this test connects to the issue:** B-05 is documentation + validation that production remains the required baseline.
+
+**How the result proves the fix:** README is the operator source of truth; `validateAssetMap()` confirms the live map still meets the documented rules.
 
 ---
 
@@ -1068,17 +1545,151 @@ log('assetLibrary.js', 'getAssetUrl', 'not-found', `Flag not found`, {
 **File:** `assetLibrary.js` lines 38, 219, 396–402  
 **Detail:** After `loadAssetsForSection` completes, the result is written to both `cacheHandler` (`setValueWithExpiration`) and the in-memory `loadedAssets` Map. On the next call, memory is checked first (line 388), then cache (line 395–402). The double-write creates two copies of every section object and forces `getAssetsForSection` to have a two-path read. The in-memory Map should be the canonical fast path; `cacheHandler` should be the persistent fallback. On memory miss → cache hit, re-hydrate memory (already done at line 401) but do not double-write on the initial load.
 
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass).
+
+**What was broken:** Every `loadAssetsForSection` success wrote the same object to `loadedAssets` and `cacheHandler` immediately (duplicate hot-path writes).
+
+**What changed:**
+- **`loadAssetsForSection`** — on fresh load, writes **`loadedAssets` only** (memory canonical for the session).
+- **`persistSectionAssetsToHandlerCache()`** — lazy TTL write when memory has data and cache has no entry yet.
+- **`getAssetsForSection`** — on memory hit, calls lazy persist so reload/rehydrate paths still get TTL cache without double-write on load.
+- **Cache-hit load path** — still reads TTL → rehydrates memory (unchanged).
+- **`getSectionAssetCacheKey()`** — shared key helper.
+
+**Conflict check:** Does not change preload orchestration. **`unloadUnusedSections`** still clears both memory and TTL for evicted sections.
+
+**How it was tested:** `npm run test:unit -- tests/unit/sectionAssetsMemoryFirst.test.js tests/unit/areAssetsLoadedForSection.test.js tests/unit/loadAssetsForSectionDedup.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste):
+   ```js
+   (async () => {
+     const {
+       resetAssetLibrary,
+       loadAssetsForSection,
+       getAssetsForSection,
+       isSectionAssetMetadataInMemory,
+       isSectionAssetMetadataCached,
+     } = await import('/src/utils/assets/index.js');
+     resetAssetLibrary();
+     await loadAssetsForSection('auth');
+     const inMemoryAfterLoad = isSectionAssetMetadataInMemory('auth');
+     const cachedAfterLoad = isSectionAssetMetadataCached('auth');
+     const assets = getAssetsForSection('auth');
+     const cachedAfterRead = isSectionAssetMetadataCached('auth');
+     console.log({
+       inMemoryAfterLoad,
+       cachedAfterLoad,
+       sectionName: assets?.sectionName,
+       cachedAfterRead,
+       pass:
+         inMemoryAfterLoad === true &&
+         cachedAfterLoad === false &&
+         assets?.sectionName === 'auth' &&
+         cachedAfterRead === true,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true` — memory warm after load, TTL empty until `getAssetsForSection` lazy-persists. Do **not** import `cacheHandler.js` separately in the console (dev can load a second module instance and show false cache misses).
+
+**How this test connects to the issue:** B-06 separates hot memory from lazy TTL persistence.
+
+**How the result proves the fix:** `cachedAfterLoad === false` proves no double-write on load; `cachedAfterRead === true` proves persistence still works via read path.
+
 ---
 
 ### B-07 — `detectEnvironment` result is cached in `currentEnvironment` but can drift from Vite's runtime `import.meta.env`
 **File:** `assetLibrary.js` lines 573–603  
 **Detail:** Environment is detected once and stored in the module-level `currentEnvironment` variable. `import.meta.env` values are compile-time constants and cannot change, so this is safe for production builds. However, in development with HMR, if a developer manually calls `setEnvironment('production')` to test, `detectEnvironment()` still returns the cached value. The function should check `currentEnvironment` only when it was **manually** set (i.e., via `setEnvironment`), and always re-evaluate `import.meta.env` otherwise.
 
+#### Resolution ✅
+
+**Status:** Resolved (this audit pass).
+
+**What was broken:** First auto-detect wrote into `currentEnvironment`, so every later `detectEnvironment()` returned that cached value even when no manual override was intended — conflating Vite auto-detect with `setEnvironment()` overrides.
+
+**What changed:**
+- **`environmentOverride`** — set only by `setEnvironment()`; cleared by `clearAssetCaches()` / `resetAssetLibrary()`.
+- **`resolveEnvironmentFromImportMeta()`** — reads `import.meta.env` / hostname on each call; not stored in module state.
+- **`detectEnvironment()`** — returns override when set, otherwise fresh auto-detect.
+
+**Conflict check:** Does not change preload orchestration or map loading; `setEnvironment()` still clears map + URL + category caches (L-06).
+
+**How it was tested:** `npm run test:unit -- tests/unit/detectEnvironmentOverride.test.js tests/unit/setEnvironmentUrlCache.test.js --run`
+
+**How to test in the browser:**
+1. Run `npm run dev`, **Console** (one paste):
+   ```js
+   (async () => {
+     const { getEnvironment, setEnvironment, clearAssetCaches } = await import(
+       '/src/utils/assets/assetLibrary.js'
+     );
+     clearAssetCaches();
+     const viteDefault = getEnvironment();
+     setEnvironment('production');
+     const afterManual = getEnvironment();
+     clearAssetCaches();
+     const afterClear = getEnvironment();
+     console.log({
+       viteDefault,
+       afterManual,
+       afterClear,
+       pass: afterManual === 'production' && afterClear === viteDefault,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true` — manual override sticks until `clearAssetCaches`; then auto-detect matches dev (`viteDefault` / `afterClear` both `'development'` in local dev).
+
+**How this test connects to the issue:** B-07 separates manual test overrides from Vite auto-detect.
+
+**How the result proves the fix:** `afterManual === 'production'` proves `setEnvironment` works; `afterClear === viteDefault` proves auto-detect is not stuck on a stale cached env.
+
 ---
 
 ### B-08 — `src/config/assetMap.json` is imported nowhere; only the `public/` copy is served
 **File:** `src/config/assetMap.json`  
 **Detail:** The file in `src/config/` is never imported by any JS module (confirmed by grep). The runtime fetch at `assetLibrary.js:667` targets `/config/assetMap.json` which is served from `public/`. The `src/` copy is therefore dead code — it exists only to give IDEs a reference, creating the maintenance hazard described in S-05.
+
+#### Resolution ✅
+
+**Status:** Obsolete finding — closed with documentation (this audit pass). Runtime no longer treats `public/` as the sole source of truth.
+
+**What was broken (historical):** `src/config/assetMap.json` was not imported; only `/config/assetMap.json` from `public/` was used at runtime, so editors could edit `src/` while production served stale `public/` copies.
+
+**What changed (prior + this pass):**
+- **S-03 / S-05 / B-01** — `assetMapSource.js` **imports** `src/config/assetMap.json` (bundled + SHA-256); production defaults to bundled map.
+- **`build/vite/syncAssetMapPlugin.js`** — mirrors `src/config/assetMap*.json` → `public/config/` on dev/build (`npm run sync:asset-map`).
+- **Dev fetch** — optional `/config/assetMap.json` only when `VITE_ASSET_MAP_RUNTIME_OVERRIDE=true`; not the primary path.
+- **Other imports** — `routeConfigLoader.js`, `jsonConfigValidator.js` import the same `src/config/assetMap.json` for validation.
+
+**Conflict check:** Complements preload/security work; does not change section preload orchestration.
+
+**How it was tested:** `npm run test:unit -- tests/unit/assetMapSourceImport.test.js tests/unit/assetMapConfig.test.js tests/unit/syncAssetMapToPublic.test.js --run`
+
+**How to test in the browser:**
+1. **Console** (one paste):
+   ```js
+   (async () => {
+     const { loadAssetMapConfig, getAssetMapConfigSource } = await import(
+       '/src/utils/assets/assetLibrary.js'
+     );
+     const map = await loadAssetMapConfig();
+     console.log({
+       source: getAssetMapConfigSource(),
+       hasCognito: Boolean(map?.production?.['script.cognito']),
+       pass:
+         typeof map?.production?.['script.cognito'] === 'string' &&
+         getAssetMapConfigSource() !== null,
+     });
+   })();
+   ```
+2. **Expected:** `pass: true`, `hasCognito: true` — map loaded from bundled `src/config` (source logged as `bundled-*` in production build, or dev override path when enabled).
+
+**How this test connects to the issue:** B-08 was “src never imported”; bundled load proves `src/config` is the build input.
+
+**How the result proves the fix:** Non-null `script.cognito` URL from `loadAssetMapConfig()` without relying on hand-edited `public/` alone.
 
 ---
 
@@ -1104,6 +1715,10 @@ log('assetLibrary.js', 'getAssetUrl', 'not-found', `Flag not found`, {
 4. Update `getAssetUrls`, `getAssetsByCategory`, `preloadAssetUrls`, and `validateAssetMap` to accept optional `section` parameter
 5. Update `preloadSectionAssets` to pass `section` context when resolving flags
 
+#### Resolution ✅
+
+**Status:** Resolved with **B-01** (steps 1–3 and 5). Step 4 partial: `getAssetUrls` / `preloadAssetUrls` accept `section`; `getAssetsByCategory` / `validateAssetMap` still global-only (**A-P05**).
+
 ---
 
 ### M-02 — No `initAssetLibrary()` startup function for eager cache warm-up
@@ -1125,6 +1740,10 @@ log('assetLibrary.js', 'getAssetUrl', 'not-found', `Flag not found`, {
 **Files:** `assetLibrary.js`, `public/config/`  
 **Detail:** Per M-01, section-level override maps are entirely absent from both the code and the `public/config/` directory. Neither `loadSectionAssetMap` nor any section-specific JSON file exists. This is the core missing feature.
 
+#### Resolution ✅
+
+**Status:** Resolved with **B-01** — `src/config/assetMap.auth.json`, `loadSectionAssetMap()`, build-time glob + `public/config` sync.
+
 ---
 
 ### M-04 — No startup cross-validation: flags in `routeConfig.assetPreload` vs. entries in `assetMap.json`
@@ -1145,6 +1764,10 @@ log('assetLibrary.js', 'getAssetUrl', 'not-found', `Flag not found`, {
 1. `clearAssetCaches()` — clears map, manifest, `loadedAssets`, `cacheHandler`
 2. `clearPreloadCache()` — clears `preloadedAssets`, `preloadInProgress`, `jsonDataCache`
 3. Log a summary of what was cleared
+
+#### Resolution ✅
+
+**Status:** Resolved with **B-03** — use `resetAssetLibrary()` / `resetAssetSystem()`.
 
 ---
 

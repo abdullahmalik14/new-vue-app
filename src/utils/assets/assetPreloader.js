@@ -14,7 +14,7 @@ import { usePreloadStore } from '../../stores/usePreloadStore.js';
  * @purpose Preload assets per section to optimize performance
  */
 
-// Performance steps use trackStep() from performanceTrackerAccess.js (B-01)
+// Performance steps use trackStep() from performanceTrackerAccess.js (B-02)
 
 // Track in-progress preloads to avoid duplicate requests
 const preloadInProgress = new Map();
@@ -1027,7 +1027,10 @@ export async function preloadAsset(asset) {
 
     // If src is missing but flag is provided, resolve it
     if (!src && flag) {
-      src = await getAssetUrl(flag);
+      src = await getAssetUrl(
+        flag,
+        asset.section ? { section: asset.section } : undefined,
+      );
       if (!src) {
         log('assetPreloader.js', 'preloadAsset', 'warn', 'Failed to resolve asset flag', { flag });
         return;
@@ -1179,7 +1182,7 @@ export async function preloadSectionCriticalImages(sectionName) {
 
     // Preload critical images (await to ensure they're loaded before components mount)
     if (criticalAssets.length > 0) {
-      await preloadAssets(criticalAssets);
+      await preloadAssets(tagAssetsWithSection(criticalAssets, sectionName));
     }
 
     log('assetPreloader.js', 'preloadSectionCriticalImages', 'success', 'Critical section images preloaded', {
@@ -1216,13 +1219,23 @@ export async function preloadSectionCriticalImages(sectionName) {
  * @param {object} asset
  * @returns {Promise<string|null>}
  */
-export async function resolveAssetPreloadUrl(asset) {
+/**
+ * @param {Array<object>} assets
+ * @param {string} sectionName
+ * @returns {Array<object>}
+ */
+function tagAssetsWithSection(assets, sectionName) {
+  return assets.map((asset) => ({ ...asset, section: sectionName }));
+}
+
+export async function resolveAssetPreloadUrl(asset, sectionName = null) {
   if (asset?.src) {
     return asset.src;
   }
 
   if (asset?.flag) {
-    return getAssetUrl(asset.flag);
+    const section = sectionName || asset.section || null;
+    return section ? getAssetUrl(asset.flag, { section }) : getAssetUrl(asset.flag);
   }
 
   return null;
@@ -1267,7 +1280,7 @@ export async function preloadSectionAssets(sectionName) {
 
     const resolvedUrls = [];
     for (const asset of allAssets) {
-      const url = await resolveAssetPreloadUrl(asset);
+      const url = await resolveAssetPreloadUrl(asset, sectionName);
       if (url) {
         resolvedUrls.push(url);
       }
@@ -1294,8 +1307,7 @@ export async function preloadSectionAssets(sectionName) {
       assetCount: allAssets.length
     });
 
-    // Preload all collected assets
-    await preloadAssets(allAssets);
+    await preloadAssets(tagAssetsWithSection(allAssets, sectionName));
 
     log('assetPreloader.js', 'preloadSectionAssets', 'success', 'Section assets preloaded', {
       sectionName,
