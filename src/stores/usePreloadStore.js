@@ -1,6 +1,14 @@
 import { defineStore } from 'pinia';
 import { log } from '../utils/common/logHandler.js';
-import { getAppBuildHash, syncPreloadStoreBuildHash } from '../utils/build/appBuildHash.js';
+import { syncPreloadStoreBuildHash } from '../utils/build/appBuildHash.js';
+import {
+  attachStorageQuotaMonitor,
+  buildPersistKey,
+  createPersistedStateSerializer,
+  migrateLegacyPersistedState,
+  resolvePersistStorage,
+  resolvePersistTtlMs,
+} from '../utils/common/persistUtils.js';
 
 function normalizeStringSet(values) {
   if (values instanceof Set) {
@@ -14,19 +22,31 @@ function normalizeStringSet(values) {
   return new Set();
 }
 
-function serializePreloadPersistedState(state) {
-  return JSON.stringify({
-    ...state,
-    preloadedSections: [...normalizeStringSet(state.preloadedSections)],
-    preloadedAssets: [...normalizeStringSet(state.preloadedAssets)],
-  });
-}
+const PRELOAD_PERSIST_VERSION = 1;
+const PRELOAD_PERSIST_KEY = buildPersistKey('app-preload-state');
+const preloadPersistSerializer = createPersistedStateSerializer({
+  version: PRELOAD_PERSIST_VERSION,
+  ttlMs: resolvePersistTtlMs(),
+  fallback: {},
+  migrate: (state) => (state && typeof state === 'object' ? state : {}),
+  mapBeforeSerialize: (state) => ({
+    ...(state && typeof state === 'object' ? state : {}),
+    preloadedSections: [...normalizeStringSet(state?.preloadedSections)],
+    preloadedAssets: [...normalizeStringSet(state?.preloadedAssets)],
+  }),
+});
 
-function deserializePreloadPersistedState(raw) {
-  const parsed = JSON.parse(raw);
-  parsed.preloadedSections = normalizeStringSet(parsed.preloadedSections);
-  parsed.preloadedAssets = normalizeStringSet(parsed.preloadedAssets);
-  return parsed;
+function finalizePreloadRestore(store) {
+  store.preloadedSections = normalizeStringSet(store.preloadedSections);
+  store.preloadedAssets = normalizeStringSet(store.preloadedAssets);
+
+  const sync = syncPreloadStoreBuildHash(store);
+  if (sync.invalidated) {
+    log('usePreloadStore.js', 'afterRestore', 'build-hash', 'Stale preload state cleared after persist rehydrate', {
+      previousHash: sync.previousHash,
+      currentHash: sync.currentBuildHash,
+    });
+  }
 }
 
 export const usePreloadStore = defineStore('preload', {
@@ -42,6 +62,8 @@ export const usePreloadStore = defineStore('preload', {
     preloadedAssetCount(state) {
       return state.preloadedAssets.size;
     },
+    hasSection: (state) => (sectionName) => state.preloadedSections.has(sectionName),
+    hasAsset: (state) => (assetUrl) => state.preloadedAssets.has(assetUrl),
   },
 
   actions: {
@@ -50,19 +72,13 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} sectionName 
      */
     addSection(sectionName) {
+      if (typeof sectionName !== 'string' || sectionName.trim() === '') {
+        return;
+      }
       if (!this.preloadedSections.has(sectionName)) {
         this.preloadedSections.add(sectionName);
         log('usePreloadStore.js', 'addSection', 'add', 'Section marked as preloaded', { sectionName });
       }
-    },
-
-    /**
-     * Check if a section is preloaded
-     * @param {string} sectionName 
-     * @returns {boolean}
-     */
-    hasSection(sectionName) {
-      return this.preloadedSections.has(sectionName);
     },
 
     /**
@@ -80,20 +96,14 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} assetUrl 
      */
     addAsset(assetUrl) {
+      if (typeof assetUrl !== 'string' || assetUrl.trim() === '') {
+        return;
+      }
       if (!this.preloadedAssets.has(assetUrl)) {
         this.preloadedAssets.add(assetUrl);
         // Log less frequently for assets to avoid noise, or keep it if needed
         // log('usePreloadStore.js', 'addAsset', 'add', 'Asset marked as preloaded', { assetUrl });
       }
-    },
-
-    /**
-     * Check if an asset is preloaded
-     * @param {string} assetUrl 
-     * @returns {boolean}
-     */
-    hasAsset(assetUrl) {
-      return this.preloadedAssets.has(assetUrl);
     },
 
     /**
@@ -169,24 +179,21 @@ export const usePreloadStore = defineStore('preload', {
   },
 
   persist: {
-    key: 'app-preload-state',
-    storage: typeof localStorage === 'undefined' ? undefined : localStorage,
-    paths: ['preloadedSections', 'preloadedAssets', 'buildHash'],
-    serializer: {
-      serialize: serializePreloadPersistedState,
-      deserialize: deserializePreloadPersistedState,
+    key: PRELOAD_PERSIST_KEY,
+    storage: () => resolvePersistStorage(),
+    pick: ['preloadedSections', 'preloadedAssets', 'buildHash'],
+    serializer: preloadPersistSerializer,
+    beforeRestore({ store }) {
+      migrateLegacyPersistedState({
+        storage: resolvePersistStorage(),
+        newKey: PRELOAD_PERSIST_KEY,
+        legacyKeys: ['app-preload-state'],
+      });
+      store.sectionsInProgress = new Set();
     },
-    afterHydrate({ store }) {
-      store.preloadedSections = normalizeStringSet(store.preloadedSections);
-      store.preloadedAssets = normalizeStringSet(store.preloadedAssets);
-
-      const sync = syncPreloadStoreBuildHash(store);
-      if (sync.invalidated) {
-        log('usePreloadStore.js', 'afterHydrate', 'build-hash', 'Stale preload state cleared after persist rehydrate', {
-          previousHash: sync.previousHash,
-          currentHash: sync.currentBuildHash,
-        });
-      }
+    afterRestore({ store }) {
+      finalizePreloadRestore(store);
+      attachStorageQuotaMonitor(store, { key: PRELOAD_PERSIST_KEY, label: 'preload' });
     },
   }
 });

@@ -1,5 +1,62 @@
   // DashboardAnalytics.js
 import { defineStore } from 'pinia'
+import {
+  attachStorageQuotaMonitor,
+  buildPersistKey,
+  createPersistedStateSerializer,
+  migrateLegacyPersistedState,
+  resolvePersistStorage,
+  resolvePersistTtlMs,
+} from '../utils/common/persistUtils.js'
+
+const ensureArray = (value) => (Array.isArray(value) ? value : [])
+const ensureObject = (value) => (value && typeof value === 'object' ? value : {})
+
+const DASHBOARD_PERSIST_VERSION = 1
+const DASHBOARD_PERSIST_KEY = buildPersistKey('DashboardAnalytics')
+const dashboardPersistSerializer = createPersistedStateSerializer({
+  version: DASHBOARD_PERSIST_VERSION,
+  ttlMs: resolvePersistTtlMs(),
+  fallback: {},
+  migrate: (state) => (state && typeof state === 'object' ? state : {}),
+})
+
+function normalizeDashboardAnalyticsAfterRestore(store) {
+  const subscriptionsBundle = ensureObject(store.subscriptionsBundle)
+  store.subscriptionsBundle = {
+    daily: ensureArray(subscriptionsBundle.daily),
+    weekly: ensureArray(subscriptionsBundle.weekly),
+    monthly: ensureArray(subscriptionsBundle.monthly),
+    yearly: ensureArray(subscriptionsBundle.yearly),
+    alltime: ensureArray(subscriptionsBundle.alltime),
+    grandTotal: subscriptionsBundle.grandTotal ?? null,
+  }
+
+  const earnings = ensureObject(store.earnings)
+  store.earnings = {
+    daily: ensureArray(earnings.daily),
+    weekly: ensureArray(earnings.weekly),
+    monthly: ensureArray(earnings.monthly),
+    yearly: ensureArray(earnings.yearly),
+    alltime: ensureArray(earnings.alltime),
+    grandTotal: earnings.grandTotal ?? null,
+  }
+
+  const recentOrders = ensureObject(store.recentOrders)
+  store.recentOrders = {
+    subscriptions: ensureArray(recentOrders.subscriptions),
+    p2v: ensureArray(recentOrders.p2v),
+    merch: ensureArray(recentOrders.merch),
+    customRequest: ensureArray(recentOrders.customRequest),
+    wishtender: ensureArray(recentOrders.wishtender),
+  }
+
+  store.metadata = {
+    etag: null,
+    lastUpdated: null,
+    ...(store.metadata && typeof store.metadata === 'object' ? store.metadata : {}),
+  }
+}
 
 export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
   state: () => ({
@@ -435,5 +492,23 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
     },
   },
 
-  persist: true,
+  persist: {
+    key: DASHBOARD_PERSIST_KEY,
+    storage: () => resolvePersistStorage(),
+    serializer: dashboardPersistSerializer,
+    beforeRestore({ store }) {
+      migrateLegacyPersistedState({
+        storage: resolvePersistStorage(),
+        newKey: DASHBOARD_PERSIST_KEY,
+        legacyKeys: ['DashboardAnalytics'],
+      })
+      if (!store.metadata || typeof store.metadata !== 'object') {
+        store.metadata = { etag: null, lastUpdated: null }
+      }
+    },
+    afterRestore({ store }) {
+      normalizeDashboardAnalyticsAfterRestore(store)
+      attachStorageQuotaMonitor(store, { key: DASHBOARD_PERSIST_KEY, label: 'dashboard' })
+    },
+  },
 })

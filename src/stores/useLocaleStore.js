@@ -3,6 +3,13 @@
 import { defineStore } from 'pinia';
 import { log } from '../utils/common/logHandler';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '../utils/translation/localeConstants.js';
+import {
+  attachStorageQuotaMonitor,
+  buildPersistKey,
+  createPersistedStateSerializer,
+  migrateLegacyPersistedState,
+  resolvePersistStorage,
+} from '../utils/common/persistUtils.js';
 
 /** Default locale preference TTL in localStorage (90 days). */
 const DEFAULT_LOCALE_PREFERENCE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
@@ -22,6 +29,14 @@ function resolveLocalePreferenceTtlMs() {
 
 /** @type {number} Locale preference TTL in localStorage (configurable via env). */
 export const LOCALE_PREFERENCE_TTL_MS = resolveLocalePreferenceTtlMs();
+const LOCALE_PERSIST_VERSION = 1;
+const LOCALE_PERSIST_KEY = buildPersistKey('locale_preference');
+const localePersistSerializer = createPersistedStateSerializer({
+  version: LOCALE_PERSIST_VERSION,
+  ttlMs: LOCALE_PREFERENCE_TTL_MS,
+  fallback: { locale: null },
+  migrate: (state) => (state && typeof state === 'object' ? state : { locale: null }),
+});
 
 /**
  * Wrap persisted locale state with an expiry timestamp for pinia-plugin-persistedstate.
@@ -29,10 +44,7 @@ export const LOCALE_PREFERENCE_TTL_MS = resolveLocalePreferenceTtlMs();
  * @returns {string}
  */
 export function serializeLocalePersistedState(value) {
-  return JSON.stringify({
-    data: value,
-    expiresAt: Date.now() + LOCALE_PREFERENCE_TTL_MS,
-  });
+  return localePersistSerializer.serialize(value);
 }
 
 /**
@@ -42,25 +54,18 @@ export function serializeLocalePersistedState(value) {
  * @returns {{ locale: string | null }}
  */
 export function deserializeLocalePersistedState(raw) {
-  try {
-    const parsed = JSON.parse(raw);
+  return localePersistSerializer.deserialize(raw);
+}
 
-    if (parsed && typeof parsed.expiresAt === 'number') {
-      if (Date.now() > parsed.expiresAt) {
-        return { locale: null };
-      }
-      return parsed.data ?? { locale: null };
-    }
-
-    if (parsed && typeof parsed === 'object' && 'locale' in parsed) {
-      return parsed;
-    }
-
-    return { locale: null };
-  } catch {
-    return { locale: null };
+function normalizeLocaleAfterRestore(store) {
+  if (store.locale && !SUPPORTED_LOCALES.includes(store.locale)) {
+    log('useLocaleStore.js', 'afterRestore', 'warn', 'Unsupported locale restored; clearing', {
+      locale: store.locale,
+    });
+    store.locale = null;
   }
 }
+
 
 /**
  * @file useLocaleStore.js
@@ -82,18 +87,6 @@ export const useLocaleStore = defineStore('locale', {
     currentLocale(state) {
       const locale = state.locale || DEFAULT_LOCALE;
 
-      log('useLocaleStore.js', 'currentLocale', 'get', 'Getting current locale', { locale });
-
-      if (window.performanceTracker) {
-        window.performanceTracker.step({
-          step: 'currentLocale_getter',
-          file: 'useLocaleStore.js',
-          method: 'currentLocale',
-          flag: 'get',
-          purpose: 'Get current locale from store'
-        });
-      }
-
       return locale;
     },
 
@@ -104,8 +97,6 @@ export const useLocaleStore = defineStore('locale', {
      */
     isDefaultLocale(state) {
       const isDefault = !state.locale || state.locale === DEFAULT_LOCALE;
-
-      log('useLocaleStore.js', 'isDefaultLocale', 'get', 'Checking if default locale', { isDefault });
 
       return isDefault;
     },
@@ -157,8 +148,9 @@ export const useLocaleStore = defineStore('locale', {
 
       // Fallback manual persistence to guarantee localStorage is updated
       try {
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('locale_preference', serializeLocalePersistedState({ locale: localeCode }));
+        const storage = resolvePersistStorage();
+        if (storage) {
+          storage.setItem(LOCALE_PERSIST_KEY, serializeLocalePersistedState({ locale: localeCode }));
         }
       } catch (e) {
         console.warn('Failed to manually persist locale:', e);
@@ -189,11 +181,26 @@ export const useLocaleStore = defineStore('locale', {
 
   persist: {
     key: 'locale_preference',
-    storage: localStorage,
-    paths: ['locale'],
+    key: LOCALE_PERSIST_KEY,
+    storage: () => resolvePersistStorage(),
+    pick: ['locale'],
     serializer: {
       serialize: serializeLocalePersistedState,
       deserialize: deserializeLocalePersistedState,
+    },
+    beforeRestore({ store }) {
+      migrateLegacyPersistedState({
+        storage: resolvePersistStorage(),
+        newKey: LOCALE_PERSIST_KEY,
+        legacyKeys: ['locale_preference'],
+      });
+      if (store.locale === undefined) {
+        store.locale = null;
+      }
+    },
+    afterRestore({ store }) {
+      normalizeLocaleAfterRestore(store);
+      attachStorageQuotaMonitor(store, { key: LOCALE_PERSIST_KEY, label: 'locale' });
     },
   }
 });
