@@ -44,7 +44,7 @@
                                 </div>
     
                                 <!-- credit-card-download-icon -->
-                                <div class="flex justify-center items-center w-[1.875rem] h-[1.875rem] rounded bg-white/80 md:bg-[#182230]">
+                                <div @click="$emit('openWithdraw')" class="flex justify-center items-center w-[1.875rem] h-[1.875rem] rounded bg-white/80 md:bg-[#182230] cursor-pointer hover:opacity-80">
                                   <img src="https://i.ibb.co.com/p6Ntxgtt/download.webp" alt="download" class="w-[1.125rem] h-[1.125rem] md:[filter:_brightness(0)_saturate(100%)_invert(94%)_sepia(0%)_saturate(7500%)_hue-rotate(124deg)_brightness(115%)_contrast(105%)]"/>
                                 </div>
                               </div>
@@ -87,6 +87,8 @@
 <script setup>
 import { ref } from 'vue';
 import EyeSlashIcon from "@heroicons/vue/24/outline/EyeSlashIcon";
+
+const emit = defineEmits(['openWithdraw']);
 
 const isBalanceVisible = ref(true);
 </script>

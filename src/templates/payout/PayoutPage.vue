@@ -3,9 +3,11 @@ import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWra
 import FlexTable from '@/components/ui/table/FlexTable.vue';
 import PayoutCard from '@/components/ui/card/dashboard/PayoutCard.vue';
 import PayoutSettingsPopup from '@/components/ui/popup/PayoutSettingsPopup.vue';
+import WithdrawEarningsPopup from '@/components/ui/popup/WithdrawEarningsPopup.vue';
 import { ref } from 'vue';
 
 const showPayoutSettingsPopup = ref(false);
+const showWithdrawPopup = ref(false);
 
 const payoutColumns = [
   { key: 'period', label: 'Period', basis: 'min-w-[11.75rem]' },
@@ -71,7 +73,7 @@ const tableThemeMobile = {
             <!-- top-page-settings -->
             <div class="flex flex-col items-start gap-2 z-[1] sm:gap-4 md:gap-2 lg:flex-row lg:gap-4">
               <!-- card-section -->
-            <PayoutCard/>
+            <PayoutCard @openWithdraw="showWithdrawPopup = true" />
             </div>
           </div>
 
@@ -253,5 +255,6 @@ const tableThemeMobile = {
     </div>
     </div>
     <PayoutSettingsPopup v-model="showPayoutSettingsPopup" />
+    <WithdrawEarningsPopup v-model="showWithdrawPopup" />
  </DashboardWrapperTwoColContainer>
 </template>

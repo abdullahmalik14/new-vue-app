@@ -168,8 +168,8 @@ export function createStepStateEngine(config) {
     throw new Error("[stateEngine] flowId is required");
   }
 
-  const bus = createEventBus();
-
+  const bus = createEventBus(); 
+       
   const core = reactive({
     flowId,
     state: deepClone(defaults),
