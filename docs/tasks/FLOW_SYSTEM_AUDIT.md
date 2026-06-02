@@ -1,0 +1,748 @@
+# Flow System Audit
+
+**Scope:**
+- `src/services/flow-system/`
+- `src/services/*/flows/`
+- `src/services/*/mappers/`
+- `src/services/*/validators/`
+
+**Files audited:** 140 files — 21 `flow-system` core, 101 `*/flows/`, 16 `*/mappers/`, 3 `*/validators/`
+
+**Per-flow registry and call-site issues** (wrong `flowKind`, unused mappers, destination config, etc.) are in [`FLOW_USAGE_AUDIT.md`](./FLOW_USAGE_AUDIT.md) — not duplicated here.
+
+---
+
+## Table of Contents
+
+1. [Logical Bugs](#1-logical-bugs)
+2. [Performance Issues](#2-performance-issues)
+3. [Security Issues](#3-security-issues)
+4. [Best Practice Violations](#4-best-practice-violations)
+5. [Missing Features](#5-missing-features)
+6. [Summary Table](#6-summary-table)
+
+---
+
+## 1. Logical Bugs
+
+---
+
+### BUG-01 — Duplicate registry key `"events.fetchEvent"` silently drops pipeline config
+
+**Moved to** [`FLOW_USAGE_AUDIT.md`](./FLOW_USAGE_AUDIT.md) **USE-03** (registry / usage audit).
+
+---
+
+### BUG-02 — `withAuth` middleware is permanently disabled by default
+
+**File:** `src/services/flow-system/FlowHandler.js` — line 24
+
+```js
+const defaultMiddlewares = []; // [withMetrics, withTimeout, withRetry, withAuth];
+```
+
+All middleware has been commented out of the defaults. `withAuth` never runs unless the caller explicitly passes it via `options.middlewares`. The `context.requireAuth` flag is read by `withAuth` correctly, but since `withAuth` is never in the middleware chain, the flag has no effect.
+
+**Impact:** Every flow executes without authentication enforcement. A flow that requires `userId` will proceed without it; the `AUTH_REQUIRED` error code is never emitted in practice.
+
+**Fix:** Restore default middlewares (at minimum `withAuth`) or document that callers must always pass `withAuth` explicitly.
+
+---
+
+### BUG-03 — `toRequest` mapper is silently skipped for read-kind flows
+
+**Engine behavior:** `FlowHandler.js` only calls `toRequest` when `flowKind === "write"`.
+
+**Primary usage bug:** [`FLOW_USAGE_AUDIT.md`](./FLOW_USAGE_AUDIT.md) **USE-01** — `orders.fetchOrders` registers `toRequest: mapOrderToRequest` on a read flow; `mapOrderToRequest` never runs and `perPage` / `ownerId` are not mapped to query params.
+
+**Fix (usage):** Map params inside `fetchOrdersFlow` or remove dead `toRequest` from registry. **Fix (engine):** Optionally support read-side request shaping explicitly (separate from write pipeline).
+
+---
+
+### BUG-04 — `map` property on `piniaAction` destination is unsupported
+
+**Engine gap:** `destinationRuntime.js` does not implement `map` on `piniaAction` destinations.
+
+**Primary usage bug:** [`FLOW_USAGE_AUDIT.md`](./FLOW_USAGE_AUDIT.md) **USE-02** — `orders.fetchOrders` relies on unsupported `map` for `setOrders`.
+
+**Fix:** Implement `map` in the runtime, or fix the registry entry (USE-02).
+
+---
+
+### BUG-05 — `events.fetchSpendingRequirementItems` retry enabled but `maxAttempts: 1` means zero retries
+
+**Moved to** [`FLOW_USAGE_AUDIT.md`](./FLOW_USAGE_AUDIT.md) **USE-05**.
+
+---
+
+### BUG-06 — Exponential backoff exponent starts at 1 instead of 0
+
+**File:** `src/services/flow-system/runtime/retryRuntime.js` — lines 36–41
+
+```js
+function computeDelayMs(attempt, retryConfig) {
+  const exp = Math.max(1, attempt - 1); // attempt=1 → exp=1; attempt=2 → exp=1
+  const base = retryConfig.baseDelayMs * (2 ** exp);
+  ...
+}
+```
+
+For the first and second retry attempt, `exp` resolves to `1`, so both use the same delay (`baseDelayMs * 2`). Standard exponential backoff uses `2^(attempt-1)`, giving `baseDelayMs` on the first retry. Using `Math.max(1, ...)` doubles the initial delay and creates a flat delay between attempts 1 and 2.
+
+**Example with `baseDelayMs: 250`:**
+- Standard: attempt 1 → 250 ms, attempt 2 → 500 ms
+- Current: attempt 1 → 500 ms, attempt 2 → 500 ms, attempt 3 → 1000 ms
+
+**Fix:** Remove the `Math.max(1, ...)` wrapper:
+```js
+const exp = attempt - 1;
+```
+
+---
+
+### BUG-07 — `validateCreateEventPayload` / `validateCreateEventResponse` never registered
+
+**Moved to** [`FLOW_USAGE_AUDIT.md`](./FLOW_USAGE_AUDIT.md) **USE-04**.
+
+---
+
+### BUG-08 — `FLOW_TOTAL_TIMEOUT` produces `status: "error"` not `status: "cancelled"`
+
+**File:** `src/services/flow-system/flowDataPipeline.js` — lines 174–188
+
+The timeout handler calls `fail(...)` which returns `{ status: "error" }`, but a second meta flag of `{ cancelled: true }` is also set:
+
+```js
+() => fail(
+  { code: "FLOW_TOTAL_TIMEOUT", message: `...` },
+  { cancelled: true, reason: "total_timeout" }
+)
+```
+
+The branching logic at line 184 checks:
+```js
+if (flowResult?.status === "cancelled" || flowResult?.meta?.cancelled) {
+```
+
+The first condition always fails (status is "error"), but the second catches it via `meta.cancelled`. This means `finalizeCancelled` is called instead of `finalizeError`, which discards the `FLOW_TOTAL_TIMEOUT` error code and returns a generic `FLOW_CANCELLED` shape to callers.
+
+**Impact:** Callers cannot distinguish a total timeout from a normal cancellation — both return `{ code: "FLOW_CANCELLED" }`.
+
+**Fix:** Use `cancelled("total_timeout")` from `flowTypes.js` to produce a consistent `status: "cancelled"` shape.
+
+---
+
+### BUG-09 — `withTimeout` timeout of 0 defaults to 15 000 ms instead of being disabled
+
+**File:** `src/services/flow-system/middleware/withTimeout.js` — line 5
+
+```js
+const timeoutMs = Number(args?.context?.timeoutMs || 15000);
+```
+
+Passing `timeoutMs: 0` to disable the timeout falls back to `15000` because `0 || 15000 === 15000`. There is no way to opt out of the middleware timeout via configuration.
+
+**Fix:** Use nullish coalescing:
+```js
+const timeoutMs = args?.context?.timeoutMs ?? 15000;
+```
+And guard with `if (timeoutMs <= 0) return next(args);`.
+
+---
+
+### BUG-10 — `concurrencyRuntime` `allowParallel` policy never tracks in-flight promises
+
+**File:** `src/services/flow-system/runtime/concurrencyRuntime.js` — lines 19–28
+
+```js
+if (policy === "allowParallel") {
+  return {
+    mode: "run",
+    key: `${key}:parallel:${Date.now()}:${Math.random()...}`,
+    abortController,
+    registerPromise() {},  // no-op
+    release() {},          // no-op
+  };
+}
+```
+
+`registerPromise` and `release` are no-ops for parallel flows. This means:
+- `cancelInFlight(key)` has no effect for these flows.
+- `hasInFlight(key)` always returns `false` for parallel policies.
+- The original `key` is never written to `inFlight`, so deduplication could misbehave if policy changes mid-flight.
+
+**Impact:** Callers relying on `cancelInFlight` to abort parallel uploads (e.g., `media.uploadFile`) cannot cancel them.
+
+**Fix:** Register parallel executions under the unique composite key so they can be tracked and cancelled individually.
+
+---
+
+## 2. Performance Issues
+
+---
+
+### PERF-01 — `flowRefreshManager` immediate run duplicates component-mount request
+
+**File:** `src/services/flow-system/flowRefreshManager.js` — line 35
+
+`runImmediately` defaults to `true`. If a component mounts and calls `FlowHandler.run("analytics.fetch", ...)` AND calls `flowRefreshManager.startFromRegistry("analytics.fetch", ...)` immediately after, two network requests fire at the same tick. For `analytics.fetch` (30 s interval) and `events.fetchCreatorEvents` (60 s interval), this means a doubled server load on every page load.
+
+**Fix:** Default `runImmediately` to `false` for registry-started flows, or deduplicate using the concurrency layer.
+
+---
+
+### PERF-02 — Module-level `memoryCache` Map never evicts expired entries
+
+**File:** `src/services/flow-system/runtime/cacheRuntime.js` — line 2
+
+```js
+const memoryCache = new Map();
+```
+
+Entries are added on every cache write but never removed when they expire. `readCacheEntry` detects expiry but returns `{ hit: false }` without removing the stale entry. Over time, especially in long-running sessions with many unique payload hashes, the map grows unboundedly.
+
+**Fix:** Call `removeFromStorage` inside `readCacheEntry` when `reason === "expired"`, or run a periodic sweep.
+
+---
+
+### PERF-03 — `stableStringify` is O(n log n) and called on every cache/concurrency key build
+
+**File:** `src/services/flow-system/runtime/cacheRuntime.js` — lines 4–10
+
+`buildPayloadHash` calls `stableStringify` which sorts all object keys recursively. This is called for every `buildCacheKey`, `buildEtagKey`, and `buildConcurrencyKey` invocation — i.e., before every single flow execution. For complex payloads (e.g., booking or event creation) this is expensive.
+
+**Fix:** Memoize the hash per payload reference, or use a faster hashing strategy.
+
+---
+
+### PERF-04 — `localStorage` writes are synchronous and unguarded against quota errors
+
+**File:** `src/services/flow-system/runtime/cacheRuntime.js` — line 59
+
+```js
+storage.setItem(key, JSON.stringify(value));
+```
+
+`localStorage.setItem` is synchronous and blocks the main thread. There is no `try/catch` around `setItem`, so a `QuotaExceededError` (storage full) will propagate as an uncaught exception and crash the flow.
+
+**Fix:** Wrap `setItem` in a try/catch and degrade gracefully to memory cache.
+
+---
+
+### PERF-05 — `mergeConfig` deep-merge utility is duplicated across files
+
+**Files:** `pipeline/pipelineContext.js` lines 5–18, `runtime/readSourceRuntime.js` lines 16–30
+
+The same `isPlainObject` + `mergeConfig` implementation is copy-pasted into two files. If one is fixed/optimised, the other won't be.
+
+**Fix:** Extract to a shared `src/services/flow-system/utils/mergeConfig.js`.
+
+---
+
+### PERF-06 — Background revalidation fires on next microtask with no debounce
+
+**File:** `src/services/flow-system/pipeline/readPipeline.js` — line 166
+
+```js
+setTimeout(() => {
+  context.rerunFlow({ forceRefresh: true, skipDestinationRead: true, backgroundRevalidate: true })
+    .catch(() => {});
+}, 0);
+```
+
+Multiple stale cache hits within the same event loop tick (e.g., multiple components reading the same flow) will each independently start a background revalidate. There is no deduplication: all will call `FlowHandler.run` and the concurrency layer will cancel all but the latest.
+
+**Fix:** Use the concurrency layer's deduplication explicitly, or dedounce background revalidation by key.
+
+---
+
+## 3. Security Issues
+
+---
+
+### SEC-01 — Authentication is opt-in instead of opt-out
+
+**File:** `src/services/flow-system/FlowHandler.js` — line 24
+
+`defaultMiddlewares` is empty. `withAuth` only runs if a caller explicitly adds it via `options.middlewares`. Any flow that does not supply middlewares runs unauthenticated, regardless of what `context.requireAuth` says.
+
+**Impact:** New flows added to the registry are automatically unauthenticated unless the developer remembers to configure middleware.
+
+**Fix:** Restore `withAuth` (and at minimum `withTimeout`) to `defaultMiddlewares`.
+
+---
+
+### SEC-02 — JWT token stored and passed as a plain string on the context
+
+**File:** `src/services/flow-system/pipeline/pipelineContext.js` — lines 72–83
+
+`backendJwtToken` is stored directly on the context object and accessible to every mapper, validator, destination callback, and middleware in the pipeline. The token is never redacted from error objects or logs.
+
+**Impact:** A misconfigured destination or leak via `details: error` in a `fail()` result could expose the JWT in response objects returned to UI components.
+
+**Fix:** Store the token in a closure, expose it only when building request headers, and redact it from any serialized error output.
+
+---
+
+### SEC-03 — Inconsistent URL parameter encoding in chat flows
+
+**Files:** `src/services/chat/flows/` (all 63 files)
+
+Some flows encode path parameters:
+```js
+api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/membership/upgrade`, ...)
+```
+
+Others do not:
+```js
+api.get(`${baseUrl}/chats/${chatId}/messages`, ...)
+```
+
+If `chatId` contains `/`, `?`, or `#` characters, unencoded flows can produce malformed URLs or, in some API server configurations, path traversal vectors.
+
+**Fix:** Enforce `encodeURIComponent` on all path parameters. Consider a URL builder utility.
+
+---
+
+### SEC-04 — ETag values written to `localStorage` without integrity check
+
+**File:** `src/services/flow-system/runtime/etagRuntime.js` — lines 17–23
+
+ETags are stored as plain strings and read back without validation. If an attacker can modify `localStorage` (e.g., via XSS), they can inject an ETag that forces a permanent `304 Not Modified` response from the server, causing stale data to be served indefinitely.
+
+**Fix:** Bind ETags to a session nonce, or sign/hash them before storage.
+
+---
+
+### SEC-05 — No CSRF protection on write flows
+
+**File:** `src/services/flow-system/pipeline/writePipeline.js`
+
+The idempotency key header (`Idempotency-Key`) is set when `pipeline.idempotency.enabled = true`, but this is not CSRF protection — it only prevents duplicate submission. There is no `X-CSRF-Token` or `SameSite` cookie enforcement at the flow layer for mutating operations (create booking, create event, etc.).
+
+**Fix:** Add a CSRF token middleware or propagate a CSRF header from the auth context.
+
+---
+
+### SEC-06 — `resolveRuntimeValue("@now")` is the only sanitised sentinel; all other destination values are unvalidated
+
+**File:** `src/services/flow-system/runtime/destinationRuntime.js` — lines 31–42
+
+Destination `value` fields are written directly to Pinia stores and stateEngine. There is no validation that destination values or `select` paths stay within expected bounds. A misconfigured registry entry with `value: { __proto__: ... }` could cause prototype pollution.
+
+**Fix:** Validate destination config entries at registry load time, and use `Object.create(null)` or `structuredClone` for destination data writes.
+
+---
+
+## 4. Best Practice Violations
+
+
+
+### BP-02 — `_globalContext` is a mutable module-level singleton in `FlowHandler`
+
+**File:** `src/services/flow-system/FlowHandler.js` — lines 65–68
+
+```js
+const _globalContext = {
+  piniaStores: {},
+  stateEngine: null,
+};
+```
+
+`FlowHandler.configure()` uses `Object.assign` to accumulate state. There is no way to clear or reset the global context (e.g., on user logout or in tests), and there is no guard against `configure()` being called multiple times with conflicting values.
+
+**Fix:** Add a `FlowHandler.reset()` method for testing; document that `configure()` is idempotent or make it replace rather than merge.
+
+---
+
+### BP-03 — `context.progress` is mutated directly instead of being reactive/immutable
+
+**File:** `src/services/flow-system/FlowHandler.js` — lines 148–152
+
+```js
+context.progress.loading = true;
+const result = await runFlowDataPipeline(context);
+context.progress.loading = false;
+```
+
+Direct mutation of `progress` inside an async pipeline means:
+- Vue reactivity will not track changes in non-reactive contexts.
+- There is no rollback if the pipeline throws before `loading = false`.
+- Concurrently running flows sharing a context reference would clobber each other's progress state.
+
+**Fix:** Use `finally` to reset `loading`, and expose progress as a reactive `ref` at the call site rather than on the context.
+
+---
+
+### BP-04 — `withMetrics` mutates the returned result object
+
+**File:** `src/services/flow-system/middleware/withMetrics.js` — line 14
+
+```js
+result.meta = { ...(result.meta || {}), durationMs, runId: args.context.runId };
+```
+
+The result object returned from the next handler is mutated in-place. If the same result reference is used elsewhere after this middleware (e.g., for logging before passing to the caller), the `meta` will unexpectedly contain timing data added after the fact.
+
+**Fix:** Return a new object: `return { ...result, meta: { ... } }`.
+
+---
+
+### BP-05 — `normalizeFlowKind` defaults unknown values to `"write"` silently
+
+**File:** `src/services/flow-system/FlowHandler.js` — lines 33–38
+
+```js
+function normalizeFlowKind(kind) {
+  const raw = String(kind || "").toLowerCase();
+  if (raw === "read" || raw === "query" || raw === "fetch") return "read";
+  if (raw === "write" || raw === "mutation" || raw === "action") return "write";
+  return "write"; // ← any typo silently becomes "write"
+}
+```
+
+A typo like `flowKind: "reed"` in a registry entry silently produces a write pipeline, bypassing all read-side optimisations (caching, ETag, staleWhileRevalidate, deduplication).
+
+**Fix:** Throw or return an error result for unrecognised flow kinds.
+
+---
+
+### BP-06 — `flowKind` is not validated when reading from `flowEntry` vs `options`
+
+**File:** `src/services/flow-system/FlowHandler.js` — line 88
+
+```js
+const flowKind = normalizeFlowKind(options.flowKind || flowEntry?.flowKind);
+```
+
+`options.flowKind` takes precedence over the registry-declared kind. A caller can silently override the flow kind at runtime, e.g., running a write flow as a read flow and triggering the read pipeline's cache logic on mutating operations.
+
+**Fix:** Remove `options.flowKind` override capability, or at minimum log a warning when it overrides the registry value.
+
+---
+
+### BP-07 — `readSourceRuntime.js` defines `resolveValueByPath` as a wrapper that only calls `deepGet`
+
+**File:** `src/services/flow-system/runtime/readSourceRuntime.js` — lines 164–167
+
+```js
+function resolveValueByPath(target, path) {
+  if (!path) return target;
+  return deepGet(target, path);
+}
+```
+
+This function is an unnecessary wrapper around `deepGet`. `deepGet` already handles falsy paths correctly (`if (!path) return value`). The wrapper adds indirection with no value.
+
+**Fix:** Replace all calls to `resolveValueByPath` with direct `deepGet` calls.
+
+---
+
+### BP-08 — `flowRefreshManager` error-handling is silent
+
+**File:** `src/services/flow-system/flowRefreshManager.js` — lines 33–39
+
+```js
+const run = () => FlowHandler.run(resolvedFlowName, payload, { ...options, forceRefresh: true });
+// ...
+const timer = setInterval(run, intervalMs);
+```
+
+`run()` returns a Promise but the return value is never awaited or error-handled. A runtime crash inside a refresh will be swallowed silently. There is also no backoff — a flow that fails on every poll still fires at the same `intervalMs`.
+
+**Fix:** Await `run()` inside the interval callback, add error logging, and implement exponential backoff on consecutive failures.
+
+
+
+
+
+## 5. Missing Features
+
+---
+
+### FEAT-01 — No circuit breaker
+
+Repeated failures on a flow (network outages, bad deployments) cause the system to keep retrying at the configured interval or per-call. There is no mechanism to temporarily disable a flow after N consecutive failures and resume with backoff.
+
+**Suggested:** Implement a per-flow failure counter that opens a circuit after a threshold and half-opens after a cooldown period.
+
+
+
+### FEAT-03 — No public cancellation API
+
+`concurrencyRuntime.cancelInFlight(key)` is exported but not exposed through `FlowHandler`. Callers cannot cancel an in-flight flow (e.g., on component unmount). The only implicit cancellation is via the `latestWins` policy aborting prior calls.
+
+**Suggested:** Expose `FlowHandler.cancel(flowName, payload)` that delegates to `cancelInFlight`.
+
+---
+
+### FEAT-04 — No structured lifecycle events / hooks
+
+There is no way to observe flow lifecycle events (start, retry, success, error, cancelled) without modifying middleware. Consumers have to instrument individual flows with custom middleware.
+
+**Suggested:** Add a global event emitter (e.g., `FlowHandler.on("error", handler)`) or Vue plugin integration.
+
+---
+
+### FEAT-05 — `validateConfirmReservationResponse` and `validateCancelReservationResponse` are missing
+
+**File:** `src/services/rental/validators/rentalFlowValidators.js`
+
+`validateConfirmReservationPayload` and `validateCancelReservationPayload` exist but there are no corresponding response validators. Unexpected API responses (missing fields) for confirm/cancel operations pass through silently.
+
+**Fix:** Add response validators for both operations.
+
+---
+
+### FEAT-06 — No registry schema validation at startup
+
+The registry is a plain object. Misconfigured entries (wrong type for `pipeline.retry`, missing `flow` function, unknown destination types) are only detected at runtime when a flow actually runs.
+
+**Suggested:** Add a `validateRegistry()` function called at app boot that iterates all entries and validates required fields and types. or on compile
+
+---
+
+### FEAT-07 — No request-level deduplication for identical concurrent HTTP calls
+
+The concurrency layer deduplicates at the flow level, but if two different flow names hit the same API endpoint simultaneously, no deduplication occurs. For example, `events.fetchEvent` and `events.fetchCreatorEvents` may both call the same endpoint in parallel.
+
+**Suggested:** Add an HTTP-level request cache / in-flight deduplication layer in `apiWrapper`.
+
+---
+
+### FEAT-08 — Background revalidate has no timeout or cancellation
+
+**File:** `src/services/flow-system/pipeline/readPipeline.js` — lines 162–175
+
+```js
+setTimeout(() => {
+  context.rerunFlow({ forceRefresh: true, ... }).catch(() => {});
+}, 0);
+```
+
+The background revalidate promise is not tracked. It has no timeout, no abort signal, and errors are silently discarded. A hanging background revalidate will keep a stale context alive and may write to stores after the originating component has unmounted.
+
+**Fix:** Pass an `AbortSignal` tied to component lifecycle, and propagate the timeout config from the original flow.
+
+---
+
+### FEAT-09 — No pagination support in the flow system
+
+Several flows return paginated data (`fetchAnalyticsFlow`, `fetchMessagesFlow`, `fetchOrdersFlow`) but the flow system has no built-in cursor/page management. Each page requires a separate `FlowHandler.run` call with a manually constructed payload, and there is no cache coordination between pages.
+
+**Suggested:** Add an `options.paginate` mode that automatically merges paginated results into a destination store.
+
+---
+
+### FEAT-10 — `flowRefreshManager` has no visibility into active intervals from outside
+
+**File:** `src/services/flow-system/flowRefreshManager.js`
+
+`flowRefreshManager.list()` is the only introspection API. There is no way to check the next scheduled run time, the last success/failure, or the number of consecutive errors. DevTools / debugging is blind to refresh activity.
+
+**Suggested:** Add `lastRunAt`, `lastError`, and `consecutiveFailures` to each interval entry and expose them via `list()`.
+
+
+### BUG-11 — `options.context` spread can overwrite core pipeline context fields
+
+**File:** `src/services/flow-system/pipeline/pipelineContext.js` — return object (line with `...(options.context || {})`)
+
+`createPipelineContext` builds trusted fields (`runId`, `flowName`, `requestHeaders`, `signal`, etc.) and then spreads `options.context` at the very end:
+
+```js
+return {
+  runId: makeRunId(),
+  flowName,
+  requestHeaders,
+  // ...
+  ...(options.context || {}),
+};
+```
+
+Any caller-provided `options.context` can silently overwrite reserved fields (including `requestHeaders`, `flowName`, `runId`, `signal`, `pipeline`, `runtimeOptions`, and `userId`).
+
+**Impact:** Flow identity and execution behavior can be corrupted at runtime; auth headers can be dropped or replaced.
+
+**Fix:** Move `...(options.context || {})` earlier and explicitly whitelist allowed context keys, or hard-block overriding reserved keys.
+
+---
+
+### BUG-12 — `withTimeout` can leave dangling timers when `next(args)` rejects
+
+**File:** `src/services/flow-system/middleware/withTimeout.js` — lines 22–25
+
+`withTimeout` clears the timer only on successful `await Promise.race(...)` resolution:
+
+```js
+const result = await Promise.race([flowPromise, timeoutPromise]);
+clearTimeout(timer);
+return result;
+```
+
+If `flowPromise` rejects, execution exits before `clearTimeout(timer)` runs. The timer remains active and later calls `controller.abort()`, causing delayed side-effects and extra event-loop work.
+
+**Fix:** Wrap the race in `try/finally` and clear the timer in `finally`.
+
+---
+
+Repository scan shows only a small subset of chat flows use `context.signal`; most requests are sent without abort signal and timeout options.
+
+**Impact:**  
+- `latestWins` cancellations do not abort in-flight HTTP calls in most chat operations.  
+- network requests can continue after UI supersedes or unmounts.  
+- wasted bandwidth and stale write/read races.
+
+**Fix:** Enforce a shared request helper for chat flows that always attaches `headers`, `signal`, and `timeoutMs`.
+
+--- 
+
+### SEC-08 — context override can replace security-critical request headers
+
+**File:** `src/services/flow-system/pipeline/pipelineContext.js`
+
+Because `options.context` is spread after the computed `requestHeaders`, a caller can replace `Authorization` (or remove it entirely) even when `backendJwtToken` is provided.
+
+**Impact:** auth downgrade or token substitution is possible through call-site context injection.
+
+**Fix:** treat `requestHeaders` as reserved and merge in a controlled order where security headers win.
+
+---
+
+### BP-11 — no reserved-key contract for `options.context`
+
+**Files:** `FlowHandler.run` + `pipelineContext.js`
+
+`options.context` serves as a generic bag but also overlaps internal runtime fields. There is no documented/validated contract for allowed keys.
+
+**Impact:** accidental key collisions cause hard-to-debug behavior changes (timeouts, retries, identity, auth).
+
+**Fix:** define and validate a strict schema for external context keys (`extraContext`) and keep internal fields isolated.
+
+---
+
+### FEAT-11 — missing shared HTTP helper for flow request consistency
+
+**Scope:** all `*/flows/` modules
+
+Request option handling is duplicated across many files, producing drift (some pass headers/signal/timeout, many do not).
+
+**Impact:** repeated correctness and security regressions in new flows.
+
+**Suggested:** add a single helper (e.g., `buildFlowRequestOptions(context, extra)`) and require every flow to use it.
+
+-- 
+
+### BUG-15 — `asValidationResult` fails open on unrecognized validator output
+
+**File:** `src/services/flow-system/flowDataPipeline.js` — lines 11–20
+
+```js
+return { ok: true, errors: [] };  // final fallback for unrecognised shapes
+```
+
+Validators returning `{ valid: true }`, `{ errors: [...] }` without `ok: false`, or other malformed shapes are treated as success.
+
+**Fix:** Default to `{ ok: false, errors: ['Unexpected validator result shape'] }`, or throw in DEV.
+
+---
+
+### BUG-16 — `validateBy` skips validation when validator function is missing
+
+**File:** `src/services/flow-system/flowDataPipeline.js` — lines 30–33
+
+```js
+if (typeof validator !== "function") {
+  return { ok: true, errors: [] };
+}
+```
+
+Registry typos in `validators.payload` / `validators.response` silently disable validation.
+
+**Fix:** Fail closed when a flow entry declares validators but the function is missing.
+
+---
+
+### BUG-17 — Response validation skipped for all `notModified` results
+
+**File:** `src/services/flow-system/flowDataPipeline.js` — lines 79–86
+
+```js
+if (!flowResult?.ok || flowResult?.meta?.notModified) {
+  return { ok: true, errors: [] };
+}
+```
+
+304 / `notModified` paths skip response schema checks even when `flowResult.data` is an empty or stale stub. Cached data validated under an old schema can pass after validator changes.
+
+**Fix:** Validate resolved data (cache/state/network) with the current response validator; only skip when there is no data to validate.
+
+---
+
+### BUG-18 — Payload validators run against `originalPayload`, not `mappedPayload`
+
+**File:** `src/services/flow-system/flowDataPipeline.js` — line 74
+
+```js
+await validateBy(context.validators?.payload, context.originalPayload, context, "payload");
+```
+
+`toRequest` mappers run after payload validation. Registry validators cannot assert the final API request shape.
+
+**Fix:** Validate both pre-map (user input) and post-map (API contract), or document and enforce one convention.
+
+---
+
+### BUG-19 — `userId` is never populated from auth state in `FlowHandler.run`
+
+**Files:** `src/services/flow-system/middleware/withAuth.js`, `src/services/flow-system/pipeline/pipelineContext.js`
+
+`withAuth` checks `context.userId`, but `createPipelineContext` only sets `userId: options.userId` from the caller. Nothing reads the auth store or JWT claims automatically. Combined with empty `defaultMiddlewares` (BUG-02), auth is inactive and manual per call.
+
+**Fix:** Wire auth store → `userId` in `FlowHandler.configure` / `run`, and enable `withAuth` in default middlewares.
+
+---
+
+### BUG-20 — Write flows can retry on `NETWORK_ERROR` (duplicate mutation risk)
+
+**File:** `src/services/flow-system/runtime/retryRuntime.js` — `shouldRetryResult`
+
+`executeWithRetry` is used by both read and write pipelines. On `NETWORK_ERROR`, write flows with retry enabled may execute twice if the server processed the request but the response was lost.
+
+**Fix:** Retry `NETWORK_ERROR` only for idempotent read flows; limit write retries to confirmed non-success HTTP codes.
+
+---
+
+### BUG-21 — Background revalidate swallows all errors
+
+**File:** `src/services/flow-system/pipeline/readPipeline.js` — `startBackgroundRevalidate`
+
+```js
+context.rerunFlow({ ... }).catch(() => {});
+```
+
+Failures during stale-while-revalidate are invisible to callers and telemetry.
+
+**Fix:** Log errors, surface `onStaleRevalidateFailed`, or increment a stale-failure counter on the context.
+
+---
+
+### PERF-08 — Cache keys use 32-bit hash (collision risk)
+
+**File:** `src/services/flow-system/runtime/cacheRuntime.js` — `buildPayloadHash`
+
+djb2-style 32-bit hashing can collide across many distinct payloads within the same flow namespace, causing wrong cache hits.
+
+**Fix:** Use a longer fingerprint (64-bit / SHA-256 prefix) or include a serialized payload checksum in the key.
+
+---
+
+---
+
+### BP-12 — `inFlight` concurrency map is a module-level singleton
+
+**File:** `src/services/flow-system/runtime/concurrencyRuntime.js`
+
+Dedupe/cancel only applies within one JS realm. Tests can leak entries unless manually cleared; multi-tab behavior is undefined.
+
+**Fix:** Injectable `inFlight` map or `clearInFlight()` for tests.
+

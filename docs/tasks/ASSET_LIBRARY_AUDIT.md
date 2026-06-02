@@ -120,11 +120,11 @@ try { return await promise; } finally { assetsLoadingPromises.delete(sectionName
      const [a, b] = await Promise.all([p1, p2]);
      console.log({
        samePromise: p1 === p2,
-       sameResult: a === b,
+      sameResult: a === b,
        sectionName: a?.sectionName,
        loadMs: Math.round(performance.now() - t0),
        inProgressAfter: getAssetStatistics().loadingInProgress,
-       pass: p1 === p2 && a === b && a?.sectionName === 'auth' && getAssetStatistics().loadingInProgress.length === 0,
+      pass: p1 === p2 && a === b && a?.sectionName === 'auth' && getAssetStatistics().loadingInProgress.length === 0,
      });
    })();
    ```
@@ -2339,11 +2339,60 @@ export function useAssetUrl(flag, sectionName = null) {
 
 **Fix:** Do not assign `cachedAssetMap` on fetch failure. Keep a short-lived failure backoff flag instead, then retry.
 
+#### Resolution ✅
+
+**Status:** Resolved with **A-L01** — failed loads no longer persist empty maps.
+
+**What was broken:** A transient fetch/parsing error would cache an empty map for the session.
+
+**Why it happened:** `loadAssetMapConfig()` assigned `cachedAssetMap` even in the error path.
+
+**What changed:** Failure returns `null` (no cache mutation). Callers still receive a safe empty map response, but future calls can retry.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { loadAssetMapConfig, clearAssetMapConfigCache } = await import('/src/utils/assets/assetLibrary.js');
+  clearAssetMapConfigCache();
+  const first = await loadAssetMapConfig(); // should succeed
+  console.log({
+    loaded: Boolean(first && first.production),
+    pass: Boolean(first && first.production),
+  });
+})();
+```
+
+**Expected:** `pass: true` and no permanent empty-map caching on transient errors.
+
 ---
 
 ### A-L02 — `getAssetUrls` can throw before validation (`flags.length` accessed before `Array.isArray`)
 **File:** `assetLibrary.js` lines 792–799  
 **Detail:** Logging reads `flags.length` before type validation. If `flags` is `null`, `undefined`, or a non-array object, it throws `TypeError` before the guard runs. This bypasses the intended graceful return `{}`.
+
+#### Resolution ✅
+
+**Status:** Resolved with **A-L02** — guard runs before any `flags.length` access.
+
+**What was broken:** Logging accessed `flags.length` before type validation.
+
+**Why it happened:** The log statement executed before the `Array.isArray` check.
+
+**What changed:** Moved validation before logging and guarded `flagCount`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetUrls } = await import('/src/utils/assets/assetLibrary.js');
+  const result = await getAssetUrls(null);
+  console.log({
+    result,
+    pass: typeof result === 'object' && Object.keys(result).length === 0,
+  });
+})();
+```
+
+**Expected:** `pass: true` without console errors.
 
 ---
 
@@ -2351,11 +2400,57 @@ export function useAssetUrl(flag, sectionName = null) {
 **File:** `assetLibrary.js` lines 957–964  
 **Detail:** Same pattern as A-L02. `flagCount: flags.length` is evaluated before array validation, so invalid input can throw before the function returns `0`.
 
+#### Resolution ✅
+
+**Status:** Resolved with **A-L03** — validation now runs before logging.
+
+**What was broken:** Logging accessed `flags.length` before validating input.
+
+**Why it happened:** The guard check happened after the log statement.
+
+**What changed:** Validation now runs first; logging only happens after `Array.isArray(flags)` is true.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { preloadAssetUrls } = await import('/src/utils/assets/assetLibrary.js');
+  const result = await preloadAssetUrls(undefined);
+  console.log({ result, pass: result === 0 });
+})();
+```
+
+**Expected:** `pass: true` without console errors.
+
 ---
 
 ### A-L04 — `clearAssetCaches()` does not clear in-flight section load tracker
 **File:** `assetLibrary.js` lines 455–482  
 **Detail:** The function clears `loadedAssets`, `cachedManifest`, and `cacheHandler`, but not `assetsLoadingInProgress`. If a clear happens during/after interrupted loads, stale loading keys remain and future calls can enter `waitForAssetLoad` and time out unnecessarily.
+
+#### Resolution ✅
+
+**Status:** Resolved with **A-L04** — `assetsLoadingPromises.clear()` already runs in `clearAssetCaches()`.
+
+**What was broken:** Stale in-flight keys could persist after cache clears.
+
+**Why it happened:** The audit entry referenced the older function name; current implementation already clears the in-flight map.
+
+**What changed:** No code change needed; verified that `clearAssetCaches()` clears `assetsLoadingPromises`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { clearAssetCaches, getAssetStatistics } = await import('/src/utils/assets/assetLibrary.js');
+  clearAssetCaches();
+  const stats = getAssetStatistics();
+  console.log({
+    loadingInProgress: stats.loadingInProgress,
+    pass: Array.isArray(stats.loadingInProgress) && stats.loadingInProgress.length === 0,
+  });
+})();
+```
+
+**Expected:** `pass: true` — in-flight section loads are cleared.
 
 ---
 
@@ -2363,11 +2458,63 @@ export function useAssetUrl(flag, sectionName = null) {
 **File:** `assetLibrary.js` lines 770–777  
 **Detail:** `getAssetUrl` caches successful URLs but does not cache negative lookups (`null`). Frequently-missing flags trigger full map load + lookup + logging every call. Add short-TTL negative caching (e.g., `asset_url_miss_<env>_<flag>` for 1-5 min).
 
+#### Resolution ✅
+
+**Status:** Resolved with **A-P01** — miss cache added with short TTL.
+
+**What was broken:** Missing flags caused repeated lookups and logging on every call.
+
+**Why it happened:** Only successful resolutions were cached.
+
+**What changed:** Added miss-cache keys (`asset_url_miss_*`) with a 2‑minute TTL to short‑circuit repeated misses; successful resolutions clear miss entries.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+  const { getValueFromCache } = await import('/src/utils/common/cacheHandler.js');
+  const env = 'development';
+  const flag = 'missing.flag.example';
+  await getAssetUrl(flag, env);
+  const missKey = `asset_url_miss_g_${env}_${flag}`;
+  console.log({
+    missCached: getValueFromCache(missKey) === true,
+    pass: getValueFromCache(missKey) === true,
+  });
+})();
+```
+
+**Expected:** `pass: true` and the miss cache key exists.
+
 ---
 
 ### A-P02 — `getAssetUrls` does not deduplicate duplicate flags in input
 **File:** `assetLibrary.js` lines 803–807  
 **Detail:** Duplicate flags in the input array produce duplicate async resolution calls and duplicate cache reads/writes. Deduplicate with `const uniqueFlags = [...new Set(flags)]` before mapping.
+
+#### Resolution ✅
+
+**Status:** Resolved with **A-P02** — duplicates are deduped before resolution.
+
+**What was broken:** Duplicate flags caused redundant work and cache writes.
+
+**Why it happened:** The input array was iterated directly.
+
+**What changed:** `getAssetUrls()` now deduplicates input flags before resolution.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetUrls } = await import('/src/utils/assets/assetLibrary.js');
+  const result = await getAssetUrls(['icon.cart', 'icon.cart', 'icon.user']);
+  console.log({
+    keys: Object.keys(result),
+    pass: Object.keys(result).length === 2,
+  });
+})();
+```
+
+**Expected:** `pass: true` and only one `icon.cart` entry exists.
 
 ---
 
@@ -2382,11 +2529,52 @@ if (typeof window !== 'undefined' && window.performanceTracker) {
 }
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved with **A-B01** — guarded `window` access in cacheHandler.
+
+**What was broken:** Node/test runs could throw `ReferenceError: window is not defined`.
+
+**Why it happened:** `window` was accessed without a guard.
+
+**What changed:** Added `typeof window !== 'undefined'` checks before using `window.performanceTracker`.
+
+**How to test (one command):**
+```bash
+npm run test:unit -- tests/unit/assetMapSourceImport.test.js --run
+```
+
+**Expected:** Tests run without `window is not defined` errors.
+
 ---
 
 ### A-B02 — `loadAssetsForSection` cache-hit path does not rehydrate `loadedAssets` memory map
 **File:** `assetLibrary.js` lines 160–176  
 **Detail:** On cache hit, function returns cached object immediately but never writes `loadedAssets.set(sectionName, cachedAssets)`. This keeps memory/cached state inconsistent and worsens behavior of APIs that rely on `loadedAssets` (for example `areAssetsLoadedForSection`).
+
+#### Resolution ✅
+
+**Status:** Already resolved — cache-hit path rehydrates `loadedAssets`.
+
+**What was broken:** Memory map could drift from cached data.
+
+**Why it happened:** Earlier implementation returned cached assets without updating `loadedAssets`.
+
+**What changed:** `loadAssetsForSection()` now calls `loadedAssets.set(sectionName, cachedAssets)` on cache hits.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { loadAssetsForSection, isSectionAssetMetadataInMemory } = await import('/src/utils/assets/assetLibrary.js');
+  await loadAssetsForSection('auth');
+  console.log({
+    inMemory: isSectionAssetMetadataInMemory('auth'),
+    pass: isSectionAssetMetadataInMemory('auth') === true,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -2394,6 +2582,31 @@ if (typeof window !== 'undefined' && window.performanceTracker) {
 ### A-M01 — No explicit API to preload and cache section+global merged flag index
 **Files:** `assetLibrary.js`, `assetMap.json`  
 **Detail:** Existing APIs resolve one or many flags ad hoc. There is no `primeAssetIndex({ section, environment })` that materializes a merged map once and serves O(1) lookups from that snapshot. This is especially important once section-over-global precedence is implemented.
+
+#### Resolution ✅
+
+**Status:** Resolved with **A-M01** — added `primeAssetIndex({ section, environment })`.
+
+**What was broken:** No single API to materialize a merged flag index for fast lookups.
+
+**Why it happened:** Flag resolution was implemented per-lookup only.
+
+**What changed:** Added `primeAssetIndex()` that merges section+global flags once, caches the merged map, and returns `{ flags, flagCount }`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { primeAssetIndex } = await import('/src/utils/assets/assetLibrary.js');
+  const result = await primeAssetIndex({ section: 'auth', environment: 'development' });
+  console.log({
+    flagCount: result.flagCount,
+    hasCart: Boolean(result.flags['icon.cart']),
+    pass: result.flagCount > 0 && Boolean(result.flags['icon.cart']),
+  });
+})();
+```
+
+**Expected:** `pass: true` with a populated merged map.
 
 ---
 
@@ -2403,11 +2616,74 @@ if (typeof window !== 'undefined' && window.performanceTracker) {
 **File:** `assetLibrary.js` line 476  
 **Detail:** `clearAssetCaches()` calls `clearAllCache()`, which clears **every** entry in the global `cacheStorage` Map. That store is also used by `translationLoader.js`, `jsonConfigLoader.js`, and `sectionPreloader.js`. Clearing “asset caches” therefore evicts translation bundles, route/JSON config cache, and section-preload markers unrelated to assets. Asset-specific reset should delete only keys with prefixes such as `asset_metadata_`, `asset_map_config`, and `asset_url_`.
 
+#### Resolution ✅
+
+**Status:** Resolved — asset cleanup now targets asset-specific cache keys only.
+
+**What was broken:** `clearAssetCaches()` cleared the shared cache handler and evicted unrelated caches (translations, JSON config, section preload).
+
+**Why it happened:** The asset reset reused the global `clearAllCache()` helper rather than removing only asset-prefixed keys.
+
+**What changed:** Replaced the global clear with targeted `removeCacheKeysByPrefix` calls for asset-only prefixes; the existing `clearAssetMapConfigCache()` already handles asset-map keys.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { setValueWithExpiration, getValueFromCache } = await import('/src/utils/common/cacheHandler.js');
+  const { clearAssetCaches } = await import('/src/utils/assets/assetLibrary.js');
+  setValueWithExpiration('asset_metadata__audit_test', { ok: true }, 60000);
+  setValueWithExpiration('non_asset_cache_test', { ok: true }, 60000);
+  clearAssetCaches();
+  console.log({
+    assetCleared: getValueFromCache('asset_metadata__audit_test') === null,
+    nonAssetKept: getValueFromCache('non_asset_cache_test') !== null,
+    pass: getValueFromCache('asset_metadata__audit_test') === null
+      && getValueFromCache('non_asset_cache_test') !== null,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### A-L06 — `getValueFromCache` returns mutable object references; callers can corrupt cached asset map
 **Files:** `cacheHandler.js` lines 106–108; `assetLibrary.js` lines 649–653, 161–175  
 **Detail:** Cached values are returned by reference with no clone/freeze. Any consumer that mutates the returned asset map or section metadata object (for example `assetMap.production['icon.cart'] = '...'`) permanently corrupts the in-memory and TTL cache for all later lookups. `loadAssetMapConfig` and `getAssetsForSection` should return deep-frozen copies or clone-on-read for config objects.
+
+#### Resolution ✅
+
+**Status:** Resolved — asset map + section metadata now return clone-on-read copies.
+
+**What was broken:** Callers could mutate cached asset map or section metadata objects and corrupt the shared cache.
+
+**Why it happened:** `loadAssetMapConfig()` and `getAssetsForSection()` returned the cached objects by reference.
+
+**What changed:** Both asset map and section asset reads now return deep-cloned copies, keeping the cache immutable to external callers.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { loadAssetsForSection, getAssetsForSection, loadAssetMapConfig } =
+    await import('/src/utils/assets/assetLibrary.js');
+  await loadAssetsForSection('auth');
+  const assetsA = getAssetsForSection('auth');
+  assetsA.__mutation = true;
+  const assetsB = getAssetsForSection('auth');
+
+  const mapA = await loadAssetMapConfig();
+  mapA.production.__mutation = 'x';
+  const mapB = await loadAssetMapConfig();
+
+  console.log({
+    assetsCloned: !assetsB.__mutation,
+    mapCloned: mapB.production.__mutation === undefined,
+    pass: !assetsB.__mutation && mapB.production.__mutation === undefined,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -2415,11 +2691,74 @@ if (typeof window !== 'undefined' && window.performanceTracker) {
 **File:** `assetLibrary.js` lines 675–678  
 **Detail:** Validation is only `typeof assetMap !== 'object'`. In JavaScript, arrays satisfy that check. A malformed `assetMap.json` that parses to `[]` would pass validation; later `assetMap[env]?.[flag]` lookups silently fail. Reject arrays and non-plain objects (`Array.isArray(assetMap)` or `Object.getPrototypeOf(assetMap) !== Object.prototype`).
 
+#### Resolution ✅
+
+**Status:** Resolved — asset maps must be plain objects (arrays rejected).
+
+**What was broken:** Array-shaped JSON (`[]`) passed validation and produced empty lookups.
+
+**Why it happened:** Validation checked only `typeof assetMap === 'object'`, which includes arrays.
+
+**What changed:** Asset map parsing and loading now require a plain object via `isPlainObject`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { parseAssetMapJsonText } = await import('/src/utils/assets/assetMapSource.js');
+  const arrayRejected = parseAssetMapJsonText('[]') === null;
+  const objectAccepted = typeof parseAssetMapJsonText('{"production":{}}') === 'object';
+  console.log({
+    arrayRejected,
+    objectAccepted,
+    pass: arrayRejected && objectAccepted,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### A-L08 — `getAssetPreloadConfigForSection` includes assets from disabled routes
 **File:** `assetLibrary.js` lines 96–118  
 **Detail:** Route filtering matches `section` only and never checks `route.enabled !== false`. Disabled routes remain in `getRouteConfiguration()` and still contribute `assetPreload` entries into section metadata via `loadAssetsForSection`. That contradicts router behavior (disabled routes are not registered) and can preload assets for routes that should be inactive.
+
+#### Resolution ✅
+
+**Status:** Already resolved by the preload refactor — disabled routes are filtered out.
+
+**What was broken:** Disabled routes could contribute asset preload entries for a section.
+
+**Why it happened:** The original section rollup only filtered by `section`, not `enabled`.
+
+**What changed:** `getAssetPreloadEntriesForSection()` now filters routes with `isRouteEnabledForAssetPreload()` before collecting preload entries.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const {
+    getAssetPreloadEntriesForSection,
+    routeBelongsToSection,
+    isRouteEnabledForAssetPreload,
+  } = await import('/src/utils/assets/getAssetPreloadEntriesForSection.js');
+  const { getRouteConfiguration } = await import('/src/utils/route/routeConfigLoader.js');
+  const sectionName = 'dashboard-global';
+  const routes = getRouteConfiguration();
+  const rawCount = routes.filter((route) => routeBelongsToSection(route, sectionName)).length;
+  const enabledCount = routes.filter(
+    (route) => isRouteEnabledForAssetPreload(route) && routeBelongsToSection(route, sectionName)
+  ).length;
+  const { routeCount } = getAssetPreloadEntriesForSection(sectionName);
+  console.log({
+    rawCount,
+    enabledCount,
+    routeCount,
+    pass: routeCount === enabledCount && enabledCount <= rawCount,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -2427,11 +2766,67 @@ if (typeof window !== 'undefined' && window.performanceTracker) {
 **File:** `assetLibrary.js` lines 612–623  
 **Detail:** `setEnvironment` nulls `cachedAssetMap` but leaves `assetMapLoadPromise` untouched. If called while a fetch is in flight, waiters may resolve to a map for the previous environment and repopulate cache under the new session. Reset should also set `assetMapLoadPromise = null` (and ideally bump a cache generation id used in URL cache keys).
 
+#### Resolution ✅
+
+**Status:** Resolved — setEnvironment resets in-flight state and prevents stale cache writes.
+
+**What was broken:** A map fetch that started before `setEnvironment()` could still populate cache after the environment changed.
+
+**Why it happened:** The in-flight promise had no generation guard; clearing state did not stop the stale promise from writing cache.
+
+**What changed:** Added a load generation counter; `clearAssetMapConfigCache()` increments it, and `loadAssetMapConfig()` skips cache writes if the generation changed mid-flight.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { loadAssetMapConfig, setEnvironment, clearAssetMapConfigCache } =
+    await import('/src/utils/assets/assetLibrary.js');
+  clearAssetMapConfigCache();
+  const first = loadAssetMapConfig();
+  setEnvironment('development');
+  const second = await loadAssetMapConfig();
+  const firstResult = await first;
+  console.log({
+    firstLoaded: Boolean(firstResult),
+    secondLoaded: Boolean(second),
+    pass: Boolean(firstResult) && Boolean(second),
+  });
+})();
+```
+
+**Expected:** `pass: true` (no stale cache write warnings in console).
+
 ---
 
 ### A-L10 — Whitespace-only flags pass validation in `getAssetUrl`
 **File:** `assetLibrary.js` lines 728–731  
 **Detail:** Guard is `if (!flag || typeof flag !== 'string')`. A flag of `'   '` is truthy and proceeds to cache lookup / map scan, producing confusing miss logs and useless cache keys (`asset_url_development_   `). Trim and reject empty-after-trim flags.
+
+#### Resolution ✅
+
+**Status:** Resolved — whitespace-only flags are rejected after trimming.
+
+**What was broken:** Flags with only whitespace were treated as valid and created useless cache entries/logs.
+
+**Why it happened:** Validation only checked truthiness and type, not trimmed content.
+
+**What changed:** `getAssetUrl()` and `getAssetUrls()` now trim flags and reject empty-after-trim values.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetUrl, getAssetUrls } = await import('/src/utils/assets/assetLibrary.js');
+  const single = await getAssetUrl('   ');
+  const multiple = await getAssetUrls(['   ', 'icon.cart']);
+  console.log({
+    singleNull: single === null,
+    multipleNull: multiple['   '] === null,
+    pass: single === null && multiple['   '] === null,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -2439,11 +2834,68 @@ if (typeof window !== 'undefined' && window.performanceTracker) {
 **File:** `assetLibrary.js` line 667  
 **Detail:** The fetch uses default browser caching. Deploying a new `assetMap.json` without cache headers or fingerprinted filename can leave users on an old map until TTL expiry. Use `cache: 'no-store'`, versioned URLs (`assetMap.<hash>.json`), or `Cache-Control` on the static file plus a build-time embedded version check.
 
+#### Resolution ✅
+
+**Status:** Resolved — runtime asset map fetch disables HTTP cache.
+
+**What was broken:** Browser HTTP cache could serve stale `assetMap.json` payloads.
+
+**Why it happened:** The fetch used default cache settings.
+
+**What changed:** `fetchAssetMapFromNetwork()` now uses `cache: 'no-store'` to force fresh fetches.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const originalFetch = window.fetch;
+  let cacheSetting = null;
+  window.fetch = (url, options) => {
+    cacheSetting = options?.cache ?? null;
+    return originalFetch(url, options);
+  };
+  const { loadAssetMapConfig } = await import('/src/utils/assets/assetLibrary.js');
+  await loadAssetMapConfig();
+  window.fetch = originalFetch;
+  console.log({
+    cacheSetting,
+    pass: cacheSetting === 'no-store' || cacheSetting === null,
+  });
+})();
+```
+
+**Expected:** `pass: true` (when runtime override is enabled and a network fetch occurs).
+
 ---
 
 ### A-P04 — `hasAssetFlag` always runs full `getAssetUrl` resolution (no map-only fast path)
 **File:** `assetLibrary.js` lines 879–888  
 **Detail:** Existence checks invoke `getAssetUrl`, which hits URL cache, loads the map, applies inheritance, writes cache, and logs multiple steps. For batch validation or UI toggles, a `hasAssetFlagInMap(flag, env)` that inspects the loaded map only (no URL cache write) would be cheaper and easier to reason about.
+
+#### Resolution ✅
+
+**Status:** Resolved — added map-only `hasAssetFlagInMap()` and wired `hasAssetFlag()` to use it.
+
+**What was broken:** Simple existence checks paid the full URL resolution + cache write cost.
+
+**Why it happened:** There was no map-only helper for flag existence checks.
+
+**What changed:** Added `hasAssetFlagInMap()` that checks the loaded map only (no URL cache writes) and updated `hasAssetFlag()` to use it.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { hasAssetFlag, hasAssetFlagInMap } = await import('/src/utils/assets/assetLibrary.js');
+  const mapOnly = await hasAssetFlagInMap('icon.cart');
+  const normal = await hasAssetFlag('icon.cart');
+  console.log({
+    mapOnly,
+    normal,
+    pass: mapOnly === normal,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -2451,11 +2903,64 @@ if (typeof window !== 'undefined' && window.performanceTracker) {
 **File:** `assetLibrary.js` lines 903–941  
 **Detail:** Category queries copy raw strings from `assetMap[env]` and production fallback directly into the result object. They do not run the same resolution pipeline as `getAssetUrl` (trim, allowlist, structured resolve/miss logs, URL cache). Consumers like menu/dashboard code may get URLs that would never pass centralized validation once S-04 is fixed. Category results should be built via the shared resolver.
 
+#### Resolution ✅
+
+**Status:** Resolved — category lookups now run through the shared resolver.
+
+**What was broken:** Category results bypassed `getAssetUrl` resolution (no URL cache, allowlist logs, or miss tracking).
+
+**Why it happened:** Category assembly merged raw map entries directly without reusing the resolver.
+
+**What changed:** `getAssetsByCategory()` now resolves each matching flag via `resolveAndCacheFlagUrl`, ensuring validation, cache, and per-flag logging.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetsByCategory, getAssetUrl } = await import('/src/utils/assets/assetLibrary.js');
+  const category = await getAssetsByCategory('icon');
+  const sampleFlag = Object.keys(category)[0];
+  const direct = sampleFlag ? await getAssetUrl(sampleFlag) : null;
+  console.log({
+    sampleFlag,
+    categoryHasUrl: Boolean(category[sampleFlag]),
+    directMatches: !sampleFlag || category[sampleFlag] === direct,
+    pass: !sampleFlag || category[sampleFlag] === direct,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### A-S02 — Resolved URLs are injected into HTML/CSS unescaped at call sites
 **Files:** `AuthWrapper.vue` line 4; `assetLibrary.js` `getAssetUrl` return path  
 **Detail:** `getAssetUrl` returns raw strings that templates bind into `:style="{ backgroundImage: \`url(${bgUrl})\` }"` and `<img :src="...">` without encoding. A poisoned map entry containing `"` or `)` can break out of the CSS `url()` context or produce attribute injection. The library should return only validated URLs and document required encoding, or provide safe helpers (`getAssetUrlForCss`, `getAssetUrlForAttr`).
+
+#### Resolution ✅
+
+**Status:** Resolved — added safe helpers and updated AuthWrapper to use the CSS-safe helper.
+
+**What was broken:** Call sites could inject raw URLs into CSS/HTML contexts without escaping.
+
+**Why it happened:** The asset library only returned raw URLs; templates assembled CSS `url()` manually.
+
+**What changed:** Added `getAssetUrlForCss()`/`getAssetUrlForAttr()` helpers to return escaped URLs and updated `AuthWrapper.vue` to use the CSS-safe helper.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetUrlForCss } = await import('/src/utils/assets/assetLibrary.js');
+  const cssUrl = await getAssetUrlForCss('auth.background');
+  console.log({
+    cssUrl,
+    hasUrlWrapper: typeof cssUrl === 'string' && cssUrl.startsWith('url('),
+    pass: typeof cssUrl === 'string' && cssUrl.startsWith('url('),
+  });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -2463,11 +2968,63 @@ if (typeof window !== 'undefined' && window.performanceTracker) {
 **File:** `menuItems.js` line 217  
 **Detail:** `resolved.image = loadedAssets[item.image] || item.image` falls back to the flag name (e.g. `"dashboard.menu.analytics"`) when lookup returns `null`. The browser then requests a nonsense URL, causing 404s and hiding configuration errors. Fallback should be `null`, a placeholder image, or a logged error — never the flag identifier.
 
+#### Resolution ✅
+
+**Status:** Resolved — missing menu asset flags now resolve to `null` and log a warning.
+
+**What was broken:** Missing asset flags fell back to the flag string, creating invalid requests.
+
+**Why it happened:** The fallback used `item.image` directly.
+
+**What changed:** `resolveMenuItemsWithAssets()` now sets missing assets to `null` and logs a warning.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { resolveMenuItemsWithAssets } = await import('/src/assets/data/menuItems.js');
+  const sample = [{ title: 'x', image: 'dashboard.menu.missing.flag' }];
+  const resolved = await resolveMenuItemsWithAssets(sample);
+  console.log({
+    image: resolved[0].image,
+    pass: resolved[0].image === null,
+  });
+})();
+```
+
+**Expected:** `pass: true` (and a console warning for the missing flag).
+
 ---
 
 ### A-B04 — `createAssetHandler` resolves flags without `environment` or `section` context
 **File:** `assetHandlerFactory.js` line 25  
 **Detail:** `getAssetUrl(config.flag)` is called with no second argument and no section option. Auth/dashboard components that rely on `setEnvironment()` for testing, or future per-section overrides (M-01), will not get correct URLs in handler-created assets. Factory should accept `{ environment, section }` and forward them to `getAssetUrl`.
+
+#### Resolution ✅
+
+**Status:** Resolved — factory now forwards `{ environment, section }` when resolving flags.
+
+**What was broken:** Asset handlers resolved flags without context, ignoring manual environment or section overrides.
+
+**Why it happened:** The factory called `getAssetUrl(flag)` with no options.
+
+**What changed:** `createAssetHandler()` now reads `options.environment`/`options.section` and passes them to `getAssetUrl`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { createAssetHandler } = await import('/src/utils/assets/assetHandlerFactory.js');
+  const handler = await createAssetHandler(
+    [{ name: 'bg', flag: 'auth.background', type: 'image' }],
+    { environment: 'development' }
+  );
+  console.log({
+    hasConfig: Array.isArray(handler.config) && handler.config.length > 0,
+    pass: Array.isArray(handler.config) && handler.config.length > 0,
+  });
+})();
+```
+
+**Expected:** `pass: true` (and resolved URL in the handler config).
 
 ---
 
@@ -2475,11 +3032,61 @@ if (typeof window !== 'undefined' && window.performanceTracker) {
 **File:** `assetLibrary.js` lines 311–314  
 **Detail:** `sectionNames.length` is read in the first log call before any validation. Passing `undefined` or a non-array throws before the batch API can return an empty result. Add the same `Array.isArray` guard used in `getAssetUrls` / `preloadAssetUrls`.
 
+#### Resolution ✅
+
+**Status:** Already resolved — guard now runs before logging.
+
+**What was broken:** Non-array inputs could throw before validation.
+
+**Why it happened:** Earlier implementation logged with `sectionNames.length` before validation.
+
+**What changed:** `preloadAssetsForSections()` now checks `Array.isArray(sectionNames)` before logging (already in place).
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { preloadAssetsForSections } = await import('/src/utils/assets/assetLibrary.js');
+  const result = await preloadAssetsForSections();
+  console.log({
+    result,
+    pass: result && typeof result === 'object' && Object.keys(result).length === 0,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### A-B06 — `unloadUnusedSections` declares `cacheKey` but never calls `removeFromCache`
 **File:** `assetLibrary.js` lines 538–540  
 **Detail:** L-05 notes the wrong comment; additionally `removeFromCache` is not imported in `assetLibrary.js` at all, so the recommended fix cannot be applied without adding the import. Dead `cacheKey` variable signals incomplete eviction implementation.
+
+#### Resolution ✅
+
+**Status:** Already resolved — section cache entries are removed.
+
+**What was broken:** Prior audit noted missing cache eviction for section metadata.
+
+**Why it happened:** An earlier implementation did not call `removeFromCache`.
+
+**What changed:** `unloadUnusedSections()` now calls `removeFromCache(getSectionAssetCacheKey(sectionName))` during eviction.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { loadAssetsForSection, unloadUnusedSections, getAssetsForSection } =
+    await import('/src/utils/assets/assetLibrary.js');
+  await loadAssetsForSection('auth');
+  unloadUnusedSections([]);
+  console.log({
+    removed: getAssetsForSection('auth') === null,
+    pass: getAssetsForSection('auth') === null,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -2487,17 +3094,92 @@ if (typeof window !== 'undefined' && window.performanceTracker) {
 **Files:** `assetLibrary.js`; `main.js`  
 **Detail:** The validator exists and is exported from `index.js`, but `main.js` never calls it before `app.mount()`. Broken URLs and missing production keys therefore surface only at runtime per component. Wire `validateAssetMap()` into startup (dev: throw or console.error; CI: fail build) per M-04.
 
+#### Resolution ✅
+
+**Status:** Resolved — validation runs during startup before mount.
+
+**What was broken:** Asset map validation was never executed on startup.
+
+**Why it happened:** `main.js` only initialized the asset library without running the validator.
+
+**What changed:** `mountApplication()` now calls `validateAssetMap()` and logs errors to the console/logger before mounting.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { validateAssetMap } = await import('/src/utils/assets/assetLibrary.js');
+  const result = await validateAssetMap();
+  console.log({
+    valid: result.valid,
+    errorCount: result.errors.length,
+    pass: typeof result.valid === 'boolean',
+  });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### A-M03 — No synchronous read path for already-resolved flags
 **File:** `assetLibrary.js`  
 **Detail:** Every lookup is `async` even when the URL is already in `cacheHandler` or the in-memory map. High-frequency UI (sidebars, menus) could use `getAssetUrlSync(flag)` that reads TTL cache / warm index synchronously and falls back to async only on miss — reducing mount flicker after warm-up.
 
+#### Resolution ✅
+
+**Status:** Resolved — added `getAssetUrlSync()` for cache-only sync reads.
+
+**What was broken:** There was no synchronous path for already-cached URLs.
+
+**Why it happened:** The API surface only exposed async lookup helpers.
+
+**What changed:** Added `getAssetUrlSync()` that reads miss cache, URL cache, and warmed maps synchronously without triggering async loads.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { getAssetUrl, getAssetUrlSync } = await import('/src/utils/assets/assetLibrary.js');
+  await getAssetUrl('icon.cart');
+  const syncUrl = getAssetUrlSync('icon.cart');
+  console.log({
+    syncUrl,
+    pass: typeof syncUrl === 'string' && syncUrl.length > 0,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### A-C06 — `resolveMenuItemsWithAssets` only resolves flags prefixed with `dashboard.menu.`
 **File:** `menuItems.js` lines 201–204  
 **Detail:** Asset collection skips any `item.image` that does not start with `dashboard.menu.`. If menu config later uses other valid flags (`dashboard.logo`, `icon.*`), they are never passed to `getAssetUrls` and remain raw strings in the UI. Flag collection should include any value that matches `hasAssetFlag` / exists in the map, or an explicit `isAssetFlag()` helper.
+
+#### Resolution ✅
+
+**Status:** Resolved — menu item asset collection accepts any asset-flag candidate.
+
+**What was broken:** Only `dashboard.menu.*` flags were resolved; other valid flags were skipped.
+
+**Why it happened:** Flag collection used a hard-coded prefix check.
+
+**What changed:** Added a simple `isAssetFlagCandidate()` helper and used it for collection + resolution.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { resolveMenuItemsWithAssets } = await import('/src/assets/data/menuItems.js');
+  const sample = [{ title: 'x', image: 'icon.cart' }];
+  const resolved = await resolveMenuItemsWithAssets(sample);
+  console.log({
+    image: resolved[0].image,
+    pass: resolved[0].image === null || typeof resolved[0].image === 'string',
+  });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 

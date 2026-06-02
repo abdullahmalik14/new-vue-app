@@ -1,7 +1,7 @@
 <template>
   <div
     class="bg-container w-full flex justify-between items-center h-[100vh] bg-cover bg-no-repeat bg-lightgray xl:bg-center lg:bg-center md:bg-left sm:bg-[position:-100px] max-[479px]:bg-[position:-290px]"
-    :style="{ backgroundImage: bgUrl ? `url(${bgUrl})` : undefined }">
+    :style="{ backgroundImage: bgUrl || undefined }">
     <!-- Left column (background image area) -->
     <div></div>
 
@@ -29,13 +29,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getAssetUrl } from '@/utils/assets/assetLibrary'
+import { getAssetUrlForCss } from '@/utils/assets/assetLibrary'
 import AuthHeader from './AuthHeader.vue'
 import AuthFooter from './AuthFooter.vue'
 
 const bgUrl = ref('')
 
 onMounted(async () => {
-  bgUrl.value = await getAssetUrl('auth.background')
+  bgUrl.value = await getAssetUrlForCss('auth.background')
 })
 </script>

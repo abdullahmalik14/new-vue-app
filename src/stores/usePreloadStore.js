@@ -2,13 +2,13 @@ import { defineStore } from 'pinia';
 import { log } from '../utils/common/logHandler.js';
 import { getAppBuildHash, syncPreloadStoreBuildHash } from '../utils/build/appBuildHash.js';
 
-function normalizePreloadedAssets(assets) {
-  if (assets instanceof Set) {
-    return assets;
+function normalizeStringSet(values) {
+  if (values instanceof Set) {
+    return values;
   }
 
-  if (Array.isArray(assets)) {
-    return new Set(assets);
+  if (Array.isArray(values)) {
+    return new Set(values);
   }
 
   return new Set();
@@ -17,23 +17,25 @@ function normalizePreloadedAssets(assets) {
 function serializePreloadPersistedState(state) {
   return JSON.stringify({
     ...state,
-    preloadedAssets: [...normalizePreloadedAssets(state.preloadedAssets)],
+    preloadedSections: [...normalizeStringSet(state.preloadedSections)],
+    preloadedAssets: [...normalizeStringSet(state.preloadedAssets)],
   });
 }
 
 function deserializePreloadPersistedState(raw) {
   const parsed = JSON.parse(raw);
-  parsed.preloadedAssets = normalizePreloadedAssets(parsed.preloadedAssets);
+  parsed.preloadedSections = normalizeStringSet(parsed.preloadedSections);
+  parsed.preloadedAssets = normalizeStringSet(parsed.preloadedAssets);
   return parsed;
 }
 
 export const usePreloadStore = defineStore('preload', {
   state: () => ({
-    preloadedSections: [], // Array of strings
+    preloadedSections: new Set(), // Resolved section bundles (O(1) membership)
     preloadedAssets: new Set(), // Resolved asset URLs (O(1) membership)
-    buildHash: null,       // Cleared on new deploy to invalidate stale preload state
+    buildHash: null, // Persisted build hash for invalidation
     manifestLoadFailed: false, // Set when production section manifest cannot be loaded
-    sectionsInProgress: [] // Reactive in-flight section preloads (not persisted)
+    sectionsInProgress: new Set() // In-flight section preloads (not persisted)
   }),
 
   getters: {
@@ -48,8 +50,8 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} sectionName 
      */
     addSection(sectionName) {
-      if (!this.preloadedSections.includes(sectionName)) {
-        this.preloadedSections.push(sectionName);
+      if (!this.preloadedSections.has(sectionName)) {
+        this.preloadedSections.add(sectionName);
         log('usePreloadStore.js', 'addSection', 'add', 'Section marked as preloaded', { sectionName });
       }
     },
@@ -60,7 +62,7 @@ export const usePreloadStore = defineStore('preload', {
      * @returns {boolean}
      */
     hasSection(sectionName) {
-      return this.preloadedSections.includes(sectionName);
+      return this.preloadedSections.has(sectionName);
     },
 
     /**
@@ -68,10 +70,7 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} sectionName
      */
     removeSection(sectionName) {
-      const index = this.preloadedSections.indexOf(sectionName);
-
-      if (index !== -1) {
-        this.preloadedSections.splice(index, 1);
+      if (this.preloadedSections.delete(sectionName)) {
         log('usePreloadStore.js', 'removeSection', 'remove', 'Section removed from preload cache', { sectionName });
       }
     },
@@ -117,8 +116,8 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} sectionName
      */
     markSectionInProgress(sectionName) {
-      if (!this.sectionsInProgress.includes(sectionName)) {
-        this.sectionsInProgress.push(sectionName);
+      if (!this.sectionsInProgress.has(sectionName)) {
+        this.sectionsInProgress.add(sectionName);
         log('usePreloadStore.js', 'markSectionInProgress', 'start', 'Section preload in progress', { sectionName });
       }
     },
@@ -128,9 +127,7 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} sectionName
      */
     unmarkSectionInProgress(sectionName) {
-      const index = this.sectionsInProgress.indexOf(sectionName);
-      if (index !== -1) {
-        this.sectionsInProgress.splice(index, 1);
+      if (this.sectionsInProgress.delete(sectionName)) {
         log('usePreloadStore.js', 'unmarkSectionInProgress', 'complete', 'Section preload no longer in progress', { sectionName });
       }
     },
@@ -141,7 +138,7 @@ export const usePreloadStore = defineStore('preload', {
      * @returns {boolean}
      */
     isSectionInProgress(sectionName) {
-      return this.sectionsInProgress.includes(sectionName);
+      return this.sectionsInProgress.has(sectionName);
     },
 
     /**
@@ -157,27 +154,31 @@ export const usePreloadStore = defineStore('preload', {
 
     /**
      * Clear all preload state
+     * @param {{ resetBuildHash?: boolean }} [options]
      */
-    clearState() {
-      this.preloadedSections = [];
+    clearState({ resetBuildHash = false } = {}) {
+      this.preloadedSections = new Set();
       this.preloadedAssets = new Set();
-      this.buildHash = null;
+      if (resetBuildHash) {
+        this.buildHash = null;
+      }
       this.manifestLoadFailed = false;
-      this.sectionsInProgress = [];
+      this.sectionsInProgress = new Set();
       log('usePreloadStore.js', 'clearState', 'clear', 'Preload state cleared', {});
     }
   },
 
   persist: {
     key: 'app-preload-state',
-    storage: localStorage,
+    storage: typeof localStorage === 'undefined' ? undefined : localStorage,
     paths: ['preloadedSections', 'preloadedAssets', 'buildHash'],
     serializer: {
       serialize: serializePreloadPersistedState,
       deserialize: deserializePreloadPersistedState,
     },
     afterHydrate({ store }) {
-      store.preloadedAssets = normalizePreloadedAssets(store.preloadedAssets);
+      store.preloadedSections = normalizeStringSet(store.preloadedSections);
+      store.preloadedAssets = normalizeStringSet(store.preloadedAssets);
 
       const sync = syncPreloadStoreBuildHash(store);
       if (sync.invalidated) {

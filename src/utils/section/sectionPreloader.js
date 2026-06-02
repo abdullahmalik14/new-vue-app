@@ -430,7 +430,7 @@ export function clearPreloadState() {
   log('sectionPreloader.js', 'clearPreloadState', 'start', 'Clearing preload state', {});
 
   const preloadStore = usePreloadStore();
-  const preloadedCount = preloadStore.preloadedSections.length;
+  const preloadedCount = preloadStore.preloadedSections.size;
 
   clearAllSectionCss();
   clearSectionJsPreloadLinks();
@@ -450,9 +450,9 @@ export function clearPreloadState() {
 export function getPreloadStatistics() {
   const preloadStore = usePreloadStore();
   const stats = {
-    preloadedCount: preloadStore.preloadedSections.length,
+    preloadedCount: preloadStore.preloadedSections.size,
     preloadedSections: [...preloadStore.preloadedSections],
-    inProgressCount: preloadStore.sectionsInProgress.length,
+    inProgressCount: preloadStore.sectionsInProgress.size,
     inProgressSections: [...preloadStore.sectionsInProgress]
   };
 

@@ -15,6 +15,8 @@ export async function createAssetHandler(assetsConfig, options = {}) {
     component: options.name
   });
 
+  const { environment, section } = options;
+
   const resolvedConfig = await Promise.all(assetsConfig.map(async (asset) => {
     // Clone to avoid mutating original
     const config = { ...asset };
@@ -22,7 +24,7 @@ export async function createAssetHandler(assetsConfig, options = {}) {
     // If flag is provided, resolve URL from assetMap
     if (config.flag && !config.url) {
       try {
-        const url = await getAssetUrl(config.flag);
+        const url = await getAssetUrl(config.flag, { environment, section });
         if (url) {
           config.url = url;
           log('assetHandlerFactory.js', 'createAssetHandler', 'resolved', 'Resolved asset URL from flag', {

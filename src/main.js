@@ -70,7 +70,7 @@ import { useCartStore } from "./stores/useCartStore";
 import { useChatStore } from "./stores/useChatStore";
 import { usePreloadStore } from "./stores/usePreloadStore.js";
 import { syncPreloadStoreBuildHash } from "./utils/build/appBuildHash.js";
-import { initAssetLibrary } from "./utils/assets/assetLibrary.js";
+import { initAssetLibrary, validateAssetMap } from "./utils/assets/assetLibrary.js";
 
 // Initialize the mock cart backend interceptor
 initMockCartApi();
@@ -624,6 +624,21 @@ async function mountApplication() {
     }
   } catch (err) {
     log("main.js", "init", "asset-library-error", "Asset library init failed (non-blocking)", {
+      error: err.message,
+    });
+  }
+
+  try {
+    const validation = await validateAssetMap();
+    if (!validation.valid) {
+      console.error("[assetLibrary] Asset map validation errors:", validation.errors);
+      log("main.js", "init", "asset-map-invalid", "Asset map validation failed", {
+        errors: validation.errors,
+        warnings: validation.warnings,
+      });
+    }
+  } catch (err) {
+    log("main.js", "init", "asset-map-validate-error", "Asset map validation failed to run", {
       error: err.message,
     });
   }

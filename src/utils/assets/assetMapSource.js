@@ -1,6 +1,7 @@
 // vueApp-main-new/src/utils/assets/assetMapSource.js
 
 import bundledAssetMap from '../../config/assetMap.json';
+import { isPlainObject } from '../common/objectSafety.js';
 
 /**
  * Injected at build time via vite `define` from src/config/assetMap.json file bytes.
@@ -68,7 +69,7 @@ export function parseAssetMapJsonText(rawText) {
   try {
     const parsed = JSON.parse(rawText);
 
-    if (!parsed || typeof parsed !== 'object') {
+    if (!isPlainObject(parsed)) {
       return null;
     }
 

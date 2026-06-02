@@ -186,6 +186,20 @@ export async function resolveMenuItemsWithAssets(items = menuItems) {
   const { getAssetUrls } = await import("@/utils/assets/assetLibrary.js");
   const { getI18nInstance } = await import("@/utils/translation/i18nInstance.js");
 
+  const isAssetFlagCandidate = (value) => {
+    if (typeof value !== "string") {
+      return false;
+    }
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return false;
+    }
+    if (trimmed.startsWith("data:") || trimmed.includes("://") || trimmed.includes("/")) {
+      return false;
+    }
+    return trimmed.includes(".");
+  };
+
   // Get i18n instance for translation
   const i18nInstance = getI18nInstance();
   const t = i18nInstance?.global?.t || ((key, fallback) => fallback || key);
@@ -193,8 +207,8 @@ export async function resolveMenuItemsWithAssets(items = menuItems) {
   // Collect all unique asset flags from menu items
   const assetFlags = new Set();
   items.forEach(item => {
-    if (item.image && item.image.startsWith('dashboard.menu.')) {
-      assetFlags.add(item.image);
+    if (isAssetFlagCandidate(item.image)) {
+      assetFlags.add(item.image.trim());
     }
   });
 
@@ -207,8 +221,12 @@ export async function resolveMenuItemsWithAssets(items = menuItems) {
     const resolved = { ...item };
 
     // Resolve image URL
-    if (item.image && item.image.startsWith('dashboard.menu.')) {
-      resolved.image = loadedAssets[item.image] || item.image; // Fallback to flag if not found
+    if (isAssetFlagCandidate(item.image)) {
+      const resolvedImage = loadedAssets[item.image.trim()] || null;
+      if (!resolvedImage) {
+        console.warn(`[menuItems] Missing asset for flag: ${item.image}`);
+      }
+      resolved.image = resolvedImage;
     }
 
     // Resolve title translation

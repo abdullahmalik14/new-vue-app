@@ -30,7 +30,7 @@ export function resetAssetLibrary(options = {}) {
     loadedAssets: getAssetStatistics().loadedCount,
     cacheHandlerEntries: getCacheStatistics().totalEntries,
     preloadedUrls: getPreloadedAssetsCount(),
-    preloadedSections: preloadStore.preloadedSections.length,
+    preloadedSections: preloadStore.preloadedSections.size,
   };
 
   log('resetAssetLibrary.js', 'resetAssetLibrary', 'start', 'Resetting all asset library caches', {
@@ -52,7 +52,7 @@ export function resetAssetLibrary(options = {}) {
     loadedAssets: getAssetStatistics().loadedCount,
     cacheHandlerEntries: getCacheStatistics().totalEntries,
     preloadedUrls: getPreloadedAssetsCount(),
-    preloadedSections: preloadStore.preloadedSections.length,
+    preloadedSections: preloadStore.preloadedSections.size,
   };
 
   const summary = {

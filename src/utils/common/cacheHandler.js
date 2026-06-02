@@ -142,7 +142,7 @@ function enforceCacheMaxEntries() {
  * @returns {void}
  */
 export function setValueWithExpiration(key, value, timeToLiveMilliseconds = 0) {
-  if (window.performanceTracker) {
+  if (typeof window !== 'undefined' && window.performanceTracker) {
     window.performanceTracker.step({
       step: 'cacheSet',
       file: 'cacheHandler.js',
@@ -189,7 +189,7 @@ export function setValueWithExpiration(key, value, timeToLiveMilliseconds = 0) {
  * @returns {any|null} - Cached value or null if not found or expired
  */
 export function getValueFromCache(key) {
-  if (window.performanceTracker) {
+  if (typeof window !== 'undefined' && window.performanceTracker) {
     window.performanceTracker.step({
       step: 'cacheGet',
       file: 'cacheHandler.js',
