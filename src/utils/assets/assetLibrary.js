@@ -252,7 +252,7 @@ export function loadAssetsForSection(sectionName) {
 
   if (typeof sectionName !== 'string' || sectionName.trim().length === 0) {
     log('assetLibrary.js', 'loadAssetsForSection', 'error', 'Invalid section name', { sectionName });
-    return {};
+    return Promise.resolve({});
   }
 
   if (window.performanceTracker) {
@@ -283,7 +283,7 @@ export function loadAssetsForSection(sectionName) {
       });
     }
 
-    return cloneOnRead(cachedAssets);
+    return Promise.resolve(cloneOnRead(cachedAssets));
   }
 
   if (assetsLoadingPromises.has(sectionName)) {
@@ -341,11 +341,11 @@ export function loadAssetsForSection(sectionName) {
     }
   })();
 
-  const sharedPromise = loadPromise.finally(() => {
-    assetsLoadingPromises.delete(sectionName);
-  });
-
-  const clonedPromise = sharedPromise.then((assets) => cloneOnRead(assets));
+  const clonedPromise = loadPromise
+    .then((assets) => cloneOnRead(assets))
+    .finally(() => {
+      assetsLoadingPromises.delete(sectionName);
+    });
   assetsLoadingPromises.set(sectionName, clonedPromise);
   return clonedPromise;
 }
@@ -663,7 +663,7 @@ export function unloadUnusedSections(sectionsToKeep = []) {
   });
 
   // Also clear section URL caches that may have been created without loading section metadata (M-07)
-  for (const sectionName of sectionUrlCacheSections) {
+  for (const sectionName of [...sectionUrlCacheSections]) {
     if (!sectionsToKeep.includes(sectionName) && !keysToDelete.includes(sectionName)) {
       removeCacheKeysByPrefix(getSectionAssetUrlCachePrefix(sectionName));
       sectionUrlCacheSections.delete(sectionName);

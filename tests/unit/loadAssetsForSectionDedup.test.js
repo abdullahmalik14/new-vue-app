@@ -70,6 +70,27 @@ describe('loadAssetsForSection dedup (L-02)', () => {
     expect(getAssetStatistics().loadingInProgress).toEqual([]);
   });
 
+  it('cache-hit returns a thenable for preloadAssetsForSections-style chaining (P-02)', async () => {
+    const { setValueWithExpiration } = await import('../../src/utils/common/cacheHandler.js');
+    const { clearAssetCaches, loadAssetsForSection } = await importAssetLibrary();
+
+    clearAssetCaches();
+
+    const cached = {
+      sectionName: 'auth',
+      bundlePaths: { js: null, css: null },
+      assetPreloadConfigs: [],
+      manifestEntry: null,
+      loadedAt: new Date().toISOString(),
+      state: 'loaded',
+    };
+    setValueWithExpiration('asset_metadata_auth', cached, 3600000);
+
+    const chained = loadAssetsForSection('auth').then((assets) => assets.sectionName);
+    await expect(chained).resolves.toBe('auth');
+    expect(loadSectionManifest).not.toHaveBeenCalled();
+  });
+
   it('clearAssetCaches clears in-flight section load promises', async () => {
     let manifestResolve;
     loadSectionManifest.mockImplementation(

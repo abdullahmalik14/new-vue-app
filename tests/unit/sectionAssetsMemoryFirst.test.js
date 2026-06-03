@@ -55,7 +55,8 @@ describe('section assets memory-first cache (B-06)', () => {
 
     const result = await loadAssetsForSection('auth');
 
-    expect(result).toBe(cached);
+    expect(result).toEqual(cached);
+    expect(result).not.toBe(cached);
     expect(getValueFromCache(`${ASSET_CACHE_KEY_PREFIX}auth`)).toBe(cached);
   });
 });
