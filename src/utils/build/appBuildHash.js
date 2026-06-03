@@ -26,6 +26,9 @@ export function syncPreloadStoreBuildHash(store) {
     const previousHash = store.buildHash;
     store.clearState();
     store.buildHash = currentBuildHash;
+    if (typeof store.$persist === 'function') {
+      store.$persist();
+    }
     return { invalidated: true, previousHash, currentBuildHash };
   }
 

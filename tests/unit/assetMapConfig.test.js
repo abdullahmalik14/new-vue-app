@@ -95,6 +95,7 @@ describe('loadAssetMapConfig (S-06)', () => {
           fetchResolve = () =>
             resolve({
               ok: true,
+              headers: { get: () => 'application/json' },
               text: async () =>
                 JSON.stringify({
                   production: { 'script.cognito': '/vendor/amazon-cognito-identity-6.3.15.min.js' },
@@ -114,14 +115,16 @@ describe('loadAssetMapConfig (S-06)', () => {
     const p1 = loadAssetMapConfig();
     const p2 = loadAssetMapConfig();
 
-    expect(p1).toBe(p2);
     expect(fetchSpy).toHaveBeenCalledTimes(1);
 
     fetchResolve();
     const [m1, m2] = await Promise.all([p1, p2]);
 
-    expect(m1).toBe(m2);
+    expect(m1).not.toBe(m2);
     expect(m1.production?.['script.cognito']).toBe(
+      '/vendor/amazon-cognito-identity-6.3.15.min.js',
+    );
+    expect(m2.production?.['script.cognito']).toBe(
       '/vendor/amazon-cognito-identity-6.3.15.min.js',
     );
 

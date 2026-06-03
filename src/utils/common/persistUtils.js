@@ -22,6 +22,19 @@ export function resolvePersistStorage() {
   return localStorage;
 }
 
+/**
+ * SSR-safe StorageLike adapter for pinia-plugin-persistedstate v4.
+ * The plugin expects getItem/setItem on the storage object itself — not a factory.
+ */
+export const persistStorageAdapter = {
+  getItem(key) {
+    return resolvePersistStorage()?.getItem(key) ?? null;
+  },
+  setItem(key, value) {
+    resolvePersistStorage()?.setItem(key, value);
+  },
+};
+
 export function buildPersistKey(baseKey) {
   const env = import.meta.env.MODE || 'production';
   const buildHash = getAppBuildHash();
@@ -32,22 +45,34 @@ export function buildPersistKey(baseKey) {
   return `${baseKey}:${env}`;
 }
 
-export function migrateLegacyPersistedState({ storage, newKey, legacyKeys }) {
+export function migrateLegacyPersistedState({
+  storage,
+  newKey,
+  legacyKeys,
+  removeLegacy = true,
+} = {}) {
   if (!storage || !newKey || !Array.isArray(legacyKeys) || legacyKeys.length === 0) {
-    return;
+    return false;
   }
 
   if (storage.getItem(newKey)) {
-    return;
+    return false;
   }
 
   for (const legacyKey of legacyKeys) {
     const legacyValue = storage.getItem(legacyKey);
     if (legacyValue) {
       storage.setItem(newKey, legacyValue);
-      break;
+      if (removeLegacy) {
+        for (const key of legacyKeys) {
+          storage.removeItem(key);
+        }
+      }
+      return true;
     }
   }
+
+  return false;
 }
 
 export function createPersistedStateSerializer({

@@ -745,8 +745,9 @@ actions: {
 
 **What changed:**
 - `resolveFlagUrlFromLoadedMap()` / `resolveAndCacheFlagUrl()` — shared resolution + URL cache for one flag.
-- `getAssetUrls()` — validates input first, `await loadAssetMapConfig()` **once**, synchronous loop over flags.
+- `getAssetUrls()` — validates input first, `await ensureAssetMapLoaded()` **once**, synchronous loop over flags.
 - `getAssetUrl()` — uses the same resolver (detailed logging kept for single-flag path).
+- `assetPreloader.resolveAssetPreloadUrls()` — section preload batches flags via `getAssetUrls()` (P-04 extended to preload path).
 
 **Conflict check:** No change to map source, env inheritance, or URL policy (`assertAllowedPreloadUrl`). `preloadAssetUrls` still calls `getAssetUrls` and benefits from single map load.
 
@@ -2653,13 +2654,17 @@ npm run test:unit -- tests/unit/assetMapSourceImport.test.js --run
 
 #### Resolution ✅
 
-**Status:** Resolved — asset map + section metadata now return clone-on-read copies.
+**Status:** Resolved — public APIs still return clone-on-read copies; internal resolution uses shared map references.
 
 **What was broken:** Callers could mutate cached asset map or section metadata objects and corrupt the shared cache.
 
 **Why it happened:** `loadAssetMapConfig()` and `getAssetsForSection()` returned the cached objects by reference.
 
-**What changed:** Both asset map and section asset reads now return deep-cloned copies, keeping the cache immutable to external callers.
+**What changed:**
+- **Public API (unchanged contract):** `loadAssetMapConfig()` and `getAssetsForSection()` still return **clone-on-read** copies via `cloneOnRead()` (`structuredClone` with `deepClone` fallback).
+- **Internal hot paths (perf follow-up):** `ensureAssetMapLoaded()` returns the shared in-memory / TTL cache reference for `getAssetUrl`, `getAssetUrls`, category/index builders, and init warm-up — no per-call clone or recursive `deepClone` logging.
+- **`objectSafety.js`:** Removed trace logging from `deepClone()` / `isPlainObject()` (recursive log spam in dev).
+- **`assetPreloader.js`:** Section asset URL resolution batches flags through `getAssetUrls()` instead of N× `getAssetUrl()`.
 
 **How to test in the browser (one paste):**
 ```js

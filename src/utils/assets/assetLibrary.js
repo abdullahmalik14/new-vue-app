@@ -118,6 +118,35 @@ let assetMapLoadGeneration = 0;
 /** @type {'bundled-production'|'bundled-dev'|'bundled-fallback'|'runtime-verified'|'cache-restored'|null} */
 let assetMapConfigSource = null;
 
+/** Empty map shape returned when load fails (A-L06 external callers). */
+const EMPTY_ASSET_MAP_SHAPE = {
+  development: {},
+  staging: {},
+  production: {},
+};
+
+/**
+ * Clone-on-read for external callers (A-L06). Uses structuredClone when available — no trace logging.
+ *
+ * @param {any} value
+ * @returns {any}
+ */
+function cloneOnRead(value) {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  if (typeof structuredClone === 'function') {
+    try {
+      return structuredClone(value);
+    } catch {
+      // Non-cloneable values fall back to deepClone (JSON-like asset payloads only).
+    }
+  }
+
+  return deepClone(value);
+}
+
 const SECTION_ASSET_MAP_CACHE_PREFIX = 'section_asset_map_';
 const SECTION_ASSET_MAP_CACHE_TTL = ASSET_MAP_CACHE_TTL;
 /** @type {Map<string, object>} */
@@ -254,7 +283,7 @@ export function loadAssetsForSection(sectionName) {
       });
     }
 
-    return deepClone(cachedAssets);
+    return cloneOnRead(cachedAssets);
   }
 
   if (assetsLoadingPromises.has(sectionName)) {
@@ -316,7 +345,7 @@ export function loadAssetsForSection(sectionName) {
     assetsLoadingPromises.delete(sectionName);
   });
 
-  const clonedPromise = sharedPromise.then((assets) => deepClone(assets));
+  const clonedPromise = sharedPromise.then((assets) => cloneOnRead(assets));
   assetsLoadingPromises.set(sectionName, clonedPromise);
   return clonedPromise;
 }
@@ -431,6 +460,28 @@ export async function preloadAssetsForSections(sectionNames) {
 }
 
 /**
+ * Internal read of section metadata without clone-on-read (hot paths).
+ *
+ * @param {string} sectionName
+ * @returns {object|null}
+ */
+function getSectionAssetsReference(sectionName) {
+  if (loadedAssets.has(sectionName)) {
+    return loadedAssets.get(sectionName);
+  }
+
+  const cacheKey = getSectionAssetCacheKey(sectionName);
+  const cachedAssets = getValueFromCache(cacheKey);
+
+  if (cachedAssets) {
+    loadedAssets.set(sectionName, cachedAssets);
+    return cachedAssets;
+  }
+
+  return null;
+}
+
+/**
  * Get assets for a section (from cache/memory only, doesn't load)
  * 
  * @param {string} sectionName - Section name
@@ -439,22 +490,12 @@ export async function preloadAssetsForSections(sectionNames) {
 export function getAssetsForSection(sectionName) {
   log('assetLibrary.js', 'getAssetsForSection', 'start', 'Getting assets for section', { sectionName });
 
-  // Check memory first
-  if (loadedAssets.has(sectionName)) {
-    const assets = loadedAssets.get(sectionName);
+  const assets = getSectionAssetsReference(sectionName);
+
+  if (assets) {
     persistSectionAssetsToHandlerCache(sectionName);
     log('assetLibrary.js', 'getAssetsForSection', 'memory-hit', 'Assets found in memory', { sectionName });
-    return deepClone(assets);
-  }
-
-  const cacheKey = getSectionAssetCacheKey(sectionName);
-  const cachedAssets = getValueFromCache(cacheKey);
-
-  if (cachedAssets) {
-    log('assetLibrary.js', 'getAssetsForSection', 'cache-hit', 'Assets found in cache', { sectionName });
-    // Also store in memory for faster subsequent access
-    loadedAssets.set(sectionName, cachedAssets);
-    return deepClone(cachedAssets);
+    return cloneOnRead(assets);
   }
 
   log('assetLibrary.js', 'getAssetsForSection', 'not-found', 'Assets not loaded for section', { sectionName });
@@ -469,7 +510,7 @@ export function getAssetsForSection(sectionName) {
  * @returns {boolean} - True if section bundle metadata is loaded
  */
 export function areAssetsLoadedForSection(sectionName) {
-  const loaded = getAssetsForSection(sectionName) !== null;
+  const loaded = getSectionAssetsReference(sectionName) !== null;
   log('assetLibrary.js', 'areAssetsLoadedForSection', 'return', 'Returning loaded status', { sectionName, loaded });
   return loaded;
 }
@@ -506,8 +547,7 @@ export function getAssetLoadingState(sectionName) {
     return 'loading';
   }
 
-  // Check if loaded
-  const assets = getAssetsForSection(sectionName);
+  const assets = getSectionAssetsReference(sectionName);
   if (assets) {
     const state = assets.state || 'loaded';
     log('assetLibrary.js', 'getAssetLoadingState', 'return', 'Assets state', { sectionName, state });
@@ -1198,37 +1238,48 @@ export function getAssetMapConfigSource() {
 export function loadAssetMapConfig() {
   log('assetLibrary.js', 'loadAssetMapConfig', 'start', 'Loading asset map configuration', {});
 
-  // Return cached map if available
+  return ensureAssetMapLoaded().then((assetMap) => {
+    if (assetMap) {
+      log('assetLibrary.js', 'loadAssetMapConfig', 'return', 'Returning clone-on-read asset map', {
+        source: assetMapConfigSource,
+      });
+      return cloneOnRead(assetMap);
+    }
+
+    return cloneOnRead(EMPTY_ASSET_MAP_SHAPE);
+  });
+}
+
+/**
+ * Load the shared asset map reference for internal resolution (no clone-on-read).
+ *
+ * @returns {Promise<object|null>}
+ */
+async function ensureAssetMapLoaded() {
   if (cachedAssetMap) {
     if (!assetMapConfigSource) {
       restoreAssetMapConfigSourceFromCache();
     }
 
-    log('assetLibrary.js', 'loadAssetMapConfig', 'memory-hit', 'Returning cached asset map from memory', {
-      source: assetMapConfigSource
-    });
-    return Promise.resolve(deepClone(cachedAssetMap));
+    return cachedAssetMap;
   }
 
-  // Check cache
   const cachedConfig = getValueFromCache(ASSET_MAP_CACHE_KEY);
   if (cachedConfig) {
     cachedAssetMap = cachedConfig;
     restoreAssetMapConfigSourceFromCache();
 
     log('assetLibrary.js', 'loadAssetMapConfig', 'cache-hit', 'Asset map loaded from cache', {
-      source: assetMapConfigSource
+      source: assetMapConfigSource,
     });
-    return Promise.resolve(deepClone(cachedConfig));
+    return cachedAssetMap;
   }
 
-  // If already loading, wait for existing promise
   if (assetMapLoadPromise) {
     log('assetLibrary.js', 'loadAssetMapConfig', 'waiting', 'Asset map load in progress, waiting', {});
     return assetMapLoadPromise;
   }
 
-  // Generation guard prevents stale cache writes if a newer load starts mid-flight (L-03).
   const loadGeneration = assetMapLoadGeneration;
   const loadPromise = (async () => {
     try {
@@ -1237,7 +1288,7 @@ export function loadAssetMapConfig() {
 
       if (shouldAllowRuntimeAssetMapFetch()) {
         log('assetLibrary.js', 'loadAssetMapConfig', 'fetch', 'Dev runtime override enabled', {
-          candidates: getAssetMapFetchCandidates()
+          candidates: getAssetMapFetchCandidates(),
         });
 
         assetMap = await fetchAssetMapFromNetwork();
@@ -1251,7 +1302,7 @@ export function loadAssetMapConfig() {
         assetMap = getBundledAssetMap();
         source = import.meta.env.PROD ? 'bundled-production' : 'bundled-dev';
         log('assetLibrary.js', 'loadAssetMapConfig', 'bundled', 'Using build-time bundled asset map', {
-          source
+          source,
         });
       }
 
@@ -1267,7 +1318,7 @@ export function loadAssetMapConfig() {
       log('assetLibrary.js', 'loadAssetMapConfig', 'success', 'Asset map loaded successfully', {
         environments: Object.keys(assetMap),
         totalFlags: Object.keys(assetMap.production || {}).length,
-        source
+        source,
       });
 
       if (loadGeneration !== assetMapLoadGeneration) {
@@ -1289,25 +1340,11 @@ export function loadAssetMapConfig() {
     }
   })();
 
-  // Keep the shared promise alive until the load settles so late callers can await it.
-  const sharedPromise = loadPromise.finally(() => {
+  assetMapLoadPromise = loadPromise.finally(() => {
     assetMapLoadPromise = null;
   });
 
-  const clonedPromise = sharedPromise.then((assetMap) => {
-    if (assetMap) {
-      return deepClone(assetMap);
-    }
-
-    return {
-      development: {},
-      staging: {},
-      production: {},
-    };
-  });
-
-  assetMapLoadPromise = clonedPromise;
-  return clonedPromise;
+  return assetMapLoadPromise;
 }
 
 /**
@@ -1578,7 +1615,7 @@ export async function getAssetUrl(flag, environmentOrOptions = null) {
   const env = environment || detectEnvironment();
 
   try {
-    const globalMap = await loadAssetMapConfig();
+    const globalMap = (await ensureAssetMapLoaded()) || EMPTY_ASSET_MAP_SHAPE;
     const sectionMap = section ? await loadSectionAssetMap(section) : null;
 
     return resolveAndCacheFlagUrl(trimmedFlag, env, globalMap, {
@@ -1694,7 +1731,7 @@ export async function getAssetUrls(flags, environmentOrOptions = null) {
   const env = environment || detectEnvironment();
 
   try {
-    const globalMap = await loadAssetMapConfig();
+    const globalMap = (await ensureAssetMapLoaded()) || EMPTY_ASSET_MAP_SHAPE;
     const sectionMap = section ? await loadSectionAssetMap(section) : null;
     const urlMap = {};
 
@@ -1761,8 +1798,8 @@ export async function getAvailableAssetFlags(environment = null) {
 
   try {
     const env = environment || detectEnvironment();
-    const assetMap = await loadAssetMapConfig();
-    const flagArray = Object.keys(resolveAssetMapForEnvironment(assetMap, env)).sort();
+    const assetMap = await ensureAssetMapLoaded();
+    const flagArray = Object.keys(resolveAssetMapForEnvironment(assetMap || EMPTY_ASSET_MAP_SHAPE, env)).sort();
 
     log('assetLibrary.js', 'getAvailableAssetFlags', 'success', 'Available flags retrieved', {
       environment: env,
@@ -1794,7 +1831,7 @@ export async function hasAssetFlagInMap(flag, environmentOrOptions = null) {
 
   const env = environment || detectEnvironment();
 
-  const globalMap = await loadAssetMapConfig();
+  const globalMap = (await ensureAssetMapLoaded()) || EMPTY_ASSET_MAP_SHAPE;
   const sectionMap = section ? await loadSectionAssetMap(section) : null;
   const resolved = resolveFlagUrlWithSectionOverride(trimmedFlag, env, globalMap, sectionMap);
   return Boolean(resolved.url);
@@ -1886,7 +1923,7 @@ export async function getAssetsByCategory(category, environmentOrOptions = null)
       return cachedCategory;
     }
 
-    const globalMap = await loadAssetMapConfig();
+    const globalMap = (await ensureAssetMapLoaded()) || EMPTY_ASSET_MAP_SHAPE;
     const sectionMap = section ? await loadSectionAssetMap(section) : null;
 
     // Merge section over global: section takes precedence (M-01)
@@ -1988,7 +2025,7 @@ export async function primeAssetIndex(options = {}) {
     };
   }
 
-  const globalMap = await loadAssetMapConfig();
+  const globalMap = (await ensureAssetMapLoaded()) || EMPTY_ASSET_MAP_SHAPE;
   const sectionMap = section ? await loadSectionAssetMap(section) : null;
   const globalResolved = resolveAssetMapForEnvironment(globalMap, env);
   const sectionResolved = sectionMap ? resolveAssetMapForEnvironment(sectionMap, env) : {};
@@ -2052,7 +2089,7 @@ export function initAssetLibrary(options = {}) {
       });
     }
 
-    await loadAssetMapConfig();
+    await ensureAssetMapLoaded();
 
     const flags =
       Array.isArray(flagsOverride) && flagsOverride.length > 0
@@ -2158,7 +2195,7 @@ export async function validateAssetMap(options = {}) {
   });
 
   try {
-    const globalMap = await loadAssetMapConfig();
+    const globalMap = (await ensureAssetMapLoaded()) || EMPTY_ASSET_MAP_SHAPE;
     const sectionMap = section ? await loadSectionAssetMap(section) : null;
     
     // Use merged map for validation: section takes precedence (M-01)

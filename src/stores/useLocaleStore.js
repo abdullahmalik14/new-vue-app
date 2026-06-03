@@ -8,6 +8,7 @@ import {
   buildPersistKey,
   createPersistedStateSerializer,
   migrateLegacyPersistedState,
+  persistStorageAdapter,
   resolvePersistStorage,
 } from '../utils/common/persistUtils.js';
 
@@ -35,7 +36,17 @@ const localePersistSerializer = createPersistedStateSerializer({
   version: LOCALE_PERSIST_VERSION,
   ttlMs: LOCALE_PREFERENCE_TTL_MS,
   fallback: { locale: null },
-  migrate: (state) => (state && typeof state === 'object' ? state : { locale: null }),
+  migrate: (state, fromVersion) => {
+    if (!state || typeof state !== 'object') {
+      return { locale: null };
+    }
+
+    if (fromVersion === 0) {
+      return { locale: state.locale ?? null };
+    }
+
+    return { locale: state.locale ?? null };
+  },
 });
 
 /**
@@ -59,7 +70,7 @@ export function deserializeLocalePersistedState(raw) {
 
 function normalizeLocaleAfterRestore(store) {
   if (store.locale && !SUPPORTED_LOCALES.includes(store.locale)) {
-    log('useLocaleStore.js', 'afterRestore', 'warn', 'Unsupported locale restored; clearing', {
+    log('useLocaleStore.js', 'afterHydrate', 'warn', 'Unsupported locale restored; clearing', {
       locale: store.locale,
     });
     store.locale = null;
@@ -180,15 +191,14 @@ export const useLocaleStore = defineStore('locale', {
   },
 
   persist: {
-    key: 'locale_preference',
     key: LOCALE_PERSIST_KEY,
-    storage: () => resolvePersistStorage(),
+    storage: persistStorageAdapter,
     pick: ['locale'],
     serializer: {
       serialize: serializeLocalePersistedState,
       deserialize: deserializeLocalePersistedState,
     },
-    beforeRestore({ store }) {
+    beforeHydrate({ store }) {
       migrateLegacyPersistedState({
         storage: resolvePersistStorage(),
         newKey: LOCALE_PERSIST_KEY,
@@ -198,7 +208,7 @@ export const useLocaleStore = defineStore('locale', {
         store.locale = null;
       }
     },
-    afterRestore({ store }) {
+    afterHydrate({ store }) {
       normalizeLocaleAfterRestore(store);
       attachStorageQuotaMonitor(store, { key: LOCALE_PERSIST_KEY, label: 'locale' });
     },

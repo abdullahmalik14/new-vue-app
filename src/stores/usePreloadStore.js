@@ -6,20 +6,77 @@ import {
   buildPersistKey,
   createPersistedStateSerializer,
   migrateLegacyPersistedState,
+  persistStorageAdapter,
   resolvePersistStorage,
   resolvePersistTtlMs,
 } from '../utils/common/persistUtils.js';
 
-function normalizeStringSet(values) {
+export function normalizeStringSet(values) {
   if (values instanceof Set) {
     return values;
   }
 
   if (Array.isArray(values)) {
-    return new Set(values);
+    return new Set(values.filter((entry) => typeof entry === 'string' && entry.trim() !== ''));
   }
 
   return new Set();
+}
+
+function isValidSectionKey(sectionName) {
+  return typeof sectionName === 'string' && sectionName.trim() !== '';
+}
+
+/** Replace Set reference so pinia-plugin-persistedstate $subscribe fires on add. */
+function addToStringSet(currentSet, value) {
+  const set = normalizeStringSet(currentSet);
+  if (set.has(value)) {
+    return set;
+  }
+  return new Set([...set, value]);
+}
+
+/** Replace Set reference so pinia-plugin-persistedstate $subscribe fires on remove. */
+function removeFromStringSet(currentSet, value) {
+  const set = normalizeStringSet(currentSet);
+  if (!set.has(value)) {
+    return set;
+  }
+  const next = new Set(set);
+  next.delete(value);
+  return next;
+}
+
+function ensurePreloadSets(store) {
+  store.preloadedSections = normalizeStringSet(store.preloadedSections);
+  store.preloadedAssets = normalizeStringSet(store.preloadedAssets);
+  store.sectionsInProgress = normalizeStringSet(store.sectionsInProgress);
+}
+
+function mapPreloadPersistedState(state) {
+  const source = state && typeof state === 'object' ? state : {};
+  return {
+    ...source,
+    preloadedSections: normalizeStringSet(source.preloadedSections),
+    preloadedAssets: normalizeStringSet(source.preloadedAssets),
+  };
+}
+
+function migratePreloadPersistedState(state, fromVersion) {
+  if (!state || typeof state !== 'object') {
+    return {};
+  }
+
+  if (fromVersion === 0) {
+    return {
+      preloadedSections: state.preloadedSections ?? [],
+      preloadedAssets: state.preloadedAssets ?? [],
+      buildHash: state.buildHash ?? null,
+      manifestLoadFailed: state.manifestLoadFailed ?? false,
+    };
+  }
+
+  return state;
 }
 
 const PRELOAD_PERSIST_VERSION = 1;
@@ -28,12 +85,16 @@ const preloadPersistSerializer = createPersistedStateSerializer({
   version: PRELOAD_PERSIST_VERSION,
   ttlMs: resolvePersistTtlMs(),
   fallback: {},
-  migrate: (state) => (state && typeof state === 'object' ? state : {}),
-  mapBeforeSerialize: (state) => ({
-    ...(state && typeof state === 'object' ? state : {}),
-    preloadedSections: [...normalizeStringSet(state?.preloadedSections)],
-    preloadedAssets: [...normalizeStringSet(state?.preloadedAssets)],
-  }),
+  migrate: migratePreloadPersistedState,
+  mapBeforeSerialize: (state) => {
+    const mapped = mapPreloadPersistedState(state);
+    return {
+      ...mapped,
+      preloadedSections: [...mapped.preloadedSections],
+      preloadedAssets: [...mapped.preloadedAssets],
+    };
+  },
+  mapAfterDeserialize: mapPreloadPersistedState,
 });
 
 function finalizePreloadRestore(store) {
@@ -42,10 +103,16 @@ function finalizePreloadRestore(store) {
 
   const sync = syncPreloadStoreBuildHash(store);
   if (sync.invalidated) {
-    log('usePreloadStore.js', 'afterRestore', 'build-hash', 'Stale preload state cleared after persist rehydrate', {
+    log('usePreloadStore.js', 'afterHydrate', 'build-hash', 'Stale preload state cleared after persist rehydrate', {
       previousHash: sync.previousHash,
       currentHash: sync.currentBuildHash,
     });
+  }
+}
+
+function commitPersistedPreloadState(store) {
+  if (typeof store.$persist === 'function') {
+    store.$persist();
   }
 }
 
@@ -60,10 +127,11 @@ export const usePreloadStore = defineStore('preload', {
 
   getters: {
     preloadedAssetCount(state) {
-      return state.preloadedAssets.size;
+      return normalizeStringSet(state.preloadedAssets).size;
     },
-    hasSection: (state) => (sectionName) => state.preloadedSections.has(sectionName),
-    hasAsset: (state) => (assetUrl) => state.preloadedAssets.has(assetUrl),
+    hasSection: (state) => (sectionName) =>
+      normalizeStringSet(state.preloadedSections).has(sectionName),
+    hasAsset: (state) => (assetUrl) => normalizeStringSet(state.preloadedAssets).has(assetUrl),
   },
 
   actions: {
@@ -72,12 +140,15 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} sectionName 
      */
     addSection(sectionName) {
-      if (typeof sectionName !== 'string' || sectionName.trim() === '') {
+      if (!isValidSectionKey(sectionName)) {
         return;
       }
-      if (!this.preloadedSections.has(sectionName)) {
-        this.preloadedSections.add(sectionName);
+      ensurePreloadSets(this);
+      const nextSections = addToStringSet(this.preloadedSections, sectionName);
+      if (nextSections !== this.preloadedSections) {
+        this.preloadedSections = nextSections;
         log('usePreloadStore.js', 'addSection', 'add', 'Section marked as preloaded', { sectionName });
+        commitPersistedPreloadState(this);
       }
     },
 
@@ -86,8 +157,15 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} sectionName
      */
     removeSection(sectionName) {
-      if (this.preloadedSections.delete(sectionName)) {
+      if (!isValidSectionKey(sectionName)) {
+        return;
+      }
+      ensurePreloadSets(this);
+      const nextSections = removeFromStringSet(this.preloadedSections, sectionName);
+      if (nextSections !== this.preloadedSections) {
+        this.preloadedSections = nextSections;
         log('usePreloadStore.js', 'removeSection', 'remove', 'Section removed from preload cache', { sectionName });
+        commitPersistedPreloadState(this);
       }
     },
 
@@ -96,13 +174,14 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} assetUrl 
      */
     addAsset(assetUrl) {
-      if (typeof assetUrl !== 'string' || assetUrl.trim() === '') {
+      if (!isValidSectionKey(assetUrl)) {
         return;
       }
-      if (!this.preloadedAssets.has(assetUrl)) {
-        this.preloadedAssets.add(assetUrl);
-        // Log less frequently for assets to avoid noise, or keep it if needed
-        // log('usePreloadStore.js', 'addAsset', 'add', 'Asset marked as preloaded', { assetUrl });
+      ensurePreloadSets(this);
+      const nextAssets = addToStringSet(this.preloadedAssets, assetUrl);
+      if (nextAssets !== this.preloadedAssets) {
+        this.preloadedAssets = nextAssets;
+        commitPersistedPreloadState(this);
       }
     },
 
@@ -111,7 +190,15 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} assetUrl
      */
     removeAsset(assetUrl) {
-      this.preloadedAssets.delete(assetUrl);
+      if (!isValidSectionKey(assetUrl)) {
+        return;
+      }
+      ensurePreloadSets(this);
+      const nextAssets = removeFromStringSet(this.preloadedAssets, assetUrl);
+      if (nextAssets !== this.preloadedAssets) {
+        this.preloadedAssets = nextAssets;
+        commitPersistedPreloadState(this);
+      }
     },
 
     /**
@@ -119,6 +206,7 @@ export const usePreloadStore = defineStore('preload', {
      */
     clearAssets() {
       this.preloadedAssets = new Set();
+      commitPersistedPreloadState(this);
     },
 
     /**
@@ -126,6 +214,10 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} sectionName
      */
     markSectionInProgress(sectionName) {
+      if (!isValidSectionKey(sectionName)) {
+        return;
+      }
+      ensurePreloadSets(this);
       if (!this.sectionsInProgress.has(sectionName)) {
         this.sectionsInProgress.add(sectionName);
         log('usePreloadStore.js', 'markSectionInProgress', 'start', 'Section preload in progress', { sectionName });
@@ -137,6 +229,10 @@ export const usePreloadStore = defineStore('preload', {
      * @param {string} sectionName
      */
     unmarkSectionInProgress(sectionName) {
+      if (!isValidSectionKey(sectionName)) {
+        return;
+      }
+      ensurePreloadSets(this);
       if (this.sectionsInProgress.delete(sectionName)) {
         log('usePreloadStore.js', 'unmarkSectionInProgress', 'complete', 'Section preload no longer in progress', { sectionName });
       }
@@ -148,6 +244,10 @@ export const usePreloadStore = defineStore('preload', {
      * @returns {boolean}
      */
     isSectionInProgress(sectionName) {
+      if (!isValidSectionKey(sectionName)) {
+        return false;
+      }
+      ensurePreloadSets(this);
       return this.sectionsInProgress.has(sectionName);
     },
 
@@ -175,15 +275,16 @@ export const usePreloadStore = defineStore('preload', {
       this.manifestLoadFailed = false;
       this.sectionsInProgress = new Set();
       log('usePreloadStore.js', 'clearState', 'clear', 'Preload state cleared', {});
+      commitPersistedPreloadState(this);
     }
   },
 
   persist: {
     key: PRELOAD_PERSIST_KEY,
-    storage: () => resolvePersistStorage(),
+    storage: persistStorageAdapter,
     pick: ['preloadedSections', 'preloadedAssets', 'buildHash'],
     serializer: preloadPersistSerializer,
-    beforeRestore({ store }) {
+    beforeHydrate({ store }) {
       migrateLegacyPersistedState({
         storage: resolvePersistStorage(),
         newKey: PRELOAD_PERSIST_KEY,
@@ -191,7 +292,7 @@ export const usePreloadStore = defineStore('preload', {
       });
       store.sectionsInProgress = new Set();
     },
-    afterRestore({ store }) {
+    afterHydrate({ store }) {
       finalizePreloadRestore(store);
       attachStorageQuotaMonitor(store, { key: PRELOAD_PERSIST_KEY, label: 'preload' });
     },

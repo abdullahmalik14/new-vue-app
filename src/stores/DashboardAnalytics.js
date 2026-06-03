@@ -5,6 +5,7 @@ import {
   buildPersistKey,
   createPersistedStateSerializer,
   migrateLegacyPersistedState,
+  persistStorageAdapter,
   resolvePersistStorage,
   resolvePersistTtlMs,
 } from '../utils/common/persistUtils.js'
@@ -18,7 +19,17 @@ const dashboardPersistSerializer = createPersistedStateSerializer({
   version: DASHBOARD_PERSIST_VERSION,
   ttlMs: resolvePersistTtlMs(),
   fallback: {},
-  migrate: (state) => (state && typeof state === 'object' ? state : {}),
+  migrate: (state, fromVersion) => {
+    if (!state || typeof state !== 'object') {
+      return {}
+    }
+
+    if (fromVersion === 0) {
+      return state
+    }
+
+    return state
+  },
 })
 
 function normalizeDashboardAnalyticsAfterRestore(store) {
@@ -494,9 +505,9 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
 
   persist: {
     key: DASHBOARD_PERSIST_KEY,
-    storage: () => resolvePersistStorage(),
+    storage: persistStorageAdapter,
     serializer: dashboardPersistSerializer,
-    beforeRestore({ store }) {
+    beforeHydrate({ store }) {
       migrateLegacyPersistedState({
         storage: resolvePersistStorage(),
         newKey: DASHBOARD_PERSIST_KEY,
@@ -506,7 +517,7 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
         store.metadata = { etag: null, lastUpdated: null }
       }
     },
-    afterRestore({ store }) {
+    afterHydrate({ store }) {
       normalizeDashboardAnalyticsAfterRestore(store)
       attachStorageQuotaMonitor(store, { key: DASHBOARD_PERSIST_KEY, label: 'dashboard' })
     },

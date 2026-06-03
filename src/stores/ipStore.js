@@ -4,18 +4,46 @@ import {
   buildPersistKey,
   createPersistedStateSerializer,
   migrateLegacyPersistedState,
+  persistStorageAdapter,
   resolvePersistStorage,
   resolvePersistTtlMs,
 } from '../utils/common/persistUtils.js';
 
 const IP_PERSIST_VERSION = 1;
 const IP_PERSIST_KEY = buildPersistKey('ip');
+const IP_PERSIST_FALLBACK = { ip: null, details: null };
+
 const ipPersistSerializer = createPersistedStateSerializer({
   version: IP_PERSIST_VERSION,
   ttlMs: resolvePersistTtlMs(),
-  fallback: {},
-  migrate: (state) => (state && typeof state === 'object' ? state : {}),
+  fallback: IP_PERSIST_FALLBACK,
+  migrate: (state, fromVersion) => {
+    if (!state || typeof state !== 'object') {
+      return { ...IP_PERSIST_FALLBACK };
+    }
+
+    if (fromVersion === 0) {
+      return {
+        ip: state.ip ?? null,
+        details: state.details ?? null,
+      };
+    }
+
+    return {
+      ip: state.ip ?? null,
+      details: state.details ?? null,
+    };
+  },
 });
+
+function normalizeIpAfterRestore(store) {
+  if (store.ip !== null && typeof store.ip !== 'string') {
+    store.ip = null;
+  }
+  if (store.details !== null && typeof store.details !== 'object') {
+    store.details = null;
+  }
+}
 
 export const useIpStore = defineStore('ip', {
   state: () => ({
@@ -43,18 +71,20 @@ export const useIpStore = defineStore('ip', {
   },
   persist: {
     key: IP_PERSIST_KEY,
-    storage: () => resolvePersistStorage(),
+    storage: persistStorageAdapter,
+    pick: ['ip', 'details'],
     serializer: ipPersistSerializer,
-    beforeRestore() {
+    beforeHydrate() {
       migrateLegacyPersistedState({
         storage: resolvePersistStorage(),
         newKey: IP_PERSIST_KEY,
         legacyKeys: ['ip'],
       });
     },
-    afterRestore({ store }) {
+    afterHydrate({ store }) {
+      normalizeIpAfterRestore(store);
       attachStorageQuotaMonitor(store, { key: IP_PERSIST_KEY, label: 'ip' });
     },
-  } // Enable persistence if using pinia-plugin-persistedstate
+  },
 });
 

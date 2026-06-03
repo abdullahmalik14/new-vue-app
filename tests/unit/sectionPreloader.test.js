@@ -175,13 +175,13 @@ describe('sectionPreloader (Task 5 lifecycle)', () => {
 
     await vi.waitUntil(() => preloadSectionCss.mock.calls.length > 0);
     expect(getPreloadStatistics().inProgressCount).toBe(1);
-    expect(usePreloadStore().sectionsInProgress).toEqual(['auth']);
+    expect(usePreloadStore().sectionsInProgress.has('auth')).toBe(true);
 
     clearPreloadState();
 
-    expect(usePreloadStore().preloadedSections).toEqual([]);
+    expect(usePreloadStore().preloadedSections.size).toBe(0);
     expect(getPreloadStatistics().inProgressCount).toBe(0);
-    expect(usePreloadStore().sectionsInProgress).toEqual([]);
+    expect(usePreloadStore().sectionsInProgress.size).toBe(0);
     expect(document.querySelector('link[data-section-js-preload]')).toBeNull();
 
     resolveCss();
@@ -251,11 +251,11 @@ describe('sectionPreloader (Task 5 lifecycle)', () => {
 
     const inFlight = preloadSection('auth');
 
-    await vi.waitUntil(() => usePreloadStore().sectionsInProgress.includes('auth'));
+    await vi.waitUntil(() => usePreloadStore().sectionsInProgress.has('auth'));
 
     clearPreloadState();
 
-    expect(usePreloadStore().sectionsInProgress).toEqual([]);
+    expect(usePreloadStore().sectionsInProgress.size).toBe(0);
 
     resolveCss();
     await inFlight;
@@ -273,7 +273,7 @@ describe('sectionPreloader (Task 5 lifecycle)', () => {
 
     const promise = preloadSection('auth');
     expect(getPreloadStatistics().inProgressCount).toBe(1);
-    expect(usePreloadStore().sectionsInProgress).toEqual(['auth']);
+    expect(usePreloadStore().sectionsInProgress.has('auth')).toBe(true);
 
     await vi.advanceTimersByTimeAsync(500);
 
@@ -282,7 +282,7 @@ describe('sectionPreloader (Task 5 lifecycle)', () => {
     expect(result).toBe(false);
     expect(usePreloadStore().hasSection('auth')).toBe(false);
     expect(getPreloadStatistics().inProgressCount).toBe(0);
-    expect(usePreloadStore().sectionsInProgress).toEqual([]);
+    expect(usePreloadStore().sectionsInProgress.size).toBe(0);
 
     vi.useRealTimers();
     vi.unstubAllEnvs();

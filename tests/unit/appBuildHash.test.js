@@ -25,7 +25,7 @@ describe('appBuildHash / preload invalidation (M-05)', () => {
     expect(result.previousHash).toBe('build-v1');
     expect(result.currentBuildHash).toBe('build-v2');
     expect(store.buildHash).toBe('build-v2');
-    expect(store.preloadedSections).toEqual([]);
+    expect(store.preloadedSections.size).toBe(0);
     expect(store.preloadedAssetCount).toBe(0);
   });
 

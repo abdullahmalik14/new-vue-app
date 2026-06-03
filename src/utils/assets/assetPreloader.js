@@ -3,7 +3,7 @@
 import { log } from '../common/logHandler';
 import { logError } from '../common/errorHandler.js';
 import { trackStep } from '../common/performanceTrackerAccess.js';
-import { getAssetUrl } from './assetLibrary';
+import { getAssetUrl, getAssetUrls } from './assetLibrary';
 import { assertAllowedPreloadUrl } from './assertAllowedPreloadUrl.js';
 import { getAssetPreloadEntriesForSection } from './getAssetPreloadEntriesForSection.js';
 import { usePreloadStore } from '../../stores/usePreloadStore.js';
@@ -1242,6 +1242,102 @@ export async function resolveAssetPreloadUrl(asset, sectionName = null) {
 }
 
 /**
+ * Batch-resolve preload URLs grouped by effective section (P-04 / perf).
+ * Returns assets with `src` populated so downstream preload does not re-resolve flags.
+ *
+ * @param {Array<object>} assets
+ * @param {string|null} defaultSectionName
+ * @returns {Promise<{ urls: string[], assets: Array<object> }>}
+ */
+export async function enrichAssetsWithPreloadUrls(assets, defaultSectionName = null) {
+  if (!Array.isArray(assets) || assets.length === 0) {
+    return { urls: [], assets: [] };
+  }
+
+  const urlByIndex = new Map();
+  /** @type {Map<string, { section: string|null, flagToIndices: Map<string, number[]> }>} */
+  const flagGroups = new Map();
+
+  assets.forEach((asset, index) => {
+    if (asset?.src) {
+      urlByIndex.set(index, asset.src);
+      return;
+    }
+
+    if (!asset?.flag || typeof asset.flag !== 'string') {
+      return;
+    }
+
+    const flag = asset.flag.trim();
+    if (!flag) {
+      return;
+    }
+
+    const section = asset.section || defaultSectionName || null;
+    const groupKey = section || '__global__';
+
+    if (!flagGroups.has(groupKey)) {
+      flagGroups.set(groupKey, { section, flagToIndices: new Map() });
+    }
+
+    const group = flagGroups.get(groupKey);
+    if (!group.flagToIndices.has(flag)) {
+      group.flagToIndices.set(flag, []);
+    }
+    group.flagToIndices.get(flag).push(index);
+  });
+
+  await Promise.all(
+    [...flagGroups.values()].map(async ({ section, flagToIndices }) => {
+      const flags = [...flagToIndices.keys()];
+      if (flags.length === 0) {
+        return;
+      }
+
+      const urlMap = await getAssetUrls(
+        flags,
+        section ? { section } : undefined,
+      );
+
+      for (const [flag, indices] of flagToIndices) {
+        const url = urlMap[flag] || null;
+        for (const index of indices) {
+          if (url) {
+            urlByIndex.set(index, url);
+          }
+        }
+      }
+    }),
+  );
+
+  const urls = [];
+  const enrichedAssets = assets.map((asset, index) => {
+    const resolvedSrc = urlByIndex.get(index) || asset?.src || null;
+    if (resolvedSrc) {
+      urls.push(resolvedSrc);
+    }
+
+    if (resolvedSrc && !asset?.src) {
+      return { ...asset, src: resolvedSrc };
+    }
+
+    return asset;
+  });
+
+  return { urls, assets: enrichedAssets };
+}
+
+/**
+ * @param {Array<object>} assets
+ * @param {string|null} defaultSectionName
+ * @returns {Promise<string[]>}
+ */
+export async function resolveAssetPreloadUrls(assets, defaultSectionName = null) {
+  const { urls } = await enrichAssetsWithPreloadUrls(assets, defaultSectionName);
+  return urls;
+}
+
+/**
  * @param {string[]} urls
  * @returns {boolean}
  */
@@ -1278,13 +1374,10 @@ export async function preloadSectionAssets(sectionName) {
       routeCount
     });
 
-    const resolvedUrls = [];
-    for (const asset of allAssets) {
-      const url = await resolveAssetPreloadUrl(asset, sectionName);
-      if (url) {
-        resolvedUrls.push(url);
-      }
-    }
+    const { urls: resolvedUrls, assets: assetsWithSrc } = await enrichAssetsWithPreloadUrls(
+      allAssets,
+      sectionName,
+    );
 
     if (areSectionAssetUrlsFullyPreloaded(resolvedUrls)) {
       log('assetPreloader.js', 'preloadSectionAssets', 'cache-hit', 'All section asset URLs already preloaded — skipping', {
@@ -1307,7 +1400,7 @@ export async function preloadSectionAssets(sectionName) {
       assetCount: allAssets.length
     });
 
-    await preloadAssets(tagAssetsWithSection(allAssets, sectionName));
+    await preloadAssets(tagAssetsWithSection(assetsWithSrc, sectionName));
 
     log('assetPreloader.js', 'preloadSectionAssets', 'success', 'Section assets preloaded', {
       sectionName,

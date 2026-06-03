@@ -4,6 +4,7 @@ import {
   buildPersistKey,
   createPersistedStateSerializer,
   migrateLegacyPersistedState,
+  persistStorageAdapter,
   resolvePersistStorage,
   resolvePersistTtlMs,
 } from "../utils/common/persistUtils.js";
@@ -28,7 +29,23 @@ const cartPersistSerializer = createPersistedStateSerializer({
   version: CART_PERSIST_VERSION,
   ttlMs: resolvePersistTtlMs(),
   fallback: {},
-  migrate: (state) => (state && typeof state === "object" ? state : {}),
+  migrate: (state, fromVersion) => {
+    if (!state || typeof state !== "object") {
+      return {};
+    }
+
+    if (fromVersion === 0) {
+      return {
+        items: Array.isArray(state.items) ? state.items : [],
+        summary: state.summary,
+        couponCode: state.couponCode ?? null,
+        label: state.label,
+        cartType: state.cartType,
+      };
+    }
+
+    return state;
+  },
 });
 
 function normalizeCartAfterRestore(store) {
@@ -117,9 +134,10 @@ export const useCartStore = defineStore("cart", {
 
   persist: {
     key: CART_PERSIST_KEY,
-    storage: () => resolvePersistStorage(),
+    storage: persistStorageAdapter,
+    pick: ["items", "summary", "couponCode", "label", "cartType", "metadata"],
     serializer: cartPersistSerializer,
-    beforeRestore({ store }) {
+    beforeHydrate({ store }) {
       migrateLegacyPersistedState({
         storage: resolvePersistStorage(),
         newKey: CART_PERSIST_KEY,
@@ -129,7 +147,7 @@ export const useCartStore = defineStore("cart", {
         store.metadata = { ...DEFAULT_METADATA };
       }
     },
-    afterRestore({ store }) {
+    afterHydrate({ store }) {
       normalizeCartAfterRestore(store);
       attachStorageQuotaMonitor(store, { key: CART_PERSIST_KEY, label: "cart" });
     },

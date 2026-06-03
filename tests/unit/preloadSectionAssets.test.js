@@ -10,6 +10,7 @@ vi.mock('../../src/utils/assets/getAssetPreloadEntriesForSection.js', () => ({
 
 vi.mock('../../src/utils/assets/assetLibrary.js', () => ({
   getAssetUrl: vi.fn().mockResolvedValue('/assets/logo.png'),
+  getAssetUrls: vi.fn().mockResolvedValue({ 'dashboard.logo': '/assets/logo.png' }),
 }));
 
 function autoResolveLinkPreloads() {
@@ -61,5 +62,35 @@ describe('preloadSectionAssets URL short-circuit (C-07)', () => {
     await mod.preloadSectionAssets('dashboard-global');
 
     expect(document.querySelector('link[href="/assets/logo.png"]')).toBeTruthy();
+  });
+
+  it('batch-resolves section flags via getAssetUrls (P-04)', async () => {
+    getAssetPreloadEntriesForSection.mockReturnValue({
+      assets: [
+        { flag: 'dashboard.logo', type: 'image', priority: 'high' },
+        { flag: 'dashboard.avatar', type: 'image', priority: 'high' },
+      ],
+      routeCount: 1,
+    });
+
+    const assetLibrary = await import('../../src/utils/assets/assetLibrary.js');
+    assetLibrary.getAssetUrls.mockClear();
+    assetLibrary.getAssetUrl.mockClear();
+    assetLibrary.getAssetUrls.mockResolvedValue({
+      'dashboard.logo': '/assets/logo.png',
+      'dashboard.avatar': '/assets/avatar.png',
+    });
+
+    autoResolveLinkPreloads();
+    const mod = await import('../../src/utils/assets/assetPreloader.js');
+
+    await mod.preloadSectionAssets('dashboard-global');
+
+    expect(assetLibrary.getAssetUrls).toHaveBeenCalledTimes(1);
+    expect(assetLibrary.getAssetUrls).toHaveBeenCalledWith(
+      ['dashboard.logo', 'dashboard.avatar'],
+      { section: 'dashboard-global' },
+    );
+    expect(assetLibrary.getAssetUrl).not.toHaveBeenCalled();
   });
 });
