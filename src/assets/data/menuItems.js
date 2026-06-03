@@ -22,7 +22,8 @@ export const menuItems = [
     route: "/payout",
     parent: false,
     children: [],
-    enabled: true
+    enabled: true,
+    roles: ['creator']
   },
   {
     id: 3,
@@ -98,7 +99,7 @@ export const menuItems = [
     route: "/shops",
     parent: false,
     children: [],
-    enabled: false // Disabled as in original
+    enabled: true // Disabled as in original
   },
   {
     id: 8,
@@ -109,6 +110,47 @@ export const menuItems = [
     parent: false,
     children: [
       {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
         id: 801,
         title: "Edit Profile", // Fallback text
         translationKey: "dashboard.menu.editProfile", // Translation key
@@ -182,7 +224,7 @@ export const menuItems = [
  * @param {Array} items - Menu items array (defaults to menuItems)
  * @returns {Promise<Array>} - Menu items with resolved image URLs and translated titles
  */
-export async function resolveMenuItemsWithAssets(items = menuItems) {
+export async function resolveMenuItemsWithAssets(items = menuItems, userRole = null) {
   const { getAssetUrls } = await import("@/utils/assets/assetLibrary.js");
   const { loadTranslationsForSection } = await import("@/utils/translation/translationLoader.js");
   const { getI18nInstance } = await import("@/utils/translation/i18nInstance.js");
@@ -212,6 +254,13 @@ export async function resolveMenuItemsWithAssets(items = menuItems) {
   const resolveItem = (item) => {
     const resolved = { ...item };
 
+    // Role-based filtering: hide completely if role doesn't match
+    if (resolved.roles && Array.isArray(resolved.roles) && userRole) {
+      if (!resolved.roles.includes(userRole)) {
+        return null;
+      }
+    }
+
     // Resolve image URL
     if (item.image && item.image.startsWith('dashboard.menu.')) {
       resolved.image = loadedAssets[item.image] || item.image; // Fallback to flag if not found
@@ -230,11 +279,11 @@ export async function resolveMenuItemsWithAssets(items = menuItems) {
 
     // Recursively resolve children
     if (item.children && item.children.length > 0) {
-      resolved.children = item.children.map(child => resolveItem(child));
+      resolved.children = item.children.map(child => resolveItem(child)).filter(Boolean);
     }
 
     return resolved;
   };
 
-  return items.map(resolveItem);
+  return items.map(resolveItem).filter(Boolean);
 }
