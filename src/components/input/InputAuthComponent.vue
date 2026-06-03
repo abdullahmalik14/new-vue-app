@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import Paragraph from "../default/Paragraph.vue";
 import { CheckIcon } from "@heroicons/vue/24/outline";
 import EyeIcon from "@heroicons/vue/24/outline/EyeIcon";
@@ -63,6 +63,28 @@ const props = defineProps({
 // Track focus state
 const isFocused = ref(false);
 
+// Password visibility (Vue-bound type — avoids DOM toggleDisplay fighting :type prop)
+const isPasswordVisible = ref(false);
+
+watch(
+  () => props.type,
+  () => {
+    isPasswordVisible.value = false;
+  }
+);
+
+const resolvedInputType = computed(() => {
+  if (props.type === "password" && isPasswordVisible.value) return "text";
+  return props.type;
+});
+
+function handleRightIconClick() {
+  if (props.type === "password" && !props.rightIconInteractionsConfig) {
+    isPasswordVisible.value = !isPasswordVisible.value;
+  }
+  emit("click:right-icon");
+}
+
 // Handle focus - hide placeholder
 const handleFocus = () => {
   isFocused.value = true;
@@ -100,20 +122,6 @@ const internalEyeVisibilityConfig = computed(() => {
   ]);
 });
 
-const internalTypeToggleConfig = computed(() => {
-  if (props.type !== "password" || !props.id) return undefined;
-  return Object.freeze([
-    {
-      triggerEvents: ["click"],
-      rules: [{ type: "bypassValidation" }],
-      onValid: [
-        { actionType: "toggleDisplay", targetSelector: `#${props.id}`, attribute: "type", values: ["password", "text"] },
-        { actionType: "toggleDisplay", targetSelector: `#${props.id}-eye-icon` },
-        { actionType: "toggleDisplay", targetSelector: `#${props.id}-eyeslash-icon` },
-      ],
-    },
-  ]);
-});
 </script>
 
 <template>
@@ -142,7 +150,7 @@ const internalTypeToggleConfig = computed(() => {
         :src="typeof leftIcon === 'string' ? leftIcon : undefined" alt="icon"
         class="absolute left-2 top-1/2 transform -translate-y-1/2 pointer-events-none w-5 h-5" :class="textColor" />
 
-      <input :id="id" :type="type" :value="modelValue" :placeholder="activePlaceholder" :required="required"
+      <input :id="id" :type="resolvedInputType" :value="modelValue" :placeholder="activePlaceholder" :required="required"
         :data-required="$attrs['data-required']" :disabled="disabled"
         class="w-full bg-transparent outline-none focus:outline-none focus:ring-0 focus:border-none placeholder:font-[400] [&::-webkit-credentials-auto-fill-button]:!hidden [&::-ms-reveal]:!hidden [&::-ms-clear]:!hidden"
         :class="[textColor, placeholderColor, leftIcon ? 'pl-8' : 'pl-1', rightIcon ? (rightIconText ? 'pr-16' : 'pr-8') : '', 'poppins-medium']"
@@ -151,17 +159,17 @@ const internalTypeToggleConfig = computed(() => {
 
       <div v-if="rightIcon || $slots['right-icon'] || type === 'password'" :id="`${id}-eye`"
         class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity [&[hidden]]:!hidden"
-        v-interactions="rightIconInteractionsConfig || internalTypeToggleConfig"
-        @click="$emit('click:right-icon')">
+        v-interactions="rightIconInteractionsConfig || undefined"
+        @click="handleRightIconClick">
         <span v-if="rightIconText" class="text-xs font-medium" :class="textColor">{{ rightIconText
         }}</span>
         <slot name="right-icon">
           <!-- Password icons default: shown if no slot is provided and type is password -->
           <template v-if="type === 'password' && !rightIcon">
-            <span :id="`${id}-eye-icon`" class="[&[hidden]]:!hidden">
+            <span v-show="!isPasswordVisible" :id="`${id}-eye-icon`">
               <EyeSlashIcon class="w-5 h-5" :class="textColor" />
             </span>
-            <span :id="`${id}-eyeslash-icon`" class="[&[hidden]]:!hidden" hidden>
+            <span v-show="isPasswordVisible" :id="`${id}-eyeslash-icon`">
               <EyeIcon class="w-5 h-5" :class="textColor" />
             </span>
           </template>

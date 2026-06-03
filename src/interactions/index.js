@@ -15,11 +15,29 @@
  *   registerRule('isABN', (v) => /^\d{11}$/.test(v.replace(/\s/g, '')))
  */
 import { vInteractions }  from './directives/vInteractions'
+import { registerAllowedScript } from './utils/allowedScriptsRegistry'
+import { INTERACTION_CONFIG_ATTR } from './utils/engine'
 import { registerRule }   from './utils/validationRules'
 
 export { vInteractions }
 export { registerRule, getRules }         from './utils/validationRules'
 export { validateScope, safeParseConfig } from './utils/engine'
+export {
+  allowedScriptsRegistry,
+  registerAllowedScript,
+  unregisterAllowedScript,
+} from './utils/allowedScriptsRegistry'
+
+function registerBuiltInInteractionScripts() {
+  registerAllowedScript('dispatchScopeInteractionInputs', (el, scope) => {
+    const root = scope ?? el?.closest?.('[interaction-container]') ?? document
+    root.querySelectorAll(`[${INTERACTION_CONFIG_ATTR}]`).forEach((field) => {
+      field.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+  })
+}
+
+registerBuiltInInteractionScripts()
 
 const InteractionsPlugin = {
   install(app, options = {}) {

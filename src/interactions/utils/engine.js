@@ -6,7 +6,9 @@
  *          validateScope, showBrowserError, pushEvent, script
  */
 
+import { runAllowedScriptAction } from './allowedScriptsRegistry.js'
 import { runRule } from './validationRules'
+import { resolveActionType } from './actionSchema.js'
 
 // ─── Module-level caches ───────────────────────────────────────────────────────
 
@@ -142,7 +144,7 @@ export function getFieldValue(el) {
   }
   if (tag === 'select' && el.multiple)
     return Array.from(el.options).filter(o => o.selected).map(o => o.value).join(',')
-  return String(el.value ?? '').trim()
+  return String(el.value ?? '')
 }
 
 function isEmptyField(el) {
@@ -221,6 +223,26 @@ export function stampValidation(el, result) {
 
 // ─── Scope validation ──────────────────────────────────────────────────────────
 
+/** DOM attribute stamped by `v-interactions` so scope validation can discover bound fields. */
+export const INTERACTION_CONFIG_ATTR = 'interaction-config'
+
+/**
+ * Persist parsed directive config on the element for `validateScope` / scope rules.
+ * `v-interactions` binds objects/arrays and does not set this attribute in templates.
+ */
+export function stampInteractionConfig(el, configs) {
+  if (!el) return
+  if (!configs?.length) {
+    clearInteractionConfig(el)
+    return
+  }
+  el.setAttribute(INTERACTION_CONFIG_ATTR, JSON.stringify(configs))
+}
+
+export function clearInteractionConfig(el) {
+  if (el) el.removeAttribute(INTERACTION_CONFIG_ATTR)
+}
+
 /**
  * Validate all fields in a scope container.
  * Fast path: reads `validated` stamp if field was already interacted with.
@@ -234,7 +256,7 @@ export function validateScope(scopeEl) {
   let firstInvalidEl = null
   let idx = 0
 
-  const fields = root.querySelectorAll('[interaction-config]')
+  const fields = root.querySelectorAll(`[${INTERACTION_CONFIG_ATTR}]`)
   for (let i = 0; i < fields.length; i++) {
     const el  = fields[i]
     const tag = (el.tagName ?? '').toLowerCase()
@@ -243,22 +265,12 @@ export function validateScope(scopeEl) {
     const key   = el.getAttribute('data-key') ?? el.name ?? el.id ?? `idx-${idx++}`
     const value = getFieldValue(el)
 
-    const stamped = el.getAttribute('validated')
-    let isValid, failedRules = []
-
-    if (stamped !== null) {
-      isValid = stamped === 'true'
-      if (!isValid) {
-        try { failedRules = JSON.parse(el.getAttribute('data-validation-reason') ?? '{}').failedRules ?? [] }
-        catch { failedRules = [] }
-      }
-    } else {
-      const configs  = safeParseConfig(el.getAttribute('interaction-config')) ?? []
-      const allRules = configs.flatMap(c => Array.isArray(c.rules) ? c.rules : [])
-      const res      = validateWithRequired(el, allRules)
-      isValid        = res.isValid
-      failedRules    = res.failedRules
-    }
+    const configs  = safeParseConfig(el.getAttribute(INTERACTION_CONFIG_ATTR)) ?? []
+    const allRules = configs.flatMap(c => Array.isArray(c.rules) ? c.rules : [])
+    const res      = validateWithRequired(el, allRules)
+    const isValid  = res.isValid
+    const failedRules = res.failedRules
+    stampValidation(el, res)
 
     if (isValid) {
       result.valid.push({ id: key, value })
@@ -285,7 +297,7 @@ export function execActions(actions, el, scope) {
 function execAction(action, el, scope) {
   const t = () => resolveTarget(action.targetSelector, el, scope)
 
-  switch (action.actionType) {
+  switch (resolveActionType(action)) {
     case 'show': {
       const target = t(); if (!target) break
       target.hidden = false; target.removeAttribute('hidden'); break
@@ -415,15 +427,12 @@ function execAction(action, el, scope) {
       break
 
     case 'script':
-      if (action.code) {
-        try { (new Function('el', 'scope', action.code))(el, scope) }
-        catch (e) { console.error('[interactions:script]', e) }
-      }
+      runAllowedScriptAction(action, el, scope)
       break
 
     default:
       if (import.meta.env?.DEV)
-        console.warn('[interactions] Unknown actionType:', action.actionType)
+        console.warn('[interactions] Unknown actionType:', resolveActionType(action))
   }
 }
 

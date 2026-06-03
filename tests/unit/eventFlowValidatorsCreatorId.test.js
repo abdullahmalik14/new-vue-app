@@ -20,6 +20,6 @@ describe('event flow validators creatorId handling', () => {
 
     expect(good.ok).toBe(true);
     expect(bad.ok).toBe(false);
-    expect(bad.errors).toContain('creatorId is required.');
+    expect(bad.errors).toContain('creatorId must be a non-empty string.');
   });
 });

@@ -155,7 +155,6 @@ export const rules = {
   },
   matchValueField(value, fieldId, ctx) {
     if (!ctx || typeof ctx.getFieldValue !== 'function' || !ctx.scope || !fieldId) return false;
-    if (!value || value === '') return true;
     const otherValue = ctx.getFieldValue(ctx.scope, fieldId);
     return value === otherValue;
   },
@@ -172,6 +171,10 @@ export const rules = {
     return false;
   },
 
+  /**
+   * Valid when value differs from the placeholder param (default '').
+   * Migrate legacy configs: pass param for old sentinel values ("0", "-1", "placeholder").
+   */
   isSelect(value, param) {
     return value !== (param ?? '');
   },
@@ -183,8 +186,10 @@ export const rules = {
   isRadioCheck(_value, param, ctx) {
     if (!param) return false;
     const root = getScopedRoot(ctx);
-    const safeName = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(String(param)) : String(param);
-    return !!root.querySelector(`input[type="radio"][name="${safeName}"]:checked`);
+    const name = String(param);
+    return Array.from(root.querySelectorAll('input[type="radio"]')).some(
+      (el) => el.name === name && el.checked,
+    );
   },
   isMultiCheck(_value, param, ctx) {
     const root = getScopedRoot(ctx);

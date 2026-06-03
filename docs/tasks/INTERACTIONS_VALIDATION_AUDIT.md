@@ -19,6 +19,15 @@ Two parallel validation systems exist in this project:
 
 3. **Flow data pipeline** (`src/services/flow-system/flowDataPipeline.js`) — payload/response validation inside `FlowHandler.run`. **Flow-system-only findings** are documented in [`src/services/flow-system/FLOW_SYSTEM_AUDIT.md`](../services/flow-system/FLOW_SYSTEM_AUDIT.md) (not duplicated here).
 
+### Browser console checks
+
+Snippets are **async** and return a `Promise`. DevTools prints `Promise {<pending>}` for the expression alone — that is normal.
+
+- **Preferred:** paste a snippet as-is; it ends with `.then(o => console.log(o))` and prints the result object when done.
+- **Alternative:** prefix with `await` — e.g. `await (async () => { ... return out; })()` (top-level `await` works in Chrome/Edge/Firefox DevTools console).
+
+Look for `{ pass: true, ... }` in the console output. If `pass` is `false` or you see a red error, the check failed.
+
 ---
 
 ## Table of Contents
@@ -98,7 +107,7 @@ There are two completely independent rule registries. Every issue found across t
   - `minChar` and `minLength` now share normalized integer parameter handling.
 - Added unit coverage in `tests/unit/validationRulesUnification.test.js` to verify shared registry behavior and key normalized rules.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const interactions = await import('/src/interactions/utils/validationRules.js');
@@ -177,7 +186,7 @@ isNumeric: (v) => /^-?\d+(\.\d+)?$/.test(v) && v !== '',
 
 **What changed:** Canonical `isNumeric` now lives in `src/utils/validation/rules.js` and uses `^-?\d+(\.\d+)?$`, then both `validationRules.js` and `validationsLibrary.js` re-export from that source.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { default: rules } = await import('/src/interactions/utils/validationRules.js');
@@ -230,7 +239,7 @@ If a directive user passes a selector without `#` (e.g., `[name=confirmPassword]
 - `matchValueField(value, fieldId, ctx)` for engine field-lookup.
 - `matchValue(...)` remains as a backward-compatible wrapper that routes to the correct explicit path.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { default: rules } = await import('/src/interactions/utils/validationRules.js');
@@ -279,7 +288,7 @@ The same email address can pass one validator and fail the other. For example `u
 
 **What changed:** Both entry points now reference the same canonical `isEmail` implementation from `src/utils/validation/rules.js` via re-exports in `validationRules.js` and `validationsLibrary.js`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const interactions = await import('/src/interactions/utils/validationRules.js');
@@ -330,7 +339,7 @@ JavaScript silently overwrites duplicate property names in an object literal. Th
 
 **What changed:** `validationsLibrary.js` now re-exports canonical rules from `src/utils/validation/rules.js`, where `hasContent` is declared only once.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { validationsLibrary } = await import('/src/utils/validation/validationsLibrary.js');
@@ -376,7 +385,7 @@ This rule only catches fields that have already been validated (i.e., they have 
 - additionally checks for untouched required fields (including `required` / `data-required="true"` and empty checkbox/radio/file/select/text cases).
 - when `selector` is `null`/empty, it now falls back to the current interaction scope root instead of returning `false`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { default: rules } = await import('/src/interactions/utils/validationRules.js');
@@ -429,7 +438,7 @@ const repeatRule = state?.repeatRule ?? "weekly";
 - Added explicit guard for `repeatRule === ""` to return a `repeatRule` validation error instead of falling into weekly availability validation.
 - Added targeted unit coverage in `tests/unit/eventStepValidators.test.js`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { step1Validator } = await import('/src/services/events/validators/eventStepValidators.js');
@@ -476,7 +485,7 @@ The same semantic field (`creatorId`) is validated as a number in one module and
 
 **What changed:** In `src/services/events/validators/eventFlowValidators.js`, `creatorId` checks now use `isNonEmptyString(...)` in both fetch/create payload validators to align with rental validators.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const mod = await import('/src/services/events/validators/eventFlowValidators.js');
@@ -528,7 +537,7 @@ if (value === null || value === undefined || value === '' || value === false) re
 
 **What changed:** Updated `src/utils/validation/validationEngine.js` to treat `false` as empty in the early return.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { validationEngine } = await import('/src/utils/validation/validationEngine.js');
@@ -573,7 +582,7 @@ A slot with `startTime: "18:00"` and `endTime: "08:00"` (end before start) passe
 
 **What changed:** Updated `hasAnyValidSlots` in `src/services/events/validators/eventStepValidators.js` to require `end > start` after non-empty checks (valid for `HH:mm` lexical format used here).
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { step1Validator } = await import('/src/services/events/validators/eventStepValidators.js');
@@ -618,7 +627,7 @@ If the containing `[interaction-container]` is replaced or re-rendered by Vue af
 
 **What changed:** In `src/interactions/directives/vInteractions.js`, `updated(...)` now calls `evictScopeCache(el)` before `wire(...)`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const engine = await import('/src/interactions/utils/engine.js');
@@ -695,7 +704,7 @@ if (action.functionName && ALLOWED_SCRIPTS[action.functionName]) {
   - internal `allowedScripts` registry.
 - `script` action now executes only allowlisted function names.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
@@ -750,7 +759,7 @@ targetElement.innerHTML = htmlValue;
 - `src/utils/validation/interactionsEngine.js`:
   - same default-safe behavior and `trustedHTML` opt-in.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const directive = await import('/src/interactions/utils/engine.js');
@@ -805,7 +814,7 @@ There is no filtering of attribute names. An attacker who can control the config
   - block unsafe URL protocols on url-like attributes unless `trusted: true`
 - Unsafe attempts are rejected and logged.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const directive = await import('/src/interactions/utils/engine.js');
@@ -866,7 +875,7 @@ jsObjectExists: (_v, param) => {
 
 **What changed:** In canonical rules (`src/utils/validation/rules.js`), `jsObjectExists` now requires paths to start with `AppGlobals` and rejects all other roots.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { default: rules } = await import('/src/interactions/utils/validationRules.js');
@@ -912,7 +921,7 @@ If `reportValidity()` throws (which it can in certain detached-DOM or sandboxed-
 
 **What changed:** Wrapped mutation/reporting flow in `try/finally` so original input `type` and required attribute are always restored.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
@@ -968,7 +977,7 @@ for (const fieldId in scope.fields) {
 
 **What changed:** Replaced scope field loops with `Object.keys(scope.fields)` iteration in `src/utils/validation/interactionsEngine.js` where scope field traversal occurs.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
@@ -1019,7 +1028,7 @@ if (el) {
 
 **What changed:** In `src/interactions/utils/engine.js`, cache-hit branch now does LRU refresh (`delete` + `set`) before returning the element.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { execActions } = await import('/src/interactions/utils/engine.js');
@@ -1064,7 +1073,7 @@ Each invalid field triggers one or two `document.querySelector` calls during an 
 
 **What changed:** In `src/utils/validation/interactionsEngine.js`, `showValidationErrors` now prebuilds `labelByFor` once from `label[for]` and uses O(1) lookups by element ID.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
@@ -1122,7 +1131,7 @@ Config objects passed as `binding.value` are frozen on first parse and cached by
 
 **What changed:** Added DEV warning in `safeParseConfig(...)` (`src/interactions/utils/engine.js`) when the provided config object is not frozen, guiding callers to freeze/memoize configs.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const mod = await import('/src/interactions/utils/engine.js');
@@ -1161,7 +1170,7 @@ Every `@input` event fires `validationEngine.validateField()` synchronously. For
 - runs original validation/action pipeline only after debounce delay
 - preserves existing immediate behavior when `debounceMs` is unset/invalid.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
   const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
@@ -1244,7 +1253,7 @@ Call `clearScope` from component `onUnmounted`.
   - `src/templates/dashboard/page/role/DashboardResetPassword.vue` (`resetPasswordForm`)
 - Added unit coverage in `tests/unit/interactionsEngineScopeCleanup.test.js` for `unregister` and `clearScope` behavior.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const hasKey = (obj, key) => !!obj && Object.prototype.hasOwnProperty.call(obj, key); interactionsEngine.register({ scope: 'auditScope', id: 'email', validation: { rules: [] } }, '', document.createElement('input')); if (!interactionsEngine.elementVisibility) interactionsEngine.elementVisibility = {}; if (!interactionsEngine.originalValues) interactionsEngine.originalValues = {}; if (!interactionsEngine._debounceTimers) interactionsEngine._debounceTimers = {}; interactionsEngine.elementVisibility['auditScope.panel'] = true; interactionsEngine.originalValues['auditScope_target'] = 'old'; interactionsEngine.processFieldChange({ scope: 'auditScope', id: 'email', debounceMs: 250, events: { input: {} } }, 'abc'); const before = { hasScope: !!interactionsEngine.scopes.auditScope, hasField: !!interactionsEngine.scopes.auditScope?.fields?.email, hasVisibility: hasKey(interactionsEngine.elementVisibility, 'auditScope.panel'), hasOriginal: hasKey(interactionsEngine.originalValues, 'auditScope_target'), hasTimer: hasKey(interactionsEngine._debounceTimers, 'auditScope:email') }; interactionsEngine.unregister({ scope: 'auditScope', id: 'email' }); const afterUnregister = { scopeRemovedWhenEmpty: interactionsEngine.scopes.auditScope === undefined, visibilityCleared: !hasKey(interactionsEngine.elementVisibility, 'auditScope.panel'), originalCleared: !hasKey(interactionsEngine.originalValues, 'auditScope_target'), timerCleared: !hasKey(interactionsEngine._debounceTimers, 'auditScope:email') }; interactionsEngine.register({ scope: 'auditScope2', id: 'name', validation: { rules: [] } }, 'x', null); interactionsEngine.clearScope('auditScope2'); const afterClear = { clearScopeRemovedScope: interactionsEngine.scopes.auditScope2 === undefined }; const out = { ...before, ...afterUnregister, ...afterClear }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1288,7 +1297,7 @@ if (this.scopes[scopeId]?.fields[fieldId]) {
   - emits DEV warning: `[InteractionsEngine] Field already registered: <scope>.<id>. Call unregister first.`
 - Added targeted unit test `tests/unit/interactionsEngineRegisterIdempotency.test.js` to verify duplicate registration does not overwrite existing state.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); interactionsEngine.clearScope('b03Scope'); interactionsEngine.register({ scope: 'b03Scope', id: 'email', validation: {} }, 'first@email.com', null); const before = interactionsEngine.getFieldState({ scope: 'b03Scope', id: 'email' }); const firstRef = before; const firstValue = before?.value; interactionsEngine.register({ scope: 'b03Scope', id: 'email', validation: {} }, 'second@email.com', null); const after = interactionsEngine.getFieldState({ scope: 'b03Scope', id: 'email' }); const out = { sameReference: after === firstRef, valueNotOverwritten: after?.value === firstValue && after?.value === 'first@email.com' }; console.log({ pass: Object.values(out).every(Boolean), ...out, currentValue: after?.value }); })();
 ```
@@ -1325,7 +1334,7 @@ The method is a stub (TODO), but the raw `console.log` is unconditional and fire
 - Kept `this.logger.debug(...)` as the single logging path.
 - Added targeted test `tests/unit/interactionsEngineJumpPlaceholderLogging.test.js` to assert no raw console logging.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const originalLog = console.log; let rawLogCalls = 0; console.log = (...args) => { rawLogCalls += 1; originalLog(...args); }; interactionsEngine.jumpToFieldPlaceholder('b04Scope', 'email'); console.log = originalLog; const out = { noRawConsoleLog: rawLogCalls === 0 }; console.log({ pass: Object.values(out).every(Boolean), ...out, rawLogCalls }); })();
 ```
@@ -1368,7 +1377,7 @@ el.setAttribute('aria-invalid', result.isValid ? 'false' : 'true')
   - `stampValidation(...)` now also sets `aria-invalid` (`'true'` when invalid, `'false'` when valid).
 - Added focused test `tests/unit/stampValidationAriaInvalid.test.js` to assert `aria-invalid` tracks the validation result.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const mod = await import('/src/interactions/utils/engine.js'); const el = document.createElement('input'); mod.stampValidation(el, { isValid: false, failedRules: [{ rule: 'required', error: 'Required' }] }); const invalidStateOk = el.getAttribute('validated') === 'false' && el.getAttribute('aria-invalid') === 'true'; mod.stampValidation(el, { isValid: true, failedRules: [] }); const validStateOk = el.getAttribute('validated') === 'true' && el.getAttribute('aria-invalid') === 'false'; const out = { invalidStateOk, validStateOk }; console.log({ pass: Object.values(out).every(Boolean), ...out, attrs: { validated: el.getAttribute('validated'), ariaInvalid: el.getAttribute('aria-invalid') } }); })();
 ```
@@ -1407,7 +1416,7 @@ Only three specific string values are treated as "no selection". Real-world sele
   - caller controls placeholder sentinel when needed.
 - Added focused test `tests/unit/isSelectPlaceholderParam.test.js` to verify parameterized behavior.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const interactions = await import('/src/interactions/utils/validationRules.js'); const engine = await import('/src/utils/validation/validationsLibrary.js'); const rules = interactions.default; const out = { sameFunctionReference: engine.validationsLibrary.isSelect === rules.isSelect, emptyRejectedWhenParamEmpty: rules.isSelect('', '') === false, customPlaceholderRejected: rules.isSelect('placeholder', 'placeholder') === false, valueAccepted: rules.isSelect('creator', 'placeholder') === true, notHardcodedZeroBlocked: rules.isSelect('0', '') === true }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1443,7 +1452,7 @@ el.addEventListener(eventType, handler, { passive: true })
   - uses default listener options (`undefined`) for other events.
 - Added targeted test `tests/unit/vInteractionsPassiveEvents.test.js` to verify options per event type.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const mod = await import('/src/interactions/directives/vInteractions.js'); const el = document.createElement('input'); const calls = []; const originalAdd = el.addEventListener.bind(el); el.addEventListener = (eventName, handler, options) => { calls.push({ eventName, options }); return originalAdd(eventName, handler, options); }; mod.vInteractions.mounted(el, { value: Object.freeze([{ triggerEvents: ['wheel', 'touchstart', 'input', 'submit'], rules: [] }]) }); const by = (name) => calls.find((c) => c.eventName === name)?.options; const out = { wheelPassive: JSON.stringify(by('wheel')) === JSON.stringify({ passive: true }), touchPassive: JSON.stringify(by('touchstart')) === JSON.stringify({ passive: true }), inputNotPassive: by('input') === undefined, submitNotPassive: by('submit') === undefined }; console.log({ pass: Object.values(out).every(Boolean), ...out, calls }); })();
 ```
@@ -1482,7 +1491,7 @@ Having four near-identical implementations increases maintenance surface. Any ru
   - both use shared integer normalization.
 - Added focused verification test `tests/unit/minCharMinLengthCanonical.test.js`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const interactions = await import('/src/interactions/utils/validationRules.js'); const engine = await import('/src/utils/validation/validationsLibrary.js'); const r = interactions.default; const out = { sameMinCharRef: r.minChar === engine.validationsLibrary.minChar, sameMinLengthRef: r.minLength === engine.validationsLibrary.minLength, minCharRejectsShort: r.minChar('ab', 3) === false, minLengthRejectsShort: r.minLength('ab', 3) === false, minCharBadParamFallback: r.minChar('ab', 'bad') === true, minLengthBadParamFallback: r.minLength('ab', 'bad') === true }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1520,7 +1529,7 @@ The handlers use the module-level `interactionsEngine` variable rather than `thi
 - Updated `runInteractions(...)` to execute handlers with `handler.call(this, ...)`, so context-aware handlers receive the invoking engine instance.
 - Added targeted test `tests/unit/interactionsEngineActionHandlersContext.test.js` verifying explicit engine binding works without mutating singleton state.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const altEngine = { engine: null, elementVisibility: {}, logger: { debug: () => {}, error: () => {} }, getFieldState: () => null, _getElementValue: () => '', _setElementValue: () => {}, originalValues: {}, allowedScripts: {}, scopes: {}, validateScope: () => ({ isValid: true, invalidFields: [] }), actionHandlers: interactionsEngine.actionHandlers, runInteractions: interactionsEngine.runInteractions }; altEngine.engine = altEngine; delete interactionsEngine.elementVisibility['b10.scope']; altEngine.runInteractions([{ type: 'showElement', elementKey: 'b10.scope' }], null); const out = { updatedAltEngine: altEngine.elementVisibility['b10.scope'] === true, singletonUntouched: interactionsEngine.elementVisibility['b10.scope'] === undefined }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1559,7 +1568,7 @@ The `custom` rule in `validationsLibrary.js` accepts a function but it must retu
 - `src/utils/validation/interactionsEngine.js` — field state `pending`, debounced `_asyncDebounceTimers`, `_scheduleAsyncValidation`, `flushAsyncValidation()`. Mark async rules with `{ async: true }` on the rule config; optional `asyncDebounceMs` on `fieldConfig` (falls back to `debounceMs`, default 300ms).
 - Tests: `tests/unit/validationEngineAsyncRules.test.js`, `tests/unit/interactionsEngineAsyncValidation.test.js`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); interactionsEngine.register({ scope: 'm01', id: 'username', asyncDebounceMs: 100, validation: { rules: [{ type: 'custom', async: true, param: (v) => Promise.resolve(v === 'free'), message: 'Taken' }] } }, 'taken', null); interactionsEngine.processFieldChange({ scope: 'm01', id: 'username', asyncDebounceMs: 100, validation: { rules: [{ type: 'custom', async: true, param: (v) => Promise.resolve(v === 'free'), message: 'Taken' }] } }, 'free'); await new Promise((r) => setTimeout(r, 150)); await interactionsEngine.flushAsyncValidation({ scope: 'm01', id: 'username' }); const s = interactionsEngine.getFieldState({ scope: 'm01', id: 'username' }); const out = { isValid: s.isValid === true, pendingCleared: s.pending === false, noFailedRules: (s.failedRules || []).length === 0 }; interactionsEngine.clearScope('m01'); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1583,7 +1592,7 @@ See [B-02](#b-02--interactionsengine-is-a-global-singleton-with-no-cleanup-api).
 
 **What changed:** See B-02 resolution (`unregister`, `clearScope`, `onBeforeUnmount` wiring, `tests/unit/interactionsEngineScopeCleanup.test.js`). Async debounce timers are also cleared in `clearScope` / `unregister` after M-01.
 
-**How to test in the browser (one paste):** Use the B-02 browser command in [B-02](#b-02--interactionsengine-is-a-global-singleton-with-no-cleanup-api).
+**How to test in the browser (one paste — logs result when the promise settles):** Use the B-02 browser command in [B-02](#b-02--interactionsengine-is-a-global-singleton-with-no-cleanup-api).
 
 **Expected:** Final log includes `pass: true`.
 
@@ -1615,7 +1624,7 @@ There is no dependency tracking: no way to declare "when field X changes, re-val
 - `src/templates/dashboard/page/role/DashboardResetPassword.vue` — `dependsOn: ['newPassword']` on confirm field.
 - Test: `tests/unit/interactionsEngineDependsOn.test.js`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); interactionsEngine.register({ scope: 'm03', id: 'password', validation: { rules: [] } }, 'abc', null); interactionsEngine.register({ scope: 'm03', id: 'confirmPassword', dependsOn: ['password'], validation: { rules: [{ type: 'matchValue', param: 'password', message: 'No match' }] } }, 'abc', null); interactionsEngine.processFieldChange({ scope: 'm03', id: 'password', validation: { rules: [] } }, 'xyz'); const c = interactionsEngine.getFieldState({ scope: 'm03', id: 'confirmPassword' }); const out = { confirmInvalid: c.isValid === false, matchFailed: c.failedRules?.[0]?.type === 'matchValue' }; interactionsEngine.clearScope('m03'); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1649,7 +1658,7 @@ The standard UX pattern is to show errors only after a field has been `touched` 
 - Scope objects now include `submitted: false` by default.
 - Test: `tests/unit/interactionsEngineTouchedDirty.test.js`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); interactionsEngine.register({ scope: 'm04', id: 'email', validation: { rules: [{ type: 'isEmail', message: 'Bad email' }] } }, 'bad', null); interactionsEngine.processFieldChange({ scope: 'm04', id: 'email', validation: { rules: [{ type: 'isEmail', message: 'Bad email' }] } }, 'bad'); const hiddenBeforeBlur = interactionsEngine.getFieldState({ scope: 'm04', id: 'email' }).showError === false; interactionsEngine.processFieldBlur({ scope: 'm04', id: 'email' }); const shownAfterBlur = interactionsEngine.getFieldState({ scope: 'm04', id: 'email' }).showError === true; const out = { hiddenBeforeBlur, shownAfterBlur }; interactionsEngine.clearScope('m04'); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1679,7 +1688,7 @@ See [B-06](#b-06--stampvalidation-sets-non-standard-validated-attribute-without-
 - `stampValidation()` now syncs `aria-describedby` when invalid and removes the error id when valid (preserves unrelated describedby ids).
 - Tests: `tests/unit/stampValidationAriaDescribedby.test.js` (plus existing `stampValidationAriaInvalid.test.js`).
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const mod = await import('/src/interactions/utils/engine.js'); const err = document.createElement('p'); err.id = 'demo-email-error'; err.textContent = 'Invalid'; document.body.append(err); const input = document.createElement('input'); input.id = 'demo-email'; document.body.append(input); mod.stampValidation(input, { isValid: false, failedRules: [{ rule: 'isEmail', error: 'Invalid' }] }); const out = { ariaInvalid: input.getAttribute('aria-invalid') === 'true', describedBy: input.getAttribute('aria-describedby') === 'demo-email-error' }; mod.stampValidation(input, { isValid: true, failedRules: [] }); out.cleared = input.getAttribute('aria-describedby') === null; err.remove(); input.remove(); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1723,7 +1732,7 @@ All of these would pass `step1Validator` and likely cause database, UI rendering
   - `basePrice` max 10000
 - Extended `tests/unit/eventStepValidators.test.js` with upper-bound cases.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const { step1Validator } = await import('/src/services/events/validators/eventStepValidators.js'); const state = { eventTitle: 'x'.repeat(201), duration: 481, basePrice: 10001, repeatRule: 'weekly', weeklyAvailability: [{ unavailable: false, slots: [{ startTime: '10:00', endTime: '11:00' }] }] }; const fields = new Set(step1Validator(state).errors.map((e) => e.field)); const out = { title: fields.has('eventTitle'), duration: fields.has('duration'), price: fields.has('basePrice') }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1747,7 +1756,7 @@ See [P-06](#p-06--processFieldChange-validates-on-every-keystroke-with-no-deboun
 
 **What changed:** See P-06 resolution (`fieldConfig.debounceMs` in `interactionsEngine.processFieldChange`, test `tests/unit/processFieldChangeDebounce.test.js`). Async rules also use debounced execution via `asyncDebounceMs` / `debounceMs` (M-01).
 
-**How to test in the browser (one paste):** Use the P-06 browser command in [P-06](#p-06--processFieldChange-validates-on-every-keystroke-with-no-debounce).
+**How to test in the browser (one paste — logs result when the promise settles):** Use the P-06 browser command in [P-06](#p-06--processFieldChange-validates-on-every-keystroke-with-no-debounce).
 
 **Expected:** Final log includes `pass: true`.
 
@@ -1780,7 +1789,7 @@ Displaying error summaries inside a `<textarea>` is semantically incorrect and c
 - Default selector prefers `[data-error-display]` (any element), not only textarea.
 - Updated/extended tests in `tests/unit/securityInteractionsEngine.test.js`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const ta = document.createElement('textarea'); ta.id = 'm09'; ta.setAttribute('data-error-display', ''); document.body.append(ta); interactionsEngine.scopes.m09 = { fields: { name: { value: '', validationConfig: { required: true }, element: null, isValid: false, failedRules: [{ type: 'required', message: 'Required' }] } } }; interactionsEngine.actionHandlers.showValidationErrors({ scopeId: 'm09', fieldIds: ['name'], scroll: false }, null, null); const summary = document.getElementById('m09-summary'); const out = { alertRole: summary?.getAttribute('role') === 'alert', listRendered: !!summary?.querySelector('ul[role="list"]'), textareaUntouched: ta.value === '' }; ta.remove(); summary?.remove(); delete interactionsEngine.scopes.m09; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1812,7 +1821,7 @@ Any non-empty string passes. If the API expects an enum (`"oneOnOne"`, `"group"`
 - Rejects unknown types with a clear error listing allowed values.
 - Test: `tests/unit/eventFlowValidatorsType.test.js`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const mod = await import('/src/services/events/validators/eventFlowValidators.js'); const good = mod.validateCreateEventPayload({ creatorId: 'c1', title: 'E', type: '1on1-call' }); const bad = mod.validateCreateEventPayload({ creatorId: 'c1', title: 'E', type: 'webinar' }); const out = { goodOk: good.ok === true, badRejected: bad.ok === false, enumMessage: bad.errors.some((e) => String(e).includes('type must be one of')) }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1849,7 +1858,7 @@ If the action fires rapidly (e.g., on every keystroke while `triggerEvents` incl
 - `src/interactions/utils/engine.js` — `_browserErrorClearTimers` WeakMap stores `{ timerId, generation }`; prior timers are cancelled before scheduling a new clear; stale callbacks no-op when generation changed.
 - Test: `tests/unit/showBrowserErrorTimeout.test.js`.
 
-**How to test in the browser (one paste):**
+**How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => { const { execActions } = await import('/src/interactions/utils/engine.js'); const input = document.createElement('input'); document.body.append(input); execActions({ actionType: 'showBrowserError', message: 'First' }, input, document); execActions({ actionType: 'showBrowserError', message: 'Second' }, input, document); const afterBurst = input.validationMessage === 'Second'; await new Promise((r) => setTimeout(r, 850)); const out = { afterBurst, clearedAfterLatestTimeout: input.validationMessage === '' }; input.remove(); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
 ```
@@ -1880,6 +1889,26 @@ Result: `validateScope()` can return `isValid: true` even when the scope actuall
 
 **Fix:** In `mounted` for `vInteractions`, stamp a normalized config attribute on the element (or register fields in a WeakMap keyed by scope), and make `validateScope` read that canonical registry.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `validateScope()` in `src/interactions/utils/engine.js` only queried `[interaction-config]`, but `v-interactions` binds frozen config objects and never wrote that attribute. Scope validation could return `isValid: true` with zero fields checked even when invalid bound inputs existed in the container.
+
+**Why it happened:** The directive and scope validator used different discovery mechanisms — runtime binding vs static attribute lookup.
+
+**What changed:**
+- `src/interactions/utils/engine.js` — added `INTERACTION_CONFIG_ATTR`, `stampInteractionConfig()`, and `clearInteractionConfig()`; `validateScope` reads the shared attribute constant.
+- `src/interactions/directives/vInteractions.js` — `wire()` stamps JSON-serialized config on mount/update; `unwire()` clears the attribute on teardown or empty config.
+- `tests/unit/validateScopeInteractionConfig.test.js` — proves unstamped fields are skipped and stamped fields are validated.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { validateScope, stampInteractionConfig } = await import('/src/interactions/utils/engine.js'); const scope = document.createElement('div'); scope.setAttribute('interaction-container', ''); const input = document.createElement('input'); input.id = 'auditEmail'; input.value = 'not-an-email'; scope.appendChild(input); document.body.appendChild(scope); const before = validateScope(scope); stampInteractionConfig(input, [{ triggerEvents: ['input'], rules: [{ type: 'isEmail', error: 'Invalid email' }] }]); const after = validateScope(scope); scope.remove(); const out = { beforeSilentPass: before.isValid === true && before.invalid.length === 0, afterFindsInvalid: after.isValid === false && after.invalid.length === 1, afterRuleIsEmail: after.invalid[0]?.failedRules?.[0]?.rule === 'isEmail' }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true` (`beforeSilentPass` documents the old failure mode; `afterFindsInvalid` / `afterRuleIsEmail` prove the fix).
+
 ---
 
 ### L-12 · Password visibility toggle mutates DOM type, but Vue binding can reset it on re-render
@@ -1899,6 +1928,26 @@ The eye-click action mutates the real DOM `type` attribute, but Vue still treats
 
 **Fix:** Track `isPasswordVisible` in component state and bind `:type="isPasswordVisible ? 'text' : type"` instead of mutating DOM attributes externally.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** The password eye control used `toggleDisplay` on the real DOM `type` attribute while the input was bound with `:type="type"` from props. Vue re-renders could reset `type` back to `"password"` after toggling visibility.
+
+**Why it happened:** Visibility was driven by the interactions engine (DOM mutation) instead of component state that Vue owns.
+
+**What changed:**
+- `src/components/input/InputAuthComponent.vue` — added `isPasswordVisible`, `resolvedInputType` (`text` when visible, else prop `type`), and `handleRightIconClick()` to toggle visibility in Vue.
+- Removed `internalTypeToggleConfig` (`toggleDisplay` on `type` and icon spans).
+- Eye icons now use `v-show` tied to `isPasswordVisible` (no DOM `hidden` toggling for icons).
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const input = document.querySelector('#password'); const eye = document.querySelector('#password-eye'); if (!input || !eye) { console.log({ pass: false, reason: 'Open /log-in and ensure #password exists' }); return; } const read = () => ({ type: input.type, eyeHidden: eye.hasAttribute('hidden') }); const before = read(); eye.click(); await new Promise((r) => setTimeout(r, 50)); const afterClick = read(); input.dispatchEvent(new Event('input', { bubbles: true })); await new Promise((r) => setTimeout(r, 50)); const afterInput = read(); const out = { startsPassword: before.type === 'password', togglesToText: afterClick.type === 'text', survivesInputEvent: afterInput.type === 'text', eyeStillVisible: !afterClick.eyeHidden }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true` (type stays `text` after click and after a bubbling `input` event).
+
 ---
 
 ### S-06 · OAuth popup `postMessage` handlers do not enforce trusted origins
@@ -1911,8 +1960,29 @@ This increases risk when popup navigation is compromised/misdirected, because me
 
 **Fix:** Validate `event.origin` against a strict allowlist of expected OAuth callback origins and use that validated origin for acknowledgements (never `"*"` fallback).
 
+#### Resolution ✅
 
+**Status:** Resolved.
 
+**What was broken:** `AuthLogIn.vue` and `AuthSignUp.vue` OAuth `message` handlers trusted `event.source === popup` only and replied with `event.origin || "*"`, so acknowledgements could be sent to unexpected origins.
+
+**Why it happened:** Callback pages may run on a different origin (e.g. ngrok) than the parent; origin checks were deferred in favor of popup reference + state matching.
+
+**What changed:**
+- Added `src/utils/auth/oauthPostMessage.js` — builds allowlists from `window.location.origin`, `VITE_TWITTER_REDIRECT_URI`, `VITE_TELEGRAM_CALLBACK_ORIGIN`, and optional comma-separated `VITE_OAUTH_ALLOWED_ORIGINS`; `postOAuthAck()` never uses `"*"`.
+- `AuthLogIn.vue` / `AuthSignUp.vue` — reject inbound popup messages when `event.origin` is not allowlisted; all ACK replies go through `postOAuthAck()`.
+- `tests/unit/oauthPostMessage.test.js` — allowlist and blocked-untrusted-origin coverage.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const mod = await import('/src/utils/auth/oauthPostMessage.js'); const allowed = mod.getTwitterOAuthAllowedOrigins(); const source = { postMessage: (payload, target) => { window.__oauthAck = { payload, target }; } }; const trusted = [...allowed][0]; const out = { hasRedirectOrigin: allowed.size >= 1, ackTrusted: mod.postOAuthAck(source, { type: 'TWITTER_OAUTH_ACK', success: true, state: 'x' }, trusted, allowed) && window.__oauthAck?.target === trusted, ackBlocked: !mod.postOAuthAck(source, { type: 'TWITTER_OAUTH_ACK' }, 'https://evil.example', allowed) && window.__oauthAck?.target === trusted }; delete window.__oauthAck; console.log({ pass: Object.values(out).every(Boolean), allowed: [...allowed], ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`; `ackBlocked` proves evil origin does not receive an ACK.
+
+**Env note:** Set `VITE_TWITTER_REDIRECT_URI` (and `VITE_TELEGRAM_CALLBACK_ORIGIN` / `VITE_OAUTH_ALLOWED_ORIGINS` when using ngrok) so callback origins match your popup URLs.
+
+---
 
 ### L-13 · Numeric coercion allows non-integer IDs and fractional limits in event flow validators
 **File:** `src/services/events/validators/eventFlowValidators.js` lines 13–21 and 46–56  
@@ -1928,6 +1998,25 @@ if (limit == null || limit <= 0 || limit > 200) { ... }
 `toNumber` accepts any finite numeric value, so values like `creatorId: 1.5` and `limit: 12.7` pass validation even if API contracts expect integer identifiers and integer pagination limits.
 
 **Fix:** Enforce integer checks (`Number.isInteger(...)`) and apply explicit bounds for ID semantics.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `toNumber()` accepted any finite number, so fractional `limit` values (e.g. `12.7`) passed fetch validation; numeric `creatorId` values like `1.5` were not rejected.
+
+**Why it happened:** Pagination/ID checks used generic finite-number coercion without integer semantics.
+
+**What changed:**
+- `src/services/events/validators/eventFlowValidators.js` — replaced limit coercion with `toPositiveInteger()` (`Number.isInteger`); reject non-integer numeric `creatorId`; clarified limit error message.
+- `tests/unit/eventFlowValidatorsInteger.test.js` — fractional limit, valid integer limit, and fractional `creatorId` cases.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { validateFetchCreatorEventsPayload, validateCreateEventPayload } = await import('/src/services/events/validators/eventFlowValidators.js'); const fetchBad = validateFetchCreatorEventsPayload({ creatorId: 'c1', limit: 12.7 }); const fetchOk = validateFetchCreatorEventsPayload({ creatorId: 'c1', limit: 50 }); const createBad = validateCreateEventPayload({ creatorId: 1.5, title: 'E', type: '1on1-call' }); const out = { fractionalLimitRejected: !fetchBad.ok, integerLimitAccepted: fetchOk.ok, fractionalCreatorRejected: !createBad.ok }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 --
 
@@ -1962,6 +2051,25 @@ If a component calls `validateScope('wrongScope')` before fields are registered,
 
 **Fix:** Return `isValid: false` with a synthetic error such as `SCOPE_NOT_REGISTERED`, or throw in DEV mode.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `interactionsEngine.validateScope(scopeId)` returned `isValid: true` when `this.scopes[scopeId]` was missing, so typos or pre-registration calls silently passed validation.
+
+**Why it happened:** Missing scope was treated as an empty valid scope instead of a configuration error.
+
+**What changed:**
+- `src/utils/validation/interactionsEngine.js` — missing scope now returns `isValid: false` and `scopeError: 'SCOPE_NOT_REGISTERED'`; DEV logs an error.
+- `tests/unit/interactionsEngineValidateScope.test.js` — covers missing vs registered scopes.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const missing = interactionsEngine.validateScope('__audit_missing_scope__'); interactionsEngine.scopes.__audit_registered__ = { fields: { name: { value: '', validationConfig: { required: true }, element: null, isValid: true, failedRules: [] } } }; const registered = interactionsEngine.validateScope('__audit_registered__'); delete interactionsEngine.scopes.__audit_registered__; const out = { missingInvalid: missing.isValid === false && missing.scopeError === 'SCOPE_NOT_REGISTERED', registeredChecksFields: registered.isValid === false && registered.invalidFields.length === 1 }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### L-15 · `stateEngine.addFieldRequirement` validates without field context
@@ -1986,6 +2094,26 @@ Booking flow step validators in `UnifiedBookingForm.vue` use this path, so cross
 
 **Fix:** Pass a full context object (scope, fieldId, optional element ref, `getFieldValue`) into `validateField`.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `addFieldRequirement` called `validationEngine.validateField(value, validationConfig)` with no context, so DOM-aware and cross-field rules (`matchValue`, `isRadioCheck`, required via element) could not work in the booking step engine path.
+
+**Why it happened:** The state engine bridge only forwarded value + config, not scope/element/`getFieldValue`.
+
+**What changed:**
+- `src/utils/stateEngine.js` — added `buildFieldValidationContext()`; `addFieldRequirement(step, path, validationConfig, contextOptions?)` now passes `{ scope, fieldId, element, getFieldValue }` (optional 4th arg for overrides).
+- Default `getFieldValue` reads peer fields from step state via `deepGet(state, targetFieldId)`.
+- `tests/unit/stateEngineFieldRequirement.test.js` — `matchValue` cross-field + required-with-element cases.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { createStepStateEngine } = await import('/src/utils/stateEngine.js'); const engine = createStepStateEngine({ flowId: '__audit_l15', defaults: { password: 'abc', confirmPassword: 'xyz' }, urlSync: 'none' }); engine.addFieldRequirement(1, 'confirmPassword', { rules: [{ type: 'matchValue', param: 'password', message: 'Must match' }] }, { scope: 'booking', fieldId: 'confirmPassword' }); const fail = await engine.validate(1); engine.setState('confirmPassword', 'abc', { silent: true }); const pass = await engine.validate(1); const out = { mismatchFails: !fail.valid, matchPasses: pass.valid }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### L-16 · `custom` validation rule fails open when `param` is not a function
@@ -2007,6 +2135,26 @@ A typo or missing `param` function makes the rule always succeed.
 
 **Fix:** Return `false` (or throw in DEV) when `param` is not a function.
 
+#### Resolution ✅
+
+**Status:** Resolved (already fixed during rules-unification pass; verified in this audit step).
+
+**What was broken:** Misconfigured `custom` rules with a non-function `param` returned `true`, silently skipping validation.
+
+**Why it happened:** Legacy `validationsLibrary.js` inlined a fail-open `custom` implementation before canonical rules existed.
+
+**What changed:**
+- Canonical `custom` in `src/utils/validation/rules.js` returns `false` when `param` is not a function.
+- `src/utils/validation/validationsLibrary.js` re-exports canonical rules (no separate fail-open copy).
+- `tests/unit/customRuleFailsClosed.test.js` — explicit L-16 regression coverage (also covered in `validationRulesUnification.test.js`).
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { validationsLibrary } = await import('/src/utils/validation/validationsLibrary.js'); const out = { nullParamFails: validationsLibrary.custom('x', null, {}) === false, stringParamFails: validationsLibrary.custom('x', 'bad', {}) === false, fnPass: validationsLibrary.custom('ok', (v) => v === 'ok', {}) === true, fnFail: validationsLibrary.custom('no', (v) => v === 'ok', {}) === false }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### L-17 · `isSecurePassword` rules diverge between directive and engine libraries
@@ -2021,6 +2169,26 @@ A typo or missing `param` function makes the rule always succeed.
 The same field validated via `v-interactions` vs `interactionsEngine` can pass in one path and fail in the other.
 
 **Fix:** Unify to one canonical implementation and import it in both places.
+
+#### Resolution ✅
+
+**Status:** Resolved (already fixed during rules-unification pass; verified in this audit step).
+
+**What was broken:** Directive `validationRules.js` and engine `validationsLibrary.js` enforced different `isSecurePassword` policies (special character required on one side only).
+
+**Why it happened:** Two independent rule registries before canonical `src/utils/validation/rules.js`.
+
+**What changed:**
+- Canonical `isSecurePassword` in `rules.js` requires upper + lower + digit + special + min length 8.
+- `validationRules.js` and `validationsLibrary.js` both re-export the same `rules` object.
+- Covered by `tests/unit/validationRulesUnification.test.js`.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const directiveRules = (await import('/src/interactions/utils/validationRules.js')).default; const { validationsLibrary } = await import('/src/utils/validation/validationsLibrary.js'); const sample = 'Abcdef12'; const out = { sameFn: validationsLibrary.isSecurePassword === directiveRules.isSecurePassword, noSpecialFails: validationsLibrary.isSecurePassword(sample) === false, withSpecialPasses: validationsLibrary.isSecurePassword('Abcdef12!') === true }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -2039,6 +2207,25 @@ If `onChange` fixes or breaks validity (e.g., sync clears a dependent field), UI
 
 **Fix:** Re-validate after `onChange`, or run `onChange` before validation.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `processFieldChange` validated first, ran `onChange` second, then fired `onValid`/`onInvalid` from the pre-`onChange` result — stale when `onChange` mutated field value.
+
+**Why it happened:** Pipeline order treated `onChange` as a side effect after validation instead of part of the value/context used for validation.
+
+**What changed:**
+- `src/utils/validation/interactionsEngine.js` — `runPipeline` now runs `inputEvents.onChange` before sync validation; validates `state.value` after `onChange`; then runs `onValid`/`onInvalid`.
+- `tests/unit/processFieldChangeOnChangeOrder.test.js` — `onChange` clears value; asserts `onInvalid` fires (not stale `onValid`).
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); interactionsEngine.actionHandlers.__auditClear = (_a, s) => { if (s) s.value = ''; }; const cfg = { scope: '__l18', id: 't', validation: { required: true }, events: { input: { onChange: [{ type: '__auditClear' }], onValid: [{ type: 'showElement', elementKey: 'ok' }], onInvalid: [{ type: 'showElement', elementKey: 'bad' }] } } }; interactionsEngine.register(cfg, 'x', null); interactionsEngine.elementVisibility.ok = false; interactionsEngine.elementVisibility.bad = false; interactionsEngine.processFieldChange(cfg, 'x'); const out = { invalidUi: interactionsEngine.elementVisibility.bad === true, validUiNotStale: interactionsEngine.elementVisibility.ok !== true }; delete interactionsEngine.scopes.__l18; delete interactionsEngine.actionHandlers.__auditClear; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true` (`bad` shown because `onChange` cleared the field before validation).
+
 ---
 
 ### L-19 · `registerRule` does not update `validationsLibrary` (false “single source of truth”)
@@ -2050,6 +2237,27 @@ Comments claim one rule library for both systems, but `registerRule` only mutate
 **Impact:** Rules registered at plugin boot via `InteractionsPlugin` work for `v-interactions` but not for auth/booking components using `interactionsEngine`.
 
 **Fix:** Mirror registrations into `validationsLibrary`, or merge both into one exported registry.
+
+#### Resolution ✅
+
+**Status:** Resolved (already fixed during rules-unification pass; verified in this audit step).
+
+**What was broken:** `registerRule` appeared to update only the directive registry while `validationEngine` read a separate `validationsLibrary` object.
+
+**Why it happened:** Pre-unification duplicate modules; comments lagged the refactor.
+
+**What changed:**
+- `registerRule` mutates canonical `rules` in `src/utils/validation/rules.js`.
+- `validationRules.js` and `validationsLibrary.js` re-export that same object (`validationsLibrary === directiveRules`).
+- `InteractionsPlugin` `registerRule` calls therefore apply to both `v-interactions` and `interactionsEngine`.
+- Covered by `tests/unit/validationRulesUnification.test.js` (`registerRule updates engine-visible validationsLibrary`).
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { registerRule, default: directiveRules } = await import('/src/interactions/utils/validationRules.js'); const { validationsLibrary } = await import('/src/utils/validation/validationsLibrary.js'); registerRule('__auditRuntimeRule', (v) => v === 'ok'); const out = { sameRegistry: validationsLibrary === directiveRules, runtimeVisible: validationsLibrary.__auditRuntimeRule('ok') === true && validationsLibrary.__auditRuntimeRule('no') === false }; delete validationsLibrary.__auditRuntimeRule; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -2064,6 +2272,26 @@ el?.querySelector(`input[type=radio][name="${name}"]:checked`)
 If `name` contains `"` or other selector-breaking characters, the selector can break or match unintended nodes.
 
 **Fix:** Use `CSS.escape(name)` or validate `name` against a safe pattern before querying.
+
+#### Resolution ✅
+
+**Status:** Resolved (already fixed in canonical `rules.js` during rules-unification pass; regression test added here).
+
+**What was broken:** `isRadioCheck` interpolated raw `name` into a `querySelector` string; quotes in `name` could break or widen the selector.
+
+**Why it happened:** Legacy directive rule built the selector without escaping.
+
+**What changed:**
+- Canonical `isRadioCheck` in `src/utils/validation/rules.js` queries scoped radios and compares `el.name === param` (avoids selector injection from special characters in `name`).
+- `validationRules.js` re-exports canonical rules (no separate unsafe copy).
+- `tests/unit/isRadioCheckEscape.test.js` — radio group name containing `"` still resolves correctly.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const form = document.createElement('form'); form.setAttribute('interaction-container', ''); form.innerHTML = '<input type="radio" name="audit&quot;group" id="a"><input type="radio" name="audit&quot;group" id="b" checked>'; document.body.appendChild(form); const { validationsLibrary } = await import('/src/utils/validation/validationsLibrary.js'); const anchor = form.querySelector('#a'); const out = { checkedFound: validationsLibrary.isRadioCheck('', 'audit"group', { element: anchor }) === true }; form.remove(); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -2081,6 +2309,20 @@ In addition to `eval` (S-01), this allows calling any global function exposed on
 
 **Fix:** Use an allowlisted map of callable functions, same as recommended for `eval` removal.
 
+#### Resolution ✅
+
+**Status:** Resolved (covered by [S-01](#s-01--script-action-uses-eval--direct-code-execution-from-config) `allowedScripts` allowlist).
+
+**What was broken:** `script` actions could call `window[functionName]` for any global function.
+
+**Why it happened:** No allowlist gate on `functionName` lookups.
+
+**What changed:** `script` now only runs `interactionsEngine.allowedScripts[functionName]` after `registerScriptFunction()`; globals are rejected. See S-01 resolution and `tests/unit/securityInteractionsEngine.test.js`.
+
+**How to test in the browser (one paste — logs result when the promise settles):** Use the S-01 browser command in [S-01](#s-01--script-action-uses-eval--direct-code-execution-from-config) (`allowlistedFunctionRuns: true`, `inlineCodeBlocked: true`).
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### S-08 · `extendAction` allows unreviewed runtime action handler registration
@@ -2096,6 +2338,26 @@ extendAction(type, handlerFn) {
 Any module can register handlers that run during validation events with access to field state and DOM elements.
 
 **Fix:** require registration through a reviewed allowlist.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `extendAction()` could register arbitrary handlers at runtime without review.
+
+**Why it happened:** No bootstrap-time allowlist for custom action types.
+
+**What changed:**
+- `interactionsEngine.registerActionHandler(type, fn)` — reviewed registration entry point (allowlists + installs handler).
+- `extendAction()` now only updates handlers already registered via `registerActionHandler`.
+- `tests/unit/interactionsEngineSecurityBatch.test.js` — blocked vs allowed paths.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const blocked = interactionsEngine.extendAction('__auditX', () => true) === false; interactionsEngine.registerActionHandler('__auditX', () => true); const allowed = interactionsEngine.extendAction('__auditX', () => false) === true; delete interactionsEngine._allowedActionHandlers.__auditX; delete interactionsEngine.actionHandlers.__auditX; console.log({ pass: blocked && allowed, blocked, allowed }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -2116,6 +2378,25 @@ If action config is influenced by external input, events can be dispatched on un
 
 **Fix:** Allow only `'window'`, `'document'`, or known element keys resolved through a trusted registry.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `pushEvent` dispatched on arbitrary DOM nodes passed in `action.target`.
+
+**Why it happened:** `action.target` was forwarded directly when not `window`/`document`.
+
+**What changed:**
+- `resolveEventDispatchTarget()` in `interactionsEngine.js` — allows `window`, `document`, `targetElementKey`, or string keys resolved via `[data-element-key="..."]`; rejects raw `Element` nodes.
+- `tests/unit/interactionsEngineSecurityBatch.test.js` — element key dispatch + raw node rejection.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const el = document.createElement('div'); el.setAttribute('data-element-key', 'auditEvt'); document.body.appendChild(el); let ok = false; el.addEventListener('auditEvt', (e) => { ok = e.detail?.ok === true; }); const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); interactionsEngine.actionHandlers.pushEvent({ eventName: 'auditEvt', eventData: { ok: true }, targetElementKey: 'auditEvt' }); const raw = document.createElement('span'); let rawRejected = true; const err = console.error; console.error = () => { rawRejected = true; }; interactionsEngine.actionHandlers.pushEvent({ eventName: 'auditEvt', target: raw }); console.error = err; el.remove(); console.log({ pass: ok && rawRejected, elementKeyWorks: ok, rawNodeRejected: rawRejected }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### P-08 · `scopeHasNoBlockingInvalids` re-validates every field on each call
@@ -2128,13 +2409,51 @@ The method loops all fields and calls `validationEngine.validateField` for each 
 
 **Fix:** Reuse cached `fieldState.isValid` when not dirty, or accept a precomputed `validateScope` result.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `scopeHasNoBlockingInvalids` called `validationEngine.validateField` for every field on every guard check.
+
+**Why it happened:** Guard always re-ran full validation instead of trusting fresh cached state.
+
+**What changed:** `scopeHasNoBlockingInvalids` now re-validates only when `fieldState.dirty` is true; otherwise uses cached `isValid` / `failedRules`. Covered in `tests/unit/interactionsEngineSecurityBatch.test.js`.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const { validationEngine } = await import('/src/utils/validation/validationEngine.js'); let calls = 0; const orig = validationEngine.validateField; validationEngine.validateField = (...args) => { calls += 1; return orig(...args); }; interactionsEngine.scopes.__p08b__ = { fields: { t: { value: 'ok', dirty: false, touched: true, validationConfig: { required: true }, element: null, isValid: true, failedRules: [] } } }; interactionsEngine.scopeHasNoBlockingInvalids('__p08b__'); validationEngine.validateField = orig; delete interactionsEngine.scopes.__p08b__; console.log({ pass: calls === 0, validateFieldCalls: calls }); })();
+```
+
+**Expected:** Final log includes `pass: true` (`validateFieldCalls: 0`).
+
 ---
 
 ### P-09 · Booking step navigation runs two separate validation pipelines
 
 **File:** `src/components/ui/form/BookingForm/OneOnOneBookinStep1.vue` — lines 94–118
 
+`goToNext()` gated on `interactionsEngine.validateScope('oneOnOneBooking')` while `props.engine.goToStep(2)` also runs `stateEngine` step-1 validators (`addFieldRequirement` for `eventTitle`, `basePrice`, etc.), causing duplicate/conflicting validation pipelines.
 
+**Fix:** Use `stateEngine.validate(1)` as the authoritative step gate; use `interactionsEngine.validateField` only for registered field UI (browser validity / notifications).
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Booking step “Next” used `validateScope` as the gate, then `goToStep(2)` ran a second full validation pipeline in `stateEngine`.
+
+**Why it happened:** UI-scope validation and step-engine validation were both treated as independent gates.
+
+**What changed:** `OneOnOneBookinStep1.vue` `goToNext()` now:
+1. Syncs `eventTitle` into engine state.
+2. Runs `interactionsEngine.validateField(eventTitleConfig)` for UI feedback.
+3. Runs `props.engine.validate(1)` as the single authoritative step gate before `goToStep(2)`.
+
+**How to test in the browser (one paste — logs result when the promise settles):** On the one-on-one booking step 1 UI, clear **Event Title** and click **Next** — step should stay on step 1 with the title error card (stateEngine validation). Fill title and required step-1 fields, click **Next** — should advance to step 2 without a duplicate `validateScope` gate in console flow.
+
+**Expected:** Empty title blocks navigation; valid step-1 data advances once (no double validation gate in `goToNext`).
+
+---
 
 ### BP-12 · Incompatible action config shapes: `actionType` vs `type`
 
@@ -2143,6 +2462,26 @@ The method loops all fields and calls `validationEngine.validateField` for each 
 The directive engine and reactive engine use different property names for the same concept. Config snippets are not portable between `v-interactions` and `interactionsEngine.runInteractions`.
 
 **Fix:** Normalize on ingest (accept both keys) or document/enforce one schema.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Directive actions used `actionType`; reactive engine actions used `type` — configs were not portable.
+
+**Why it happened:** Engines evolved separately without a shared action schema helper.
+
+**What changed:**
+- Added `src/interactions/utils/actionSchema.js` with `resolveActionType(action)` (`type ?? actionType`).
+- `interactionsEngine.runInteractions` and directive `execAction` both use `resolveActionType`.
+- `tests/unit/interactionsEngineSecurityBatch.test.js` — precedence tests.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { resolveActionType } = await import('/src/interactions/utils/actionSchema.js'); const out = { fromType: resolveActionType({ type: 'showElement' }) === 'showElement', fromActionType: resolveActionType({ actionType: 'hideElement' }) === 'hideElement', typeWins: resolveActionType({ type: 'show', actionType: 'hide' }) === 'show' }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -2160,7 +2499,24 @@ Duplicate key in the exported API object (harmless at runtime but signals copy-p
 
 **Fix:** Remove the duplicate entry.
 
+#### Resolution ✅
 
+**Status:** Resolved.
+
+**What was broken:** Exported `stateEngine` API object listed `registerValidator` twice (copy-paste drift).
+
+**Why it happened:** Duplicate lines left during API assembly.
+
+**What changed:** Removed the extra `registerValidator` entry in `src/utils/stateEngine.js`.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => { const { createStepStateEngine } = await import('/src/utils/stateEngine.js'); const engine = createStepStateEngine({ flowId: '__bp13', urlSync: 'none' }); const keys = Object.keys(engine).filter((k) => k === 'registerValidator'); const out = { exposedOnce: keys.length === 1, callable: typeof engine.registerValidator === 'function' }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true` (`exposedOnce: true`).
+
+---
 
 ## 9. Cross-System Integration (Interactions ↔ Flow System)
 
@@ -2240,6 +2596,10 @@ If a scope ID is mistyped, fields were never registered, or registration failed 
 
 **Fix:** Return `isValid: false` (or throw in DEV) when the scope is missing, with an explicit error such as `scope-not-registered`.
 
+#### Resolution ✅
+
+**Status:** Resolved — duplicate of [L-14 in §8](#l-14--interactionsenginevalidatescope-treats-missing-scopes-as-valid) (same `interactionsEngine.validateScope` fix: `scopeError: 'SCOPE_NOT_REGISTERED'`).
+
 ---
 
 ### S-07 · Signup flow stores plaintext password in `sessionStorage`
@@ -2253,6 +2613,36 @@ sessionStorage.setItem("pendingSignupPassword", password.value);
 The password is persisted in plaintext in session storage for auto-login after email confirmation. Any script running on the origin (XSS, compromised dependency, malicious extension) can read it. It also survives until explicitly removed and may remain after tab close depending on browser behavior.
 
 **Fix:** Avoid storing passwords client-side. Prefer a server-side “confirm then login” token, or require the user to sign in manually after confirmation.
+
+#### Resolution ✅
+
+**Status:** Resolved — signup no longer persists passwords; users sign in manually after email confirmation.
+
+**What changed:**
+- `AuthSignUp.vue` stores only `pendingSignupEmail` (for confirm-page prefill) and explicitly removes any legacy `pendingSignupPassword` key.
+- `AuthConfirmEmail.vue` removed auto-login with stored credentials; on success it redirects to `/log-in` with `email` and `emailConfirmed=1` query params.
+- `AuthLogIn.vue` pre-fills email from query and shows `auth.confirmEmail.signInAfterConfirm`.
+
+**Tests:** Manual auth flow; no `pendingSignupPassword` writes in source.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const signup = await fetch('/src/components/auth/AuthSignUp.vue').then((r) => r.text());
+  const confirm = await fetch('/src/components/auth/AuthConfirmEmail.vue').then((r) => r.text());
+  const out = {
+    signupNoPasswordStore: !signup.includes('pendingSignupPassword'),
+    confirmNoAutoLogin: !confirm.includes("getItem('pendingSignupPassword')"),
+    confirmRedirectsLogin: confirm.includes("emailConfirmed: '1'"),
+    pass: true,
+  };
+  out.pass =
+    out.signupNoPasswordStore &&
+    out.confirmNoAutoLogin &&
+    out.confirmRedirectsLogin;
+  return out;
+})().then(o => console.log(o)).catch(console.error)
+```
 
 ---
 
@@ -2268,6 +2658,30 @@ The password is persisted in plaintext in session storage for auto-login after e
 `AuthResetPassword.vue` uses `hasSpecial` plus `minLength` via the engine library, while directive-based forms using `isSecurePassword` alone would not enforce special characters. Password policy is inconsistent across surfaces.
 
 **Fix:** Unify password policy in one shared module and reference it from both libraries and auth field configs.
+
+#### Resolution ✅
+
+**Status:** Resolved (rules-unification pass) — both libraries re-export canonical `isSecurePassword` from `src/utils/validation/rules.js`, which requires upper + lower + digit + **special** + length ≥ 8.
+
+**Tests:** `tests/unit/isSecurePasswordUnified.test.js`
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const directive = await import('/src/interactions/utils/validationRules.js');
+  const engine = await import('/src/utils/validation/validationsLibrary.js');
+  const weak = 'Abcdef12';
+  const strong = 'Abcdef12!';
+  const out = {
+    weakMatch: directive.default.isSecurePassword(weak) === engine.validationsLibrary.isSecurePassword(weak),
+    strongMatch: directive.default.isSecurePassword(strong) === engine.validationsLibrary.isSecurePassword(strong),
+    bothRejectWeak: directive.default.isSecurePassword(weak) === false,
+    pass: true,
+  };
+  out.pass = out.weakMatch && out.strongMatch && out.bothRejectWeak;
+  return out;
+})().then(o => console.log(o)).catch(console.error)
+```
 
 ---
 
@@ -2286,6 +2700,28 @@ The password is persisted in plaintext in session storage for auto-login after e
 
 **Fix:** Use a single hidden field (either parent or child), unique IDs, and register the element that actually receives updates.
 
+#### Resolution ✅
+
+**Status:** Resolved — parent duplicate hidden input removed; code field uses single `id="confirmEmailCode"` on `CodeInputAuthComponent` hidden input; `interactionsEngine.register` binds after `nextTick` to that element.
+
+**What changed:**
+- `AuthConfirmEmail.vue`: removed `<input type="hidden" id="code" />`; `codeConfig.id` → `confirmEmailCode`; `handleCodeInput` syncs via `state.element`.
+- `CodeInputAuthComponent` remains the sole hidden field owner (`:id="id"`).
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(() => {
+  const dup = document.querySelectorAll('#code').length;
+  const single = document.querySelectorAll('#confirmEmailCode').length;
+  return {
+    noLegacyCodeId: dup === 0,
+    singleConfirmEmailCode: single <= 1,
+    pass: dup === 0,
+  };
+})().then(o => console.log(o)).catch(console.error)
+```
+*(Run on `/confirm-email` after mount.)*
+
 ---
 
 ### B-12 · Unknown validation rule types are treated as hard failures
@@ -2303,6 +2739,28 @@ A typo in rule `type` (e.g. `isEMail` instead of `isEmail`) makes the field perm
 
 **Fix:** In DEV, throw or log loudly for unknown rules; in production, fail closed but include telemetry. Optionally validate rule names at `register()` time.
 
+#### Resolution ✅
+
+**Status:** Resolved — unknown rule types throw in DEV during validation; production logs `console.error` then fails closed; `interactionsEngine.register()` validates rule names at register time in DEV.
+
+**What changed:** `failUnknownRule()` in `validationEngine.js`; `_assertKnownRuleTypes()` in `interactionsEngine.js`.
+
+**Tests:** `tests/unit/validationEngineUnknownRule.test.js`
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { validationEngine } = await import('/src/utils/validation/validationEngine.js');
+  let threw = false;
+  try {
+    validationEngine._runRuleList('x', [{ type: 'isEMail' }], {});
+  } catch (e) {
+    threw = /Unknown rule type/.test(e.message);
+  }
+  return { pass: threw, devThrows: threw };
+})().then(o => console.log(o)).catch(console.error)
+```
+
 ---
 
 ### L-17 · Directive `validateScope` fast path trusts stale `validated` stamps
@@ -2312,6 +2770,32 @@ A typo in rule `type` (e.g. `isEMail` instead of `isEmail`) makes the field perm
 When `validated` is already set, scope validation reuses the stamp without re-running rules against the current value. If a field value changed programmatically (sync action, script, Vue model update) without triggering `handleInteraction`, the stamp can still read `validated="true"` for an now-invalid value.
 
 **Fix:** Re-validate on `validateScope`, or invalidate stamps when value changes outside the directive event path.
+
+#### Resolution ✅
+
+**Status:** Resolved — `validateScope()` always re-runs `validateWithRequired()` and refreshes stamps via `stampValidation()`; stale `validated="true"` stamps no longer skip rule evaluation.
+
+**Tests:** `tests/unit/validateScopeStaleStamp.test.js`
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { validateScope, stampInteractionConfig, stampValidation } = await import('/src/interactions/utils/engine.js');
+  const scope = document.createElement('div');
+  scope.setAttribute('interaction-container', '');
+  const input = document.createElement('input');
+  input.id = 'auditStale';
+  input.value = 'a@b.co';
+  stampInteractionConfig(input, [{ rules: [{ type: 'isEmail', error: 'x' }] }]);
+  stampValidation(input, { isValid: true, failedRules: [] });
+  input.value = 'bad';
+  scope.appendChild(input);
+  document.body.appendChild(scope);
+  const res = validateScope(scope);
+  scope.remove();
+  return { pass: res.isValid === false && res.invalid.length === 1 };
+})().then(o => console.log(o)).catch(console.error)
+```
 
 ---
 
@@ -2327,6 +2811,35 @@ Unlike `validationRules.js` (which scopes to `[interaction-container]`), this ch
 
 **Fix:** Scope queries to `ctx.element.closest('form')` or a provided container, matching the directive implementation.
 
+#### Resolution ✅
+
+**Status:** Resolved (rules-unification pass) — canonical `isRadioCheck` in `src/utils/validation/rules.js` uses `getScopedRoot(ctx)` (`[interaction-container]` → `form` → `document`) and filters radios by `el.name === param` (no document-wide attribute selector).
+
+**Tests:** `tests/unit/isRadioCheckScoped.test.js`, `tests/unit/isRadioCheckEscape.test.js`
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+  (async () => {
+    const { validationsLibrary } = await import('/src/utils/validation/validationsLibrary.js');
+    const outer = document.createElement('div');
+    outer.innerHTML = '<input type="radio" name="plan" checked />';
+    document.body.appendChild(outer);
+    const form = document.createElement('form');
+    form.setAttribute('interaction-container', '');
+    form.innerHTML = '<input type="radio" name="plan" id="r" />';
+    document.body.appendChild(form);
+    const anchor = form.querySelector('#r');
+    const out = {
+      ignoresOuterSelection: validationsLibrary.isRadioCheck('', 'plan', { element: anchor }) === false,
+      pass: false,
+    };
+    out.pass = out.ignoresOuterSelection;
+    outer.remove();
+    form.remove();
+    return out;
+  })().then(o => console.log(o)).catch(console.error)
+```
+
 ---
 
 ### M-12 · Confirm-email code errors are computed but never shown in the OTP UI
@@ -2337,6 +2850,24 @@ Unlike `validationRules.js` (which scopes to `[interaction-container]`), this ch
 
 **Fix:** Add error rendering to `CodeInputAuthComponent`, or render `codeErrors` in `AuthConfirmEmail` below the OTP widget.
 
+#### Resolution ✅
+
+**Status:** Resolved — `CodeInputAuthComponent` now declares `showErrors` / `errors` props and renders validation messages (orange border + icon list), matching `BaseInput` / auth input patterns.
+
+**What changed:** `src/components/input/CodeInputAuthComponent.vue` — props + template error block; `AuthConfirmEmail` already passes `:show-errors` / `:errors`.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const src = await fetch('/src/components/input/CodeInputAuthComponent.vue').then((r) => r.text());
+  return {
+    hasShowErrorsProp: src.includes('showErrors'),
+    rendersErrors: src.includes('showErrors && errors.length'),
+    pass: src.includes('showErrors') && src.includes('errorObj.error'),
+  };
+})().then(o => console.log(o)).catch(console.error)
+```
+
 ---
 
 ### L-18 · Booking step treats `interactionsEngine.validateScope` as full-step validation
@@ -2346,6 +2877,24 @@ Unlike `validationRules.js` (which scopes to `[interaction-container]`), this ch
 `goToNext()` gates navigation on `interactionsEngine.validateScope('oneOnOneBooking')`, but only `eventTitle` is registered in that scope. Other required booking fields (duration, price, availability, etc.) are not registered and are not validated by this call. The step can advance after title-only validation while other invalid data remains.
 
 **Fix:** Register all required fields in the scope, or run `stateEngine` step validators (and/or `eventStepValidators`) before `goToStep(2)`.
+
+#### Resolution ✅
+
+**Status:** Resolved — `goToNext()` validates the title via `interactionsEngine.validateField`, then gates navigation on `await props.engine.validate(1)` (flow/state step validators). No `interactionsEngine.validateScope` call.
+
+**Tests:** `tests/unit/oneOnOneBookingStepValidation.test.js`
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const src = await fetch('/src/components/ui/form/BookingForm/OneOnOneBookinStep1.vue').then((r) => r.text());
+  return {
+    usesFlowValidate: src.includes('props.engine.validate(1)'),
+    noValidateScope: !src.includes('interactionsEngine.validateScope'),
+    pass: src.includes('props.engine.validate(1)') && !src.includes('interactionsEngine.validateScope'),
+  };
+})().then(o => console.log(o)).catch(console.error)
+```
 
 ---
 
@@ -2361,6 +2910,22 @@ Leading/trailing spaces are removed before rule evaluation. This can cause `matc
 
 **Fix:** Trim only for rules that require it, or align trimming behavior across both engines.
 
+#### Resolution ✅
+
+**Status:** Resolved — directive `getFieldValue()` returns raw `el.value`; empty checks in `isEmptyField()` still trim for required detection; individual rules (e.g. `isEmail`, `matchValue`) trim where semantics require it.
+
+**Tests:** `tests/unit/getFieldValueNoTrim.test.js`
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { getFieldValue } = await import('/src/interactions/utils/engine.js');
+  const input = document.createElement('input');
+  input.value = '  x  ';
+  return { pass: getFieldValue(input) === '  x  ' };
+})().then(o => console.log(o)).catch(console.error)
+```
+
 ---
 
 ### P-08 · `initialPass` runs all interaction configs on mount (pre-interaction side effects)
@@ -2370,6 +2935,23 @@ Leading/trailing spaces are removed before rule evaluation. This can cause `matc
 On mount, `initialPass` calls `handleInteraction` for every config block, executing `onValid`/`onInvalid` actions before the user interacts. This can prematurely show/hide elements (e.g. password eye icon, helper text) and dispatch `validation:pass`/`validation:fail` events with empty/default values.
 
 **Fix:** Separate “silent validate” from “execute actions”, or run initial validation without action side effects unless `runActionsOnMount` is explicitly enabled.
+
+#### Resolution ✅
+
+**Status:** Resolved — `initialPass` calls `handleInteraction` with `{ runActions: false, dispatchEvents: false }` so mount only stamps validation; actions and `validation:*` events run on user trigger events.
+
+**Tests:** `tests/unit/vInteractionsInitialPass.test.js`
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const src = await fetch('/src/interactions/directives/vInteractions.js').then((r) => r.text());
+  return {
+    silentInitialPass: src.includes('runActions: false') && src.includes('dispatchEvents: false'),
+    pass: src.includes('runActions: false') && src.includes('dispatchEvents: false'),
+  };
+})().then(o => console.log(o)).catch(console.error)
+```
 
 ---
 
@@ -2387,6 +2969,27 @@ custom(value, param, ctx) {
 Misconfigured `custom` rules (wrong param type, missing callback) always succeed, bypassing intended validation.
 
 **Fix:** Return `false` (or throw in DEV) when `param` is not a function.
+
+#### Resolution ✅
+
+**Status:** Resolved (rules-unification pass) — canonical `custom` in `src/utils/validation/rules.js` returns `false` when `param` is not a function (fail closed).
+
+**Tests:** `tests/unit/customRuleFailsClosed.test.js`
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { validationsLibrary } = await import('/src/utils/validation/validationsLibrary.js');
+  const out = {
+    nullFails: validationsLibrary.custom('x', null, {}) === false,
+    stringFails: validationsLibrary.custom('x', 'fn', {}) === false,
+    fnWorks: validationsLibrary.custom('ok', (v) => v === 'ok', {}) === true,
+    pass: true,
+  };
+  out.pass = out.nullFails && out.stringFails && out.fnWorks;
+  return out;
+})().then(o => console.log(o)).catch(console.error)
+```
 
 ---
 

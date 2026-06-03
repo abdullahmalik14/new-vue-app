@@ -5,6 +5,11 @@
       <!-- Heading -->
       <Heading :text="t('auth.login.button')" tag="h2" theme="AuthHeading" />
 
+      <p v-if="confirmMessage"
+        class="text-sm text-green-300 bg-green-900/30 border border-green-500/40 rounded-md px-3 py-2">
+        {{ confirmMessage }}
+      </p>
+
       <form @submit.prevent="handleLogin" class="flex flex-col gap-8">
         <div class="flex items-center gap-1">
           <Paragraph :text="t('auth.login.noAccount')" font-size="text-base" font-weight="font-medium"
@@ -111,6 +116,12 @@ import { browserUtility } from "@/lib/mock-api-demo/utilities/browserHelper.js";
 import { initiateTwitterLogin } from "@/utils/auth/socialAuthHandler.js";
 import { initiateTelegramLogin } from "@/utils/auth/telegramAuthHandler.js";
 import { authenticateOrSignUpTelegramUser } from "@/utils/auth/telegramCognitoHandler.js";
+import {
+  getTwitterOAuthAllowedOrigins,
+  getTelegramOAuthAllowedOrigins,
+  isTrustedOAuthOrigin,
+  postOAuthAck,
+} from "@/utils/auth/oauthPostMessage.js";
 import { createRoutePrefetchIntentHandler } from "@/utils/route/useRoutePrefetch.js";
 
 const { t, locale: i18nLocale } = useI18n();
@@ -121,6 +132,7 @@ const rememberMe = ref(false);
 const email = ref("");
 const password = ref("");
 const error = ref("");
+const confirmMessage = ref("");
 const router = useRouter();
 const auth = useAuthStore();
 const isLoading = ref(false);
@@ -327,6 +339,14 @@ onMounted(async () => {
   } catch (assetError) {
     console.error("[LOGIN] Asset loading failed:", assetError);
     error.value = "Failed to load required resources. Please refresh.";
+  }
+
+  const queryEmail = route.query.email;
+  if (typeof queryEmail === "string" && queryEmail.trim()) {
+    email.value = queryEmail.trim();
+  }
+  if (route.query.emailConfirmed === "1") {
+    confirmMessage.value = t("auth.confirmEmail.signInAfterConfirm");
   }
 
   // Register fields with validation engine
@@ -576,6 +596,14 @@ function handleTwitterAuthMessage(event) {
   // Ignore any unrelated postMessage traffic (Vite HMR, other widgets, etc.)
   if (!isFromPopup) return;
 
+  const twitterAllowedOrigins = getTwitterOAuthAllowedOrigins();
+  if (!isTrustedOAuthOrigin(event.origin, twitterAllowedOrigins)) {
+    if (import.meta.env?.DEV) {
+      console.warn("[LOGIN] Ignoring Twitter popup message from untrusted origin:", event.origin);
+    }
+    return;
+  }
+
   console.log("[LOGIN] Received message from Twitter popup:", {
     type: data.type,
     origin: event.origin,
@@ -600,10 +628,12 @@ function handleTwitterAuthMessage(event) {
       error.value = "Twitter login failed: Missing authorization data";
       isLoading.value = false;
 
-      // Send acknowledgment back to popup
-      if (event.source) {
-        event.source.postMessage({ type: 'TWITTER_OAUTH_ACK', success: false, state }, event.origin || "*");
-      }
+      postOAuthAck(
+        event.source,
+        { type: 'TWITTER_OAUTH_ACK', success: false, state },
+        event.origin,
+        twitterAllowedOrigins,
+      );
       return;
     }
 
@@ -624,19 +654,21 @@ function handleTwitterAuthMessage(event) {
       twitterPopupRef.value = null;
       twitterOAuthState.value = null;
 
-      if (event.source) {
-        event.source.postMessage(
-          { type: "TWITTER_OAUTH_ACK", success: false, state, error: "state_mismatch" },
-          event.origin || "*"
-        );
-      }
+      postOAuthAck(
+        event.source,
+        { type: "TWITTER_OAUTH_ACK", success: false, state, error: "state_mismatch" },
+        event.origin,
+        twitterAllowedOrigins,
+      );
       return;
     }
 
-    // Send acknowledgment that we received the message
-    if (event.source) {
-      event.source.postMessage({ type: 'TWITTER_OAUTH_ACK', success: true, state }, event.origin || "*");
-    }
+    postOAuthAck(
+      event.source,
+      { type: 'TWITTER_OAUTH_ACK', success: true, state },
+      event.origin,
+      twitterAllowedOrigins,
+    );
 
     handleTwitterOAuthCode(code, state)
       .then(() => {
@@ -669,15 +701,17 @@ function handleTwitterAuthMessage(event) {
         twitterPopupRef.value = null;
         twitterOAuthState.value = null;
 
-        // Send error acknowledgment to popup
-        if (event.source) {
-          event.source.postMessage({
+        postOAuthAck(
+          event.source,
+          {
             type: 'TWITTER_OAUTH_ACK',
             success: false,
             error: err.message,
-            state
-          }, event.origin || "*");
-        }
+            state,
+          },
+          event.origin,
+          twitterAllowedOrigins,
+        );
       });
   } else if (data.type === 'TWITTER_AUTH_ERROR') {
     // State-check this too (prevents unrelated windows from spamming errors)
@@ -774,6 +808,14 @@ function handleTelegramAuthMessage(event) {
   const isFromPopup = !!popup && event.source === popup;
   if (!isFromPopup) return;
 
+  const telegramAllowedOrigins = getTelegramOAuthAllowedOrigins();
+  if (!isTrustedOAuthOrigin(event.origin, telegramAllowedOrigins)) {
+    if (import.meta.env?.DEV) {
+      console.warn("[LOGIN] Ignoring Telegram popup message from untrusted origin:", event.origin);
+    }
+    return;
+  }
+
   const hasExpectedState = !!expectedState && data.state === expectedState;
 
   console.log("[LOGIN] Received message from Telegram popup:", {
@@ -794,12 +836,12 @@ function handleTelegramAuthMessage(event) {
     isLoading.value = false;
     telegramPopupRef.value = null;
     telegramAuthState.value = null;
-    if (event.source) {
-      event.source.postMessage(
-        { type: "TELEGRAM_AUTH_ACK", success: false, state: data.state, error: "state_mismatch" },
-        event.origin || "*"
-      );
-    }
+    postOAuthAck(
+      event.source,
+      { type: "TELEGRAM_AUTH_ACK", success: false, state: data.state, error: "state_mismatch" },
+      event.origin,
+      telegramAllowedOrigins,
+    );
     return;
   }
 
@@ -810,13 +852,12 @@ function handleTelegramAuthMessage(event) {
       telegramPopupCheckInterval.value = null;
     }
 
-    // Ack receipt to allow popup to close fast
-    if (event.source) {
-      event.source.postMessage(
-        { type: "TELEGRAM_AUTH_ACK", success: true, state: data.state },
-        event.origin || "*"
-      );
-    }
+    postOAuthAck(
+      event.source,
+      { type: "TELEGRAM_AUTH_ACK", success: true, state: data.state },
+      event.origin,
+      telegramAllowedOrigins,
+    );
 
     handleTelegramUser(data.user)
       .then(() => {
@@ -830,12 +871,12 @@ function handleTelegramAuthMessage(event) {
         isLoading.value = false;
         telegramPopupRef.value = null;
         telegramAuthState.value = null;
-        if (event.source) {
-          event.source.postMessage(
-            { type: "TELEGRAM_AUTH_ACK", success: false, state: data.state, error: err.message },
-            event.origin || "*"
-          );
-        }
+        postOAuthAck(
+          event.source,
+          { type: "TELEGRAM_AUTH_ACK", success: false, state: data.state, error: err.message },
+          event.origin,
+          telegramAllowedOrigins,
+        );
       });
   } else if (data.type === "TELEGRAM_AUTH_ERROR") {
     // Clear popup check interval on error

@@ -9,22 +9,23 @@ const VALID_CREATE_EVENT_TYPES = new Set([
   "oneOnOne",
 ]);
 
-function toNumber(value) {
+function toPositiveInteger(value) {
   const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
+  if (!Number.isFinite(parsed) || !Number.isInteger(parsed)) return null;
+  return parsed;
 }
 
 export function validateFetchCreatorEventsPayload(payload = {}) {
   const errors = [];
 
   if (!isNonEmptyString(payload.creatorId)) {
-    errors.push("creatorId is required.");
+    errors.push("creatorId must be a non-empty string.");
   }
 
   if (payload.limit !== undefined) {
-    const limit = toNumber(payload.limit);
+    const limit = toPositiveInteger(payload.limit);
     if (limit == null || limit <= 0 || limit > 200) {
-      errors.push("limit must be between 1 and 200.");
+      errors.push("limit must be an integer between 1 and 200.");
     }
   }
 
@@ -51,7 +52,7 @@ export function validateCreateEventPayload(payload = {}) {
   const errors = [];
 
   if (!isNonEmptyString(payload.creatorId)) {
-    errors.push("creatorId is required.");
+    errors.push("creatorId must be a non-empty string.");
   }
 
   if (!isNonEmptyString(payload.title)) {

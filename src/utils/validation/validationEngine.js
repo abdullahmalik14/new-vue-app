@@ -1,5 +1,14 @@
 import { validationsLibrary } from './validationsLibrary.js';
 
+function failUnknownRule(ruleType) {
+  const message = `[validationEngine] Unknown rule type: ${ruleType}`;
+  if (import.meta.env?.DEV) {
+    console.error(message);
+    throw new Error(message);
+  }
+  console.error(message);
+}
+
 export const validationEngine = {
   _hasRequiredAttr(element) {
     // Check if element has HTML required attribute
@@ -131,6 +140,7 @@ export const validationEngine = {
 
       const fn = validationsLibrary[rule.type];
       if (!fn) {
+        failUnknownRule(rule.type);
         failedRules.push({
           type: rule.type,
           message: rule.message || `Unknown rule: ${rule.type}`
@@ -159,6 +169,7 @@ export const validationEngine = {
 
       const fn = validationsLibrary[rule.type];
       if (!fn) {
+        failUnknownRule(rule.type);
         failedRules.push({
           type: rule.type,
           message: rule.message || `Unknown rule: ${rule.type}`

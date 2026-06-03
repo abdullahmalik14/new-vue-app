@@ -30,6 +30,26 @@ function deepClone(value) {
   }
 }
 
+function buildFieldValidationContext(path, state, contextOptions = {}) {
+  const fieldId = contextOptions.fieldId ?? (path.includes(".") ? path.split(".").pop() : path);
+  const scope = contextOptions.scope ?? "stateEngine";
+  const element = typeof contextOptions.element === "function"
+    ? contextOptions.element(state)
+    : (contextOptions.element ?? null);
+
+  return {
+    scope,
+    fieldId,
+    element,
+    getFieldValue: (targetScope, targetFieldId) => {
+      if (typeof contextOptions.getFieldValue === "function") {
+        return contextOptions.getFieldValue(targetScope, targetFieldId, state);
+      }
+      return deepGet(state, targetFieldId);
+    },
+  };
+}
+
 function deepGet(obj, path) {
   if (!path) {
     return obj;
@@ -458,10 +478,6 @@ export function createStepStateEngine(config) {
       return core._dirty.has(path);
     },
 
-    // validator registration
-    registerValidator,
-
-    // validator registration
     registerValidator,
 
     addValidator(step, fn) {
@@ -478,13 +494,14 @@ export function createStepStateEngine(config) {
       );
     },
 
-    addFieldRequirement(step, path, validationConfig) {
+    addFieldRequirement(step, path, validationConfig, contextOptions = {}) {
       this.addValidator(step, async (state) => {
         const value = deepGet(state, path);
-        const result = validationEngine.validateField(value, validationConfig);
+        const context = buildFieldValidationContext(path, state, contextOptions);
+        const result = validationEngine.validateField(value, validationConfig, context);
         if (result.isValid) return true;
         return {
-          errors: (result.failedRules || []).map((r) => r.message),
+          errors: (result.failedRules || []).map((r) => r.message || r.error).filter(Boolean),
         };
       });
     },

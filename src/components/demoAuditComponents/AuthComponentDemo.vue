@@ -449,7 +449,7 @@ const loginSubmitInteractions = [
   {
     triggerEvents: ['click'],
     actionType: 'script',
-    code: 'scope.querySelectorAll("[interaction-config]").forEach(el => el.dispatchEvent(new Event("input")))'
+    functionName: 'dispatchScopeInteractionInputs',
   }
 ];
 
@@ -463,7 +463,7 @@ const signupSubmitInteractions = [
   {
     triggerEvents: ['click'],
     actionType: 'script',
-    code: 'scope.querySelectorAll("[interaction-config]").forEach(el => el.dispatchEvent(new Event("input")))'
+    functionName: 'dispatchScopeInteractionInputs',
   }
 ];
 
@@ -539,7 +539,7 @@ const demoSelectRole = (val) => {
 const onboardingRoleInteractions = [
   {
     triggerEvents: ['input', 'change'],
-    rules: [{ type: 'isSelect' }],
+    rules: [{ type: 'isSelect', param: '' }],
     onInvalid: { actionType: 'show', targetSelector: '#onboarding-role-err' },
     onValid: { actionType: 'hide', targetSelector: '#onboarding-role-err' },
   },

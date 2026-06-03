@@ -28,14 +28,11 @@
 
         <!-- Confirmation Code input -->
         <div class="flex flex-col gap-2">
-          <!-- Hidden input for validation engine -->
-          <input type="hidden" id="code" :value="code" />
-
-          <CodeInputAuthComponent ref="codeInputRef" :model-value="code" @update:model-value="handleCodeInput"
-            @update:is-valid="handleCodeValidityChange" @auto-submit="handleAutoSubmit" show-label
-            :label-text="t('auth.confirmEmail.codeLabel')" data-required="true" required-display="italic-text"
-            :show-errors="codeErrors.length > 0" :errors="codeErrors" :disabled="isSubmitting"
-            :is-submitting="isSubmitting" />
+          <CodeInputAuthComponent ref="codeInputRef" id="confirmEmailCode" :model-value="code"
+            @update:model-value="handleCodeInput" @update:is-valid="handleCodeValidityChange"
+            @auto-submit="handleAutoSubmit" show-label :label-text="t('auth.confirmEmail.codeLabel')"
+            data-required="true" required-display="italic-text" :show-errors="codeErrors.length > 0"
+            :errors="codeErrors" :disabled="isSubmitting" :is-submitting="isSubmitting" />
 
           <!-- Resend Code Button -->
           <div class="flex justify-start">
@@ -66,12 +63,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, onBeforeUnmount, inject } from "vue"
+import { ref, onMounted, computed, watch, onBeforeUnmount, inject, nextTick } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { useI18n } from "vue-i18n"
 import { getActiveLocale } from "@/utils/translation/localeManager.js"
 import { authHandler } from "@/utils/auth/authHandler"
-import { useAuthStore } from "@/stores/useAuthStore"
 import { createAssetHandler } from "@/utils/assets/assetHandlerFactory.js"
 import { interactionsEngine } from "@/utils/validation/interactionsEngine.js"
 import { InformationCircleIcon } from "@heroicons/vue/24/outline"
@@ -96,7 +92,6 @@ const isCognitoScriptReady = ref(false)
 const isEmailMissing = ref(false)
 const router = useRouter()
 const route = useRoute()
-const auth = useAuthStore()
 const assetHandler = ref(null)
 const codeInputRef = ref(null)
 const popupNavHandler = inject('popupNavHandler', null)
@@ -167,7 +162,7 @@ const emailConfig = {
 
 const codeConfig = {
   scope: SCOPE_ID,
-  id: 'code',
+  id: 'confirmEmailCode',
   validation: {
     required: true,
     requiredMessage: 'Confirmation code is required',
@@ -280,7 +275,8 @@ onMounted(async () => {
     interactionsEngine.register(emailConfig, email.value, emailElement)
   }
 
-  const codeElement = document.getElementById('code')
+  await nextTick()
+  const codeElement = document.getElementById('confirmEmailCode')
   interactionsEngine.register(codeConfig, code.value || '', codeElement)
   console.log('[CONFIRM_EMAIL] Validation engine initialized')
 })
@@ -313,18 +309,13 @@ const handleEmailInput = (value) => {
 const handleCodeInput = (value) => {
   code.value = value
 
-  // Update the hidden input value for validation engine
-  const hiddenInput = document.getElementById('code')
-  if (hiddenInput) {
-    hiddenInput.value = value
-    // Trigger input event to notify validation engine
-    hiddenInput.dispatchEvent(new Event('input', { bubbles: true }))
-  }
-
-  // Update field state value without triggering validation
   const state = interactionsEngine.getFieldState(codeConfig)
   if (state) {
     state.value = value
+    if (state.element) {
+      state.element.value = value
+      state.element.dispatchEvent(new Event('input', { bubbles: true }))
+    }
   }
 
   // Always clear browser validation when user types (to reset any previous validation message)
@@ -422,73 +413,20 @@ async function performConfirmation() {
 
     console.log("[CONFIRM_EMAIL] Email confirmed and tracked successfully")
 
-    // Check if we have a stored password from signup flow
-    const storedPassword = sessionStorage.getItem('pendingSignupPassword')
-    const storedEmail = sessionStorage.getItem('pendingSignupEmail')
+    sessionStorage.removeItem('pendingSignupPassword')
+    sessionStorage.removeItem('pendingSignupEmail')
 
-    if (storedPassword && storedEmail && storedEmail.toLowerCase() === email.value.trim().toLowerCase()) {
-      console.log("[CONFIRM_EMAIL] Auto-login after email confirmation")
-
-      try {
-        // Auto-login with stored credentials
-        const { idToken, accessToken, refreshToken } = await authHandler.login(
-          email.value.trim(),
-          storedPassword
-        )
-
-        // Store tokens
-        localStorage.setItem("idToken", idToken)
-        localStorage.setItem("accessToken", accessToken)
-        localStorage.setItem("refreshToken", refreshToken)
-
-        // Decode token and set user
-        auth.setTokenAndDecode(idToken)
-        auth.startTokenRefreshLoop()
-
-        // Clear stored password for security
-        sessionStorage.removeItem('pendingSignupPassword')
-        sessionStorage.removeItem('pendingSignupEmail')
-
-        console.log("[CONFIRM_EMAIL] Auto-login successful, redirecting to dashboard")
-        // RouteGuard will handle redirects based on dependencies (onboarding/KYC)
-        if (popupNavHandler) {
-          popupNavHandler('/dashboard')
-        } else {
-          await router.push("/dashboard")
-        }
-      } catch (loginErr) {
-        console.error("[CONFIRM_EMAIL] Auto-login failed:", loginErr)
-        // If auto-login fails, clear stored password and redirect to login
-        sessionStorage.removeItem('pendingSignupPassword')
-        sessionStorage.removeItem('pendingSignupEmail')
-        error.value = t('auth.confirmEmail.autoLoginError')
-        isLoading.value = false
-        isSubmitting.value = false
-
-        // Clear code inputs on error
-        if (codeInputRef.value) {
-          codeInputRef.value.clearInputs()
-        }
-
-        // Still redirect to login after a short delay
-        setTimeout(() => {
-          if (popupNavHandler) {
-            popupNavHandler('/log-in')
-          } else {
-            router.push("/log-in")
-          }
-        }, 2000)
-      }
+    const loginQuery = {
+      email: email.value.trim(),
+      emailConfirmed: '1',
+    }
+    console.log("[CONFIRM_EMAIL] Redirecting to login after confirmation")
+    isLoading.value = false
+    isSubmitting.value = false
+    if (popupNavHandler) {
+      popupNavHandler(`/log-in?email=${encodeURIComponent(loginQuery.email)}&emailConfirmed=1`)
     } else {
-      // No stored password (user came directly to confirm-email page)
-      console.log("[CONFIRM_EMAIL] No stored password, redirecting to login")
-      isLoading.value = false
-      isSubmitting.value = false
-      if (popupNavHandler) {
-        popupNavHandler('/log-in')
-      } else {
-        await router.push("/log-in")
-      }
+      await router.push({ path: '/log-in', query: loginQuery })
     }
   } catch (err) {
     console.error("[CONFIRM_EMAIL] Confirmation error:", err)

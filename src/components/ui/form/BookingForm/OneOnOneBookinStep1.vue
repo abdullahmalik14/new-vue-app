@@ -96,29 +96,44 @@
   };
 
   const goToNext = async () => {
-    // 1. Run interactionsEngine validation to trigger UI side-effects
-    const interactionValidation = await interactionsEngine.validateScope('oneOnOneBooking');
+    props.engine.setState('eventTitle', formData.value.eventTitle, { silent: true });
 
-    if (interactionValidation && !interactionValidation.isValid) {
-      // Instead of browser default error, let's use the UI NotificationCard
-      titleErrorMessage.value = "Event Title is required.";
+    interactionsEngine.validateField(eventTitleConfig);
+    const titleState = interactionsEngine.getFieldState(eventTitleConfig);
+    if (titleState && !titleState.isValid) {
+      titleErrorMessage.value = titleState.failedRules?.[0]?.message
+        || "Event Title is required.";
       showTitleError.value = true;
-
-      // Auto-hide after 5 seconds
       setTimeout(() => {
         showTitleError.value = false;
       }, 5000);
-
       const wrapper = document.getElementById('eventTitle');
       if (wrapper) {
         wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-      return; // Stop here if UI validation fails
+      return;
     }
 
-    // 2. Clear error if valid
+    const stepValidation = await props.engine.validate(1);
+    if (!stepValidation.valid) {
+      const firstError = stepValidation.errors?.[0];
+      if (typeof firstError === 'string' && firstError.toLowerCase().includes('event title')) {
+        titleErrorMessage.value = firstError;
+        showTitleError.value = true;
+        setTimeout(() => {
+          showTitleError.value = false;
+        }, 5000);
+        const wrapper = document.getElementById('eventTitle');
+        if (wrapper) {
+          wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+      console.warn('[OneOnOneBookinStep1] step validation failed:', stepValidation.errors);
+      return;
+    }
+
     showTitleError.value = false;
-    // 3. Let stateEngine handle the step transition
     props.engine.goToStep(2);
   };
 

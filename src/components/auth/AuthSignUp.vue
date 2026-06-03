@@ -112,6 +112,12 @@ import Paragraph from "@/components/default/Paragraph.vue";
 import { initiateTwitterLogin } from "@/utils/auth/socialAuthHandler.js";
 import { initiateTelegramLogin } from "@/utils/auth/telegramAuthHandler.js";
 import { authenticateOrSignUpTelegramUser } from "@/utils/auth/telegramCognitoHandler.js";
+import {
+  getTwitterOAuthAllowedOrigins,
+  getTelegramOAuthAllowedOrigins,
+  isTrustedOAuthOrigin,
+  postOAuthAck,
+} from "@/utils/auth/oauthPostMessage.js";
 
 const { t, locale: i18nLocale } = useI18n();
 const route = useRoute();
@@ -490,6 +496,14 @@ function handleTwitterAuthMessage(event) {
   const hasExpectedState = !!expectedState && data.state === expectedState;
   if (!isFromPopup) return;
 
+  const twitterAllowedOrigins = getTwitterOAuthAllowedOrigins();
+  if (!isTrustedOAuthOrigin(event.origin, twitterAllowedOrigins)) {
+    if (import.meta.env?.DEV) {
+      console.warn("[SIGNUP] Ignoring Twitter popup message from untrusted origin:", event.origin);
+    }
+    return;
+  }
+
   if (data.type === "TWITTER_OAUTH_CODE") {
     const { code, state } = data;
 
@@ -513,9 +527,12 @@ function handleTwitterAuthMessage(event) {
       return;
     }
 
-    if (event.source) {
-      event.source.postMessage({ type: "TWITTER_OAUTH_ACK", success: true, state }, event.origin || "*");
-    }
+    postOAuthAck(
+      event.source,
+      { type: "TWITTER_OAUTH_ACK", success: true, state },
+      event.origin,
+      twitterAllowedOrigins,
+    );
 
     handleTwitterOAuthCode(code, state)
       .then(() => {
@@ -626,6 +643,14 @@ function handleTelegramAuthMessage(event) {
   const isFromPopup = !!popup && event.source === popup;
   if (!isFromPopup) return;
 
+  const telegramAllowedOrigins = getTelegramOAuthAllowedOrigins();
+  if (!isTrustedOAuthOrigin(event.origin, telegramAllowedOrigins)) {
+    if (import.meta.env?.DEV) {
+      console.warn("[SIGNUP] Ignoring Telegram popup message from untrusted origin:", event.origin);
+    }
+    return;
+  }
+
   const hasExpectedState = !!expectedState && data.state === expectedState;
   if (!hasExpectedState) {
     // Clear popup check interval on state mismatch
@@ -647,9 +672,12 @@ function handleTelegramAuthMessage(event) {
       telegramPopupCheckInterval.value = null;
     }
 
-    if (event.source) {
-      event.source.postMessage({ type: "TELEGRAM_AUTH_ACK", success: true, state: data.state }, event.origin || "*");
-    }
+    postOAuthAck(
+      event.source,
+      { type: "TELEGRAM_AUTH_ACK", success: true, state: data.state },
+      event.origin,
+      telegramAllowedOrigins,
+    );
     handleTelegramUser(data.user)
       .then(() => {
         window.removeEventListener("message", handleTelegramAuthMessage);
@@ -959,11 +987,10 @@ async function handleSignUp() {
         : window.APP?.getCurrentAuthMode?.();
 
     if (mode === "cognito") {
-      // Store password temporarily for auto-login after email confirmation
-      sessionStorage.setItem("pendingSignupPassword", password.value);
       sessionStorage.setItem("pendingSignupEmail", email.value.trim());
+      sessionStorage.removeItem("pendingSignupPassword");
       console.log(
-        "[SIGNUP] Cognito mode → storing password for auto-login, redirecting to /confirm-email"
+        "[SIGNUP] Cognito mode → redirecting to /confirm-email (sign in after confirm)"
       );
       if (popupNavHandler) {
         popupNavHandler('/confirm-email');

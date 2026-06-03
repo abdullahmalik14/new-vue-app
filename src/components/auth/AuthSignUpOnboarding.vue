@@ -182,7 +182,7 @@ const roleConfig = computed(() => ({
     required: true,
     requiredMessage: t('auth.validation.roleRequired'),
     rules: [
-      { type: 'isSelect', message: t('auth.validation.roleSelect') }
+      { type: 'isSelect', param: '', message: t('auth.validation.roleSelect') }
     ]
   },
   validateOnInput: false

@@ -72,6 +72,7 @@
       "codeLabel": "Confirmation Code",
       "codePlaceholder": "6-digit code",
       "error": "Confirmation failed",
+      "signInAfterConfirm": "Email confirmed. Please sign in with your password.",
       "autoLoginError": "Email confirmed, but auto-login failed. Please log in manually.",
       "resending": "Sending...",
       "resendCode": "Resend code",

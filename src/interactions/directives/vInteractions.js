@@ -26,6 +26,8 @@ import {
   safeParseConfig,
   validateWithRequired,
   stampValidation,
+  stampInteractionConfig,
+  clearInteractionConfig,
   execActions,
   resolveScope,
   evictScopeCache,
@@ -59,7 +61,12 @@ export const vInteractions = {
 
 function wire(el, value) {
   const configs = safeParseConfig(value)   // parsed + frozen here, once
-  if (!configs?.length) return
+  if (!configs?.length) {
+    clearInteractionConfig(el)
+    return
+  }
+
+  stampInteractionConfig(el, configs)
 
   // Resolve scope once — cached in WeakMap, not repeated on every event
   const scope    = resolveScope(el)
@@ -92,11 +99,12 @@ function unwire(el) {
     for (let i = 0; i < cleanups.length; i++) cleanups[i]()
     delete el[CLEANUP]
   }
+  clearInteractionConfig(el)
 }
 
 // ─── Hot path: called on every event ──────────────────────────────────────────
 
-function handleInteraction(el, cfg, scope) {
+function handleInteraction(el, cfg, scope, { runActions = true, dispatchEvents = true } = {}) {
   const rules           = cfg.rules ?? _empty
   const needsValidation = rules.length > 0 || el.hasAttribute('required')
 
@@ -109,12 +117,16 @@ function handleInteraction(el, cfg, scope) {
     stampValidation(el, detail)
   }
 
-  const actions = isValid ? cfg.onValid : cfg.onInvalid
-  if (actions) execActions(actions, el, scope)
+  if (runActions) {
+    const actions = isValid ? cfg.onValid : cfg.onInvalid
+    if (actions) execActions(actions, el, scope)
+  }
 
-  el.dispatchEvent(new CustomEvent(isValid ? 'validation:pass' : 'validation:fail', {
-    bubbles: true, detail: { source: el, ...detail }
-  }))
+  if (dispatchEvents) {
+    el.dispatchEvent(new CustomEvent(isValid ? 'validation:pass' : 'validation:fail', {
+      bubbles: true, detail: { source: el, ...detail }
+    }))
+  }
 }
 
 // ─── Initial pass ──────────────────────────────────────────────────────────────
@@ -123,7 +135,7 @@ function initialPass(el, configs, scope) {
   const hasRules = configs.some(c => Array.isArray(c.rules) && c.rules.length > 0)
   if (!hasRules && !el.hasAttribute('required')) return
   for (let i = 0; i < configs.length; i++) {
-    handleInteraction(el, configs[i], scope)
+    handleInteraction(el, configs[i], scope, { runActions: false, dispatchEvents: false })
   }
 }
 

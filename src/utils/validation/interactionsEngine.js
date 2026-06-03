@@ -1,5 +1,35 @@
 import { reactive } from 'vue';
+import { resolveActionType } from '@/interactions/utils/actionSchema.js';
+import {
+  allowedScriptsRegistry,
+  registerAllowedScript,
+  unregisterAllowedScript,
+} from '@/interactions/utils/allowedScriptsRegistry.js';
 import { validationEngine } from './validationEngine.js';
+import { validationsLibrary } from './validationsLibrary.js';
+
+function resolveEventDispatchTarget(action) {
+  const raw = action?.target;
+
+  if (action.targetElementKey) {
+    return document.querySelector(`[data-element-key="${action.targetElementKey}"]`);
+  }
+
+  if (raw === 'document') return document;
+  if (!raw || raw === 'window') return window;
+
+  if (typeof raw === 'string') {
+    const elementKey = raw.startsWith('element:') ? raw.slice('element:'.length) : raw;
+    if (elementKey && elementKey !== 'window' && elementKey !== 'document') {
+      return document.querySelector(`[data-element-key="${elementKey}"]`);
+    }
+  }
+
+  if (import.meta.env?.DEV) {
+    console.warn('[pushEvent] rejected target — use window, document, or a trusted element key');
+  }
+  return null;
+}
 
 function isUnsafeAttributeName(name) {
   return /^on/i.test(name);
@@ -111,7 +141,8 @@ export const interactionsEngine = {
   scopes: reactive({}),
   elementVisibility: reactive({}),
   originalValues: reactive({}), // For sync-with-restore: stores original values before sync
-  allowedScripts: Object.create(null),
+  allowedScripts: allowedScriptsRegistry,
+  _allowedActionHandlers: Object.create(null),
   _debounceTimers: Object.create(null),
   _asyncDebounceTimers: Object.create(null),
 
@@ -268,11 +299,11 @@ export const interactionsEngine = {
         cancelable: action.cancelable !== false
       });
 
-      const target = action.target === 'window' || !action.target
-        ? window
-        : action.target === 'document'
-          ? document
-          : action.target;
+      const target = resolveEventDispatchTarget(action);
+      if (!target?.dispatchEvent) {
+        interactionsEngine.logger.error('pushEvent: invalid or unresolved target', action.target);
+        return;
+      }
 
       target.dispatchEvent(event);
       interactionsEngine.logger.debug('pushEvent', action.eventName, action.eventData);
@@ -280,7 +311,7 @@ export const interactionsEngine = {
 
     script(action) {
       const interactionsEngine = resolveActionEngine(this);
-      if (!action.code && !action.functionName) return;
+      if (!action?.code && !action?.functionName) return;
 
       try {
         if (action.code) {
@@ -288,16 +319,13 @@ export const interactionsEngine = {
           return;
         }
 
-        if (action.functionName) {
-          const allowedFn = interactionsEngine.allowedScripts[action.functionName];
-          if (typeof allowedFn === 'function') {
-            allowedFn(...(action.args || []));
-          } else {
-            interactionsEngine.logger.error('script action rejected: function is not allowlisted', action.functionName);
-            return;
-          }
+        const allowedFn = allowedScriptsRegistry[action.functionName];
+        if (typeof allowedFn !== 'function') {
+          interactionsEngine.logger.error('script action rejected: function is not allowlisted', action.functionName);
+          return;
         }
-        interactionsEngine.logger.debug('script executed', action.functionName || 'code');
+        allowedFn(...(action.args || []));
+        interactionsEngine.logger.debug('script executed', action.functionName);
       } catch (error) {
         interactionsEngine.logger.error('script error', error);
       }
@@ -649,23 +677,45 @@ export const interactionsEngine = {
     }
   },
 
+  registerActionHandler(type, handlerFn) {
+    if (!type || typeof handlerFn !== 'function') {
+      this.logger.error('registerActionHandler: invalid args', { type, fnType: typeof handlerFn });
+      return false;
+    }
+    this._allowedActionHandlers[type] = handlerFn;
+    this.actionHandlers[type] = handlerFn;
+    this.logger.debug('registerActionHandler', type);
+    return true;
+  },
+
   extendAction(type, handlerFn) {
+    if (!this._allowedActionHandlers[type]) {
+      this.logger.error(
+        'extendAction rejected: register with registerActionHandler during app bootstrap',
+        type,
+      );
+      return false;
+    }
+    if (typeof handlerFn !== 'function') {
+      this.logger.error('extendAction: invalid handler', type);
+      return false;
+    }
+    this._allowedActionHandlers[type] = handlerFn;
     this.actionHandlers[type] = handlerFn;
     this.logger.debug('extendAction', type);
+    return true;
   },
 
   registerScriptFunction(name, handlerFn) {
-    if (!name || typeof handlerFn !== 'function') {
+    if (!registerAllowedScript(name, handlerFn)) {
       this.logger.error('registerScriptFunction: invalid args', { name, type: typeof handlerFn });
       return;
     }
-    this.allowedScripts[name] = handlerFn;
     this.logger.debug('registerScriptFunction', name);
   },
 
   unregisterScriptFunction(name) {
-    if (!name) return;
-    delete this.allowedScripts[name];
+    unregisterAllowedScript(name);
     this.logger.debug('unregisterScriptFunction', name);
   },
 
@@ -733,11 +783,27 @@ export const interactionsEngine = {
     this.logger.debug('clearScope', scopeId);
   },
 
+  _assertKnownRuleTypes(validationConfig) {
+    const rules = validationConfig?.rules;
+    if (!Array.isArray(rules)) return;
+
+    for (const rule of rules) {
+      if (!rule?.type || validationsLibrary[rule.type]) continue;
+      const message = `[InteractionsEngine] Unknown rule type at register: ${rule.type}`;
+      if (import.meta.env?.DEV) {
+        throw new Error(message);
+      }
+      this.logger.error(message);
+    }
+  },
+
   register(fieldConfig, initialValue, element) {
     if (!fieldConfig || !fieldConfig.scope || !fieldConfig.id) {
       this.logger.error('register: invalid fieldConfig', fieldConfig);
       return;
     }
+
+    this._assertKnownRuleTypes(fieldConfig.validation);
 
     const scopeId = fieldConfig.scope;
     const fieldId = fieldConfig.id;
@@ -1027,11 +1093,15 @@ export const interactionsEngine = {
   validateScope(scopeId) {
     const scope = this.scopes[scopeId];
     if (!scope) {
+      if (import.meta.env?.DEV) {
+        console.error('[interactionsEngine] validateScope: scope not registered:', scopeId);
+      }
       return {
         scopeId,
-        isValid: true,
+        isValid: false,
         invalidFields: [],
-        firstInvalidField: null
+        firstInvalidField: null,
+        scopeError: 'SCOPE_NOT_REGISTERED',
       };
     }
 
@@ -1095,27 +1165,25 @@ export const interactionsEngine = {
     for (const fieldId of Object.keys(scope.fields)) {
       const fieldState = scope.fields[fieldId];
 
-      // Validate the field first
-      const result = validationEngine.validateField(
-        fieldState.value,
-        fieldState.validationConfig,
-        {
-          scope: scopeId,
-          fieldId: fieldId,
-          element: fieldState.element,
-          getFieldValue: (scope, fieldId) => {
-            const fieldState = this.getFieldState({ scope, id: fieldId });
-            return fieldState ? fieldState.value : null;
-          }
-        }
-      );
+      if (fieldState.dirty) {
+        const result = validationEngine.validateField(
+          fieldState.value,
+          fieldState.validationConfig,
+          {
+            scope: scopeId,
+            fieldId,
+            element: fieldState.element,
+            getFieldValue: (scope, id) => {
+              const depState = this.getFieldState({ scope, id });
+              return depState ? depState.value : null;
+            },
+          },
+        );
+        fieldState.isValid = result.isValid;
+        fieldState.failedRules = result.failedRules;
+      }
 
-      // Update field state
-      fieldState.isValid = result.isValid;
-      fieldState.failedRules = result.failedRules;
-
-      // Check if this field is blocking
-      if (!result.isValid) {
+      if (!fieldState.isValid) {
         const hasHTMLRequired = fieldState.element && fieldState.element.hasAttribute &&
           fieldState.element.hasAttribute('required');
         const hasPseudoRequired = fieldState.element && fieldState.element.hasAttribute &&
@@ -1129,7 +1197,7 @@ export const interactionsEngine = {
         if (isRequired || hasUserData) {
           blockingFields.push({
             fieldId,
-            failedRules: result.failedRules,
+            failedRules: fieldState.failedRules,
             reason: isRequired ? 'required' : 'has-user-data'
           });
         }
@@ -1241,9 +1309,14 @@ export const interactionsEngine = {
     const state = fieldConfig ? this.getFieldState(fieldConfig) : null;
 
     for (const action of actions) {
-      const handler = this.actionHandlers[action.type];
+      const type = resolveActionType(action);
+      if (!type) {
+        this.logger.error('runInteractions: missing action type', action);
+        continue;
+      }
+      const handler = this.actionHandlers[type];
       if (!handler) {
-        this.logger.error('runInteractions: unknown action type', action.type, action);
+        this.logger.error('runInteractions: unknown action type', type, action);
         continue;
       }
       handler.call(this, action, state, fieldConfig);
@@ -1264,11 +1337,15 @@ export const interactionsEngine = {
       const validateOnInput = fieldConfig.validateOnInput !== false;
       const inputEvents = (fieldConfig.events && fieldConfig.events.input) || {};
 
+      if (inputEvents.onChange) {
+        this.runInteractions(inputEvents.onChange, fieldConfig);
+      }
+
       if (validateOnInput) {
         this._cancelAsyncValidation(fieldConfig.scope, fieldConfig.id);
 
         const result = validationEngine.validateField(
-          newValue,
+          state.value,
           state.validationConfig,
           this._buildValidationContext(fieldConfig, state)
         );
@@ -1276,17 +1353,11 @@ export const interactionsEngine = {
         this._applyValidationResult(state, result, fieldConfig);
 
         this.logger.debug('processFieldChange validation', fieldConfig.scope, fieldConfig.id, {
-          value: newValue,
+          value: state.value,
           isValid: state.isValid,
           failedRules: state.failedRules
         });
-      }
 
-      if (inputEvents.onChange) {
-        this.runInteractions(inputEvents.onChange, fieldConfig);
-      }
-
-      if (validateOnInput) {
         if (state.isValid && inputEvents.onValid) {
           this.runInteractions(inputEvents.onValid, fieldConfig);
         }

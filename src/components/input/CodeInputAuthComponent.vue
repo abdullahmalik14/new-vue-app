@@ -43,6 +43,14 @@ const props = defineProps({
   interactionsConfig: {
     type: [Object, Array],
     default: undefined
+  },
+  showErrors: {
+    type: Boolean,
+    default: false
+  },
+  errors: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -270,9 +278,11 @@ defineExpose({
     </div>
 
     <!-- Code Inputs Wrapper -->
-    <div class="flex gap-2 sm:gap-3 justify-start items-center w-full">
+    <div class="flex gap-2 sm:gap-3 justify-start items-center w-full"
+      :class="{ '!border-[#ff7c1e]': showErrors && errors.length }">
       <div v-for="(digit, index) in inputs" :key="index"
-        class="relative rounded-xl border border-white/20 bg-white/5 shadow-sm min-h-14 sm:min-h-16 flex justify-center items-center flex-1 max-w-[60px] sm:max-w-[70px]">
+        class="relative rounded-xl border border-white/20 bg-white/5 shadow-sm min-h-14 sm:min-h-16 flex justify-center items-center flex-1 max-w-[60px] sm:max-w-[70px]"
+        :class="{ '!border-[#ff7c1e]': showErrors && errors.length }">
         <input :ref="el => { if (el) inputRefs[index] = el }" type="text" inputmode="numeric" pattern="[0-9]*"
           maxlength="1" :value="digit" :disabled="disabled || isSubmitting"
           class="w-full h-full text-white bg-transparent outline-none text-center text-2xl sm:text-3xl font-semibold focus:outline-none focus:ring-0 focus:border-none disabled:opacity-50 disabled:cursor-not-allowed"
@@ -283,6 +293,17 @@ defineExpose({
 
     <Paragraph v-if="requiredDisplayValues.includes('required-text-error')" :text="'This field is required.'"
       fontSize="text-xs" fontColor="text-[#FF4405]" />
+
+    <div v-if="showErrors && errors.length" class="flex flex-col gap-1 w-full mt-1">
+      <div v-for="(errorObj, index) in errors" :key="`code-error-${index}`"
+        class="flex items-center w-full gap-[.4375rem] text-[#ff7c1e]">
+        <component v-if="errorObj.icon" :is="errorObj.icon" class="w-[1.125rem] h-[1.125rem] flex-shrink-0" />
+        <HexagonExclamationIcon v-else class="w-[1.125rem] h-[1.125rem] flex-shrink-0 text-[#ff7c1e]" />
+        <p class="text-[12px] sm:text-[14px] font-normal text-[#ff7c1e]">
+          {{ errorObj.error || errorObj.message || errorObj }}
+        </p>
+      </div>
+    </div>
 
     <!-- Hidden input for interactionsEngine -->
     <input type="hidden" :id="id" :value="fullCode" v-interactions="interactionsConfig" />
