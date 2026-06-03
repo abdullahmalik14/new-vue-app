@@ -10,6 +10,7 @@ import { withCsrf } from "@/services/flow-system/middleware/withCsrf.js";
 import { withRetry } from "@/services/flow-system/middleware/withRetry.js";
 import { withTimeout } from "@/services/flow-system/middleware/withTimeout.js";
 import { withMetrics } from "@/services/flow-system/middleware/withMetrics.js";
+import { patchPipelineProgress } from "@/services/flow-system/utils/flowProgress.js";
 
 function composeMiddlewares(handler, middlewares) {
   return middlewares.reduceRight((acc, middleware) => middleware(acc), handler);
@@ -32,11 +33,24 @@ function normalizeFlowEntry(flowEntry) {
   return flowEntry || null;
 }
 
-function normalizeFlowKind(kind) {
-  const raw = String(kind || "").toLowerCase();
-  if (raw === "read" || raw === "query" || raw === "fetch") return "read";
-  if (raw === "write" || raw === "mutation" || raw === "action") return "write";
-  return "write";
+function resolveFlowKind(kind, flowName) {
+  const raw = String(kind ?? "").toLowerCase().trim();
+  if (!raw) {
+    return fail({
+      code: "INVALID_FLOW_KIND",
+      message: `Flow '${flowName}' is missing flowKind.`,
+    });
+  }
+  if (raw === "read" || raw === "query" || raw === "fetch") {
+    return "read";
+  }
+  if (raw === "write" || raw === "mutation" || raw === "action") {
+    return "write";
+  }
+  return fail({
+    code: "INVALID_FLOW_KIND",
+    message: `Unrecognized flowKind '${kind}' for flow '${flowName}'.`,
+  });
 }
 
 function normalizeMapper(mapper) {
@@ -66,15 +80,38 @@ function normalizeValidators(validators) {
   };
 }
 
-const _globalContext = {
+const _emptyGlobalContext = () => ({
   piniaStores: {},
   stateEngine: null,
-};
+});
+
+let _globalContext = _emptyGlobalContext();
 
 export const FlowHandler = {
-  configure({ piniaStores = {}, stateEngine = null } = {}) {
-    if (piniaStores) Object.assign(_globalContext.piniaStores, piniaStores);
-    if (stateEngine) _globalContext.stateEngine = stateEngine;
+  /**
+   * Replaces global flow context fields (does not merge/accumulate pinia store keys).
+   * Call again with the same values for idempotent setup; pass only the fields you intend to set.
+   */
+  configure({ piniaStores, stateEngine } = {}) {
+    if (piniaStores !== undefined) {
+      _globalContext.piniaStores = { ...piniaStores };
+    }
+    if (stateEngine !== undefined) {
+      _globalContext.stateEngine = stateEngine;
+    }
+  },
+
+  /** Clears module-level global context (tests, logout, hot reload). */
+  reset() {
+    _globalContext = _emptyGlobalContext();
+  },
+
+  /** Read-only snapshot for tests and diagnostics (store keys only). */
+  getContextSnapshot() {
+    return {
+      piniaStoreKeys: Object.keys(_globalContext.piniaStores),
+      hasStateEngine: _globalContext.stateEngine != null,
+    };
   },
 
   async run(flowName, payload = {}, options = {}) {
@@ -88,7 +125,27 @@ export const FlowHandler = {
 
     const flowEntry = normalizeFlowEntry(rawFlowEntry);
     const flow = flowEntry?.flow;
-    const flowKind = normalizeFlowKind(options.flowKind || flowEntry?.flowKind);
+    const registryFlowKindOrError = resolveFlowKind(flowEntry?.flowKind, flowName);
+    if (typeof registryFlowKindOrError === "object" && registryFlowKindOrError?.ok === false) {
+      return registryFlowKindOrError;
+    }
+    if (options.flowKind !== undefined) {
+      const optionFlowKindOrError = resolveFlowKind(options.flowKind, flowName);
+      if (typeof optionFlowKindOrError === "object" && optionFlowKindOrError?.ok === false) {
+        return optionFlowKindOrError;
+      }
+      if (optionFlowKindOrError !== registryFlowKindOrError) {
+        return fail({
+          code: "FLOW_KIND_OVERRIDE_NOT_ALLOWED",
+          message: `options.flowKind cannot override registry flowKind for '${flowName}'.`,
+          details: {
+            registryFlowKind: flowEntry?.flowKind,
+            requestedFlowKind: options.flowKind,
+          },
+        });
+      }
+    }
+    const flowKind = registryFlowKindOrError;
     const mapper = normalizeMapper(flowEntry?.mapper);
     const validators = normalizeValidators(flowEntry?.validators);
     if (typeof flow !== "function") {
@@ -119,9 +176,10 @@ export const FlowHandler = {
 
     const middlewares = options.middlewares || flowEntry.middlewares || defaultMiddlewares;
     const runWithMiddleware = composeMiddlewares(baseHandler, middlewares);
+    const { flowKind: _ignoredFlowKind, ...runtimeOptions } = options;
     const mergedOptions = {
       ..._globalContext,
-      ...options,
+      ...runtimeOptions,
       piniaStores: { ..._globalContext.piniaStores, ...(options.piniaStores || {}) },
     };
 
@@ -147,14 +205,16 @@ export const FlowHandler = {
     });
     context.middlewares = middlewares;
 
+    const progressRef = options.progressRef;
     try {
-      context.progress.loading = true;
-      const result = await runFlowDataPipeline(context);
-      context.progress.loading = false;
-      return result;
+      patchPipelineProgress(context, { loading: true });
+      if (progressRef) progressRef.value = true;
+      return await runFlowDataPipeline(context);
     } catch (error) {
-      context.progress.loading = false;
       return normalizeUnknownError(error);
+    } finally {
+      patchPipelineProgress(context, { loading: false });
+      if (progressRef) progressRef.value = false;
     }
   },
 };

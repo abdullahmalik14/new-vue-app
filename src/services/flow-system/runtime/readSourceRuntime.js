@@ -67,7 +67,7 @@ export function readFromPiniaSource(source, context) {
     return buildMissSnapshot(source, "store_not_found");
   }
 
-  const data = resolveValueByPath(store, source.select);
+  const data = deepGet(store, source.select);
   if (data === undefined || data === null) {
     return buildMissSnapshot(source, "data_not_found");
   }
@@ -76,8 +76,8 @@ export function readFromPiniaSource(source, context) {
     source,
     destinationType: "pinia",
     data,
-    etag: resolveValueByPath(store, source.etagSelect) ?? null,
-    updatedAt: resolveValueByPath(store, source.updatedAtSelect) ?? null,
+    etag: deepGet(store, source.etagSelect) ?? null,
+    updatedAt: deepGet(store, source.updatedAtSelect) ?? null,
   });
 }
 
@@ -140,11 +140,6 @@ export function readFromLocalSource(source, context) {
     savedAt: Number.isFinite(Number(record.savedAt)) ? Number(record.savedAt) : null,
     staleHint: cacheResult.reason === "expired",
   });
-}
-
-function resolveValueByPath(target, path) {
-  if (!path) return target;
-  return deepGet(target, path);
 }
 
 export function readSourceSnapshot(source, context) {

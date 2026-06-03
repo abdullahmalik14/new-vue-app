@@ -11,14 +11,23 @@ export function withMetrics(next) {
       const durationMs = Date.now() - startedAt;
 
       if (isFlowResult(result)) {
-        result.meta = { ...(result.meta || {}), durationMs, runId: args.context.runId };
+        return {
+          ...result,
+          meta: { ...(result.meta || {}), durationMs, runId: args.context.runId },
+        };
       }
 
       return result;
     } catch (error) {
       const normalized = normalizeUnknownError(error);
-      normalized.meta = { ...(normalized.meta || {}), durationMs: Date.now() - startedAt, runId: args.context.runId };
-      return normalized;
+      return {
+        ...normalized,
+        meta: {
+          ...(normalized.meta || {}),
+          durationMs: Date.now() - startedAt,
+          runId: args.context.runId,
+        },
+      };
     }
   };
 }

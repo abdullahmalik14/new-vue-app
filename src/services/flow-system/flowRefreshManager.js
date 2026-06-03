@@ -1,5 +1,6 @@
 import FlowHandler from "@/services/flow-system/FlowHandler.js";
 import { flowRegistry } from "@/services/flow-system/flowRegistry.js";
+import { log } from "@/utils/common/logHandler.js";
 
 function mergeRunOptions(registryOptions = {}, runtimeOptions = {}) {
   const merged = { ...(registryOptions || {}), ...(runtimeOptions || {}) };
@@ -15,6 +16,12 @@ function mergeRunOptions(registryOptions = {}, runtimeOptions = {}) {
   return merged;
 }
 
+function resolveBackoffDelayMs(baseIntervalMs, consecutiveFailures, maxBackoffMs) {
+  if (consecutiveFailures <= 0) return baseIntervalMs;
+  const exponent = Math.min(consecutiveFailures, 6);
+  return Math.min(baseIntervalMs * (2 ** exponent), maxBackoffMs);
+}
+
 function createFlowRefreshManager() {
   const intervals = new Map();
 
@@ -26,18 +33,89 @@ function createFlowRefreshManager() {
       }
 
       if (intervals.has(scopeKey)) {
-        clearInterval(intervals.get(scopeKey).timer);
+        clearTimeout(intervals.get(scopeKey).timer);
         intervals.delete(scopeKey);
       }
 
-      const run = () => FlowHandler.run(resolvedFlowName, payload, { ...options, forceRefresh: true });
+      const baseIntervalMs = intervalMs;
+      const maxBackoffMs = Number.isFinite(Number(options.maxBackoffMs))
+        ? Number(options.maxBackoffMs)
+        : baseIntervalMs * 8;
+      let consecutiveFailures = 0;
+
+      const executeRun = async () => {
+        try {
+          const result = await FlowHandler.run(resolvedFlowName, payload, { ...options, forceRefresh: true });
+          if (!result?.ok) {
+            consecutiveFailures += 1;
+            log({
+              file: "flowRefreshManager.js",
+              method: "executeRun",
+              flag: "flow_refresh",
+              purpose: "Flow refresh returned error result",
+              flowName: resolvedFlowName,
+              scopeKey,
+              consecutiveFailures,
+              error: result?.error,
+            });
+          } else {
+            consecutiveFailures = 0;
+          }
+        } catch (error) {
+          consecutiveFailures += 1;
+          log({
+            file: "flowRefreshManager.js",
+            method: "executeRun",
+            flag: "flow_refresh",
+            purpose: "Flow refresh threw",
+            flowName: resolvedFlowName,
+            scopeKey,
+            consecutiveFailures,
+            error: error?.message || error,
+          });
+        }
+      };
+
+      const scheduleNext = () => {
+        const delayMs = resolveBackoffDelayMs(baseIntervalMs, consecutiveFailures, maxBackoffMs);
+        const timer = setTimeout(async () => {
+          await executeRun();
+          if (intervals.has(scopeKey)) {
+            scheduleNext();
+          }
+        }, delayMs);
+        intervals.set(scopeKey, {
+          timer,
+          flowName: resolvedFlowName,
+          payload,
+          intervalMs: baseIntervalMs,
+          options,
+          consecutiveFailures,
+        });
+      };
+
+      intervals.set(scopeKey, {
+        timer: null,
+        flowName: resolvedFlowName,
+        payload,
+        intervalMs: baseIntervalMs,
+        options,
+        consecutiveFailures: 0,
+      });
+
+      const kickoff = async () => {
+        await executeRun();
+        if (intervals.has(scopeKey)) {
+          scheduleNext();
+        }
+      };
 
       if (runImmediately) {
-        run();
+        void kickoff();
+      } else {
+        scheduleNext();
       }
 
-      const timer = setInterval(run, intervalMs);
-      intervals.set(scopeKey, { timer, flowName: resolvedFlowName, payload, intervalMs, options });
       return () => this.stop(scopeKey);
     },
 
@@ -64,13 +142,13 @@ function createFlowRefreshManager() {
     stop(scopeKey) {
       const entry = intervals.get(scopeKey);
       if (!entry) return false;
-      clearInterval(entry.timer);
+      clearTimeout(entry.timer);
       intervals.delete(scopeKey);
       return true;
     },
 
     stopAll() {
-      intervals.forEach((entry) => clearInterval(entry.timer));
+      intervals.forEach((entry) => clearTimeout(entry.timer));
       intervals.clear();
     },
 
@@ -83,6 +161,7 @@ function createFlowRefreshManager() {
         scopeKey,
         flowName: entry.flowName,
         intervalMs: entry.intervalMs,
+        consecutiveFailures: entry.consecutiveFailures ?? 0,
       }));
     },
   };

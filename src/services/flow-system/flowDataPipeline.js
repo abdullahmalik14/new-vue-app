@@ -3,6 +3,7 @@ import { normalizeUnknownError } from "@/services/flow-system/flowErrors.js";
 import { mergeMeta } from "@/services/flow-system/pipeline/pipelineResult.js";
 import { runReadPipeline } from "@/services/flow-system/pipeline/readPipeline.js";
 import { runWritePipeline } from "@/services/flow-system/pipeline/writePipeline.js";
+import { patchPipelineProgress } from "@/services/flow-system/utils/flowProgress.js";
 
 function nowMs() {
   return Date.now();
@@ -50,7 +51,7 @@ export function markStage(context, stageName) {
     context._stages = [];
   }
   context._stages.push({ stage: stageName, at: timestamp });
-  context.progress.step = stageName;
+  patchPipelineProgress(context, { step: stageName });
   return timestamp;
 }
 

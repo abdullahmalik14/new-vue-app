@@ -1033,6 +1033,58 @@ const _globalContext = {
 
 **Fix:** Add a `FlowHandler.reset()` method for testing; document that `configure()` is idempotent or make it replace rather than merge.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `FlowHandler.configure()` merged new `piniaStores` into the module singleton via `Object.assign`, so stale store keys survived re-configuration (logout/tests) and conflicting `configure()` calls could leave orphaned entries.
+
+**What changed:**
+- `FlowHandler.js`: `configure()` now **replaces** `piniaStores` when provided (shallow copy) and sets `stateEngine` only when that field is passed; JSDoc notes idempotent re-call with the same values.
+- Added `FlowHandler.reset()` to restore empty global context (tests, logout, dev hot reload).
+- Added `FlowHandler.getContextSnapshot()` returning `piniaStoreKeys` and `hasStateEngine` for verifiable browser/unit checks without exposing store instances.
+- `tests/unit/flowHandlerGlobalContext.test.js` covers replace semantics, reset, and idempotent configure.
+
+**How to test in the browser (one paste, on a running dev page after app load):**
+```js
+(async () => {
+  const { getActivePinia } = await import('pinia');
+  const { FlowHandler } = await import('/src/services/flow-system/FlowHandler.js');
+  const { useChatStore } = await import('/src/stores/useChatStore.js');
+  const { useCartStore } = await import('/src/stores/useCartStore.js');
+  const { useDashboardAnalytics } = await import('/src/stores/DashboardAnalytics.js');
+  const before = FlowHandler.getContextSnapshot();
+  FlowHandler.configure({ piniaStores: { __bp02_a: {}, __bp02_stale: {} } });
+  FlowHandler.configure({ piniaStores: { __bp02_a: {} } });
+  const afterReplace = FlowHandler.getContextSnapshot();
+  FlowHandler.reset();
+  const afterReset = FlowHandler.getContextSnapshot();
+  const pinia = getActivePinia();
+  FlowHandler.configure({
+    piniaStores: {
+      chat: useChatStore(pinia),
+      cart: useCartStore(pinia),
+      dashboard: useDashboardAnalytics(pinia),
+    },
+  });
+  const restored = FlowHandler.getContextSnapshot();
+  const out = {
+    pass: afterReplace.piniaStoreKeys.join() === '__bp02_a'
+      && afterReset.piniaStoreKeys.length === 0
+      && !afterReset.hasStateEngine
+      && restored.piniaStoreKeys.sort().join() === before.piniaStoreKeys.sort().join(),
+    beforeKeys: before.piniaStoreKeys,
+    afterReplaceKeys: afterReplace.piniaStoreKeys,
+    afterResetKeys: afterReset.piniaStoreKeys,
+    restoredKeys: restored.piniaStoreKeys,
+  };
+  console.log('[BP-02]', out);
+})();
+```
+**Expected:** `pass: true`; `afterReplaceKeys` is `['__bp02_a']` only (no `__bp02_stale`); `afterResetKeys` is `[]`; `restoredKeys` matches `beforeKeys` (`cart`, `chat`, `dashboard`).
+
+**Unit test:** `pnpm vitest run tests/unit/flowHandlerGlobalContext.test.js`
+
 ---
 
 ### BP-03 — `context.progress` is mutated directly instead of being reactive/immutable
@@ -1052,6 +1104,45 @@ Direct mutation of `progress` inside an async pipeline means:
 
 **Fix:** Use `finally` to reset `loading`, and expose progress as a reactive `ref` at the call site rather than on the context.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `context.progress.loading` was set in `try`/`catch` without `finally`, so a throw could leave `loading: true`. Progress fields were mutated in place (`context.progress.loading = …`, `context.progress.step = …`), which is not immutable and is invisible to Vue unless the call site opts in.
+
+**What changed:**
+- `FlowHandler.js`: `patchPipelineProgress` + `try`/`finally` always clears `loading`; optional `options.progressRef` (from `createFlowProgressRef()`) syncs loading for reactive UI at the call site.
+- `utils/flowProgress.js`: `createFlowProgressRef()`, `patchPipelineProgress()`.
+- `flowDataPipeline.js` `markStage`: uses `patchPipelineProgress` for `step` updates.
+- `tests/unit/flowHandlerProgress.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { FlowHandler } = await import('/src/services/flow-system/FlowHandler.js');
+  const { createFlowProgressRef, patchPipelineProgress } = await import('/src/services/flow-system/utils/flowProgress.js');
+  const { createPipelineContext } = await import('/src/services/flow-system/pipeline/pipelineContext.js');
+  const ctx = createPipelineContext({
+    flowName: 'bp03', flowEntry: { flowKind: 'read' }, flow: async () => ({}),
+    payload: {}, mappedPayload: {}, flowKind: 'read',
+    rerunFlow: async () => ({}), executeFlow: async () => ({}),
+  });
+  const before = ctx.progress;
+  patchPipelineProgress(ctx, { loading: true });
+  const progressRef = createFlowProgressRef(false);
+  await FlowHandler.run('events.fetchEvent', { eventId: 'bp03-test' }, { progressRef });
+  const out = {
+    pass: progressRef.value === false && ctx.progress !== before && ctx.progress.loading === true,
+    refAfterRun: progressRef.value,
+    patchedImmutable: ctx.progress !== before,
+  };
+  console.log('[BP-03]', out);
+})();
+```
+**Expected:** `pass: true`; `refAfterRun: false` (finally cleared); `patchedImmutable: true`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowHandlerProgress.test.js`
+
 ---
 
 ### BP-04 — `withMetrics` mutates the returned result object
@@ -1065,6 +1156,39 @@ result.meta = { ...(result.meta || {}), durationMs, runId: args.context.runId };
 The result object returned from the next handler is mutated in-place. If the same result reference is used elsewhere after this middleware (e.g., for logging before passing to the caller), the `meta` will unexpectedly contain timing data added after the fact.
 
 **Fix:** Return a new object: `return { ...result, meta: { ... } }`.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `withMetrics` assigned `result.meta` on the object returned by the inner handler, so consumers holding the pre-middleware reference saw `meta` change later.
+
+**What changed:**
+- `withMetrics.js`: success and error paths return `{ ...result, meta: { ... } }` (and `{ ...normalized, meta }` on catch) without mutating the original reference.
+- `tests/unit/withMetricsImmutability.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { withMetrics } = await import('/src/services/flow-system/middleware/withMetrics.js');
+  const original = { ok: true, status: 'success', data: { n: 1 }, meta: { source: 'flow' } };
+  const wrapped = withMetrics(async () => original);
+  const out = await wrapped({ context: { runId: 'bp04-browser' }, payload: {} });
+  const out2 = {
+    pass: out !== original
+      && original.meta.source === 'flow'
+      && out.meta.source === 'flow'
+      && typeof out.meta.durationMs === 'number'
+      && out.meta.runId === 'bp04-browser',
+    originalMeta: original.meta,
+    outMeta: out.meta,
+  };
+  console.log('[BP-04]', out2);
+})();
+```
+**Expected:** `pass: true`; `originalMeta` has no `durationMs`; `outMeta` includes `durationMs` and `runId`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/withMetricsImmutability.test.js`
 
 ---
 
@@ -1085,6 +1209,37 @@ A typo like `flowKind: "reed"` in a registry entry silently produces a write pip
 
 **Fix:** Throw or return an error result for unrecognised flow kinds.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Typos like `flowKind: "reed"` fell through to `return "write"`, running write pipeline semantics (no read cache/ETag/dedupe).
+
+**What changed:**
+- `FlowHandler.js`: `normalizeFlowKind` replaced with `resolveFlowKind()` — returns `"read"` / `"write"` for known aliases, otherwise `fail({ code: "INVALID_FLOW_KIND", ... })`; missing/empty `flowKind` also fails (registry entries must declare kind).
+- `tests/unit/flowHandlerFlowKind.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { FlowHandler } = await import('/src/services/flow-system/FlowHandler.js');
+  const typo = await FlowHandler.run('events.fetchEvent', {}, { flowKind: 'reed' });
+  const valid = await FlowHandler.run('events.fetchEvent', {}, { flowKind: 'read' });
+  const out = {
+    pass: typo.ok === false
+      && typo.error?.code === 'INVALID_FLOW_KIND'
+      && typo.error?.message?.includes('reed')
+      && (valid.ok === true || valid.error?.code !== 'INVALID_FLOW_KIND'),
+    typo,
+    validOk: valid.ok,
+  };
+  console.log('[BP-05]', out);
+})();
+```
+**Expected:** `pass: true`; `typo.error.code` is `INVALID_FLOW_KIND`; `validOk` is not blocked by kind validation (flow may still fail for other reasons such as API).
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowHandlerFlowKind.test.js`
+
 ---
 
 ### BP-06 — `flowKind` is not validated when reading from `flowEntry` vs `options`
@@ -1098,6 +1253,36 @@ const flowKind = normalizeFlowKind(options.flowKind || flowEntry?.flowKind);
 `options.flowKind` takes precedence over the registry-declared kind. A caller can silently override the flow kind at runtime, e.g., running a write flow as a read flow and triggering the read pipeline's cache logic on mutating operations.
 
 **Fix:** Remove `options.flowKind` override capability, or at minimum log a warning when it overrides the registry value.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `options.flowKind` won over `flowEntry.flowKind`, so a caller could run a write registry flow through the read pipeline (cache/ETag/dedupe) or vice versa.
+
+**What changed:**
+- `FlowHandler.js`: pipeline kind comes **only** from registry `flowEntry.flowKind`; `options.flowKind` is rejected when it normalizes to a different kind (`FLOW_KIND_OVERRIDE_NOT_ALLOWED`). Matching aliases (e.g. `query` on a `read` flow) are allowed. `flowKind` is stripped from merged runtime options so `rerunFlow` cannot smuggle overrides.
+- `tests/unit/flowHandlerFlowKindOverride.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { FlowHandler } = await import('/src/services/flow-system/FlowHandler.js');
+  const override = await FlowHandler.run('events.fetchEvent', {}, { flowKind: 'write' });
+  const aliasOk = await FlowHandler.run('events.fetchEvent', {}, { flowKind: 'query' });
+  const out = {
+    pass: override.ok === false
+      && override.error?.code === 'FLOW_KIND_OVERRIDE_NOT_ALLOWED'
+      && aliasOk.error?.code !== 'FLOW_KIND_OVERRIDE_NOT_ALLOWED',
+    overrideCode: override.error?.code,
+    aliasCode: aliasOk.error?.code,
+  };
+  console.log('[BP-06]', out);
+})();
+```
+**Expected:** `pass: true`; `overrideCode` is `FLOW_KIND_OVERRIDE_NOT_ALLOWED`; `aliasCode` is not that code.
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowHandlerFlowKindOverride.test.js`
 
 ---
 
@@ -1116,6 +1301,36 @@ This function is an unnecessary wrapper around `deepGet`. `deepGet` already hand
 
 **Fix:** Replace all calls to `resolveValueByPath` with direct `deepGet` calls.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `resolveValueByPath` duplicated `deepGet` with no extra behavior.
+
+**What changed:**
+- `readSourceRuntime.js`: removed `resolveValueByPath`; Pinia reads use `deepGet(store, path)` for `select`, `etagSelect`, and `updatedAtSelect`.
+- `tests/unit/readSourceRuntimeDeepGet.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { readFromPiniaSource } = await import('/src/services/flow-system/runtime/readSourceRuntime.js');
+  const store = { nested: { items: [7] }, meta: { etag: 'e7', updatedAt: 42 } };
+  const snap = readFromPiniaSource(
+    { type: 'pinia', storeId: 'demo', select: 'nested.items', etagSelect: 'meta.etag', updatedAtSelect: 'meta.updatedAt' },
+    { piniaStores: { demo: store } },
+  );
+  const out = {
+    pass: snap.hit === true && snap.data?.[0] === 7 && snap.etag === 'e7' && snap.updatedAt === 42,
+    snap,
+  };
+  console.log('[BP-07]', out);
+})();
+```
+**Expected:** `pass: true`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/readSourceRuntimeDeepGet.test.js`
+
 ---
 
 ### BP-08 — `flowRefreshManager` error-handling is silent
@@ -1132,9 +1347,47 @@ const timer = setInterval(run, intervalMs);
 
 **Fix:** Await `run()` inside the interval callback, add error logging, and implement exponential backoff on consecutive failures.
 
+#### Resolution ✅
 
+**Status:** Resolved.
 
+**What was broken:** `setInterval` fired `FlowHandler.run()` without `await`; rejections and `{ ok: false }` results were ignored; failed polls retried at the same cadence forever.
 
+**What changed:**
+- `flowRefreshManager.js`: replaced `setInterval` with chained `setTimeout` + `await FlowHandler.run(...)`.
+- Logs flow refresh failures via `logHandler` (`flag: "flow_refresh"`).
+- `resolveBackoffDelayMs()` applies exponential backoff on consecutive failures (cap `maxBackoffMs`, default `intervalMs * 8`).
+- `stop`/`stopAll` use `clearTimeout`; `list()` exposes `consecutiveFailures`.
+- `tests/unit/flowRefreshManagerBackoff.test.js` (existing `flowRefreshManagerRunImmediately.test.js` still passes).
+
+**How to test in the browser (one paste, dev app loaded):**
+```js
+(async () => {
+  const flowRefreshManager = (await import('/src/services/flow-system/flowRefreshManager.js')).default;
+  const scopeKey = '__bp08_test__';
+  flowRefreshManager.stop(scopeKey);
+  const stop = flowRefreshManager.start({
+    scopeKey,
+    flowName: 'events.fetchEvent',
+    payload: { eventId: 'bp08' },
+    intervalMs: 5000,
+    runImmediately: true,
+  });
+  await new Promise((r) => setTimeout(r, 50));
+  const entry = flowRefreshManager.list().find((e) => e.scopeKey === scopeKey);
+  stop();
+  const out = {
+    pass: !!entry && entry.flowName === 'events.fetchEvent' && typeof entry.consecutiveFailures === 'number',
+    entry,
+  };
+  console.log('[BP-08]', out);
+})();
+```
+**Expected:** `pass: true`; `entry` shows the refresh scope running and tracking `consecutiveFailures` (0 after a successful run, >0 after failures).
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowRefreshManagerBackoff.test.js tests/unit/flowRefreshManagerRunImmediately.test.js`
+
+---
 
 ## 5. Missing Features
 
