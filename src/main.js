@@ -179,7 +179,7 @@ const { earnings } = storeToRefs(dashboardStore);
 
 // Load analytics data immediately using the new data pipeline
 try {
-  flowRefreshManager.startFromRegistry("analytics.fetch", { source: "full" });
+  flowRefreshManager.startFromRegistry("analytics.fetch", { source: "full" }, { runImmediately: true });
   console.log("Dashboard Analytics pipeline started in main.js");
 } catch (error) {
   console.error("Failed to start analytics pipeline in main.js:", error);

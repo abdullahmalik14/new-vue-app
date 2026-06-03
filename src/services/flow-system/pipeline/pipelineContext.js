@@ -1,22 +1,11 @@
-function isPlainObject(value) {
-  return value != null && typeof value === "object" && !Array.isArray(value);
-}
-
-function mergeConfig(baseConfig, overrideConfig) {
-  if (!isPlainObject(baseConfig) || !isPlainObject(overrideConfig)) {
-    return overrideConfig === undefined ? baseConfig : overrideConfig;
-  }
-
-  const merged = { ...baseConfig };
-  Object.entries(overrideConfig).forEach(([key, value]) => {
-    if (isPlainObject(value) && isPlainObject(baseConfig[key])) {
-      merged[key] = mergeConfig(baseConfig[key], value);
-      return;
-    }
-    merged[key] = value;
-  });
-  return merged;
-}
+import { isPlainObject, mergeConfig } from "@/services/flow-system/utils/mergeConfig.js";
+import {
+  applyBackendJwtToRequestHeaders,
+  applyCsrfToRequestHeaders,
+  resolveBackendJwtToken,
+  resolveCsrfToken,
+  stripSensitiveContextOverrides,
+} from "@/services/flow-system/utils/flowAuthSecrets.js";
 
 function makeRunId() {
   return `flow_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -69,20 +58,23 @@ export function createPipelineContext({
   const optionPipeline = options.pipeline || {};
   const pipeline = mergeConfig(mergeConfig(defaultPipeline, registryPipeline), optionPipeline);
 
-  const backendJwtToken = typeof options.backendJwtToken === "string"
-    ? options.backendJwtToken.trim()
-    : typeof options.context?.backendJwtToken === "string"
-      ? options.context.backendJwtToken.trim()
-      : "";
-  const requestHeaders = {
-    ...((isPlainObject(options.context?.requestHeaders) ? options.context.requestHeaders : {})),
-    ...((isPlainObject(options.requestHeaders) ? options.requestHeaders : {})),
-  };
-  if (backendJwtToken && !Object.prototype.hasOwnProperty.call(requestHeaders, "Authorization")) {
-    requestHeaders.Authorization = `Bearer ${backendJwtToken}`;
-  }
+  const backendJwtToken = resolveBackendJwtToken(options);
+  const csrfToken = resolveCsrfToken(options);
+  const safeContextOverrides = stripSensitiveContextOverrides(options.context);
+  const requestHeaders = applyCsrfToRequestHeaders(
+    applyBackendJwtToRequestHeaders(
+      {
+        ...((isPlainObject(safeContextOverrides.requestHeaders) ? safeContextOverrides.requestHeaders : {})),
+        ...((isPlainObject(options.requestHeaders) ? options.requestHeaders : {})),
+      },
+      backendJwtToken,
+    ),
+    csrfToken,
+    { flowKind },
+  );
 
   return {
+    ...safeContextOverrides,
     runId: makeRunId(),
     flowName,
     flow,
@@ -111,12 +103,11 @@ export function createPipelineContext({
     totalFlowTimeoutMs: options.totalFlowTimeoutMs || pipeline.timeouts?.totalFlowMs || pipeline.timeoutMs || 15000,
     retryAttempts: options.retryAttempts,
     userId: options.userId,
-    backendJwtToken,
     apiBaseUrl: options.apiBaseUrl,
     storage: options.storage,
     stateEngine: options.stateEngine || options.context?.stateEngine,
     piniaStores: options.piniaStores || options.context?.piniaStores,
     debug: !!options.debug,
-    ...(options.context || {}),
+    flowSecurity: csrfToken ? { csrfToken } : null,
   };
 }

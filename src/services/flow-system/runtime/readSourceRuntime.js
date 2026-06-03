@@ -1,5 +1,6 @@
 import { deepGet, deepSet } from "@/services/flow-system/runtime/destinationRuntime.js";
 import { resolveStorage, readCacheEntry, writeCacheEntry } from "@/services/flow-system/runtime/cacheRuntime.js";
+import { mergeConfig } from "@/services/flow-system/utils/mergeConfig.js";
 
 const DEFAULT_READ_FROM_CONFIG = {
   enabled: false,
@@ -8,26 +9,6 @@ const DEFAULT_READ_FROM_CONFIG = {
   priority: ["pinia", "stateEngine", "local"],
   sources: [],
 };
-
-function isPlainObject(value) {
-  return value != null && typeof value === "object" && !Array.isArray(value);
-}
-
-function mergeConfig(baseConfig, overrideConfig) {
-  if (!isPlainObject(baseConfig) || !isPlainObject(overrideConfig)) {
-    return overrideConfig === undefined ? baseConfig : overrideConfig;
-  }
-
-  const merged = { ...baseConfig };
-  Object.entries(overrideConfig).forEach(([key, value]) => {
-    if (isPlainObject(value) && isPlainObject(baseConfig[key])) {
-      merged[key] = mergeConfig(baseConfig[key], value);
-      return;
-    }
-    merged[key] = value;
-  });
-  return merged;
-}
 
 function normalizeSourceType(type) {
   if (!type) return "";

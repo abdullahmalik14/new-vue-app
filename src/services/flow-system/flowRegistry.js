@@ -1,3 +1,4 @@
+import { assertRegistryDestinationsSafe } from "@/services/flow-system/runtime/destinationRuntime.js";
 import { createEventFlow } from "@/services/events/flows/createEventFlow.js";
 import { fetchCreatorEventsFlow } from "@/services/events/flows/fetchCreatorEventsFlow.js";
 import { fetchEventFlow } from "@/services/events/flows/fetchEventFlow.js";
@@ -1707,3 +1708,5 @@ export const flowRegistry = {
     refresh: { enabled: true, intervalMs: 30000, scopeKey: "analytics.fetch" },
   },
 };
+
+assertRegistryDestinationsSafe(flowRegistry);

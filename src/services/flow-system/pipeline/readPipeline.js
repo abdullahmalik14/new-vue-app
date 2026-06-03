@@ -19,6 +19,7 @@ import {
   isNotModifiedResult,
 } from "@/services/flow-system/runtime/etagRuntime.js";
 import { applyDestinations } from "@/services/flow-system/runtime/destinationRuntime.js";
+import { scheduleBackgroundRevalidateOnce } from "@/services/flow-system/utils/backgroundRevalidate.js";
 import {
   resolveReadFromConfig,
   readConfiguredSourceSnapshots,
@@ -163,15 +164,16 @@ function startBackgroundRevalidate(context) {
   if (context.runtimeOptions.backgroundRevalidate) return false;
   if (typeof context.rerunFlow !== "function") return false;
 
-  setTimeout(() => {
+  const concurrencyConfig = context.pipeline?.concurrency || {};
+  const revalidateKey = buildConcurrencyKey(context.flowName, context.payload, concurrencyConfig);
+
+  return scheduleBackgroundRevalidateOnce(revalidateKey, () => {
     context.rerunFlow({
       forceRefresh: true,
       skipDestinationRead: true,
       backgroundRevalidate: true,
     }).catch(() => {});
-  }, 0);
-
-  return true;
+  });
 }
 
 export async function runReadPipeline(context) {

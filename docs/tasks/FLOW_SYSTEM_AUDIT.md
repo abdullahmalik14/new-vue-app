@@ -505,6 +505,38 @@ if (policy === "allowParallel") {
 
 **Fix:** Default `runImmediately` to `false` for registry-started flows, or deduplicate using the concurrency layer.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `startFromRegistry` always fired an immediate `FlowHandler.run` plus any separate mount-time run, doubling network load on page load.
+
+**Why it happened:** `runImmediately` defaulted to true (`options.runImmediately !== false`).
+
+**What changed:**
+- `startFromRegistry` only runs immediately when `options.runImmediately === true`.
+- Call sites that need an initial fetch pass it explicitly: `main.js` (analytics bootstrap), `Cart.vue` (cart on mount).
+- `AnalyticsPage` relies on `main.js` bootstrap and only re-registers the interval without a second immediate fetch.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { createFlowRefreshManager } = await import('/src/services/flow-system/flowRefreshManager.js');
+  let calls = 0;
+  const mod = await import('/src/services/flow-system/FlowHandler.js');
+  const original = mod.default.run;
+  mod.default.run = async (...args) => { calls += 1; return { ok: true }; };
+  const mgr = createFlowRefreshManager();
+  mgr.startFromRegistry('analytics.fetch', { source: 'full' });
+  const out = { noImmediateByDefault: calls === 0 };
+  mgr.stopAll();
+  mod.default.run = original;
+  console.log({ pass: Object.values(out).every(Boolean), calls, ...out });
+})();
+```
+
+**Expected:** `pass: true`, `calls: 0` (interval still scheduled; first tick after `intervalMs`).
+
 ---
 
 ### PERF-02 — Module-level `memoryCache` Map never evicts expired entries
@@ -519,6 +551,35 @@ Entries are added on every cache write but never removed when they expire. `read
 
 **Fix:** Call `removeFromStorage` inside `readCacheEntry` when `reason === "expired"`, or run a periodic sweep.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Expired in-memory cache rows stayed in `memoryCache` forever, so long sessions could grow memory without bound.
+
+**Why it happened:** `readCacheEntry` returned `hit: false` for expiry but never deleted the stale record.
+
+**What changed:** On `reason === "expired"`, `readCacheEntry` calls `removeFromStorage` before returning (memory and `localStorage`).
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { writeCacheEntry, readCacheEntry } = await import('/src/services/flow-system/runtime/cacheRuntime.js');
+  const key = '__flow_cache__:demo:shared';
+  writeCacheEntry({ storage: null, key, data: { n: 1 }, ttlMs: 1 });
+  await new Promise((r) => setTimeout(r, 5));
+  const expired = readCacheEntry({ storage: null, key });
+  const missing = readCacheEntry({ storage: null, key });
+  const out = {
+    wasExpired: expired.reason === 'expired',
+    thenMissing: missing.reason === 'missing',
+  };
+  console.log({ pass: Object.values(out).every(Boolean), expired, missing, ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### PERF-03 — `stableStringify` is O(n log n) and called on every cache/concurrency key build
@@ -528,6 +589,30 @@ Entries are added on every cache write but never removed when they expire. `read
 `buildPayloadHash` calls `stableStringify` which sorts all object keys recursively. This is called for every `buildCacheKey`, `buildEtagKey`, and `buildConcurrencyKey` invocation — i.e., before every single flow execution. For complex payloads (e.g., booking or event creation) this is expensive.
 
 **Fix:** Memoize the hash per payload reference, or use a faster hashing strategy.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Every flow run recomputed `stableStringify` + hash for the same payload object reference, adding avoidable CPU cost on hot paths (cache keys, concurrency keys).
+
+**Why it happened:** `buildPayloadHash` had no memoization layer.
+
+**What changed:** `buildPayloadHash` memoizes by object reference via `WeakMap` (same reference → same hash without re-stringifying).
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { buildPayloadHash } = await import('/src/services/flow-system/runtime/cacheRuntime.js');
+  const payload = { a: 1, b: 2, nested: { z: 9 } };
+  const h1 = buildPayloadHash(payload);
+  const h2 = buildPayloadHash(payload);
+  const out = { stable: h1 === h2, nonEmpty: h1.length > 0 };
+  console.log({ pass: Object.values(out).every(Boolean), h1, h2, ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -543,6 +628,35 @@ storage.setItem(key, JSON.stringify(value));
 
 **Fix:** Wrap `setItem` in a try/catch and degrade gracefully to memory cache.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** A full `localStorage` threw `QuotaExceededError` and could crash the whole flow.
+
+**Why it happened:** `writeToStorage` called `setItem` without `try/catch` and never read from the in-memory fallback.
+
+**What changed:** `writeToStorage` catches quota errors and stores in `memoryCache`; `readFromStorage` falls back to memory when `getItem` misses; successful local writes clear stale memory copies.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { writeCacheEntry, readCacheEntry } = await import('/src/services/flow-system/runtime/cacheRuntime.js');
+  const key = '__flow_cache__:quota:demo';
+  const badStorage = {
+    getItem: () => null,
+    setItem: () => { throw new DOMException('quota', 'QuotaExceededError'); },
+    removeItem: () => {},
+  };
+  writeCacheEntry({ storage: badStorage, key, data: { saved: true }, ttlMs: 60000 });
+  const read = readCacheEntry({ storage: badStorage, key });
+  const out = { hit: read.hit === true, dataOk: read.record?.data?.saved === true };
+  console.log({ pass: Object.values(out).every(Boolean), read, ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### PERF-05 — `mergeConfig` deep-merge utility is duplicated across files
@@ -552,6 +666,28 @@ storage.setItem(key, JSON.stringify(value));
 The same `isPlainObject` + `mergeConfig` implementation is copy-pasted into two files. If one is fixed/optimised, the other won't be.
 
 **Fix:** Extract to a shared `src/services/flow-system/utils/mergeConfig.js`.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Identical `mergeConfig` / `isPlainObject` lived in two files, so fixes could diverge.
+
+**Why it happened:** Copy-paste during pipeline growth.
+
+**What changed:** Shared module `src/services/flow-system/utils/mergeConfig.js`; `pipelineContext.js` and `readSourceRuntime.js` import it.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { mergeConfig } = await import('/src/services/flow-system/utils/mergeConfig.js');
+  const merged = mergeConfig({ retry: { enabled: true, maxAttempts: 2 } }, { retry: { maxAttempts: 3 } });
+  const out = { keepsEnabled: merged.retry.enabled === true, updatesMax: merged.retry.maxAttempts === 3 };
+  console.log({ pass: Object.values(out).every(Boolean), merged, ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -570,6 +706,37 @@ Multiple stale cache hits within the same event loop tick (e.g., multiple compon
 
 **Fix:** Use the concurrency layer's deduplication explicitly, or dedounce background revalidation by key.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Multiple stale-while-revalidate hits in the same tick each scheduled their own `rerunFlow`, causing redundant work and cancel churn.
+
+**Why it happened:** Every stale hit called `setTimeout(..., 0)` with no per-key guard.
+
+**What changed:** `scheduleBackgroundRevalidateOnce` in `utils/backgroundRevalidate.js` dedupes by concurrency key; `readPipeline` uses it before background `rerunFlow`.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const {
+    scheduleBackgroundRevalidateOnce,
+    clearBackgroundRevalidateScheduleForTests,
+  } = await import('/src/services/flow-system/utils/backgroundRevalidate.js');
+  clearBackgroundRevalidateScheduleForTests();
+  let calls = 0;
+  const key = 'demo.flow:shared';
+  scheduleBackgroundRevalidateOnce(key, () => { calls += 1; });
+  scheduleBackgroundRevalidateOnce(key, () => { calls += 1; });
+  await new Promise((r) => setTimeout(r, 0));
+  const out = { singleRun: calls === 1 };
+  clearBackgroundRevalidateScheduleForTests();
+  console.log({ pass: Object.values(out).every(Boolean), calls, ...out });
+})();
+```
+
+**Expected:** `pass: true`, `calls: 1`.
+
 ---
 
 ## 3. Security Issues
@@ -586,6 +753,32 @@ Multiple stale cache hits within the same event loop tick (e.g., multiple compon
 
 **Fix:** Restore `withAuth` (and at minimum `withTimeout`) to `defaultMiddlewares`.
 
+#### Resolution ✅
+
+**Status:** Resolved (addressed with BUG-02).
+
+**What was broken:** `defaultMiddlewares` was empty, so `withAuth` never ran and `requireAuth` had no effect.
+
+**Why it happened:** Middleware defaults were commented out during debugging and not restored.
+
+**What changed:** `FlowHandler.js` restores `[withMetrics, withTimeout, withRetry, withAuth]`. Auth enforcement is **opt-in per call** via `requireAuth: true` and `userId` (see BUG-02) so existing public flows without login still work until BUG-19 wires auth state.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { flowMiddlewares } = await import('/src/services/flow-system/FlowHandler.js');
+  const wrapped = flowMiddlewares.withAuth(async () => ({ ok: true }));
+  const blocked = await wrapped({ context: { requireAuth: true }, payload: {} });
+  const out = {
+    hasWithAuth: typeof flowMiddlewares.withAuth === 'function',
+    blocksWithoutUser: blocked?.ok === false && blocked?.error?.code === 'AUTH_REQUIRED',
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### SEC-02 — JWT token stored and passed as a plain string on the context
@@ -597,6 +790,45 @@ Multiple stale cache hits within the same event loop tick (e.g., multiple compon
 **Impact:** A misconfigured destination or leak via `details: error` in a `fail()` result could expose the JWT in response objects returned to UI components.
 
 **Fix:** Store the token in a closure, expose it only when building request headers, and redact it from any serialized error output.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `backendJwtToken` was a plain field on `context`, and errors could echo it (or `Authorization`) in `details` returned to the UI.
+
+**Why it happened:** Token was copied onto the context object for convenience; error normalization did not redact secrets.
+
+**What changed:**
+- `flowAuthSecrets.js` resolves the JWT only when building `requestHeaders` (not stored on `context`).
+- `stripSensitiveContextOverrides` blocks `backendJwtToken` from `options.context` overrides.
+- `requestHeaders` are applied after safe context spread so callers cannot overwrite `Authorization` via `options.context`.
+- `normalizeUnknownError` redacts `backendJwtToken`, `Authorization`, and `Bearer …` strings in error `details`.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { createPipelineContext } = await import('/src/services/flow-system/pipeline/pipelineContext.js');
+  const { normalizeUnknownError } = await import('/src/services/flow-system/flowErrors.js');
+  const ctx = createPipelineContext({
+    flowName: 'demo', flowEntry: { flowKind: 'read' }, flow: async () => ({}),
+    payload: {}, mappedPayload: {}, flowKind: 'read',
+    options: { backendJwtToken: 'top-secret-jwt' },
+    rerunFlow: async () => ({}), executeFlow: async () => ({}),
+  });
+  const err = normalizeUnknownError({
+    message: 'fail', details: { backendJwtToken: 'top-secret-jwt', requestHeaders: { Authorization: 'Bearer top-secret-jwt' } },
+  });
+  const out = {
+    notOnContext: ctx.backendJwtToken === undefined,
+    headerSet: ctx.requestHeaders?.Authorization === 'Bearer top-secret-jwt',
+    detailsRedacted: err.error?.details?.backendJwtToken === '[REDACTED]' && err.error?.details?.requestHeaders?.Authorization === '[REDACTED]',
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true` (`notOnContext: true`, `headerSet: true`, `detailsRedacted: true`).
 
 ---
 
@@ -661,6 +893,38 @@ ETags are stored as plain strings and read back without validation. If an attack
 
 **Fix:** Bind ETags to a session nonce, or sign/hash them before storage.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** ETags were stored and read as plain strings; tampered `localStorage` could force perpetual `304` / stale reads.
+
+**What changed:**
+- `etagRuntime.js` seals records as `{ v, etag, digest }` where `digest = hash(sessionNonce|key|etag)`.
+- Session nonce is persisted in the same storage as ETags (`__flow_etag_nonce__`) or held in memory when storage is unavailable.
+- `loadEtag` returns `null` on digest mismatch or legacy plain-string values (fail closed).
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { saveEtag, loadEtag, sealEtagRecord } = await import('/src/services/flow-system/runtime/etagRuntime.js');
+  const storage = window.localStorage;
+  const key = '__flow_etag_test__';
+  saveEtag({ storage, key, etag: '"good"' });
+  const raw = storage.getItem(key);
+  const parsed = JSON.parse(raw);
+  parsed.etag = '"tampered"';
+  storage.setItem(key, JSON.stringify(parsed));
+  const out = {
+    pass: loadEtag({ storage, key }) === null && typeof sealEtagRecord === 'function',
+    sealedShape: !!parsed.digest,
+  };
+  storage.removeItem(key);
+  console.log('[SEC-04]', out);
+})();
+```
+**Expected:** `pass: true`, `sealedShape: true`.
+
 ---
 
 ### SEC-05 — No CSRF protection on write flows
@@ -671,6 +935,42 @@ The idempotency key header (`Idempotency-Key`) is set when `pipeline.idempotency
 
 **Fix:** Add a CSRF token middleware or propagate a CSRF header from the auth context.
 
+#### Resolution ✅
+
+**Status:** Resolved (client header propagation; server must validate token).
+
+**What was broken:** Write flows had idempotency keys only; no CSRF header was attached at the flow layer.
+
+**What changed:**
+- `flowAuthSecrets.js`: `resolveCsrfToken`, `applyCsrfToRequestHeaders` (write flows only, header `X-CSRF-Token`).
+- `pipelineContext.js` applies CSRF when `options.csrfToken` is set; token is not exposed on context (`flowSecurity` bag for middleware only).
+- `withCsrf` middleware added to `defaultMiddlewares` after `withAuth`.
+- CSRF values redacted in error/header logging like JWT.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { createPipelineContext } = await import('/src/services/flow-system/pipeline/pipelineContext.js');
+  const writeCtx = createPipelineContext({
+    flowName: 'demo.write', flowEntry: {}, flow: async () => ({}),
+    payload: {}, mappedPayload: {}, flowKind: 'write',
+    options: { csrfToken: 'test-csrf' }, rerunFlow: async () => ({}), executeFlow: async () => ({}),
+  });
+  const readCtx = createPipelineContext({
+    flowName: 'demo.read', flowEntry: {}, flow: async () => ({}),
+    payload: {}, mappedPayload: {}, flowKind: 'read',
+    options: { csrfToken: 'test-csrf' }, rerunFlow: async () => ({}), executeFlow: async () => ({}),
+  });
+  const out = {
+    pass: writeCtx.requestHeaders['X-CSRF-Token'] === 'test-csrf'
+      && readCtx.requestHeaders['X-CSRF-Token'] === undefined
+      && writeCtx.csrfToken === undefined,
+  };
+  console.log('[SEC-05]', out);
+})();
+```
+**Expected:** `pass: true`.
+
 ---
 
 ### SEC-06 — `resolveRuntimeValue("@now")` is the only sanitised sentinel; all other destination values are unvalidated
@@ -680,6 +980,37 @@ The idempotency key header (`Idempotency-Key`) is set when `pipeline.idempotency
 Destination `value` fields are written directly to Pinia stores and stateEngine. There is no validation that destination values or `select` paths stay within expected bounds. A misconfigured registry entry with `value: { __proto__: ... }` could cause prototype pollution.
 
 **Fix:** Validate destination config entries at registry load time, and use `Object.create(null)` or `structuredClone` for destination data writes.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Destination `value` objects could carry prototype-pollution keys; only `@now` had special handling.
+
+**What changed:**
+- `destinationRuntime.js`: `sanitizeDestinationShape` strips `__proto__`, `constructor`, `prototype`; runtime writes use `Object.create(null)` + `structuredClone` when expanding values.
+- `resolveRuntimeValue` still expands `@now` (including nested) after sanitization.
+- `assertRegistryDestinationsSafe` runs at end of `flowRegistry.js` import to fail fast on forbidden `select` paths or polluted static `value` configs.
+- Pinia patch and stateEngine merge paths sanitize patches before apply.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { sanitizeDestinationValue, applyDestinations } = await import('/src/services/flow-system/runtime/destinationRuntime.js');
+  const polluted = JSON.parse('{"__proto__":{"polluted":true},"ok":1}');
+  const { returnData } = applyDestinations({
+    context: {},
+    flowResult: { data: {} },
+    destinations: [{ type: 'return', value: polluted }],
+  });
+  const out = {
+    pass: returnData.ok === 1 && {}.polluted === undefined,
+    configKeepsNow: sanitizeDestinationValue({ ts: '@now' }).ts === '@now',
+  };
+  console.log('[SEC-06]', out);
+})();
+```
+**Expected:** `pass: true`, `configKeepsNow: true`.
 
 ---
 

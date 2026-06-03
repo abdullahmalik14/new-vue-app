@@ -6,6 +6,7 @@ import { createPipelineContext } from "@/services/flow-system/pipeline/pipelineC
 import { invalidFlowResult } from "@/services/flow-system/pipeline/pipelineResult.js";
 import { runFlowDataPipeline } from "@/services/flow-system/flowDataPipeline.js";
 import { withAuth } from "@/services/flow-system/middleware/withAuth.js";
+import { withCsrf } from "@/services/flow-system/middleware/withCsrf.js";
 import { withRetry } from "@/services/flow-system/middleware/withRetry.js";
 import { withTimeout } from "@/services/flow-system/middleware/withTimeout.js";
 import { withMetrics } from "@/services/flow-system/middleware/withMetrics.js";
@@ -16,12 +17,13 @@ function composeMiddlewares(handler, middlewares) {
 
 export const flowMiddlewares = {
   withAuth,
+  withCsrf,
   withRetry,
   withTimeout,
   withMetrics,
 };
 
-const defaultMiddlewares = [withMetrics, withTimeout, withRetry, withAuth];
+const defaultMiddlewares = [withMetrics, withTimeout, withRetry, withAuth, withCsrf];
 
 function normalizeFlowEntry(flowEntry) {
   if (typeof flowEntry === "function") {

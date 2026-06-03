@@ -1,5 +1,61 @@
 import { resolveStorage, writeCacheEntry, flushCacheEntry } from "@/services/flow-system/runtime/cacheRuntime.js";
 
+const FORBIDDEN_OBJECT_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+function sanitizeDestinationShape(value, { expandNow } = {}) {
+  if (value === "@now") {
+    return expandNow ? Date.now() : "@now";
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeDestinationShape(item, { expandNow }));
+  }
+  if (value && typeof value === "object") {
+    const safe = Object.create(null);
+    Object.entries(value).forEach(([key, nested]) => {
+      if (FORBIDDEN_OBJECT_KEYS.has(key)) return;
+      safe[key] = sanitizeDestinationShape(nested, { expandNow });
+    });
+    if (!expandNow) return safe;
+    try {
+      return structuredClone(safe);
+    } catch {
+      return safe;
+    }
+  }
+  return value;
+}
+
+export function sanitizeDestinationValue(value) {
+  return sanitizeDestinationShape(value, { expandNow: false });
+}
+
+export function assertDestinationConfigSafe(dest) {
+  if (!dest || typeof dest !== "object") return;
+  if (dest.value !== undefined) {
+    sanitizeDestinationValue(dest.value);
+  }
+  if (typeof dest.select === "string") {
+    const invalidSegment = dest.select.split(".").find((segment) => FORBIDDEN_OBJECT_KEYS.has(segment));
+    if (invalidSegment) {
+      throw new Error(`destination select path contains forbidden segment '${invalidSegment}'`);
+    }
+  }
+}
+
+export function assertRegistryDestinationsSafe(registry = {}) {
+  Object.entries(registry).forEach(([flowName, entry]) => {
+    const destinations = entry?.pipeline?.destinations;
+    if (!Array.isArray(destinations)) return;
+    destinations.forEach((dest, index) => {
+      try {
+        assertDestinationConfigSafe(dest);
+      } catch (error) {
+        throw new Error(`Invalid destination[${index}] in flow '${flowName}': ${error.message}`);
+      }
+    });
+  });
+}
+
 export function deepGet(value, path) {
   if (!path) return value;
   if (typeof path !== "string") return value;
@@ -29,16 +85,7 @@ function resolveSelectedData(sourceData, select) {
 }
 
 function resolveRuntimeValue(value) {
-  if (value === "@now") return Date.now();
-  if (Array.isArray(value)) return value.map((item) => resolveRuntimeValue(item));
-  if (value && typeof value === "object") {
-    const next = {};
-    Object.entries(value).forEach(([key, nested]) => {
-      next[key] = resolveRuntimeValue(nested);
-    });
-    return next;
-  }
-  return value;
+  return sanitizeDestinationShape(value, { expandNow: true });
 }
 
 function applyStateEngineDestination(dest, selectedData, context) {
@@ -53,7 +100,8 @@ function applyStateEngineDestination(dest, selectedData, context) {
 
   if (mode === "merge" && typeof engine.getState === "function" && typeof engine.setState === "function") {
     const prev = engine.getState(dest.key) || {};
-    const merged = { ...prev, ...(selectedData || {}) };
+    const patch = sanitizeDestinationValue(selectedData || {});
+    const merged = { ...prev, ...(patch || {}) };
     engine.setState(dest.key, merged, { reason: "flow-destination", silent: !!dest.silent });
     return;
   }
@@ -89,8 +137,8 @@ function applyPiniaDestination(dest, selectedData, context, flowResult) {
   }
 
   if (dest.type === "piniaPatch" && typeof store.$patch === "function") {
-    const patch = typeof dest.patch === "function" ? dest.patch(selectedData, context) : dest.patch || {};
-    store.$patch(patch);
+    const rawPatch = typeof dest.patch === "function" ? dest.patch(selectedData, context) : dest.patch || {};
+    store.$patch(sanitizeDestinationValue(rawPatch));
     return;
   }
 

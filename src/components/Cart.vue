@@ -437,9 +437,9 @@ onMounted(() => {
   ]);
 
   // Start background sync from registry (includes initial fetch)
-  flowRefreshManager.startFromRegistry("cart.fetch", { 
-    sessionId: localStorage.getItem("sessionId") || "guest"
-  });
+  flowRefreshManager.startFromRegistry("cart.fetch", {
+    sessionId: localStorage.getItem("sessionId") || "guest",
+  }, { runImmediately: true });
 });
 
 onUnmounted(() => {

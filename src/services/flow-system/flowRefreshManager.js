@@ -57,7 +57,7 @@ function createFlowRefreshManager() {
         payload,
         intervalMs,
         options: runOptions,
-        runImmediately: options.runImmediately !== false,
+        runImmediately: options.runImmediately === true,
       });
     },
 
