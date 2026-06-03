@@ -43,6 +43,7 @@ export const vInteractions = {
     // Because config objects are frozen, referential equality is a reliable check.
     if (binding.value !== binding.oldValue) {
       unwire(el)
+      evictScopeCache(el)
       wire(el, binding.value)
     }
   },

@@ -76,6 +76,72 @@ There are two completely independent rule registries. Every issue found across t
    - Normalise `minChar`/`minLength` param handling
    - Make `custom` return `false` on bad param
 
+#### Resolution ✅
+
+**Status:** Resolved — validation rules are now unified behind one canonical registry.
+
+**What was broken:** `v-interactions` and `validationEngine` used different rule registries and diverged in behavior (`isEmail`, `isNumeric`, `isSecurePassword`, `hasContent`, `matchValue`, `isRadioCheck`, `minChar/minLength`, `custom`), causing inconsistent validation outcomes across forms.
+
+**Why it happened:** Rules were implemented and maintained separately in `validationRules.js` and `validationsLibrary.js`, and runtime `registerRule()` only mutated the directive-side registry.
+
+**What changed:**
+- Added canonical file `src/utils/validation/rules.js` as the single source of truth.
+- Updated `src/interactions/utils/validationRules.js` to re-export from canonical rules.
+- Updated `src/utils/validation/validationsLibrary.js` to re-export canonical rules as `validationsLibrary`.
+- Canonicalized previously divergent rules:
+  - `isNumeric` now requires `\d+` (rejects bare `-`).
+  - `isSecurePassword` now enforces upper + lower + digit + special + min length 8.
+  - `custom` now fails closed (`false`) when `param` is not a function.
+  - `hasContent` duplicate removed by design (single implementation in canonical registry).
+  - `matchValue` split into explicit helpers (`matchValueSelector`, `matchValueField`) while keeping backward-compatible `matchValue`.
+  - `isRadioCheck` now scopes queries to nearest interaction/form container.
+  - `minChar` and `minLength` now share normalized integer parameter handling.
+- Added unit coverage in `tests/unit/validationRulesUnification.test.js` to verify shared registry behavior and key normalized rules.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const interactions = await import('/src/interactions/utils/validationRules.js');
+  const validationLib = await import('/src/utils/validation/validationsLibrary.js');
+  const rules = interactions.default;
+  const sameRegistry = validationLib.validationsLibrary === rules;
+
+  interactions.registerRule('auditSharedRule', (v) => v === 'ok');
+  const runtimeShared = validationLib.validationsLibrary.auditSharedRule('ok') === true;
+
+  const host = document.createElement('div');
+  host.setAttribute('interaction-container', '');
+  host.innerHTML = '<input type="radio" name="auditGroup" id="auditA"><input type="radio" name="auditGroup" id="auditB">';
+  document.body.appendChild(host);
+  host.querySelector('#auditB').checked = true;
+
+  const out = {
+    sameRegistry,
+    runtimeShared,
+    isNumericBareDashRejected: rules.isNumeric('-') === false,
+    securePasswordRequiresSpecial: rules.isSecurePassword('Abcdef12') === false && rules.isSecurePassword('Abcdef12!') === true,
+    customFailsOnBadParam: rules.custom('x', null, {}) === false,
+    matchValueFieldPass: rules.matchValueField('abc', 'password', { scope: 'auth', getFieldValue: () => 'abc' }) === true,
+    matchValueSelectorPass: (() => {
+      const wrap = document.createElement('div');
+      wrap.setAttribute('interaction-container', '');
+      wrap.innerHTML = '<input id="auditPass" value="abc"><input id="auditConfirm" value="abc">';
+      document.body.appendChild(wrap);
+      const result = rules.matchValueSelector('abc', '#auditPass', { element: wrap.querySelector('#auditConfirm') });
+      wrap.remove();
+      return result === true;
+    })(),
+    isRadioCheckScoped: rules.isRadioCheck('', 'auditGroup', { element: host.querySelector('#auditA') }) === true,
+  };
+
+  host.remove();
+  console.table(out);
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 
@@ -100,6 +166,31 @@ isNumeric: (v) => /^-?\d*(\.\d+)?$/.test(v) && v !== '',
 ```js
 isNumeric: (v) => /^-?\d+(\.\d+)?$/.test(v) && v !== '',
 ```
+
+#### Resolution ✅
+
+**Status:** Resolved (already fixed during rules-unification pass).
+
+**What was broken:** `isNumeric('-')` could return `true` because the previous pattern allowed zero digits.
+
+**Why it happened:** The original directive-side regex used `\d*` and rule logic diverged across two libraries.
+
+**What changed:** Canonical `isNumeric` now lives in `src/utils/validation/rules.js` and uses `^-?\d+(\.\d+)?$`, then both `validationRules.js` and `validationsLibrary.js` re-export from that source.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { default: rules } = await import('/src/interactions/utils/validationRules.js');
+  const out = {
+    bareDashRejected: rules.isNumeric('-') === false,
+    intPass: rules.isNumeric('12') === true,
+    decimalPass: rules.isNumeric('-12.5') === true,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -126,6 +217,43 @@ If a directive user passes a selector without `#` (e.g., `[name=confirmPassword]
 
 **Fix:** Separate `matchValue` into two named rules: `matchValueSelector` (for the directive) and `matchValueField` (for the engine), each with unambiguous signatures.
 
+#### Resolution ✅
+
+**Status:** Resolved (already fixed during rules-unification pass).
+
+**What was broken:** `matchValue` mixed selector-based and field-based logic in one branchy function and could silently fail for directive selectors that did not start with `#`.
+
+**Why it happened:** Path detection depended on `param.startsWith('#')`, so valid selectors like `[name="password"]` were not reliably treated as selector mode.
+
+**What changed:** Added explicit canonical rules:
+- `matchValueSelector(value, selector, ctx)` for directive/DOM selectors.
+- `matchValueField(value, fieldId, ctx)` for engine field-lookup.
+- `matchValue(...)` remains as a backward-compatible wrapper that routes to the correct explicit path.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { default: rules } = await import('/src/interactions/utils/validationRules.js');
+
+  const root = document.createElement('div');
+  root.setAttribute('interaction-container', '');
+  root.innerHTML = '<input name="password" value="abc123!A"><input name="confirmPassword" value="abc123!A">';
+  document.body.appendChild(root);
+  const confirm = root.querySelector('[name="confirmPassword"]');
+
+  const out = {
+    selectorPathWorksWithoutHash: rules.matchValueSelector('abc123!A', '[name="password"]', { element: confirm }) === true,
+    fieldPathWorks: rules.matchValueField('same', 'password', { scope: 'auth', getFieldValue: () => 'same' }) === true,
+    backwardCompatibleMatchValueSelector: rules.matchValue('abc123!A', '[name="password"]', confirm) === true,
+  };
+
+  root.remove();
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### L-03 · `isEmail` implementations diverge between the two rule libraries
@@ -140,6 +268,34 @@ If a directive user passes a selector without `#` (e.g., `[name=confirmPassword]
 The same email address can pass one validator and fail the other. For example `user+tag@sub.example.co.uk` passes both, but edge cases like `"user name"@example.com` (quoted local part) are rejected by the simple regex but allowed by RFC. More importantly, once users see inconsistent error behavior between auth forms and booking forms, trust is eroded.
 
 **Fix:** Import and reuse the single RFC-compliant validator from `validationRules.js` inside `validationsLibrary.js`.
+
+#### Resolution ✅
+
+**Status:** Resolved (already fixed during rules-unification pass).
+
+**What was broken:** Email validation behavior could diverge between directive and engine paths, creating inconsistent UX.
+
+**Why it happened:** Validation rules existed in two separate registries with different implementations.
+
+**What changed:** Both entry points now reference the same canonical `isEmail` implementation from `src/utils/validation/rules.js` via re-exports in `validationRules.js` and `validationsLibrary.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const interactions = await import('/src/interactions/utils/validationRules.js');
+  const engine = await import('/src/utils/validation/validationsLibrary.js');
+  const sample = 'user+tag@sub.example.co.uk';
+  const out = {
+    sameFunctionReference: engine.validationsLibrary.isEmail === interactions.default.isEmail,
+    directivePass: interactions.default.isEmail(sample) === true,
+    enginePass: engine.validationsLibrary.isEmail(sample) === true,
+    bothRejectInvalid: interactions.default.isEmail('bad@@mail') === false && engine.validationsLibrary.isEmail('bad@@mail') === false,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -164,6 +320,32 @@ JavaScript silently overwrites duplicate property names in an object literal. Th
 
 **Fix:** Remove the first `hasContent` definition (lines 7–9). The second definition is more correct.
 
+#### Resolution ✅
+
+**Status:** Resolved (already fixed during rules-unification pass).
+
+**What was broken:** `hasContent` existed twice in the old `validationsLibrary` object; JavaScript kept only the second declaration, leaving the first as silent dead code.
+
+**Why it happened:** The previous engine registry was an inline object with duplicate keys and no shared canonical source.
+
+**What changed:** `validationsLibrary.js` now re-exports canonical rules from `src/utils/validation/rules.js`, where `hasContent` is declared only once.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { validationsLibrary } = await import('/src/utils/validation/validationsLibrary.js');
+  const out = {
+    nullFalse: validationsLibrary.hasContent(null) === false,
+    undefinedFalse: validationsLibrary.hasContent(undefined) === false,
+    spacesFalse: validationsLibrary.hasContent('   ') === false,
+    textTrue: validationsLibrary.hasContent('hello') === true,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### L-05 · `scopeHasNoBlockingInvalids` (directive) misses untouched fields
@@ -181,6 +363,43 @@ This rule only catches fields that have already been validated (i.e., they have 
 
 **Fix:** Fall back to running `validateScope(scopeEl)` when no stamped fields exist, or always run `validateScope` and check `result.isValid`.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `scopeHasNoBlockingInvalids` only looked for `[validated="false"]`, so untouched required fields could be missed and scope could be treated as valid.
+
+**Why it happened:** The guard assumed only stamped invalid fields matter and had no fallback for untouched required inputs.
+
+**What changed:** In canonical rules (`src/utils/validation/rules.js`), `scopeHasNoBlockingInvalids` now:
+- returns `false` immediately if any stamped invalid exists, and
+- additionally checks for untouched required fields (including `required` / `data-required="true"` and empty checkbox/radio/file/select/text cases).
+- when `selector` is `null`/empty, it now falls back to the current interaction scope root instead of returning `false`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { default: rules } = await import('/src/interactions/utils/validationRules.js');
+  const scope = document.createElement('div');
+  scope.setAttribute('interaction-container', '');
+  scope.innerHTML = '<input id="req" required interaction-config="[]" value=""><input id="ok" interaction-config="[]" value="x">';
+  document.body.appendChild(scope);
+
+  const req = scope.querySelector('#req');
+  const out = {
+    untouchedRequiredBlocks: rules.scopeHasNoBlockingInvalids('', null, { element: req }) === false,
+  };
+
+  req.value = 'filled';
+  out.filledRequiredPasses = rules.scopeHasNoBlockingInvalids('', null, { element: req }) === true;
+
+  scope.remove();
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### L-06 · `step1Validator` uses `||` instead of `??` for `repeatRule` default
@@ -197,6 +416,40 @@ If `state.repeatRule` is explicitly set to an empty string `""` (a real value th
 const repeatRule = state?.repeatRule ?? "weekly";
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `repeatRule` defaulting logic treated explicit empty values incorrectly and could route validation through weekly checks instead of flagging missing selection.
+
+**Why it happened:** `||` collapsed all falsy values; even after switching to `??`, explicit empty string still needed explicit handling in branch logic.
+
+**What changed:**
+- Updated `src/services/events/validators/eventStepValidators.js` to use nullish coalescing (`??`) for defaulting.
+- Added explicit guard for `repeatRule === ""` to return a `repeatRule` validation error instead of falling into weekly availability validation.
+- Added targeted unit coverage in `tests/unit/eventStepValidators.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { step1Validator } = await import('/src/services/events/validators/eventStepValidators.js');
+  const base = {
+    eventTitle: 'Demo Event',
+    duration: 30,
+    basePrice: 10,
+    weeklyAvailability: [],
+    oneTimeAvailability: [],
+    monthlyAvailability: [],
+  };
+  const out = step1Validator({ ...base, repeatRule: '' });
+  const hasRepeatRuleError = out.errors.some((e) => e.field === 'repeatRule');
+  const hasWeeklyError = out.errors.some((e) => e.field === 'weeklyAvailability');
+  console.log({ pass: hasRepeatRuleError && !hasWeeklyError, hasRepeatRuleError, hasWeeklyError, errors: out.errors });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### L-07 · `creatorId` validated inconsistently as number vs string across flow validators
@@ -212,6 +465,36 @@ if (!isNonEmptyString(payload.creatorId)) { ... }  // validates as string
 ```
 
 The same semantic field (`creatorId`) is validated as a number in one module and as a string in another. If the backend uses large integer IDs (> `Number.MAX_SAFE_INTEGER = 2^53 - 1`), converting to `Number` silently corrupts the value. Both validators should treat IDs as opaque non-empty strings.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Event-flow validators accepted numeric `creatorId` while rental validators required string `creatorId`, creating inconsistent contracts and precision risk.
+
+**Why it happened:** Event validators used `toNumber(payload.creatorId)` rather than string-based identity checks.
+
+**What changed:** In `src/services/events/validators/eventFlowValidators.js`, `creatorId` checks now use `isNonEmptyString(...)` in both fetch/create payload validators to align with rental validators.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const mod = await import('/src/services/events/validators/eventFlowValidators.js');
+  const a = mod.validateFetchCreatorEventsPayload({ creatorId: '90071992547409930' });
+  const b = mod.validateFetchCreatorEventsPayload({ creatorId: 90071992547409930 });
+  const c = mod.validateCreateEventPayload({ creatorId: 'creator-1', title: 'Event', type: 'oneOnOne' });
+  const d = mod.validateCreateEventPayload({ creatorId: 123, title: 'Event', type: 'oneOnOne' });
+  const out = {
+    fetchStringPasses: a.ok === true,
+    fetchNumberRejected: b.ok === false,
+    createStringPasses: c.ok === true,
+    createNumberRejected: d.ok === false,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -235,6 +518,31 @@ For an unchecked checkbox registered with no DOM element reference, `value` is `
 if (value === null || value === undefined || value === '' || value === false) return true;
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `_isElementEmpty(null, false)` returned `false` (not empty), which could let unchecked values pass as if filled.
+
+**Why it happened:** Early-empty guard did not include boolean `false`.
+
+**What changed:** Updated `src/utils/validation/validationEngine.js` to treat `false` as empty in the early return.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { validationEngine } = await import('/src/utils/validation/validationEngine.js');
+  const out = {
+    falseIsEmptyWithoutElement: validationEngine._isElementEmpty(null, false) === true,
+    nullIsEmpty: validationEngine._isElementEmpty(null, null) === true,
+    textNotEmpty: validationEngine._isElementEmpty(null, 'x') === false,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### L-09 · `hasAnyValidSlots` does not validate that `endTime > startTime`
@@ -255,6 +563,37 @@ A slot with `startTime: "18:00"` and `endTime: "08:00"` (end before start) passe
 
 **Fix:** Add a time comparison after confirming format, e.g. `end > start` for ISO time strings.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Slot validation only checked non-empty times and allowed inverted ranges (`endTime <= startTime`).
+
+**Why it happened:** `hasAnyValidSlots` had no ordering check.
+
+**What changed:** Updated `hasAnyValidSlots` in `src/services/events/validators/eventStepValidators.js` to require `end > start` after non-empty checks (valid for `HH:mm` lexical format used here).
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { step1Validator } = await import('/src/services/events/validators/eventStepValidators.js');
+  const state = {
+    eventTitle: 'Demo Event',
+    duration: 30,
+    basePrice: 10,
+    repeatRule: 'weekly',
+    weeklyAvailability: [{ unavailable: false, slots: [{ startTime: '18:00', endTime: '08:00' }] }],
+    oneTimeAvailability: [],
+    monthlyAvailability: [],
+  };
+  const res = step1Validator(state);
+  const hasWeeklyError = res.errors.some((e) => e.field === 'weeklyAvailability');
+  console.log({ pass: hasWeeklyError, hasWeeklyError, errors: res.errors });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### L-10 · `scope` resolved at `wire()` time may become stale after DOM mutation
@@ -268,6 +607,46 @@ const scope = resolveScope(el)  // cached once at wire time
 If the containing `[interaction-container]` is replaced or re-rendered by Vue after the directive is mounted (but the host `el` stays alive), the cached scope no longer points to the live container. Actions targeting elements inside the container via `targetSelector` will resolve against a detached DOM node. The `evictScopeCache` is only called on `beforeUnmount`, not on `updated` when the config changes.
 
 **Fix:** In the `updated` hook, call `evictScopeCache(el)` before `wire()` re-resolves the scope.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Directive rewiring on config changes could keep stale scope cache and target detached containers after DOM moves/re-renders.
+
+**Why it happened:** `updated` rewired listeners but did not invalidate cached scope before resolving again.
+
+**What changed:** In `src/interactions/directives/vInteractions.js`, `updated(...)` now calls `evictScopeCache(el)` before `wire(...)`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const engine = await import('/src/interactions/utils/engine.js');
+  const a = document.createElement('div');
+  a.setAttribute('interaction-container', '');
+  const b = document.createElement('div');
+  b.setAttribute('interaction-container', '');
+  const input = document.createElement('input');
+  a.appendChild(input);
+  document.body.appendChild(a);
+  document.body.appendChild(b);
+
+  const first = engine.resolveScope(input);
+  b.appendChild(input); // move element to a new container
+  const stale = engine.resolveScope(input);
+  engine.evictScopeCache(input);
+  const refreshed = engine.resolveScope(input);
+
+  console.log({
+    pass: first === a && stale === a && refreshed === b,
+    firstIsA: first === a,
+    staleIsA: stale === a,
+    refreshedIsB: refreshed === b,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 

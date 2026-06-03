@@ -12,7 +12,9 @@ function hasAnyValidSlots(slots) {
   return slots.some((slot) => {
     const start = typeof slot?.startTime === "string" ? slot.startTime.trim() : "";
     const end = typeof slot?.endTime === "string" ? slot.endTime.trim() : "";
-    return start.length > 0 && end.length > 0;
+    if (start.length === 0 || end.length === 0) return false;
+    // Time strings are HH:mm in this flow; lexical compare is safe for ordering.
+    return end > start;
   });
 }
 
@@ -70,8 +72,10 @@ export function step1Validator(state = {}) {
     errors.push(asError("basePrice", "Base price must be 0 or higher."));
   }
 
-  const repeatRule = state?.repeatRule || "weekly";
-  if (repeatRule === "doesNotRepeat") {
+  const repeatRule = state?.repeatRule ?? "weekly";
+  if (repeatRule === "") {
+    errors.push(asError("repeatRule", "Please choose a repeat rule."));
+  } else if (repeatRule === "doesNotRepeat") {
     if (!hasAtLeastOneOneTimeSlot(state)) {
       errors.push(asError("oneTimeAvailability", "Add at least one available slot before continuing."));
     }

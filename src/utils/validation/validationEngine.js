@@ -71,7 +71,7 @@ export const validationEngine = {
 
   _isElementEmpty(element, value) {
     // Determine if element is empty based on its type
-    if (value === null || value === undefined || value === '') return true;
+    if (value === null || value === undefined || value === '' || value === false) return true;
 
     if (!element) {
       // No element reference, just check value

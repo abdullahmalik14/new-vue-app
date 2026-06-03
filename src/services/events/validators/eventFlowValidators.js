@@ -10,7 +10,7 @@ function toNumber(value) {
 export function validateFetchCreatorEventsPayload(payload = {}) {
   const errors = [];
 
-  if (toNumber(payload.creatorId) == null) {
+  if (!isNonEmptyString(payload.creatorId)) {
     errors.push("creatorId is required.");
   }
 
@@ -43,7 +43,7 @@ export function validateFetchCreatorEventsResponse(response = {}) {
 export function validateCreateEventPayload(payload = {}) {
   const errors = [];
 
-  if (toNumber(payload.creatorId) == null) {
+  if (!isNonEmptyString(payload.creatorId)) {
     errors.push("creatorId is required.");
   }
 
