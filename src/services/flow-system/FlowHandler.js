@@ -21,7 +21,7 @@ export const flowMiddlewares = {
   withMetrics,
 };
 
-const defaultMiddlewares = []; // [withMetrics, withTimeout, withRetry, withAuth];
+const defaultMiddlewares = [withMetrics, withTimeout, withRetry, withAuth];
 
 function normalizeFlowEntry(flowEntry) {
   if (typeof flowEntry === "function") {
@@ -98,7 +98,7 @@ export const FlowHandler = {
     }
 
     let mappedPayload = payload;
-    if (flowKind === "write" && typeof mapper.toRequest === "function") {
+    if (typeof mapper.toRequest === "function") {
       try {
         mappedPayload = mapper.toRequest(payload, options.context || {});
       } catch (error) {

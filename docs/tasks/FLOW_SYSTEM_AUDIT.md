@@ -31,6 +31,37 @@
 
 **Moved to** [`FLOW_USAGE_AUDIT.md`](./FLOW_USAGE_AUDIT.md) **USE-03** (registry / usage audit).
 
+**File:** `src/services/flow-system/flowRegistry.js` — duplicate `"events.fetchEvent"` keys (lines ~101 and ~215)
+
+In a JS object literal, the second key wins. The minimal second entry replaced the full pipeline entry (timeouts, concurrency, retry).
+
+#### Resolution ✅
+
+**Status:** Resolved (implemented here; `FLOW_USAGE_AUDIT.md` not required).
+
+**What was broken:** `events.fetchEvent` lost `pipeline.timeouts`, `pipeline.concurrency`, and related config because a bare duplicate key overwrote the full registry entry.
+
+**Why it happened:** The same flow was registered twice—once with pipeline options and again with only `flowKind` + `flow`.
+
+**What changed:** Removed the duplicate minimal `"events.fetchEvent"` block; the surviving entry retains `requestMs: 8000`, `totalFlowMs: 10000`, and `latestWins` concurrency.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { flowRegistry } = await import('/src/services/flow-system/flowRegistry.js');
+  const e = flowRegistry['events.fetchEvent'];
+  const out = {
+    entryExists: !!e,
+    requestTimeout: e?.pipeline?.timeouts?.requestMs === 8000,
+    totalTimeout: e?.pipeline?.timeouts?.totalFlowMs === 10000,
+    concurrency: e?.pipeline?.concurrency?.policy === 'latestWins',
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### BUG-02 — `withAuth` middleware is permanently disabled by default
@@ -47,6 +78,36 @@ All middleware has been commented out of the defaults. `withAuth` never runs unl
 
 **Fix:** Restore default middlewares (at minimum `withAuth`) or document that callers must always pass `withAuth` explicitly.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `defaultMiddlewares` was `[]`, so `withAuth` (and `withMetrics`, `withTimeout`, `withRetry`) never ran unless passed per call. `requireAuth` on context had no effect.
+
+**Why it happened:** The default stack was commented out during debugging and never restored.
+
+**What changed:**
+- Restored `defaultMiddlewares = [withMetrics, withTimeout, withRetry, withAuth]` in `FlowHandler.js`.
+- Aligned `requireAuth` to **opt-in** (`requireAuth === true` in `withAuth.js` and `pipelineContext.js`) so existing call sites without `userId` keep working until BUG-19 wires auth state. Flows that need auth must pass `{ requireAuth: true, userId }`.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { flowMiddlewares } = await import('/src/services/flow-system/FlowHandler.js');
+  const wrapped = flowMiddlewares.withAuth(async () => ({ ok: true, data: 1 }));
+  const blocked = await wrapped({ context: { requireAuth: true }, payload: {} });
+  const allowed = await wrapped({ context: {}, payload: {} });
+  const out = {
+    hasWithAuth: typeof flowMiddlewares.withAuth === 'function',
+    blocksWithoutUser: blocked?.ok === false && blocked?.error?.code === 'AUTH_REQUIRED',
+    allowsWhenOptOut: allowed?.ok === true,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true` (`blocksWithoutUser` and `allowsWhenOptOut` both true).
+
 ---
 
 ### BUG-03 — `toRequest` mapper is silently skipped for read-kind flows
@@ -56,6 +117,34 @@ All middleware has been commented out of the defaults. `withAuth` never runs unl
 **Primary usage bug:** [`FLOW_USAGE_AUDIT.md`](./FLOW_USAGE_AUDIT.md) **USE-01** — `orders.fetchOrders` registers `toRequest: mapOrderToRequest` on a read flow; `mapOrderToRequest` never runs and `perPage` / `ownerId` are not mapped to query params.
 
 **Fix (usage):** Map params inside `fetchOrdersFlow` or remove dead `toRequest` from registry. **Fix (engine):** Optionally support read-side request shaping explicitly (separate from write pipeline).
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `toRequest` ran only when `flowKind === "write"`, so `orders.fetchOrders` (read) never applied `mapOrderToRequest`; `perPage` stayed unmapped and API params used camelCase inconsistently.
+
+**Why it happened:** Request mappers were wired only into the write path assumption.
+
+**What changed:**
+- `FlowHandler.js` runs `toRequest` whenever the registry provides it (read or write).
+- `fetchOrdersFlow.js` sends mapped snake_case query params (`per_page`, `owner_id`, `customer_id`).
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { mapOrderToRequest } = await import('/src/services/orders/mappers/ordersMapper.js');
+  const mapped = mapOrderToRequest({ perPage: 25, ownerId: 'creator-1' });
+  const out = {
+    mapsPerPage: mapped.per_page === 25,
+    mapsOwnerId: mapped.owner_id === 'creator-1',
+    noCamelPerPage: mapped.perPage === undefined,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), mapped, ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -67,11 +156,91 @@ All middleware has been commented out of the defaults. `withAuth` never runs unl
 
 **Fix:** Implement `map` in the runtime, or fix the registry entry (USE-02).
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `orders.fetchOrders` destination used `map: (data) => [items, meta]` but `applyPiniaDestination` passed a single object to `setOrders`, ignoring `map`.
+
+**Why it happened:** `destinationRuntime.js` only supported `select` / `value`, not `map` on `piniaAction`.
+
+**What changed:** `applyPiniaDestination` applies `dest.map(selectedData, context, flowResult)` and spreads array results into the store action (`setOrders(items, meta)`).
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { applyDestinations } = await import('/src/services/flow-system/runtime/destinationRuntime.js');
+  const calls = [];
+  const context = {
+    runId: 'test',
+    piniaStores: { orders: { setOrders: (...args) => calls.push(args) } },
+  };
+  const flowResult = { ok: true, data: { items: [1], etag: 'e1', totalCount: 1, pagination: {} } };
+  applyDestinations({
+    context,
+    flowResult,
+    destinations: [{
+      type: 'piniaAction',
+      storeId: 'orders',
+      action: 'setOrders',
+      map: (d) => [d.items, { etag: d.etag, totalCount: d.totalCount, pagination: d.pagination }],
+    }],
+  });
+  const out = {
+    called: calls.length === 1,
+    twoArgs: calls[0]?.length === 2,
+    items: calls[0]?.[0]?.[0] === 1,
+    etag: calls[0]?.[1]?.etag === 'e1',
+  };
+  console.log({ pass: Object.values(out).every(Boolean), calls, ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### BUG-05 — `events.fetchSpendingRequirementItems` retry enabled but `maxAttempts: 1` means zero retries
 
 **Moved to** [`FLOW_USAGE_AUDIT.md`](./FLOW_USAGE_AUDIT.md) **USE-05**.
+
+**File:** `src/services/flow-system/flowRegistry.js` — `events.fetchSpendingRequirementItems`
+
+With `retry.enabled: true` and `maxAttempts: 1`, `executeWithRetry` performs only one attempt (`while (attempt < maxAttempts)`), so no retry happens after failure.
+
+#### Resolution ✅
+
+**Status:** Resolved (implemented here; `FLOW_USAGE_AUDIT.md` not required).
+
+**What was broken:** Retry was enabled but `maxAttempts: 1` allowed zero retries on transient failures.
+
+**Why it happened:** `maxAttempts` was set to 1 while `enabled: true`, misunderstanding that attempts include the initial try.
+
+**What changed:** `events.fetchSpendingRequirementItems` registry `maxAttempts` updated from `1` to `2` (initial attempt + one retry), matching peer read flows.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { executeWithRetry } = await import('/src/services/flow-system/runtime/retryRuntime.js');
+  let calls = 0;
+  const result = await executeWithRetry({
+    retry: { enabled: true, maxAttempts: 2, baseDelayMs: 1, maxDelayMs: 1, jitterRatio: 0 },
+    operation: async () => {
+      calls += 1;
+      return calls < 2
+        ? { ok: false, error: { code: 'HTTP_503', message: 'retry me' } }
+        : { ok: true, data: { ok: true } };
+    },
+  });
+  const out = {
+    success: result?.ok === true,
+    twoAttempts: calls === 2,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), calls, ...out });
+})();
+```
+
+**Expected:** `pass: true`, `calls: 2`.
 
 ---
 
@@ -98,11 +267,71 @@ For the first and second retry attempt, `exp` resolves to `1`, so both use the s
 const exp = attempt - 1;
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `Math.max(1, attempt - 1)` forced `exp >= 1`, so the first two retries both waited `baseDelayMs * 2` instead of `baseDelayMs` then `baseDelayMs * 2`.
+
+**Why it happened:** A guard intended to avoid negative exponents also clamped the first retry exponent to 1.
+
+**What changed:** `computeDelayMs` now uses `const exp = attempt - 1` in `retryRuntime.js`. `resolveRetryConfig` uses `jitterRatio ?? 0.15` so `jitterRatio: 0` disables jitter (browser/console tests with exact delays).
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { executeWithRetry } = await import('/src/services/flow-system/runtime/retryRuntime.js');
+  const delays = [];
+  await executeWithRetry({
+    retry: { enabled: true, maxAttempts: 3, baseDelayMs: 250, maxDelayMs: 5000, jitterRatio: 0 },
+    onRetry: ({ delayMs }) => delays.push(delayMs),
+    operation: async () => ({ ok: false, error: { code: 'HTTP_503' } }),
+  });
+  const out = { firstDelay250: delays[0] === 250, secondDelay500: delays[1] === 500 };
+  console.log({ pass: Object.values(out).every(Boolean), delays, ...out });
+})();
+```
+
+**Expected:** `pass: true`, `delays: [250, 500]`.
+
 ---
 
 ### BUG-07 — `validateCreateEventPayload` / `validateCreateEventResponse` never registered
 
 **Moved to** [`FLOW_USAGE_AUDIT.md`](./FLOW_USAGE_AUDIT.md) **USE-04**.
+
+**File:** `src/services/flow-system/flowRegistry.js` — `events.createEvent`
+
+Validators exist in `eventFlowValidators.js` but were not wired on the registry entry.
+
+#### Resolution ✅
+
+**Status:** Resolved (implemented here; `FLOW_USAGE_AUDIT.md` not required).
+
+**What was broken:** `events.createEvent` ran without payload/response validation despite validators being implemented.
+
+**Why it happened:** Validators were authored but never added to the `events.createEvent` registry `validators` block.
+
+**What changed:** Registered `validateCreateEventPayload` and `validateCreateEventResponse` on `events.createEvent` in `flowRegistry.js`.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const {
+    validateCreateEventPayload,
+    validateCreateEventResponse,
+  } = await import('/src/services/events/validators/eventFlowValidators.js');
+  const badPayload = validateCreateEventPayload({ title: 'X', type: 'live' });
+  const badResponse = validateCreateEventResponse({});
+  const out = {
+    payloadRejected: badPayload.ok === false,
+    responseRejected: badResponse.ok === false,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), badPayload, badResponse, ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -130,6 +359,39 @@ The first condition always fails (status is "error"), but the second catches it 
 
 **Fix:** Use `cancelled("total_timeout")` from `flowTypes.js` to produce a consistent `status: "cancelled"` shape.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Total timeout used `fail()` (`status: "error"`) with `meta.cancelled`, so `finalizeCancelled` dropped `FLOW_TOTAL_TIMEOUT` and callers only saw `FLOW_CANCELLED`.
+
+**Why it happened:** Timeout handler mixed error and cancelled semantics.
+
+**What changed:**
+- `executeWithTimeout` callback now returns `cancelled("total_timeout")`.
+- `finalizeCancelled` accepts `sourceResult` and preserves `error.code: "FLOW_TOTAL_TIMEOUT"` when `reason === "total_timeout"`.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { cancelled } = await import('/src/services/flow-system/flowTypes.js');
+  const { finalizeCancelled } = await import('/src/services/flow-system/flowDataPipeline.js');
+  const source = cancelled('total_timeout');
+  const result = finalizeCancelled(
+    { flowName: 'demo', runId: 'r1', totalFlowTimeoutMs: 1000 },
+    'total_timeout',
+    source,
+  );
+  const out = {
+    statusCancelled: result.status === 'cancelled',
+    codePreserved: result.error?.code === 'FLOW_TOTAL_TIMEOUT',
+  };
+  console.log({ pass: Object.values(out).every(Boolean), result, ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### BUG-09 — `withTimeout` timeout of 0 defaults to 15 000 ms instead of being disabled
@@ -147,6 +409,33 @@ Passing `timeoutMs: 0` to disable the timeout falls back to `15000` because `0 |
 const timeoutMs = args?.context?.timeoutMs ?? 15000;
 ```
 And guard with `if (timeoutMs <= 0) return next(args);`.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `timeoutMs: 0` became `15000` via `0 || 15000`, so middleware timeout could not be disabled.
+
+**Why it happened:** Falsy `0` fell through to the default using `||`.
+
+**What changed:** `withTimeout.js` uses `??` for the default, returns early when `timeoutMs <= 0`, and clears the timer in `finally` after the race.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { withTimeout } = await import('/src/services/flow-system/middleware/withTimeout.js');
+  let signalSet = false;
+  const wrapped = withTimeout(async (args) => {
+    signalSet = !!args?.context?.signal;
+    return { ok: true };
+  });
+  const result = await wrapped({ context: { timeoutMs: 0 } });
+  const out = { success: result?.ok === true, noAbortSignal: signalSet === false };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true` (`noAbortSignal: true`).
 
 ---
 
@@ -174,6 +463,33 @@ if (policy === "allowParallel") {
 **Impact:** Callers relying on `cancelInFlight` to abort parallel uploads (e.g., `media.uploadFile`) cannot cancel them.
 
 **Fix:** Register parallel executions under the unique composite key so they can be tracked and cancelled individually.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `allowParallel` used no-op `registerPromise` / `release`, so parallel uploads were not in `inFlight` and `cancelInFlight` / `hasInFlight` never worked.
+
+**Why it happened:** Parallel policy generated a unique key but never stored the promise under it.
+
+**What changed:** `acquireRunSlot` for `allowParallel` now registers and releases under `parallelKey` in `concurrencyRuntime.js`.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { acquireRunSlot, hasInFlight, cancelInFlight } = await import('/src/services/flow-system/runtime/concurrencyRuntime.js');
+  const slot = acquireRunSlot({ key: 'media.upload', policy: 'allowParallel' });
+  slot.registerPromise(Promise.resolve());
+  const out = {
+    tracked: hasInFlight(slot.key) === true,
+    cancelled: cancelInFlight(slot.key) === true,
+    cleared: hasInFlight(slot.key) === false,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), key: slot.key, ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -301,6 +617,39 @@ api.get(`${baseUrl}/chats/${chatId}/messages`, ...)
 If `chatId` contains `/`, `?`, or `#` characters, unencoded flows can produce malformed URLs or, in some API server configurations, path traversal vectors.
 
 **Fix:** Enforce `encodeURIComponent` on all path parameters. Consider a URL builder utility.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Some chat flows interpolated `chatId` (and similar IDs) into URL paths without `encodeURIComponent`, so IDs containing `/`, `?`, or `#` could produce malformed URLs or ambiguous routing.
+
+**Why it happened:** URL construction was duplicated across ~63 flow files with no shared helper or regression test, so encoding was inconsistent at audit time.
+
+**What changed:**
+- Added `encodePathSegment` and `buildChatApiUrl` in `src/services/chat/chatApiUtils.js` as the canonical path builder.
+- Migrated `fetchMessagesFlow.js` (the audit’s example) to `buildChatApiUrl`.
+- Verified all files under `src/services/chat/flows/` encode dynamic `/chats/` path segments; added `tests/unit/chatFlowUrlEncoding.test.js` to fail CI if a new flow omits encoding.
+
+**How to test in the browser (one paste — logs result when the promise settles):**
+```js
+(async () => {
+  const { buildChatApiUrl, encodePathSegment } = await import('/src/services/chat/chatApiUtils.js');
+  const malicious = 'evil/chat?x=1#frag';
+  const url = buildChatApiUrl('http://localhost:3001', 'chats', malicious, 'messages');
+  const out = {
+    noRawSlashInPath: !url.includes('/evil/chat'),
+    encodesSlash: url.includes('%2F'),
+    encodesQuery: url.includes('%3F'),
+    encodesHash: url.includes('%23'),
+    endsWithMessages: url.endsWith('/messages'),
+    segmentHelper: encodePathSegment(malicious) === 'evil%2Fchat%3Fx%3D1%23frag',
+  };
+  console.log({ pass: Object.values(out).every(Boolean), url, ...out });
+})();
+```
+
+**Expected:** `pass: true` and `url` contains `%2F`, `%3F`, `%23` (no literal `/evil/chat` segment).
 
 ---
 

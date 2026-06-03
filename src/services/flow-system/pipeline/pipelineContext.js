@@ -105,7 +105,7 @@ export function createPipelineContext({
     },
     pipeline,
     uiErrorMap: pipeline.uiErrorMap || flowEntry.uiErrorMap || null,
-    requireAuth: options.requireAuth !== false,
+    requireAuth: options.requireAuth === true,
     timeoutMs: options.timeoutMs || pipeline.timeoutMs || 15000,
     requestTimeoutMs: options.requestTimeoutMs || pipeline.timeouts?.requestMs || pipeline.timeoutMs || 15000,
     totalFlowTimeoutMs: options.totalFlowTimeoutMs || pipeline.timeouts?.totalFlowMs || pipeline.timeoutMs || 15000,

@@ -18,12 +18,20 @@ export function acquireRunSlot({ key, policy = "latestWins", dedupe = false }) {
 
   if (policy === "allowParallel") {
     const abortController = new AbortController();
+    const parallelKey = `${key}:parallel:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
     return {
       mode: "run",
-      key: `${key}:parallel:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`,
+      key: parallelKey,
       abortController,
-      registerPromise() {},
-      release() {},
+      registerPromise(promise) {
+        inFlight.set(parallelKey, { promise, abortController });
+      },
+      release() {
+        const current = inFlight.get(parallelKey);
+        if (current?.abortController === abortController) {
+          inFlight.delete(parallelKey);
+        }
+      },
     };
   }
 

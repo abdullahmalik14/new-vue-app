@@ -2,6 +2,7 @@ import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import {
   getChatApiBaseUrl,
+  buildChatApiUrl,
   asFlowError,
 } from "@/services/chat/chatApiUtils.js";
 
@@ -17,7 +18,7 @@ export async function fetchMessagesFlow({ payload, context, api }) {
     });
   }
 
-  let url = `${baseUrl}/chats/${encodeURIComponent(chatId)}/messages`;
+  const url = buildChatApiUrl(baseUrl, "chats", chatId, "messages");
   let query = { limit };
   if (pagingState) {
     query.pagingState = JSON.stringify(pagingState);

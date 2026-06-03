@@ -16,6 +16,28 @@ export function getChatApiBaseUrl(context) {
   return getFallbackBaseUrl();
 }
 
+/** RFC 3986 path segment — use for chatId, messageId, userId, etc. */
+export function encodePathSegment(value) {
+  if (value == null || value === "") {
+    return "";
+  }
+  return encodeURIComponent(String(value));
+}
+
+/**
+ * Join base URL with path segments; each segment is encodeURIComponent-encoded.
+ * @param {string} baseUrl
+ * @param {...(string|number|null|undefined)} segments
+ */
+export function buildChatApiUrl(baseUrl, ...segments) {
+  const base = String(baseUrl ?? "").replace(/\/+$/, "");
+  const path = segments
+    .map((segment) => encodePathSegment(segment))
+    .filter((segment) => segment !== "")
+    .join("/");
+  return path ? `${base}/${path}` : base;
+}
+
 export function asFlowError(error, defaultCode = "CHAT_API_ERROR", defaultMessage = "A chat API error occurred.") {
   const norm = normalizeUnknownError(error);
   return fail({

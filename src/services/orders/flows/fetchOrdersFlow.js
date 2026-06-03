@@ -13,9 +13,10 @@ import { getHttpStatus, getEtag, isApiNotModified } from "@/services/flow-system
  * @param {Object} params.api - API client
  */
 export async function fetchOrdersFlow({ payload, context, api }) {
-  const isReceived = payload.ownerId; // "Orders Received" view if ownerId is present
+  const ownerId = payload.owner_id ?? payload.ownerId;
+  const isReceived = !!ownerId;
   const endpoint = isReceived ? "/orders/received" : "/orders/purchased";
-  
+
   try {
     const response = await api.get(endpoint, {
       params: {
@@ -24,8 +25,8 @@ export async function fetchOrdersFlow({ payload, context, api }) {
         status: payload.status,
         type: payload.type,
         search: payload.search,
-        ownerId: payload.ownerId,
-        customerId: payload.customerId,
+        owner_id: payload.owner_id,
+        customer_id: payload.customer_id,
       },
       headers: context.requestHeaders || {},
       signal: context.signal,

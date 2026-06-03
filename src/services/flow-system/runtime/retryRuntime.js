@@ -16,7 +16,7 @@ function resolveRetryConfig(config = {}, fallbackAttempts) {
     maxAttempts: Number(config.maxAttempts || fallbackAttempts || (enabled ? 2 : 1)),
     baseDelayMs: Number(config.baseDelayMs || 250),
     maxDelayMs: Number(config.maxDelayMs || 5000),
-    jitterRatio: Number(config.jitterRatio || 0.15),
+    jitterRatio: Number(config.jitterRatio ?? 0.15),
   };
 }
 
@@ -33,7 +33,7 @@ function shouldRetryResult(result, attempt, retryConfig) {
 }
 
 function computeDelayMs(attempt, retryConfig) {
-  const exp = Math.max(1, attempt - 1);
+  const exp = attempt - 1;
   const base = retryConfig.baseDelayMs * (2 ** exp);
   const capped = Math.min(base, retryConfig.maxDelayMs);
   const jitter = capped * retryConfig.jitterRatio * Math.random();

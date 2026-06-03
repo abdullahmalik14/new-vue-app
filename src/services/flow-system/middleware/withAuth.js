@@ -2,7 +2,7 @@ import { fail } from "../flowTypes.js";
 
 export function withAuth(next) {
   return async (args) => {
-    const requireAuth = args?.context?.requireAuth !== false;
+    const requireAuth = args?.context?.requireAuth === true;
     if (!requireAuth) return next(args);
 
     if (!args?.context?.userId) {

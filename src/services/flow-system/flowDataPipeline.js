@@ -122,8 +122,22 @@ export function finalizeError(context, flowResult, stage = "unknown") {
   return normalized;
 }
 
-export function finalizeCancelled(context, reason = "cancelled") {
-  return mergeMeta(cancelled(reason), {
+export function finalizeCancelled(context, reason = "cancelled", sourceResult = null) {
+  let result = sourceResult?.status === "cancelled" ? sourceResult : cancelled(reason);
+  if (reason === "total_timeout") {
+    result = {
+      ...result,
+      status: "cancelled",
+      error: {
+        code: "FLOW_TOTAL_TIMEOUT",
+        message: sourceResult?.error?.message
+          || `Flow timed out after ${context.totalFlowTimeoutMs}ms`,
+        details: { reason: "total_timeout" },
+      },
+      meta: { ...(result.meta || {}), cancelled: true, reason: "total_timeout" },
+    };
+  }
+  return mergeMeta(result, {
     flow: context.flowName,
     runId: context.runId,
     timings: context._timings || [],
@@ -174,15 +188,15 @@ export async function runFlowDataPipeline(context) {
   const flowResult = await executeWithTimeout(
     executionPromise,
     context.totalFlowTimeoutMs,
-    () => fail({
-      code: "FLOW_TOTAL_TIMEOUT",
-      message: `Flow timed out after ${context.totalFlowTimeoutMs}ms`,
-    }, { cancelled: true, reason: "total_timeout" })
+    () => cancelled("total_timeout")
   );
 
   if (!flowResult?.ok) {
     if (flowResult?.status === "cancelled" || flowResult?.meta?.cancelled) {
-      return finalizeCancelled(context, flowResult?.meta?.reason || "cancelled");
+      const reason = flowResult?.meta?.reason
+        || flowResult?.error?.details?.reason
+        || "cancelled";
+      return finalizeCancelled(context, reason, flowResult);
     }
     return finalizeError(context, flowResult, "execute");
   }

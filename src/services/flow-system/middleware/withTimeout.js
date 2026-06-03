@@ -2,7 +2,11 @@ import { fail } from "../flowTypes.js";
 
 export function withTimeout(next) {
   return async (args) => {
-    const timeoutMs = Number(args?.context?.timeoutMs || 15000);
+    const timeoutMs = Number(args?.context?.timeoutMs ?? 15000);
+    if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+      return next(args);
+    }
+
     const controller = new AbortController();
     args.context.signal = controller.signal;
 
@@ -19,10 +23,12 @@ export function withTimeout(next) {
       }, timeoutMs);
     });
 
-    const flowPromise = next(args);
-    const result = await Promise.race([flowPromise, timeoutPromise]);
-    clearTimeout(timer);
-    return result;
+    try {
+      const flowPromise = next(args);
+      return await Promise.race([flowPromise, timeoutPromise]);
+    } finally {
+      clearTimeout(timer);
+    }
   };
 }
 

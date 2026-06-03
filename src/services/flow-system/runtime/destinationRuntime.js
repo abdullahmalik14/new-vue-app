@@ -70,14 +70,21 @@ function applyStateEngineDestination(dest, selectedData, context) {
   }
 }
 
-function applyPiniaDestination(dest, selectedData, context) {
+function applyPiniaDestination(dest, selectedData, context, flowResult) {
   const stores = context.piniaStores;
   if (!stores || !dest.storeId) return;
   const store = stores[dest.storeId];
   if (!store) return;
 
   if (dest.type === "piniaAction" && typeof store[dest.action] === "function") {
-    store[dest.action](selectedData);
+    const actionInput = typeof dest.map === "function"
+      ? dest.map(selectedData, context, flowResult)
+      : selectedData;
+    if (Array.isArray(actionInput)) {
+      store[dest.action](...actionInput);
+    } else {
+      store[dest.action](actionInput);
+    }
     return;
   }
 
@@ -138,7 +145,7 @@ export function applyDestinations({ context, flowResult, destinations = [] }) {
       case "piniaAction":
       case "piniaPatch":
       case "piniaFlush":
-        applyPiniaDestination(dest, selectedData, context);
+        applyPiniaDestination(dest, selectedData, context, flowResult);
         break;
       case "local":
       case "localFlush":

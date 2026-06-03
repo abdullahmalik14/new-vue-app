@@ -25,6 +25,8 @@ import { pinMessageFlow } from "@/services/chat/flows/pinMessageFlow.js";
 import { fetchSpendingRequirementItemsFlow } from "@/services/events/flows/fetchSpendingRequirementItemsFlow.js";
 import { mapFetchSpendingRequirementItemsFromResponse } from "@/services/events/mappers/fetchSpendingRequirementItemsMapper.js";
 import {
+  validateCreateEventPayload,
+  validateCreateEventResponse,
   validateFetchCreatorEventsPayload,
   validateFetchCreatorEventsResponse,
 } from "@/services/events/validators/eventFlowValidators.js";
@@ -212,15 +214,14 @@ export const flowRegistry = {
     },
   },
 
-  "events.fetchEvent": {
-    flowKind: "read",
-    flow: fetchEventFlow,
-  },
-
   "events.createEvent": {
     flowKind: "write",
     flow: createEventFlow,
     mapper: { toRequest: createEventMapper },
+    validators: {
+      payload: validateCreateEventPayload,
+      response: validateCreateEventResponse,
+    },
     pipeline: {
       timeouts: { requestMs: 15000, totalFlowMs: 24000 },
       retry: { enabled: false },
@@ -266,7 +267,7 @@ export const flowRegistry = {
       timeouts: { requestMs: 12000, totalFlowMs: 22000 },
       retry: {
         enabled: true,
-        maxAttempts: 1,
+        maxAttempts: 2,
         baseDelayMs: 250,
         maxDelayMs: 1200,
         jitterRatio: 0.1,
