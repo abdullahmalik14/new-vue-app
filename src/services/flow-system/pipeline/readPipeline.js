@@ -20,6 +20,7 @@ import {
 } from "@/services/flow-system/runtime/etagRuntime.js";
 import { applyDestinations } from "@/services/flow-system/runtime/destinationRuntime.js";
 import { scheduleBackgroundRevalidateOnce } from "@/services/flow-system/utils/backgroundRevalidate.js";
+import { log } from "@/utils/common/logHandler.js";
 import {
   resolveReadFromConfig,
   readConfiguredSourceSnapshots,
@@ -160,20 +161,82 @@ function getSnapshotTtlMs(snapshot, readFromConfig) {
   return readFromConfig.ttlMs;
 }
 
+function recordStaleRevalidateFailure(context, errorOrResult) {
+  context.staleRevalidateFailures = (context.staleRevalidateFailures || 0) + 1;
+  context.lastStaleRevalidateError = errorOrResult?.error || errorOrResult?.message || errorOrResult;
+  log({
+    file: "readPipeline.js",
+    method: "recordStaleRevalidateFailure",
+    flag: "flow_revalidate",
+    purpose: "Background stale revalidate failed",
+    flowName: context.flowName,
+    runId: context.runId,
+    failures: context.staleRevalidateFailures,
+    error: context.lastStaleRevalidateError,
+  });
+  if (typeof context.onStaleRevalidateFailed === "function") {
+    context.onStaleRevalidateFailed({
+      flowName: context.flowName,
+      runId: context.runId,
+      error: context.lastStaleRevalidateError,
+      failures: context.staleRevalidateFailures,
+    });
+  }
+}
+
+function resolveRevalidateAbortSignal(context) {
+  if (context.revalidateAbortController) {
+    return context.revalidateAbortController.signal;
+  }
+
+  const controller = new AbortController();
+  context.revalidateAbortController = controller;
+
+  const parentSignal = context.runtimeOptions?.revalidateSignal;
+  if (parentSignal) {
+    if (parentSignal.aborted) {
+      controller.abort(parentSignal.reason || "Parent revalidate signal aborted");
+    } else {
+      parentSignal.addEventListener("abort", () => {
+        controller.abort(parentSignal.reason || "Parent revalidate signal aborted");
+      }, { once: true });
+    }
+  }
+
+  return controller.signal;
+}
+
 function startBackgroundRevalidate(context) {
   if (context.runtimeOptions.backgroundRevalidate) return false;
   if (typeof context.rerunFlow !== "function") return false;
 
   const concurrencyConfig = context.pipeline?.concurrency || {};
   const revalidateKey = buildConcurrencyKey(context.flowName, context.payload, concurrencyConfig);
+  const signal = resolveRevalidateAbortSignal(context);
+  const timeoutMs = context.totalFlowTimeoutMs || context.requestTimeoutMs || context.timeoutMs;
 
-  return scheduleBackgroundRevalidateOnce(revalidateKey, () => {
-    context.rerunFlow({
-      forceRefresh: true,
-      skipDestinationRead: true,
-      backgroundRevalidate: true,
-    }).catch(() => {});
-  });
+  return scheduleBackgroundRevalidateOnce(
+    revalidateKey,
+    async () => {
+      const result = await context.rerunFlow({
+        forceRefresh: true,
+        skipDestinationRead: true,
+        backgroundRevalidate: true,
+        revalidateSignal: signal,
+      });
+      if (!result?.ok) {
+        recordStaleRevalidateFailure(context, result);
+      }
+      return result;
+    },
+    {
+      signal,
+      timeoutMs,
+      onError: (error) => {
+        recordStaleRevalidateFailure(context, error);
+      },
+    },
+  );
 }
 
 export async function runReadPipeline(context) {
@@ -290,6 +353,7 @@ export async function runReadPipeline(context) {
         operation: () => runReadOnce(context),
         retry: pipeline.retry,
         fallbackAttempts: context.retryAttempts,
+        flowKind: "read",
       });
 
       if (!result?.ok) {

@@ -20,15 +20,19 @@ function resolveRetryConfig(config = {}, fallbackAttempts) {
   };
 }
 
-function shouldRetryResult(result, attempt, retryConfig) {
+function shouldRetryResult(result, attempt, retryConfig, { flowKind = "read" } = {}) {
   if (!retryConfig.enabled) return false;
   if (!result || result.ok) return false;
   if (attempt >= retryConfig.maxAttempts) return false;
 
   const code = String(result?.error?.code || "");
-  if (code === "NETWORK_ERROR" || code === "FLOW_TIMEOUT") return true;
+  const isWrite = flowKind === "write";
+
+  if (code === "NETWORK_ERROR" || code === "FLOW_TIMEOUT") {
+    return !isWrite;
+  }
   if (code === "HTTP_429") return true;
-  if (code.startsWith("HTTP_5")) return true;
+  if (code.startsWith("HTTP_5")) return !isWrite;
   return false;
 }
 
@@ -44,7 +48,13 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function executeWithRetry({ operation, retry, fallbackAttempts, onRetry }) {
+export async function executeWithRetry({
+  operation,
+  retry,
+  fallbackAttempts,
+  onRetry,
+  flowKind = "read",
+}) {
   const retryConfig = resolveRetryConfig(retry, fallbackAttempts);
   let attempt = 0;
   let lastResult = null;
@@ -55,7 +65,7 @@ export async function executeWithRetry({ operation, retry, fallbackAttempts, onR
       const result = await operation(attempt);
       lastResult = mergeMeta(result, { attempt });
 
-      if (!shouldRetryResult(lastResult, attempt, retryConfig)) {
+      if (!shouldRetryResult(lastResult, attempt, retryConfig, { flowKind })) {
         return lastResult;
       }
 
@@ -66,7 +76,7 @@ export async function executeWithRetry({ operation, retry, fallbackAttempts, onR
       await sleep(delayMs);
     } catch (error) {
       lastResult = mergeMeta(normalizeUnknownError(error), { attempt });
-      if (!shouldRetryResult(lastResult, attempt, retryConfig)) {
+      if (!shouldRetryResult(lastResult, attempt, retryConfig, { flowKind })) {
         return lastResult;
       }
 

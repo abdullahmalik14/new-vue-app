@@ -170,6 +170,10 @@ FlowHandler.configure({
     cart: useCartStore(pinia),
     dashboard: useDashboardAnalytics(pinia),
   },
+  getUserId: () => {
+    const auth = useAuthStore();
+    return auth.currentUser?.sub || auth.currentUser?.id || undefined;
+  },
 });
 
 // Initialize Dashboard Analytics

@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { asFlowError } from "@/services/chat/chatApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function getWpBaseUrl() {
   if (typeof import.meta !== "undefined" && import.meta.env?.VITE_WEB_BASE_URL) {
@@ -23,8 +24,7 @@ export async function fetchChatUsersDataFlow({ payload, context, api }) {
   try {
     const response = await api.get(
       `${baseUrl}/wp-json/api/chat/get-users-data?user_ids=${encodeURIComponent(userIdsParam)}`,
-      {},
-      { headers, signal: context.signal }
+      buildFlowRequestOptions(context),
     );
     const status = getHttpStatus(response, 200);
 

@@ -29,4 +29,12 @@ describe("cacheRuntime performance fixes (PERF-02, PERF-03)", () => {
     const second = buildPayloadHash(payload);
     expect(second).toBe(first);
   });
+
+  it("uses 16-char dual-hash fingerprint and avoids trivial collisions (PERF-08)", () => {
+    const a = buildPayloadHash({ id: 1, nested: { x: "a" } });
+    const b = buildPayloadHash({ id: 2, nested: { x: "b" } });
+    expect(a).toHaveLength(16);
+    expect(b).toHaveLength(16);
+    expect(a).not.toBe(b);
+  });
 });

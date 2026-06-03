@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getChatApiBaseUrl, asFlowError } from "@/services/chat/chatApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function fetchUserChatsFlow({ payload, context, api }) {
   const baseUrl = getChatApiBaseUrl(context);
@@ -20,8 +21,7 @@ export async function fetchUserChatsFlow({ payload, context, api }) {
   try {
     const response = await api.get(
       `${baseUrl}/chats/user/${encodeURIComponent(userId)}`,
-      { params },
-      { headers, signal: context.signal }
+      { ...buildFlowRequestOptions(context), params },
     );
     const status = getHttpStatus(response, 200);
 

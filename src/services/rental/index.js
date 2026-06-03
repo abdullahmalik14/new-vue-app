@@ -24,5 +24,7 @@ export {
   validateCreateReservationPayload,
   validateCreateReservationResponse,
   validateConfirmReservationPayload,
+  validateConfirmReservationResponse,
   validateCancelReservationPayload,
+  validateCancelReservationResponse,
 } from "@/services/rental/validators/rentalFlowValidators.js";

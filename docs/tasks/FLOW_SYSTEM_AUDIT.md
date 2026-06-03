@@ -1399,13 +1399,76 @@ Repeated failures on a flow (network outages, bad deployments) cause the system 
 
 **Suggested:** Implement a per-flow failure counter that opens a circuit after a threshold and half-opens after a cooldown period.
 
+#### Resolution ✅
 
+**Status:** Resolved.
+
+**What was broken:** Failed flows retried indefinitely (per-call retry + refresh polling) with no fast-fail guard during outages.
+
+**What changed:**
+- `utils/flowCircuitBreaker.js`: per-flow `closed` / `open` / `half-open` states, `failureThreshold`, `cooldownMs`; ignores validation/config error codes.
+- `FlowHandler.run`: checks circuit before pipeline; records outcome after run; `getCircuitState(flowName)`; `reset()` clears circuits.
+- `flowRefreshManager`: skips refresh ticks while circuit is open (logs skip).
+- Configure per run/registry: `circuitBreaker: { failureThreshold, cooldownMs, enabled }`.
+- `tests/unit/flowCircuitBreaker.test.js`, `tests/unit/flowHandlerCircuitBreaker.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { FlowHandler } = await import('/src/services/flow-system/FlowHandler.js');
+  const { recordCircuitOutcome, resolveCircuitConfig, resetCircuit } = await import('/src/services/flow-system/utils/flowCircuitBreaker.js');
+  resetCircuit();
+  const cfg = resolveCircuitConfig({ flowKind: 'read' }, { circuitBreaker: { failureThreshold: 2, cooldownMs: 60000 } });
+  const fail = { ok: false, error: { code: 'NETWORK_ERROR' } };
+  recordCircuitOutcome('events.fetchEvent', cfg, fail);
+  recordCircuitOutcome('events.fetchEvent', cfg, fail);
+  const blocked = await FlowHandler.run('events.fetchEvent', { eventId: 'feat01' }, { circuitBreaker: { failureThreshold: 2, cooldownMs: 60000 } });
+  const out = {
+    pass: blocked.ok === false && blocked.error?.code === 'CIRCUIT_OPEN',
+    circuit: FlowHandler.getCircuitState('events.fetchEvent'),
+  };
+  console.log('[FEAT-01]', out);
+})();
+```
+**Expected:** `pass: true`; `circuit.state` is `"open"`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowCircuitBreaker.test.js tests/unit/flowHandlerCircuitBreaker.test.js`
+
+---
 
 ### FEAT-03 — No public cancellation API
 
 `concurrencyRuntime.cancelInFlight(key)` is exported but not exposed through `FlowHandler`. Callers cannot cancel an in-flight flow (e.g., on component unmount). The only implicit cancellation is via the `latestWins` policy aborting prior calls.
 
 **Suggested:** Expose `FlowHandler.cancel(flowName, payload)` that delegates to `cancelInFlight`.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `cancelInFlight` existed in `concurrencyRuntime` but was not reachable from app/components.
+
+**What changed:**
+- `FlowHandler.cancel(flowName, payload, { reason })` builds the registry concurrency key and calls `cancelInFlight`.
+- `FlowHandler.hasInFlight(flowName, payload)` exposes in-flight lookup for UI guards.
+- Emits `cancelled` lifecycle event when cancel succeeds.
+- `tests/unit/flowHandlerCancelAndLifecycle.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { FlowHandler } = await import('/src/services/flow-system/FlowHandler.js');
+  const out = {
+    pass: typeof FlowHandler.cancel === 'function' && typeof FlowHandler.hasInFlight === 'function',
+    cancelledUnknown: FlowHandler.cancel('events.fetchEvent', { eventId: 'noop' }),
+    inFlight: FlowHandler.hasInFlight('events.fetchEvent', { eventId: 'noop' }),
+  };
+  console.log('[FEAT-03]', out);
+})();
+```
+**Expected:** `pass: true`; `cancelledUnknown` is `false` when nothing is in flight.
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowHandlerCancelAndLifecycle.test.js`
 
 ---
 
@@ -1414,6 +1477,40 @@ Repeated failures on a flow (network outages, bad deployments) cause the system 
 There is no way to observe flow lifecycle events (start, retry, success, error, cancelled) without modifying middleware. Consumers have to instrument individual flows with custom middleware.
 
 **Suggested:** Add a global event emitter (e.g., `FlowHandler.on("error", handler)`) or Vue plugin integration.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** No global hooks for flow lifecycle; consumers had to add custom middleware per flow.
+
+**What changed:**
+- `utils/flowLifecycle.js`: `onFlowLifecycle` / `offFlowLifecycle` / `emitFlowLifecycle` for `start`, `success`, `error`, `retry`, `cancelled`.
+- `FlowHandler.on` / `FlowHandler.off` delegate to lifecycle bus.
+- Emits from `FlowHandler.run`, `withRetry` (`retry`), and `finalizeCancelled` (`cancelled`).
+- `FlowHandler.reset()` clears lifecycle listeners.
+- `tests/unit/flowHandlerCancelAndLifecycle.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { FlowHandler } = await import('/src/services/flow-system/FlowHandler.js');
+  const seen = [];
+  const off = FlowHandler.on('start', (d) => seen.push(['start', d.flowName]));
+  FlowHandler.on('error', (d) => seen.push(['error', d.flowName]));
+  FlowHandler.on('success', (d) => seen.push(['success', d.flowName]));
+  await FlowHandler.run('events.fetchEvent', { eventId: 'feat04' });
+  off();
+  const out = {
+    pass: seen[0]?.[0] === 'start' && seen.some((e) => e[0] === 'error' || e[0] === 'success'),
+    seen,
+  };
+  console.log('[FEAT-04]', out);
+})();
+```
+**Expected:** `pass: true`; `seen` starts with `['start', 'events.fetchEvent']` then `error` or `success`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowHandlerCancelAndLifecycle.test.js`
 
 ---
 
@@ -1425,6 +1522,38 @@ There is no way to observe flow lifecycle events (start, retry, success, error, 
 
 **Fix:** Add response validators for both operations.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Confirm/cancel rental flows validated payloads only; malformed API responses could pass through the pipeline.
+
+**What changed:**
+- `rentalFlowValidators.js`: added `validateConfirmReservationResponse` and `validateCancelReservationResponse` (require `reservationId`; optional `status` must be non-empty when present).
+- `flowRegistry.js`: wired `validators.response` for `rental.confirmReservation` and `rental.cancelReservation`.
+- `rental/index.js`: exports new validators.
+- `tests/unit/rentalReservationResponseValidators.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const {
+    validateConfirmReservationResponse,
+    validateCancelReservationResponse,
+  } = await import('/src/services/rental/validators/rentalFlowValidators.js');
+  const out = {
+    pass: validateConfirmReservationResponse({}).ok === false
+      && validateConfirmReservationResponse({ reservationId: 'r1', status: 'confirmed' }).ok === true
+      && validateCancelReservationResponse({}).ok === false
+      && validateCancelReservationResponse({ reservationId: 'r1', status: 'cancelled' }).ok === true,
+  };
+  console.log('[FEAT-05]', out);
+})();
+```
+**Expected:** `pass: true`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/rentalReservationResponseValidators.test.js`
+
 ---
 
 ### FEAT-06 — No registry schema validation at startup
@@ -1433,6 +1562,30 @@ The registry is a plain object. Misconfigured entries (wrong type for `pipeline.
 
 **Suggested:** Add a `validateRegistry()` function called at app boot that iterates all entries and validates required fields and types. or on compile
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Registry misconfigurations (missing `flow`, invalid `pipeline.retry`, unknown destination types) only surfaced when a flow was first executed.
+
+**What changed:**
+- `registry/validateRegistry.js`: validates `flow`, `flowKind`, `pipeline.retry`, destination `type`, and `refresh` shape; reuses `assertRegistryDestinationsSafe`.
+- `flowRegistry.js`: calls `validateRegistry(flowRegistry)` at module load (boot/import).
+- `tests/unit/validateRegistry.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { validateRegistry } = await import('/src/services/flow-system/registry/validateRegistry.js');
+  const bad = () => validateRegistry({ 'bad.flow': { flowKind: 'read', pipeline: { retry: 'nope' } } });
+  const out = { pass: (() => { try { bad(); return false; } catch { return true; } })() };
+  console.log('[FEAT-06]', out);
+})();
+```
+**Expected:** `pass: true` (invalid registry throws).
+
+**Unit test:** `npm run test:unit -- run tests/unit/validateRegistry.test.js`
+
 ---
 
 ### FEAT-07 — No request-level deduplication for identical concurrent HTTP calls
@@ -1440,6 +1593,32 @@ The registry is a plain object. Misconfigured entries (wrong type for `pipeline.
 The concurrency layer deduplicates at the flow level, but if two different flow names hit the same API endpoint simultaneously, no deduplication occurs. For example, `events.fetchEvent` and `events.fetchCreatorEvents` may both call the same endpoint in parallel.
 
 **Suggested:** Add an HTTP-level request cache / in-flight deduplication layer in `apiWrapper`.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Two flows hitting the same HTTP endpoint concurrently always issued duplicate network calls.
+
+**What changed:**
+- `apiWrapper.js`: in-flight dedupe map keyed by method + endpoint + serialized body/query; concurrent identical calls share one promise (`dedupeHttp: false` to opt out).
+- `tests/unit/apiWrapperHttpDedupe.test.js`.
+
+**How to test in the browser (one paste, dev app loaded):**
+```js
+(async () => {
+  const api = window.apiWrapper;
+  const q = { page: 1, __feat07: Date.now() };
+  const p1 = api.get('/orders/purchased', q);
+  const p2 = api.get('/orders/purchased', q);
+  const [a, b] = await Promise.all([p1, p2]);
+  const out = { pass: a === b };
+  console.log('[FEAT-07]', out);
+})();
+```
+**Expected:** `pass: true` (same promise result reference).
+
+**Unit test:** `npm run test:unit -- run tests/unit/apiWrapperHttpDedupe.test.js`
 
 ---
 
@@ -1457,6 +1636,39 @@ The background revalidate promise is not tracked. It has no timeout, no abort si
 
 **Fix:** Pass an `AbortSignal` tied to component lifecycle, and propagate the timeout config from the original flow.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Background revalidate used `setTimeout` + `.catch(() => {})` with no timeout, abort, or error logging.
+
+**What changed:**
+- `backgroundRevalidateRunner.js`: `runWithAbortAndTimeout` (abort signal + timeout race).
+- `backgroundRevalidate.js`: schedules tracked tasks; supports `signal`, `timeoutMs`, `onError`.
+- `readPipeline.js`: wires revalidate `AbortController` (links `options.revalidateSignal` from parent), passes flow timeout to background rerun.
+- `pipelineContext.js`: `runtimeOptions.revalidateSignal`.
+- `FlowHandler.abortBackgroundRevalidate(flowName, payload)` for call-site cancellation.
+- `tests/unit/backgroundRevalidateRunner.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { FlowHandler } = await import('/src/services/flow-system/FlowHandler.js');
+  const ctrl = new AbortController();
+  const runPromise = FlowHandler.run('events.fetchCreatorEvents', { creatorId: 'feat08' }, { revalidateSignal: ctrl.signal });
+  ctrl.abort();
+  const out = {
+    pass: typeof FlowHandler.abortBackgroundRevalidate === 'function',
+    aborted: ctrl.signal.aborted,
+  };
+  await runPromise.catch(() => null);
+  console.log('[FEAT-08]', out);
+})();
+```
+**Expected:** `pass: true`; `aborted: true`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/backgroundRevalidateRunner.test.js`
+
 ---
 
 ### FEAT-09 — No pagination support in the flow system
@@ -1464,6 +1676,33 @@ The background revalidate promise is not tracked. It has no timeout, no abort si
 Several flows return paginated data (`fetchAnalyticsFlow`, `fetchMessagesFlow`, `fetchOrdersFlow`) but the flow system has no built-in cursor/page management. Each page requires a separate `FlowHandler.run` call with a manually constructed payload, and there is no cache coordination between pages.
 
 **Suggested:** Add an `options.paginate` mode that automatically merges paginated results into a destination store.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Paginated flows required manual per-page `FlowHandler.run` calls and manual merge logic in each caller.
+
+**What changed:**
+- `utils/flowPagination.js`: `runPaginatedFlow` loops pages via `options.paginate` (`maxPages`, `pageField`, `perPage`, optional `hasMore` / `mergePages` hooks).
+- `FlowHandler.run`: when `options.paginate` is set, delegates to paginated runner (stripped on nested page calls).
+- Default merge appends `data.items` and tracks `pagesFetched` in meta.
+- `tests/unit/flowPagination.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { resolvePaginateConfig } = await import('/src/services/flow-system/utils/flowPagination.js');
+  const cfg = resolvePaginateConfig({ paginate: { startPage: 1, maxPages: 3, perPage: 10 } });
+  const out = { pass: cfg?.pageField === 'page' && cfg?.maxPages === 3 };
+  console.log('[FEAT-09]', out);
+})();
+```
+**Expected:** `pass: true`.
+
+**Example run:** `FlowHandler.run('orders.fetch', { ownerId: 'x' }, { paginate: { maxPages: 5, perPage: 10 } })`
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowPagination.test.js`
 
 ---
 
@@ -1475,6 +1714,37 @@ Several flows return paginated data (`fetchAnalyticsFlow`, `fetchMessagesFlow`, 
 
 **Suggested:** Add `lastRunAt`, `lastError`, and `consecutiveFailures` to each interval entry and expose them via `list()`.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `list()` only exposed `scopeKey`, `flowName`, and `intervalMs` — no run history for debugging.
+
+**What changed:**
+- `flowRefreshManager.js`: per-scope stats (`lastRunAt`, `lastSuccessAt`, `lastError`, `nextRunAt`, `consecutiveFailures`).
+- `list()` and new `get(scopeKey)` return the full snapshot.
+- `tests/unit/flowRefreshManagerIntrospection.test.js`.
+
+**How to test in the browser (one paste, dev app loaded):**
+```js
+(async () => {
+  const flowRefreshManager = (await import('/src/services/flow-system/flowRefreshManager.js')).default;
+  const entry = flowRefreshManager.list().find((e) => e.flowName === 'analytics.fetch') || flowRefreshManager.get('analytics.fetch');
+  const out = {
+    pass: !!entry
+      && typeof entry.lastRunAt === 'number'
+      && typeof entry.nextRunAt === 'number'
+      && typeof entry.consecutiveFailures === 'number',
+    entry,
+  };
+  console.log('[FEAT-10]', out);
+})();
+```
+**Expected:** `pass: true` after analytics refresh has started (see `main.js`); `entry` includes timing fields.
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowRefreshManagerIntrospection.test.js`
+
+---
 
 ### BUG-11 — `options.context` spread can overwrite core pipeline context fields
 
@@ -1498,6 +1768,17 @@ Any caller-provided `options.context` can silently overwrite reserved fields (in
 
 **Fix:** Move `...(options.context || {})` earlier and explicitly whitelist allowed context keys, or hard-block overriding reserved keys.
 
+#### Resolution ✅
+
+**Status:** Resolved (with SEC-08, BP-11).
+
+**What changed:**
+- `pipelineExtraContext.js`: `RESERVED_PIPELINE_CONTEXT_KEYS`, `ALLOWED_EXTRA_CONTEXT_KEYS`, `pickExtraContext()`.
+- `pipelineContext.js`: spreads only whitelisted `extraContext` first; trusted fields (`runId`, `flowName`, `requestHeaders`, etc.) are set afterward and cannot be overwritten.
+- Supports `options.extraContext` and legacy `options.context` (non-reserved keys only).
+
+**Unit test:** `npm run test:unit -- run tests/unit/pipelineExtraContext.test.js`
+
 ---
 
 ### BUG-12 — `withTimeout` can leave dangling timers when `next(args)` rejects
@@ -1516,7 +1797,17 @@ If `flowPromise` rejects, execution exits before `clearTimeout(timer)` runs. The
 
 **Fix:** Wrap the race in `try/finally` and clear the timer in `finally`.
 
+#### Resolution ✅
+
+**Status:** Resolved (already present; verified).
+
+**What changed:** `withTimeout.js` wraps `Promise.race` in `try/finally` and calls `clearTimeout(timer)` in `finally`, including when `next(args)` rejects.
+
+**Unit test:** `npm run test:unit -- run tests/unit/withTimeoutTimer.test.js`
+
 ---
+
+### BUG-13 — Most chat flows omit `signal` and `timeoutMs` on HTTP calls
 
 Repository scan shows only a small subset of chat flows use `context.signal`; most requests are sent without abort signal and timeout options.
 
@@ -1527,7 +1818,25 @@ Repository scan shows only a small subset of chat flows use `context.signal`; mo
 
 **Fix:** Enforce a shared request helper for chat flows that always attaches `headers`, `signal`, and `timeoutMs`.
 
---- 
+#### Resolution ✅
+
+**Status:** Resolved (with FEAT-11).
+
+**What changed:** All `src/services/chat/flows/*.js` API calls now use `buildFlowRequestOptions(context)` so `headers`, `signal`, and `timeoutMs` are attached consistently (see FEAT-11).
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { buildFlowRequestOptions } = await import('/src/services/flow-system/utils/buildFlowRequestOptions.js');
+  const ctrl = new AbortController();
+  const opts = buildFlowRequestOptions({ requestHeaders: { 'X-Test': '1' }, signal: ctrl.signal, requestTimeoutMs: 5000 });
+  const out = { pass: opts.headers['X-Test'] === '1' && opts.signal === ctrl.signal && opts.timeoutMs === 5000 };
+  console.log('[BUG-13]', out);
+})();
+```
+**Expected:** `pass: true`.
+
+---
 
 ### SEC-08 — context override can replace security-critical request headers
 
@@ -1538,6 +1847,32 @@ Because `options.context` is spread after the computed `requestHeaders`, a calle
 **Impact:** auth downgrade or token substitution is possible through call-site context injection.
 
 **Fix:** treat `requestHeaders` as reserved and merge in a controlled order where security headers win.
+
+#### Resolution ✅
+
+**Status:** Resolved (with BUG-11).
+
+**What changed:**
+- `applyBackendJwtToRequestHeaders` and `applyCsrfToRequestHeaders` always apply trusted tokens after caller header merges (overwrite spoofed `Authorization` / `X-CSRF-Token`).
+- Caller `requestHeaders` in context cannot replace final security headers.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { createPipelineContext } = await import('/src/services/flow-system/pipeline/pipelineContext.js');
+  const ctx = createPipelineContext({
+    flowName: 'sec08', flowEntry: { flowKind: 'read' }, flow: async () => ({}),
+    payload: {}, mappedPayload: {}, flowKind: 'read',
+    options: { context: { requestHeaders: { Authorization: 'Bearer evil' } }, backendJwtToken: 'good-jwt' },
+    rerunFlow: async () => ({}), executeFlow: async () => ({}),
+  });
+  const out = { pass: ctx.requestHeaders.Authorization === 'Bearer good-jwt' };
+  console.log('[SEC-08]', out);
+})();
+```
+**Expected:** `pass: true`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/pipelineExtraContext.test.js`
 
 ---
 
@@ -1551,6 +1886,12 @@ Because `options.context` is spread after the computed `requestHeaders`, a calle
 
 **Fix:** define and validate a strict schema for external context keys (`extraContext`) and keep internal fields isolated.
 
+#### Resolution ✅
+
+**Status:** Resolved (with BUG-11).
+
+**What changed:** Documented allowlist in `pipelineExtraContext.js` (`ALLOWED_EXTRA_CONTEXT_KEYS`); reserved keys stripped via `pickExtraContext()`. Prefer `options.extraContext` for new call sites.
+
 ---
 
 ### FEAT-11 — missing shared HTTP helper for flow request consistency
@@ -1563,7 +1904,31 @@ Request option handling is duplicated across many files, producing drift (some p
 
 **Suggested:** add a single helper (e.g., `buildFlowRequestOptions(context, extra)`) and require every flow to use it.
 
--- 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What changed:**
+- `utils/buildFlowRequestOptions.js`: standard `{ headers, signal, timeoutMs }` builder.
+- Re-exported from `chatApiUtils.js`.
+- Chat flows updated to use `buildFlowRequestOptions(context)` on API calls (`scripts/patch-chat-flow-request-options.mjs`).
+- `tests/unit/buildFlowRequestOptions.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { buildFlowRequestOptions } = await import('/src/services/flow-system/utils/buildFlowRequestOptions.js');
+  const c = new AbortController();
+  const o = buildFlowRequestOptions({ requestHeaders: {}, signal: c.signal, requestTimeoutMs: 8000 });
+  const out = { pass: o.signal === c.signal && o.timeoutMs === 8000 && typeof o.headers === 'object' };
+  console.log('[FEAT-11]', out);
+})();
+```
+**Expected:** `pass: true`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/buildFlowRequestOptions.test.js`
+
+---
 
 ### BUG-15 — `asValidationResult` fails open on unrecognized validator output
 
@@ -1576,6 +1941,14 @@ return { ok: true, errors: [] };  // final fallback for unrecognised shapes
 Validators returning `{ valid: true }`, `{ errors: [...] }` without `ok: false`, or other malformed shapes are treated as success.
 
 **Fix:** Default to `{ ok: false, errors: ['Unexpected validator result shape'] }`, or throw in DEV.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What changed:** `asValidationResult` (exported) fails closed on unrecognized shapes; still accepts legacy `{ valid: true/false }` and explicit `{ ok: boolean }`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowValidationStrict.test.js`
 
 ---
 
@@ -1593,6 +1966,16 @@ Registry typos in `validators.payload` / `validators.response` silently disable 
 
 **Fix:** Fail closed when a flow entry declares validators but the function is missing.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What changed:**
+- `validatorsDeclared` on pipeline context from registry `validators` keys.
+- `validateBy(..., { required })` fails when a declared validator is not a function.
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowValidationStrict.test.js`
+
 ---
 
 ### BUG-17 — Response validation skipped for all `notModified` results
@@ -1609,6 +1992,14 @@ if (!flowResult?.ok || flowResult?.meta?.notModified) {
 
 **Fix:** Validate resolved data (cache/state/network) with the current response validator; only skip when there is no data to validate.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What changed:** `validateResponse` no longer skips on `meta.notModified`; it validates `flowResult.data` when present (`hasValidatableData`) and only short-circuits when data is null/empty.
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowValidationNotModified.test.js`
+
 ---
 
 ### BUG-18 — Payload validators run against `originalPayload`, not `mappedPayload`
@@ -1623,6 +2014,14 @@ await validateBy(context.validators?.payload, context.originalPayload, context, 
 
 **Fix:** Validate both pre-map (user input) and post-map (API contract), or document and enforce one convention.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What changed:** `validatePayload` runs the payload validator on `originalPayload`, then on `context.payload` when `mapper.toRequest` exists (stage `payload:mapped`, non-required).
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowPayloadMappedValidation.test.js`
+
 ---
 
 ### BUG-19 — `userId` is never populated from auth state in `FlowHandler.run`
@@ -1633,6 +2032,18 @@ await validateBy(context.validators?.payload, context.originalPayload, context, 
 
 **Fix:** Wire auth store → `userId` in `FlowHandler.configure` / `run`, and enable `withAuth` in default middlewares.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What changed:**
+- `utils/flowAuthContext.js` — `configureFlowAuth`, `resolveFlowUserId`, `resetFlowAuthContext`.
+- `FlowHandler.configure({ getUserId })` and `run` merge `userId: resolveFlowUserId(options)`.
+- `main.js` passes `getUserId` from `useAuthStore()` (`sub` / `id`).
+- `withAuth` already in `defaultMiddlewares` (BP-02).
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowAuthUserId.test.js`
+
 ---
 
 ### BUG-20 — Write flows can retry on `NETWORK_ERROR` (duplicate mutation risk)
@@ -1642,6 +2053,14 @@ await validateBy(context.validators?.payload, context.originalPayload, context, 
 `executeWithRetry` is used by both read and write pipelines. On `NETWORK_ERROR`, write flows with retry enabled may execute twice if the server processed the request but the response was lost.
 
 **Fix:** Retry `NETWORK_ERROR` only for idempotent read flows; limit write retries to confirmed non-success HTTP codes.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What changed:** `shouldRetryResult` accepts `flowKind`; `NETWORK_ERROR`, `FLOW_TIMEOUT`, and `HTTP_5xx` retry only for `read`. Write flows still retry `HTTP_429`. Read/write pipelines pass `flowKind` into `executeWithRetry`.
+
+**Unit test:** `npm run test:unit -- run tests/unit/retryRuntimeWrite.test.js`
 
 ---
 
@@ -1657,6 +2076,14 @@ Failures during stale-while-revalidate are invisible to callers and telemetry.
 
 **Fix:** Log errors, surface `onStaleRevalidateFailed`, or increment a stale-failure counter on the context.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What changed:** `recordStaleRevalidateFailure` logs via `logHandler`, increments `context.staleRevalidateFailures`, sets `lastStaleRevalidateError`, and invokes optional `onStaleRevalidateFailed`. Background revalidate checks `rerunFlow` result and routes failures through `onError`.
+
+**Unit test:** Manual / integration; pipeline context fields covered by read pipeline usage.
+
 ---
 
 ### PERF-08 — Cache keys use 32-bit hash (collision risk)
@@ -1666,6 +2093,14 @@ Failures during stale-while-revalidate are invisible to callers and telemetry.
 djb2-style 32-bit hashing can collide across many distinct payloads within the same flow namespace, causing wrong cache hits.
 
 **Fix:** Use a longer fingerprint (64-bit / SHA-256 prefix) or include a serialized payload checksum in the key.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What changed:** `buildPayloadHash` uses dual FNV-style 32-bit hashes concatenated to a 16-character hex fingerprint (replacing single 32-bit djb2).
+
+**Unit test:** `npm run test:unit -- run tests/unit/cacheRuntimePerf.test.js`
 
 ---
 
@@ -1678,4 +2113,12 @@ djb2-style 32-bit hashing can collide across many distinct payloads within the s
 Dedupe/cancel only applies within one JS realm. Tests can leak entries unless manually cleared; multi-tab behavior is undefined.
 
 **Fix:** Injectable `inFlight` map or `clearInFlight()` for tests.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What changed:** `clearInFlight()` exported from `concurrencyRuntime.js`; `FlowHandler.reset()` clears the map alongside auth/circuit/lifecycle state.
+
+**Unit test:** `npm run test:unit -- run tests/unit/flowHandlerClearInFlight.test.js`
 

@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getChatApiBaseUrl, asFlowError } from "@/services/chat/chatApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function joinChatFlow({ payload, context, api }) {
   const baseUrl = getChatApiBaseUrl(context);
@@ -11,7 +12,7 @@ export async function joinChatFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/join`, { userId });
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/join`, { userId }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

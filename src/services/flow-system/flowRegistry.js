@@ -1,4 +1,5 @@
 import { assertRegistryDestinationsSafe } from "@/services/flow-system/runtime/destinationRuntime.js";
+import { validateRegistry } from "@/services/flow-system/registry/validateRegistry.js";
 import { createEventFlow } from "@/services/events/flows/createEventFlow.js";
 import { fetchCreatorEventsFlow } from "@/services/events/flows/fetchCreatorEventsFlow.js";
 import { fetchEventFlow } from "@/services/events/flows/fetchEventFlow.js";
@@ -72,7 +73,9 @@ import {
   validateCreateReservationPayload,
   validateCreateReservationResponse,
   validateConfirmReservationPayload,
+  validateConfirmReservationResponse,
   validateCancelReservationPayload,
+  validateCancelReservationResponse,
 } from "@/services/rental/validators/rentalFlowValidators.js";
 import { fetchRentalCatalogFlow } from "@/services/rental/flows/fetchRentalCatalogFlow.js";
 import { fetchRentalAvailabilityFlow } from "@/services/rental/flows/fetchRentalAvailabilityFlow.js";
@@ -1038,6 +1041,7 @@ export const flowRegistry = {
     mapper: { toRequest: mapConfirmReservationToRequest },
     validators: {
       payload: validateConfirmReservationPayload,
+      response: validateConfirmReservationResponse,
     },
     pipeline: {
       timeouts: { requestMs: 15000, totalFlowMs: 20000 },
@@ -1080,6 +1084,7 @@ export const flowRegistry = {
     mapper: { toRequest: mapCancelReservationToRequest },
     validators: {
       payload: validateCancelReservationPayload,
+      response: validateCancelReservationResponse,
     },
     pipeline: {
       timeouts: { requestMs: 12000, totalFlowMs: 18000 },
@@ -1709,4 +1714,4 @@ export const flowRegistry = {
   },
 };
 
-assertRegistryDestinationsSafe(flowRegistry);
+validateRegistry(flowRegistry);

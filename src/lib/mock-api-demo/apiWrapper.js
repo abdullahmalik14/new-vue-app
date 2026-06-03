@@ -4,6 +4,20 @@ import mockApiConfig from './mockApi.config.js';
 import { APIHandler } from './apiHandler.js'; // Import APIHandler directly
 import PerfTracker from '../../utils/common/performanceTracker.js';
 
+const inFlightHttpRequests = new Map();
+
+function stableSerialize(value) {
+  try {
+    return JSON.stringify(value ?? null);
+  } catch {
+    return String(value);
+  }
+}
+
+function buildHttpDedupeKey(method, endpoint, data, query) {
+  return `${method}:${endpoint}:${stableSerialize({ data, query })}`;
+}
+
 /**
  * Unified API Wrapper
  * Routes requests to APIHandler or MockApi based on configuration
@@ -30,44 +44,57 @@ class ApiWrapper {
 
         const useRealApi = this._shouldUseRealApi();
         const isDebug = apiConfig.debug;
+        const query = options.query || {};
+        const dedupeEnabled = options.dedupeHttp !== false;
+        const dedupeKey = options.dedupeKey || buildHttpDedupeKey(method, endpoint, data, query);
 
-        if (isDebug) {
-            console.log(`🔌 [ApiWrapper] Request: ${method} ${endpoint}`, {
-                mode: useRealApi ? 'ONLINE (Real API)' : 'OFFLINE (MockApi via APIHandler)',
-                data
-            });
+        if (dedupeEnabled && inFlightHttpRequests.has(dedupeKey)) {
+            return inFlightHttpRequests.get(dedupeKey);
         }
 
-        // ALWAYS use APIHandler - it will route to MockApi internally when offline
-        // This ensures all requests go through APIHandler's processing pipeline
-        const APIHandlerClass = APIHandler; // Use imported class
+        const executeRequest = async () => {
+            if (isDebug) {
+                console.log(`🔌 [ApiWrapper] Request: ${method} ${endpoint}`, {
+                    mode: useRealApi ? 'ONLINE (Real API)' : 'OFFLINE (MockApi via APIHandler)',
+                    data,
+                });
+            }
 
-        const handler = new APIHandlerClass({
-            apiBaseUrl: apiConfig.apiHandler.defaultBaseUrl,
-            // Pass MockApi instance to APIHandler so it can use it when offline
-            mockApi: this.mockApi,
-            useMockApi: !useRealApi
-        });
+            const APIHandlerClass = APIHandler;
+            const handler = new APIHandlerClass({
+                apiBaseUrl: apiConfig.apiHandler.defaultBaseUrl,
+                mockApi: this.mockApi,
+                useMockApi: !useRealApi,
+            });
 
-        // Map generic args to APIHandler's expected params
-        const apiParams = {
-            // For offline mode, we pass the endpoint directly (MockApi uses route keys)
-            // For online mode, we append to baseUrl
-            apiBaseUrl: useRealApi
-                ? (endpoint.startsWith('http') ? endpoint : `${apiConfig.apiHandler.defaultBaseUrl}${endpoint}`)
-                : endpoint, // MockApi uses endpoint as route key
-            httpMethod: method,
-            requestData: data,
-            queryParams: options.query || {},
-            // Pass through other options like callbacks/containers
-            ...options
+            const apiParams = {
+                apiBaseUrl: useRealApi
+                    ? (endpoint.startsWith('http') ? endpoint : `${apiConfig.apiHandler.defaultBaseUrl}${endpoint}`)
+                    : endpoint,
+                httpMethod: method,
+                requestData: data,
+                queryParams: query,
+                ...options,
+            };
+
+            pt.step({ step: 'beforeRequest', purpose: 'Preparing to call APIHandler' });
+            const result = await handler.handleRequest(apiParams);
+            pt.step({ step: 'afterRequest', purpose: 'APIHandler returned' });
+            return result;
         };
 
-        pt.step({ step: 'beforeRequest', purpose: 'Preparing to call APIHandler' });
-        const result = await handler.handleRequest(apiParams);
-        pt.step({ step: 'afterRequest', purpose: 'APIHandler returned' });
+        const requestPromise = executeRequest();
+        if (dedupeEnabled) {
+            inFlightHttpRequests.set(dedupeKey, requestPromise);
+        }
 
-        return result;
+        try {
+            return await requestPromise;
+        } finally {
+            if (dedupeEnabled && inFlightHttpRequests.get(dedupeKey) === requestPromise) {
+                inFlightHttpRequests.delete(dedupeKey);
+            }
+        }
     }
 
     // Convenience helpers

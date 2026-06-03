@@ -1,12 +1,13 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getChatApiBaseUrl, asFlowError } from "@/services/chat/chatApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function expireOldChatsFlow({ payload, context, api }) {
   const baseUrl = getChatApiBaseUrl(context);
 
   try {
-    const response = await api.post(`${baseUrl}/chats/admin/expire`, {});
+    const response = await api.post(`${baseUrl}/chats/admin/expire`, {}, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

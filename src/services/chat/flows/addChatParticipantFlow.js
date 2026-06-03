@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getChatApiBaseUrl, asFlowError } from "@/services/chat/chatApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function addChatParticipantFlow({ payload, context, api }) {
   const baseUrl = getChatApiBaseUrl(context);
@@ -13,7 +14,7 @@ export async function addChatParticipantFlow({ payload, context, api }) {
 
   try {
     const body = isMulti ? { userIds, role, invitedBy } : { userId, role, invitedBy };
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/participants`, body);
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/participants`, body, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 201);
 
     if (response?.ok === false) {

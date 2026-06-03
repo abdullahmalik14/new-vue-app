@@ -11,6 +11,32 @@ import { withRetry } from "@/services/flow-system/middleware/withRetry.js";
 import { withTimeout } from "@/services/flow-system/middleware/withTimeout.js";
 import { withMetrics } from "@/services/flow-system/middleware/withMetrics.js";
 import { patchPipelineProgress } from "@/services/flow-system/utils/flowProgress.js";
+import {
+  assessCircuit,
+  recordCircuitOutcome,
+  resetCircuit,
+  resolveCircuitConfig,
+  getCircuitSnapshot,
+} from "@/services/flow-system/utils/flowCircuitBreaker.js";
+import {
+  emitFlowLifecycle,
+  offFlowLifecycle,
+  onFlowLifecycle,
+  resetFlowLifecycleListeners,
+} from "@/services/flow-system/utils/flowLifecycle.js";
+import {
+  buildConcurrencyKey,
+  cancelInFlight,
+  hasInFlight as isFlowInFlight,
+} from "@/services/flow-system/runtime/concurrencyRuntime.js";
+import { runPaginatedFlow } from "@/services/flow-system/utils/flowPagination.js";
+import { abortBackgroundRevalidate as abortScheduledBackgroundRevalidate } from "@/services/flow-system/utils/backgroundRevalidate.js";
+import {
+  configureFlowAuth,
+  resetFlowAuthContext,
+  resolveFlowUserId,
+} from "@/services/flow-system/utils/flowAuthContext.js";
+import { clearInFlight } from "@/services/flow-system/runtime/concurrencyRuntime.js";
 
 function composeMiddlewares(handler, middlewares) {
   return middlewares.reduceRight((acc, middleware) => middleware(acc), handler);
@@ -92,18 +118,69 @@ export const FlowHandler = {
    * Replaces global flow context fields (does not merge/accumulate pinia store keys).
    * Call again with the same values for idempotent setup; pass only the fields you intend to set.
    */
-  configure({ piniaStores, stateEngine } = {}) {
+  configure({ piniaStores, stateEngine, getUserId } = {}) {
     if (piniaStores !== undefined) {
       _globalContext.piniaStores = { ...piniaStores };
     }
     if (stateEngine !== undefined) {
       _globalContext.stateEngine = stateEngine;
     }
+    if (getUserId !== undefined) {
+      configureFlowAuth({ getUserId });
+    }
   },
 
   /** Clears module-level global context (tests, logout, hot reload). */
   reset() {
     _globalContext = _emptyGlobalContext();
+    resetCircuit();
+    resetFlowLifecycleListeners();
+    resetFlowAuthContext();
+    clearInFlight();
+  },
+
+  on(event, handler) {
+    return onFlowLifecycle(event, handler);
+  },
+
+  off(event, handler) {
+    offFlowLifecycle(event, handler);
+  },
+
+  getCircuitState(flowName) {
+    return getCircuitSnapshot(flowName);
+  },
+
+  cancel(flowName, payload = {}, options = {}) {
+    const rawFlowEntry = flowRegistry[flowName];
+    if (!rawFlowEntry) return false;
+
+    const flowEntry = normalizeFlowEntry(rawFlowEntry);
+    const concurrency = flowEntry?.pipeline?.concurrency || {};
+    const key = buildConcurrencyKey(flowName, payload, concurrency);
+    const cancelled = cancelInFlight(key, options.reason || "Cancelled");
+    if (cancelled) {
+      emitFlowLifecycle("cancelled", { flowName, payload, key, reason: options.reason || "Cancelled" });
+    }
+    return cancelled;
+  },
+
+  hasInFlight(flowName, payload = {}) {
+    const rawFlowEntry = flowRegistry[flowName];
+    if (!rawFlowEntry) return false;
+    const flowEntry = normalizeFlowEntry(rawFlowEntry);
+    const concurrency = flowEntry?.pipeline?.concurrency || {};
+    const key = buildConcurrencyKey(flowName, payload, concurrency);
+    return isFlowInFlight(key);
+  },
+
+  abortBackgroundRevalidate(flowName, payload = {}) {
+    const rawFlowEntry = flowRegistry[flowName];
+    if (!rawFlowEntry) return false;
+    const flowEntry = normalizeFlowEntry(rawFlowEntry);
+    const concurrency = flowEntry?.pipeline?.concurrency || {};
+    const key = buildConcurrencyKey(flowName, payload, concurrency);
+    return abortScheduledBackgroundRevalidate(key);
   },
 
   /** Read-only snapshot for tests and diagnostics (store keys only). */
@@ -115,6 +192,13 @@ export const FlowHandler = {
   },
 
   async run(flowName, payload = {}, options = {}) {
+    if (options.paginate) {
+      return runPaginatedFlow(
+        (pagePayload, pageOptions) => FlowHandler.run(flowName, pagePayload, pageOptions),
+        { flowName, payload, options },
+      );
+    }
+
     const rawFlowEntry = flowRegistry[flowName];
     if (!rawFlowEntry) {
       return fail({
@@ -146,6 +230,20 @@ export const FlowHandler = {
       }
     }
     const flowKind = registryFlowKindOrError;
+    const circuitConfig = resolveCircuitConfig(flowEntry, options);
+    const circuitAssessment = assessCircuit(flowName, circuitConfig);
+    if (!circuitAssessment.allowed) {
+      return fail({
+        code: "CIRCUIT_OPEN",
+        message: `Flow '${flowName}' is temporarily disabled after repeated failures.`,
+        details: {
+          state: circuitAssessment.state,
+          retryAfterMs: circuitAssessment.retryAfterMs,
+          circuit: getCircuitSnapshot(flowName),
+        },
+      });
+    }
+
     const mapper = normalizeMapper(flowEntry?.mapper);
     const validators = normalizeValidators(flowEntry?.validators);
     if (typeof flow !== "function") {
@@ -176,11 +274,16 @@ export const FlowHandler = {
 
     const middlewares = options.middlewares || flowEntry.middlewares || defaultMiddlewares;
     const runWithMiddleware = composeMiddlewares(baseHandler, middlewares);
-    const { flowKind: _ignoredFlowKind, ...runtimeOptions } = options;
+    const {
+      flowKind: _ignoredFlowKind,
+      paginate: _ignoredPaginate,
+      ...runtimeOptions
+    } = options;
     const mergedOptions = {
       ..._globalContext,
       ...runtimeOptions,
       piniaStores: { ..._globalContext.piniaStores, ...(options.piniaStores || {}) },
+      userId: resolveFlowUserId(options),
     };
 
     const context = createPipelineContext({
@@ -206,16 +309,35 @@ export const FlowHandler = {
     context.middlewares = middlewares;
 
     const progressRef = options.progressRef;
+    emitFlowLifecycle("start", {
+      flowName,
+      payload,
+      runId: context.runId,
+      flowKind,
+      circuitState: circuitAssessment.state,
+    });
+
+    let result;
     try {
       patchPipelineProgress(context, { loading: true });
       if (progressRef) progressRef.value = true;
-      return await runFlowDataPipeline(context);
+      result = await runFlowDataPipeline(context);
     } catch (error) {
-      return normalizeUnknownError(error);
+      result = normalizeUnknownError(error);
     } finally {
       patchPipelineProgress(context, { loading: false });
       if (progressRef) progressRef.value = false;
     }
+
+    recordCircuitOutcome(flowName, circuitConfig, result);
+
+    if (result?.ok) {
+      emitFlowLifecycle("success", { flowName, payload, runId: context.runId, result });
+    } else {
+      emitFlowLifecycle("error", { flowName, payload, runId: context.runId, result });
+    }
+
+    return result;
   },
 };
 

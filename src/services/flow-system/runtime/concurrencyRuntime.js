@@ -72,3 +72,7 @@ export function cancelInFlight(key, reason = "Cancelled") {
 export function hasInFlight(key) {
   return inFlight.has(key);
 }
+
+export function clearInFlight() {
+  inFlight.clear();
+}

@@ -4,8 +4,11 @@ import {
   applyCsrfToRequestHeaders,
   resolveBackendJwtToken,
   resolveCsrfToken,
-  stripSensitiveContextOverrides,
 } from "@/services/flow-system/utils/flowAuthSecrets.js";
+import {
+  pickExtraContext,
+  resolveValidatorsDeclared,
+} from "@/services/flow-system/utils/pipelineExtraContext.js";
 
 function makeRunId() {
   return `flow_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -40,6 +43,16 @@ function defaultPipelineConfigFor(flowKind) {
   };
 }
 
+function mergeCallerRequestHeaders(...headerSets) {
+  const merged = {};
+  headerSets.forEach((set) => {
+    if (isPlainObject(set)) {
+      Object.assign(merged, set);
+    }
+  });
+  return merged;
+}
+
 export function createPipelineContext({
   flowName,
   flowEntry,
@@ -60,27 +73,30 @@ export function createPipelineContext({
 
   const backendJwtToken = resolveBackendJwtToken(options);
   const csrfToken = resolveCsrfToken(options);
-  const safeContextOverrides = stripSensitiveContextOverrides(options.context);
-  const requestHeaders = applyCsrfToRequestHeaders(
-    applyBackendJwtToRequestHeaders(
-      {
-        ...((isPlainObject(safeContextOverrides.requestHeaders) ? safeContextOverrides.requestHeaders : {})),
-        ...((isPlainObject(options.requestHeaders) ? options.requestHeaders : {})),
-      },
-      backendJwtToken,
-    ),
-    csrfToken,
-    { flowKind },
+  const contextBag = {
+    ...(isPlainObject(options.extraContext) ? options.extraContext : {}),
+    ...(isPlainObject(options.context) ? options.context : {}),
+  };
+  const { extra: extraContext, requestHeaders: extraRequestHeaders } = pickExtraContext(contextBag);
+
+  let requestHeaders = mergeCallerRequestHeaders(
+    extraRequestHeaders,
+    options.requestHeaders,
   );
+  requestHeaders = applyBackendJwtToRequestHeaders(requestHeaders, backendJwtToken);
+  requestHeaders = applyCsrfToRequestHeaders(requestHeaders, csrfToken, { flowKind });
+
+  const validatorsDeclared = resolveValidatorsDeclared(flowEntry);
 
   return {
-    ...safeContextOverrides,
+    ...extraContext,
     runId: makeRunId(),
     flowName,
     flow,
     flowKind,
     mapper,
     validators: validators || {},
+    validatorsDeclared,
     originalPayload: payload,
     payload: mappedPayload,
     executeFlow,
@@ -94,7 +110,9 @@ export function createPipelineContext({
       skipDestinationRead: !!options.skipDestinationRead,
       backgroundRevalidate: !!options.backgroundRevalidate,
       readFromOverride: options.readFromOverride || null,
+      revalidateSignal: options.revalidateSignal || null,
     },
+    revalidateAbortController: null,
     pipeline,
     uiErrorMap: pipeline.uiErrorMap || flowEntry.uiErrorMap || null,
     requireAuth: options.requireAuth === true,
@@ -109,5 +127,8 @@ export function createPipelineContext({
     piniaStores: options.piniaStores || options.context?.piniaStores,
     debug: !!options.debug,
     flowSecurity: csrfToken ? { csrfToken } : null,
+    onStaleRevalidateFailed: options.onStaleRevalidateFailed || null,
+    staleRevalidateFailures: 0,
+    lastStaleRevalidateError: null,
   };
 }

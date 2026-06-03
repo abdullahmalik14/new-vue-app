@@ -1,6 +1,10 @@
 import FlowHandler from "@/services/flow-system/FlowHandler.js";
 import { flowRegistry } from "@/services/flow-system/flowRegistry.js";
 import { log } from "@/utils/common/logHandler.js";
+import {
+  assessCircuit,
+  resolveCircuitConfig,
+} from "@/services/flow-system/utils/flowCircuitBreaker.js";
 
 function mergeRunOptions(registryOptions = {}, runtimeOptions = {}) {
   const merged = { ...(registryOptions || {}), ...(runtimeOptions || {}) };
@@ -22,6 +26,29 @@ function resolveBackoffDelayMs(baseIntervalMs, consecutiveFailures, maxBackoffMs
   return Math.min(baseIntervalMs * (2 ** exponent), maxBackoffMs);
 }
 
+function createIntervalStats() {
+  return {
+    lastRunAt: null,
+    lastSuccessAt: null,
+    lastError: null,
+    nextRunAt: null,
+    consecutiveFailures: 0,
+  };
+}
+
+function snapshotIntervalEntry(scopeKey, entry) {
+  return {
+    scopeKey,
+    flowName: entry.flowName,
+    intervalMs: entry.intervalMs,
+    consecutiveFailures: entry.stats.consecutiveFailures,
+    lastRunAt: entry.stats.lastRunAt,
+    lastSuccessAt: entry.stats.lastSuccessAt,
+    lastError: entry.stats.lastError,
+    nextRunAt: entry.stats.nextRunAt,
+  };
+}
+
 function createFlowRefreshManager() {
   const intervals = new Map();
 
@@ -41,13 +68,36 @@ function createFlowRefreshManager() {
       const maxBackoffMs = Number.isFinite(Number(options.maxBackoffMs))
         ? Number(options.maxBackoffMs)
         : baseIntervalMs * 8;
-      let consecutiveFailures = 0;
+      const stats = createIntervalStats();
 
       const executeRun = async () => {
+        stats.lastRunAt = Date.now();
+        const flowEntry = flowRegistry[resolvedFlowName];
+        const circuitConfig = resolveCircuitConfig(flowEntry || {}, options);
+        const circuitAssessment = assessCircuit(resolvedFlowName, circuitConfig);
+        if (!circuitAssessment.allowed) {
+          stats.lastError = {
+            code: "CIRCUIT_OPEN",
+            message: "Refresh skipped while circuit is open.",
+            details: circuitAssessment,
+          };
+          log({
+            file: "flowRefreshManager.js",
+            method: "executeRun",
+            flag: "flow_refresh",
+            purpose: "Skipped refresh while circuit is open",
+            flowName: resolvedFlowName,
+            scopeKey,
+            circuit: circuitAssessment,
+          });
+          return;
+        }
+
         try {
           const result = await FlowHandler.run(resolvedFlowName, payload, { ...options, forceRefresh: true });
           if (!result?.ok) {
-            consecutiveFailures += 1;
+            stats.consecutiveFailures += 1;
+            stats.lastError = result.error || { code: "FLOW_REFRESH_FAILED", message: "Refresh failed" };
             log({
               file: "flowRefreshManager.js",
               method: "executeRun",
@@ -55,14 +105,20 @@ function createFlowRefreshManager() {
               purpose: "Flow refresh returned error result",
               flowName: resolvedFlowName,
               scopeKey,
-              consecutiveFailures,
+              consecutiveFailures: stats.consecutiveFailures,
               error: result?.error,
             });
           } else {
-            consecutiveFailures = 0;
+            stats.consecutiveFailures = 0;
+            stats.lastSuccessAt = Date.now();
+            stats.lastError = null;
           }
         } catch (error) {
-          consecutiveFailures += 1;
+          stats.consecutiveFailures += 1;
+          stats.lastError = {
+            code: "FLOW_REFRESH_EXCEPTION",
+            message: error?.message || "Refresh threw",
+          };
           log({
             file: "flowRefreshManager.js",
             method: "executeRun",
@@ -70,14 +126,15 @@ function createFlowRefreshManager() {
             purpose: "Flow refresh threw",
             flowName: resolvedFlowName,
             scopeKey,
-            consecutiveFailures,
+            consecutiveFailures: stats.consecutiveFailures,
             error: error?.message || error,
           });
         }
       };
 
       const scheduleNext = () => {
-        const delayMs = resolveBackoffDelayMs(baseIntervalMs, consecutiveFailures, maxBackoffMs);
+        const delayMs = resolveBackoffDelayMs(baseIntervalMs, stats.consecutiveFailures, maxBackoffMs);
+        stats.nextRunAt = Date.now() + delayMs;
         const timer = setTimeout(async () => {
           await executeRun();
           if (intervals.has(scopeKey)) {
@@ -90,7 +147,7 @@ function createFlowRefreshManager() {
           payload,
           intervalMs: baseIntervalMs,
           options,
-          consecutiveFailures,
+          stats,
         });
       };
 
@@ -100,7 +157,7 @@ function createFlowRefreshManager() {
         payload,
         intervalMs: baseIntervalMs,
         options,
-        consecutiveFailures: 0,
+        stats,
       });
 
       const kickoff = async () => {
@@ -157,12 +214,13 @@ function createFlowRefreshManager() {
     },
 
     list() {
-      return Array.from(intervals.entries()).map(([scopeKey, entry]) => ({
-        scopeKey,
-        flowName: entry.flowName,
-        intervalMs: entry.intervalMs,
-        consecutiveFailures: entry.consecutiveFailures ?? 0,
-      }));
+      return Array.from(intervals.entries()).map(([scopeKey, entry]) => snapshotIntervalEntry(scopeKey, entry));
+    },
+
+    get(scopeKey) {
+      const entry = intervals.get(scopeKey);
+      if (!entry) return null;
+      return snapshotIntervalEntry(scopeKey, entry);
     },
   };
 }

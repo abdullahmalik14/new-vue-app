@@ -1,4 +1,5 @@
 import { normalizeUnknownError } from "../flowErrors.js";
+import { emitFlowLifecycle } from "@/services/flow-system/utils/flowLifecycle.js";
 
 function shouldRetry(flowError) {
   const code = flowError?.error?.code || "";
@@ -22,6 +23,14 @@ export function withRetry(next) {
 
       lastResult = result;
       if (!shouldRetry(result)) return result;
+
+      emitFlowLifecycle("retry", {
+        flowName: args.context?.flowName,
+        runId: args.context?.runId,
+        attempt: attempt + 1,
+        maxAttempts,
+        error: result?.error,
+      });
     }
 
     return normalizeUnknownError(lastResult);

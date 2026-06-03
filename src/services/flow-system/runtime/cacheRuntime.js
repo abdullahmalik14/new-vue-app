@@ -12,12 +12,14 @@ function stableStringify(value) {
 const payloadHashMemo = new WeakMap();
 
 function hashStableString(raw) {
-  let hash = 0;
+  let h1 = 0x811c9dc5;
+  let h2 = 0x01000193;
   for (let i = 0; i < raw.length; i += 1) {
-    hash = ((hash << 5) - hash) + raw.charCodeAt(i);
-    hash |= 0;
+    const code = raw.charCodeAt(i);
+    h1 = Math.imul(h1 ^ code, 0x01000193);
+    h2 = Math.imul(h2 ^ (code + i), 0x01000193);
   }
-  return String(hash >>> 0);
+  return `${(h1 >>> 0).toString(16).padStart(8, "0")}${(h2 >>> 0).toString(16).padStart(8, "0")}`;
 }
 
 function computePayloadHash(payload) {

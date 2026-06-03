@@ -63,6 +63,7 @@ export async function runWritePipeline(context) {
         operation: () => runWriteOnce(context),
         retry: pipeline.retry,
         fallbackAttempts: context.retryAttempts,
+        flowKind: "write",
       });
 
       if (!result?.ok) {

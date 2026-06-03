@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getChatApiBaseUrl, asFlowError } from "@/services/chat/chatApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function updateBookingRequestMessageFlow({ payload, context, api }) {
   const baseUrl = getChatApiBaseUrl(context);
@@ -17,7 +18,8 @@ export async function updateBookingRequestMessageFlow({ payload, context, api })
   try {
     const response = await api.patch(
       `${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}/booking`,
-      { action, slotDate, eventTitle, text, meta }
+      { action, slotDate, eventTitle, text, meta },
+      buildFlowRequestOptions(context),
     );
     const status = getHttpStatus(response, 200);
 

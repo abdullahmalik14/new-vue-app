@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getChatApiBaseUrl, asFlowError } from "@/services/chat/chatApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function sendProductRecommendationFlow({ payload, context, api }) {
   const baseUrl = getChatApiBaseUrl(context);
@@ -12,11 +13,11 @@ export async function sendProductRecommendationFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/product`, { productData }, {
-      headers,
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
-    });
+    const response = await api.post(
+      `${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/product`,
+      { productData },
+      buildFlowRequestOptions(context),
+    );
     const status = getHttpStatus(response, 201);
 
     if (response?.ok === false) {

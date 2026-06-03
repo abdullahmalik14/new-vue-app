@@ -144,3 +144,37 @@ export function validateCancelReservationPayload(payload = {}) {
     errors,
   };
 }
+
+export function validateConfirmReservationResponse(response = {}) {
+  const errors = [];
+
+  if (!isNonEmptyString(response.reservationId)) {
+    errors.push("reservationId is required in response.");
+  }
+
+  if (response.status !== undefined && !isNonEmptyString(response.status)) {
+    errors.push("status must be a non-empty string when provided.");
+  }
+
+  return {
+    ok: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateCancelReservationResponse(response = {}) {
+  const errors = [];
+
+  if (!isNonEmptyString(response.reservationId)) {
+    errors.push("reservationId is required in response.");
+  }
+
+  if (response.status !== undefined && !isNonEmptyString(response.status)) {
+    errors.push("status must be a non-empty string when provided.");
+  }
+
+  return {
+    ok: errors.length === 0,
+    errors,
+  };
+}

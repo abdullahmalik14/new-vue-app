@@ -2,6 +2,7 @@ import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { asFlowError } from "@/services/chat/chatApiUtils.js";
 import { buildWpApiUrl } from "@/utils/wpApiBaseUrl.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 import {
   normalizeProductForChat,
   normalizeProductRecommendationStatus,
@@ -60,13 +61,11 @@ export async function fetchProductRecommendationStatusFlow({ payload, context, a
 
   try {
     const response = await api.get(buildWpApiUrl(endpoint.path), {
+      ...buildFlowRequestOptions(context),
       params: {
         ...endpoint.params,
         uid: fanUid,
       },
-      headers: context.requestHeaders || {},
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
     });
     const status = getHttpStatus(response, 200);
 

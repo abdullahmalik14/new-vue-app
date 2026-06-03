@@ -15,10 +15,7 @@ export function resolveCsrfToken(options = {}) {
 }
 
 export function applyCsrfToRequestHeaders(requestHeaders, token, { flowKind } = {}) {
-  if (flowKind !== "write" || !token) {
-    return requestHeaders;
-  }
-  if (!Object.prototype.hasOwnProperty.call(requestHeaders, "X-CSRF-Token")) {
+  if (flowKind === "write" && token) {
     requestHeaders["X-CSRF-Token"] = token;
   }
   return requestHeaders;
@@ -35,10 +32,7 @@ export function resolveBackendJwtToken(options = {}) {
 }
 
 export function applyBackendJwtToRequestHeaders(requestHeaders, token) {
-  if (
-    token
-    && !Object.prototype.hasOwnProperty.call(requestHeaders, "Authorization")
-  ) {
+  if (token) {
     requestHeaders.Authorization = `Bearer ${token}`;
   }
   return requestHeaders;

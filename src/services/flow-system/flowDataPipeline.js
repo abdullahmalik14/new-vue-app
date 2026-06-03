@@ -4,12 +4,13 @@ import { mergeMeta } from "@/services/flow-system/pipeline/pipelineResult.js";
 import { runReadPipeline } from "@/services/flow-system/pipeline/readPipeline.js";
 import { runWritePipeline } from "@/services/flow-system/pipeline/writePipeline.js";
 import { patchPipelineProgress } from "@/services/flow-system/utils/flowProgress.js";
+import { emitFlowLifecycle } from "@/services/flow-system/utils/flowLifecycle.js";
 
 function nowMs() {
   return Date.now();
 }
 
-function asValidationResult(rawResult) {
+export function asValidationResult(rawResult) {
   if (rawResult === true || rawResult == null) return { ok: true, errors: [] };
   if (rawResult === false) return { ok: false, errors: ["Validation failed"] };
   if (typeof rawResult === "string") return { ok: false, errors: [rawResult] };
@@ -17,8 +18,12 @@ function asValidationResult(rawResult) {
   if (typeof rawResult === "object") {
     if (typeof rawResult.ok === "boolean") return { ok: rawResult.ok, errors: rawResult.errors || [] };
     if (Array.isArray(rawResult.errors)) return { ok: rawResult.errors.length === 0, errors: rawResult.errors };
+    if (rawResult.valid === true) return { ok: true, errors: [] };
+    if (rawResult.valid === false) {
+      return { ok: false, errors: rawResult.errors || ["Validation failed"] };
+    }
   }
-  return { ok: true, errors: [] };
+  return { ok: false, errors: ["Unexpected validator result shape"] };
 }
 
 function mapUiError(code, uiErrorMap) {
@@ -28,8 +33,14 @@ function mapUiError(code, uiErrorMap) {
   return uiErrorMap[code] || null;
 }
 
-async function validateBy(validator, value, context, stage) {
+async function validateBy(validator, value, context, stage, { required = false } = {}) {
   if (typeof validator !== "function") {
+    if (required) {
+      return {
+        ok: false,
+        errors: [`${stage} validator is declared in the registry but is not a function.`],
+      };
+    }
     return { ok: true, errors: [] };
   }
 
@@ -70,19 +81,65 @@ export function debugLog(context, ...args) {
   console.log("[flowDataPipeline]", context.flowName, ...args);
 }
 
+function hasValidatableData(data) {
+  if (data == null) return false;
+  if (typeof data !== "object") return true;
+  if (Array.isArray(data)) return data.length > 0;
+  return Object.keys(data).length > 0;
+}
+
 export async function validatePayload(context) {
   const startedAt = markStage(context, "validate:payload");
-  const result = await validateBy(context.validators?.payload, context.originalPayload, context, "payload");
+  const payloadValidator = context.validators?.payload;
+  const required = !!context.validatorsDeclared?.payload;
+
+  const userValidation = await validateBy(
+    payloadValidator,
+    context.originalPayload,
+    context,
+    "payload",
+    { required },
+  );
+  if (!userValidation.ok) {
+    recordTiming(context, "validate:payload", startedAt);
+    return userValidation;
+  }
+
+  if (typeof context.mapper?.toRequest === "function" && payloadValidator) {
+    const mappedValidation = await validateBy(
+      payloadValidator,
+      context.payload,
+      context,
+      "payload:mapped",
+      { required: false },
+    );
+    if (!mappedValidation.ok) {
+      recordTiming(context, "validate:payload", startedAt);
+      return mappedValidation;
+    }
+  }
+
   recordTiming(context, "validate:payload", startedAt);
-  return result;
+  return userValidation;
 }
 
 export async function validateResponse(context, flowResult) {
-  if (!flowResult?.ok || flowResult?.meta?.notModified) {
+  if (!flowResult?.ok) {
     return { ok: true, errors: [] };
   }
+
+  if (!hasValidatableData(flowResult.data)) {
+    return { ok: true, errors: [] };
+  }
+
   const startedAt = markStage(context, "validate:response");
-  const result = await validateBy(context.validators?.response, flowResult.data, context, "response");
+  const result = await validateBy(
+    context.validators?.response,
+    flowResult.data,
+    context,
+    "response",
+    { required: !!context.validatorsDeclared?.response },
+  );
   recordTiming(context, "validate:response", startedAt);
   return result;
 }
@@ -124,6 +181,13 @@ export function finalizeError(context, flowResult, stage = "unknown") {
 }
 
 export function finalizeCancelled(context, reason = "cancelled", sourceResult = null) {
+  emitFlowLifecycle("cancelled", {
+    flowName: context.flowName,
+    runId: context.runId,
+    reason,
+    result: sourceResult,
+  });
+
   let result = sourceResult?.status === "cancelled" ? sourceResult : cancelled(reason);
   if (reason === "total_timeout") {
     result = {

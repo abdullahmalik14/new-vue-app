@@ -1,5 +1,6 @@
 import { fail } from "../flow-system/flowTypes.js";
 import { normalizeUnknownError } from "../flow-system/flowErrors.js";
+export { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function getFallbackBaseUrl() {
   // If Vite env isn't defined, default to local backend
