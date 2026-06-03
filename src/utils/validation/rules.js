@@ -44,7 +44,11 @@ export const rules = {
 
   custom(value, param, ctx) {
     if (typeof param !== 'function') return false;
-    return !!param(value, ctx);
+    const result = param(value, ctx);
+    if (result != null && typeof result.then === 'function') {
+      return result;
+    }
+    return !!result;
   },
 
   hasContent(value) {

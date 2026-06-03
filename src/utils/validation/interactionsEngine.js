@@ -22,6 +22,81 @@ function canSetAttribute(name, value, trusted = false) {
   return true;
 }
 
+function resolveValidationSummaryHost(targetElement) {
+  const tag = (targetElement.tagName ?? '').toUpperCase();
+  if (tag !== 'TEXTAREA' && tag !== 'INPUT') {
+    if (!targetElement.hasAttribute('role')) {
+      targetElement.setAttribute('role', 'alert');
+    }
+    if (!targetElement.hasAttribute('aria-live')) {
+      targetElement.setAttribute('aria-live', 'assertive');
+    }
+    return targetElement;
+  }
+
+  const summaryKey = targetElement.id
+    || targetElement.getAttribute('data-element-key')
+    || 'legacy-input-summary';
+  const parent = targetElement.parentElement;
+  let host = parent?.querySelector(`[data-validation-summary-for="${summaryKey}"]`);
+
+  if (!host) {
+    host = document.createElement('div');
+    host.setAttribute('role', 'alert');
+    host.setAttribute('aria-live', 'assertive');
+    host.setAttribute('data-validation-summary-for', summaryKey);
+    if (targetElement.id) host.id = `${targetElement.id}-summary`;
+    targetElement.insertAdjacentElement('afterend', host);
+  }
+
+  return host;
+}
+
+function renderValidationErrorSummary(host, summary, scope, labelByFor) {
+  host.replaceChildren();
+
+  const list = document.createElement('ul');
+  list.setAttribute('role', 'list');
+
+  if (!summary.isValid && summary.invalidFields?.length > 0) {
+    summary.invalidFields.forEach((invalidField) => {
+      const fieldId = invalidField.fieldId;
+      const fieldState = scope?.fields[fieldId];
+      let fieldLabel = fieldId;
+
+      if (fieldState?.element) {
+        const element = fieldState.element;
+        const linkedLabel = element.id ? labelByFor.get(element.id) : null;
+        const formGroupLabel = element.closest('.form-group')?.querySelector('label');
+        if (linkedLabel) {
+          fieldLabel = linkedLabel;
+        } else if (formGroupLabel) {
+          fieldLabel = formGroupLabel.textContent.trim() || fieldId;
+        } else if (element.placeholder) {
+          fieldLabel = element.placeholder;
+        }
+      }
+
+      const li = document.createElement('li');
+      const messages = invalidField.failedRules?.length
+        ? invalidField.failedRules.map((rule) => rule.message || `${rule.type} failed`).join(', ')
+        : 'Invalid';
+      li.textContent = `${fieldLabel}: ${messages}`;
+      list.appendChild(li);
+    });
+
+    const total = document.createElement('li');
+    total.textContent = `Total: ${summary.invalidFields.length} error(s) found.`;
+    list.appendChild(total);
+  } else {
+    const li = document.createElement('li');
+    li.textContent = 'No validation errors found.';
+    list.appendChild(li);
+  }
+
+  host.appendChild(list);
+}
+
 function resolveActionEngine(ctx) {
   if (ctx && typeof ctx === 'object' && 'engine' in ctx && ctx.engine) {
     return ctx.engine;
@@ -38,6 +113,7 @@ export const interactionsEngine = {
   originalValues: reactive({}), // For sync-with-restore: stores original values before sync
   allowedScripts: Object.create(null),
   _debounceTimers: Object.create(null),
+  _asyncDebounceTimers: Object.create(null),
 
   logger: {
     debug: (...args) => console.debug('[InteractionsEngine]', ...args),
@@ -452,7 +528,7 @@ export const interactionsEngine = {
 
     showValidationErrors(action, fieldState, fieldConfig) {
       const interactionsEngine = resolveActionEngine(this);
-      // Collect all validation errors and display them in a textarea
+      // Collect validation errors and render them in an accessible summary region
       if (!action.scopeId) {
         interactionsEngine.logger.error('showValidationErrors: scopeId is required', action);
         return;
@@ -518,7 +594,6 @@ export const interactionsEngine = {
         summary = interactionsEngine.validateScope(action.scopeId);
       }
 
-      // Find target textarea element
       let targetElement = null;
 
       if (action.targetElementKey) {
@@ -529,97 +604,39 @@ export const interactionsEngine = {
         const targetState = interactionsEngine.getFieldState({ scope: fieldConfig.scope, id: action.targetFieldId });
         targetElement = targetState?.element;
       } else {
-        // Default: try to find by common patterns
-        targetElement = document.querySelector('textarea[data-error-display]') ||
+        targetElement = document.querySelector('[data-error-display]') ||
           document.querySelector('#validation-errors') ||
           document.querySelector('.validation-errors');
       }
 
       if (!targetElement) {
-        interactionsEngine.logger.error('showValidationErrors: target textarea not found', action);
+        interactionsEngine.logger.error('showValidationErrors: target summary element not found', action);
         return;
       }
 
-      // Build error messages
-      let errorText = '';
+      const scope = interactionsEngine.scopes[action.scopeId];
+      const labelByFor = new Map(
+        Array.from(document.querySelectorAll('label[for]')).map((label) => [
+          label.getAttribute('for'),
+          (label.textContent || '').trim(),
+        ]),
+      );
 
-      if (!summary.isValid && summary.invalidFields && summary.invalidFields.length > 0) {
-        // Get field labels/names if available
-        const scope = interactionsEngine.scopes[action.scopeId];
-        const labelByFor = new Map(
-          Array.from(document.querySelectorAll('label[for]')).map((label) => [
-            label.getAttribute('for'),
-            (label.textContent || '').trim(),
-          ]),
-        );
+      const summaryHost = resolveValidationSummaryHost(targetElement);
+      renderValidationErrorSummary(summaryHost, summary, scope, labelByFor);
 
-        errorText = 'Validation Errors:\n\n';
-
-        summary.invalidFields.forEach((invalidField, index) => {
-          const fieldId = invalidField.fieldId;
-          const fieldState = scope?.fields[fieldId];
-
-          // Try to get field label from element or use fieldId
-          let fieldLabel = fieldId;
-          if (fieldState?.element) {
-            // Try to find label associated with the field
-            const element = fieldState.element;
-            const linkedLabel = element.id ? labelByFor.get(element.id) : null;
-            const formGroupLabel = element.closest('.form-group')?.querySelector('label');
-            if (linkedLabel) {
-              fieldLabel = linkedLabel || fieldId;
-            } else {
-              if (formGroupLabel) fieldLabel = formGroupLabel.textContent.trim() || fieldId;
-            }
-            if (!linkedLabel && !formGroupLabel && element.placeholder) {
-              fieldLabel = element.placeholder;
-            } else if (!linkedLabel && element.placeholder && fieldLabel === fieldId) {
-              fieldLabel = element.placeholder;
-            }
-          }
-
-          // Format: "1. Field Label: Error message"
-          errorText += `${index + 1}. ${fieldLabel}: `;
-
-          if (invalidField.failedRules && invalidField.failedRules.length > 0) {
-            const errorMessages = invalidField.failedRules.map(rule => rule.message || `${rule.type} failed`).join(', ');
-            errorText += errorMessages;
-          } else {
-            errorText += 'Invalid';
-          }
-
-          errorText += '\n';
-        });
-
-        // Add summary at the end
-        errorText += `\nTotal: ${summary.invalidFields.length} error(s) found.`;
-      } else {
-        errorText = 'No validation errors found.';
-      }
-
-      // Set textarea value
-      if (targetElement.tagName === 'TEXTAREA' || targetElement.tagName === 'INPUT') {
-        targetElement.value = errorText;
-        // Trigger input event for Vue reactivity
-        if (targetElement.dispatchEvent) {
-          targetElement.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-      } else {
-        // For other elements, set textContent or innerHTML
-        targetElement.textContent = errorText;
-      }
-
-      // Optionally scroll to the textarea
       if (action.scroll !== false) {
-        targetElement.scrollIntoView({
+        summaryHost.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
         });
 
-        // Also focus the textarea
-        if (targetElement.focus && (targetElement.tagName === 'TEXTAREA' || targetElement.tagName === 'INPUT')) {
+        if (summaryHost.focus) {
+          if (!summaryHost.hasAttribute('tabindex')) {
+            summaryHost.setAttribute('tabindex', '-1');
+          }
           setTimeout(() => {
-            targetElement.focus();
+            summaryHost.focus({ preventScroll: true });
           }, 300);
         }
       }
@@ -671,6 +688,7 @@ export const interactionsEngine = {
       clearTimeout(existingTimer);
       delete this._debounceTimers[timerKey];
     }
+    this._cancelAsyncValidation(scopeId, fieldId);
 
     this.logger.debug('unregister', scopeId, fieldId);
 
@@ -691,6 +709,12 @@ export const interactionsEngine = {
       if (!timerKey.startsWith(scopePrefix)) return;
       clearTimeout(this._debounceTimers[timerKey]);
       delete this._debounceTimers[timerKey];
+    });
+
+    Object.keys(this._asyncDebounceTimers).forEach((timerKey) => {
+      if (!timerKey.startsWith(scopePrefix)) return;
+      clearTimeout(this._asyncDebounceTimers[timerKey]);
+      delete this._asyncDebounceTimers[timerKey];
     });
 
     const keyPrefixes = [`${scopeId}_`, `${scopeId}:`, `${scopeId}.`];
@@ -719,7 +743,7 @@ export const interactionsEngine = {
     const fieldId = fieldConfig.id;
 
     if (!this.scopes[scopeId]) {
-      this.scopes[scopeId] = { fields: {} };
+      this.scopes[scopeId] = { fields: {}, submitted: false };
     }
 
     if (this.scopes[scopeId]?.fields[fieldId]) {
@@ -731,12 +755,21 @@ export const interactionsEngine = {
 
     this.scopes[scopeId].fields[fieldId] = reactive({
       value: initialValue,
+      initialValue,
       isValid: true,
       failedRules: [],
+      pending: false,
+      touched: false,
+      dirty: false,
+      showError: false,
+      dependsOn: this._normalizeDependsOn(fieldConfig.dependsOn),
       validationConfig: fieldConfig.validation || {},
       meta: {},
-      element: element || null
+      element: element || null,
+      _validationGeneration: 0
     });
+
+    this._updateFieldUxState(this.scopes[scopeId].fields[fieldId], this.scopes[scopeId]);
 
     this.logger.debug('register', scopeId, fieldId, {
       initialValue,
@@ -756,6 +789,215 @@ export const interactionsEngine = {
     return scope.fields[fieldConfig.id] || null;
   },
 
+  _normalizeDependsOn(dependsOn) {
+    if (!dependsOn) return [];
+    if (Array.isArray(dependsOn)) return dependsOn.filter(Boolean);
+    if (typeof dependsOn === 'string') return [dependsOn];
+    return [];
+  },
+
+  _buildValidationContext(fieldConfig, state) {
+    return {
+      scope: fieldConfig.scope,
+      fieldId: fieldConfig.id,
+      element: state.element,
+      getFieldValue: (scope, fieldId) => {
+        const fieldState = this.getFieldState({ scope, id: fieldId });
+        return fieldState ? fieldState.value : null;
+      }
+    };
+  },
+
+  _cancelAsyncValidation(scopeId, fieldId) {
+    const timerKey = `${scopeId}:${fieldId}:async`;
+    const existingTimer = this._asyncDebounceTimers[timerKey];
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      delete this._asyncDebounceTimers[timerKey];
+    }
+
+    const state = this.getFieldState({ scope: scopeId, id: fieldId });
+    if (state) {
+      state.pending = false;
+      state._validationGeneration += 1;
+    }
+  },
+
+  _scheduleAsyncValidation(fieldConfig, state, syncResult) {
+    const cfg = state.validationConfig || {};
+    const hasAsyncRules = (cfg.rules || []).some((rule) => validationEngine.isAsyncRule(rule));
+    if (!hasAsyncRules) {
+      this._cancelAsyncValidation(fieldConfig.scope, fieldConfig.id);
+      return;
+    }
+
+    if (!syncResult.isValid) {
+      this._cancelAsyncValidation(fieldConfig.scope, fieldConfig.id);
+      return;
+    }
+
+    const scopeId = fieldConfig.scope;
+    const fieldId = fieldConfig.id;
+    const timerKey = `${scopeId}:${fieldId}:async`;
+    const debounceMs = Number(fieldConfig.asyncDebounceMs ?? fieldConfig.debounceMs ?? 300);
+
+    if (this._asyncDebounceTimers[timerKey]) {
+      clearTimeout(this._asyncDebounceTimers[timerKey]);
+    }
+
+    const runAsync = () => {
+      delete this._asyncDebounceTimers[timerKey];
+      const generation = state._validationGeneration + 1;
+      state._validationGeneration = generation;
+      state.pending = true;
+
+      const promise = validationEngine.validateAsyncRules(
+        state.value,
+        state.validationConfig,
+        this._buildValidationContext(fieldConfig, state)
+      );
+
+      state._asyncValidationPromise = promise;
+
+      promise.then((asyncResult) => {
+        if (state._validationGeneration !== generation) return;
+
+        state.pending = false;
+        const mergedFailed = [
+          ...(syncResult.failedRules || []),
+          ...(asyncResult.failedRules || [])
+        ];
+        state.failedRules = mergedFailed;
+        state.isValid = mergedFailed.length === 0;
+        this._updateFieldUxState(state, this.scopes[fieldConfig.scope]);
+
+        this.logger.debug('async validation', fieldConfig.scope, fieldConfig.id, {
+          isValid: state.isValid,
+          failedRules: state.failedRules
+        });
+      }).catch((err) => {
+        if (state._validationGeneration !== generation) return;
+        state.pending = false;
+        this.logger.error('async validation failed', fieldConfig.scope, fieldConfig.id, err);
+      });
+    };
+
+    if (Number.isFinite(debounceMs) && debounceMs > 0) {
+      this._asyncDebounceTimers[timerKey] = setTimeout(runAsync, debounceMs);
+      return;
+    }
+
+    runAsync();
+  },
+
+  async flushAsyncValidation(fieldConfig) {
+    const state = this.getFieldState(fieldConfig);
+    if (!state) return;
+
+    const scopeId = fieldConfig.scope;
+    const fieldId = fieldConfig.id;
+    const timerKey = `${scopeId}:${fieldId}:async`;
+    const pendingTimer = this._asyncDebounceTimers[timerKey];
+
+    if (pendingTimer) {
+      clearTimeout(pendingTimer);
+      delete this._asyncDebounceTimers[timerKey];
+      const syncResult = validationEngine.validateField(
+        state.value,
+        state.validationConfig,
+        this._buildValidationContext(fieldConfig, state)
+      );
+      state.isValid = syncResult.isValid;
+      state.failedRules = syncResult.failedRules;
+      await new Promise((resolve) => {
+        const generation = state._validationGeneration + 1;
+        state._validationGeneration = generation;
+        state.pending = true;
+        validationEngine.validateAsyncRules(
+          state.value,
+          state.validationConfig,
+          this._buildValidationContext(fieldConfig, state)
+        ).then((asyncResult) => {
+          if (state._validationGeneration !== generation) {
+            resolve();
+            return;
+          }
+          state.pending = false;
+          const mergedFailed = [
+            ...(syncResult.failedRules || []),
+            ...(asyncResult.failedRules || [])
+          ];
+          state.failedRules = mergedFailed;
+          state.isValid = mergedFailed.length === 0;
+          this._updateFieldUxState(state, this.scopes[fieldConfig.scope]);
+          resolve();
+        }).catch(() => {
+          if (state._validationGeneration === generation) {
+            state.pending = false;
+          }
+          resolve();
+        });
+      });
+      return;
+    }
+
+    if (state._asyncValidationPromise) {
+      await state._asyncValidationPromise;
+    }
+  },
+
+  _updateFieldUxState(state, scope) {
+    if (!state) return;
+    state.dirty = state.value !== state.initialValue;
+    const scopeSubmitted = scope?.submitted === true;
+    state.showError = (state.touched || scopeSubmitted) && !state.isValid;
+  },
+
+  processFieldBlur(fieldConfig) {
+    const state = this.getFieldState(fieldConfig);
+    if (!state) {
+      this.logger.error('processFieldBlur: missing state', fieldConfig?.scope, fieldConfig?.id);
+      return;
+    }
+
+    state.touched = true;
+    const scope = this.scopes[fieldConfig.scope];
+    this._updateFieldUxState(state, scope);
+  },
+
+  markScopeSubmitted(scopeId) {
+    const scope = this.scopes[scopeId];
+    if (!scope) return;
+
+    scope.submitted = true;
+    for (const fieldId of Object.keys(scope.fields)) {
+      this._updateFieldUxState(scope.fields[fieldId], scope);
+    }
+  },
+
+  _revalidateDependents(fieldConfig) {
+    const scopeId = fieldConfig.scope;
+    const sourceId = fieldConfig.id;
+    const scope = this.scopes[scopeId];
+    if (!scope) return;
+
+    for (const fieldId of Object.keys(scope.fields)) {
+      if (fieldId === sourceId) continue;
+      const depState = scope.fields[fieldId];
+      const deps = this._normalizeDependsOn(depState.dependsOn);
+      if (!deps.includes(sourceId)) continue;
+      this.validateField({ scope: scopeId, id: fieldId });
+    }
+  },
+
+  _applyValidationResult(state, result, fieldConfig) {
+    state.isValid = result.isValid;
+    state.failedRules = result.failedRules;
+    this._scheduleAsyncValidation(fieldConfig, state, result);
+    this._revalidateDependents(fieldConfig);
+    this._updateFieldUxState(state, this.scopes[fieldConfig.scope]);
+  },
+
   validateField(fieldConfig) {
     const state = this.getFieldState(fieldConfig);
     if (!state) {
@@ -763,22 +1005,15 @@ export const interactionsEngine = {
       return null;
     }
 
+    this._cancelAsyncValidation(fieldConfig.scope, fieldConfig.id);
+
     const result = validationEngine.validateField(
       state.value,
       state.validationConfig,
-      {
-        scope: fieldConfig.scope,
-        fieldId: fieldConfig.id,
-        element: state.element,
-        getFieldValue: (scope, fieldId) => {
-          const fieldState = this.getFieldState({ scope, id: fieldId });
-          return fieldState ? fieldState.value : null;
-        }
-      }
+      this._buildValidationContext(fieldConfig, state)
     );
 
-    state.isValid = result.isValid;
-    state.failedRules = result.failedRules;
+    this._applyValidationResult(state, result, fieldConfig);
 
     this.logger.debug('validateField', fieldConfig.scope, fieldConfig.id, {
       value: state.value,
@@ -820,6 +1055,7 @@ export const interactionsEngine = {
 
       fieldState.isValid = result.isValid;
       fieldState.failedRules = result.failedRules;
+      this._updateFieldUxState(fieldState, scope);
 
       if (!result.isValid) {
         invalidFields.push({
@@ -1022,28 +1258,22 @@ export const interactionsEngine = {
     }
 
     state.value = newValue;
+    this._updateFieldUxState(state, this.scopes[fieldConfig.scope]);
 
     const runPipeline = () => {
       const validateOnInput = fieldConfig.validateOnInput !== false;
       const inputEvents = (fieldConfig.events && fieldConfig.events.input) || {};
 
       if (validateOnInput) {
+        this._cancelAsyncValidation(fieldConfig.scope, fieldConfig.id);
+
         const result = validationEngine.validateField(
           newValue,
           state.validationConfig,
-          {
-            scope: fieldConfig.scope,
-            fieldId: fieldConfig.id,
-            element: state.element,
-            getFieldValue: (scope, fieldId) => {
-              const fieldState = this.getFieldState({ scope, id: fieldId });
-              return fieldState ? fieldState.value : null;
-            }
-          }
+          this._buildValidationContext(fieldConfig, state)
         );
 
-        state.isValid = result.isValid;
-        state.failedRules = result.failedRules;
+        this._applyValidationResult(state, result, fieldConfig);
 
         this.logger.debug('processFieldChange validation', fieldConfig.scope, fieldConfig.id, {
           value: newValue,

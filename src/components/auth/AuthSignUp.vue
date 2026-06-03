@@ -184,6 +184,7 @@ const passwordConfig = computed(() => ({
 const confirmPasswordConfig = computed(() => ({
   scope: SCOPE_ID,
   id: "confirmPassword",
+  dependsOn: ["password"],
   validation: {
     required: true,
     requiredMessage: t("auth.validation.confirmPasswordRequired"),
@@ -793,20 +794,6 @@ const handlePasswordInput = (value) => {
     state.element.classList.remove("first-invalid");
   }
 
-  // Re-validate confirm password since it depends on password
-  if (confirmPassword.value) {
-    interactionsEngine.processFieldChange(
-      confirmPasswordConfig.value,
-      confirmPassword.value
-    );
-    // Also clear browser validation for confirm password when password changes
-    const confirmState = interactionsEngine.getFieldState(
-      confirmPasswordConfig.value
-    );
-    if (confirmState?.element && confirmState.element.setCustomValidity) {
-      confirmState.element.setCustomValidity("");
-    }
-  }
 };
 
 const handleConfirmPasswordInput = (value) => {

@@ -1545,12 +1545,47 @@ The `custom` rule in `validationsLibrary.js` accepts a function but it must retu
 
 **Required:** Async rule support with `Promise<boolean>` return, pending state tracking per field (for spinner display), and debounce before triggering async calls.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Validation ran only synchronously. `custom` rules could not return a `Promise`, and there was no `pending` flag for async UI (spinners) or debounced async execution.
+
+**Why it happened:** `validationEngine.validateField` executed every rule inline; `custom` coerced results with `!!`, so Promises were treated as truthy passes.
+
+**What changed:**
+- `src/utils/validation/validationEngine.js` — sync `validateField` skips rules with `async: true`; added `validateAsyncRules()` and `isAsyncRule()`.
+- `src/utils/validation/rules.js` — `custom` returns Promises unchanged for async evaluation.
+- `src/utils/validation/interactionsEngine.js` — field state `pending`, debounced `_asyncDebounceTimers`, `_scheduleAsyncValidation`, `flushAsyncValidation()`. Mark async rules with `{ async: true }` on the rule config; optional `asyncDebounceMs` on `fieldConfig` (falls back to `debounceMs`, default 300ms).
+- Tests: `tests/unit/validationEngineAsyncRules.test.js`, `tests/unit/interactionsEngineAsyncValidation.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); interactionsEngine.register({ scope: 'm01', id: 'username', asyncDebounceMs: 100, validation: { rules: [{ type: 'custom', async: true, param: (v) => Promise.resolve(v === 'free'), message: 'Taken' }] } }, 'taken', null); interactionsEngine.processFieldChange({ scope: 'm01', id: 'username', asyncDebounceMs: 100, validation: { rules: [{ type: 'custom', async: true, param: (v) => Promise.resolve(v === 'free'), message: 'Taken' }] } }, 'free'); await new Promise((r) => setTimeout(r, 150)); await interactionsEngine.flushAsyncValidation({ scope: 'm01', id: 'username' }); const s = interactionsEngine.getFieldState({ scope: 'm01', id: 'username' }); const out = { isValid: s.isValid === true, pendingCleared: s.pending === false, noFailedRules: (s.failedRules || []).length === 0 }; interactionsEngine.clearScope('m01'); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### M-02 · No `unregister` / `clearScope` on `interactionsEngine`
 **Severity:** High
 
 See [B-02](#b-02--interactionsengine-is-a-global-singleton-with-no-cleanup-api). Without cleanup, every mounted form permanently grows the global `scopes` reactive object. Long-lived SPAs will accumulate stale field state.
+
+#### Resolution ✅
+
+**Status:** Resolved (duplicate of [B-02](#b-02--interactionsengine-is-a-global-singleton-with-no-cleanup-api); tracked here because the missing-features list called it out separately).
+
+**What was broken:** Same as B-02 — no `unregister` / `clearScope`, so scoped field maps grew without bound across SPA navigations.
+
+**Why it happened:** Missing lifecycle teardown API on the engine singleton.
+
+**What changed:** See B-02 resolution (`unregister`, `clearScope`, `onBeforeUnmount` wiring, `tests/unit/interactionsEngineScopeCleanup.test.js`). Async debounce timers are also cleared in `clearScope` / `unregister` after M-01.
+
+**How to test in the browser (one paste):** Use the B-02 browser command in [B-02](#b-02--interactionsengine-is-a-global-singleton-with-no-cleanup-api).
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -1566,6 +1601,27 @@ There is no dependency tracking: no way to declare "when field X changes, re-val
 
 **Required:** A `dependsOn` field in `fieldConfig` that triggers re-validation of dependents via `processFieldChange`.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Changing `password` did not re-run `matchValue` on `confirmPassword`, so confirm could stay stamped valid after the source password changed.
+
+**Why it happened:** No dependency graph; forms duplicated logic (e.g. manual `processFieldChange` on confirm inside password handlers).
+
+**What changed:**
+- `src/utils/validation/interactionsEngine.js` — `dependsOn` on `fieldConfig` (string or array); stored on field state; `_revalidateDependents()` runs after sync validation in `processFieldChange` / `validateField`.
+- `src/components/auth/AuthSignUp.vue` — `confirmPasswordConfig.dependsOn: ['password']`; removed manual confirm re-validation from password handler.
+- `src/templates/dashboard/page/role/DashboardResetPassword.vue` — `dependsOn: ['newPassword']` on confirm field.
+- Test: `tests/unit/interactionsEngineDependsOn.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); interactionsEngine.register({ scope: 'm03', id: 'password', validation: { rules: [] } }, 'abc', null); interactionsEngine.register({ scope: 'm03', id: 'confirmPassword', dependsOn: ['password'], validation: { rules: [{ type: 'matchValue', param: 'password', message: 'No match' }] } }, 'abc', null); interactionsEngine.processFieldChange({ scope: 'm03', id: 'password', validation: { rules: [] } }, 'xyz'); const c = interactionsEngine.getFieldState({ scope: 'm03', id: 'confirmPassword' }); const out = { confirmInvalid: c.isValid === false, matchFailed: c.failedRules?.[0]?.type === 'matchValue' }; interactionsEngine.clearScope('m03'); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### M-04 · No `touched` / `dirty` state per field in `interactionsEngine`
@@ -1579,12 +1635,56 @@ The standard UX pattern is to show errors only after a field has been `touched` 
 
 **Required:** Add `touched: false` and `dirty: false` to field state. Set `touched = true` on `blur`. Expose `showError = touched && !isValid` for template binding.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Field state tracked only `isValid` / `failedRules`, so templates could not defer error display until interaction or submit.
+
+**Why it happened:** No UX state (`touched`, `dirty`, `showError`) on registered fields and no blur/submit hooks.
+
+**What changed:**
+- `src/utils/validation/interactionsEngine.js` — field state now includes `touched`, `dirty`, `showError`, and `initialValue`; `_updateFieldUxState()` keeps `showError = (touched || scope.submitted) && !isValid`.
+- Added `processFieldBlur(fieldConfig)` (call from `@blur`) and `markScopeSubmitted(scopeId)` (call on submit attempt).
+- Scope objects now include `submitted: false` by default.
+- Test: `tests/unit/interactionsEngineTouchedDirty.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); interactionsEngine.register({ scope: 'm04', id: 'email', validation: { rules: [{ type: 'isEmail', message: 'Bad email' }] } }, 'bad', null); interactionsEngine.processFieldChange({ scope: 'm04', id: 'email', validation: { rules: [{ type: 'isEmail', message: 'Bad email' }] } }, 'bad'); const hiddenBeforeBlur = interactionsEngine.getFieldState({ scope: 'm04', id: 'email' }).showError === false; interactionsEngine.processFieldBlur({ scope: 'm04', id: 'email' }); const shownAfterBlur = interactionsEngine.getFieldState({ scope: 'm04', id: 'email' }).showError === true; const out = { hiddenBeforeBlur, shownAfterBlur }; interactionsEngine.clearScope('m04'); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### M-05 · `stampValidation` does not set `aria-invalid` or link error messages
 **Severity:** Medium
 
 See [B-06](#b-06--stampvalidation-sets-non-standard-validated-attribute-without-aria-invalid). This is both a best practice violation and a missing feature from an accessibility standpoint. The directive has no mechanism to automatically associate an error message element (`aria-describedby`) with the invalid field.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `aria-invalid` was added in B-06, but error text elements were not linked to inputs for screen readers.
+
+**Why it happened:** `stampValidation` updated only field attributes, with no lookup for companion error nodes.
+
+**What changed:**
+- `src/interactions/utils/engine.js` — `resolveValidationErrorId()` finds error elements via:
+  - `data-validation-describedby` on the input
+  - `#${input.id}-error` convention
+  - `[data-validation-error-for="${input.id}"]` within the nearest form/container
+- `stampValidation()` now syncs `aria-describedby` when invalid and removes the error id when valid (preserves unrelated describedby ids).
+- Tests: `tests/unit/stampValidationAriaDescribedby.test.js` (plus existing `stampValidationAriaInvalid.test.js`).
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const mod = await import('/src/interactions/utils/engine.js'); const err = document.createElement('p'); err.id = 'demo-email-error'; err.textContent = 'Invalid'; document.body.append(err); const input = document.createElement('input'); input.id = 'demo-email'; document.body.append(input); mod.stampValidation(input, { isValid: false, failedRules: [{ rule: 'isEmail', error: 'Invalid' }] }); const out = { ariaInvalid: input.getAttribute('aria-invalid') === 'true', describedBy: input.getAttribute('aria-describedby') === 'demo-email-error' }; mod.stampValidation(input, { isValid: true, failedRules: [] }); out.cleared = input.getAttribute('aria-describedby') === null; err.remove(); input.remove(); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -1608,6 +1708,27 @@ All of these would pass `step1Validator` and likely cause database, UI rendering
 
 **Fix:** Add upper bounds — e.g. `duration > 480` (8 hours), `basePrice > 10000`, `eventTitle.length > 200`.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `step1Validator` enforced minimums/required checks only; extreme duration, price, and title values passed client validation.
+
+**Why it happened:** No upper-bound guards in `eventStepValidators.js`.
+
+**What changed:**
+- `src/services/events/validators/eventStepValidators.js` — added caps:
+  - `eventTitle` max 200 characters
+  - `duration` max 480 minutes (8 hours)
+  - `basePrice` max 10000
+- Extended `tests/unit/eventStepValidators.test.js` with upper-bound cases.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const { step1Validator } = await import('/src/services/events/validators/eventStepValidators.js'); const state = { eventTitle: 'x'.repeat(201), duration: 481, basePrice: 10001, repeatRule: 'weekly', weeklyAvailability: [{ unavailable: false, slots: [{ startTime: '10:00', endTime: '11:00' }] }] }; const fields = new Set(step1Validator(state).errors.map((e) => e.field)); const out = { title: fields.has('eventTitle'), duration: fields.has('duration'), price: fields.has('basePrice') }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -1615,6 +1736,20 @@ All of these would pass `step1Validator` and likely cause database, UI rendering
 **Severity:** Low
 
 See [P-06](#p-06--processFieldChange-validates-on-every-keystroke-with-no-debounce). Particularly important for expensive `custom` rule functions or when validation triggers UI re-renders.
+
+#### Resolution ✅
+
+**Status:** Resolved (duplicate of [P-06](#p-06--processFieldChange-validates-on-every-keystroke-with-no-debounce); listed here under missing features).
+
+**What was broken:** Same as P-06 — synchronous validation on every keystroke with no built-in debounce.
+
+**Why it happened:** `processFieldChange` had no timer-based deferral path.
+
+**What changed:** See P-06 resolution (`fieldConfig.debounceMs` in `interactionsEngine.processFieldChange`, test `tests/unit/processFieldChangeDebounce.test.js`). Async rules also use debounced execution via `asyncDebounceMs` / `debounceMs` (M-01).
+
+**How to test in the browser (one paste):** Use the P-06 browser command in [P-06](#p-06--processFieldChange-validates-on-every-keystroke-with-no-debounce).
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -1631,6 +1766,27 @@ Displaying error summaries inside a `<textarea>` is semantically incorrect and c
 
 **Fix:** Display validation summaries in `<div role="alert" aria-live="assertive">` or `<ul role="list">` elements.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `showValidationErrors` wrote summary text into `<textarea>` / `<input>` `.value`, which is semantically wrong and poor for screen readers.
+
+**Why it happened:** The action treated any matched target as a plain text sink, including form controls.
+
+**What changed:**
+- `src/utils/validation/interactionsEngine.js` — renders summaries into `role="alert"` hosts with `<ul role="list">` items via `resolveValidationSummaryHost()` / `renderValidationErrorSummary()`.
+- Legacy textarea/input targets auto-create an adjacent alert summary (`#${id}-summary`); the input value is no longer modified.
+- Default selector prefers `[data-error-display]` (any element), not only textarea.
+- Updated/extended tests in `tests/unit/securityInteractionsEngine.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const ta = document.createElement('textarea'); ta.id = 'm09'; ta.setAttribute('data-error-display', ''); document.body.append(ta); interactionsEngine.scopes.m09 = { fields: { name: { value: '', validationConfig: { required: true }, element: null, isValid: false, failedRules: [{ type: 'required', message: 'Required' }] } } }; interactionsEngine.actionHandlers.showValidationErrors({ scopeId: 'm09', fieldIds: ['name'], scroll: false }, null, null); const summary = document.getElementById('m09-summary'); const out = { alertRole: summary?.getAttribute('role') === 'alert', listRendered: !!summary?.querySelector('ul[role="list"]'), textareaUntouched: ta.value === '' }; ta.remove(); summary?.remove(); delete interactionsEngine.scopes.m09; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### M-10 · `validateCreateEventPayload` does not validate `type` against a known enum
@@ -1642,6 +1798,26 @@ if (!isNonEmptyString(payload.type)) { errors.push("type is required."); }
 ```
 
 Any non-empty string passes. If the API expects an enum (`"oneOnOne"`, `"group"`, `"webinar"`, etc.), invalid type strings will fail only at the server, returning an unhelpful generic error to the user.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Any non-empty `payload.type` passed client validation.
+
+**Why it happened:** Validator only checked `isNonEmptyString(payload.type)`.
+
+**What changed:**
+- `src/services/events/validators/eventFlowValidators.js` — `VALID_CREATE_EVENT_TYPES` set aligned with mapper/client usage: `1on1-call`, `group-event`, `group`, `oneOnOne`.
+- Rejects unknown types with a clear error listing allowed values.
+- Test: `tests/unit/eventFlowValidatorsType.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const mod = await import('/src/services/events/validators/eventFlowValidators.js'); const good = mod.validateCreateEventPayload({ creatorId: 'c1', title: 'E', type: '1on1-call' }); const bad = mod.validateCreateEventPayload({ creatorId: 'c1', title: 'E', type: 'webinar' }); const out = { goodOk: good.ok === true, badRejected: bad.ok === false, enumMessage: bad.errors.some((e) => String(e).includes('type must be one of')) }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -1661,7 +1837,27 @@ If the action fires rapidly (e.g., on every keystroke while `triggerEvents` incl
 
 **Fix:** Track the timeout ID per element and cancel pending timeouts before setting a new one.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Each `showBrowserError` scheduled an independent 800ms `setTimeout` to clear validity; rapid events let stale timers clear a newer error state.
+
+**Why it happened:** No per-element timer tracking or generation guard.
+
+**What changed:**
+- `src/interactions/utils/engine.js` — `_browserErrorClearTimers` WeakMap stores `{ timerId, generation }`; prior timers are cancelled before scheduling a new clear; stale callbacks no-op when generation changed.
+- Test: `tests/unit/showBrowserErrorTimeout.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const { execActions } = await import('/src/interactions/utils/engine.js'); const input = document.createElement('input'); document.body.append(input); execActions({ actionType: 'showBrowserError', message: 'First' }, input, document); execActions({ actionType: 'showBrowserError', message: 'Second' }, input, document); const afterBurst = input.validationMessage === 'Second'; await new Promise((r) => setTimeout(r, 850)); const out = { afterBurst, clearedAfterLatestTimeout: input.validationMessage === '' }; input.remove(); console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 --
+
 ## 7. Additional Issues (Incremental Audit)
 
 Only **new issues** discovered in a second pass are listed below.

@@ -30,6 +30,20 @@ describe('eventStepValidators step1', () => {
     expect(hasWeeklyError).toBe(false);
   });
 
+  it('rejects values above configured upper bounds', () => {
+    const result = step1Validator(
+      baseState({
+        eventTitle: 'x'.repeat(201),
+        duration: 481,
+        basePrice: 10001,
+      }),
+    );
+
+    expect(result.errors.some((error) => error.field === 'eventTitle')).toBe(true);
+    expect(result.errors.some((error) => error.field === 'duration')).toBe(true);
+    expect(result.errors.some((error) => error.field === 'basePrice')).toBe(true);
+  });
+
   it('rejects inverted weekly slot ranges', () => {
     const result = step1Validator(
       baseState({

@@ -110,42 +110,25 @@ export const validationEngine = {
     return typeof value === 'string' ? value.trim() === '' : !value;
   },
 
-  validateField(value, validationConfig, context) {
-    const cfg = validationConfig || {};
-    const required = !!cfg.required;
-    const rules = cfg.rules || [];
-    const ctx = context || {};
-    const element = ctx.element || null;
+  isAsyncRule(rule) {
+    return !!(rule && rule.async);
+  },
 
-    // First, check HTML required attribute if element is provided
-    const requiredResult = this._validateWithRequiredFlag(element, value, cfg);
-    if (requiredResult) {
-      return requiredResult;
+  _resolveRuleResult(result) {
+    if (result != null && typeof result.then === 'function') {
+      return result.then((value) => !!value);
     }
+    return Promise.resolve(!!result);
+  },
 
-    // Then check config-based required (for backwards compatibility)
-    // For checkboxes, also check if value is false
-    const isCheckbox = element && element.type && element.type.toLowerCase() === 'checkbox';
-    const isEmpty = value === '' || value === null || value === undefined || (isCheckbox && value === false);
-
-    if (required && isEmpty) {
-      return {
-        isValid: false,
-        failedRules: [
-          {
-            type: 'required',
-            message: cfg.requiredMessage || 'This field is required.'
-          }
-        ]
-      };
-    }
-
-    // Get actual value from element if it's a div/content element
-    const actualValue = element ? this._getElementValue(element, value) : value;
-
+  _runRuleList(actualValue, rules, ctx, { asyncOnly = false, syncOnly = false } = {}) {
     const failedRules = [];
 
     for (const rule of rules) {
+      const isAsync = this.isAsyncRule(rule);
+      if (syncOnly && isAsync) continue;
+      if (asyncOnly && !isAsync) continue;
+
       const fn = validationsLibrary[rule.type];
       if (!fn) {
         failedRules.push({
@@ -164,6 +147,101 @@ export const validationEngine = {
         });
       }
     }
+
+    return failedRules;
+  },
+
+  async _runAsyncRuleList(actualValue, rules, ctx) {
+    const failedRules = [];
+
+    for (const rule of rules) {
+      if (!this.isAsyncRule(rule)) continue;
+
+      const fn = validationsLibrary[rule.type];
+      if (!fn) {
+        failedRules.push({
+          type: rule.type,
+          message: rule.message || `Unknown rule: ${rule.type}`
+        });
+        continue;
+      }
+
+      const result = fn(actualValue, rule.param, ctx);
+      const ok = await this._resolveRuleResult(result);
+      if (!ok) {
+        failedRules.push({
+          type: rule.type,
+          param: rule.param,
+          message: rule.message || `${rule.type} failed`
+        });
+      }
+    }
+
+    return failedRules;
+  },
+
+  _validateRequired(value, validationConfig, context) {
+    const cfg = validationConfig || {};
+    const required = !!cfg.required;
+    const ctx = context || {};
+    const element = ctx.element || null;
+
+    const requiredResult = this._validateWithRequiredFlag(element, value, cfg);
+    if (requiredResult) {
+      return requiredResult;
+    }
+
+    const isCheckbox = element && element.type && element.type.toLowerCase() === 'checkbox';
+    const isEmpty = value === '' || value === null || value === undefined || (isCheckbox && value === false);
+
+    if (required && isEmpty) {
+      return {
+        isValid: false,
+        failedRules: [
+          {
+            type: 'required',
+            message: cfg.requiredMessage || 'This field is required.'
+          }
+        ]
+      };
+    }
+
+    return null;
+  },
+
+  validateField(value, validationConfig, context) {
+    const cfg = validationConfig || {};
+    const rules = cfg.rules || [];
+    const ctx = context || {};
+    const element = ctx.element || null;
+
+    const requiredFailure = this._validateRequired(value, cfg, ctx);
+    if (requiredFailure) {
+      return requiredFailure;
+    }
+
+    const actualValue = element ? this._getElementValue(element, value) : value;
+    const failedRules = this._runRuleList(actualValue, rules, ctx, { syncOnly: true });
+
+    return {
+      isValid: failedRules.length === 0,
+      failedRules
+    };
+  },
+
+  async validateAsyncRules(value, validationConfig, context) {
+    const cfg = validationConfig || {};
+    const rules = cfg.rules || [];
+    const ctx = context || {};
+    const element = ctx.element || null;
+
+    const requiredFailure = this._validateRequired(value, cfg, ctx);
+    if (requiredFailure) {
+      return requiredFailure;
+    }
+
+    const actualValue = element ? this._getElementValue(element, value) : value;
+    const failedRules = await this._runAsyncRuleList(actualValue, rules, ctx);
 
     return {
       isValid: failedRules.length === 0,

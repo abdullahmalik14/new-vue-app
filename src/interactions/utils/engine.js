@@ -31,6 +31,9 @@ const _selectorCache = new Map()
 const SELECTOR_CACHE_MAX = 500
 let   _idCounter = 0
 
+/** Per-element browser error clear timers (prevents overlapping clear callbacks). */
+const _browserErrorClearTimers = new WeakMap()
+
 const FIELD_SEL = 'input:not([type=submit]):not([type=button]):not([type=reset]):not([type=image]), select, textarea'
 
 function isUnsafeAttributeName(name) {
@@ -168,6 +171,42 @@ export function validateWithRequired(el, rulesArr) {
   return validateElement(el, rulesArr)
 }
 
+export function resolveValidationErrorId(el) {
+  if (!el) return null;
+
+  const explicit = el.getAttribute('data-validation-describedby');
+  if (explicit && explicit.trim()) return explicit.trim();
+
+  if (el.id) {
+    const byConvention = document.getElementById(`${el.id}-error`);
+    if (byConvention?.id) return byConvention.id;
+  }
+
+  const root = el.closest('[interaction-container]') ?? el.closest('form') ?? document;
+  if (el.id) {
+    const safeId = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(el.id) : el.id;
+    const byFor = root.querySelector(`[data-validation-error-for="${safeId}"]`);
+    if (byFor?.id) return byFor.id;
+  }
+
+  return null;
+}
+
+function syncAriaDescribedBy(el, errorId, isValid) {
+  if (!errorId) return;
+
+  const tokens = new Set((el.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean));
+  if (!isValid) tokens.add(errorId);
+  else tokens.delete(errorId);
+
+  if (tokens.size) {
+    el.setAttribute('aria-describedby', [...tokens].join(' '));
+    return;
+  }
+
+  el.removeAttribute('aria-describedby');
+}
+
 export function stampValidation(el, result) {
   el.setAttribute('validated', result.isValid ? 'true' : 'false')
   el.setAttribute('aria-invalid', result.isValid ? 'false' : 'true')
@@ -175,6 +214,9 @@ export function stampValidation(el, result) {
     ? '{"isValid":true}'
     : JSON.stringify({ isValid: false, failedRules: result.failedRules.map(r => ({ rule: r.rule, error: r.error ?? null })) })
   )
+
+  const errorId = resolveValidationErrorId(el)
+  syncAriaDescribedBy(el, errorId, result.isValid)
 }
 
 // ─── Scope validation ──────────────────────────────────────────────────────────
@@ -352,8 +394,18 @@ function execAction(action, el, scope) {
     case 'showBrowserError': {
       if (!el?.reportValidity || !el?.setCustomValidity) break
       const msg = typeof action.message === 'string' && action.message.trim() ? action.message : 'Please check this field'
-      el.setCustomValidity(msg); el.reportValidity()
-      setTimeout(() => el.setCustomValidity(''), 800)
+      const prevState = _browserErrorClearTimers.get(el)
+      if (prevState?.timerId) clearTimeout(prevState.timerId)
+      const generation = (prevState?.generation ?? 0) + 1
+      el.setCustomValidity(msg)
+      el.reportValidity()
+      const timerId = setTimeout(() => {
+        const state = _browserErrorClearTimers.get(el)
+        if (state?.generation !== generation) return
+        el.setCustomValidity('')
+        _browserErrorClearTimers.delete(el)
+      }, 800)
+      _browserErrorClearTimers.set(el, { timerId, generation })
       break
     }
 

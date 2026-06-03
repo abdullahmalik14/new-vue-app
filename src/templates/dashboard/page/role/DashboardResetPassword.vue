@@ -150,6 +150,7 @@ const newPasswordConfig = computed(() => ({
 const confirmPasswordConfig = computed(() => ({
   scope: SCOPE_ID,
   id: "confirmPassword",
+  dependsOn: ["newPassword"],
   validation: {
     required: true,
     requiredMessage: t("auth.validation.confirmPasswordRequired", "Confirm password is required"),

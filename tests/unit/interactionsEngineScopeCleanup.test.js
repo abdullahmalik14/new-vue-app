@@ -11,6 +11,10 @@ afterEach(() => {
     clearTimeout(interactionsEngine._debounceTimers[key]);
     delete interactionsEngine._debounceTimers[key];
   });
+  Object.keys(interactionsEngine._asyncDebounceTimers).forEach((key) => {
+    clearTimeout(interactionsEngine._asyncDebounceTimers[key]);
+    delete interactionsEngine._asyncDebounceTimers[key];
+  });
 });
 
 describe('interactionsEngine scope cleanup', () => {

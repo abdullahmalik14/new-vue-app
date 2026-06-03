@@ -7,6 +7,10 @@ function asError(field, message) {
   return { field, message };
 }
 
+const MAX_EVENT_TITLE_LENGTH = 200;
+const MAX_DURATION_MINUTES = 480;
+const MAX_BASE_PRICE = 10000;
+
 function hasAnyValidSlots(slots) {
   if (!Array.isArray(slots)) return false;
   return slots.some((slot) => {
@@ -58,18 +62,25 @@ function hasAnyAddonValue(addOn = {}) {
 export function step1Validator(state = {}) {
   const errors = [];
 
-  if (!state?.eventTitle || String(state.eventTitle).trim().length === 0) {
+  const eventTitle = typeof state?.eventTitle === "string" ? state.eventTitle.trim() : "";
+  if (eventTitle.length === 0) {
     errors.push(asError("eventTitle", "Event title is required."));
+  } else if (eventTitle.length > MAX_EVENT_TITLE_LENGTH) {
+    errors.push(asError("eventTitle", `Event title must be ${MAX_EVENT_TITLE_LENGTH} characters or fewer.`));
   }
 
   const duration = asNumber(state?.duration);
   if (duration == null || duration < 5) {
     errors.push(asError("duration", "Session duration must be at least 5 minutes."));
+  } else if (duration > MAX_DURATION_MINUTES) {
+    errors.push(asError("duration", `Session duration cannot exceed ${MAX_DURATION_MINUTES} minutes.`));
   }
 
   const basePrice = asNumber(state?.basePrice);
   if (basePrice == null || basePrice < 0) {
     errors.push(asError("basePrice", "Base price must be 0 or higher."));
+  } else if (basePrice > MAX_BASE_PRICE) {
+    errors.push(asError("basePrice", `Base price cannot exceed ${MAX_BASE_PRICE}.`));
   }
 
   const repeatRule = state?.repeatRule ?? "weekly";

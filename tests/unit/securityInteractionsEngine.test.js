@@ -88,8 +88,9 @@ describe('interactionsEngine security hardening', () => {
     const label = document.createElement('label');
     label.setAttribute('for', 'emailField');
     label.textContent = 'Email Address';
-    const output = document.createElement('textarea');
+    const output = document.createElement('div');
     output.setAttribute('data-error-display', '');
+    output.setAttribute('role', 'alert');
     document.body.appendChild(label);
     document.body.appendChild(email);
     document.body.appendChild(output);
@@ -108,6 +109,42 @@ describe('interactionsEngine security hardening', () => {
     };
 
     interactionsEngine.actionHandlers.showValidationErrors({ scopeId: 'formA', scroll: false }, null, null);
-    expect(output.value.includes('Email Address')).toBe(true);
+    expect(output.getAttribute('role')).toBe('alert');
+    expect(output.querySelector('ul[role="list"]')?.textContent).toContain('Email Address');
+  });
+
+  it('showValidationErrors renders alert summary when legacy textarea target is used', () => {
+    const output = document.createElement('textarea');
+    output.id = 'legacyErrors';
+    output.setAttribute('data-error-display', '');
+    document.body.appendChild(output);
+
+    interactionsEngine.scopes.formB = {
+      fields: {
+        name: {
+          value: '',
+          validationConfig: { required: true, rules: [] },
+          element: null,
+          isValid: false,
+          failedRules: [{ type: 'required', message: 'Name is required' }],
+          meta: {},
+        },
+      },
+    };
+
+    interactionsEngine.actionHandlers.showValidationErrors({
+      scopeId: 'formB',
+      fieldIds: ['name'],
+      scroll: false,
+    }, null, null);
+
+    const summary = document.getElementById('legacyErrors-summary');
+    expect(summary?.getAttribute('role')).toBe('alert');
+    expect(summary?.querySelector('ul')?.textContent).toContain('required');
+    expect(output.value).toBe('');
+
+    summary?.remove();
+    output.remove();
+    delete interactionsEngine.scopes.formB;
   });
 });

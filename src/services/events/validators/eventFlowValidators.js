@@ -2,6 +2,13 @@ function isNonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+const VALID_CREATE_EVENT_TYPES = new Set([
+  "1on1-call",
+  "group-event",
+  "group",
+  "oneOnOne",
+]);
+
 function toNumber(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
@@ -51,8 +58,11 @@ export function validateCreateEventPayload(payload = {}) {
     errors.push("title is required.");
   }
 
-  if (!isNonEmptyString(payload.type)) {
+  const eventType = typeof payload.type === "string" ? payload.type.trim() : "";
+  if (!eventType) {
     errors.push("type is required.");
+  } else if (!VALID_CREATE_EVENT_TYPES.has(eventType)) {
+    errors.push(`type must be one of: ${[...VALID_CREATE_EVENT_TYPES].join(", ")}.`);
   }
 
   return {
