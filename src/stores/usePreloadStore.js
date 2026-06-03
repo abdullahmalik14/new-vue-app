@@ -132,6 +132,9 @@ export const usePreloadStore = defineStore('preload', {
     hasSection: (state) => (sectionName) =>
       normalizeStringSet(state.preloadedSections).has(sectionName),
     hasAsset: (state) => (assetUrl) => normalizeStringSet(state.preloadedAssets).has(assetUrl),
+    isSectionInProgress: (state) => (sectionName) =>
+      isValidSectionKey(sectionName) &&
+      normalizeStringSet(state.sectionsInProgress).has(sectionName),
   },
 
   actions: {
@@ -218,8 +221,9 @@ export const usePreloadStore = defineStore('preload', {
         return;
       }
       ensurePreloadSets(this);
-      if (!this.sectionsInProgress.has(sectionName)) {
-        this.sectionsInProgress.add(sectionName);
+      const next = addToStringSet(this.sectionsInProgress, sectionName);
+      if (next !== this.sectionsInProgress) {
+        this.sectionsInProgress = next;
         log('usePreloadStore.js', 'markSectionInProgress', 'start', 'Section preload in progress', { sectionName });
       }
     },
@@ -233,22 +237,11 @@ export const usePreloadStore = defineStore('preload', {
         return;
       }
       ensurePreloadSets(this);
-      if (this.sectionsInProgress.delete(sectionName)) {
+      const next = removeFromStringSet(this.sectionsInProgress, sectionName);
+      if (next !== this.sectionsInProgress) {
+        this.sectionsInProgress = next;
         log('usePreloadStore.js', 'unmarkSectionInProgress', 'complete', 'Section preload no longer in progress', { sectionName });
       }
-    },
-
-    /**
-     * Check whether a section preload is currently in progress
-     * @param {string} sectionName
-     * @returns {boolean}
-     */
-    isSectionInProgress(sectionName) {
-      if (!isValidSectionKey(sectionName)) {
-        return false;
-      }
-      ensurePreloadSets(this);
-      return this.sectionsInProgress.has(sectionName);
     },
 
     /**
@@ -289,6 +282,7 @@ export const usePreloadStore = defineStore('preload', {
         storage: resolvePersistStorage(),
         newKey: PRELOAD_PERSIST_KEY,
         legacyKeys: ['app-preload-state'],
+        baseKey: 'app-preload-state',
       });
       store.sectionsInProgress = new Set();
     },

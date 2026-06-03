@@ -142,6 +142,7 @@ export const useCartStore = defineStore("cart", {
         storage: resolvePersistStorage(),
         newKey: CART_PERSIST_KEY,
         legacyKeys: ["cart"],
+        baseKey: "cart",
       });
       if (!store.metadata || typeof store.metadata !== "object") {
         store.metadata = { ...DEFAULT_METADATA };

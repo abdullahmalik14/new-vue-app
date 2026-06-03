@@ -512,6 +512,7 @@ export const useDashboardAnalytics = defineStore('DashboardAnalytics', {
         storage: resolvePersistStorage(),
         newKey: DASHBOARD_PERSIST_KEY,
         legacyKeys: ['DashboardAnalytics'],
+        baseKey: 'DashboardAnalytics',
       })
       if (!store.metadata || typeof store.metadata !== 'object') {
         store.metadata = { etag: null, lastUpdated: null }

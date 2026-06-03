@@ -103,6 +103,20 @@ describe('usePreloadStore — preloadedAssets Set', () => {
     expect(store.sectionsInProgress.size).toBe(0);
   });
 
+  it('tracks in-progress sections via getter with Set reference updates', () => {
+    const store = usePreloadStore();
+
+    expect(store.isSectionInProgress('auth')).toBe(false);
+
+    store.markSectionInProgress('auth');
+    expect(store.isSectionInProgress('auth')).toBe(true);
+    expect(store.sectionsInProgress.has('auth')).toBe(true);
+
+    store.unmarkSectionInProgress('auth');
+    expect(store.isSectionInProgress('auth')).toBe(false);
+    expect(store.sectionsInProgress.size).toBe(0);
+  });
+
   it('persist serializer round-trip restores Sets', () => {
     const serializer = createPersistedStateSerializer({
       version: 1,

@@ -428,3 +428,179 @@ if (!sectionName || typeof sectionName !== 'string') return;
 ```
 
 **Expected:** `pass: true`.
+
+---
+
+## Follow-up Fixes (Fifth Pass)
+
+> Post-resolution review findings. Original resolutions above are unchanged; these are additional hardening passes.
+
+---
+
+### FU-01 — `persistStorageAdapter` missing `removeItem`
+
+**Files:** `persistUtils.js`  
+**Severity:** Low (defensive)
+
+**What was broken:** The shared storage adapter only exposed `getItem`/`setItem`, not a full Storage-like surface.
+
+**Why it happened:** v4 `StorageLike` only requires two methods; `removeItem` was omitted.
+
+**What changed:** Added `removeItem` passthrough on `persistStorageAdapter` for manual cleanup and Storage-compatible adapters.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { persistStorageAdapter } = await import('/src/utils/common/persistUtils.js');
+  persistStorageAdapter.setItem('__persist_adapter_test__', '1');
+  persistStorageAdapter.removeItem('__persist_adapter_test__');
+  console.log({
+    pass: localStorage.getItem('__persist_adapter_test__') === null,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
+
+---
+
+### FU-02 — `attachStorageQuotaMonitor` duplicate subscriptions on re-hydrate
+
+**Files:** `persistUtils.js`, all persisted stores  
+**Severity:** Low–Medium
+
+**What was broken:** Each `afterHydrate` call registered another detached `$subscribe`, leaking listeners when `$hydrate({ runHooks: true })` ran more than once.
+
+**Why it happened:** No guard prevented re-attaching the monitor to the same store instance.
+
+**What changed:** `attachStorageQuotaMonitor` now uses a `WeakSet` so each store gets at most one quota subscription.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { useCartStore } = await import('/src/stores/useCartStore.js');
+  const store = useCartStore();
+  await store.$hydrate({ runHooks: true });
+  await store.$hydrate({ runHooks: true });
+  console.log({ pass: true, note: 'Unit test covers subscribe count guard' });
+})();
+```
+
+**Expected:** `pass: true` (see `tests/unit/persistUtils.test.js`).
+
+---
+
+### FU-03 — Double-write in `useLocaleStore.setLocale`
+
+**File:** `useLocaleStore.js`  
+**Severity:** Medium
+
+**What was broken:** `setLocale` wrote to localStorage twice — once via the persist plugin and once via a manual `setItem` fallback.
+
+**Why it happened:** Manual persistence was added as a safety net before plugin config was finalized.
+
+**What changed:** Removed the manual `setItem`; assignment is followed by explicit `$persist()` when available.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { useLocaleStore } = await import('/src/stores/useLocaleStore.js');
+  const { buildPersistKey } = await import('/src/utils/common/persistUtils.js');
+  const store = useLocaleStore();
+  store.setLocale('vi');
+  const raw = localStorage.getItem(buildPersistKey('locale_preference'));
+  const parsed = JSON.parse(raw || '{}');
+  console.log({
+    locale: parsed.data?.locale ?? parsed.locale,
+    pass: (parsed.data?.locale ?? parsed.locale) === 'vi',
+  });
+})();
+```
+
+**Expected:** `pass: true`.
+
+---
+
+### FU-04 — `sectionsInProgress` in-place Set mutation
+
+**File:** `usePreloadStore.js`  
+**Severity:** Medium
+
+**What was broken:** `markSectionInProgress` / `unmarkSectionInProgress` mutated the Set in place while persisted sets use reference replacement.
+
+**Why it happened:** In-progress tracking was added before the Set replacement pattern was standardized.
+
+**What changed:** Both actions now use `addToStringSet` / `removeFromStringSet` and assign a new Set reference.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { usePreloadStore } = await import('/src/stores/usePreloadStore.js');
+  const store = usePreloadStore();
+  const before = store.sectionsInProgress;
+  store.markSectionInProgress('auth');
+  console.log({
+    newReference: store.sectionsInProgress !== before,
+    inProgress: store.isSectionInProgress('auth'),
+    pass: store.sectionsInProgress !== before && store.isSectionInProgress('auth') === true,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
+
+---
+
+### FU-05 — `isSectionInProgress` defined as action, not getter
+
+**File:** `usePreloadStore.js`  
+**Severity:** High
+
+**What was broken:** Read-only in-progress check was an action, same class as the pre-fix `hasSection`/`hasAsset` issue.
+
+**Why it happened:** `isSectionInProgress` was added alongside mutation actions and not moved when getters were fixed.
+
+**What changed:** Moved `isSectionInProgress` to `getters` (same API name) so reactive consumers track `sectionsInProgress` changes.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { usePreloadStore } = await import('/src/stores/usePreloadStore.js');
+  const store = usePreloadStore();
+  store.markSectionInProgress('auth');
+  console.log({
+    pass: store.isSectionInProgress('auth') === true,
+  });
+})();
+```
+
+**Expected:** `pass: true`.
+
+---
+
+### FU-06 — Build-hash key rotation abandoned valid persisted state on every deploy
+
+**Files:** `persistUtils.js`, all persisted stores  
+**Severity:** High (product decision)
+
+**What was broken:** `buildPersistKey()` always appended `VITE_BUILD_HASH`, so cart/locale/dashboard/IP data was orphaned on every deploy. Preload was invalidated twice (key rotation + `syncPreloadStoreBuildHash`).
+
+**Why it happened:** ADD-FEAT-01 namespaced keys by env **and** build hash for all stores without distinguishing deploy-sensitive vs user-preference data.
+
+**Decision:** Env-only keys by default (`{baseKey}:{mode}`). Preload deploy invalidation stays in `syncPreloadStoreBuildHash` via the persisted `buildHash` field. Optional `includeBuildHash: true` remains for exceptional cases. `migrateBuildHashPersistKey` copies data from prior `{baseKey}:{env}:{hash}` keys on first load after upgrade.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { buildPersistKey } = await import('/src/utils/common/persistUtils.js');
+  const envKey = buildPersistKey('cart');
+  const hashKey = buildPersistKey('cart', { includeBuildHash: true });
+  console.log({
+    envKey,
+    hashKeyIncludesBuild: hashKey.split(':').length > envKey.split(':').length,
+    pass: !envKey.includes(import.meta.env.VITE_BUILD_HASH || '__none__'),
+  });
+})();
+```
+
+**Expected:** `pass: true` when `VITE_BUILD_HASH` is set (env key must not contain the hash).

@@ -79,6 +79,7 @@ export const useIpStore = defineStore('ip', {
         storage: resolvePersistStorage(),
         newKey: IP_PERSIST_KEY,
         legacyKeys: ['ip'],
+        baseKey: 'ip',
       });
     },
     afterHydrate({ store }) {

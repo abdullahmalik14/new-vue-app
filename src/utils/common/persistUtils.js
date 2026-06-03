@@ -33,16 +33,65 @@ export const persistStorageAdapter = {
   setItem(key, value) {
     resolvePersistStorage()?.setItem(key, value);
   },
+  removeItem(key) {
+    resolvePersistStorage()?.removeItem(key);
+  },
 };
 
-export function buildPersistKey(baseKey) {
+/**
+ * Build a namespaced persist key.
+ * Default: `{baseKey}:{env}` — survives deploys within the same environment.
+ * Preload invalidation on deploy is handled by `syncPreloadStoreBuildHash`, not the key.
+ *
+ * @param {string} baseKey
+ * @param {{ includeBuildHash?: boolean }} [options]
+ * @returns {string}
+ */
+export function buildPersistKey(baseKey, { includeBuildHash = false } = {}) {
   const env = import.meta.env.MODE || 'production';
-  const buildHash = getAppBuildHash();
-  if (buildHash) {
-    return `${baseKey}:${env}:${buildHash}`;
+
+  if (includeBuildHash) {
+    const buildHash = getAppBuildHash();
+    if (buildHash) {
+      return `${baseKey}:${env}:${buildHash}`;
+    }
   }
 
   return `${baseKey}:${env}`;
+}
+
+/**
+ * Copy persisted state from a prior build-hash key (`{baseKey}:{env}:{hash}`) into the env-only key.
+ *
+ * @param {{ storage?: Storage, newKey: string, baseKey: string }} options
+ * @returns {boolean}
+ */
+export function migrateBuildHashPersistKey({ storage, newKey, baseKey } = {}) {
+  if (!storage || !newKey || !baseKey || storage.getItem(newKey)) {
+    return false;
+  }
+
+  if (typeof storage.length !== 'number' || typeof storage.key !== 'function') {
+    return false;
+  }
+
+  const env = import.meta.env.MODE || 'production';
+  const prefix = `${baseKey}:${env}:`;
+
+  for (let i = 0; i < storage.length; i++) {
+    const candidateKey = storage.key(i);
+    if (!candidateKey || !candidateKey.startsWith(prefix) || candidateKey === newKey) {
+      continue;
+    }
+
+    const legacyValue = storage.getItem(candidateKey);
+    if (legacyValue) {
+      storage.setItem(newKey, legacyValue);
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function migrateLegacyPersistedState({
@@ -50,8 +99,12 @@ export function migrateLegacyPersistedState({
   newKey,
   legacyKeys,
   removeLegacy = true,
+  baseKey,
 } = {}) {
   if (!storage || !newKey || !Array.isArray(legacyKeys) || legacyKeys.length === 0) {
+    if (baseKey) {
+      return migrateBuildHashPersistKey({ storage, newKey, baseKey });
+    }
     return false;
   }
 
@@ -70,6 +123,10 @@ export function migrateLegacyPersistedState({
       }
       return true;
     }
+  }
+
+  if (baseKey) {
+    return migrateBuildHashPersistKey({ storage, newKey, baseKey });
   }
 
   return false;
@@ -147,10 +204,18 @@ export async function checkStorageQuota({ key, label, warnRatio = DEFAULT_STORAG
   return estimate;
 }
 
+const storageQuotaMonitoredStores = new WeakSet();
+
 export function attachStorageQuotaMonitor(store, { key, warnRatio, label } = {}) {
   if (typeof window === 'undefined' || !store?.$subscribe) {
     return;
   }
+
+  if (storageQuotaMonitoredStores.has(store)) {
+    return;
+  }
+
+  storageQuotaMonitoredStores.add(store);
 
   let timeoutId = null;
   const runCheck = () => {

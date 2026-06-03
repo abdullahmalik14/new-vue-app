@@ -154,17 +154,10 @@ export const useLocaleStore = defineStore('locale', {
         return false;
       }
 
-      // Set locale in state (persisted automatically)
+      // Set locale in state (persisted via pinia-plugin-persistedstate)
       this.locale = localeCode;
-
-      // Fallback manual persistence to guarantee localStorage is updated
-      try {
-        const storage = resolvePersistStorage();
-        if (storage) {
-          storage.setItem(LOCALE_PERSIST_KEY, serializeLocalePersistedState({ locale: localeCode }));
-        }
-      } catch (e) {
-        console.warn('Failed to manually persist locale:', e);
+      if (typeof this.$persist === 'function') {
+        this.$persist();
       }
 
       log('useLocaleStore.js', 'setLocale', 'success', 'Locale set successfully', { localeCode });
@@ -203,6 +196,7 @@ export const useLocaleStore = defineStore('locale', {
         storage: resolvePersistStorage(),
         newKey: LOCALE_PERSIST_KEY,
         legacyKeys: ['locale_preference'],
+        baseKey: 'locale_preference',
       });
       if (store.locale === undefined) {
         store.locale = null;

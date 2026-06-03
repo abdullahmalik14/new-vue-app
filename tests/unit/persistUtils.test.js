@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  attachStorageQuotaMonitor,
   buildPersistKey,
   createPersistedStateSerializer,
   migrateLegacyPersistedState,
+  persistStorageAdapter,
   resolvePersistTtlMs,
 } from '../../src/utils/common/persistUtils.js';
 
@@ -65,15 +67,70 @@ describe('persistUtils', () => {
   });
 
   describe('buildPersistKey', () => {
-    it('namespaces keys with mode and optional build hash', () => {
+    it('namespaces keys with mode only by default (survives deploys)', () => {
       vi.stubEnv('VITE_BUILD_HASH', 'abc123');
 
       const key = buildPersistKey('cart');
 
-      expect(key).toContain('cart:');
+      expect(key).toMatch(/^cart:/);
+      expect(key).not.toContain('abc123');
+
+      vi.unstubAllEnvs();
+    });
+
+    it('can optionally include build hash in the key', () => {
+      vi.stubEnv('VITE_BUILD_HASH', 'abc123');
+
+      const key = buildPersistKey('cart', { includeBuildHash: true });
+
       expect(key).toContain('abc123');
 
       vi.unstubAllEnvs();
+    });
+  });
+
+  describe('migrateBuildHashPersistKey', () => {
+    /** @type {Storage} */
+    let storage;
+
+    beforeEach(() => {
+      vi.stubEnv('MODE', 'test');
+      const hashKey = 'cart:test:old-hash';
+      storage = {
+        data: new Map([[hashKey, '{"items":["migrated"]}']]),
+        get length() {
+          return this.data.size;
+        },
+        key(index) {
+          return [...this.data.keys()][index] ?? null;
+        },
+        getItem(key) {
+          return this.data.get(key) ?? null;
+        },
+        setItem(key, value) {
+          this.data.set(key, value);
+        },
+        removeItem(key) {
+          this.data.delete(key);
+        },
+      };
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it('copies state from a prior build-hash key into the env-only key', async () => {
+      const { migrateBuildHashPersistKey } = await import('../../src/utils/common/persistUtils.js');
+
+      const migrated = migrateBuildHashPersistKey({
+        storage,
+        newKey: 'cart:test',
+        baseKey: 'cart',
+      });
+
+      expect(migrated).toBe(true);
+      expect(storage.getItem('cart:test')).toBe('{"items":["migrated"]}');
     });
   });
 
@@ -134,6 +191,30 @@ describe('persistUtils', () => {
 
       expect(migrated).toBe(false);
       expect(storage.getItem('cart')).toBe('{"items":["legacy"]}');
+    });
+  });
+
+  describe('persistStorageAdapter', () => {
+    it('forwards removeItem to localStorage', () => {
+      const removeItem = vi.fn();
+      vi.stubGlobal('localStorage', { removeItem });
+
+      persistStorageAdapter.removeItem('demo-key');
+
+      expect(removeItem).toHaveBeenCalledWith('demo-key');
+      vi.unstubAllGlobals();
+    });
+  });
+
+  describe('attachStorageQuotaMonitor', () => {
+    it('registers at most one subscription per store', () => {
+      const subscribe = vi.fn();
+      const store = { $subscribe: subscribe };
+
+      attachStorageQuotaMonitor(store, { key: 'cart:test', label: 'cart' });
+      attachStorageQuotaMonitor(store, { key: 'cart:test', label: 'cart' });
+
+      expect(subscribe).toHaveBeenCalledTimes(1);
     });
   });
 
