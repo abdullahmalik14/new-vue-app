@@ -395,6 +395,7 @@ onBeforeUnmount(() => {
   if (assetHandler.value) {
     assetHandler.value.dispose();
   }
+  interactionsEngine.clearScope(SCOPE_ID);
 });
 
 async function handleLogin() {

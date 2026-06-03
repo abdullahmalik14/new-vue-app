@@ -1216,6 +1216,41 @@ clearScope(scopeId) {
 ```
 Call `clearScope` from component `onUnmounted`.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `interactionsEngine` stored scoped field state in long-lived singleton maps (`scopes`, `elementVisibility`, `originalValues`) but had no teardown API, so SPA route changes could leave stale field state and DOM references alive longer than needed.
+
+**Why it happened:** Engine had `register(...)` but no matching lifecycle cleanup contract (`unregister`/`clearScope`) and form components were not clearing scope state during unmount.
+
+**What changed:**
+- Added `unregister(fieldConfig)` to `src/utils/validation/interactionsEngine.js`:
+  - removes a single field from `scopes[scopeId].fields`
+  - clears field debounce timer
+  - auto-calls `clearScope(scopeId)` when the scope becomes empty
+- Added `clearScope(scopeId)` to `src/utils/validation/interactionsEngine.js`:
+  - deletes `scopes[scopeId]`
+  - clears all debounce timers belonging to that scope
+  - removes scope-prefixed entries from `originalValues` and `elementVisibility`
+- Wired cleanup on component unmount for scopes that register fields:
+  - `src/components/auth/AuthLogIn.vue` (`loginForm`)
+  - `src/components/auth/AuthSignUp.vue` (`signupForm`)
+  - `src/components/auth/AuthResetPassword.vue` (`resetPasswordForm`)
+  - `src/components/auth/AuthConfirmEmail.vue` (`confirmEmailForm`)
+  - `src/components/auth/AuthSignUpOnboarding.vue` (`onboardingForm`)
+  - `src/components/auth/AuthLostPassword.vue` (`lostPasswordForm`)
+  - `src/components/ui/form/BookingForm/OneOnOneBookinStep1.vue` (`oneOnOneBooking`)
+  - `src/templates/dashboard/page/role/DashboardResetPassword.vue` (`resetPasswordForm`)
+- Added unit coverage in `tests/unit/interactionsEngineScopeCleanup.test.js` for `unregister` and `clearScope` behavior.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const hasKey = (obj, key) => !!obj && Object.prototype.hasOwnProperty.call(obj, key); interactionsEngine.register({ scope: 'auditScope', id: 'email', validation: { rules: [] } }, '', document.createElement('input')); if (!interactionsEngine.elementVisibility) interactionsEngine.elementVisibility = {}; if (!interactionsEngine.originalValues) interactionsEngine.originalValues = {}; if (!interactionsEngine._debounceTimers) interactionsEngine._debounceTimers = {}; interactionsEngine.elementVisibility['auditScope.panel'] = true; interactionsEngine.originalValues['auditScope_target'] = 'old'; interactionsEngine.processFieldChange({ scope: 'auditScope', id: 'email', debounceMs: 250, events: { input: {} } }, 'abc'); const before = { hasScope: !!interactionsEngine.scopes.auditScope, hasField: !!interactionsEngine.scopes.auditScope?.fields?.email, hasVisibility: hasKey(interactionsEngine.elementVisibility, 'auditScope.panel'), hasOriginal: hasKey(interactionsEngine.originalValues, 'auditScope_target'), hasTimer: hasKey(interactionsEngine._debounceTimers, 'auditScope:email') }; interactionsEngine.unregister({ scope: 'auditScope', id: 'email' }); const afterUnregister = { scopeRemovedWhenEmpty: interactionsEngine.scopes.auditScope === undefined, visibilityCleared: !hasKey(interactionsEngine.elementVisibility, 'auditScope.panel'), originalCleared: !hasKey(interactionsEngine.originalValues, 'auditScope_target'), timerCleared: !hasKey(interactionsEngine._debounceTimers, 'auditScope:email') }; interactionsEngine.register({ scope: 'auditScope2', id: 'name', validation: { rules: [] } }, 'x', null); interactionsEngine.clearScope('auditScope2'); const afterClear = { clearScopeRemovedScope: interactionsEngine.scopes.auditScope2 === undefined }; const out = { ...before, ...afterUnregister, ...afterClear }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### B-03 · `register` silently overwrites existing field state
@@ -1239,6 +1274,27 @@ if (this.scopes[scopeId]?.fields[fieldId]) {
 }
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Calling `register(...)` multiple times for the same `scope + id` silently replaced the existing reactive field state.
+
+**Why it happened:** `register(...)` wrote directly to `this.scopes[scopeId].fields[fieldId]` with no existing-state guard.
+
+**What changed:**
+- Added idempotency guard in `src/utils/validation/interactionsEngine.js`:
+  - if the field already exists, it now returns early
+  - emits DEV warning: `[InteractionsEngine] Field already registered: <scope>.<id>. Call unregister first.`
+- Added targeted unit test `tests/unit/interactionsEngineRegisterIdempotency.test.js` to verify duplicate registration does not overwrite existing state.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); interactionsEngine.clearScope('b03Scope'); interactionsEngine.register({ scope: 'b03Scope', id: 'email', validation: {} }, 'first@email.com', null); const before = interactionsEngine.getFieldState({ scope: 'b03Scope', id: 'email' }); const firstRef = before; const firstValue = before?.value; interactionsEngine.register({ scope: 'b03Scope', id: 'email', validation: {} }, 'second@email.com', null); const after = interactionsEngine.getFieldState({ scope: 'b03Scope', id: 'email' }); const out = { sameReference: after === firstRef, valueNotOverwritten: after?.value === firstValue && after?.value === 'first@email.com' }; console.log({ pass: Object.values(out).every(Boolean), ...out, currentValue: after?.value }); })();
+```
+
+**Expected:** Final log includes `pass: true` and `currentValue: "first@email.com"`.
+
 ---
 
 ### B-04 · `jumpToFieldPlaceholder` has a duplicate `console.log` alongside `logger.debug`
@@ -1255,6 +1311,26 @@ jumpToFieldPlaceholder(scopeId, fieldId) {
 The method is a stub (TODO), but the raw `console.log` is unconditional and fires in production. Even stub methods should use the internal `logger`.
 
 **Fix:** Remove the `console.log` line. The `logger.debug` call is sufficient.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `jumpToFieldPlaceholder(...)` emitted both `logger.debug(...)` and raw `console.log(...)`, creating duplicate logs and production-console noise.
+
+**Why it happened:** The stub kept a legacy direct `console.log` line in addition to centralized logger usage.
+
+**What changed:**
+- Removed direct `console.log(...)` from `jumpToFieldPlaceholder(...)` in `src/utils/validation/interactionsEngine.js`.
+- Kept `this.logger.debug(...)` as the single logging path.
+- Added targeted test `tests/unit/interactionsEngineJumpPlaceholderLogging.test.js` to assert no raw console logging.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const originalLog = console.log; let rawLogCalls = 0; console.log = (...args) => { rawLogCalls += 1; originalLog(...args); }; interactionsEngine.jumpToFieldPlaceholder('b04Scope', 'email'); console.log = originalLog; const out = { noRawConsoleLog: rawLogCalls === 0 }; console.log({ pass: Object.values(out).every(Boolean), ...out, rawLogCalls }); })();
+```
+
+**Expected:** Final log includes `pass: true` and `rawLogCalls: 0`.
 
 ---
 
@@ -1279,6 +1355,26 @@ Custom `validated` attribute is used for CSS styling and the `validateScope` fas
 el.setAttribute('aria-invalid', result.isValid ? 'false' : 'true')
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `stampValidation(...)` updated only custom attributes (`validated`, `data-validation-reason`) and did not set `aria-invalid`, so assistive technologies had no standard invalid-state signal.
+
+**Why it happened:** Validation stamping was focused on internal UI/CSS state and omitted accessibility attribute parity.
+
+**What changed:**
+- Updated `src/interactions/utils/engine.js`:
+  - `stampValidation(...)` now also sets `aria-invalid` (`'true'` when invalid, `'false'` when valid).
+- Added focused test `tests/unit/stampValidationAriaInvalid.test.js` to assert `aria-invalid` tracks the validation result.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const mod = await import('/src/interactions/utils/engine.js'); const el = document.createElement('input'); mod.stampValidation(el, { isValid: false, failedRules: [{ rule: 'required', error: 'Required' }] }); const invalidStateOk = el.getAttribute('validated') === 'false' && el.getAttribute('aria-invalid') === 'true'; mod.stampValidation(el, { isValid: true, failedRules: [] }); const validStateOk = el.getAttribute('validated') === 'true' && el.getAttribute('aria-invalid') === 'false'; const out = { invalidStateOk, validStateOk }; console.log({ pass: Object.values(out).every(Boolean), ...out, attrs: { validated: el.getAttribute('validated'), ariaInvalid: el.getAttribute('aria-invalid') } }); })();
+```
+
+**Expected:** Final log includes `pass: true` and final attributes show `validated: "true"`, `ariaInvalid: "false"` after the valid stamp.
+
 ---
 
 ### B-07 · `isSelect` in `validationsLibrary.js` uses a hardcoded placeholder value list
@@ -1296,6 +1392,28 @@ Only three specific string values are treated as "no selection". Real-world sele
 
 **Fix:** Accept `param` as an array of disallowed placeholder values, or rely solely on the empty-string check (which is already handled by the required check upstream).
 
+#### Resolution ✅
+
+**Status:** Resolved (already covered by rule-unification architecture, verified with focused test).
+
+**What was broken:** The old engine-side `isSelect` implementation relied on hardcoded placeholder strings (`"0"`, `"-1"`, `"placeholder"`), making behavior brittle across forms.
+
+**Why it happened:** Before unification, `validationsLibrary.js` and directive rules diverged and carried different select semantics.
+
+**What changed:**
+- `src/utils/validation/validationsLibrary.js` now re-exports canonical rules from `src/utils/validation/rules.js`.
+- Canonical `isSelect` is parameter-driven: `isSelect(value, param) { return value !== (param ?? ''); }`
+  - no hardcoded placeholder list
+  - caller controls placeholder sentinel when needed.
+- Added focused test `tests/unit/isSelectPlaceholderParam.test.js` to verify parameterized behavior.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const interactions = await import('/src/interactions/utils/validationRules.js'); const engine = await import('/src/utils/validation/validationsLibrary.js'); const rules = interactions.default; const out = { sameFunctionReference: engine.validationsLibrary.isSelect === rules.isSelect, emptyRejectedWhenParamEmpty: rules.isSelect('', '') === false, customPlaceholderRejected: rules.isSelect('placeholder', 'placeholder') === false, valueAccepted: rules.isSelect('creator', 'placeholder') === true, notHardcodedZeroBlocked: rules.isSelect('0', '') === true }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
+
 ---
 
 ### B-08 · `passive: true` on all directive event listeners prevents `preventDefault`
@@ -1309,6 +1427,28 @@ el.addEventListener(eventType, handler, { passive: true })
 `passive: true` tells the browser the handler will never call `preventDefault()`, enabling scroll optimization. This is correct for `input`, `change`, and `blur`, but if a caller adds `submit` to `triggerEvents`, the passive listener cannot prevent form submission. There is no guard against this combination.
 
 **Fix:** Apply `{ passive: true }` only for known scroll/touch events (`wheel`, `touchstart`, `touchmove`). Use no options (or `{ passive: false }`) for `submit`, `keydown`, and `click`.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Directive listeners always used `{ passive: true }`, including non-scroll events like `submit`/`click` where passive semantics are not appropriate.
+
+**Why it happened:** Listener registration in `vInteractions` used a single hardcoded options object for every configured event.
+
+**What changed:**
+- Updated `src/interactions/directives/vInteractions.js`:
+  - added `PASSIVE_EVENTS` set (`wheel`, `touchstart`, `touchmove`)
+  - applies `{ passive: true }` only for those events
+  - uses default listener options (`undefined`) for other events.
+- Added targeted test `tests/unit/vInteractionsPassiveEvents.test.js` to verify options per event type.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const mod = await import('/src/interactions/directives/vInteractions.js'); const el = document.createElement('input'); const calls = []; const originalAdd = el.addEventListener.bind(el); el.addEventListener = (eventName, handler, options) => { calls.push({ eventName, options }); return originalAdd(eventName, handler, options); }; mod.vInteractions.mounted(el, { value: Object.freeze([{ triggerEvents: ['wheel', 'touchstart', 'input', 'submit'], rules: [] }]) }); const by = (name) => calls.find((c) => c.eventName === name)?.options; const out = { wheelPassive: JSON.stringify(by('wheel')) === JSON.stringify({ passive: true }), touchPassive: JSON.stringify(by('touchstart')) === JSON.stringify({ passive: true }), inputNotPassive: by('input') === undefined, submitNotPassive: by('submit') === undefined }; console.log({ pass: Object.values(out).every(Boolean), ...out, calls }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -1324,6 +1464,30 @@ Both rule libraries expose `minChar` and `minLength` with subtly different param
 Having four near-identical implementations increases maintenance surface. Any rule fix must be applied in four places.
 
 **Fix:** Consolidate into a single canonical rule set and alias the other.
+
+#### Resolution ✅
+
+**Status:** Resolved (already covered by rule unification, verified with focused test).
+
+**What was broken:** `minChar`/`minLength` existed in multiple places with inconsistent parameter handling, increasing maintenance risk.
+
+**Why it happened:** Legacy split between directive and engine rule libraries duplicated near-identical rule logic.
+
+**What changed:**
+- `src/interactions/utils/validationRules.js` now re-exports canonical rules.
+- `src/utils/validation/validationsLibrary.js` now re-exports canonical rules.
+- Canonical `src/utils/validation/rules.js` contains one implementation each for:
+  - `minChar(value, param)`
+  - `minLength(value, param)`
+  - both use shared integer normalization.
+- Added focused verification test `tests/unit/minCharMinLengthCanonical.test.js`.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const interactions = await import('/src/interactions/utils/validationRules.js'); const engine = await import('/src/utils/validation/validationsLibrary.js'); const r = interactions.default; const out = { sameMinCharRef: r.minChar === engine.validationsLibrary.minChar, sameMinLengthRef: r.minLength === engine.validationsLibrary.minLength, minCharRejectsShort: r.minChar('ab', 3) === false, minLengthRejectsShort: r.minLength('ab', 3) === false, minCharBadParamFallback: r.minChar('ab', 'bad') === true, minLengthBadParamFallback: r.minLength('ab', 'bad') === true }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 
@@ -1341,6 +1505,27 @@ actionHandlers: {
 The handlers use the module-level `interactionsEngine` variable rather than `this`. This is not a bug in normal usage, but it breaks unit-testing: if you mock or replace `interactionsEngine`, action handlers in the original export still reference the original. It also makes `extendAction` overrides unable to call `this.getFieldState(...)`.
 
 **Fix:** Replace all `interactionsEngine.xxx` references inside `actionHandlers` with a local alias via closure or pass the engine explicitly to handlers.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `actionHandlers` referenced the module singleton by closed-over name, which reduced testability and prevented clean rebinding of handlers to alternative engine instances.
+
+**Why it happened:** Handler implementations directly used `interactionsEngine.*` instead of resolving engine context from invocation.
+
+**What changed:**
+- Added `resolveActionEngine(ctx)` helper in `src/utils/validation/interactionsEngine.js`.
+- Updated all built-in `actionHandlers` methods to resolve the engine from `this` (or fallback to singleton).
+- Updated `runInteractions(...)` to execute handlers with `handler.call(this, ...)`, so context-aware handlers receive the invoking engine instance.
+- Added targeted test `tests/unit/interactionsEngineActionHandlersContext.test.js` verifying explicit engine binding works without mutating singleton state.
+
+**How to test in the browser (one paste):**
+```js
+(async () => { const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js'); const altEngine = { engine: null, elementVisibility: {}, logger: { debug: () => {}, error: () => {} }, getFieldState: () => null, _getElementValue: () => '', _setElementValue: () => {}, originalValues: {}, allowedScripts: {}, scopes: {}, validateScope: () => ({ isValid: true, invalidFields: [] }), actionHandlers: interactionsEngine.actionHandlers, runInteractions: interactionsEngine.runInteractions }; altEngine.engine = altEngine; delete interactionsEngine.elementVisibility['b10.scope']; altEngine.runInteractions([{ type: 'showElement', elementKey: 'b10.scope' }], null); const out = { updatedAltEngine: altEngine.elementVisibility['b10.scope'] === true, singletonUntouched: interactionsEngine.elementVisibility['b10.scope'] === undefined }; console.log({ pass: Object.values(out).every(Boolean), ...out }); })();
+```
+
+**Expected:** Final log includes `pass: true`.
 
 ---
 

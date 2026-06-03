@@ -170,6 +170,7 @@ export function validateWithRequired(el, rulesArr) {
 
 export function stampValidation(el, result) {
   el.setAttribute('validated', result.isValid ? 'true' : 'false')
+  el.setAttribute('aria-invalid', result.isValid ? 'false' : 'true')
   el.setAttribute('data-validation-reason', result.isValid
     ? '{"isValid":true}'
     : JSON.stringify({ isValid: false, failedRules: result.failedRules.map(r => ({ rule: r.rule, error: r.error ?? null })) })

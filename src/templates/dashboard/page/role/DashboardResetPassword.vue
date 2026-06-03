@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onBeforeUnmount, onMounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { interactionsEngine } from "@/utils/validation/interactionsEngine.js";
 import { changeUserPassword, getUserAttributes, adminSetUserPassword } from "@/utils/auth/awsCognitoHandler.js";
@@ -300,6 +300,10 @@ onMounted(async () => {
   } catch (e) {
     console.error("Failed to fetch user attributes", e);
   }
+});
+
+onBeforeUnmount(() => {
+  interactionsEngine.clearScope(SCOPE_ID);
 });
 
 // Submit

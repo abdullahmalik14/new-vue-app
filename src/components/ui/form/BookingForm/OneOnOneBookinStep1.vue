@@ -1,5 +1,5 @@
   <script setup>
-  import { onMounted, ref, watch } from "vue";
+  import { onBeforeUnmount, onMounted, ref, watch } from "vue";
   import CheckboxGroup from "@/components/checkbox/CheckboxGroup.vue";
   import ButtonComponent from "@/components/button/ButtonComponent.vue";
   import BookingSectionsWrapper from "@/components/ui/form/BookingForm/HelperComponents/BookingSectionsWrapper.vue";
@@ -78,6 +78,10 @@
 
     console.log("[DEBUG] Registering eventTitle:", { wrapper, titleElement });
     interactionsEngine.register(eventTitleConfig, formData.value.eventTitle, titleElement);
+  });
+
+  onBeforeUnmount(() => {
+    interactionsEngine.clearScope('oneOnOneBooking');
   });
 
 

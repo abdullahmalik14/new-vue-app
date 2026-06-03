@@ -737,6 +737,8 @@ onBeforeUnmount(() => {
     assetHandler.value.dispose();
   }
 
+  interactionsEngine.clearScope(SCOPE_ID);
+
   window.removeEventListener("message", handleTwitterAuthMessage);
   window.removeEventListener("message", handleTelegramAuthMessage);
   // Cleanup Twitter popup check interval

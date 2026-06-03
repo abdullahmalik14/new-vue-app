@@ -22,6 +22,16 @@ function canSetAttribute(name, value, trusted = false) {
   return true;
 }
 
+function resolveActionEngine(ctx) {
+  if (ctx && typeof ctx === 'object' && 'engine' in ctx && ctx.engine) {
+    return ctx.engine;
+  }
+  if (ctx && typeof ctx === 'object' && 'elementVisibility' in ctx && 'logger' in ctx) {
+    return ctx;
+  }
+  return interactionsEngine;
+}
+
 export const interactionsEngine = {
   scopes: reactive({}),
   elementVisibility: reactive({}),
@@ -36,6 +46,7 @@ export const interactionsEngine = {
 
   actionHandlers: {
     showElement(action) {
+      const interactionsEngine = resolveActionEngine(this);
       const key = action.elementKey;
       if (!key) return;
       interactionsEngine.elementVisibility[key] = true;
@@ -43,6 +54,7 @@ export const interactionsEngine = {
     },
 
     hideElement(action) {
+      const interactionsEngine = resolveActionEngine(this);
       const key = action.elementKey;
       if (!key) return;
       interactionsEngine.elementVisibility[key] = false;
@@ -50,6 +62,7 @@ export const interactionsEngine = {
     },
 
     toggleElementVisibility(action) {
+      const interactionsEngine = resolveActionEngine(this);
       const key = action.elementKey;
       if (!key) return;
       const current = !!interactionsEngine.elementVisibility[key];
@@ -63,6 +76,7 @@ export const interactionsEngine = {
     },
 
     toggleFieldMeta(action, fieldState, fieldConfig) {
+      const interactionsEngine = resolveActionEngine(this);
       if (!fieldState) return;
       const key = action.metaKey;
       if (!key) return;
@@ -79,6 +93,7 @@ export const interactionsEngine = {
     },
 
     showBrowserError(action, fieldState, fieldConfig) {
+      const interactionsEngine = resolveActionEngine(this);
       const element = fieldState?.element || action.element;
       if (!element || !element.setCustomValidity || !element.reportValidity) return;
 
@@ -126,6 +141,7 @@ export const interactionsEngine = {
     },
 
     setType(action, fieldState, fieldConfig) {
+      const interactionsEngine = resolveActionEngine(this);
       const element = fieldState?.element || action.element;
       if (!element || !action.inputType) return;
 
@@ -134,6 +150,7 @@ export const interactionsEngine = {
     },
 
     attribute(action, fieldState, fieldConfig) {
+      const interactionsEngine = resolveActionEngine(this);
       const element = fieldState?.element || action.element;
       if (!element || !action.attributeName) return;
 
@@ -166,6 +183,7 @@ export const interactionsEngine = {
     },
 
     pushEvent(action) {
+      const interactionsEngine = resolveActionEngine(this);
       if (!action.eventName) return;
 
       const event = new CustomEvent(action.eventName, {
@@ -185,6 +203,7 @@ export const interactionsEngine = {
     },
 
     script(action) {
+      const interactionsEngine = resolveActionEngine(this);
       if (!action.code && !action.functionName) return;
 
       try {
@@ -209,6 +228,7 @@ export const interactionsEngine = {
     },
 
     setHTML(action, fieldState, fieldConfig) {
+      const interactionsEngine = resolveActionEngine(this);
       let targetElement = null;
 
       // Determine target element
@@ -254,6 +274,7 @@ export const interactionsEngine = {
     },
 
     sync(action, fieldState, fieldConfig) {
+      const interactionsEngine = resolveActionEngine(this);
       if (!fieldState) return;
 
       const sourceElement = fieldState.element || action.element;
@@ -348,6 +369,7 @@ export const interactionsEngine = {
     },
 
     restore(action, fieldState, fieldConfig) {
+      const interactionsEngine = resolveActionEngine(this);
       // Get target element
       let targetElement = null;
       let targetState = null;
@@ -401,6 +423,7 @@ export const interactionsEngine = {
     },
 
     commit(action, fieldState, fieldConfig) {
+      const interactionsEngine = resolveActionEngine(this);
       // Get target element
       let targetElement = null;
 
@@ -428,6 +451,7 @@ export const interactionsEngine = {
     },
 
     showValidationErrors(action, fieldState, fieldConfig) {
+      const interactionsEngine = resolveActionEngine(this);
       // Collect all validation errors and display them in a textarea
       if (!action.scopeId) {
         interactionsEngine.logger.error('showValidationErrors: scopeId is required', action);
@@ -628,6 +652,63 @@ export const interactionsEngine = {
     this.logger.debug('unregisterScriptFunction', name);
   },
 
+  unregister(fieldConfig) {
+    if (!fieldConfig || !fieldConfig.scope || !fieldConfig.id) {
+      this.logger.error('unregister: invalid fieldConfig', fieldConfig);
+      return;
+    }
+
+    const scopeId = fieldConfig.scope;
+    const fieldId = fieldConfig.id;
+    const scope = this.scopes[scopeId];
+    if (!scope || !scope.fields || !scope.fields[fieldId]) return;
+
+    delete scope.fields[fieldId];
+
+    const timerKey = `${scopeId}:${fieldId}`;
+    const existingTimer = this._debounceTimers[timerKey];
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      delete this._debounceTimers[timerKey];
+    }
+
+    this.logger.debug('unregister', scopeId, fieldId);
+
+    if (Object.keys(scope.fields).length === 0) {
+      this.clearScope(scopeId);
+    }
+  },
+
+  clearScope(scopeId) {
+    if (!scopeId) return;
+
+    if (this.scopes[scopeId]) {
+      delete this.scopes[scopeId];
+    }
+
+    const scopePrefix = `${scopeId}:`;
+    Object.keys(this._debounceTimers).forEach((timerKey) => {
+      if (!timerKey.startsWith(scopePrefix)) return;
+      clearTimeout(this._debounceTimers[timerKey]);
+      delete this._debounceTimers[timerKey];
+    });
+
+    const keyPrefixes = [`${scopeId}_`, `${scopeId}:`, `${scopeId}.`];
+    Object.keys(this.originalValues).forEach((key) => {
+      if (keyPrefixes.some(prefix => key.startsWith(prefix))) {
+        delete this.originalValues[key];
+      }
+    });
+
+    Object.keys(this.elementVisibility).forEach((key) => {
+      if (keyPrefixes.some(prefix => key.startsWith(prefix))) {
+        delete this.elementVisibility[key];
+      }
+    });
+
+    this.logger.debug('clearScope', scopeId);
+  },
+
   register(fieldConfig, initialValue, element) {
     if (!fieldConfig || !fieldConfig.scope || !fieldConfig.id) {
       this.logger.error('register: invalid fieldConfig', fieldConfig);
@@ -639,6 +720,13 @@ export const interactionsEngine = {
 
     if (!this.scopes[scopeId]) {
       this.scopes[scopeId] = { fields: {} };
+    }
+
+    if (this.scopes[scopeId]?.fields[fieldId]) {
+      if (import.meta.env?.DEV) {
+        console.warn(`[InteractionsEngine] Field already registered: ${scopeId}.${fieldId}. Call unregister first.`);
+      }
+      return;
     }
 
     this.scopes[scopeId].fields[fieldId] = reactive({
@@ -895,7 +983,6 @@ export const interactionsEngine = {
     // TODO: implement real DOM scrolling/focus.
     // For now: this is a stub so another layer can hook into it.
     this.logger.debug('jumpToFieldPlaceholder called for', scopeId, fieldId);
-    console.log('[InteractionsEngine] jumpToFieldPlaceholder called for', scopeId, fieldId);
   },
 
   getInputType(fieldConfig, baseType) {
@@ -923,7 +1010,7 @@ export const interactionsEngine = {
         this.logger.error('runInteractions: unknown action type', action.type, action);
         continue;
       }
-      handler(action, state, fieldConfig);
+      handler.call(this, action, state, fieldConfig);
     }
   },
 

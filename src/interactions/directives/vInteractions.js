@@ -32,6 +32,7 @@ import {
 } from '../utils/engine'
 
 const CLEANUP = Symbol('v-interactions:cleanup')
+const PASSIVE_EVENTS = new Set(['wheel', 'touchstart', 'touchmove'])
 
 export const vInteractions = {
   mounted(el, binding) {
@@ -71,7 +72,8 @@ function wire(el, value) {
     for (let j = 0; j < events.length; j++) {
       const eventType = events[j]
       const handler = () => handleInteraction(el, cfg, scope)
-      el.addEventListener(eventType, handler, { passive: true })
+      const options = PASSIVE_EVENTS.has(eventType) ? { passive: true } : undefined
+      el.addEventListener(eventType, handler, options)
       cleanups.push(() => el.removeEventListener(eventType, handler))
     }
   }
