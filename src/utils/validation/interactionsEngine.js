@@ -1,10 +1,32 @@
 import { reactive } from 'vue';
 import { validationEngine } from './validationEngine.js';
 
+function isUnsafeAttributeName(name) {
+  return /^on/i.test(name);
+}
+
+function isUrlLikeAttribute(name) {
+  return ['href', 'src', 'action', 'formaction', 'xlink:href'].includes(String(name).toLowerCase());
+}
+
+function isUnsafeUrlValue(value) {
+  if (value === null || value === undefined) return false;
+  const normalized = String(value).trim().toLowerCase();
+  return normalized.startsWith('javascript:') || normalized.startsWith('data:text/html');
+}
+
+function canSetAttribute(name, value, trusted = false) {
+  if (!name) return false;
+  if (isUnsafeAttributeName(name)) return false;
+  if (!trusted && isUrlLikeAttribute(name) && isUnsafeUrlValue(value)) return false;
+  return true;
+}
+
 export const interactionsEngine = {
   scopes: reactive({}),
   elementVisibility: reactive({}),
   originalValues: reactive({}), // For sync-with-restore: stores original values before sync
+  allowedScripts: Object.create(null),
 
   logger: {
     debug: (...args) => console.debug('[InteractionsEngine]', ...args),
@@ -67,34 +89,36 @@ export const interactionsEngine = {
       const hadRequired = element.hasAttribute('required');
       const hadDataRequired = element.hasAttribute('data-required');
 
-      // Remove HTML required attribute to prevent browser's native required validation
-      element.removeAttribute('required');
+      try {
+        // Remove HTML required attribute to prevent browser's native required validation
+        element.removeAttribute('required');
 
-      // Temporarily change type from "email" to "text" to prevent browser's native email validation
-      // This ensures our custom message is shown instead of browser's default email validation message
-      if (originalType === 'email') {
-        element.type = 'text';
-      }
+        // Temporarily change type from "email" to "text" to prevent browser's native email validation
+        // This ensures our custom message is shown instead of browser's default email validation message
+        if (originalType === 'email') {
+          element.type = 'text';
+        }
 
-      // Clear any existing validation state first
-      element.setCustomValidity('');
+        // Clear any existing validation state first
+        element.setCustomValidity('');
 
-      // Set our custom message - this will override browser's native validation messages
-      // Setting a non-empty custom validity message makes the element invalid
-      element.setCustomValidity(message);
+        // Set our custom message - this will override browser's native validation messages
+        // Setting a non-empty custom validity message makes the element invalid
+        element.setCustomValidity(message);
 
-      // Trigger browser validation popup with our custom message
-      // This will show the custom message we set via setCustomValidity
-      element.reportValidity();
+        // Trigger browser validation popup with our custom message
+        // This will show the custom message we set via setCustomValidity
+        element.reportValidity();
+      } finally {
+        // Restore original input type even if reportValidity throws
+        if (originalType === 'email') {
+          element.type = originalType;
+        }
 
-      // Restore original input type after showing the error
-      if (originalType === 'email') {
-        element.type = originalType;
-      }
-
-      // Restore required attribute if it was there (but keep data-required for our validation)
-      if (hadRequired) {
-        element.setAttribute('required', '');
+        // Restore required attribute if it was there (but keep data-required for our validation)
+        if (hadRequired) {
+          element.setAttribute('required', '');
+        }
       }
 
       interactionsEngine.logger.debug('showBrowserError', { message, originalType, hadRequired });
@@ -123,10 +147,18 @@ export const interactionsEngine = {
         if (hasAttr) {
           element.removeAttribute(name);
         } else {
+          if (!canSetAttribute(name, value || '', action.trusted === true)) {
+            interactionsEngine.logger.error('attribute toggle rejected: unsafe attribute', name);
+            return;
+          }
           element.setAttribute(name, value || '');
         }
         interactionsEngine.logger.debug('attribute toggle', name, !hasAttr);
       } else {
+        if (!canSetAttribute(name, value || '', action.trusted === true)) {
+          interactionsEngine.logger.error('attribute set rejected: unsafe attribute', name);
+          return;
+        }
         element.setAttribute(name, value || '');
         interactionsEngine.logger.debug('attribute set', name, value);
       }
@@ -156,10 +188,18 @@ export const interactionsEngine = {
 
       try {
         if (action.code) {
-          // eslint-disable-next-line no-eval
-          eval(action.code);
-        } else if (action.functionName && typeof window[action.functionName] === 'function') {
-          window[action.functionName](...action.args || []);
+          interactionsEngine.logger.error('script action rejected: inline code execution is disabled');
+          return;
+        }
+
+        if (action.functionName) {
+          const allowedFn = interactionsEngine.allowedScripts[action.functionName];
+          if (typeof allowedFn === 'function') {
+            allowedFn(...(action.args || []));
+          } else {
+            interactionsEngine.logger.error('script action rejected: function is not allowlisted', action.functionName);
+            return;
+          }
         }
         interactionsEngine.logger.debug('script executed', action.functionName || 'code');
       } catch (error) {
@@ -207,7 +247,8 @@ export const interactionsEngine = {
         htmlValue = action.format.replace(/\{value\}/g, htmlValue);
       }
 
-      targetElement.innerHTML = htmlValue;
+      if (action.trustedHTML === true) targetElement.innerHTML = htmlValue;
+      else targetElement.textContent = String(htmlValue);
       interactionsEngine.logger.debug('setHTML', htmlValue?.substring(0, 50));
     },
 
@@ -560,6 +601,21 @@ export const interactionsEngine = {
   extendAction(type, handlerFn) {
     this.actionHandlers[type] = handlerFn;
     this.logger.debug('extendAction', type);
+  },
+
+  registerScriptFunction(name, handlerFn) {
+    if (!name || typeof handlerFn !== 'function') {
+      this.logger.error('registerScriptFunction: invalid args', { name, type: typeof handlerFn });
+      return;
+    }
+    this.allowedScripts[name] = handlerFn;
+    this.logger.debug('registerScriptFunction', name);
+  },
+
+  unregisterScriptFunction(name) {
+    if (!name) return;
+    delete this.allowedScripts[name];
+    this.logger.debug('unregisterScriptFunction', name);
   },
 
   register(fieldConfig, initialValue, element) {

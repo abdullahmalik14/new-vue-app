@@ -220,9 +220,11 @@ export const rules = {
 
   jsObjectExists(_value, path) {
     if (typeof path !== 'string' || !path.trim()) return false;
+    const normalizedPath = path.trim();
+    if (!normalizedPath.startsWith('AppGlobals')) return false;
     try {
       let current = window;
-      for (const key of path.split('.')) {
+      for (const key of normalizedPath.split('.')) {
         if (!(key in current)) return false;
         current = current[key];
       }

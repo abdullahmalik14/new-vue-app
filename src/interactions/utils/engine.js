@@ -33,6 +33,27 @@ let   _idCounter = 0
 
 const FIELD_SEL = 'input:not([type=submit]):not([type=button]):not([type=reset]):not([type=image]), select, textarea'
 
+function isUnsafeAttributeName(name) {
+  return /^on/i.test(name);
+}
+
+function isUrlLikeAttribute(name) {
+  return ['href', 'src', 'action', 'formaction', 'xlink:href'].includes(String(name).toLowerCase());
+}
+
+function isUnsafeUrlValue(value) {
+  if (value === null || value === undefined) return false;
+  const normalized = String(value).trim().toLowerCase();
+  return normalized.startsWith('javascript:') || normalized.startsWith('data:text/html');
+}
+
+function canSetAttribute(name, value, trusted = false) {
+  if (!name) return false;
+  if (isUnsafeAttributeName(name)) return false;
+  if (!trusted && isUrlLikeAttribute(name) && isUnsafeUrlValue(value)) return false;
+  return true;
+}
+
 // ─── Config helpers ────────────────────────────────────────────────────────────
 
 export function safeParseConfig(raw) {
@@ -223,7 +244,15 @@ function execAction(action, el, scope) {
     }
     case 'attribute': {
       const target = t(); if (!target) break
-      if (action.add)         Object.entries(action.add).forEach(([a, v]) => target.setAttribute(a, v))
+      if (action.add) {
+        Object.entries(action.add).forEach(([a, v]) => {
+          if (canSetAttribute(a, v, action.trusted === true)) {
+            target.setAttribute(a, v)
+          } else if (import.meta.env?.DEV) {
+            console.warn('[interactions] blocked unsafe attribute:', a)
+          }
+        })
+      }
       if (action.remove)      action.remove.forEach(a => target.removeAttribute(a))
       if (action.addClass)    target.classList.add(...[].concat(action.addClass))
       if (action.removeClass) target.classList.remove(...[].concat(action.removeClass))
@@ -245,7 +274,13 @@ function execAction(action, el, scope) {
       break
     }
     case 'setType': { const target = t(); if (target) target.setAttribute('type', action.value); break }
-    case 'setHTML': { const target = t(); if (target) target.innerHTML = action.value ?? ''; break }
+    case 'setHTML': {
+      const target = t(); if (!target) break
+      const value = action.value ?? ''
+      if (action.trustedHTML === true) target.innerHTML = value
+      else target.textContent = value
+      break
+    }
 
     case 'cloneValue': {
       const target = t(); if (!target) break

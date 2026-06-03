@@ -679,6 +679,44 @@ if (action.functionName && ALLOWED_SCRIPTS[action.functionName]) {
 }
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `interactionsEngine.actionHandlers.script` executed arbitrary inline code via `eval` and could also call any global function by name.
+
+**Why it happened:** Script action accepted unrestricted config (`action.code` / `window[action.functionName]`) without allowlisting.
+
+**What changed:**
+- Removed inline code execution path (`eval`) and now reject `action.code`.
+- Added allowlist API on `interactionsEngine`:
+  - `registerScriptFunction(name, fn)`
+  - `unregisterScriptFunction(name)`
+  - internal `allowedScripts` registry.
+- `script` action now executes only allowlisted function names.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
+  window.__auditInlineExec = 0;
+  interactionsEngine.actionHandlers.script({ code: 'window.__auditInlineExec = 1' });
+
+  window.__safeCallCount = 0;
+  interactionsEngine.registerScriptFunction('auditSafeFn', () => { window.__safeCallCount += 1; });
+  interactionsEngine.actionHandlers.script({ functionName: 'auditSafeFn' });
+
+  const out = {
+    inlineCodeBlocked: window.__auditInlineExec === 0,
+    allowlistedFunctionRuns: window.__safeCallCount === 1,
+  };
+  interactionsEngine.unregisterScriptFunction('auditSafeFn');
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### S-02 · `setHTML` action writes unsanitized HTML to the DOM
@@ -696,6 +734,44 @@ targetElement.innerHTML = htmlValue;
 `innerHTML` assignment allows injection of arbitrary HTML including `<script>` tags and event-handler attributes (e.g., `<img onerror="..."/>`). If `action.value` / `htmlValue` ever contains data derived from user input, API responses, or URL parameters, this is a stored or reflected XSS vulnerability.
 
 **Fix:** Use `textContent` for plain text, or sanitize with DOMPurify before assigning `innerHTML`. Add a config flag `trustedHTML: true` to make the risk explicit.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `setHTML` in both engines wrote directly to `innerHTML` by default, allowing unsafe HTML injection.
+
+**Why it happened:** Action handlers treated all incoming values as trusted HTML.
+
+**What changed:**
+- `src/interactions/utils/engine.js`:
+  - `setHTML` now defaults to `textContent`.
+  - optional `trustedHTML: true` enables explicit `innerHTML`.
+- `src/utils/validation/interactionsEngine.js`:
+  - same default-safe behavior and `trustedHTML` opt-in.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const directive = await import('/src/interactions/utils/engine.js');
+  const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
+  const host = document.createElement('div');
+  host.innerHTML = '<div id="t1"></div><div id="t2"></div>';
+  document.body.appendChild(host);
+
+  directive.execActions({ actionType: 'setHTML', targetSelector: '#t1', value: '<b>unsafe</b>' }, host, host);
+  interactionsEngine.actionHandlers.setHTML({ html: '<i>unsafe</i>' }, { element: host.querySelector('#t2') }, {});
+
+  const out = {
+    directiveSafeDefault: host.querySelector('#t1').textContent === '<b>unsafe</b>',
+    engineSafeDefault: host.querySelector('#t2').textContent === '<i>unsafe</i>',
+  };
+  host.remove();
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -715,6 +791,54 @@ There is no filtering of attribute names. An attacker who can control the config
 
 **Fix:** Validate attribute names against an allowlist (e.g., `class`, `style`, `data-*`, `aria-*`, `disabled`, `hidden`, `placeholder`) and block `on*` and protocol-carrying attributes (`href`, `src`, `action`) unless explicitly trusted.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Attribute actions could set unsafe attributes (e.g., `onclick`) and unsafe URL values (e.g., `javascript:`).
+
+**Why it happened:** No attribute safety checks were performed before `setAttribute`.
+
+**What changed:**
+- Added shared safety checks in both engines for attribute actions:
+  - block `on*` attributes
+  - block unsafe URL protocols on url-like attributes unless `trusted: true`
+- Unsafe attempts are rejected and logged.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const directive = await import('/src/interactions/utils/engine.js');
+  const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
+  const host = document.createElement('div');
+  host.innerHTML = '<a id="link1"></a><a id="link2"></a>';
+  document.body.appendChild(host);
+
+  directive.execActions({
+    actionType: 'attribute',
+    targetSelector: '#link1',
+    add: { onclick: 'alert(1)', href: 'javascript:alert(1)', 'data-safe': 'ok' },
+  }, host, host);
+
+  interactionsEngine.actionHandlers.attribute(
+    { attributeName: 'onclick', attributeValue: 'alert(1)' },
+    { element: host.querySelector('#link2') },
+    {},
+  );
+
+  const out = {
+    directiveBlocksOnclick: !host.querySelector('#link1').hasAttribute('onclick'),
+    directiveBlocksJsHref: host.querySelector('#link1').getAttribute('href') === null,
+    directiveKeepsSafeAttr: host.querySelector('#link1').getAttribute('data-safe') === 'ok',
+    engineBlocksOnclick: !host.querySelector('#link2').hasAttribute('onclick'),
+  };
+  host.remove();
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### S-04 · `jsObjectExists` probes arbitrary `window` property paths
@@ -731,6 +855,31 @@ jsObjectExists: (_v, param) => {
 `param` is a dot-delimited path string from config. Any config author (or XSS attacker who can influence config) can traverse arbitrary window properties: `window.__vue_app__`, `window.__webpack_modules__`, sensitive globals. While this doesn't modify state, it leaks internal object structure.
 
 **Fix:** Restrict traversal to a declared namespace (e.g., `window.AppGlobals.*`) rather than the entire `window` object.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `jsObjectExists` allowed probing arbitrary `window` paths.
+
+**Why it happened:** Rule started traversal directly from `window` with no namespace restriction.
+
+**What changed:** In canonical rules (`src/utils/validation/rules.js`), `jsObjectExists` now requires paths to start with `AppGlobals` and rejects all other roots.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { default: rules } = await import('/src/interactions/utils/validationRules.js');
+  window.AppGlobals = { audit: { enabled: true } };
+  const out = {
+    appGlobalsAllowed: rules.jsObjectExists('', 'AppGlobals.audit.enabled') === true,
+    arbitraryWindowBlocked: rules.jsObjectExists('', '__vue_app__.config') === false,
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -752,6 +901,40 @@ if (originalType === 'email') {
 If `reportValidity()` throws (which it can in certain detached-DOM or sandboxed-frame scenarios), `element.type` is not restored, leaving an email field permanently behaving as a text field. This can silently disable browser-native format hinting.
 
 **Fix:** Wrap the entire block in `try/finally` to guarantee type restoration.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** If `reportValidity()` threw inside `showBrowserError`, input type/required restoration was skipped.
+
+**Why it happened:** Restoration logic was outside exception-safe cleanup.
+
+**What changed:** Wrapped mutation/reporting flow in `try/finally` so original input `type` and required attribute are always restored.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
+  const el = document.createElement('input');
+  el.type = 'email';
+  el.setAttribute('required', '');
+  el.setCustomValidity = () => {};
+  el.reportValidity = () => { throw new Error('boom'); };
+
+  try {
+    interactionsEngine.actionHandlers.showBrowserError({}, { element: el }, {});
+  } catch (_) {}
+
+  const out = {
+    typeRestored: el.type === 'email',
+    requiredRestored: el.hasAttribute('required'),
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
