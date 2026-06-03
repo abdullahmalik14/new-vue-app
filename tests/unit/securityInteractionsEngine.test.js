@@ -65,4 +65,49 @@ describe('interactionsEngine security hardening', () => {
     interactionsEngine.actionHandlers.setHTML({ html: '<b>x</b>', trustedHTML: true }, { element: el }, {});
     expect(el.innerHTML).toBe('<b>x</b>');
   });
+
+  it('iterates only own scope field keys', () => {
+    interactionsEngine.scopes.audit = { fields: Object.create({ inheritedField: { value: 'x' } }) };
+    interactionsEngine.scopes.audit.fields.ownField = {
+      value: 'ok',
+      validationConfig: { rules: [] },
+      element: null,
+      isValid: true,
+      failedRules: [],
+    };
+
+    const summary = interactionsEngine.validateScope('audit');
+    expect(summary.invalidFields.some((f) => f.fieldId === 'inheritedField')).toBe(false);
+  });
+
+  it('showValidationErrors resolves labels via prebuilt label map', () => {
+    const email = document.createElement('input');
+    email.id = 'emailField';
+    email.value = '';
+    email.setAttribute('required', '');
+    const label = document.createElement('label');
+    label.setAttribute('for', 'emailField');
+    label.textContent = 'Email Address';
+    const output = document.createElement('textarea');
+    output.setAttribute('data-error-display', '');
+    document.body.appendChild(label);
+    document.body.appendChild(email);
+    document.body.appendChild(output);
+
+    interactionsEngine.scopes.formA = {
+      fields: {
+        email: {
+          value: '',
+          validationConfig: { required: true, rules: [] },
+          element: email,
+          isValid: true,
+          failedRules: [],
+          meta: {},
+        },
+      },
+    };
+
+    interactionsEngine.actionHandlers.showValidationErrors({ scopeId: 'formA', scroll: false }, null, null);
+    expect(output.value.includes('Email Address')).toBe(true);
+  });
 });

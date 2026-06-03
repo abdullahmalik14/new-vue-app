@@ -958,6 +958,32 @@ for (const fieldId in scope.fields) {
 
 **Fix:** Replace with `for (const fieldId of Object.keys(scope.fields))` in all three locations.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Scope iteration used `for...in`, which can include inherited enumerable properties and produce invalid field processing.
+
+**Why it happened:** Loops iterated object prototypes instead of own field keys only.
+
+**What changed:** Replaced scope field loops with `Object.keys(scope.fields)` iteration in `src/utils/validation/interactionsEngine.js` where scope field traversal occurs.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
+  interactionsEngine.scopes.audit = { fields: Object.create({ inheritedField: { value: 'x' } }) };
+  interactionsEngine.scopes.audit.fields.ownField = { value: 'ok', validationConfig: { rules: [] }, element: null, isValid: true, failedRules: [] };
+  const summary = interactionsEngine.validateScope('audit');
+  const out = {
+    inheritedNotIterated: !summary.invalidFields.some((f) => f.fieldId === 'inheritedField'),
+  };
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### P-03 · `_selectorCache` eviction is FIFO, not LRU
@@ -983,6 +1009,34 @@ if (el) {
 }
 ```
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Selector cache eviction policy behaved as FIFO and did not refresh entries on cache hits.
+
+**Why it happened:** Cache-hit path returned immediately without re-inserting key/value to update recency order.
+
+**What changed:** In `src/interactions/utils/engine.js`, cache-hit branch now does LRU refresh (`delete` + `set`) before returning the element.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { execActions } = await import('/src/interactions/utils/engine.js');
+  const host = document.createElement('div');
+  host.innerHTML = '<div id="target"></div><input id="field" value="abc">';
+  document.body.appendChild(host);
+  const field = host.querySelector('#field');
+  execActions({ actionType: 'cloneValue', targetSelector: '#target' }, field, host);
+  execActions({ actionType: 'cloneValue', targetSelector: '#target' }, field, host); // second hit refreshes LRU position
+  const out = { repeatedHitWorks: host.querySelector('#target').textContent === 'abc' };
+  host.remove();
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
+
 ---
 
 ### P-04 · `showValidationErrors` performs DOM label lookups inside a loop
@@ -999,6 +1053,46 @@ summary.invalidFields.forEach((invalidField, index) => {
 Each invalid field triggers one or two `document.querySelector` calls during an already O(n) loop. For a form with 20 invalid fields this is 20–40 synchronous DOM queries, each potentially forcing a full selector traversal.
 
 **Fix:** Pre-build a `Map<elementId, labelText>` from `document.querySelectorAll('label[for]')` once before the loop.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `showValidationErrors` did repeated DOM label queries inside the invalid-field loop.
+
+**Why it happened:** Label lookups were performed per field with `document.querySelector(...)` instead of using a precomputed lookup map.
+
+**What changed:** In `src/utils/validation/interactionsEngine.js`, `showValidationErrors` now prebuilds `labelByFor` once from `label[for]` and uses O(1) lookups by element ID.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
+  const email = document.createElement('input');
+  email.id = 'emailField';
+  email.value = '';
+  email.setAttribute('required', '');
+  const label = document.createElement('label');
+  label.setAttribute('for', 'emailField');
+  label.textContent = 'Email Address';
+  const output = document.createElement('textarea');
+  output.setAttribute('data-error-display', '');
+  document.body.append(label, email, output);
+
+  interactionsEngine.scopes.formA = {
+    fields: {
+      email: { value: '', validationConfig: { required: true, rules: [] }, element: email, isValid: true, failedRules: [], meta: {} },
+    },
+  };
+
+  interactionsEngine.actionHandlers.showValidationErrors({ scopeId: 'formA', scroll: false }, null, null);
+  const out = { labelUsedFromMap: output.value.includes('Email Address') };
+  label.remove(); email.remove(); output.remove();
+  console.log({ pass: Object.values(out).every(Boolean), ...out });
+})();
+```
+
+**Expected:** `pass: true`.
 
 ---
 
@@ -1018,6 +1112,31 @@ Config objects passed as `binding.value` are frozen on first parse and cached by
 
 **Fix:** Document that configs *must* be defined outside `<template>` or in `setup()` with `shallowRef` / `Object.freeze` applied by the caller, and add a DEV-mode warning if a non-frozen object is passed.
 
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** Re-created config object references could trigger repeated deepFreeze work, especially when configs are inline literals.
+
+**Why it happened:** Parsing cache is reference-based; fresh object references bypass WeakMap cache.
+
+**What changed:** Added DEV warning in `safeParseConfig(...)` (`src/interactions/utils/engine.js`) when the provided config object is not frozen, guiding callers to freeze/memoize configs.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const mod = await import('/src/interactions/utils/engine.js');
+  const warn = console.warn;
+  let warned = false;
+  console.warn = (...args) => { warned = true; warn(...args); };
+  mod.safeParseConfig([{ rules: [{ type: 'hasContent' }] }]);
+  console.warn = warn;
+  console.log({ pass: warned, warned });
+})();
+```
+
+**Expected:** `pass: true` and one warning about non-frozen config.
+
 ---
 
 ### P-06 · `processFieldChange` validates on every keystroke with no debounce
@@ -1027,6 +1146,42 @@ Config objects passed as `binding.value` are frozen on first parse and cached by
 Every `@input` event fires `validationEngine.validateField()` synchronously. For fields with many rules (e.g., a password field with 5 complexity rules), this is acceptable. But `custom` rule support (`validationsLibrary.custom`) allows an arbitrary function, meaning a slow custom validator runs on every keystroke.
 
 **Fix:** Add an optional `debounceMs` field to `fieldConfig`. Provide a built-in debounce wrapper in `processFieldChange`.
+
+#### Resolution ✅
+
+**Status:** Resolved.
+
+**What was broken:** `processFieldChange` validated synchronously on every keystroke with no built-in debounce option.
+
+**Why it happened:** Input pipeline always executed validation/actions immediately per event.
+
+**What changed:** In `src/utils/validation/interactionsEngine.js`, added optional `fieldConfig.debounceMs` support:
+- uses per-field timer key (`scope:id`)
+- clears prior timer on new keystroke
+- runs original validation/action pipeline only after debounce delay
+- preserves existing immediate behavior when `debounceMs` is unset/invalid.
+
+**How to test in the browser (one paste):**
+```js
+(async () => {
+  const { interactionsEngine } = await import('/src/utils/validation/interactionsEngine.js');
+  interactionsEngine.scopes.demo = {
+    fields: {
+      name: { value: '', isValid: true, failedRules: [], validationConfig: { rules: [{ type: 'minLength', param: 3 }] }, meta: {}, element: null },
+    },
+  };
+  const cfg = { scope: 'demo', id: 'name', debounceMs: 100, events: { input: {} } };
+  interactionsEngine.processFieldChange(cfg, 'a');
+  interactionsEngine.processFieldChange(cfg, 'ab');
+  interactionsEngine.processFieldChange(cfg, 'abc');
+  setTimeout(() => {
+    const state = interactionsEngine.scopes.demo.fields.name;
+    console.log({ pass: state.value === 'abc' && state.isValid === true, value: state.value, isValid: state.isValid });
+  }, 130);
+})();
+```
+
+**Expected:** Final log shows `pass: true` after debounce delay.
 
 --
 

@@ -27,6 +27,7 @@ export const interactionsEngine = {
   elementVisibility: reactive({}),
   originalValues: reactive({}), // For sync-with-restore: stores original values before sync
   allowedScripts: Object.create(null),
+  _debounceTimers: Object.create(null),
 
   logger: {
     debug: (...args) => console.debug('[InteractionsEngine]', ...args),
@@ -521,6 +522,12 @@ export const interactionsEngine = {
       if (!summary.isValid && summary.invalidFields && summary.invalidFields.length > 0) {
         // Get field labels/names if available
         const scope = interactionsEngine.scopes[action.scopeId];
+        const labelByFor = new Map(
+          Array.from(document.querySelectorAll('label[for]')).map((label) => [
+            label.getAttribute('for'),
+            (label.textContent || '').trim(),
+          ]),
+        );
 
         errorText = 'Validation Errors:\n\n';
 
@@ -533,13 +540,16 @@ export const interactionsEngine = {
           if (fieldState?.element) {
             // Try to find label associated with the field
             const element = fieldState.element;
-            const labelElement = element.id
-              ? document.querySelector(`label[for="${element.id}"]`)
-              : element.closest('.form-group')?.querySelector('label');
-
-            if (labelElement) {
-              fieldLabel = labelElement.textContent.trim() || fieldId;
-            } else if (element.placeholder) {
+            const linkedLabel = element.id ? labelByFor.get(element.id) : null;
+            const formGroupLabel = element.closest('.form-group')?.querySelector('label');
+            if (linkedLabel) {
+              fieldLabel = linkedLabel || fieldId;
+            } else {
+              if (formGroupLabel) fieldLabel = formGroupLabel.textContent.trim() || fieldId;
+            }
+            if (!linkedLabel && !formGroupLabel && element.placeholder) {
+              fieldLabel = element.placeholder;
+            } else if (!linkedLabel && element.placeholder && fieldLabel === fieldId) {
               fieldLabel = element.placeholder;
             }
           }
@@ -704,7 +714,7 @@ export const interactionsEngine = {
 
     const invalidFields = [];
 
-    for (const fieldId in scope.fields) {
+    for (const fieldId of Object.keys(scope.fields)) {
       const fieldState = scope.fields[fieldId];
       const result = validationEngine.validateField(
         fieldState.value,
@@ -758,7 +768,7 @@ export const interactionsEngine = {
 
     const blockingFields = [];
 
-    for (const fieldId in scope.fields) {
+    for (const fieldId of Object.keys(scope.fields)) {
       const fieldState = scope.fields[fieldId];
 
       // Validate the field first
@@ -926,48 +936,63 @@ export const interactionsEngine = {
 
     state.value = newValue;
 
-    const validateOnInput = fieldConfig.validateOnInput !== false;
+    const runPipeline = () => {
+      const validateOnInput = fieldConfig.validateOnInput !== false;
+      const inputEvents = (fieldConfig.events && fieldConfig.events.input) || {};
 
-    if (validateOnInput) {
-      const result = validationEngine.validateField(
-        newValue,
-        state.validationConfig,
-        {
-          scope: fieldConfig.scope,
-          fieldId: fieldConfig.id,
-          element: state.element,
-          getFieldValue: (scope, fieldId) => {
-            const fieldState = this.getFieldState({ scope, id: fieldId });
-            return fieldState ? fieldState.value : null;
+      if (validateOnInput) {
+        const result = validationEngine.validateField(
+          newValue,
+          state.validationConfig,
+          {
+            scope: fieldConfig.scope,
+            fieldId: fieldConfig.id,
+            element: state.element,
+            getFieldValue: (scope, fieldId) => {
+              const fieldState = this.getFieldState({ scope, id: fieldId });
+              return fieldState ? fieldState.value : null;
+            }
           }
+        );
+
+        state.isValid = result.isValid;
+        state.failedRules = result.failedRules;
+
+        this.logger.debug('processFieldChange validation', fieldConfig.scope, fieldConfig.id, {
+          value: newValue,
+          isValid: state.isValid,
+          failedRules: state.failedRules
+        });
+      }
+
+      if (inputEvents.onChange) {
+        this.runInteractions(inputEvents.onChange, fieldConfig);
+      }
+
+      if (validateOnInput) {
+        if (state.isValid && inputEvents.onValid) {
+          this.runInteractions(inputEvents.onValid, fieldConfig);
         }
-      );
 
-      state.isValid = result.isValid;
-      state.failedRules = result.failedRules;
-
-      this.logger.debug('processFieldChange validation', fieldConfig.scope, fieldConfig.id, {
-        value: newValue,
-        isValid: state.isValid,
-        failedRules: state.failedRules
-      });
-    }
-
-    const inputEvents = (fieldConfig.events && fieldConfig.events.input) || {};
-
-    if (inputEvents.onChange) {
-      this.runInteractions(inputEvents.onChange, fieldConfig);
-    }
-
-    if (validateOnInput) {
-      if (state.isValid && inputEvents.onValid) {
-        this.runInteractions(inputEvents.onValid, fieldConfig);
+        if (!state.isValid && inputEvents.onInvalid) {
+          this.runInteractions(inputEvents.onInvalid, fieldConfig);
+        }
       }
+    };
 
-      if (!state.isValid && inputEvents.onInvalid) {
-        this.runInteractions(inputEvents.onInvalid, fieldConfig);
-      }
+    const debounceMs = Number(fieldConfig?.debounceMs);
+    if (Number.isFinite(debounceMs) && debounceMs > 0) {
+      const timerKey = `${fieldConfig.scope}:${fieldConfig.id}`;
+      const existingTimer = this._debounceTimers[timerKey];
+      if (existingTimer) clearTimeout(existingTimer);
+      this._debounceTimers[timerKey] = setTimeout(() => {
+        delete this._debounceTimers[timerKey];
+        runPipeline();
+      }, debounceMs);
+      return;
     }
+
+    runPipeline();
   }
 };
 

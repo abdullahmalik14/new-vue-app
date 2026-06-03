@@ -60,6 +60,10 @@ export function safeParseConfig(raw) {
   if (raw !== null && typeof raw === 'object' && _configCache.has(raw))
     return _configCache.get(raw)
 
+  if (import.meta.env?.DEV && raw !== null && typeof raw === 'object' && !Object.isFrozen(raw)) {
+    console.warn('[interactions] Non-frozen config detected. Define configs outside template and freeze or memoize to avoid repeated deepFreeze cost.')
+  }
+
   let parsed
   if (Array.isArray(raw))               parsed = raw
   else if (raw && typeof raw === 'object') parsed = [raw]
@@ -105,7 +109,12 @@ function resolveTarget(selector, triggerEl, scope) {
 
   if (cached) {
     const el = cached.deref()
-    if (el) return el
+    if (el) {
+      // LRU refresh: move cache entry to most-recent position.
+      _selectorCache.delete(cacheKey)
+      _selectorCache.set(cacheKey, new WeakRef(el))
+      return el
+    }
     _selectorCache.delete(cacheKey)
   }
 
