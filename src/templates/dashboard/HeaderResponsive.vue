@@ -1,7 +1,7 @@
 <template>
   <header v-show="$breakpoints.mobile" class="mb-[50px]">
     <div
-      class="flex flex-col gap-4 px-2 py-2 flex-1 z-10 backdrop-blur-lg fixed inset-x-0 top-0 bg-gradient-to-t from-white/90 to-white/0 bg-[rgba(234,236,240,0.9)]">
+      class="flex flex-col gap-4 px-2 py-2 flex-1 z-10 backdrop-blur-lg fixed inset-x-0 top-0 bg-gradient-to-t from-white/90 to-white/0 bg-slate-100/90">
       <div class="flex justify-between items-center">
         <!-- logo -->
         <div class="flex items-center gap-1.5 relative">
@@ -17,7 +17,7 @@
           <div class="flex items-center justify-end gap-2">
             <!-- choose-language -->
             <div
-              class="flex items-center justify-center p-1.5 gap-3 rounded hover:bg-[rgba(12,17,29,0.1)] cursor-pointer">
+              class="flex items-center justify-center p-1.5 gap-3 rounded hover:bg-slate-900/10 cursor-pointer">
               <div class="pointer-events-none h-5 w-5">
                 <img v-show="languageLoaded" :src="assets.language" @load="languageLoaded = true"
                   @error="languageLoaded = false" alt="language" class="brightness-0 pointer-events-none h-5 w-5" />
@@ -28,7 +28,7 @@
             <!-- notification-item -->
             <div class="relative">
               <span
-                class="absolute top-[.125rem] right-[.188rem] h-[.438rem] w-[.438rem] bg-[#F40793] rounded-full block"></span>
+                class="absolute top-[.125rem] right-[.188rem] h-[.438rem] w-[.438rem] bg-pink-500 rounded-full block"></span>
 
               <a @click="isNotificationOpen = true"
                 class="notifications-panel-trigger group cursor-pointer rounded flex items-center justify-center p-1.5 gap-3 hover:bg-notification-hover">
@@ -52,7 +52,7 @@
                         class="bg-avatar object-cover w-full h-full rounded-full" />
                       <div v-show="!avatarLoaded" class="w-full h-full rounded-full bg-gray-200 animate-pulse"></div>
                     </div>
-                    <div class="bg-[#FDB022] w-1.5 h-1.5 absolute block bottom-0 right-0 rounded-full"></div>
+                    <div class="bg-amber-400 w-1.5 h-1.5 absolute block bottom-0 right-0 rounded-full"></div>
                   </div>
                 </div>
               </a>

@@ -20,6 +20,10 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: 'Select Option'
+  },
+  unstyled: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -27,10 +31,17 @@ const emit = defineEmits(['update:modelValue']);
 
 const isOpen = ref(false);
 const dropdownRef = ref(null);
+const isUpwards = ref(false);
 
 // Toggle dropdown
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value;
+  if (isOpen.value && dropdownRef.value) {
+    const rect = dropdownRef.value.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    // If there is less than 250px below, open upwards
+    isUpwards.value = spaceBelow < 250;
+  }
 };
 
 // Select option logic
@@ -52,6 +63,11 @@ const currentLabel = () => {
   return selected ? selected.label : props.placeholder;
 };
 
+// Helper to get selected option object
+const selectedOption = () => {
+  return props.options.find(opt => opt.value === props.modelValue) || null;
+};
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
 });
@@ -62,10 +78,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="dropdownRef" class="relative h-11 flex-shrink-0" :class="widthClass">
+  <div ref="dropdownRef" class="relative flex-shrink-0" :class="unstyled ? widthClass : `h-11 ${widthClass}`">
     <div class="dash-select cursor-pointer" @click="toggleDropdown">
       
-      <div 
+      <!-- Styled Trigger -->
+      <div v-if="!unstyled"
         class="dash-select__trigger h-11 flex items-center justify-between w-full px-3.5 border-r border-b border-b-[#EAECF0] rounded-t-sm bg-white/50 shadow-[0px_1px_2px_0px_#1018280D] dark:bg-[#181a1b80] dark:border-b-[#353a3c]"
         :class="{ 'border-r-[#D0D5DD] dark:border-r-[#3b4043]': true }" 
       >
@@ -80,9 +97,16 @@ onUnmounted(() => {
         >
       </div>
 
-      <div 
-        class="dash-options-container absolute w-full transition-all duration-300 z-10 top-[calc(100%+0.5rem)] shadow-none border-none"
-        :class="isOpen ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'"
+      <!-- Unstyled Trigger Slot -->
+      <slot v-else name="trigger" :label="currentLabel()" :isOpen="isOpen" :selectedOption="selectedOption()"></slot>
+
+      <!-- Styled Options Container -->
+      <div v-if="!unstyled"
+        class="dash-options-container absolute w-full transition-all duration-300 z-10 shadow-none border-none"
+        :class="[
+          isOpen ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none',
+          isUpwards ? 'bottom-[calc(100%+0.5rem)] top-auto origin-bottom' : 'top-[calc(100%+0.5rem)] origin-top'
+        ]"
       >
         <div class="dash-options rounded-[2px] bg-white/70 backdrop-blur-[25px] max-h-[200px] overflow-y-auto dark:bg-[#181a1bb3]">
           
@@ -102,6 +126,9 @@ onUnmounted(() => {
 
         </div>
       </div>
+
+      <!-- Unstyled Options Container Slot -->
+      <slot v-else name="options-container" :options="options" :selectOption="selectOption" :modelValue="modelValue" :isOpen="isOpen" :isUpwards="isUpwards"></slot>
 
     </div>
     

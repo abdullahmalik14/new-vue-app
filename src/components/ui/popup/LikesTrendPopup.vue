@@ -118,7 +118,7 @@ async function fetchLikesData() {
     // We fetch the bundle directly to get the history since store only holds latest daily
     const urlParams = new URLSearchParams(window.location.search)
     const source = urlParams.get('data') || 'full'
-    const bundleFile = source === 'empty' ? '/chartsData.empty.json' : '/chartsData.bundle.json'
+    const bundleFile = source === 'empty' ? '/chartsData.empty.json' : '/api/charts/456?nocache=1'
     const res = await fetch(bundleFile)
     const bundle = await res.json()
     return bundle.likes || {}

@@ -1,16 +1,16 @@
 <template>
   <div
-    class="sidebar-wrapper flex sticky top-0 z-[3] h-screen w-max shadow-custom bg-[rgba(249,250,251,0.7)] backdrop-blur-xs [-ms-overflow-style:none] [scrollbar-width:none]">
+    class="sidebar-wrapper flex sticky top-0 z-[3] h-screen w-max shadow-custom bg-gray-50/70 backdrop-blur-xs [-ms-overflow-style:none] [scrollbar-width:none]">
     <div
       class="sidebar-container transition-all duration-150 ease-in-out w-[5.625rem] gap-1.5 pt-3 pb-3 z-[5] relative flex flex-col items-center justify-start">
       <!-- site-logo -->
-      <div @click="$router.push('/dashboard')"
-        class="flex items-center gap-2.5 rounded-xl cursor-pointer transition-opacity duration-200 ease-in-out bg-fce40d opacity-80">
+      <div ref="logoContainer" @click="$router.push('/dashboard')"
+        class="flex items-center gap-2.5 rounded-xl cursor-pointer transition-opacity duration-200 ease-in-out bg-yellow-400 opacity-80">
         <img v-if="assets.logo" :src="assets.logo" alt="logo" class="w-9 h-9 pointer-events-none" />
       </div>
 
       <!-- profile & controls -->
-      <div class="flex flex-col items-center self-stretch gap-2 pt-2 pb-2 pl-1 pr-1 border-b border-d0d5dd">
+      <div ref="headerContainer" class="flex flex-col items-center self-stretch gap-2 pt-2 pb-2 pl-1 pr-1 border-b border-d0d5dd">
         <!-- avatar -->
         <div class="flex w-10 h-10 rounded-[1.25rem]">
           <div @click="isProfileOpen = true" class="flex relative w-10 h-10 rounded-[1.25rem] cursor-pointer">
@@ -29,17 +29,17 @@
           <div
             class="log-out-icon-container flex cursor-pointer items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out hover:bg-notification-hover group">
             <img v-if="assets.logout" :src="assets.logout" alt="logout"
-              class="w-5 h-5 pointer-events-none transition-all duration-200 [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+              class="w-5 h-5 pointer-events-none [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
           </div>
 
           <!-- notification -->
           <div @click="isNotificationOpen = true"
             class="notification-icon-container cursor-pointer flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out hover:bg-notification-hover relative group">
             <img v-if="assets.notification" :src="assets.notification" alt="notification"
-              class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+              class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
             <!-- status-indicator -->
             <div
-              class="absolute top-[0.188rem] right-[0.188rem] flex w-[0.438rem] h-[0.438rem] rounded-[0.625rem] bg-ff00a6">
+              class="absolute top-[0.188rem] right-[0.188rem] flex w-[0.438rem] h-[0.438rem] rounded-[0.625rem] bg-pink-500">
               &nbsp;
             </div>
           </div>
@@ -47,7 +47,7 @@
       </div>
 
       <!-- main-navigation -->
-      <div class="flex flex-col items-center self-stretch flex-1 gap-1 pt-1 pb-1 pl-2 pr-2 overflow-hidden" ref="menuContainer">
+      <div class="flex flex-col items-center self-stretch flex-1 gap-1 pt-1 pb-1 pl-2 pr-2 overflow-hidden min-h-0" ref="menuContainer">
         <div class="flex flex-col items-center self-stretch gap-1 w-full">
           <div class="flex flex-col relative z-[5] self-stretch w-full">
             <div class="flex flex-col items-center self-stretch gap-1">
@@ -56,13 +56,15 @@
                 class="sidebar-menu-item block transition-all duration-200 ease-in-out rounded-md flex-col items-center justify-center self-stretch w-full"
                 :class="{ 'opacity-50 pointer-events-none grayscale': !item.enabled }"
                 :title="item.title">
-                <a href="#" @click.prevent="handleMenuClick(item)"
-                  @mouseenter="prefetchMenuRoute(item)" @focus="prefetchMenuRoute(item)"
+                <a :href="item.route || '#'" @click.prevent="handleMenuClick(item)"
                   class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active"
+                  :class="{ 'bg-sidebar-active': isActive(item) }"
                   :style="!item.enabled ? { pointerEvents: 'none', opacity: '0.5' } : {}">
                   <img :src="item.image" :alt="item.title"
-                    class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
-                  <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text">
+                    class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]"
+                    :class="{ '[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]': isActive(item) }" />
+                  <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text"
+                        :class="{ 'text-sidebar-active-text': isActive(item) }">
                     {{ item.title }}
                   </span>
                 </a>
@@ -79,7 +81,7 @@
             <a data-menu-item=""
               class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active cursor-pointer">
               <img :src="assets.more || ''" :alt="moreText"
-                class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+                class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
               <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text">
                 {{ moreText }}
               </span>
@@ -89,62 +91,66 @@
       </div>
 
       <!-- sidebar-bottom-controls -->
-      <div class="flex flex-col items-center self-stretch gap-2 pt-2 pb-2">
+      <div ref="footerContainer" class="flex flex-col items-center self-stretch gap-2 pt-2 pb-2">
         <!-- cta-controls -->
         <div class="flex items-center justify-center self-stretch gap-2 pl-1 pr-1">
           <!-- language -->
           <div
             class="language-icon-container flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out hover:bg-notification-hover group cursor-pointer">
             <img v-if="assets.language" :src="assets.language" alt="language"
-              class="w-5 h-5 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+              class="w-5 h-5 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
           </div>
 
           <!-- help -->
           <div
             class="help-icon-container opacity-50 pointer-events-none flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out hover:bg-notification-hover group">
             <img v-if="assets.help" :src="assets.help" alt="help"
-              class="w-5 h-5 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+              class="w-5 h-5 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
           </div>
         </div>
       </div>
     </div>
 
     <!-- More Flyout (replaces manual data-floating-panel) -->
-    <div v-if="isMoreVisible" class="fixed z-[100]" :style="flyoutWrapperStyle">
+    <div v-show="isMoreVisible" class="fixed z-[100]" :style="flyoutWrapperStyle">
       <div class="hover-bridge absolute" :style="bridgeStyle" @mouseenter="onMoreEnter" @mouseleave="onMoreLeave"></div>
       <div class="sidebar-flyout bg-white rounded-2xl shadow-custom p-4 flex flex-col min-w-[200px]" 
            ref="flyoutInner"
            @mouseenter="onMoreEnter" @mouseleave="onMoreLeave">
         <div class="grid grid-cols-2 gap-x-6 gap-y-6">
-          <div v-for="item in overflowItems" :key="item.id || item.title"
+          <a v-for="item in overflowItems" :key="item.id || item.title"
+            :href="item.route || '#'"
             class="flex flex-col items-center justify-center cursor-pointer group"
-            @click="handleMenuClick(item)"
-            @mouseenter="prefetchMenuRoute(item)" @focus="prefetchMenuRoute(item)">
-            <div class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group-hover:bg-sidebar-active">
+            :style="!item.enabled ? { pointerEvents: 'none', opacity: '0.5' } : {}"
+            @click.prevent="handleMenuClick(item)">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group-hover:bg-sidebar-active"
+                 :class="{ 'bg-sidebar-active': isActive(item) }">
               <img :src="item.image" :alt="item.title"
-                class="w-6 h-6 pointer-events-none transition-all duration-200 group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+                class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]"
+                :class="{ '[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]': isActive(item) }" />
             </div>
-            <span class="mt-1 text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] transition-all duration-200 group-hover:text-sidebar-active-text">
+            <span class="mt-1 text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] transition-all duration-200 group-hover:text-sidebar-active-text"
+                  :class="{ 'text-sidebar-active-text': isActive(item) }">
               {{ item.title }}
             </span>
-          </div>
+          </a>
         </div>
       </div>
     </div>
 
     <!-- Hidden measurement container -->
     <div class="fixed top-[-9999px] left-[-9999px] invisible flex flex-col items-center w-[5.625rem] pl-2 pr-2" ref="measureContainer">
-      <div class="sidebar-menu-item block p-2 rounded-md flex-col items-center justify-center self-stretch" ref="measureItem">
-        <div class="flex flex-col items-center h-[52px]"></div>
-      </div>
-      <div class="sidebar-menu-item block p-2 rounded-md flex-col items-center justify-center self-stretch" ref="measureMore">
-        <div class="flex flex-col items-center h-[52px]"></div>
+      <div class="sidebar-menu-item block transition-all duration-200 ease-in-out rounded-md flex-col items-center justify-center self-stretch w-full" ref="measureItem">
+        <a class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out">
+          <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="w-6 h-6 pointer-events-none" />
+          <span class="pointer-events-none text-[0.625rem] font-medium leading-[1.125rem] text-center">Test</span>
+        </a>
       </div>
     </div>
 
     <!-- PopupHandler for submenu -->
     <PopupHandler v-model="showSubmenuPopup" :config="submenuPopupConfig" :is-loading="false">
-      <div class="w-full h-[100vh] flex flex-col items-start gap-4 overflow-hidden bg-submenu-bg px-4 py-2 shadow-md backdrop-blur-lg">
+      <div v-if="showSubmenuPopup" class="w-full h-[100vh] flex flex-col items-start gap-4 overflow-hidden bg-submenu-bg px-4 py-2 shadow-md backdrop-blur-lg">
         <!-- submenu-header -->
         <div class="flex justify-between gap-4 w-full mt-8">
           <!-- title -->
@@ -155,7 +161,7 @@
 
           <!-- back-button -->
           <div class="flex w-full justify-end">
-            <a @click="showSubmenuPopup = false"
+            <a @click="goBackSubmenu"
               class="flex items-center justify-center w-6 h-6 md:w-auto md:h-auto p-0 md:p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-panel-light-buttonHover cursor-pointer">
               <img v-if="assets.closeDesktop"
                 class="w-6 h-6 pointer-events-none hidden md:block [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)]"
@@ -216,6 +222,7 @@ import NotificationPopup from "@/components/ui/popup/NotificationPopup.vue";
 import { getI18nInstance } from "@/utils/translation/i18nInstance.js";
 import { createRoutePrefetchIntentHandler } from "@/utils/route/useRoutePrefetch.js";
 
+import { useAuthStore } from "@/stores/useAuthStore";
 export default {
   name: "Sidebar",
   components: {
@@ -231,6 +238,7 @@ export default {
       currentSubmenuItems: [],
       currentSubmenuTitle: "",
       currentSubmenuImage: "",
+      submenuHistory: [],
       resolvedMenuItems: [],
       visibleItems: [],
       overflowItems: [],
@@ -316,30 +324,31 @@ export default {
       
       // Calculate flyout height dynamically if possible, or use a reasonable estimate
       let flyoutHeight = 0;
-      if (this.$refs.flyoutInner) {
+      if (this.$refs.flyoutInner && this.$refs.flyoutInner.offsetHeight > 0) {
         flyoutHeight = this.$refs.flyoutInner.offsetHeight;
       } else {
-        // Fallback estimate: 2 rows of items (2*52px) + padding (2*16px) + gap (1*24px) = 104 + 32 + 24 = 160px
-        // This is a rough estimate, actual height depends on content and number of items
+        // Fallback estimate: 2 rows of items (2*52px) + padding (2*16px) + gap (1*24px)
         const numRows = Math.ceil(this.overflowItems.length / 2);
-        flyoutHeight = (numRows * 52) + ((numRows - 1) * 24) + (2 * 16); // item height + gap + padding
-        if (this.overflowItems.length === 0) flyoutHeight = 0; // No items, no flyout
-        if (flyoutHeight < 100) flyoutHeight = 100; // Minimum height
+        flyoutHeight = (numRows * 52) + ((numRows - 1) * 24) + (2 * 16); 
+        if (this.overflowItems.length === 0) flyoutHeight = 0; 
+        if (flyoutHeight < 100) flyoutHeight = 100;
       }
 
-      // Align bottom of flyout with bottom of button and offset it "thora upper"
-      let top = btnRect.bottom - flyoutHeight - 10;
+      // Default: Align top of flyout with top of button so it's directly across
+      let top = btnRect.top;
       
-      // Ensure it doesn't go off screen
+      // Ensure it doesn't go off screen at the bottom
       const windowHeight = window.innerHeight;
-      if (top < 10) top = 10;
       if (top + flyoutHeight > windowHeight - 10) {
         top = windowHeight - flyoutHeight - 10;
       }
       
+      // Ensure it doesn't go off screen at the top
+      if (top < 10) top = 10;
+      
       return {
         top: `${top}px`,
-        left: `${btnRect.right + 10}px`,
+        left: `${btnRect.right + 4}px`, // 4px gap to the button
         pointerEvents: 'auto'
       };
     },
@@ -367,6 +376,19 @@ export default {
           this.$forceUpdate();
         });
       }
+    },
+    showSubmenuPopup(val) {
+      if (!val) {
+        this.submenuHistory = []; // Reset on close
+      }
+      // Dispatch custom event for menu open/close and active menu state
+      const event = new CustomEvent('dashboard-menu-state', {
+        detail: {
+          isOpen: val,
+          activePage: this.currentSubmenuTitle || null
+        }
+      });
+      window.dispatchEvent(event);
     }
   },
   async beforeMount() {
@@ -397,9 +419,42 @@ export default {
     }
   },
   methods: {
+    isActive(item) {
+      if (!item.route || !this.$route) return false;
+      // Handle exact match for dashboard home
+      if (item.route === '/dashboard' || item.route === '/dashboard/') {
+        return this.$route.path === '/dashboard' || this.$route.path === '/dashboard/';
+      }
+      // For other routes, check if the current path starts with the item's route
+      return this.$route.path.startsWith(item.route);
+    },
+    async loadAssetWithRetry(flag, maxRetries = 2) {
+      const { getAssetUrl } = await import("@/utils/assets/assetLibrary.js");
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          const url = await getAssetUrl(flag);
+          if (url) return url;
+          if (attempt < maxRetries) await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 100));
+        } catch (e) {
+          if (attempt === maxRetries) throw e;
+          await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 100));
+        }
+      }
+      return null;
+    },
+    async loadTranslations() {
+      try {
+        const locale = getActiveLocale() || 'en';
+        await loadTranslationsForSection('dashboard-global', locale);
+      } catch (e) {
+        console.warn('[DashboardSidebar] Translation load failed', e);
+      }
+    },
     async resolveMenuItems() {
       try {
-        this.resolvedMenuItems = await resolveMenuItemsWithAssets(menuItems);
+        const authStore = useAuthStore();
+        const userRole = authStore.userRole;
+        this.resolvedMenuItems = await resolveMenuItemsWithAssets(menuItems, userRole);
       } catch (e) {
         this.resolvedMenuItems = menuItems;
       }
@@ -431,25 +486,34 @@ export default {
       if (!this.$refs.menuContainer || !this.$refs.measureItem) return;
       
       const sidebarHeight = this.$el.offsetHeight;
-      // Replicating original margin/padding awareness
-      const header = this.$el.querySelector(".flex.flex-col.items-center.self-stretch.gap-2.pt-2.pb-2");
-      const footer = this.$el.querySelector(".flex.flex-col.items-center.self-stretch.gap-2.pt-2.pb-2:last-child");
-      const logo = this.$el.querySelector("div.flex.items-center.gap-2\\.5");
+      const headerH = this.$refs.headerContainer ? this.$refs.headerContainer.offsetHeight : 0;
+      const footerH = this.$refs.footerContainer ? this.$refs.footerContainer.offsetHeight : 0;
+      const logoH = this.$refs.logoContainer ? this.$refs.logoContainer.offsetHeight : 0;
       
-      const headerH = header ? header.offsetHeight : 0;
-      const footerH = footer ? footer.offsetHeight : 0;
-      const logoH = logo ? logo.offsetHeight : 0;
+      const fixedSpacing = 50; // padding and gaps from the layout structure
+      const availableHeight = sidebarHeight - headerH - footerH - logoH - fixedSpacing;
       
-      const availableHeight = sidebarHeight - headerH - footerH - logoH - 48;
-      const itemH = 56; // 52px height + 4px gap as per manual measurement
-      const moreBtnH = 56;
+      const measuredItemH = this.$refs.measureItem ? this.$refs.measureItem.offsetHeight : 52;
+      const itemH = measuredItemH + 4; // Add 4px for the gap-1
+      const moreBtnH = itemH;
 
       let usedHeight = 0;
       const visible = [];
       const overflow = [];
 
+      // Check if EVERYTHING fits perfectly
+      const totalRequired = this.resolvedMenuItems.length * itemH;
+      if (totalRequired <= availableHeight) {
+        this.visibleItems = [...this.resolvedMenuItems];
+        this.overflowItems = [];
+        return;
+      }
+
+      // If it doesn't fit, we MUST have a More button. Reserve its space.
+      const availableForItems = availableHeight - moreBtnH;
+
       this.resolvedMenuItems.forEach((item) => {
-        if (usedHeight + itemH + moreBtnH <= availableHeight) {
+        if (usedHeight + itemH <= availableForItems) {
           usedHeight += itemH;
           visible.push(item);
         } else {
@@ -457,17 +521,13 @@ export default {
         }
       });
 
-      // If everything fits without More button, use extra space
-      if (overflow.length === 0 && usedHeight + itemH <= availableHeight + moreBtnH) {
-        // Already handled by the logic above essentially
-      }
-
       this.visibleItems = visible;
       this.overflowItems = overflow;
     },
     handleMenuClick(item) {
       this.closeAllPopups();
       if (item.children && item.children.length > 0) {
+        this.submenuHistory = [];
         this.currentSubmenuItems = item.children;
         this.currentSubmenuTitle = item.title;
         this.currentSubmenuImage = item.image;
@@ -482,9 +542,28 @@ export default {
       }
     },
     handleChildClick(child) {
-      if (child.enabled && child.route) {
+      if (child.children && child.children.length > 0) {
+        this.submenuHistory.push({
+          items: this.currentSubmenuItems,
+          title: this.currentSubmenuTitle,
+          image: this.currentSubmenuImage
+        });
+        this.currentSubmenuItems = child.children;
+        this.currentSubmenuTitle = child.title;
+        this.currentSubmenuImage = child.image || this.currentSubmenuImage;
+      } else if (child.enabled && child.route) {
         this.showSubmenuPopup = false;
         this.$router.push(child.route);
+      }
+    },
+    goBackSubmenu() {
+      if (this.submenuHistory.length > 0) {
+        const prev = this.submenuHistory.pop();
+        this.currentSubmenuItems = prev.items;
+        this.currentSubmenuTitle = prev.title;
+        this.currentSubmenuImage = prev.image;
+      } else {
+        this.showSubmenuPopup = false;
       }
     },
     closeAllPopups() {
