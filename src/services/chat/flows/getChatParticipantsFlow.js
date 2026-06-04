@@ -12,7 +12,7 @@ export async function getChatParticipantsFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.get(`${baseUrl}/chats/${encodeURIComponent(chatId)}/participants`, { params: { asObjects, includeRoles } });
+    const response = await api.get(`${baseUrl}/chats/${encodeURIComponent(chatId)}/participants`, { ...buildFlowRequestOptions(context), params: { asObjects, includeRoles } });
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

@@ -12,7 +12,7 @@ export async function sendExclusiveContentFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/exclusive`, { contentId, tier, senderId, previewText });
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/exclusive`, { contentId, tier, senderId, previewText }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

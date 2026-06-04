@@ -4,6 +4,8 @@ import { defineStore } from 'pinia';
 import { jwtDecode } from 'jwt-decode';
 import { authHandler } from '../utils/auth/authHandler';
 import { log } from '../utils/common/logHandler';
+import FlowHandler from '@/services/flow-system/FlowHandler.js';
+import flowRefreshManager from '@/services/flow-system/flowRefreshManager.js';
 import {
   getPreferredLocaleFromTokenClaims,
   normalizePreferredLocaleCode,
@@ -447,6 +449,9 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         authHandler.logout();
+
+        flowRefreshManager.stopAll();
+        FlowHandler.reset();
 
         // Remove only auth keys
         localStorage.removeItem('idToken');

@@ -1,5 +1,6 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getRentalApiBaseUrl, asFlowError } from "@/services/rental/rentalApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function confirmRentalReservationFlow({ payload, context, api }) {
   const baseUrl = getRentalApiBaseUrl(context);
@@ -16,11 +17,7 @@ export async function confirmRentalReservationFlow({ payload, context, api }) {
     const response = await api.post(
       `${baseUrl}/rentals/reservations/${payload.reservationId}/confirm`,
       payload,
-      {
-        headers,
-        signal: context.signal,
-        timeoutMs: context.requestTimeoutMs,
-      }
+      buildFlowRequestOptions(context)
     );
 
     if (!response?.ok || !response?.reservationId) {

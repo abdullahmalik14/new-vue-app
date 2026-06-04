@@ -220,6 +220,7 @@ export const flowRegistry = {
 
   "events.createEvent": {
     flowKind: "write",
+    requireAuth: true,
     flow: createEventFlow,
     mapper: { toRequest: createEventMapper },
     validators: {
@@ -474,6 +475,7 @@ export const flowRegistry = {
   },
   "bookings.createBooking": {
     flowKind: "write",
+    requireAuth: true,
     flow: createBookingFlow,
     mapper: { toRequest: mapCreateBookingToRequest },
     pipeline: {
@@ -560,7 +562,7 @@ export const flowRegistry = {
       timeouts: { requestMs: 10000, totalFlowMs: 16000 },
       retry: {
         enabled: true,
-        maxAttempts: 1,
+        maxAttempts: 2,
         baseDelayMs: 200,
         maxDelayMs: 800,
         jitterRatio: 0.1,
@@ -637,6 +639,7 @@ export const flowRegistry = {
   },
   "bookings.updateTemporaryHoldUser": {
     flowKind: "write",
+    requireAuth: true,
     flow: updateTemporaryHoldUserFlow,
     pipeline: {
       timeouts: { requestMs: 10000, totalFlowMs: 16000 },
@@ -653,6 +656,7 @@ export const flowRegistry = {
   },
   "bookings.reviewPendingBooking": {
     flowKind: "write",
+    requireAuth: true,
     flow: reviewPendingBookingFlow,
     mapper: { toRequest: mapReviewPendingBookingToRequest },
     pipeline: {
@@ -680,6 +684,7 @@ export const flowRegistry = {
   },
   "bookings.cancelBooking": {
     flowKind: "write",
+    requireAuth: true,
     flow: cancelBookingFlow,
     mapper: { toRequest: mapCancelBookingToRequest },
     pipeline: {
@@ -707,6 +712,7 @@ export const flowRegistry = {
   },
   "bookings.renegotiateBooking": {
     flowKind: "write",
+    requireAuth: true,
     flow: updateBookingFlow,
     mapper: { toRequest: mapRenegotiateBookingToRequest },
     pipeline: {
@@ -730,6 +736,7 @@ export const flowRegistry = {
   },
   "bookings.rescheduleBooking": {
     flowKind: "write",
+    requireAuth: true,
     flow: updateBookingFlow,
     mapper: { toRequest: mapRescheduleBookingToRequest },
     pipeline: {
@@ -753,6 +760,7 @@ export const flowRegistry = {
 
   "bookings.updateMeta": {
     flowKind: "write",
+    requireAuth: true,
     flow: updateBookingFlow,
     mapper: { toRequest: mapUpdateBookingMetaToRequest },
     pipeline: {
@@ -977,6 +985,7 @@ export const flowRegistry = {
   },
   "rental.createReservation": {
     flowKind: "write",
+    requireAuth: true,
     flow: createRentalReservationFlow,
     mapper: { toRequest: mapCreateReservationToRequest },
     validators: {
@@ -1037,6 +1046,7 @@ export const flowRegistry = {
   },
   "rental.confirmReservation": {
     flowKind: "write",
+    requireAuth: true,
     flow: confirmRentalReservationFlow,
     mapper: { toRequest: mapConfirmReservationToRequest },
     validators: {
@@ -1080,6 +1090,7 @@ export const flowRegistry = {
   },
   "rental.cancelReservation": {
     flowKind: "write",
+    requireAuth: true,
     flow: cancelRentalReservationFlow,
     mapper: { toRequest: mapCancelReservationToRequest },
     validators: {
@@ -1151,12 +1162,13 @@ export const flowRegistry = {
   },
   "chat.createChat": {
     flowKind: "write",
+    requireAuth: true,
     flow: createChatFlow,
     pipeline: {
       timeouts: { requestMs: 10000, totalFlowMs: 15000 },
       retry: {
         enabled: true,
-        maxAttempts: 1,
+        maxAttempts: 2,
         baseDelayMs: 250,
         maxDelayMs: 1000,
         jitterRatio: 0.1,
@@ -1177,6 +1189,7 @@ export const flowRegistry = {
   },
   "chat.sendMessage": {
     flowKind: "write",
+    requireAuth: true,
     flow: sendMessageFlow,
     pipeline: {
       timeouts: { requestMs: 15000, totalFlowMs: 20000 },
@@ -1203,6 +1216,7 @@ export const flowRegistry = {
   },
   "chat.sendProductRecommendation": {
     flowKind: "write",
+    requireAuth: true,
     flow: sendProductRecommendationFlow,
     pipeline: {
       timeouts: { requestMs: 15000, totalFlowMs: 20000 },
@@ -1222,7 +1236,7 @@ export const flowRegistry = {
     flow: fetchProductRecommendationStatusFlow,
     pipeline: {
       timeouts: { requestMs: 12000, totalFlowMs: 16000 },
-      retry: { enabled: true, maxAttempts: 1, baseDelayMs: 250, maxDelayMs: 1000, jitterRatio: 0.1 },
+      retry: { enabled: true, maxAttempts: 2, baseDelayMs: 250, maxDelayMs: 1000, jitterRatio: 0.1 },
       concurrency: { policy: "latestWins", dedupe: true, keyByPayload: true },
       uiErrorMap: {
         FETCH_PRODUCT_RECOMMENDATION_STATUS_MISSING_FAN_UID: "Fan access could not be checked.",
@@ -1323,6 +1337,7 @@ export const flowRegistry = {
   },
   "chat.sendBookingRequestMessage": {
     flowKind: "write",
+    requireAuth: true,
     flow: sendBookingRequestMessageFlow,
     pipeline: {
       timeouts: { requestMs: 10000, totalFlowMs: 15000 },
@@ -1334,6 +1349,7 @@ export const flowRegistry = {
   },
   "chat.updateBookingRequestMessage": {
     flowKind: "write",
+    requireAuth: true,
     flow: updateBookingRequestMessageFlow,
     pipeline: {
       timeouts: { requestMs: 10000, totalFlowMs: 15000 },
@@ -1345,6 +1361,7 @@ export const flowRegistry = {
   },
   "chat.updateMessage": {
     flowKind: "write",
+    requireAuth: true,
     flow: updateMessageFlow,
     pipeline: {
       timeouts: { requestMs: 10000, totalFlowMs: 15000 },
@@ -1356,6 +1373,7 @@ export const flowRegistry = {
   },
   "chat.sendChatActivityLog": {
     flowKind: "write",
+    requireAuth: true,
     flow: sendChatActivityLogFlow,
     pipeline: {
       timeouts: { requestMs: 8000, totalFlowMs: 12000 },
@@ -1367,6 +1385,7 @@ export const flowRegistry = {
   },
   "chat.pinMessage": {
     flowKind: "write",
+    requireAuth: true,
     flow: pinMessageFlow,
     pipeline: {
       timeouts: { requestMs: 8000, totalFlowMs: 12000 },
@@ -1378,6 +1397,7 @@ export const flowRegistry = {
   },
   "chat.markMessageDelivered": {
     flowKind: "write",
+    requireAuth: true,
     flow: markMessageDeliveredFlow,
     pipeline: {
       timeouts: { requestMs: 8000, totalFlowMs: 12000 },
@@ -1393,6 +1413,7 @@ export const flowRegistry = {
   },
   "chat.markMessageRead": {
     flowKind: "write",
+    requireAuth: true,
     flow: markMessageReadFlow,
     pipeline: {
       timeouts: { requestMs: 8000, totalFlowMs: 12000 },
@@ -1408,12 +1429,13 @@ export const flowRegistry = {
   },
   "chat.createGroupChat": {
     flowKind: "write",
+    requireAuth: true,
     flow: createGroupChatFlow,
     pipeline: {
       timeouts: { requestMs: 15000, totalFlowMs: 20000 },
       retry: {
         enabled: true,
-        maxAttempts: 1,
+        maxAttempts: 2,
         baseDelayMs: 250,
         maxDelayMs: 1000,
         jitterRatio: 0.1,
@@ -1427,6 +1449,7 @@ export const flowRegistry = {
   },
   "chat.addChatParticipant": {
     flowKind: "write",
+    requireAuth: true,
     flow: addChatParticipantFlow,
     pipeline: {
       timeouts: { requestMs: 10000, totalFlowMs: 15000 },
@@ -1664,6 +1687,7 @@ export const flowRegistry = {
   // --- MEDIA UPLOADER FLOWS ---
   "media.uploadFile": {
     flowKind: "write",
+    requireAuth: true,
     flow: uploadMediaFlow,
     pipeline: {
       retry: { enabled: false },
@@ -1674,6 +1698,7 @@ export const flowRegistry = {
   },
   "media.submitUploader": {
     flowKind: "write",
+    requireAuth: true,
     flow: submitUploaderFlow,
     pipeline: {
       uiErrorMap: {

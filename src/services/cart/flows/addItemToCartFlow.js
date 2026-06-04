@@ -1,5 +1,6 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getCartApiBaseUrl, asFlowError } from "../cartApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * Flow to add an item to the shopping cart.
@@ -31,10 +32,7 @@ export async function addItemToCartFlow({ payload, context, api }) {
       type: payload.type || "standard",
       vendor: vendorId,
     }, {
-      headers: context.requestHeaders || {},
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
-    });
+      ...buildFlowRequestOptions(context) });
 
     if (response?.ok === false) {
       return fail({

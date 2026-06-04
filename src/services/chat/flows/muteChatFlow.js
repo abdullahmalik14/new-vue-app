@@ -12,7 +12,7 @@ export async function muteChatFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/mute`, { userId, durationMs, reason });
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/mute`, { userId, durationMs, reason }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

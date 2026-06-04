@@ -12,7 +12,7 @@ export async function updateChatNotificationsFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.patch(`${baseUrl}/chats/${encodeURIComponent(chatId)}/notifications`, { userId, settings });
+    const response = await api.patch(`${baseUrl}/chats/${encodeURIComponent(chatId)}/notifications`, { userId, settings }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

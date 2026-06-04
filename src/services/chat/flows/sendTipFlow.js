@@ -12,7 +12,7 @@ export async function sendTipFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}/tip`, { amount, currency });
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}/tip`, { amount, currency }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

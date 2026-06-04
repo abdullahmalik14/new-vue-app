@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus, getEtag, isApiNotModified } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getBookingsApiBaseUrl, asFlowError, toNumber } from "@/services/bookings/bookingsApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function buildEventsParams(payload = {}) {
   return {
@@ -82,10 +83,7 @@ export async function fetchCreatorBookingContextFlow({ payload, context, api }) 
   try {
     // Required order: events first, then booked slots.
     const eventsResponse = await api.get(`${baseUrl}/events`, {
-      params: buildEventsParams(payload),
-      headers,
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
+      ...buildFlowRequestOptions(context), params: buildEventsParams(payload),
     });
 
     const eventsStatus = getHttpStatus(eventsResponse, 200);
@@ -105,11 +103,10 @@ export async function fetchCreatorBookingContextFlow({ payload, context, api }) 
       : (Array.isArray(eventsResponse?.items) ? eventsResponse.items : []);
 
     const bookedSlotsResponse = await api.get(resolveBookedSlotsEndpoint(baseUrl, payload), {
+      ...buildFlowRequestOptions(context),
       params: buildBookedSlotParams(payload, {
         includeEventId: !shouldUseFanBookedSlotsEndpoint(payload),
       }),
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
     });
 
     if (bookedSlotsResponse?.ok === false) {
@@ -130,10 +127,7 @@ export async function fetchCreatorBookingContextFlow({ payload, context, api }) 
     } else if (shouldFetchFirstTimeDiscountStatus(payload)) {
       const eligibilityResponse = await api.get(
         `${baseUrl}/bookings/creators/${creatorId}/fans/${fanId}/first-time-discount-status`,
-        {
-          signal: context.signal,
-          timeoutMs: context.requestTimeoutMs,
-        },
+        buildFlowRequestOptions(context),
       );
 
       if (eligibilityResponse?.ok === false) {

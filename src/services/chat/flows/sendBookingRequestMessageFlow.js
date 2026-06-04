@@ -16,7 +16,7 @@ export async function sendBookingRequestMessageFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/booking`, { bookingId, action, senderId, start_at, end_at, slotDate, eventId, eventTitle, text, meta });
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/booking`, { bookingId, action, senderId, start_at, end_at, slotDate, eventId, eventTitle, text, meta }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 201);
 
     if (response?.ok === false) {

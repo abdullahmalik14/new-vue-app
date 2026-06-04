@@ -2,17 +2,14 @@ import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getEventsApiBaseUrl, asFlowError } from "@/services/events/eventsApiUtils.js";
 import { mapSingleEventFromResponse } from "@/services/events/mappers/fetchCreatorEventsMapper.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function createEventFlow({ payload, context, api }) {
   const baseUrl = getEventsApiBaseUrl(context);
   const headers = context.requestHeaders || {};
 
   try {
-    const response = await api.post(`${baseUrl}/events`, payload, {
-      headers,
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
-    });
+    const response = await api.post(`${baseUrl}/events`, payload, buildFlowRequestOptions(context));
 
     const status = getHttpStatus(response, 201);
 

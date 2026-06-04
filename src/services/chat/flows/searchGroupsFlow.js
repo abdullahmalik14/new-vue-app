@@ -12,7 +12,7 @@ export async function searchGroupsFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.get(`${baseUrl}/chats/groups/search`, { params: { q } });
+    const response = await api.get(`${baseUrl}/chats/groups/search`, { ...buildFlowRequestOptions(context), params: { q } });
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

@@ -48,4 +48,19 @@ describe("chat flow URL encoding (SEC-03)", () => {
     });
     expect(violations).toEqual([]);
   });
+
+  it("every chat flow with api calls uses buildFlowRequestOptions (BUG-13)", () => {
+    const files = readdirSync(FLOWS_DIR).filter((name) => name.endsWith(".js"));
+    const violations = [];
+    const hasApiCall = /await api\.(get|post|patch|put|delete)\(/;
+
+    for (const fileName of files) {
+      const source = readFileSync(join(FLOWS_DIR, fileName), "utf8");
+      if (!hasApiCall.test(source)) continue;
+      if (!source.includes("buildFlowRequestOptions(context)")) {
+        violations.push(`${fileName} — missing buildFlowRequestOptions(context) for api calls`);
+      }
+    }
+    expect(violations).toEqual([]);
+  });
 });

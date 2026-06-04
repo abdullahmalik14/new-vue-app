@@ -12,7 +12,7 @@ export async function getUnreadCountFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.get(`${baseUrl}/chats/${encodeURIComponent(chatId)}/unread`, { params: { userId } });
+    const response = await api.get(`${baseUrl}/chats/${encodeURIComponent(chatId)}/unread`, { ...buildFlowRequestOptions(context), params: { userId } });
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

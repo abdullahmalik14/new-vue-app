@@ -26,8 +26,8 @@ import {
 } from "@/services/flow-system/utils/flowLifecycle.js";
 import {
   buildConcurrencyKey,
-  cancelInFlight,
-  hasInFlight as isFlowInFlight,
+  cancelInFlightForKey,
+  hasInFlightForKey,
 } from "@/services/flow-system/runtime/concurrencyRuntime.js";
 import { runPaginatedFlow } from "@/services/flow-system/utils/flowPagination.js";
 import { abortBackgroundRevalidate as abortScheduledBackgroundRevalidate } from "@/services/flow-system/utils/backgroundRevalidate.js";
@@ -158,7 +158,7 @@ export const FlowHandler = {
     const flowEntry = normalizeFlowEntry(rawFlowEntry);
     const concurrency = flowEntry?.pipeline?.concurrency || {};
     const key = buildConcurrencyKey(flowName, payload, concurrency);
-    const cancelled = cancelInFlight(key, options.reason || "Cancelled");
+    const cancelled = cancelInFlightForKey(key, options.reason || "Cancelled");
     if (cancelled) {
       emitFlowLifecycle("cancelled", { flowName, payload, key, reason: options.reason || "Cancelled" });
     }
@@ -171,7 +171,7 @@ export const FlowHandler = {
     const flowEntry = normalizeFlowEntry(rawFlowEntry);
     const concurrency = flowEntry?.pipeline?.concurrency || {};
     const key = buildConcurrencyKey(flowName, payload, concurrency);
-    return isFlowInFlight(key);
+    return hasInFlightForKey(key);
   },
 
   abortBackgroundRevalidate(flowName, payload = {}) {

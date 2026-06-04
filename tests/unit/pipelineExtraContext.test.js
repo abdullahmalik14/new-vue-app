@@ -1,9 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { createPipelineContext } from "@/services/flow-system/pipeline/pipelineContext.js";
 import { pickExtraContext } from "@/services/flow-system/utils/pipelineExtraContext.js";
 
 describe("pipeline extra context (BUG-11, BP-11, SEC-08)", () => {
+  it("pickExtraContext warns in DEV for unknown keys", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    pickExtraContext({ locale: "en", evilKey: 1 });
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('Dropped unknown context key "evilKey"'),
+    );
+    warn.mockRestore();
+  });
+
   it("pickExtraContext strips reserved keys", () => {
     const picked = pickExtraContext({
       flowName: "hijacked",

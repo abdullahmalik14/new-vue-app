@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getCartApiBaseUrl, asFlowError } from "../cartApiUtils.js";
 import { SafeUtils } from "@/utils/SafeUtils";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * renameCartFlow
@@ -29,10 +30,7 @@ export async function renameCartFlow({ payload, context, api }) {
   const url = `${baseUrl}/cart/${sessionId}/label`;
 
   try {
-    const response = await api.patch(url, { label }, {
-      headers: context.requestHeaders || {},
-      signal: context.signal,
-    });
+    const response = await api.patch(url, { label }, buildFlowRequestOptions(context));
 
     if (response?.ok === false) {
       return fail({

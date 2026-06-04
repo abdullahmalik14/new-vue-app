@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { runPaginatedFlow } from "@/services/flow-system/utils/flowPagination.js";
+import {
+  runPaginatedFlow,
+  runOrdersFetchPaginated,
+} from "@/services/flow-system/utils/flowPagination.js";
 
 describe("flow pagination (FEAT-09)", () => {
   it("merges pages until hasMore returns false", async () => {
@@ -28,5 +31,24 @@ describe("flow pagination (FEAT-09)", () => {
     expect(result.ok).toBe(true);
     expect(result.data.items).toHaveLength(2);
     expect(runOnce).toHaveBeenCalledTimes(2);
+  });
+
+  it("runOrdersFetchPaginated passes page and per_page fields", async () => {
+    const run = vi.fn(async () => ({ ok: true, data: { items: [], pagination: { totalPages: 1 } } }));
+    const FlowHandler = { run };
+
+    await runOrdersFetchPaginated(FlowHandler, { ownerId: "o1" }, { forceRefresh: true });
+
+    expect(run).toHaveBeenCalledWith(
+      "orders.fetchOrders",
+      { ownerId: "o1" },
+      expect.objectContaining({
+        forceRefresh: true,
+        paginate: expect.objectContaining({
+          pageField: "page",
+          perPageField: "per_page",
+        }),
+      }),
+    );
   });
 });

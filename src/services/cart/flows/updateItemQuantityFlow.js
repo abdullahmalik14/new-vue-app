@@ -1,5 +1,6 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getCartApiBaseUrl, asFlowError } from "../cartApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * Flow to update item quantity in the shopping cart.
@@ -28,10 +29,7 @@ export async function updateItemQuantityFlow({ payload, context, api }) {
     const response = await api.patch(url, {
       quantity: quantity,
     }, {
-      headers: context.requestHeaders || {},
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
-    });
+      ...buildFlowRequestOptions(context) });
 
     if (response?.ok === false) {
       return fail({

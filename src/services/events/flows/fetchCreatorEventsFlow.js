@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus, getEtag, isApiNotModified } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getEventsApiBaseUrl, asFlowError, toNumberOr } from "@/services/events/eventsApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function buildParams(payload = {}) {
   return {
@@ -24,10 +25,7 @@ export async function fetchCreatorEventsFlow({ payload, context, api }) {
 
   try {
     const response = await api.get(`${baseUrl}/events`, {
-      params: buildParams(payload),
-      headers,
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
+      ...buildFlowRequestOptions(context), params: buildParams(payload),
     });
 
     const status = getHttpStatus(response, 200);

@@ -10,7 +10,7 @@ describe("FlowHandler default middlewares (BUG-02)", () => {
   it("restores default middleware stack in FlowHandler.js", () => {
     const source = readFileSync(FLOW_HANDLER_PATH, "utf8");
     expect(source).toMatch(
-      /const defaultMiddlewares = \[withMetrics, withTimeout, withRetry, withAuth\]/,
+      /const defaultMiddlewares = \[withMetrics, withTimeout, withRetry, withAuth, withCsrf\]/,
     );
   });
 

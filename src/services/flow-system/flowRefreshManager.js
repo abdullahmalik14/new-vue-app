@@ -53,7 +53,7 @@ function createFlowRefreshManager() {
   const intervals = new Map();
 
   return {
-    start({ scopeKey, flowName, flowKey, payload = {}, intervalMs = 30000, options = {}, runImmediately = true }) {
+    start({ scopeKey, flowName, flowKey, payload = {}, intervalMs = 30000, options = {}, runImmediately = false }) {
       const resolvedFlowName = flowName || flowKey;
       if (!scopeKey || !resolvedFlowName) {
         throw new Error("flowRefreshManager.start requires scopeKey and flowName");

@@ -74,6 +74,12 @@ export function pickExtraContext(contextOverrides = {}) {
     }
     if (ALLOWED_EXTRA_CONTEXT_KEYS.has(key)) {
       extra[key] = value;
+      return;
+    }
+    if (import.meta.env?.DEV) {
+      console.warn(
+        `[flow-system] Dropped unknown context key "${key}" (not in ALLOWED_EXTRA_CONTEXT_KEYS). Use options.extraContext or an allowlisted key.`,
+      );
     }
   });
 

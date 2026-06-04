@@ -38,6 +38,13 @@ class ApiWrapper {
         return navigator.onLine;
     }
 
+    /**
+     * @param {Object} [options]
+     * @param {boolean} [options.dedupeHttp=true] When true (default), identical in-flight
+     *   requests (method + endpoint + body/query) share one promise. Set `dedupeHttp: false`
+     *   when parallel identical calls must not be collapsed (FEAT-07). Dedupe applies only
+     *   within this ApiWrapper instance, not across separate HTTP clients.
+     */
     async call(endpoint, method = 'GET', data = {}, options = {}) {
         const pt = new PerfTracker(`API:${method}:${endpoint}`, { enabled: true });
         pt.start();

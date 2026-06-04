@@ -31,4 +31,34 @@ describe("validateRegistry (FEAT-06)", () => {
       "bad.flow": { flowKind: "read", pipeline: { retry: "nope" } },
     })).toThrow(/registry validation failed/i);
   });
+
+  it("throws when validators.response is not a function", () => {
+    expect(() => validateRegistry({
+      "bad.validators": {
+        flowKind: "read",
+        flow: async () => ({ ok: true }),
+        validators: { response: "not-fn" },
+      },
+    })).toThrow(/validators\.response must be a function/i);
+  });
+
+  it("throws for unknown concurrency policy", () => {
+    expect(() => validateRegistry({
+      "bad.concurrency": {
+        flowKind: "read",
+        flow: async () => ({ ok: true }),
+        pipeline: { concurrency: { policy: "invalidPolicy" } },
+      },
+    })).toThrow(/concurrency\.policy/i);
+  });
+
+  it("throws for invalid circuitBreaker.failureThreshold", () => {
+    expect(() => validateRegistry({
+      "bad.circuit": {
+        flowKind: "read",
+        flow: async () => ({ ok: true }),
+        circuitBreaker: { failureThreshold: "many" },
+      },
+    })).toThrow(/circuitBreaker\.failureThreshold/i);
+  });
 });

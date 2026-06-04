@@ -1,16 +1,13 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getRentalApiBaseUrl, asFlowError } from "@/services/rental/rentalApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function createRentalReservationFlow({ payload, context, api }) {
   const baseUrl = getRentalApiBaseUrl(context);
   const headers = context.requestHeaders || {};
 
   try {
-    const response = await api.post(`${baseUrl}/rentals/reservations`, payload, {
-      headers,
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
-    });
+    const response = await api.post(`${baseUrl}/rentals/reservations`, payload, buildFlowRequestOptions(context));
 
     const reservationIdRaw = response?.reservationId || response?.id || null;
     const reservationId = reservationIdRaw == null ? null : String(reservationIdRaw);

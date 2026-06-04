@@ -1,5 +1,6 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getCartApiBaseUrl, asFlowError } from "../cartApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * Flow to remove an item from the shopping cart.
@@ -18,10 +19,7 @@ export async function removeItemFromCartFlow({ payload, context, api }) {
 
   try {
     const response = await api.delete(url, {
-      headers: context.requestHeaders || {},
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
-    });
+      ...buildFlowRequestOptions(context) });
 
     if (response?.ok === false) {
       return fail({

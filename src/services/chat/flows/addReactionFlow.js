@@ -12,7 +12,7 @@ export async function addReactionFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}/reactions`, { emoji, count });
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}/reactions`, { emoji, count }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

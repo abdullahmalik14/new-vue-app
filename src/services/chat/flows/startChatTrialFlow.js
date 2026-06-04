@@ -12,7 +12,7 @@ export async function startChatTrialFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/trial`, { userId, trialDays });
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/trial`, { userId, trialDays }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

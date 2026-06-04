@@ -161,7 +161,7 @@ function getSnapshotTtlMs(snapshot, readFromConfig) {
   return readFromConfig.ttlMs;
 }
 
-function recordStaleRevalidateFailure(context, errorOrResult) {
+export function recordStaleRevalidateFailure(context, errorOrResult) {
   context.staleRevalidateFailures = (context.staleRevalidateFailures || 0) + 1;
   context.lastStaleRevalidateError = errorOrResult?.error || errorOrResult?.message || errorOrResult;
   log({
@@ -184,9 +184,9 @@ function recordStaleRevalidateFailure(context, errorOrResult) {
   }
 }
 
-function resolveRevalidateAbortSignal(context) {
+function resolveRevalidateAbortController(context) {
   if (context.revalidateAbortController) {
-    return context.revalidateAbortController.signal;
+    return context.revalidateAbortController;
   }
 
   const controller = new AbortController();
@@ -203,7 +203,7 @@ function resolveRevalidateAbortSignal(context) {
     }
   }
 
-  return controller.signal;
+  return controller;
 }
 
 function startBackgroundRevalidate(context) {
@@ -212,7 +212,7 @@ function startBackgroundRevalidate(context) {
 
   const concurrencyConfig = context.pipeline?.concurrency || {};
   const revalidateKey = buildConcurrencyKey(context.flowName, context.payload, concurrencyConfig);
-  const signal = resolveRevalidateAbortSignal(context);
+  const revalidateController = resolveRevalidateAbortController(context);
   const timeoutMs = context.totalFlowTimeoutMs || context.requestTimeoutMs || context.timeoutMs;
 
   return scheduleBackgroundRevalidateOnce(
@@ -222,7 +222,7 @@ function startBackgroundRevalidate(context) {
         forceRefresh: true,
         skipDestinationRead: true,
         backgroundRevalidate: true,
-        revalidateSignal: signal,
+        revalidateSignal: revalidateController.signal,
       });
       if (!result?.ok) {
         recordStaleRevalidateFailure(context, result);
@@ -230,7 +230,8 @@ function startBackgroundRevalidate(context) {
       return result;
     },
     {
-      signal,
+      abortController: revalidateController,
+      signal: revalidateController.signal,
       timeoutMs,
       onError: (error) => {
         recordStaleRevalidateFailure(context, error);

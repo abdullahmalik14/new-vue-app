@@ -12,7 +12,7 @@ export async function updateChatModeFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.patch(`${baseUrl}/chats/${encodeURIComponent(chatId)}/mode`, { mode, maxParticipants });
+    const response = await api.patch(`${baseUrl}/chats/${encodeURIComponent(chatId)}/mode`, { mode, maxParticipants }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

@@ -2,6 +2,7 @@ import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getBookingsApiBaseUrl, asFlowError } from "@/services/bookings/bookingsApiUtils.js";
 import { getEventsApiBaseUrl } from "@/services/events/eventsApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 import {
   fireAndForgetCreateScheduleNotify,
   getCreateScheduleNotifyPayload,
@@ -26,11 +27,7 @@ async function fetchFreshEventForApprovalNotification({ api, context, headers, e
 
   try {
     const baseUrl = getEventsApiBaseUrl(context);
-    const response = await api.get(`${baseUrl}/events/${encodeURIComponent(normalizedEventId)}`, {
-      headers,
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
-    });
+    const response = await api.get(`${baseUrl}/events/${encodeURIComponent(normalizedEventId)}`, buildFlowRequestOptions(context));
 
     if (response?.ok === false) {
       return null;
@@ -70,11 +67,7 @@ export async function reviewPendingBookingFlow({ payload, context, api }) {
       actor: payload?.actor || "creator",
       reason: payload?.reason || "",
       args: payload?.args && typeof payload.args === "object" ? payload.args : {},
-    }, {
-      headers,
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
-    });
+    }, buildFlowRequestOptions(context));
 
     const status = getHttpStatus(response, 200);
 

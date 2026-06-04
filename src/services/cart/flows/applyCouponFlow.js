@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getCartApiBaseUrl, asFlowError } from "../cartApiUtils.js";
 import { SafeUtils } from "@/utils/SafeUtils";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * applyCouponFlow
@@ -18,10 +19,7 @@ export async function applyCouponFlow({ payload, context, api }) {
   const url = `${baseUrl}/cart/${sessionId}/coupons`;
 
   try {
-    const response = await api.post(url, { couponCode }, {
-      headers: context.requestHeaders,
-      signal: context.signal,
-    });
+    const response = await api.post(url, { couponCode }, buildFlowRequestOptions(context));
 
     if (response?.ok === false) {
       return fail({

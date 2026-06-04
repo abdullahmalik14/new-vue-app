@@ -115,7 +115,7 @@ export function createPipelineContext({
     revalidateAbortController: null,
     pipeline,
     uiErrorMap: pipeline.uiErrorMap || flowEntry.uiErrorMap || null,
-    requireAuth: options.requireAuth === true,
+    requireAuth: options.requireAuth === true || flowEntry?.requireAuth === true,
     timeoutMs: options.timeoutMs || pipeline.timeoutMs || 15000,
     requestTimeoutMs: options.requestTimeoutMs || pipeline.timeouts?.requestMs || pipeline.timeoutMs || 15000,
     totalFlowTimeoutMs: options.totalFlowTimeoutMs || pipeline.timeouts?.totalFlowMs || pipeline.timeoutMs || 15000,

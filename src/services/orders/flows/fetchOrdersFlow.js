@@ -1,5 +1,6 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus, getEtag, isApiNotModified } from "@/services/flow-system/runtime/httpMetaRuntime.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * fetchOrdersFlow
@@ -19,7 +20,7 @@ export async function fetchOrdersFlow({ payload, context, api }) {
 
   try {
     const response = await api.get(endpoint, {
-      params: {
+      ...buildFlowRequestOptions(context), params: {
         page: payload.page || 1,
         per_page: payload.per_page || 10,
         status: payload.status,
@@ -28,9 +29,6 @@ export async function fetchOrdersFlow({ payload, context, api }) {
         owner_id: payload.owner_id,
         customer_id: payload.customer_id,
       },
-      headers: context.requestHeaders || {},
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs || 12000,
     });
 
     if (response?.ok === false) {

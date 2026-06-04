@@ -1,6 +1,7 @@
 import { assertRegistryDestinationsSafe } from "@/services/flow-system/runtime/destinationRuntime.js";
 
 const VALID_FLOW_KINDS = new Set(["read", "write", "query", "fetch", "mutation", "action"]);
+const VALID_CONCURRENCY_POLICIES = new Set(["latestWins", "firstWins", "allowParallel"]);
 const VALID_DESTINATION_TYPES = new Set([
   "return",
   "stateEngine",
@@ -38,6 +39,51 @@ function validateRetryConfig(flowName, retry, issues) {
   }
 }
 
+function validateValidators(flowName, validators, issues) {
+  if (validators == null) return;
+  if (typeof validators !== "object" || Array.isArray(validators)) {
+    pushIssue(issues, flowName, "validators must be an object.");
+    return;
+  }
+  if (validators.payload != null && typeof validators.payload !== "function") {
+    pushIssue(issues, flowName, "validators.payload must be a function.");
+  }
+  if (validators.response != null && typeof validators.response !== "function") {
+    pushIssue(issues, flowName, "validators.response must be a function.");
+  }
+}
+
+function validateConcurrency(flowName, concurrency, issues) {
+  if (concurrency == null) return;
+  if (typeof concurrency !== "object" || Array.isArray(concurrency)) {
+    pushIssue(issues, flowName, "pipeline.concurrency must be an object.");
+    return;
+  }
+  if (concurrency.policy != null && !VALID_CONCURRENCY_POLICIES.has(String(concurrency.policy))) {
+    pushIssue(issues, flowName, `pipeline.concurrency.policy must be one of: ${[...VALID_CONCURRENCY_POLICIES].join(", ")}.`);
+  }
+  if (concurrency.dedupe !== undefined && typeof concurrency.dedupe !== "boolean") {
+    pushIssue(issues, flowName, "pipeline.concurrency.dedupe must be a boolean.");
+  }
+}
+
+function validateCircuitBreaker(flowName, circuitBreaker, issues) {
+  if (circuitBreaker == null) return;
+  if (typeof circuitBreaker !== "object" || Array.isArray(circuitBreaker)) {
+    pushIssue(issues, flowName, "circuitBreaker must be an object.");
+    return;
+  }
+  if (circuitBreaker.enabled !== undefined && typeof circuitBreaker.enabled !== "boolean") {
+    pushIssue(issues, flowName, "circuitBreaker.enabled must be a boolean.");
+  }
+  if (circuitBreaker.failureThreshold !== undefined && !Number.isFinite(Number(circuitBreaker.failureThreshold))) {
+    pushIssue(issues, flowName, "circuitBreaker.failureThreshold must be a number.");
+  }
+  if (circuitBreaker.cooldownMs !== undefined && !Number.isFinite(Number(circuitBreaker.cooldownMs))) {
+    pushIssue(issues, flowName, "circuitBreaker.cooldownMs must be a number.");
+  }
+}
+
 function validateDestination(flowName, dest, index, issues) {
   if (!dest || typeof dest !== "object") {
     pushIssue(issues, flowName, `destinations[${index}] must be an object.`);
@@ -63,11 +109,15 @@ function validateFlowEntry(flowName, rawEntry, issues) {
     pushIssue(issues, flowName, "flowKind must be 'read' or 'write' (or alias).");
   }
 
+  validateValidators(flowName, entry.validators, issues);
+  validateCircuitBreaker(flowName, entry.circuitBreaker, issues);
+
   if (entry.pipeline != null) {
     if (typeof entry.pipeline !== "object" || Array.isArray(entry.pipeline)) {
       pushIssue(issues, flowName, "pipeline must be an object.");
     } else {
       validateRetryConfig(flowName, entry.pipeline.retry, issues);
+      validateConcurrency(flowName, entry.pipeline.concurrency, issues);
       if (entry.pipeline.destinations != null) {
         if (!Array.isArray(entry.pipeline.destinations)) {
           pushIssue(issues, flowName, "pipeline.destinations must be an array.");

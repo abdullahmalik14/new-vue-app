@@ -12,7 +12,7 @@ export async function editMessageFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.patch(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}`, { text, metadata });
+    const response = await api.patch(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}`, { text, metadata }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

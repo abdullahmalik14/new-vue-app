@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getBookingsApiBaseUrl, asFlowError } from "@/services/bookings/bookingsApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function updateTemporaryHoldUserFlow({ payload, context, api }) {
   const baseUrl = getBookingsApiBaseUrl(context);
@@ -20,7 +21,7 @@ export async function updateTemporaryHoldUserFlow({ payload, context, api }) {
     const response = await api.patch(
       `${baseUrl}/temporary-holds/${encodeURIComponent(temporaryHoldId)}/user`,
       { userId },
-      { headers, signal: context.signal, timeoutMs: context.requestTimeoutMs },
+      buildFlowRequestOptions(context),
     );
 
     const status = getHttpStatus(response, 200);

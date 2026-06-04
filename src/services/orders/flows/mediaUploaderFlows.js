@@ -9,6 +9,6 @@ export const uploadMediaFlow = async ({ payload, api }) => {
 };
 
 export const submitUploaderFlow = async ({ payload, api }) => {
-  const response = await api.post("/media/submit", payload);
+  const response = await api.post("/media/submit", payload, buildFlowRequestOptions(context));
   return response;
 };

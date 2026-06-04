@@ -1,5 +1,6 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getCartApiBaseUrl, asFlowError } from "../cartApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * mergeGuestCartFlow
@@ -19,10 +20,7 @@ export async function mergeGuestCartFlow({ payload, context, api }) {
   const url = `${baseUrl}/cart/merge`;
 
   try {
-    const response = await api.post(url, { sessionId: guestSessionId, userId }, {
-      headers: context.requestHeaders,
-      signal: context.signal,
-    });
+    const response = await api.post(url, { sessionId: guestSessionId, userId }, buildFlowRequestOptions(context));
 
     if (response?.ok === false) {
       return fail({

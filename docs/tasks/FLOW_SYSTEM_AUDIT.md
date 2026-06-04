@@ -1041,6 +1041,7 @@ const _globalContext = {
 
 **What changed:**
 - `FlowHandler.js`: `configure()` now **replaces** `piniaStores` when provided (shallow copy) and sets `stateEngine` only when that field is passed; JSDoc notes idempotent re-call with the same values.
+- `useAuthStore.logout()` calls `flowRefreshManager.stopAll()` and `FlowHandler.reset()` before clearing auth state.
 - Added `FlowHandler.reset()` to restore empty global context (tests, logout, dev hot reload).
 - Added `FlowHandler.getContextSnapshot()` returning `piniaStoreKeys` and `hasStateEngine` for verifiable browser/unit checks without exposing store instances.
 - `tests/unit/flowHandlerGlobalContext.test.js` covers replace semantics, reset, and idempotent configure.
@@ -1132,14 +1133,14 @@ Direct mutation of `progress` inside an async pipeline means:
   const progressRef = createFlowProgressRef(false);
   await FlowHandler.run('events.fetchEvent', { eventId: 'bp03-test' }, { progressRef });
   const out = {
-    pass: progressRef.value === false && ctx.progress !== before && ctx.progress.loading === true,
+    pass: progressRef.value === false && ctx.progress !== before && ctx.progress.loading === false,
     refAfterRun: progressRef.value,
     patchedImmutable: ctx.progress !== before,
   };
   console.log('[BP-03]', out);
 })();
 ```
-**Expected:** `pass: true`; `refAfterRun: false` (finally cleared); `patchedImmutable: true`.
+**Expected:** `pass: true`; `refAfterRun: false` (finally cleared); `ctx.progress.loading: false` after run; `patchedImmutable: true`.
 
 **Unit test:** `npm run test:unit -- run tests/unit/flowHandlerProgress.test.js`
 
@@ -1449,7 +1450,7 @@ Repeated failures on a flow (network outages, bad deployments) cause the system 
 **What was broken:** `cancelInFlight` existed in `concurrencyRuntime` but was not reachable from app/components.
 
 **What changed:**
-- `FlowHandler.cancel(flowName, payload, { reason })` builds the registry concurrency key and calls `cancelInFlight`.
+- `FlowHandler.cancel(flowName, payload, { reason })` builds the registry concurrency key and calls `cancelInFlightForKey` (base key + `allowParallel` children).
 - `FlowHandler.hasInFlight(flowName, payload)` exposes in-flight lookup for UI guards.
 - Emits `cancelled` lifecycle event when cancel succeeds.
 - `tests/unit/flowHandlerCancelAndLifecycle.test.js`.
@@ -1569,7 +1570,7 @@ The registry is a plain object. Misconfigured entries (wrong type for `pipeline.
 **What was broken:** Registry misconfigurations (missing `flow`, invalid `pipeline.retry`, unknown destination types) only surfaced when a flow was first executed.
 
 **What changed:**
-- `registry/validateRegistry.js`: validates `flow`, `flowKind`, `pipeline.retry`, destination `type`, and `refresh` shape; reuses `assertRegistryDestinationsSafe`.
+- `registry/validateRegistry.js`: validates `flow`, `flowKind`, `validators.*`, `circuitBreaker`, `pipeline.retry`, `pipeline.concurrency.policy`, destination `type`, and `refresh` shape; reuses `assertRegistryDestinationsSafe`.
 - `flowRegistry.js`: calls `validateRegistry(flowRegistry)` at module load (boot/import).
 - `tests/unit/validateRegistry.test.js`.
 
@@ -1601,7 +1602,7 @@ The concurrency layer deduplicates at the flow level, but if two different flow 
 **What was broken:** Two flows hitting the same HTTP endpoint concurrently always issued duplicate network calls.
 
 **What changed:**
-- `apiWrapper.js`: in-flight dedupe map keyed by method + endpoint + serialized body/query; concurrent identical calls share one promise (`dedupeHttp: false` to opt out).
+- `apiWrapper.js`: in-flight dedupe map keyed by method + endpoint + serialized body/query; concurrent identical calls share one promise (`options.dedupeHttp: false` to opt out; mock ApiWrapper only).
 - `tests/unit/apiWrapperHttpDedupe.test.js`.
 
 **How to test in the browser (one paste, dev app loaded):**
@@ -1644,7 +1645,7 @@ The background revalidate promise is not tracked. It has no timeout, no abort si
 
 **What changed:**
 - `backgroundRevalidateRunner.js`: `runWithAbortAndTimeout` (abort signal + timeout race).
-- `backgroundRevalidate.js`: schedules tracked tasks; supports `signal`, `timeoutMs`, `onError`.
+- `backgroundRevalidate.js`: schedules tracked tasks with `setTimeout` ids; `abortBackgroundRevalidate` clears timer and aborts `AbortController`; supports `signal`, `timeoutMs`, `onError`.
 - `readPipeline.js`: wires revalidate `AbortController` (links `options.revalidateSignal` from parent), passes flow timeout to background rerun.
 - `pipelineContext.js`: `runtimeOptions.revalidateSignal`.
 - `FlowHandler.abortBackgroundRevalidate(flowName, payload)` for call-site cancellation.
@@ -1687,6 +1688,7 @@ Several flows return paginated data (`fetchAnalyticsFlow`, `fetchMessagesFlow`, 
 - `utils/flowPagination.js`: `runPaginatedFlow` loops pages via `options.paginate` (`maxPages`, `pageField`, `perPage`, optional `hasMore` / `mergePages` hooks).
 - `FlowHandler.run`: when `options.paginate` is set, delegates to paginated runner (stripped on nested page calls).
 - Default merge appends `data.items` and tracks `pagesFetched` in meta.
+- `runOrdersFetchPaginated()` helper and JSDoc example for `orders.fetchOrders` (`page` / `per_page`).
 - `tests/unit/flowPagination.test.js`.
 
 **How to test in the browser (one paste):**
@@ -1890,7 +1892,7 @@ Because `options.context` is spread after the computed `requestHeaders`, a calle
 
 **Status:** Resolved (with BUG-11).
 
-**What changed:** Documented allowlist in `pipelineExtraContext.js` (`ALLOWED_EXTRA_CONTEXT_KEYS`); reserved keys stripped via `pickExtraContext()`. Prefer `options.extraContext` for new call sites.
+**What changed:** Documented allowlist in `pipelineExtraContext.js` (`ALLOWED_EXTRA_CONTEXT_KEYS`); reserved keys stripped via `pickExtraContext()`. Unknown keys log a DEV `console.warn`. Prefer `options.extraContext` for new call sites.
 
 ---
 
@@ -1906,13 +1908,15 @@ Request option handling is duplicated across many files, producing drift (some p
 
 #### Resolution ✅
 
-**Status:** Resolved.
+**Status:** Resolved (chat + domain flows); lint enforces all `*/flows/` API modules.
 
 **What changed:**
 - `utils/buildFlowRequestOptions.js`: standard `{ headers, signal, timeoutMs }` builder.
 - Re-exported from `chatApiUtils.js`.
-- Chat flows updated to use `buildFlowRequestOptions(context)` on API calls (`scripts/patch-chat-flow-request-options.mjs`).
-- `tests/unit/buildFlowRequestOptions.test.js`.
+- Chat flows updated via `scripts/patch-chat-flow-request-options.mjs`.
+- Cart, bookings, events, orders, and rental flows updated via `scripts/patch-domain-flow-request-options.mjs` (+ pass 2).
+- `tests/unit/buildFlowRequestOptions.test.js`, `tests/unit/flowRequestOptionsLint.test.js` (repo-wide).
+- Exempt: `analytics/flows` (uses `fetch`), `orders/flows/mediaUploaderFlows.js` (no pipeline context).
 
 **How to test in the browser (one paste):**
 ```js
@@ -2082,7 +2086,7 @@ Failures during stale-while-revalidate are invisible to callers and telemetry.
 
 **What changed:** `recordStaleRevalidateFailure` logs via `logHandler`, increments `context.staleRevalidateFailures`, sets `lastStaleRevalidateError`, and invokes optional `onStaleRevalidateFailed`. Background revalidate checks `rerunFlow` result and routes failures through `onError`.
 
-**Unit test:** Manual / integration; pipeline context fields covered by read pipeline usage.
+**Unit test:** `npm run test:unit -- run tests/unit/readPipelineStaleRevalidate.test.js`
 
 ---
 

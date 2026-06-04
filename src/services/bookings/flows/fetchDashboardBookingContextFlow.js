@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus, getEtag, isApiNotModified } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getBookingsApiBaseUrl, asFlowError, toNumber } from "@/services/bookings/bookingsApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function normalizeUserRole(value) {
   const normalized = typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -83,7 +84,7 @@ function extractUniqueEventIdsFromSlots(slots = []) {
   return ids;
 }
 
-async function fetchCreatorDashboardContext({ payload, context, api, baseUrl, headers }) {
+async function fetchCreatorDashboardContext({ payload, context, api, baseUrl }) {
   if (payload?.creatorId == null || payload?.creatorId === "") {
     return fail({
       code: "MISSING_CREATOR_ID",
@@ -92,10 +93,7 @@ async function fetchCreatorDashboardContext({ payload, context, api, baseUrl, he
   }
 
   const eventsResponse = await api.get(`${baseUrl}/events`, {
-    params: buildCreatorEventParams(payload),
-    headers,
-    signal: context.signal,
-    timeoutMs: context.requestTimeoutMs,
+    ...buildFlowRequestOptions(context), params: buildCreatorEventParams(payload),
   });
 
   const eventsStatus = getHttpStatus(eventsResponse, 200);
@@ -115,9 +113,8 @@ async function fetchCreatorDashboardContext({ payload, context, api, baseUrl, he
     : (Array.isArray(eventsResponse?.items) ? eventsResponse.items : []);
 
   const bookedSlotsResponse = await api.get(resolveBookedSlotsEndpoint(baseUrl, payload), {
+    ...buildFlowRequestOptions(context),
     params: buildBookedSlotParams(payload, { includeEventId: true }),
-    signal: context.signal,
-    timeoutMs: context.requestTimeoutMs,
   });
 
   if (bookedSlotsResponse?.ok === false) {
@@ -154,9 +151,7 @@ async function fetchFanDashboardContext({ payload, context, api, baseUrl }) {
   }
 
   const bookedSlotsResponse = await api.get(resolveBookedSlotsEndpoint(baseUrl, payload), {
-    params: buildBookedSlotParams(payload),
-    signal: context.signal,
-    timeoutMs: context.requestTimeoutMs,
+    ...buildFlowRequestOptions(context), params: buildBookedSlotParams(payload),
   });
 
   if (bookedSlotsResponse?.ok === false) {
@@ -189,10 +184,8 @@ async function fetchFanDashboardContext({ payload, context, api, baseUrl }) {
   }
 
   const eventsResponse = await api.get(`${baseUrl}/events`, {
+    ...buildFlowRequestOptions(context),
     params: buildIdsEventParams(eventIds, payload),
-    headers: context.requestHeaders || {},
-    signal: context.signal,
-    timeoutMs: context.requestTimeoutMs,
   });
 
   const eventsStatus = getHttpStatus(eventsResponse, 200);
@@ -230,16 +223,15 @@ async function fetchFanDashboardContext({ payload, context, api, baseUrl }) {
 
 export async function fetchDashboardBookingContextFlow({ payload, context, api }) {
   const baseUrl = getBookingsApiBaseUrl(context);
-  const headers = context.requestHeaders || {};
   const userRole = normalizeUserRole(payload?.userRole);
 
   try {
     if (userRole === "fan") {
-      return await fetchFanDashboardContext({ payload, context, api, baseUrl, headers });
+      return await fetchFanDashboardContext({ payload, context, api, baseUrl });
     }
 
     if (userRole === "creator") {
-      return await fetchCreatorDashboardContext({ payload, context, api, baseUrl, headers });
+      return await fetchCreatorDashboardContext({ payload, context, api, baseUrl });
     }
 
     return fail({

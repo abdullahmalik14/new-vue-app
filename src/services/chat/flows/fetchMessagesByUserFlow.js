@@ -12,7 +12,7 @@ export async function fetchMessagesByUserFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.get(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/by-user/${encodeURIComponent(userId)}`, { params: { since, until, limit, sort } });
+    const response = await api.get(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/by-user/${encodeURIComponent(userId)}`, { ...buildFlowRequestOptions(context), params: { since, until, limit, sort } });
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

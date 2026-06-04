@@ -12,7 +12,7 @@ export async function upgradeMembershipFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/membership/upgrade`, { userId, newTier });
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/membership/upgrade`, { userId, newTier }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {

@@ -1,5 +1,6 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getRentalApiBaseUrl, asFlowError } from "@/services/rental/rentalApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function cancelRentalReservationFlow({ payload, context, api }) {
   const baseUrl = getRentalApiBaseUrl(context);
@@ -18,11 +19,7 @@ export async function cancelRentalReservationFlow({ payload, context, api }) {
       {
         reason: payload.reason || "user_cancelled",
       },
-      {
-        headers,
-        signal: context.signal,
-        timeoutMs: context.requestTimeoutMs,
-      }
+      buildFlowRequestOptions(context)
     );
 
     if (!response?.ok) {

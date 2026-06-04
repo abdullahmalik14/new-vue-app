@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus, getEtag, isApiNotModified } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getCartApiBaseUrl, asFlowError } from "../cartApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * Flow to fetch the current user's cart including items and summary.
@@ -18,10 +19,7 @@ export async function fetchCartFlow({ payload, context, api }) {
 
   try {
     const response = await api.get(endpoint, {
-      headers: context.requestHeaders || {},
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
-    });
+      ...buildFlowRequestOptions(context) });
 
     if (response?.ok === false) {
       return fail({

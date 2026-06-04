@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getBookingsApiBaseUrl, asFlowError } from "@/services/bookings/bookingsApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function fetchBookingFlow({ payload, context, api }) {
   const baseUrl = getBookingsApiBaseUrl(context);
@@ -16,10 +17,7 @@ export async function fetchBookingFlow({ payload, context, api }) {
 
   try {
     const response = await api.get(`${baseUrl}/bookings/${encodeURIComponent(bookingId)}`, {
-      headers: context.requestHeaders || {},
-      signal: context.signal,
-      timeoutMs: context.requestTimeoutMs,
-    });
+      ...buildFlowRequestOptions(context) });
 
     const status = getHttpStatus(response, 200);
 

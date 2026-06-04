@@ -290,6 +290,8 @@
           </div>
         </div>
       </section>
+
+      <ValidationRulesShowcase />
     </div>
   </div>
 </template>
@@ -298,10 +300,10 @@
 import { ref, computed, onMounted, defineComponent, h } from 'vue';
 import InputAuthComponent from '@/components/input/InputAuthComponent.vue';
 import CodeInputAuthComponent from '@/components/input/CodeInputAuthComponent.vue';
+import ValidationRulesShowcase from '@/components/demoAuditComponents/ValidationRulesShowcase.vue';
 import DemoSectionHeader from '@/templates/dev/DemoSectionHeader.vue';
 import ButtonComponent from '@/components/button/ButtonComponent.vue';
 import Checkbox from '@/components/checkbox/CheckboxGroup.vue';
-import { interactionsEngine } from '@/utils/validation/interactionsEngine.js';
 import {
   InformationCircleIcon,
   CheckCircleIcon,

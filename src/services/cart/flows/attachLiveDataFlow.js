@@ -1,5 +1,6 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getCartApiBaseUrl, asFlowError } from "../cartApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * attachLiveDataFlow
@@ -11,10 +12,7 @@ export async function attachLiveDataFlow({ payload, context, api }) {
   const url = `${baseUrl}/cart/${sessionId}/live-data`;
 
   try {
-    const response = await api.post(url, {}, {
-      headers: context.requestHeaders,
-      signal: context.signal,
-    });
+    const response = await api.post(url, {}, buildFlowRequestOptions(context));
 
     if (response?.ok === false) {
       return fail({

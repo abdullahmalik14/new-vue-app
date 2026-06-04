@@ -61,6 +61,12 @@ export function acquireRunSlot({ key, policy = "latestWins", dedupe = false }) {
   };
 }
 
+const PARALLEL_KEY_MARKER = ":parallel:";
+
+function isParallelChildKey(key, baseKey) {
+  return key.startsWith(`${baseKey}${PARALLEL_KEY_MARKER}`);
+}
+
 export function cancelInFlight(key, reason = "Cancelled") {
   const current = inFlight.get(key);
   if (!current?.abortController) return false;
@@ -69,8 +75,28 @@ export function cancelInFlight(key, reason = "Cancelled") {
   return true;
 }
 
+/** Cancels exact key and any allowParallel child keys under the same base concurrency key. */
+export function cancelInFlightForKey(baseKey, reason = "Cancelled") {
+  let cancelled = cancelInFlight(baseKey, reason);
+  for (const key of [...inFlight.keys()]) {
+    if (isParallelChildKey(key, baseKey)) {
+      cancelled = cancelInFlight(key, reason) || cancelled;
+    }
+  }
+  return cancelled;
+}
+
 export function hasInFlight(key) {
   return inFlight.has(key);
+}
+
+/** True when base key or any allowParallel child slot is in flight. */
+export function hasInFlightForKey(baseKey) {
+  if (inFlight.has(baseKey)) return true;
+  for (const key of inFlight.keys()) {
+    if (isParallelChildKey(key, baseKey)) return true;
+  }
+  return false;
 }
 
 export function clearInFlight() {

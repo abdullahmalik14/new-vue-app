@@ -39,4 +39,27 @@ describe("flowRefreshManager runImmediately (PERF-01)", () => {
     expect(runMock).toHaveBeenCalledTimes(1);
     manager.stopAll();
   });
+
+  it("start does not run immediately by default", () => {
+    const manager = createFlowRefreshManager();
+    manager.start({
+      scopeKey: "perf01-direct",
+      flowName: "analytics.fetch",
+      intervalMs: 30000,
+    });
+    expect(runMock).not.toHaveBeenCalled();
+    manager.stopAll();
+  });
+
+  it("start runs immediately when runImmediately is true", async () => {
+    const manager = createFlowRefreshManager();
+    manager.start({
+      scopeKey: "perf01-direct-immediate",
+      flowName: "analytics.fetch",
+      intervalMs: 30000,
+      runImmediately: true,
+    });
+    await vi.waitFor(() => expect(runMock).toHaveBeenCalledTimes(1));
+    manager.stopAll();
+  });
 });

@@ -1,5 +1,6 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getCartApiBaseUrl, asFlowError } from "../cartApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * applyFeesFlow
@@ -17,10 +18,7 @@ export async function applyFeesFlow({ payload, context, api }) {
   const url = `${baseUrl}/cart/${sessionId}/fees`;
 
   try {
-    const response = await api.post(url, fees, {
-      headers: context.requestHeaders,
-      signal: context.signal,
-    });
+    const response = await api.post(url, fees, buildFlowRequestOptions(context));
 
     if (response?.ok === false) {
       return fail({

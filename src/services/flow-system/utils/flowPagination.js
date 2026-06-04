@@ -1,5 +1,22 @@
 import { fail } from "@/services/flow-system/flowTypes.js";
 
+/**
+ * Paginated flow runs (FEAT-09).
+ *
+ * Example — `orders.fetchOrders` (page + per_page query fields):
+ * ```js
+ * await FlowHandler.run('orders.fetchOrders', { ownerId: 'creator-1' }, {
+ *   paginate: {
+ *     pageField: 'page',
+ *     perPageField: 'per_page',
+ *     perPage: 10,
+ *     maxPages: 20,
+ *   },
+ * });
+ * ```
+ * Merged result: `data.items` appended across pages; `meta.pagesFetched` set.
+ */
+
 function defaultHasMore(result, page, config) {
   const pagination = result?.data?.pagination;
   if (pagination && Number.isFinite(Number(pagination.totalPages))) {
@@ -91,4 +108,18 @@ export async function runPaginatedFlow(runOnce, { flowName, payload, options }) 
   }
 
   return accumulated;
+}
+
+/** Convenience wrapper for orders.fetchOrders pagination (page / per_page). */
+export function runOrdersFetchPaginated(FlowHandler, payload = {}, options = {}) {
+  return FlowHandler.run("orders.fetchOrders", payload, {
+    ...options,
+    paginate: {
+      pageField: "page",
+      perPageField: "per_page",
+      perPage: 10,
+      maxPages: 20,
+      ...options.paginate,
+    },
+  });
 }

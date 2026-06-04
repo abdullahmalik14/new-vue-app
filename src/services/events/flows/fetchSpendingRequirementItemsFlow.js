@@ -1,6 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { asFlowError, toNumberOr } from "@/services/events/eventsApiUtils.js";
+import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 const EXTERNAL_API_BASE_URL = import.meta.env.VITE_WEB_BASE_URL + "/wp-json/api";
 const COLLECTION_CONFIG = {
@@ -52,10 +53,7 @@ function mapPrimaryResponse(type, response = {}, payload = {}) {
 async function fetchPrimaryCollection({ type, payload, context, api }) {
   const config = COLLECTION_CONFIG[type];
   const response = await api.get(`${EXTERNAL_API_BASE_URL}${config.path}`, {
-    params: buildPrimaryParams(type, payload),
-    headers: context.requestHeaders || {},
-    signal: context.signal,
-    timeoutMs: context.requestTimeoutMs,
+    ...buildFlowRequestOptions(context), params: buildPrimaryParams(type, payload),
   });
 
   const status = getHttpStatus(response, 200);
@@ -73,12 +71,9 @@ async function fetchPrimaryCollection({ type, payload, context, api }) {
 
 async function fetchSubscriptionFallback({ payload, context, api }) {
   const response = await api.get(`${EXTERNAL_API_BASE_URL}/users/active-tiers`, {
-    params: {
+    ...buildFlowRequestOptions(context), params: {
       user_id: payload.creatorId,
     },
-    headers: context.requestHeaders || {},
-    signal: context.signal,
-    timeoutMs: context.requestTimeoutMs,
   });
 
   const status = getHttpStatus(response, 200);

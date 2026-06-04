@@ -12,7 +12,7 @@ export async function sendMixedMessageFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/mixed`, { elements, senderId });
+    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/mixed`, { elements, senderId }, buildFlowRequestOptions(context));
     const status = getHttpStatus(response, 201);
 
     if (response?.ok === false) {
