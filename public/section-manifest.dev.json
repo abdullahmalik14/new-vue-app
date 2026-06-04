@@ -1,0 +1,79 @@
+{
+  "auth": {
+    "section": "auth",
+    "js": "/assets/section-auth-dev.js",
+    "css": "/assets/section-auth-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  },
+  "dashboard-global": {
+    "section": "dashboard-global",
+    "js": "/assets/section-dashboard-global-dev.js",
+    "css": "/assets/section-dashboard-global-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  },
+  "dashboard-creator": {
+    "section": "dashboard-creator",
+    "js": "/assets/section-dashboard-creator-dev.js",
+    "css": "/assets/section-dashboard-creator-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  },
+  "dashboard-fan": {
+    "section": "dashboard-fan",
+    "js": "/assets/section-dashboard-fan-dev.js",
+    "css": "/assets/section-dashboard-fan-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  },
+  "shop": {
+    "section": "shop",
+    "js": "/assets/section-shop-dev.js",
+    "css": "/assets/section-shop-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  },
+  "misc": {
+    "section": "misc",
+    "js": "/assets/section-misc-dev.js",
+    "css": "/assets/section-misc-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  },
+  "discover": {
+    "section": "discover",
+    "js": "/assets/section-discover-dev.js",
+    "css": "/assets/section-discover-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  },
+  "profile": {
+    "section": "profile",
+    "js": "/assets/section-profile-dev.js",
+    "css": "/assets/section-profile-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  },
+  "about": {
+    "section": "about",
+    "js": "/assets/section-about-dev.js",
+    "css": "/assets/section-about-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  },
+  "contact": {
+    "section": "contact",
+    "js": "/assets/section-contact-dev.js",
+    "css": "/assets/section-contact-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  },
+  "dev": {
+    "section": "dev",
+    "js": "/assets/section-dev-dev.js",
+    "css": "/assets/section-dev-dev.css",
+    "size": 0,
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  }
+}

@@ -7,15 +7,19 @@
  */
 
 import routeConfigData from '../../router/routeConfig.json';
-import { loadJsonConfigFromImport } from '../common/jsonConfigLoader.js';
+import sharedAssetPreloads from '../../router/sharedAssetPreloads.json';
+import assetMapData from '../../config/assetMap.json';
+import { loadJsonConfigFromImport, clearConfigCache } from '../common/jsonConfigLoader.js';
 import { log } from '../common/logHandler.js';
+import { trackStep } from '../common/performanceTrackerAccess.js';
 import { logError } from '../common/errorHandler.js';
 import { validateRouteConfig } from '../build/jsonConfigValidator.js';
+import { resolveRouteAssetPreloads } from './resolveRouteAssetPreloads.js';
+import { validateRouteComponentPathsWithResolver } from './routeComponentPathValidator.js';
+import { findComponentLoader } from './routeComponentLoader.js';
+import { validateRouteAssetPreloadFlags } from '../assets/validateRouteAssetPreloadFlags.js';
 
-// Performance tracker available globally as window.performanceTracker
-
-// Cache TTL - route config rarely changes at runtime
-const ROUTE_CONFIG_CACHE_TTL = 3600000; // 1 hour
+// Performance tracking via trackStep() from performanceTrackerAccess.js
 
 /**
  * Load route configuration from JSON file with validation
@@ -26,26 +30,20 @@ const ROUTE_CONFIG_CACHE_TTL = 3600000; // 1 hour
  */
 export function loadRouteConfigurationFromFile() {
   log('routeConfigLoader.js', 'loadRouteConfigurationFromFile', 'start', 'Loading route configuration', {});
-
-  if (window.performanceTracker) {
-    try {
-      window.performanceTracker.step({
+  trackStep({
         step: 'loadRouteConfig_start',
         file: 'routeConfigLoader.js',
         method: 'loadRouteConfigurationFromFile',
         flag: 'io',
         purpose: 'Load route configuration from JSON file'
       });
-    } catch (e) {
-      // Performance tracker session ended, ignore
-    }
-  }
 
   try {
     // Load route config using global JSON config loader
+    // Static Vite import — config is fixed for the page session (L17: no TTL expiry)
     const result = loadJsonConfigFromImport(routeConfigData, {
       configName: 'route_config',
-      cacheTTL: ROUTE_CONFIG_CACHE_TTL,
+      cacheTTL: 0,
       skipValidation: false,
       validator: validateRouteConfig
     });
@@ -57,7 +55,7 @@ export function loadRouteConfigurationFromFile() {
       throw new Error(result.error || 'Failed to load route configuration');
     }
 
-    const loadedRouteConfig = result.data;
+    const loadedRouteConfig = resolveRouteAssetPreloads(result.data, sharedAssetPreloads);
 
     // Validate it's an array
     if (!Array.isArray(loadedRouteConfig)) {
@@ -67,43 +65,51 @@ export function loadRouteConfigurationFromFile() {
       throw new Error('Route configuration is not an array');
     }
 
+    if (import.meta.env.DEV) {
+      const componentValidation = validateRouteComponentPathsWithResolver(
+        loadedRouteConfig,
+        findComponentLoader,
+      );
+
+      if (!componentValidation.valid) {
+        const details = componentValidation.errors.map((error) => error.message).join('\n  - ');
+        throw new Error(`Route componentPath validation failed:\n  - ${details}`);
+      }
+
+      const flagValidation = validateRouteAssetPreloadFlags(
+        loadedRouteConfig,
+        assetMapData,
+        sharedAssetPreloads,
+      );
+
+      if (!flagValidation.valid) {
+        throw new Error(`Asset preload validation failed:\n  - ${flagValidation.errors.join('\n  - ')}`);
+      }
+    }
+
     log('routeConfigLoader.js', 'loadRouteConfigurationFromFile', 'success', 'Route configuration loaded', {
       routeCount: loadedRouteConfig.length
     });
-
-    if (window.performanceTracker) {
-      try {
-        window.performanceTracker.step({
+  trackStep({
           step: 'loadRouteConfig_complete',
           file: 'routeConfigLoader.js',
           method: 'loadRouteConfigurationFromFile',
           flag: 'success',
           purpose: `Loaded ${loadedRouteConfig.length} routes`
         });
-      } catch (e) {
-        // Performance tracker session ended, ignore
-      }
-    }
 
     log('routeConfigLoader.js', 'loadRouteConfigurationFromFile', 'return', 'Returning loaded route configuration', { routeCount: loadedRouteConfig.length });
     return loadedRouteConfig;
 
   } catch (error) {
     logError('routeConfigLoader.js', 'loadRouteConfigurationFromFile', 'Failed to load route configuration', error);
-
-    if (window.performanceTracker) {
-      try {
-        window.performanceTracker.step({
+  trackStep({
           step: 'loadRouteConfig_error',
           file: 'routeConfigLoader.js',
           method: 'loadRouteConfigurationFromFile',
           flag: 'error',
           purpose: 'Route config load failed'
         });
-      } catch (e) {
-        // Performance tracker session ended, ignore
-      }
-    }
 
     log('routeConfigLoader.js', 'loadRouteConfigurationFromFile', 'return', 'Returning empty array due to error', { error: error.message });
     return [];
@@ -119,20 +125,13 @@ export function loadRouteConfigurationFromFile() {
  */
 export function getCachedRouteConfiguration() {
   log('routeConfigLoader.js', 'getCachedRouteConfiguration', 'start', 'Getting cached route configuration', {});
-
-  if (window.performanceTracker) {
-    try {
-      window.performanceTracker.step({
+  trackStep({
         step: 'getCachedConfig_start',
         file: 'routeConfigLoader.js',
         method: 'getCachedRouteConfiguration',
         flag: 'cache',
         purpose: 'Get cached route configuration'
       });
-    } catch (e) {
-      // Performance tracker session ended, ignore
-    }
-  }
 
   try {
     // Load from file (caching is handled by jsonConfigLoader)
@@ -141,20 +140,13 @@ export function getCachedRouteConfiguration() {
     log('routeConfigLoader.js', 'getCachedRouteConfiguration', 'success', 'Route configuration retrieved', {
       routeCount: loadedConfig.length
     });
-
-    if (window.performanceTracker) {
-      try {
-        window.performanceTracker.step({
+  trackStep({
           step: 'getCachedConfig_complete',
           file: 'routeConfigLoader.js',
           method: 'getCachedRouteConfiguration',
           flag: 'success',
           purpose: 'Route config retrieved'
         });
-      } catch (e) {
-        // Performance tracker session ended, ignore
-      }
-    }
 
     log('routeConfigLoader.js', 'getCachedRouteConfiguration', 'return', 'Returning route configuration', { routeCount: loadedConfig.length });
     return loadedConfig;
@@ -176,41 +168,24 @@ export function getCachedRouteConfiguration() {
  */
 export function resetRouteConfigurationCache() {
   log('routeConfigLoader.js', 'resetRouteConfigurationCache', 'start', 'Resetting route configuration cache', {});
-
-  if (window.performanceTracker) {
-    try {
-      window.performanceTracker.step({
+  trackStep({
         step: 'resetCache',
         file: 'routeConfigLoader.js',
         method: 'resetRouteConfigurationCache',
         flag: 'cache-clear',
         purpose: 'Clear route configuration cache'
       });
-    } catch (e) {
-      // Performance tracker session ended, ignore
-    }
-  }
 
-  // Import and use clearConfigCache from jsonConfigLoader
-  import('../common/jsonConfigLoader.js').then(({ clearConfigCache }) => {
-    clearConfigCache('route_config');
-  });
+  clearConfigCache('route_config');
 
   log('routeConfigLoader.js', 'resetRouteConfigurationCache', 'success', 'Route configuration cache cleared', {});
-
-  if (window.performanceTracker) {
-    try {
-      window.performanceTracker.step({
+  trackStep({
         step: 'resetCache_complete',
         file: 'routeConfigLoader.js',
         method: 'resetRouteConfigurationCache',
         flag: 'success',
         purpose: 'Cache cleared'
       });
-    } catch (e) {
-      // Performance tracker session ended, ignore
-    }
-  }
 
   log('routeConfigLoader.js', 'resetRouteConfigurationCache', 'return', 'Cache reset complete', {});
 }

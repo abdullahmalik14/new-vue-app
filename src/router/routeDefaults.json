@@ -1,5 +1,7 @@
 {
   "notFoundSlug": "/404",
+  "guardErrorSlug": "/404",
+  "navigationErrorSlug": "/404",
   "loginSlug": "/log-in",
   "dashboardSlug": "/dashboard"
 }

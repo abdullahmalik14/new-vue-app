@@ -96,7 +96,7 @@ export const menuItems = [
     title: "Shops", // Fallback text
     translationKey: "dashboard.menu.shops", // Translation key
     image: "dashboard.menu.shops", // Asset flag instead of hardcoded URL
-    route: "/shops",
+    route: "/shop",
     parent: false,
     children: [],
     enabled: true // Disabled as in original

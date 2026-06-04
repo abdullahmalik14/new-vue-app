@@ -11,6 +11,7 @@ import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { loadJsonConfigSync } from '../../src/utils/common/jsonConfigLoaderNode.js';
+import { injectManifestIntegrityMetaTags, computeFileIntegritySri } from './manifestIntegrityNode.js';
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -41,7 +42,8 @@ export function scanDistAssetsForSections(distPath) {
 
         // Extract section name from filename
         // Format: section-{name}-{hash}.{ext}
-        const match = file.match(/^section-([^-]+)-.+\.(js|css)$/);
+        // const match = file.match(/^section-([^-]+)-.+\.(js|css)$/);
+        const match = file.match(/^section-(.+)-[A-Za-z0-9]{8,}\.(js|css)$/);
 
         if (match) {
           const sectionName = match[1];
@@ -93,7 +95,7 @@ export function generateSectionManifestFile(bundles, distPath) {
   const sectionMap = new Map();
 
   for (const bundle of bundles) {
-    const { sectionName, fileType, filePath, fileSize, timestamp } = bundle;
+    const { sectionName, fileType, filePath, fileSize, timestamp, fileName } = bundle;
 
     // Initialize section entry if not exists
     if (!sectionMap.has(sectionName)) {
@@ -101,6 +103,7 @@ export function generateSectionManifestFile(bundles, distPath) {
         section: sectionName,
         js: null,
         css: null,
+        integrity: {},
         size: 0,
         timestamp: null
       });
@@ -114,6 +117,8 @@ export function generateSectionManifestFile(bundles, distPath) {
     } else if (fileType === 'css') {
       sectionEntry.css = filePath;
     }
+
+    sectionEntry.integrity[fileType] = computeFileIntegritySri(join(distPath, 'assets', fileName));
 
     // Update size and timestamp
     sectionEntry.size += fileSize;
@@ -258,6 +263,8 @@ export function createManifestGeneratorPlugin() {
         sections: Object.keys(enrichedManifest).length,
         totalSize: Object.values(enrichedManifest).reduce((sum, s) => sum + (s.size || 0), 0)
       });
+
+      injectManifestIntegrityMetaTags(distPath);
     }
   };
 }

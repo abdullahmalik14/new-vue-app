@@ -12,6 +12,7 @@
 import { getRouteConfiguration } from './routeConfigLoader.js';
 import { log } from '../common/logHandler.js';
 import { deepMergePreferChild, safelyGetNestedProperty } from '../common/objectSafety.js';
+import { routeConfigMatchesPath } from './routeAliases.js';
 
 
 // Performance tracker available globally as window.performanceTracker
@@ -25,7 +26,7 @@ import { deepMergePreferChild, safelyGetNestedProperty } from '../common/objectS
  */
 export function resolveRouteFromPath(targetPath) {
   log('routeResolver.js', 'resolveRouteFromPath', 'start', 'Finding route by path', { targetPath });
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'resolveRoute',
     file: 'route/routeResolver.js',
     method: 'resolveRouteFromPath',
@@ -38,14 +39,14 @@ export function resolveRouteFromPath(targetPath) {
 
   // Try exact match first
   for (const route of allRoutes) {
-    if (route.slug === targetPath) {
+    if (routeConfigMatchesPath(route, targetPath)) {
       log('routeResolver.js', 'resolveRouteFromPath', 'exact-match', 'Exact route match found', {
         slug: route.slug,
         section: route.section
       });
 
       // Track success
-      window.performanceTracker.step({
+      window.performanceTracker?.step({
         step: 'routeResolved',
         file: 'routeResolver.js',
         method: 'resolveRouteFromPath',
@@ -71,7 +72,7 @@ export function resolveRouteFromPath(targetPath) {
         });
 
         // Track success
-        window.performanceTracker.step({
+        window.performanceTracker?.step({
           step: 'routeResolved',
           file: 'routeResolver.js',
           method: 'resolveRouteFromPath',
@@ -89,7 +90,7 @@ export function resolveRouteFromPath(targetPath) {
   log('routeResolver.js', 'resolveRouteFromPath', 'not-found', 'No route match found for path', { targetPath });
 
   // Track miss
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'routeNotFound',
     file: 'routeResolver.js',
     method: 'resolveRouteFromPath',
@@ -98,6 +99,25 @@ export function resolveRouteFromPath(targetPath) {
   });
 
   log('routeResolver.js', 'resolveRouteFromPath', 'return', 'Returning null - no route found', { targetPath });
+  return null;
+}
+
+/**
+ * Find a route by exact slug only (no wildcard / catch-all fallback).
+ * Use for intent prefetch and other lookups that must not match /:pathMatch(.*)*.
+ *
+ * @param {string} targetPath
+ * @returns {object|null}
+ */
+export function resolveExactRouteFromPath(targetPath) {
+  const allRoutes = getRouteConfiguration();
+
+  for (const route of allRoutes) {
+    if (routeConfigMatchesPath(route, targetPath)) {
+      return route;
+    }
+  }
+
   return null;
 }
 
@@ -160,7 +180,7 @@ export function resolveComponentPathForRoute(route, userRole) {
     slug: route.slug,
     userRole
   });
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'resolveComponentPath',
     file: 'route/routeResolver.js',
     method: 'resolveComponentPathForRoute',
@@ -189,7 +209,7 @@ export function resolveComponentPathForRoute(route, userRole) {
       });
 
       // Track resolution
-      window.performanceTracker.step({
+      window.performanceTracker?.step({
         step: 'componentPathResolved',
         file: 'routeResolver.js',
         method: 'resolveComponentPathForRoute',
@@ -209,7 +229,7 @@ export function resolveComponentPathForRoute(route, userRole) {
     });
 
     // Track resolution
-    window.performanceTracker.step({
+    window.performanceTracker?.step({
       step: 'componentPathResolved',
       file: 'routeResolver.js',
       method: 'resolveComponentPathForRoute',
@@ -249,7 +269,7 @@ export function inheritConfigurationFromParentRoute(childRoute) {
     log('routeResolver.js', 'inheritConfigurationFromParentRoute', 'return', 'Returning original route - no inheritance', { slug: childRoute.slug });
     return childRoute;
   }
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'inheritParentConfig',
     file: 'route/routeResolver.js',
     method: 'inheritConfigurationFromParentRoute',
@@ -268,16 +288,35 @@ export function inheritConfigurationFromParentRoute(childRoute) {
     return childRoute;
   }
 
+  // Resolve parent first so nested inheritConfigFromParent chains merge auth (S4)
+  const resolvedParentRoute = parentRoute.inheritConfigFromParent
+    ? inheritConfigurationFromParentRoute(parentRoute)
+    : parentRoute;
+
   // Merge parent config with child config (child wins)
-  const mergedConfig = deepMergePreferChild(parentRoute, childRoute);
+  const mergedConfig = deepMergePreferChild(resolvedParentRoute, childRoute);
+
+  // Concat assetPreload[] so child entries extend (not replace) inherited parent assets (C-02)
+  const parentAssets = Array.isArray(resolvedParentRoute.assetPreload)
+    ? resolvedParentRoute.assetPreload
+    : [];
+  const childAssets = Array.isArray(childRoute.assetPreload) ? childRoute.assetPreload : [];
+
+  if (parentAssets.length > 0 && childAssets.length > 0) {
+    mergedConfig.assetPreload = [...parentAssets, ...childAssets];
+  }
 
   log('routeResolver.js', 'inheritConfigurationFromParentRoute', 'success', 'Parent configuration inherited', {
     childSlug: childRoute.slug,
-    parentSlug: parentRoute.slug
+    parentSlug: parentRoute.slug,
+    requiresAuth: mergedConfig.requiresAuth,
+    redirectIfNotAuth: mergedConfig.redirectIfNotAuth,
+    inheritedRequiresAuth: childRoute.requiresAuth === undefined && mergedConfig.requiresAuth === true,
+    inheritedAssetPreloadCount: Array.isArray(mergedConfig.assetPreload) ? mergedConfig.assetPreload.length : 0,
   });
 
   // Track merge completion
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'parentConfigInherited',
     file: 'routeResolver.js',
     method: 'inheritConfigurationFromParentRoute',
@@ -287,6 +326,24 @@ export function inheritConfigurationFromParentRoute(childRoute) {
 
   log('routeResolver.js', 'inheritConfigurationFromParentRoute', 'return', 'Returning merged configuration', { childSlug: childRoute.slug, parentSlug: parentRoute.slug });
   return mergedConfig;
+}
+
+/**
+ * Resolve inherited + inline assetPreload[] for section rollups and preload orchestration (C-02).
+ *
+ * @param {object} route
+ * @returns {object[]}
+ */
+export function resolveEffectiveAssetPreloadForRoute(route) {
+  if (!route) {
+    return [];
+  }
+
+  const effectiveRoute = route.inheritConfigFromParent
+    ? inheritConfigurationFromParentRoute(route)
+    : route;
+
+  return Array.isArray(effectiveRoute.assetPreload) ? effectiveRoute.assetPreload : [];
 }
 
 /**
@@ -327,9 +384,12 @@ function findParentRouteBySlug(childSlug) {
 
 /**
  * Get all matched routes for a path (including parent chain)
- * Useful for breadcrumbs and nested layouts
- * 
- * @param {string} targetPath - Path to get route chain for
+ * Optional utility for breadcrumbs and path introspection.
+ *
+ * NOT used by the router guard/preload pipeline — config inheritance uses
+ * `inheritConfigurationFromParentRoute()` / `resolveEffectiveRouteConfig()` instead.
+ *
+ * @param {string} targetPath - Path to get route chain for (locale-free slug path)
  * @returns {Array} - Array of route objects from root to target
  */
 export function getRouteChainForPath(targetPath) {
@@ -338,10 +398,10 @@ export function getRouteChainForPath(targetPath) {
   const routeChain = [];
   const slugParts = targetPath.split('/').filter(part => part.length > 0);
 
-  // Build progressively longer paths
+  // Build progressively longer paths (exact slug matches only — no catch-all)
   for (let i = 1; i <= slugParts.length; i++) {
     const partialPath = '/' + slugParts.slice(0, i).join('/');
-    const route = resolveRouteFromPath(partialPath);
+    const route = resolveExactRouteFromPath(partialPath);
 
     if (route) {
       routeChain.push(route);

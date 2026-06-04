@@ -8,9 +8,10 @@
 
 
 // Check if logging is enabled via environment variable
-const isLoggingEnabled = import.meta.env.VITE_ENABLE_LOGGER === 'true' ||
-                         import.meta.env.VITE_ENABLE_LOGGER === true ||
-                         import.meta.env.DEV; // Default to enabled in development
+const viteEnv = typeof import.meta !== 'undefined' ? import.meta.env : undefined;
+const isLoggingEnabled = viteEnv?.VITE_ENABLE_LOGGER === 'true' ||
+                         viteEnv?.VITE_ENABLE_LOGGER === true ||
+                         viteEnv?.DEV; // Default to enabled in development
 
 /**
  * Single unified logging function

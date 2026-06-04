@@ -1,5 +1,7 @@
 <template>
   <div id="app" class="min-h-screen bg-gray-50 flex flex-col">
+    <NavigationProgressBar />
+
     <!-- Global Header -->
     <!-- <AppHeader ref="appHeader" v-if="shouldShowLayout" /> -->
     <!-- <AppShell /> -->
@@ -7,23 +9,38 @@
     <!-- Main Content Area -->
     <main class="flex-1">
       <!-- Router view for page content -->
-      <RouterView v-slot="{ Component }">
-        <Suspense>
-          <!-- Main content -->
-          <template #default>
-            <component :is="Component" />
-          </template>
+      <RouterView v-slot="{ Component, route: activeRoute }">
+        <RouteErrorBoundary :route-key="activeRoute.fullPath">
+          <Suspense>
+            <!-- Main content -->
+            <template #default>
+              <component
+                v-if="skipRouteTransition"
+                :is="Component"
+                :key="activeRoute.fullPath"
+              />
+              <Transition
+                v-else
+                :name="routeTransition.name"
+                :mode="routeTransition.mode"
+              >
+                <div :key="activeRoute.fullPath" class="route-view-root">
+                  <component :is="Component" />
+                </div>
+              </Transition>
+            </template>
 
-          <!-- Loading fallback -->
-          <template #fallback>
-            <div class="flex items-center justify-center min-h-screen">
-              <div class="text-center">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p class="text-gray-600">Loading...</p>
+            <!-- Loading fallback -->
+            <template #fallback>
+              <div class="flex items-center justify-center min-h-screen">
+                <div class="text-center">
+                  <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p class="text-gray-600">Loading...</p>
+                </div>
               </div>
-            </div>
-          </template>
-        </Suspense>
+            </template>
+          </Suspense>
+        </RouteErrorBoundary>
       </RouterView>
     </main>
 
@@ -33,17 +50,27 @@
 </template>
 
 <script setup>
-// import { onMounted, onErrorCaptured } from 'vue';
-import { onMounted, onErrorCaptured, computed } from 'vue';
+// import { onMounted } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { log } from './utils/common/logHandler.js';
+import { resolveRouteTransition } from './utils/route/routeTransition.js';
 import AppHeader from './components/layout/AppHeader.vue';
 import AppFooter from './components/layout/AppFooter.vue';
 import AppShell from './components/layout/AppShell.vue';
+import NavigationProgressBar from './components/layout/NavigationProgressBar.vue';
+import RouteErrorBoundary from './components/layout/RouteErrorBoundary.vue';
 
 // Get router instance
 const router = useRouter();
 const route = useRoute();
+const isInitialRouteRender = ref(true);
+
+const routeTransition = computed(() => resolveRouteTransition(route));
+
+const skipRouteTransition = computed(
+  () => isInitialRouteRender.value || routeTransition.value.disabled,
+);
 
 const shouldShowLayout = computed(() => {
   // Check meta config first
@@ -62,6 +89,10 @@ const shouldShowLayout = computed(() => {
 onMounted(() => {
   log('App.vue', 'onMounted', 'lifecycle', 'App component mounted', {});
 
+  requestAnimationFrame(() => {
+    isInitialRouteRender.value = false;
+  });
+
   if (window.performanceTracker) {
     window.performanceTracker.step({
       step: 'appComponentMounted',
@@ -73,27 +104,6 @@ onMounted(() => {
   }
 });
 
-// Error boundary for child components
-onErrorCaptured((err, instance, info) => {
-  log('App.vue', 'onErrorCaptured', 'error', 'Component error captured', {
-    error: err.message,
-    info,
-    componentName: instance?.$options?.name || 'Unknown'
-  });
-
-  if (window.performanceTracker) {
-    window.performanceTracker.step({
-      step: 'componentError',
-      file: 'App.vue',
-      method: 'onErrorCaptured',
-      flag: 'error',
-      purpose: `Component error: ${err.message}`
-    });
-  }
-
-  // Return false to propagate error to global handler
-  return false;
-});
 </script>
 
 <style>

@@ -7,17 +7,45 @@
 
 import { log } from '../common/logHandler.js';
 import { logError } from '../common/errorHandler.js';
-import { setValueWithExpiration } from '../common/cacheHandler.js';
 import { getSectionBundlePaths } from '../build/manifestLoader.js';
+import { isTrustedBundlePath, escapeSelectorAttributeValue } from '../build/bundlePathValidation.js';
+import { preloadSectionCss, clearAllSectionCss, clearSectionCssPreloadHint } from '../section/sectionCssLoader.js';
 import { preloadSectionAssets } from '../assets/assetPreloader.js';
 import { usePreloadStore } from '../../stores/usePreloadStore.js';
 
-// Cache for preloaded sections
-const PRELOAD_CACHE_KEY_PREFIX = 'section_preload_';
-const PRELOAD_CACHE_TTL = 7200000; // 2 hours
+// Track in-progress preloads — maps sectionName → shared Promise
+const inProgressPromises = new Map();
 
-// Track which sections are currently being preloaded to avoid duplicates
-const preloadingInProgress = new Set();
+const DEFAULT_PRELOAD_BUNDLE_TIMEOUT_MS = 10_000;
+
+function getPreloadBundleTimeoutMs() {
+  const configured = Number(import.meta.env.VITE_SECTION_PRELOAD_TIMEOUT_MS);
+  return Number.isFinite(configured) && configured > 0
+    ? configured
+    : DEFAULT_PRELOAD_BUNDLE_TIMEOUT_MS;
+}
+
+function raceLinkPreloadWithTimeout(linkPromise, { sectionName, bundlePath, bundleType }) {
+  const timeoutMs = getPreloadBundleTimeoutMs();
+
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(new Error(
+        `Section ${bundleType} preload timeout after ${timeoutMs}ms: ${sectionName} (${bundlePath})`
+      ));
+    }, timeoutMs);
+
+    linkPromise
+      .then((value) => {
+        clearTimeout(timeoutId);
+        resolve(value);
+      })
+      .catch((error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      });
+  });
+}
 
 /**
  * Preload a section bundle
@@ -26,7 +54,7 @@ const preloadingInProgress = new Set();
  * @param {string} sectionName - Name of section to preload
  * @returns {Promise<boolean>} - True if preload successful
  */
-export async function preloadSection(sectionName) {
+export function preloadSection(sectionName) {
   const preloadStore = usePreloadStore();
 
   log('sectionPreloader.js', 'preloadSection', 'start', 'Starting section preload', { sectionName });
@@ -41,111 +69,114 @@ export async function preloadSection(sectionName) {
     });
   }
 
+  // Check if already preloaded — fast return
+  if (preloadStore.hasSection(sectionName)) {
+    log('sectionPreloader.js', 'preloadSection', 'cache-hit', 'Section already preloaded', { sectionName });
+
+    if (window.performanceTracker) {
+      window.performanceTracker.step({
+        step: 'preloadSection_cached',
+        file: 'sectionPreloader.js',
+        method: 'preloadSection',
+        flag: 'cache-hit',
+        purpose: `Section ${sectionName} already in memory`
+      });
+    }
+
+    log('sectionPreloader.js', 'preloadSection', 'return', 'Returning cached section status', { sectionName, preloaded: true });
+    return Promise.resolve(true);
+  }
+
+  // return shared promise so concurrent callers wait on the same operation
+  if (inProgressPromises.has(sectionName)) {
+    log('sectionPreloader.js', 'preloadSection', 'in-progress', 'Section preload already in progress — sharing promise', { sectionName });
+    return inProgressPromises.get(sectionName);
+  }
+
+  const promise = _doPreload(sectionName).finally(() => {
+    inProgressPromises.delete(sectionName);
+    preloadStore.unmarkSectionInProgress(sectionName);
+  });
+
+  inProgressPromises.set(sectionName, promise);
+  preloadStore.markSectionInProgress(sectionName);
+  return promise;
+}
+
+/**
+ * Internal: perform the actual preload work for a section.
+ * Called only once per section — concurrent callers share the promise above.
+ *
+ * @param {string} sectionName
+ * @returns {Promise<boolean>}
+ */
+async function _doPreload(sectionName) {
+  const preloadStore = usePreloadStore();
+
   try {
-    // Check if already preloaded
-    if (preloadStore.hasSection(sectionName)) {
-      log('sectionPreloader.js', 'preloadSection', 'cache-hit', 'Section already preloaded', { sectionName });
-
-      if (window.performanceTracker) {
-        window.performanceTracker.step({
-          step: 'preloadSection_cached',
-          file: 'sectionPreloader.js',
-          method: 'preloadSection',
-          flag: 'cache-hit',
-          purpose: `Section ${sectionName} already in memory`
-        });
-      }
-
-      log('sectionPreloader.js', 'preloadSection', 'return', 'Returning cached section status', { sectionName, preloaded: true });
-      return true;
-    }
-
-    // Check if preload is in progress
-    if (preloadingInProgress.has(sectionName)) {
-      log('sectionPreloader.js', 'preloadSection', 'in-progress', 'Section preload already in progress', { sectionName });
-      log('sectionPreloader.js', 'preloadSection', 'return', 'Returning in-progress status', { sectionName, preloaded: false });
-      return false;
-    }
-
-    // Mark as in progress
-    preloadingInProgress.add(sectionName);
-
     // Get section bundle paths from manifest
     const bundlePaths = await getSectionBundlePaths(sectionName);
 
     if (!bundlePaths) {
-      log('sectionPreloader.js', 'preloadSection', 'no-paths', 'No bundle paths found in manifest', { sectionName });
-      preloadingInProgress.delete(sectionName);
-      log('sectionPreloader.js', 'preloadSection', 'return', 'Returning no-paths status', { sectionName, preloaded: false });
+      log('sectionPreloader.js', '_doPreload', 'no-paths', 'No bundle paths found in manifest', { sectionName });
+      log('sectionPreloader.js', '_doPreload', 'return', 'Returning no-paths status', { sectionName, preloaded: false });
       return false;
     }
 
-    log('sectionPreloader.js', 'preloadSection', 'paths-resolved', 'Bundle paths resolved from manifest', {
+    log('sectionPreloader.js', '_doPreload', 'paths-resolved', 'Bundle paths resolved from manifest', {
       sectionName,
       hasCss: !!bundlePaths.css,
       hasJs: !!bundlePaths.js
     });
 
-    // Preload JavaScript bundle
-    if (bundlePaths.js) {
-      await preloadJavaScriptBundle(bundlePaths.js, sectionName);
-    }
+    // run JS + CSS in parallel; Fix 5c: delegate CSS to sectionCssLoader
+    await Promise.all([
+      bundlePaths.js
+        ? preloadJavaScriptBundle(bundlePaths.js, sectionName, bundlePaths.integrity?.js)
+        : Promise.resolve(),
+      bundlePaths.css ? preloadSectionCss(sectionName) : Promise.resolve()
+    ]);
 
-    // Preload CSS bundle
-    if (bundlePaths.css) {
-      await preloadCssBundle(bundlePaths.css, sectionName);
-    }
-
-    // Mark as successfully preloaded
+    // addSection only after both JS + CSS are fully cached
     preloadStore.addSection(sectionName);
-
-    // Cache preload status
-    const cacheKey = PRELOAD_CACHE_KEY_PREFIX + sectionName;
-    setValueWithExpiration(cacheKey, { loaded: true, timestamp: Date.now() }, PRELOAD_CACHE_TTL);
 
     // Preload section assets (non-blocking)
     preloadSectionAssets(sectionName).catch(err => {
-      log('sectionPreloader.js', 'preloadSection', 'asset-preload-error', 'Asset preload failed (non-blocking)', {
+      log('sectionPreloader.js', '_doPreload', 'asset-preload-error', 'Asset preload failed (non-blocking)', {
         sectionName,
         error: err.message
       });
     });
 
-    log('sectionPreloader.js', 'preloadSection', 'success', 'Section preload completed successfully', { sectionName });
+    log('sectionPreloader.js', '_doPreload', 'success', 'Section preload completed successfully', { sectionName });
 
     if (window.performanceTracker) {
       window.performanceTracker.step({
         step: 'preloadSection_complete',
         file: 'sectionPreloader.js',
-        method: 'preloadSection',
+        method: '_doPreload',
         flag: 'preload-complete',
         purpose: `Section ${sectionName} preloaded successfully`
       });
     }
 
-    // Remove from in-progress set
-    preloadingInProgress.delete(sectionName);
-
-    log('sectionPreloader.js', 'preloadSection', 'return', 'Returning successful preload status', { sectionName, preloaded: true });
+    log('sectionPreloader.js', '_doPreload', 'return', 'Returning successful preload status', { sectionName, preloaded: true });
     return true;
 
   } catch (error) {
-    logError('sectionPreloader.js', 'preloadSection', 'Section preload failed', error, { sectionName });
+    logError('sectionPreloader.js', '_doPreload', 'Section preload failed', error, { sectionName });
 
     if (window.performanceTracker) {
       window.performanceTracker.step({
         step: 'preloadSection_error',
         file: 'sectionPreloader.js',
-        method: 'preloadSection',
+        method: '_doPreload',
         flag: 'preload-error',
         purpose: `Section ${sectionName} preload failed`
       });
     }
 
-    // Remove from in-progress set
-    preloadingInProgress.delete(sectionName);
-
-    log('sectionPreloader.js', 'preloadSection', 'return', 'Returning failed preload status', { sectionName, preloaded: false, error: error.message });
+    log('sectionPreloader.js', '_doPreload', 'return', 'Returning failed preload status', { sectionName, preloaded: false, error: error.message });
     return false;
   }
 }
@@ -155,9 +186,10 @@ export async function preloadSection(sectionName) {
  * 
  * @param {string} bundlePath - Path to JS bundle
  * @param {string} sectionName - Section name for logging
+ * @param {string|null} integrity - Optional SRI hash for the bundle
  * @returns {Promise<void>}
  */
-async function preloadJavaScriptBundle(bundlePath, sectionName) {
+async function preloadJavaScriptBundle(bundlePath, sectionName, integrity = null) {
   log('sectionPreloader.js', 'preloadJavaScriptBundle', 'start', 'Preloading JavaScript bundle', {
     bundlePath,
     sectionName
@@ -173,9 +205,18 @@ async function preloadJavaScriptBundle(bundlePath, sectionName) {
     });
   }
 
+  if (!isTrustedBundlePath(bundlePath)) {
+    const error = new Error(`Untrusted JS bundle path for section: ${sectionName}`);
+    logError('sectionPreloader.js', 'preloadJavaScriptBundle', 'Untrusted bundle path rejected', error, {
+      bundlePath,
+      sectionName
+    });
+    return Promise.reject(error);
+  }
+
   // Check if a link with the same href already exists in the DOM
   // This prevents duplicate JS loading when the same section is preloaded multiple times
-  const existingLink = document.querySelector(`link[href="${bundlePath}"]`);
+  const existingLink = document.querySelector(`link[href="${escapeSelectorAttributeValue(bundlePath)}"]`);
   if (existingLink) {
     log('sectionPreloader.js', 'preloadJavaScriptBundle', 'already-exists', 'JavaScript link already exists in DOM', {
       bundlePath,
@@ -197,133 +238,69 @@ async function preloadJavaScriptBundle(bundlePath, sectionName) {
     return Promise.resolve();
   }
 
-  return new Promise((resolve, reject) => {
-    // Create link element for preload
-    const linkElement = document.createElement('link');
-    linkElement.rel = 'modulepreload'; // Use modulepreload for ES modules
-    linkElement.href = bundlePath;
-    linkElement.as = 'script';
-
-    // Handle load success
-    linkElement.onload = () => {
-      log('sectionPreloader.js', 'preloadJavaScriptBundle', 'success', 'JavaScript bundle preloaded', {
-        bundlePath,
-        sectionName
-      });
-
-      if (window.performanceTracker) {
-        window.performanceTracker.step({
-          step: 'preloadJs_complete',
-          file: 'sectionPreloader.js',
-          method: 'preloadJavaScriptBundle',
-          flag: 'js-complete',
-          purpose: `JS preload complete for ${sectionName}`
-        });
+  return raceLinkPreloadWithTimeout(
+    new Promise((resolve, reject) => {
+      const linkElement = document.createElement('link');
+      linkElement.rel = 'modulepreload'; // Use modulepreload for ES modules
+      linkElement.href = bundlePath;
+      linkElement.as = 'script';
+      if (typeof integrity === 'string' && integrity.length > 0) {
+        linkElement.integrity = integrity;
       }
+      linkElement.setAttribute('data-section-js-preload', sectionName);
 
-      resolve();
-    };
+      const cleanupLink = () => {
+        if (linkElement.parentNode) {
+          linkElement.parentNode.removeChild(linkElement);
+        }
+      };
 
-    // Handle load error
-    linkElement.onerror = (error) => {
-      logError('sectionPreloader.js', 'preloadJavaScriptBundle', 'JavaScript bundle preload failed', error, {
+      // Handle load success
+      linkElement.onload = () => {
+        log('sectionPreloader.js', 'preloadJavaScriptBundle', 'success', 'JavaScript bundle preloaded', {
+          bundlePath,
+          sectionName
+        });
+
+        if (window.performanceTracker) {
+          window.performanceTracker.step({
+            step: 'preloadJs_complete',
+            file: 'sectionPreloader.js',
+            method: 'preloadJavaScriptBundle',
+            flag: 'js-complete',
+            purpose: `JS preload complete for ${sectionName}`
+          });
+        }
+
+        resolve();
+      };
+
+      // Handle load error
+      linkElement.onerror = (error) => {
+        cleanupLink();
+        logError('sectionPreloader.js', 'preloadJavaScriptBundle', 'JavaScript bundle preload failed', error, {
+          bundlePath,
+          sectionName
+        });
+        reject(new Error(`Failed to preload JS bundle for section: ${sectionName}`));
+      };
+
+      // Append to document head to start preload
+      document.head.appendChild(linkElement);
+    }),
+    { sectionName, bundlePath, bundleType: 'JS' }
+  ).catch((error) => {
+    document.querySelector(`link[data-section-js-preload="${escapeSelectorAttributeValue(sectionName)}"][href="${escapeSelectorAttributeValue(bundlePath)}"]`)?.remove();
+
+    if (error.message.includes('preload timeout')) {
+      logError('sectionPreloader.js', 'preloadJavaScriptBundle', 'JavaScript bundle preload timed out', error, {
         bundlePath,
-        sectionName
-      });
-      reject(error);
-    };
-
-    // Append to document head to start preload
-    document.head.appendChild(linkElement);
-  });
-}
-
-/**
- * Preload CSS bundle using link preload
- * 
- * @param {string} bundlePath - Path to CSS bundle
- * @param {string} sectionName - Section name for logging
- * @returns {Promise<void>}
- */
-async function preloadCssBundle(bundlePath, sectionName) {
-  log('sectionPreloader.js', 'preloadCssBundle', 'start', 'Preloading CSS bundle', {
-    bundlePath,
-    sectionName
-  });
-
-  if (window.performanceTracker) {
-    window.performanceTracker.step({
-      step: 'preloadCss_start',
-      file: 'sectionPreloader.js',
-      method: 'preloadCssBundle',
-      flag: 'css-preload',
-      purpose: `Preload CSS for ${sectionName}`
-    });
-  }
-
-  // Check if a link with the same href already exists in the DOM
-  // This prevents duplicate CSS loading when the same section is preloaded multiple times
-  const existingLink = document.querySelector(`link[href="${bundlePath}"]`);
-  if (existingLink) {
-    log('sectionPreloader.js', 'preloadCssBundle', 'already-exists', 'CSS link already exists in DOM', {
-      bundlePath,
-      sectionName,
-      existingRel: existingLink.rel
-    });
-
-    if (window.performanceTracker) {
-      window.performanceTracker.step({
-        step: 'preloadCss_skipped',
-        file: 'sectionPreloader.js',
-        method: 'preloadCssBundle',
-        flag: 'css-skip',
-        purpose: `CSS link already exists for ${sectionName}`
+        sectionName,
+        timeoutMs: getPreloadBundleTimeoutMs()
       });
     }
 
-    // If it's already a stylesheet, resolve immediately
-    // If it's a preload link, we can also resolve (it will be converted to stylesheet when needed)
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve, reject) => {
-    // Create link element for preload
-    const linkElement = document.createElement('link');
-    linkElement.rel = 'preload';
-    linkElement.href = bundlePath;
-    linkElement.as = 'style';
-
-    // Handle load success
-    linkElement.onload = () => {
-      log('sectionPreloader.js', 'preloadCssBundle', 'success', 'CSS bundle preloaded', {
-        bundlePath,
-        sectionName
-      });
-
-      if (window.performanceTracker) {
-        window.performanceTracker.step({
-          step: 'preloadCss_complete',
-          file: 'sectionPreloader.js',
-          method: 'preloadCssBundle',
-          flag: 'css-complete',
-          purpose: `CSS preload complete for ${sectionName}`
-        });
-      }
-
-      resolve();
-    };
-
-    // Handle load error
-    linkElement.onerror = (error) => {
-      logError('sectionPreloader.js', 'preloadCssBundle', 'CSS bundle preload failed', error, {
-        bundlePath,
-        sectionName
-      });
-      reject(error);
-    };
-
-    // Append to document head to start preload
-    document.head.appendChild(linkElement);
+    throw error;
   });
 }
 
@@ -413,14 +390,53 @@ export function isSectionPreloaded(sectionName) {
  * 
  * @returns {void}
  */
+function clearSectionJsPreloadLink(sectionName) {
+  document.querySelectorAll(
+    `link[data-section-js-preload="${escapeSelectorAttributeValue(sectionName)}"]`
+  ).forEach((link) => {
+    if (link.parentNode) {
+      link.parentNode.removeChild(link);
+    }
+  });
+}
+
+function clearSectionJsPreloadLinks() {
+  document.querySelectorAll('link[data-section-js-preload]').forEach(link => {
+    if (link.parentNode) {
+      link.parentNode.removeChild(link);
+    }
+  });
+}
+
+/**
+ * Clear cached preload state for one section so it can be re-warmed (e.g. locale change).
+ *
+ * @param {string} sectionName
+ * @returns {void}
+ */
+export function resetSectionPreloadState(sectionName) {
+  const preloadStore = usePreloadStore();
+
+  preloadStore.removeSection(sectionName);
+  preloadStore.unmarkSectionInProgress(sectionName);
+  inProgressPromises.delete(sectionName);
+  clearSectionJsPreloadLink(sectionName);
+  clearSectionCssPreloadHint(sectionName);
+
+  log('sectionPreloader.js', 'resetSectionPreloadState', 'reset', 'Section preload state reset', { sectionName });
+}
+
 export function clearPreloadState() {
   log('sectionPreloader.js', 'clearPreloadState', 'start', 'Clearing preload state', {});
 
   const preloadStore = usePreloadStore();
   const preloadedCount = preloadStore.preloadedSections.length;
 
+  clearAllSectionCss();
+  clearSectionJsPreloadLinks();
+
   preloadStore.clearState();
-  preloadingInProgress.clear();
+  inProgressPromises.clear();
 
   log('sectionPreloader.js', 'clearPreloadState', 'success', 'Preload state cleared', { clearedCount: preloadedCount });
   log('sectionPreloader.js', 'clearPreloadState', 'return', 'Clear complete', {});
@@ -436,8 +452,8 @@ export function getPreloadStatistics() {
   const stats = {
     preloadedCount: preloadStore.preloadedSections.length,
     preloadedSections: [...preloadStore.preloadedSections],
-    inProgressCount: preloadingInProgress.size,
-    inProgressSections: Array.from(preloadingInProgress)
+    inProgressCount: preloadStore.sectionsInProgress.length,
+    inProgressSections: [...preloadStore.sectionsInProgress]
   };
 
   log('sectionPreloader.js', 'getPreloadStatistics', 'return', 'Returning preload statistics', {

@@ -12,13 +12,34 @@ export {
   preloadFont,
   preloadMedia,
   preloadScript,
+  injectExecutableScript,
+  shouldInjectExecutableScript,
   preloadAsset,
   preloadAssets,
   preloadSectionAssets,
   preloadSectionCriticalImages,
+  resolveAssetPreloadUrl,
+  areSectionAssetUrlsFullyPreloaded,
   clearPreloadCache,
   getPreloadedAssetsCount
 } from './assetPreloader';
+
+export {
+  getAssetPreloadEntriesForSection,
+  clearAssetPreloadSectionCache,
+  dedupeAssetPreloadEntries,
+  isRouteEnabledForAssetPreload,
+  routeBelongsToSection,
+} from './getAssetPreloadEntriesForSection.js';
+
+export {
+  collectAssetMapFlags,
+  validateRouteAssetPreloadFlags,
+  validateAssetPreloadEntryShape,
+  validateRouteAssetPreloadRefs,
+  ALLOWED_ASSET_PRELOAD_TYPES,
+  ALLOWED_ASSET_PRELOAD_PRIORITIES,
+} from './validateRouteAssetPreloadFlags.js';
 
 // Export asset scanner functions
 export {
@@ -49,6 +70,11 @@ export {
   getAssetsByCategory,
   preloadAssetUrls,
   validateAssetMap,
+  normalizeAssetMapUrl,
+  loadAssetMapConfig,
+  getAssetMapConfigSource,
+  clearAssetMapConfigCache,
+  getAssetMapFetchCandidates,
   setEnvironment,
   getEnvironment
 } from './assetLibrary';

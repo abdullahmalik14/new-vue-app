@@ -176,7 +176,9 @@
         <!-- Submenu items -->
         <div class="flex flex-col overflow-auto w-full gap-2 py-2">
           <button v-for="child in currentSubmenuItems" :key="child.id" :disabled="!child.enabled"
-            @click="child.enabled && handleChildClick(child)" :class="[
+            @click="child.enabled && handleChildClick(child)"
+            @mouseenter="child.enabled && prefetchMenuRoute(child)"
+            @focus="child.enabled && prefetchMenuRoute(child)" :class="[
               'relative flex w-full gap-3 rounded-md px-4 py-2 group transition-all duration-200 outline-none',
               child.enabled
                 ? 'hover:bg-transparent cursor-pointer'
@@ -465,9 +467,7 @@ export default {
     },
     async loadAllAssets() {
       try {
-        const { preloadAsset } = await import("@/utils/assets/assetPreloader.js");
         const flags = ['dashboard.logo', 'dashboard.avatar', 'dashboard.notification', 'dashboard.logout', 'dashboard.language', 'dashboard.help', 'dashboard.close.desktop', 'dashboard.close.mobile', 'dashboard.more'];
-        await Promise.allSettled(flags.map(flag => preloadAsset({ flag, type: 'image', priority: 'normal' })));
         const urls = await Promise.all(flags.map(flag => this.loadAssetWithRetry(flag)));
         this.assets = {
           logo: urls[0], avatar: urls[1], notification: urls[2], logout: urls[3],
@@ -530,6 +530,11 @@ export default {
       } else if (item.enabled && item.route) {
         this.$router.push(item.route);
       }
+    },
+    prefetchMenuRoute(item) {
+      if (item?.enabled && item?.route) {
+        prefetchRouteComponent(item.route);
+        }
     },
     handleChildClick(child) {
       if (child.children && child.children.length > 0) {

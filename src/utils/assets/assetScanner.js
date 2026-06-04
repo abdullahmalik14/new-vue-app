@@ -1,6 +1,8 @@
 // vueApp-main-new/src/utils/assets/assetScanner.js
 
 import { log } from '../common/logHandler';
+import { trackStep } from '../common/performanceTrackerAccess.js';
+import { getAssetPreloadEntriesForSection } from './getAssetPreloadEntriesForSection.js';
 
 /**
  * @file assetScanner.js
@@ -8,7 +10,7 @@ import { log } from '../common/logHandler';
  * @purpose Extract asset preload configurations from components
  */
 
-// Performance tracker available globally as window.performanceTracker
+// Performance steps use trackStep() from performanceTrackerAccess.js (B-01)
 
 /**
  * @function extractAssetsFromComponent
@@ -20,7 +22,7 @@ export function extractAssetsFromComponent(component) {
   log('assetScanner.js', 'extractAssetsFromComponent', 'start', 'Extracting assets from component', { 
     hasComponent: !!component 
   });
-  window.performanceTracker.step({
+  trackStep({
     step: 'extractAssetsFromComponent_start',
     file: 'assetScanner.js',
     method: 'extractAssetsFromComponent',
@@ -39,15 +41,10 @@ export function extractAssetsFromComponent(component) {
       });
     }
 
-    // Check for assets in setup function return
-    if (component.setup) {
-      const setupResult = component.setup();
-      if (setupResult && setupResult.preloadAssets && Array.isArray(setupResult.preloadAssets)) {
-        assets.push(...setupResult.preloadAssets);
-        log('assetScanner.js', 'extractAssetsFromComponent', 'found-setup', 'Found assets in setup return', { 
-          count: setupResult.preloadAssets.length 
-        });
-      }
+    // Do not call component.setup() — requires an active Vue instance (inject/provide/lifecycle).
+    // Declare preloadAssets on the component options object or use PRELOAD_ASSETS instead.
+    if (component.setup && !component.preloadAssets && !component.PRELOAD_ASSETS) {
+      log('assetScanner.js', 'extractAssetsFromComponent', 'skip-setup', 'Skipping setup() scan — use static preloadAssets or PRELOAD_ASSETS', {});
     }
 
     // Check for PRELOAD_ASSETS constant
@@ -61,7 +58,7 @@ export function extractAssetsFromComponent(component) {
     log('assetScanner.js', 'extractAssetsFromComponent', 'success', 'Assets extracted from component', { 
       totalCount: assets.length 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'extractAssetsFromComponent_complete',
       file: 'assetScanner.js',
       method: 'extractAssetsFromComponent',
@@ -75,7 +72,7 @@ export function extractAssetsFromComponent(component) {
       error: error.message, 
       stack: error.stack 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'extractAssetsFromComponent_error',
       file: 'assetScanner.js',
       method: 'extractAssetsFromComponent',
@@ -84,6 +81,70 @@ export function extractAssetsFromComponent(component) {
     });
     return [];
   }
+}
+
+/**
+ * @param {string} tag
+ * @param {string} attributeName
+ * @returns {string|null}
+ */
+export function extractLiteralBoundAttribute(tag, attributeName) {
+  const staticMatch = tag.match(new RegExp(`\\s${attributeName}=["']([^"']+)["']`, 'i'));
+
+  if (staticMatch?.[1]) {
+    return staticMatch[1];
+  }
+
+  const boundSingleQuoted = tag.match(
+    new RegExp(`\\s(?::${attributeName}|v-bind:${attributeName})\\s*=\\s*"'([^']+)'"`, 'i'),
+  );
+
+  if (boundSingleQuoted?.[1]) {
+    return boundSingleQuoted[1];
+  }
+
+  const boundDoubleQuoted = tag.match(
+    new RegExp(`\\s(?::${attributeName}|v-bind:${attributeName})\\s*=\\s*'\\"([^"]+)\\"'`, 'i'),
+  );
+
+  if (boundDoubleQuoted?.[1]) {
+    return boundDoubleQuoted[1];
+  }
+
+  const boundPathLiteral = tag.match(
+    new RegExp(`\\s(?::${attributeName}|v-bind:${attributeName})\\s*=\\s*"([/@][^"]+)"`, 'i'),
+  );
+
+  if (boundPathLiteral?.[1]) {
+    return boundPathLiteral[1];
+  }
+
+  return null;
+}
+
+/**
+ * @param {string} template
+ * @param {string} tagName
+ * @param {'image'|'video'|'audio'} type
+ * @returns {Array<object>}
+ */
+function collectMediaAssetsFromTemplate(template, tagName, type) {
+  const assets = [];
+  const tagRegex = new RegExp(`<${tagName}\\b[^>]*>`, 'gi');
+  let tagMatch;
+
+  while ((tagMatch = tagRegex.exec(template)) !== null) {
+    const src = extractLiteralBoundAttribute(tagMatch[0], 'src');
+
+    if (!src || src.startsWith('data:') || src.startsWith('blob:')) {
+      continue;
+    }
+
+    assets.push({ src, type, auto: true });
+    log('assetScanner.js', 'collectMediaAssetsFromTemplate', 'found', `Found ${type} reference`, { src, binding: tagMatch[0].includes(':src') || tagMatch[0].includes('v-bind:src') ? 'dynamic-literal' : 'static' });
+  }
+
+  return assets;
 }
 
 /**
@@ -96,7 +157,7 @@ export function scanComponentForAssetReferences(template) {
   log('assetScanner.js', 'scanComponentForAssetReferences', 'start', 'Scanning template for assets', { 
     templateLength: template?.length 
   });
-  window.performanceTracker.step({
+  trackStep({
     step: 'scanComponentForAssetReferences_start',
     file: 'assetScanner.js',
     method: 'scanComponentForAssetReferences',
@@ -109,7 +170,7 @@ export function scanComponentForAssetReferences(template) {
 
     if (!template || typeof template !== 'string') {
       log('assetScanner.js', 'scanComponentForAssetReferences', 'invalid', 'Invalid template provided', {});
-      window.performanceTracker.step({
+      trackStep({
         step: 'scanComponentForAssetReferences_invalid',
         file: 'assetScanner.js',
         method: 'scanComponentForAssetReferences',
@@ -119,43 +180,14 @@ export function scanComponentForAssetReferences(template) {
       return assets;
     }
 
-    // Scan for image sources
-    const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    let imgMatch;
-    while ((imgMatch = imgRegex.exec(template)) !== null) {
-      const src = imgMatch[1];
-      if (src && !src.startsWith('data:') && !src.startsWith('blob:')) {
-        assets.push({ src, type: 'image', auto: true });
-        log('assetScanner.js', 'scanComponentForAssetReferences', 'found-image', 'Found image reference', { src });
-      }
-    }
+    assets.push(...collectMediaAssetsFromTemplate(template, 'img', 'image'));
+    assets.push(...collectMediaAssetsFromTemplate(template, 'video', 'video'));
+    assets.push(...collectMediaAssetsFromTemplate(template, 'audio', 'audio'));
 
-    // Scan for video sources
-    const videoRegex = /<video[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    let videoMatch;
-    while ((videoMatch = videoRegex.exec(template)) !== null) {
-      const src = videoMatch[1];
-      if (src) {
-        assets.push({ src, type: 'video', auto: true });
-        log('assetScanner.js', 'scanComponentForAssetReferences', 'found-video', 'Found video reference', { src });
-      }
-    }
-
-    // Scan for audio sources
-    const audioRegex = /<audio[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    let audioMatch;
-    while ((audioMatch = audioRegex.exec(template)) !== null) {
-      const src = audioMatch[1];
-      if (src) {
-        assets.push({ src, type: 'audio', auto: true });
-        log('assetScanner.js', 'scanComponentForAssetReferences', 'found-audio', 'Found audio reference', { src });
-      }
-    }
-
-    log('assetScanner.js', 'scanComponentForAssetReferences', 'success', 'Template scanning complete', { 
+    log('assetScanner.js', 'scanComponentForAssetReferences', 'success', 'Template scanning complete', {
       totalFound: assets.length 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'scanComponentForAssetReferences_complete',
       file: 'assetScanner.js',
       method: 'scanComponentForAssetReferences',
@@ -169,7 +201,7 @@ export function scanComponentForAssetReferences(template) {
       error: error.message, 
       stack: error.stack 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'scanComponentForAssetReferences_error',
       file: 'assetScanner.js',
       method: 'scanComponentForAssetReferences',
@@ -188,7 +220,7 @@ export function scanComponentForAssetReferences(template) {
  */
 export async function scanSectionComponents(sectionName) {
   log('assetScanner.js', 'scanSectionComponents', 'start', 'Scanning section components', { sectionName });
-  window.performanceTracker.step({
+  trackStep({
     step: 'scanSectionComponents_start',
     file: 'assetScanner.js',
     method: 'scanSectionComponents',
@@ -197,39 +229,18 @@ export async function scanSectionComponents(sectionName) {
   });
 
   try {
-    const allAssets = [];
-
-    // Get section routes
-    const { getRouteConfiguration } = await import('../route/routeConfigLoader');
-    const routes = getRouteConfiguration();
-    
-    const sectionRoutes = routes.filter(route => {
-      if (typeof route.section === 'string') {
-        return route.section === sectionName;
-      }
-      if (typeof route.section === 'object') {
-        return Object.values(route.section).includes(sectionName);
-      }
-      return false;
-    });
+    const { assets: allAssets, routeCount } = getAssetPreloadEntriesForSection(sectionName);
 
     log('assetScanner.js', 'scanSectionComponents', 'routes-found', 'Section routes found', { 
       sectionName, 
-      routeCount: sectionRoutes.length 
+      routeCount 
     });
-
-    // Collect assets from routes
-    for (const route of sectionRoutes) {
-      if (route.assetPreload && Array.isArray(route.assetPreload)) {
-        allAssets.push(...route.assetPreload);
-      }
-    }
 
     log('assetScanner.js', 'scanSectionComponents', 'success', 'Section component scanning complete', { 
       sectionName, 
       assetCount: allAssets.length 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'scanSectionComponents_complete',
       file: 'assetScanner.js',
       method: 'scanSectionComponents',
@@ -244,7 +255,7 @@ export async function scanSectionComponents(sectionName) {
       error: error.message, 
       stack: error.stack 
     });
-    window.performanceTracker.step({
+    trackStep({
       step: 'scanSectionComponents_error',
       file: 'assetScanner.js',
       method: 'scanSectionComponents',
@@ -263,13 +274,6 @@ export async function scanSectionComponents(sectionName) {
  */
 export function shouldIgnoreComponent(component) {
   log('assetScanner.js', 'shouldIgnoreComponent', 'check', 'Checking if component should be ignored', {});
-  window.performanceTracker.step({
-    step: 'shouldIgnoreComponent',
-    file: 'assetScanner.js',
-    method: 'shouldIgnoreComponent',
-    flag: 'check',
-    purpose: 'Check component ignore status'
-  });
 
   try {
     // Check for IGNORE_ASSET_PRELOAD constant
@@ -291,13 +295,6 @@ export function shouldIgnoreComponent(component) {
       error: error.message, 
       stack: error.stack 
     });
-    window.performanceTracker.step({
-      step: 'shouldIgnoreComponent_error',
-      file: 'assetScanner.js',
-      method: 'shouldIgnoreComponent',
-      flag: 'error',
-      purpose: 'Ignore check failed'
-    });
     return false;
   }
 }
@@ -312,13 +309,6 @@ export function normalizeAssetDefinition(asset) {
   log('assetScanner.js', 'normalizeAssetDefinition', 'start', 'Normalizing asset definition', { 
     assetType: typeof asset 
   });
-  window.performanceTracker.step({
-    step: 'normalizeAssetDefinition',
-    file: 'assetScanner.js',
-    method: 'normalizeAssetDefinition',
-    flag: 'normalize',
-    purpose: 'Normalize asset to standard format'
-  });
 
   try {
     // If string, convert to object
@@ -332,12 +322,13 @@ export function normalizeAssetDefinition(asset) {
       return normalized;
     }
 
-    // If object, ensure required fields
+    // Spread first so computed fallbacks win over null/undefined on the source object
+    const src = asset.src || asset.url || asset.path;
     const normalized = {
-      src: asset.src || asset.url || asset.path,
-      type: asset.type || inferAssetType(asset.src || asset.url || asset.path),
-      priority: asset.priority || 'low',
-      ...asset
+      ...asset,
+      src: src || '',
+      type: asset.type || inferAssetType(src),
+      priority: asset.priority || 'low'
     };
 
     log('assetScanner.js', 'normalizeAssetDefinition', 'normalized', 'Asset definition normalized', { normalized });
@@ -347,13 +338,6 @@ export function normalizeAssetDefinition(asset) {
       asset, 
       error: error.message, 
       stack: error.stack 
-    });
-    window.performanceTracker.step({
-      step: 'normalizeAssetDefinition_error',
-      file: 'assetScanner.js',
-      method: 'normalizeAssetDefinition',
-      flag: 'error',
-      purpose: 'Normalization failed'
     });
     return { src: '', type: 'unknown', priority: 'low' };
   }

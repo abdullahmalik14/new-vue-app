@@ -10,6 +10,9 @@ import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { loadJsonConfigSync } from '../../src/utils/common/jsonConfigLoaderNode.js';
+import { validateRouteConfig } from '../../src/utils/build/jsonConfigValidator.js';
+import { isRouteAccessibleInCurrentEnvironment } from '../../src/utils/route/routeEnvAccess.js';
+import { validateRouteComponentPathsOnDisk } from '../../src/utils/route/routeComponentPathValidator.node.js';
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -41,6 +44,23 @@ export function discoverAllSectionsFromConfig() {
       throw new Error('Route config must be an array');
     }
 
+    const routeValidation = validateRouteConfig(routeConfigData);
+    if (!routeValidation.valid) {
+      const details = routeValidation.errors
+        .map((error) => error.message)
+        .join('\n  - ');
+      throw new Error(`Route config validation failed:\n  - ${details}`);
+    }
+
+    const projectRoot = join(__dirname, '../..');
+    const componentValidation = validateRouteComponentPathsOnDisk(routeConfigData, projectRoot);
+    if (!componentValidation.valid) {
+      const details = componentValidation.errors
+        .map((error) => error.message)
+        .join('\n  - ');
+      throw new Error(`Route componentPath validation failed:\n  - ${details}`);
+    }
+
     const discoveredSections = new Set();
     const warnings = [];
 
@@ -54,6 +74,13 @@ export function discoverAllSectionsFromConfig() {
 
       // Skip disabled routes - don't create chunks for them
       if (route.enabled === false) {
+        continue;
+      }
+
+      // Skip development-only routes in production builds (S1)
+      if (!isRouteAccessibleInCurrentEnvironment(route, {
+        isDevelopment: process.env.NODE_ENV !== 'production',
+      })) {
         continue;
       }
 

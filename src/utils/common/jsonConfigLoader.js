@@ -6,7 +6,7 @@
  * All operations tracked with global window.performanceTracker.
  */
 
-import { getValueFromCache, setValueWithExpiration } from './cacheHandler.js';
+import { getValueFromCache, removeFromCache, setValueWithExpiration } from './cacheHandler.js';
 import { log } from './logHandler.js';
 import { logError } from './errorHandler.js';
 

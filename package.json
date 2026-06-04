@@ -42,6 +42,7 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.21",
+    "baseline-browser-mapping": "^2.10.32",
     "fs-extra": "^11.3.1",
     "happy-dom": "^18.0.1",
     "jsdom": "^26.1.0",

@@ -14,6 +14,7 @@
           <component :is="popupNavHandler ? 'button' : RouterLink"
             v-bind="popupNavHandler ? { type: 'button' } : { to: '/sign-up' }"
             @click="popupNavHandler ? popupNavHandler('/sign-up') : undefined"
+            @mouseenter="prefetchSignUp" @focus="prefetchSignUp"
             class="text-base font-medium leading-6 text-[#f06]"
             :class="{ 'opacity-50 pointer-events-none': isLoading }">
             {{ t("auth.register.button") }}
@@ -37,6 +38,7 @@
             <component :is="popupNavHandler ? 'button' : RouterLink"
               v-bind="popupNavHandler ? { type: 'button' } : { to: '/lost-password' }"
               @click="popupNavHandler ? popupNavHandler('/lost-password') : undefined"
+              @mouseenter="prefetchLostPassword" @focus="prefetchLostPassword"
               class="w-fit opacity-70 text-xs capitalize text-text font-normal"
               :class="{ 'opacity-50 pointer-events-none': isLoading }">
               {{ t("auth.login.forgotPassword") }}
@@ -110,9 +112,12 @@ import { browserUtility } from "@/lib/mock-api-demo/utilities/browserHelper.js";
 import { initiateTwitterLogin } from "@/utils/auth/socialAuthHandler.js";
 import { initiateTelegramLogin } from "@/utils/auth/telegramAuthHandler.js";
 import { authenticateOrSignUpTelegramUser } from "@/utils/auth/telegramCognitoHandler.js";
+import { createRoutePrefetchIntentHandler } from "@/utils/route/routeComponentPrefetch.js";
 
 const { t, locale: i18nLocale } = useI18n();
 const route = useRoute();
+const prefetchSignUp = createRoutePrefetchIntentHandler('/sign-up');
+const prefetchLostPassword = createRoutePrefetchIntentHandler('/lost-password');
 const rememberMe = ref(false);
 const email = ref("");
 const password = ref("");

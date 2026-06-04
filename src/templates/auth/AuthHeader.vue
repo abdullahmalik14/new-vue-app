@@ -21,7 +21,7 @@ const globeIcon = ref('');
 const logoUrl = ref('');
 
 // Fallback URLs in case asset library doesn't find them
-const FALLBACK_GLOBE_ICON = 'https://i.ibb.co.com/mF9x2JG0/svgviewer-png-output-85.webp';
+const FALLBACK_GLOBE_ICON = 'https://i.ibb.co/mF9x2JG0/svgviewer-png-output-85.webp';
 const FALLBACK_LOGO = 'https://i.ibb.co/jZQNHC2t/svgviewer-png-output-4.webp';
 
 onMounted(async () => {

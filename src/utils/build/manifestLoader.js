@@ -1,6 +1,11 @@
 // vueApp-main-new/src/utils/build/manifestLoader.js
 
 import { log } from '../common/logHandler';
+import {
+  fetchVerifiedManifest,
+  MANIFEST_INTEGRITY_META
+} from './manifestIntegrity.js';
+import { isTrustedBundlePath } from './bundlePathValidation.js';
 /**
  * @file manifestLoader.js
  * @description Load section manifest in production
@@ -12,6 +17,131 @@ import { log } from '../common/logHandler';
 let cachedManifest = null;
 let manifestPromise = null;
 
+const MANIFEST_SESSION_KEY = 'app-section-manifest';
+const MANIFEST_MAX_RETRIES = 2;
+const MANIFEST_RETRY_BASE_MS = 500;
+const MANIFEST_URL = '/section-manifest.json';
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getManifestFetchStatus(error) {
+  const match = error?.message?.match(/Failed to fetch manifest .+: (\d{3})/);
+  return match ? Number(match[1]) : null;
+}
+
+function isRetryableManifestError(error) {
+  const status = getManifestFetchStatus(error);
+
+  if (status !== null) {
+    return status >= 500;
+  }
+
+  return error instanceof TypeError;
+}
+
+async function fetchProductionManifestWithRetry() {
+  let lastError;
+
+  for (let attempt = 0; attempt <= MANIFEST_MAX_RETRIES; attempt++) {
+    try {
+      if (attempt > 0) {
+        const delayMs = MANIFEST_RETRY_BASE_MS * (2 ** (attempt - 1));
+        log('manifestLoader.js', 'fetchProductionManifestWithRetry', 'retry', 'Retrying manifest fetch', {
+          attempt,
+          delayMs
+        });
+        await sleep(delayMs);
+      }
+
+      return await fetchVerifiedManifest(
+        MANIFEST_URL,
+        MANIFEST_INTEGRITY_META.section,
+        { cache: 'force-cache' }
+      );
+    } catch (error) {
+      lastError = error;
+
+      if (!isRetryableManifestError(error) || attempt === MANIFEST_MAX_RETRIES) {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+async function markManifestLoadFailed(error) {
+  console.error('[manifestLoader] Section manifest load failed:', error);
+
+  try {
+    const { usePreloadStore } = await import('../../stores/usePreloadStore.js');
+    usePreloadStore().setManifestLoadFailed(true);
+  } catch {
+    // Pinia may not be ready during very early startup
+  }
+}
+
+async function markManifestLoadRecovered() {
+  try {
+    const { usePreloadStore } = await import('../../stores/usePreloadStore.js');
+    usePreloadStore().setManifestLoadFailed(false);
+  } catch {
+    // Pinia may not be ready during very early startup
+  }
+}
+
+function resetManifestLoadState() {
+  cachedManifest = null;
+  manifestPromise = null;
+}
+
+function getManifestBuildHash() {
+  return import.meta.env.VITE_BUILD_HASH || null;
+}
+
+function readManifestFromSession() {
+  if (typeof sessionStorage === 'undefined') {
+    return null;
+  }
+
+  try {
+    const raw = sessionStorage.getItem(MANIFEST_SESSION_KEY);
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw);
+    if (parsed.buildHash !== getManifestBuildHash()) {
+      return null;
+    }
+
+    if (!parsed.manifest || typeof parsed.manifest !== 'object') {
+      return null;
+    }
+
+    return parsed.manifest;
+  } catch {
+    return null;
+  }
+}
+
+function persistManifestToSession(manifest) {
+  if (typeof sessionStorage === 'undefined') {
+    return;
+  }
+
+  try {
+    sessionStorage.setItem(MANIFEST_SESSION_KEY, JSON.stringify({
+      buildHash: getManifestBuildHash(),
+      manifest
+    }));
+  } catch {
+    // Ignore quota / private-mode failures — in-memory cache still works
+  }
+}
+
 /**
  * @function loadSectionManifest
  * @description Load section manifest from build output
@@ -19,7 +149,7 @@ let manifestPromise = null;
  */
 export async function loadSectionManifest() {
   log('manifestLoader.js', 'loadSectionManifest', 'start', 'Loading section manifest', {});
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'loadSectionManifest_start',
     file: 'manifestLoader.js',
     method: 'loadSectionManifest',
@@ -32,7 +162,7 @@ export async function loadSectionManifest() {
     log('manifestLoader.js', 'loadSectionManifest', 'cache-hit', 'Returning cached manifest', {
       sectionCount: Object.keys(cachedManifest).length
     });
-    window.performanceTracker.step({
+    window.performanceTracker?.step({
       step: 'loadSectionManifest_cached',
       file: 'manifestLoader.js',
       method: 'loadSectionManifest',
@@ -45,27 +175,38 @@ export async function loadSectionManifest() {
   try {
     // In production, load from dist/section-manifest.json
     if (import.meta.env.PROD) {
+      const sessionManifest = readManifestFromSession();
+      if (sessionManifest) {
+        cachedManifest = sessionManifest;
+
+        log('manifestLoader.js', 'loadSectionManifest', 'session-cache-hit', 'Manifest loaded from sessionStorage', {
+          sectionCount: Object.keys(cachedManifest).length
+        });
+        window.performanceTracker?.step({
+          step: 'loadSectionManifest_session_cached',
+          file: 'manifestLoader.js',
+          method: 'loadSectionManifest',
+          flag: 'session-cache-hit',
+          purpose: 'Manifest served from sessionStorage'
+        });
+
+        return cachedManifest;
+      }
+
       if (!manifestPromise) {
         log('manifestLoader.js', 'loadSectionManifest', 'fetch', 'Fetching manifest from production build', {});
 
         manifestPromise = (async () => {
           try {
-            const response = await fetch('/section-manifest.json');
-
-            if (!response.ok) {
-              log('manifestLoader.js', 'loadSectionManifest', 'error', 'Failed to fetch manifest', {
-                status: response.status
-              });
-              return {};
-            }
-
-            const manifest = await response.json();
+            const manifest = await fetchProductionManifestWithRetry();
             cachedManifest = manifest;
+            persistManifestToSession(manifest);
+            await markManifestLoadRecovered();
 
             log('manifestLoader.js', 'loadSectionManifest', 'success', 'Manifest loaded from production', {
               sectionCount: Object.keys(manifest).length
             });
-            window.performanceTracker.step({
+            window.performanceTracker?.step({
               step: 'loadSectionManifest_complete',
               file: 'manifestLoader.js',
               method: 'loadSectionManifest',
@@ -79,14 +220,15 @@ export async function loadSectionManifest() {
               error: error.message,
               stack: error.stack
             });
-            window.performanceTracker.step({
+            window.performanceTracker?.step({
               step: 'loadSectionManifest_error',
               file: 'manifestLoader.js',
               method: 'loadSectionManifest',
               flag: 'error',
               purpose: 'Manifest load failed'
             });
-            cachedManifest = {};
+            await markManifestLoadFailed(error);
+            resetManifestLoadState();
             return {};
           } finally {
             manifestPromise = null;
@@ -97,25 +239,33 @@ export async function loadSectionManifest() {
       return manifestPromise;
     }
 
-    // In development, return empty (Vite handles module loading)
-    log('manifestLoader.js', 'loadSectionManifest', 'dev', 'Development mode, using empty manifest', {});
-    window.performanceTracker.step({
-      step: 'loadSectionManifest_dev',
-      file: 'manifestLoader.js',
-      method: 'loadSectionManifest',
-      flag: 'dev',
-      purpose: 'Development mode, no manifest needed'
-    });
+    // In development, load from dev stub so the full preload path can be exercised locally
+    if (import.meta.env.DEV) {
+      log('manifestLoader.js', 'loadSectionManifest', 'dev', 'Development mode, loading dev manifest stub', {});
+      window.performanceTracker?.step({
+        step: 'loadSectionManifest_dev',
+        file: 'manifestLoader.js',
+        method: 'loadSectionManifest',
+        flag: 'dev',
+        purpose: 'Development mode, loading stub manifest'
+      });
 
-    cachedManifest = {};
-    return {};
+      try {
+        const r = await fetch('/section-manifest.dev.json');
+        cachedManifest = r.ok ? await r.json() : {};
+      } catch {
+        cachedManifest = {};
+      }
+
+      return cachedManifest ?? {};
+    }
 
   } catch (error) {
     log('manifestLoader.js', 'loadSectionManifest', 'error', 'Error loading manifest', {
       error: error.message,
       stack: error.stack
     });
-    window.performanceTracker.step({
+    window.performanceTracker?.step({
       step: 'loadSectionManifest_error',
       file: 'manifestLoader.js',
       method: 'loadSectionManifest',
@@ -123,8 +273,12 @@ export async function loadSectionManifest() {
       purpose: 'Manifest load failed'
     });
 
-    // Return empty manifest on error (fail gracefully)
-    cachedManifest = {};
+    if (import.meta.env.PROD) {
+      await markManifestLoadFailed(error);
+    }
+
+    // Return empty manifest on error (fail gracefully, stay retryable per Task 8)
+    resetManifestLoadState();
     return {};
   }
 }
@@ -138,7 +292,7 @@ export async function loadSectionManifest() {
  */
 export async function getSectionBundlePaths(sectionName, manifest) {
   log('manifestLoader.js', 'getSectionBundlePaths', 'start', 'Getting bundle paths for section', { sectionName });
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'getSectionBundlePaths_start',
     file: 'manifestLoader.js',
     method: 'getSectionBundlePaths',
@@ -159,7 +313,7 @@ export async function getSectionBundlePaths(sectionName, manifest) {
         sectionName,
         availableSections: Object.keys(manifestData).length + ' sections available'
       });
-      window.performanceTracker.step({
+      window.performanceTracker?.step({
         step: 'getSectionBundlePaths_not_found',
         file: 'manifestLoader.js',
         method: 'getSectionBundlePaths',
@@ -171,9 +325,17 @@ export async function getSectionBundlePaths(sectionName, manifest) {
 
     // Handle string path (backward compatibility)
     if (typeof sectionEntry === 'string') {
-      const paths = { js: sectionEntry, css: null };
+      if (!isTrustedBundlePath(sectionEntry)) {
+        log('manifestLoader.js', 'getSectionBundlePaths', 'untrusted-path', 'Untrusted JS bundle path rejected', {
+          sectionName,
+          path: sectionEntry
+        });
+        return null;
+      }
+
+      const paths = { js: sectionEntry, css: null, integrity: null };
       log('manifestLoader.js', 'getSectionBundlePaths', 'success', 'Bundle paths resolved (string format)', { sectionName, paths });
-      window.performanceTracker.step({
+      window.performanceTracker?.step({
         step: 'getSectionBundlePaths_complete',
         file: 'manifestLoader.js',
         method: 'getSectionBundlePaths',
@@ -187,10 +349,21 @@ export async function getSectionBundlePaths(sectionName, manifest) {
     if (typeof sectionEntry === 'object') {
       const paths = {
         js: sectionEntry.js || sectionEntry.path || null,
-        css: sectionEntry.css || null
+        css: sectionEntry.css || null,
+        integrity: sectionEntry.integrity || null
       };
+
+      if ((paths.js && !isTrustedBundlePath(paths.js)) || (paths.css && !isTrustedBundlePath(paths.css))) {
+        log('manifestLoader.js', 'getSectionBundlePaths', 'untrusted-path', 'Untrusted bundle path rejected', {
+          sectionName,
+          js: paths.js,
+          css: paths.css
+        });
+        return null;
+      }
+
       log('manifestLoader.js', 'getSectionBundlePaths', 'success', 'Bundle paths resolved (object format)', { sectionName, paths });
-      window.performanceTracker.step({
+      window.performanceTracker?.step({
         step: 'getSectionBundlePaths_complete',
         file: 'manifestLoader.js',
         method: 'getSectionBundlePaths',
@@ -209,7 +382,7 @@ export async function getSectionBundlePaths(sectionName, manifest) {
       error: error.message,
       stack: error.stack
     });
-    window.performanceTracker.step({
+    window.performanceTracker?.step({
       step: 'getSectionBundlePaths_error',
       file: 'manifestLoader.js',
       method: 'getSectionBundlePaths',
@@ -227,7 +400,7 @@ export async function getSectionBundlePaths(sectionName, manifest) {
  */
 export function clearManifestCache() {
   log('manifestLoader.js', 'clearManifestCache', 'clear', 'Clearing manifest cache', {});
-  window.performanceTracker.step({
+  window.performanceTracker?.step({
     step: 'clearManifestCache',
     file: 'manifestLoader.js',
     method: 'clearManifestCache',
@@ -236,6 +409,15 @@ export function clearManifestCache() {
   });
 
   cachedManifest = null;
+  manifestPromise = null;
+
+  if (typeof sessionStorage !== 'undefined') {
+    try {
+      sessionStorage.removeItem(MANIFEST_SESSION_KEY);
+    } catch {
+      // Ignore sessionStorage failures in restricted environments
+    }
+  }
 
   log('manifestLoader.js', 'clearManifestCache', 'success', 'Manifest cache cleared', {});
 }

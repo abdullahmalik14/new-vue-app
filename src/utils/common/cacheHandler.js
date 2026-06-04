@@ -170,6 +170,38 @@ export function removeFromCache(key) {
 }
 
 /**
+ * Remove all cache entries whose keys start with a prefix
+ *
+ * @param {string} prefix - Key prefix to match
+ * @returns {number} - Number of entries removed
+ */
+export function removeCacheKeysByPrefix(prefix) {
+  log('cacheHandler.js', 'removeCacheKeysByPrefix', 'start', 'Removing cache entries by prefix', { prefix });
+
+  if (!prefix || typeof prefix !== 'string') {
+    log('cacheHandler.js', 'removeCacheKeysByPrefix', 'return', 'Returning 0 - invalid prefix', { prefix });
+    return 0;
+  }
+
+  let removedCount = 0;
+
+  for (const key of cacheStorage.keys()) {
+    if (key.startsWith(prefix)) {
+      cacheStorage.delete(key);
+      removedCount += 1;
+    }
+  }
+
+  log('cacheHandler.js', 'removeCacheKeysByPrefix', 'success', 'Cache entries removed by prefix', {
+    prefix,
+    removedCount
+  });
+  log('cacheHandler.js', 'removeCacheKeysByPrefix', 'return', 'Returning removed count', { removedCount });
+
+  return removedCount;
+}
+
+/**
  * Clear all cached values
  * 
  * @returns {number} - Number of entries cleared

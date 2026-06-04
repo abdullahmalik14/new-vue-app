@@ -18,14 +18,48 @@ import { useLocaleStore } from "../../stores/useLocaleStore.js";
 import { useAuthStore } from "../../stores/useAuthStore.js";
 
 import {
-  resolveSectionIdentifier,
   resolveRoleSectionVariant,
 } from "../section/sectionResolver.js";
+import {
+  getRoutePreloadPlan,
+  refreshSectionPreloadsOnLocaleChange,
+} from "../section/sectionPreloadOrchestrator.js";
 import { getI18nInstance } from "./i18nInstance.js";
 
 // Supported locales - exported as the single source of truth
 export const SUPPORTED_LOCALES = [ "af", "sq", "am", "ar", "hy", "az", "bn", "bs", "bg", "ca", "zh", "zh-tw", "hr", "cs", "da", "fa-af", "nl", "en", "et", "fa", "tl", "fi", "fr", "fr-ca", "ka", "de", "el", "gu", "ht", "ha", "he", "hi", "hu", "is", "id", "ga", "it", "ja", "kn", "kk", "ko", "lv", "lt", "mk", "ms", "ml", "mt", "mr", "mn", "no", "ps", "pl", "pt", "pt-pt", "pa", "ro", "ru", "sr", "si", "sk", "sl", "so", "es", "es-mx", "sw", "sv", "ta", "te", "th", "tr", "uk", "ur", "uz", "vi", "cy" ];
 const DEFAULT_LOCALE = "en";
+
+/**
+ * First path segment if it is a supported locale (e.g. /vi/dashboard → vi).
+ *
+ * @param {string} path
+ * @param {string[]} [supportedLocales=SUPPORTED_LOCALES]
+ * @returns {string|null}
+ */
+export function getLeadingLocaleFromPath(path, supportedLocales = SUPPORTED_LOCALES) {
+  const segments = String(path || "").split("/").filter(Boolean);
+  if (segments.length > 0 && supportedLocales.includes(segments[0])) {
+    return segments[0];
+  }
+  return null;
+}
+
+/**
+ * Remove a leading locale segment from a path (L14 — avoid /vi/vi/... double prefix).
+ *
+ * @param {string} path
+ * @param {string[]} [supportedLocales=SUPPORTED_LOCALES]
+ * @returns {string}
+ */
+export function stripLeadingLocaleFromPath(path, supportedLocales = SUPPORTED_LOCALES) {
+  const segments = String(path || "").split("/").filter(Boolean);
+  if (segments.length > 0 && supportedLocales.includes(segments[0])) {
+    const rest = segments.slice(1);
+    return rest.length ? `/${rest.join("/")}` : "/";
+  }
+  return path || "/";
+}
 
 // Current active locale
 let currentActiveLocale = null;
@@ -233,28 +267,24 @@ function getLocaleFromUrl() {
   );
 
   try {
-    // Check path: /vi/dashboard
-    const pathParts = window.location.pathname
-      .split("/")
-      .filter((part) => part.length > 0);
-    const firstPathPart = pathParts[0];
+    const pathLocale = getLeadingLocaleFromPath(window.location.pathname);
 
-    if (firstPathPart && SUPPORTED_LOCALES.includes(firstPathPart)) {
+    if (pathLocale) {
       log(
         "localeManager.js",
         "getLocaleFromUrl",
         "info",
         "Found locale in path",
-        { locale: firstPathPart }
+        { locale: pathLocale }
       );
       log(
         "localeManager.js",
         "getLocaleFromUrl",
         "return",
         "Returning path locale",
-        { locale: firstPathPart }
+        { locale: pathLocale }
       );
-      return firstPathPart;
+      return pathLocale;
     }
 
     log(
@@ -502,7 +532,6 @@ export async function setActiveLocale(localeCode, options = {}) {
     const {
       clearTranslationCaches,
       loadTranslationsForSection,
-      preloadTranslationsForSections,
     } = await import("./translationLoader.js");
     clearTranslationCaches();
     log(
@@ -520,20 +549,7 @@ export async function setActiveLocale(localeCode, options = {}) {
           "../route/routeResolver.js"
         );
         const rawPath = window.location.pathname || "/";
-        const pathSegments = rawPath
-          .split("/")
-          .filter((segment) => segment.length > 0);
-        const firstSegment = pathSegments[0];
-
-        // Strip locale prefix from path for route resolution
-        let routePath = rawPath;
-        if (firstSegment && SUPPORTED_LOCALES.includes(firstSegment)) {
-          const remainingSegments = pathSegments.slice(1);
-          routePath = "/" + remainingSegments.join("/");
-          if (remainingSegments.length === 0) {
-            routePath = "/";
-          }
-        }
+        const routePath = stripLeadingLocaleFromPath(rawPath);
 
         const currentRoute = resolveRouteFromPath(routePath);
         if (currentRoute?.section) {
@@ -584,51 +600,43 @@ export async function setActiveLocale(localeCode, options = {}) {
             );
           }
 
-          // Reload translations for preloaded sections (if any)
-          const preloadedSections = Array.isArray(currentRoute.preLoadSections)
-            ? currentRoute.preLoadSections.filter(
-                (sectionName) =>
-                  typeof sectionName === "string" && sectionName.length > 0
-              )
-            : [];
+          // Refresh bundle/CSS preload and translations for background preLoadSections
+          const { resolved: preloadedSectionsToRefresh } = getRoutePreloadPlan(
+            currentRoute,
+            userRole
+          );
 
-          const resolvedPreloadedSections = preloadedSections
-            .map((identifier) => resolveSectionIdentifier(identifier, userRole))
-            .filter(
-              (sectionName) =>
-                typeof sectionName === "string" && sectionName.length > 0
-            );
-
-          const uniquePreloadedSections = [
-            ...new Set(resolvedPreloadedSections),
-          ];
-
-          if (uniquePreloadedSections.length > 0) {
+          if (preloadedSectionsToRefresh.length > 0) {
             log(
               "localeManager.js",
               "setActiveLocale",
               "info",
-              "Reloading translations for preloaded sections",
+              "Refreshing section preloads for locale change",
               {
                 localeCode,
-                originalIdentifiers: preloadedSections,
-                resolvedSections: uniquePreloadedSections,
+                resolvedSections: preloadedSectionsToRefresh,
+                skipSection: resolvedSection,
               }
             );
 
             try {
-              await preloadTranslationsForSections(
-                uniquePreloadedSections,
-                localeCode
-              );
+              await refreshSectionPreloadsOnLocaleChange({
+                sections: preloadedSectionsToRefresh,
+                locale: localeCode,
+                skipSection: resolvedSection,
+                logContext: {
+                  file: "localeManager.js",
+                  method: "setActiveLocale",
+                },
+              });
               log(
                 "localeManager.js",
                 "setActiveLocale",
                 "info",
-                "Reloaded translations for all preloaded sections",
+                "Refreshed section bundles and translations for preloaded sections",
                 {
                   localeCode,
-                  resolvedSections: uniquePreloadedSections,
+                  resolvedSections: preloadedSectionsToRefresh,
                 }
               );
             } catch (error) {
@@ -636,11 +644,10 @@ export async function setActiveLocale(localeCode, options = {}) {
                 "localeManager.js",
                 "setActiveLocale",
                 "warn",
-                "Failed to reload translations for preloaded sections",
+                "Failed to refresh section preloads for locale change",
                 {
                   localeCode,
-                  resolvedSections: uniquePreloadedSections,
-                  originalIdentifiers: preloadedSections,
+                  resolvedSections: preloadedSectionsToRefresh,
                   error: error?.message,
                 }
               );
@@ -715,24 +722,15 @@ function updateUrlWithLocale(localeCode) {
   try {
     const currentPath = window.location.pathname;
     const pathParts = currentPath.split("/").filter((part) => part.length > 0);
-
-    // Check if first segment is already a locale
-    const firstPart = pathParts[0];
-    const hasLocaleInPath = firstPart && SUPPORTED_LOCALES.includes(firstPart);
+    const hasLocaleInPath = Boolean(getLeadingLocaleFromPath(currentPath));
 
     let newPath;
 
     // If switching to default locale (en), remove locale prefix
     if (localeCode === DEFAULT_LOCALE) {
-      if (hasLocaleInPath) {
-        // Remove locale prefix - keep rest of path
-        const remainingParts = pathParts.slice(1);
-        newPath =
-          remainingParts.length > 0 ? "/" + remainingParts.join("/") : "/";
-      } else {
-        // No locale in path, keep as is
-        newPath = currentPath;
-      }
+      newPath = hasLocaleInPath
+        ? stripLeadingLocaleFromPath(currentPath)
+        : currentPath;
     } else {
       // Non-default locale - add or replace locale prefix
       if (hasLocaleInPath) {

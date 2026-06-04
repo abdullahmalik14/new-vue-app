@@ -16,6 +16,22 @@ import { getI18nInstance } from './i18nInstance.js';
 const TRANSLATION_CACHE_KEY_PREFIX = 'translation_';
 const TRANSLATION_CACHE_TTL = 3600000; // 1 hour
 
+const SECTION_NAME_PATTERN = /^[a-z0-9-]+$/i;
+
+/**
+ * Allowlist section names before they are embedded in fetch URLs.
+ *
+ * @param {string} name
+ * @returns {string}
+ */
+function sanitizeSectionName(name) {
+  if (typeof name !== 'string' || !SECTION_NAME_PATTERN.test(name)) {
+    throw new Error(`Invalid section name: ${name}`);
+  }
+
+  return name;
+}
+
 // Track which translations are currently loading to prevent duplicates
 const translationsLoadingInProgress = new Set();
 
@@ -31,7 +47,8 @@ const loadedTranslations = new Map();
  * @returns {string} - URL to the translation file
  */
 function getTranslationUrl(sectionName, localeCode) {
-  return `/i18n/section-${sectionName}/${localeCode}.json`;
+  const safeSectionName = sanitizeSectionName(sectionName);
+  return `/i18n/section-${safeSectionName}/${localeCode}.json`;
 }
 
 /**

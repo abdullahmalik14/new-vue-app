@@ -6,9 +6,8 @@
  */
 
 import { log } from '../common/logHandler.js';
-
-
-// Performance tracker available globally as window.performanceTracker
+import { trackStep } from '../common/performanceTrackerAccess.js';
+import { deepClone } from '../common/objectSafety.js';
 
 // Navigation state
 let currentActiveRoute = null;
@@ -17,6 +16,20 @@ const fullNavigationHistory = [];
 
 // Maximum history entries to keep in memory
 const MAX_HISTORY_ENTRIES = 100;
+
+/**
+ * Store an immutable snapshot of route config (meta.routeConfig is mutable in-place).
+ *
+ * @param {object|null|undefined} route
+ * @returns {object|null}
+ */
+function snapshotRouteConfig(route) {
+  if (!route) {
+    return null;
+  }
+
+  return deepClone(route);
+}
 
 /**
  * Update current active route
@@ -30,7 +43,7 @@ export function setCurrentActiveRoute(route) {
     slug: route?.slug
   });
 
-  window.performanceTracker.step({
+  trackStep({
     step: 'updateActiveRoute',
     file: 'routeNavigation.js',
     method: 'setCurrentActiveRoute',
@@ -43,14 +56,16 @@ export function setCurrentActiveRoute(route) {
     previousActiveRoute = currentActiveRoute;
   }
 
-  // Set new current
-  currentActiveRoute = route;
+  const routeSnapshot = snapshotRouteConfig(route);
+
+  // Set new current (snapshot — not shared with meta.routeConfig reference)
+  currentActiveRoute = routeSnapshot;
 
   // Add to history
   fullNavigationHistory.push({
-    route: route,
+    route: routeSnapshot,
     timestamp: Date.now(),
-    path: route?.slug
+    path: routeSnapshot?.slug
   });
 
   // Trim history if too large
@@ -164,7 +179,7 @@ export function canNavigateBack() {
 export function clearNavigationHistory() {
   log('routeNavigation.js', 'clearNavigationHistory', 'start', 'Clearing navigation history', {});
 
-  window.performanceTracker.step({
+  trackStep({
     step: 'clearHistory',
     file: 'routeNavigation.js',
     method: 'clearNavigationHistory',

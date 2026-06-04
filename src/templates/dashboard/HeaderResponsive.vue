@@ -92,7 +92,6 @@ import { ref, onMounted } from "vue";
 import NotificationPopup from "@/components/ui/popup/NotificationPopup.vue";
 import AvatarProfilePopup from "@/components/ui/popup/AvatarProfilePopup.vue";
 import { getAssetUrl } from "@/utils/assets/assetLibrary.js";
-import { preloadAssets } from "@/utils/assets/assetPreloader.js";
 import { loadTranslationsForSection } from "@/utils/translation/translationLoader.js";
 import { getActiveLocale } from "@/utils/translation/localeManager.js";
 
@@ -186,37 +185,6 @@ async function loadAssetsWithPriority() {
     const normalPriorityResults = await Promise.all(normalPriorityPromises);
     assets.value.language = normalPriorityResults[0];
     assets.value.hamburger = normalPriorityResults[1];
-
-    // Step 4: Preload all loaded images with priority
-    const imageAssets = [];
-
-    // Critical priority
-    if (assets.value.logo) {
-      imageAssets.push({ src: assets.value.logo, type: 'image', priority: 'high' });
-    }
-
-    // High priority
-    if (assets.value.avatar) {
-      imageAssets.push({ src: assets.value.avatar, type: 'image', priority: 'high' });
-    }
-    if (assets.value.notification) {
-      imageAssets.push({ src: assets.value.notification, type: 'image', priority: 'high' });
-    }
-
-    // Normal priority
-    if (assets.value.language) {
-      imageAssets.push({ src: assets.value.language, type: 'image', priority: 'normal' });
-    }
-    if (assets.value.hamburger) {
-      imageAssets.push({ src: assets.value.hamburger, type: 'image', priority: 'normal' });
-    }
-
-    if (imageAssets.length > 0) {
-      // Preload in background (don't await - non-blocking)
-      preloadAssets(imageAssets).catch(() => {
-        // Silently fail - images will still load normally when needed
-      });
-    }
 
     isAssetsLoading.value = false;
   } catch (error) {

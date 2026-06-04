@@ -291,7 +291,7 @@
       </section>
 
       <!-- bottom-section -->
-      <div class="flex flex-col items-stretch max-[580px]:bg-black/25 opacity-100 md:overflow-hidden xl:overflow-auto">
+      <div id="features" class="flex flex-col items-stretch max-[580px]:bg-black/25 opacity-100 md:overflow-hidden xl:overflow-auto">
         <!-- feed-tab-content -->
         <div class="tab-content active relative flex-1 min-h-[100svh] lg:bg-black/50" id="feed-content">
           <div

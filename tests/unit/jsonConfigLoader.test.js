@@ -156,5 +156,15 @@ describe('jsonConfigLoader (browser)', () => {
     expect(result.success).toBe(true);
     expect(result.data).toEqual(mockData);
   });
+
+  it('clearConfigCache removes cached config entries without throwing', async () => {
+    const { loadJsonConfigFromImport, clearConfigCache } = await importLoader();
+    const mockData = { locale: 'en-US' };
+
+    loadJsonConfigFromImport(mockData, { configName: 'clearable-config' });
+
+    expect(clearConfigCache('clearable-config')).toBe(true);
+    expect(clearConfigCache('clearable-config')).toBe(false);
+  });
 });
 

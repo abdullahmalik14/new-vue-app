@@ -8,6 +8,8 @@
 
 import { log } from '../common/logHandler.js';
 import { logError } from '../common/errorHandler.js';
+import { getSectionBundlePaths } from '../build/manifestLoader.js';
+import { isTrustedBundlePath, escapeSelectorAttributeValue } from '../build/bundlePathValidation.js';
 
 /**
  * Track loaded CSS files
@@ -15,68 +17,85 @@ import { logError } from '../common/errorHandler.js';
  */
 const loadedSectionCss = new Set();
 const activeSectionCss = new Map(); // section -> link element
+const preloadHintLinks = new Map(); // section -> preload hint link element
 
-/**
- * CSS loading manifest cache
- */
-let cssManifest = null;
-let cssManifestPromise = null;
+export function clearSectionCssPreloadHint(sectionName) {
+  return removeSectionCssPreloadHint(sectionName);
+}
 
-/**
- * Load section CSS manifest
- * Contains mapping of sections to CSS files
- * 
- * @returns {Promise<object>} CSS manifest
- */
-async function loadCssManifest() {
-  if (cssManifest) {
-    return cssManifest;
+function removeSectionCssPreloadHint(sectionName) {
+  const hintLink = preloadHintLinks.get(sectionName);
+
+  if (hintLink && hintLink.parentNode) {
+    hintLink.parentNode.removeChild(hintLink);
+    preloadHintLinks.delete(sectionName);
+    return true;
   }
 
-  if (cssManifestPromise) {
-    return cssManifestPromise;
+  preloadHintLinks.delete(sectionName);
+  return false;
+}
+
+function applyBundleLinkIntegrity(linkElement, integrity) {
+  if (typeof integrity === 'string' && integrity.length > 0) {
+    linkElement.integrity = integrity;
   }
+}
+
+function normalizeCssBundlePath(rawPath) {
+  const trimmed = rawPath.trim();
+
+  if (trimmed.startsWith('/') || /^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  return `/${trimmed.replace(/^\/+/, '')}`;
+}
+
+/**
+ * Get CSS bundle info for a section
+ *
+ * @param {string} sectionName - Section name
+ * @returns {Promise<{ cssPath: string, integrity: string|null }|null>}
+ */
+async function getSectionCssBundle(sectionName) {
+  log('sectionCssLoader.js', 'getSectionCssBundle', 'start', 'Getting CSS bundle for section', { sectionName });
 
   try {
-    // In development, return empty manifest
-    if (import.meta.env.DEV) {
-      log('sectionCssLoader.js', 'loadCssManifest', 'dev', 'Development mode, no CSS manifest needed', {});
-      cssManifest = {};
-      return cssManifest;
-    }
+    const bundlePaths = await getSectionBundlePaths(sectionName);
+    const rawPath = bundlePaths?.css;
 
-    // Load section manifest
-    cssManifestPromise = fetch('/section-css-manifest.json')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Failed to load CSS manifest: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(manifest => {
-        cssManifest = manifest;
+    if (rawPath) {
+      const normalized = normalizeCssBundlePath(rawPath);
+      const integrity = bundlePaths.integrity?.css || null;
 
-        log('sectionCssLoader.js', 'loadCssManifest', 'success', 'CSS manifest loaded', {
-          sectionCount: Object.keys(cssManifest.sections || {}).length
+      if (!isTrustedBundlePath(normalized)) {
+        logError('sectionCssLoader.js', 'getSectionCssBundle', 'Untrusted CSS bundle path rejected', new Error('Untrusted path'), {
+          sectionName,
+          cssPath: normalized
         });
+        return null;
+      }
 
-        return cssManifest;
-      })
-      .catch(error => {
-        logError('sectionCssLoader.js', 'loadCssManifest', 'Error loading CSS manifest', error, {});
-        cssManifest = { sections: {} };
-        return cssManifest;
-      })
-      .finally(() => {
-        cssManifestPromise = null;
+      log('sectionCssLoader.js', 'getSectionCssBundle', 'success', 'CSS bundle found', {
+        sectionName,
+        cssPath: normalized,
+        hasIntegrity: !!integrity
       });
 
-    return cssManifestPromise;
+      return { cssPath: normalized, integrity };
+    }
+
+    log('sectionCssLoader.js', 'getSectionCssBundle', 'not-found', 'No CSS bundle for section', {
+      sectionName
+    });
+
+    return null;
   } catch (error) {
-    logError('sectionCssLoader.js', 'loadCssManifest', 'Error loading CSS manifest', error, {});
-    cssManifest = { sections: {} };
-    cssManifestPromise = null;
-    return cssManifest;
+    logError('sectionCssLoader.js', 'getSectionCssBundle', 'Error getting CSS bundle', error, {
+      sectionName
+    });
+    return null;
   }
 }
 
@@ -87,49 +106,8 @@ async function loadCssManifest() {
  * @returns {Promise<string|null>} CSS file path or null
  */
 async function getSectionCssPath(sectionName) {
-  log('sectionCssLoader.js', 'getSectionCssPath', 'start', 'Getting CSS path for section', { sectionName });
-
-  try {
-    // In development, section CSS is handled by Vite's dev server via main.css
-    // Skip section CSS loading in dev mode
-    if (import.meta.env.DEV) {
-      log('sectionCssLoader.js', 'getSectionCssPath', 'dev', 'Dev mode - CSS handled by Vite', {
-        sectionName
-      });
-      return null;
-    }
-
-    // In production, use manifest
-    const manifest = await loadCssManifest();
-
-    if (manifest.sections && manifest.sections[sectionName]) {
-      const cssEntry = manifest.sections[sectionName];
-      const rawPath = typeof cssEntry === 'string' ? cssEntry : cssEntry.css;
-      if (rawPath) {
-        const normalized = rawPath.startsWith('/')
-          ? rawPath
-          : `/${rawPath.replace(/^\/+/, '')}`;
-
-        log('sectionCssLoader.js', 'getSectionCssPath', 'success', 'CSS path found', {
-          sectionName,
-          cssPath: normalized
-        });
-
-        return normalized;
-      }
-    }
-
-    log('sectionCssLoader.js', 'getSectionCssPath', 'not-found', 'No CSS path for section', {
-      sectionName
-    });
-
-    return null;
-  } catch (error) {
-    logError('sectionCssLoader.js', 'getSectionCssPath', 'Error getting CSS path', error, {
-      sectionName
-    });
-    return null;
-  }
+  const bundle = await getSectionCssBundle(sectionName);
+  return bundle?.cssPath ?? null;
 }
 
 /**
@@ -139,15 +117,19 @@ async function getSectionCssPath(sectionName) {
  * @param {string} sectionName - Section name
  * @returns {Promise<HTMLLinkElement>} Link element
  */
-async function injectCssLink(cssPath, sectionName) {
+async function injectCssLink(cssPath, sectionName, integrity = null) {
   log('sectionCssLoader.js', 'injectCssLink', 'start', 'Injecting CSS link', {
     cssPath,
     sectionName
   });
 
+  if (!isTrustedBundlePath(cssPath)) {
+    return Promise.reject(new Error(`Untrusted CSS bundle path for section: ${sectionName}`));
+  }
+
   return new Promise((resolve, reject) => {
     // Check if CSS is already loaded
-    const existingLink = document.querySelector(`link[data-section="${sectionName}"]`);
+    const existingLink = document.querySelector(`link[data-section="${escapeSelectorAttributeValue(sectionName)}"]`);
     if (existingLink) {
       log('sectionCssLoader.js', 'injectCssLink', 'exists', 'CSS already loaded', { sectionName });
       resolve(existingLink);
@@ -158,6 +140,7 @@ async function injectCssLink(cssPath, sectionName) {
     const linkElement = document.createElement('link');
     linkElement.rel = 'stylesheet';
     linkElement.href = cssPath;
+    applyBundleLinkIntegrity(linkElement, integrity);
     linkElement.setAttribute('data-section', sectionName);
     linkElement.setAttribute('data-section-css', 'true');
 
@@ -238,16 +221,16 @@ export async function loadSectionCss(sectionName) {
       return true;
     }
 
-    // Get CSS path
-    const cssPath = await getSectionCssPath(sectionName);
+    // Get CSS bundle info
+    const cssBundle = await getSectionCssBundle(sectionName);
 
-    if (!cssPath) {
+    if (!cssBundle) {
       log('sectionCssLoader.js', 'loadSectionCss', 'skip', 'No CSS file for section', { sectionName });
       return false;
     }
 
     // Inject CSS
-    const linkElement = await injectCssLink(cssPath, sectionName);
+    const linkElement = await injectCssLink(cssBundle.cssPath, sectionName, cssBundle.integrity);
 
     // Mark as loaded
     loadedSectionCss.add(sectionName);
@@ -301,16 +284,21 @@ export async function preloadSectionCss(sectionName) {
       return true;
     }
 
-    // Get CSS path
-    const cssPath = await getSectionCssPath(sectionName);
+    // Get CSS bundle info
+    const cssBundle = await getSectionCssBundle(sectionName);
 
-    if (!cssPath) {
+    if (!cssBundle) {
       return false;
     }
 
+    const { cssPath, integrity } = cssBundle;
+
     // Check if preload link already exists
-    const existingPreload = document.querySelector(`link[rel="preload"][href="${cssPath}"]`);
+    const existingPreload = document.querySelector(
+      `link[rel="preload"][href="${escapeSelectorAttributeValue(cssPath)}"]`
+    );
     if (existingPreload) {
+      preloadHintLinks.set(sectionName, existingPreload);
       return true;
     }
 
@@ -319,9 +307,11 @@ export async function preloadSectionCss(sectionName) {
     preloadLink.rel = 'preload';
     preloadLink.as = 'style';
     preloadLink.href = cssPath;
+    applyBundleLinkIntegrity(preloadLink, integrity);
     preloadLink.setAttribute('data-section-preload', sectionName);
 
     document.head.appendChild(preloadLink);
+    preloadHintLinks.set(sectionName, preloadLink);
 
     log('sectionCssLoader.js', 'preloadSectionCss', 'success', 'CSS preloaded', { sectionName });
 
@@ -342,14 +332,10 @@ export async function preloadSectionCss(sectionName) {
  * @returns {boolean} True if unloaded successfully
  */
 export function unloadSectionCss(sectionName) {
-  // Skip in dev mode
-  if (import.meta.env.DEV) {
-    return false;
-  }
-
   log('sectionCssLoader.js', 'unloadSectionCss', 'start', 'Unloading CSS for section', { sectionName });
 
   try {
+    const preloadRemoved = removeSectionCssPreloadHint(sectionName);
     const linkElement = activeSectionCss.get(sectionName);
 
     if (linkElement && linkElement.parentNode) {
@@ -359,6 +345,11 @@ export function unloadSectionCss(sectionName) {
 
       log('sectionCssLoader.js', 'unloadSectionCss', 'success', 'CSS unloaded', { sectionName });
 
+      return true;
+    }
+
+    if (preloadRemoved) {
+      log('sectionCssLoader.js', 'unloadSectionCss', 'success', 'CSS preload hint removed', { sectionName });
       return true;
     }
 
@@ -388,8 +379,10 @@ export function clearAllSectionCss() {
   log('sectionCssLoader.js', 'clearAllSectionCss', 'start', 'Clearing all section CSS', {});
 
   try {
-    // Remove all section CSS links
-    const allSectionLinks = document.querySelectorAll('link[data-section-css="true"]');
+    // Remove injected stylesheets and CSS preload hints
+    const allSectionLinks = document.querySelectorAll(
+      'link[data-section-css="true"], link[data-section-preload]'
+    );
     allSectionLinks.forEach(link => {
       if (link.parentNode) {
         link.parentNode.removeChild(link);
@@ -399,6 +392,7 @@ export function clearAllSectionCss() {
     // Clear tracking
     activeSectionCss.clear();
     loadedSectionCss.clear();
+    preloadHintLinks.clear();
 
     log('sectionCssLoader.js', 'clearAllSectionCss', 'success', 'All section CSS cleared', {});
   } catch (error) {

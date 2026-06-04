@@ -19,9 +19,22 @@
 
 import { log } from '../common/logHandler.js';
 import { logError } from '../common/errorHandler.js';
-import { getValueFromCache, setValueWithExpiration, clearAllCache } from '../common/cacheHandler.js';
+import {
+  getValueFromCache,
+  setValueWithExpiration,
+  clearAllCache,
+  removeFromCache,
+  removeCacheKeysByPrefix
+} from '../common/cacheHandler.js';
 import { loadSectionManifest, getSectionBundlePaths } from '../build/manifestLoader.js';
-import { getRouteConfiguration } from '../route/routeConfigLoader.js';
+import { getAssetPreloadEntriesForSection } from './getAssetPreloadEntriesForSection.js';
+import { assertAllowedPreloadUrl } from './assertAllowedPreloadUrl.js';
+import {
+  getBundledAssetMap,
+  parseAssetMapJsonText,
+  shouldAllowRuntimeAssetMapFetch,
+  verifyFetchedAssetMapText,
+} from './assetMapSource.js';
 
 // ============================================================================
 // SECTION-BASED ASSET LOADING
@@ -34,7 +47,7 @@ const ASSET_CACHE_TTL = 3600000; // 1 hour
 // Track which assets are currently loading to prevent duplicates
 const assetsLoadingInProgress = new Set();
 
-// Track loaded assets in memory
+// Track loaded section bundle metadata in memory (NOT per-URL preload completion; see usePreloadStore.hasAsset)
 const loadedAssets = new Map();
 
 // In-memory manifest cache
@@ -53,6 +66,8 @@ const ASSET_URL_CACHE_TTL = 1800000; // 30 minutes
 // In-memory cache for asset map
 let cachedAssetMap = null;
 let assetMapLoadPromise = null;
+/** @type {'bundled-production'|'bundled-dev'|'bundled-fallback'|'runtime-verified'|null} */
+let assetMapConfigSource = null;
 
 // Current environment
 let currentEnvironment = null;
@@ -93,36 +108,19 @@ function getAssetPreloadConfigForSection(sectionName) {
   log('assetLibrary.js', 'getAssetPreloadConfigForSection', 'start', 'Getting asset preload config', { sectionName });
 
   try {
-    const routes = getRouteConfiguration();
-    const sectionRoutes = routes.filter(route => {
-      if (typeof route.section === 'string') {
-        return route.section === sectionName;
-      }
-      if (typeof route.section === 'object') {
-        return Object.values(route.section).includes(sectionName);
-      }
-      return false;
-    });
+    const { assets, routeCount } = getAssetPreloadEntriesForSection(sectionName);
 
     log('assetLibrary.js', 'getAssetPreloadConfigForSection', 'info', 'Section routes found', {
       sectionName,
-      routeCount: sectionRoutes.length
+      routeCount
     });
-
-    // Collect all asset preload configs from routes
-    const assetConfigs = [];
-    for (const route of sectionRoutes) {
-      if (route.assetPreload && Array.isArray(route.assetPreload)) {
-        assetConfigs.push(...route.assetPreload);
-      }
-    }
 
     log('assetLibrary.js', 'getAssetPreloadConfigForSection', 'success', 'Asset preload configs collected', {
       sectionName,
-      assetCount: assetConfigs.length
+      assetCount: assets.length
     });
 
-    return assetConfigs;
+    return assets;
   } catch (error) {
     logError('assetLibrary.js', 'getAssetPreloadConfigForSection', 'Failed to get asset preload config', error, { sectionName });
     return [];
@@ -407,10 +405,11 @@ export function getAssetsForSection(sectionName) {
 }
 
 /**
- * Check if assets are loaded for a section
- * 
+ * Check if section bundle metadata is loaded (manifest paths, preload config rollup).
+ * For resolved URL preload completion, use usePreloadStore.hasAsset(url) instead.
+ *
  * @param {string} sectionName - Section name
- * @returns {boolean} - True if assets are loaded
+ * @returns {boolean} - True if section bundle metadata is loaded
  */
 export function areAssetsLoadedForSection(sectionName) {
   const loaded = loadedAssets.has(sectionName);
@@ -565,6 +564,40 @@ export function unloadUnusedSections(sectionsToKeep = []) {
 // FLAG-TO-URL ASSET MAPPING FUNCTIONS
 // ============================================================================
 
+function isLocalhostHostname(hostname) {
+  const host = String(hostname).toLowerCase();
+  return host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+}
+
+/**
+ * Upgrade insecure http:// asset URLs to https:// except on localhost.
+ * @param {string} url
+ * @returns {string}
+ */
+export function normalizeAssetMapUrl(url) {
+  if (typeof url !== 'string' || !url.trim()) {
+    return url;
+  }
+
+  const trimmed = url.trim();
+
+  if (!trimmed.startsWith('http://')) {
+    return trimmed;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+
+    if (isLocalhostHostname(parsed.hostname)) {
+      return trimmed;
+    }
+
+    return `https://${trimmed.slice('http://'.length)}`;
+  } catch {
+    return trimmed;
+  }
+}
+
 /**
  * Detect the current environment
  * 
@@ -618,8 +651,8 @@ export function setEnvironment(env) {
   currentEnvironment = env;
   log('assetLibrary.js', 'setEnvironment', 'set', 'Environment manually set', { environment: env });
 
-  // Clear asset map cache when environment changes
-  cachedAssetMap = null;
+  clearAssetMapConfigCache();
+  removeCacheKeysByPrefix(ASSET_URL_CACHE_PREFIX);
 }
 
 /**
@@ -632,23 +665,111 @@ export function getEnvironment() {
 }
 
 /**
+ * Candidate URLs for runtime asset map fetch (dev may serve from public or /src).
+ * @returns {string[]}
+ */
+export function getAssetMapFetchCandidates() {
+  const candidates = ['/config/assetMap.json'];
+
+  if (import.meta.env.DEV) {
+    candidates.push('/src/config/assetMap.json');
+  }
+
+  const override = import.meta.env.VITE_ASSET_MAP_URL;
+  if (override && typeof override === 'string') {
+    candidates.unshift(override);
+  }
+
+  return candidates;
+}
+
+/**
+ * Fetch asset map JSON from the first reachable candidate URL.
+ * @returns {Promise<object|null>}
+ */
+async function fetchAssetMapFromNetwork() {
+  for (const url of getAssetMapFetchCandidates()) {
+    try {
+      log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'fetch', 'Fetching asset map', { url });
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'warn', 'Asset map fetch failed for URL', {
+          url,
+          status: response.status
+        });
+        continue;
+      }
+
+      const rawText = await response.text();
+
+      if (!(await verifyFetchedAssetMapText(rawText))) {
+        log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'warn', 'Asset map hash mismatch — rejected', {
+          url
+        });
+        continue;
+      }
+
+      const assetMap = parseAssetMapJsonText(rawText);
+
+      if (!assetMap) {
+        log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'warn', 'Invalid asset map JSON', { url });
+        continue;
+      }
+
+      log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'success', 'Asset map loaded from network', { url });
+      return assetMap;
+    } catch (error) {
+      log('assetLibrary.js', 'fetchAssetMapFromNetwork', 'warn', 'Asset map fetch error', {
+        url,
+        error: error.message
+      });
+    }
+  }
+
+  return null;
+}
+
+/**
  * Load asset map configuration from JSON file
  * 
  * @returns {Promise<object>} - Asset map configuration
  */
-async function loadAssetMapConfig() {
+/**
+ * Clear in-memory and handler cache for asset map (tests / environment switches).
+ */
+export function clearAssetMapConfigCache() {
+  cachedAssetMap = null;
+  assetMapLoadPromise = null;
+  assetMapConfigSource = null;
+  removeFromCache(ASSET_MAP_CACHE_KEY);
+}
+
+/**
+ * @returns {string|null} How the current asset map was loaded
+ */
+export function getAssetMapConfigSource() {
+  return assetMapConfigSource;
+}
+
+export async function loadAssetMapConfig() {
   log('assetLibrary.js', 'loadAssetMapConfig', 'start', 'Loading asset map configuration', {});
 
   // Return cached map if available
   if (cachedAssetMap) {
-    log('assetLibrary.js', 'loadAssetMapConfig', 'memory-hit', 'Returning cached asset map from memory', {});
+    log('assetLibrary.js', 'loadAssetMapConfig', 'memory-hit', 'Returning cached asset map from memory', {
+      source: assetMapConfigSource
+    });
     return cachedAssetMap;
   }
 
   // Check cache
   const cachedConfig = getValueFromCache(ASSET_MAP_CACHE_KEY);
   if (cachedConfig) {
-    log('assetLibrary.js', 'loadAssetMapConfig', 'cache-hit', 'Asset map loaded from cache', {});
+    log('assetLibrary.js', 'loadAssetMapConfig', 'cache-hit', 'Asset map loaded from cache', {
+      source: assetMapConfigSource
+    });
     cachedAssetMap = cachedConfig;
     return cachedConfig;
   }
@@ -659,25 +780,35 @@ async function loadAssetMapConfig() {
     return assetMapLoadPromise;
   }
 
-  // Load from JSON file
   assetMapLoadPromise = (async () => {
     try {
-      log('assetLibrary.js', 'loadAssetMapConfig', 'fetch', 'Fetching asset map from JSON file', {});
+      let assetMap;
+      let source;
 
-      const response = await fetch('/config/assetMap.json');
+      if (shouldAllowRuntimeAssetMapFetch()) {
+        log('assetLibrary.js', 'loadAssetMapConfig', 'fetch', 'Dev runtime override enabled', {
+          candidates: getAssetMapFetchCandidates()
+        });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch asset map: ${response.status} ${response.statusText}`);
+        assetMap = await fetchAssetMapFromNetwork();
+        source = assetMap ? 'runtime-verified' : 'bundled-fallback';
+
+        if (!assetMap) {
+          log('assetLibrary.js', 'loadAssetMapConfig', 'bundled-fallback', 'Using bundled asset map', {});
+          assetMap = getBundledAssetMap();
+        }
+      } else {
+        assetMap = getBundledAssetMap();
+        source = import.meta.env.PROD ? 'bundled-production' : 'bundled-dev';
+        log('assetLibrary.js', 'loadAssetMapConfig', 'bundled', 'Using build-time bundled asset map', {
+          source
+        });
       }
 
-      const assetMap = await response.json();
-
-      // Validate structure
       if (!assetMap || typeof assetMap !== 'object') {
         throw new Error('Invalid asset map structure');
       }
 
-      // Ensure required environments exist
       if (!assetMap.production) {
         log('assetLibrary.js', 'loadAssetMapConfig', 'warn', 'No production environment in asset map', {});
         assetMap.production = {};
@@ -685,19 +816,18 @@ async function loadAssetMapConfig() {
 
       log('assetLibrary.js', 'loadAssetMapConfig', 'success', 'Asset map loaded successfully', {
         environments: Object.keys(assetMap),
-        totalFlags: Object.keys(assetMap.production || {}).length
+        totalFlags: Object.keys(assetMap.production || {}).length,
+        source
       });
 
-      // Cache the loaded map
       cachedAssetMap = assetMap;
+      assetMapConfigSource = source;
       setValueWithExpiration(ASSET_MAP_CACHE_KEY, assetMap, ASSET_MAP_CACHE_TTL);
 
       return assetMap;
-
     } catch (error) {
       logError('assetLibrary.js', 'loadAssetMapConfig', 'Failed to load asset map', error);
 
-      // Return empty map on error
       const emptyMap = {
         development: {},
         staging: {},
@@ -705,14 +835,30 @@ async function loadAssetMapConfig() {
       };
 
       cachedAssetMap = emptyMap;
+      assetMapConfigSource = 'bundled-fallback';
       return emptyMap;
-
     } finally {
       assetMapLoadPromise = null;
     }
   })();
 
   return assetMapLoadPromise;
+}
+
+/**
+ * @param {string} flag
+ * @returns {string}
+ */
+function inferAssetTypeFromFlag(flag) {
+  if (flag.startsWith('script.')) {
+    return 'script';
+  }
+
+  if (flag.startsWith('font.')) {
+    return 'font';
+  }
+
+  return 'default';
 }
 
 /**
@@ -733,7 +879,7 @@ export async function getAssetUrl(flag, environment = null) {
   // Determine environment
   const env = environment || detectEnvironment();
 
-  // Check cache first
+  // Resolution cache only (flag → URL). Does not mean the URL was preloaded in the browser.
   const cacheKey = `${ASSET_URL_CACHE_PREFIX}${env}_${flag}`;
   const cachedUrl = getValueFromCache(cacheKey);
   if (cachedUrl) {
@@ -759,12 +905,41 @@ export async function getAssetUrl(flag, environment = null) {
     }
 
     if (url) {
-      log('assetLibrary.js', 'getAssetUrl', 'success', 'Asset URL resolved', { flag, url, environment: env });
+      const normalizedUrl = normalizeAssetMapUrl(url);
 
-      // Cache the resolved URL
-      setValueWithExpiration(cacheKey, url, ASSET_URL_CACHE_TTL);
+      if (normalizedUrl !== url) {
+        log('assetLibrary.js', 'getAssetUrl', 'normalize', 'Upgraded HTTP asset URL to HTTPS', {
+          flag,
+          original: url,
+          normalized: normalizedUrl,
+          environment: env,
+        });
+      }
 
-      return url;
+      log('assetLibrary.js', 'getAssetUrl', 'success', 'Asset URL resolved', {
+        flag,
+        url: normalizedUrl,
+        environment: env,
+      });
+
+      const urlCheck = assertAllowedPreloadUrl(normalizedUrl, {
+        assetType: inferAssetTypeFromFlag(flag),
+      });
+
+      if (!urlCheck.ok) {
+        log('assetLibrary.js', 'getAssetUrl', 'blocked', 'Resolved URL blocked by policy', {
+          flag,
+          url: normalizedUrl,
+          reason: urlCheck.reason,
+        });
+        return null;
+      }
+
+      const safeUrl = urlCheck.url;
+
+      setValueWithExpiration(cacheKey, safeUrl, ASSET_URL_CACHE_TTL);
+
+      return safeUrl;
     }
 
     log('assetLibrary.js', 'getAssetUrl', 'not-found', 'Asset flag not found in any environment', {
@@ -1015,6 +1190,28 @@ export async function validateAssetMap() {
         // Check URL format
         if (!url.startsWith('/') && !url.startsWith('http://') && !url.startsWith('https://')) {
           warnings.push(`URL for flag "${flag}" in environment "${env}" may be invalid: ${url}`);
+        }
+
+        if (url.startsWith('http://')) {
+          try {
+            const parsed = new URL(url);
+
+            if (!isLocalhostHostname(parsed.hostname)) {
+              const upgraded = normalizeAssetMapUrl(url);
+
+              if (env === 'production') {
+                errors.push(
+                  `Production flag "${flag}" uses HTTP; use HTTPS (${upgraded})`,
+                );
+              } else {
+                warnings.push(
+                  `Flag "${flag}" in "${env}" uses HTTP; will be upgraded to HTTPS at runtime (${upgraded})`,
+                );
+              }
+            }
+          } catch {
+            warnings.push(`HTTP URL for flag "${flag}" in environment "${env}" is malformed: ${url}`);
+          }
         }
       });
     });

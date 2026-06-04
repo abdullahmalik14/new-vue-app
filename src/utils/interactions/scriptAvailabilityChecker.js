@@ -17,7 +17,7 @@ let assetHandlerInstance = null;
 const DEFAULT_ASSET_CONFIG = [
   {
     name: 'cognito',
-    url: 'https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.15/dist/amazon-cognito-identity.min.js',
+    url: '/vendor/amazon-cognito-identity-6.3.15.min.js',
     type: 'script',
     flags: ['auth', 'cognito', 'critical'],
     priority: 'critical',

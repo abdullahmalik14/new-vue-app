@@ -9,7 +9,6 @@ import { buildAllSectionCss } from '../tailwind/sectionCssCompiler.js';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { Buffer } from 'buffer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -76,13 +75,6 @@ export function createSectionCssBuilderPlugin() {
 
     // Hook to emit section CSS files as Vite assets
     generateBundle(options, bundle) {
-      const generatedAt = new Date().toISOString();
-      const manifest = {
-        generated: generatedAt,
-        version: '1.0.0',
-        sections: {}
-      };
-
       // Emit each section CSS file as a Vite asset
       for (const [sectionName, cssContent] of compiledCssFiles.entries()) {
         const referenceId = this.emitFile({
@@ -93,25 +85,11 @@ export function createSectionCssBuilderPlugin() {
 
         // Get the final filename with hash from Vite
         const fileName = this.getFileName(referenceId);
-        const cssPath = fileName.startsWith('/') ? fileName : `/${fileName}`;
-
-        manifest.sections[sectionName] = {
-          css: cssPath,
-          size: Buffer.byteLength(cssContent, 'utf8'),
-          generated: generatedAt
-        };
 
         console.log(`[SectionCssPlugin] ✅ Emitted ${sectionName}: ${fileName}`);
       }
 
-      // Emit the manifest
-      this.emitFile({
-        type: 'asset',
-        fileName: 'section-css-manifest.json',
-        source: `${JSON.stringify(manifest, null, 2)}\n`
-      });
-
-      console.log(`[SectionCssPlugin] ✅ Emitted manifest with ${compiledCssFiles.size} sections`);
+      console.log(`[SectionCssPlugin] ✅ Emitted ${compiledCssFiles.size} section CSS assets (paths merged into section-manifest.json)`);
     }
   };
 }

@@ -5,6 +5,7 @@
  * Tailwind CSS compiled via PostCSS.
  */
 
+import { readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
@@ -14,6 +15,10 @@ import {
   createManifestGeneratorPlugin,
   createSectionCssBuilderPlugin
 } from './build/vite/index.js';
+import { sha256HexFromText } from './build/vite/manifestIntegrityNode.js';
+
+const assetMapSourcePath = fileURLToPath(new URL('./src/config/assetMap.json', import.meta.url));
+const assetMapSha256 = sha256HexFromText(readFileSync(assetMapSourcePath, 'utf8'));
 
 // Section-based bundling plugin
 const sectionBundler = createSectionBundlerPlugin();
@@ -41,7 +46,9 @@ export default defineConfig(({ mode }) => {
     define: {
       global: 'globalThis',
       __VUE_OPTIONS_API__: true,
-      __VUE_PROD_DEVTOOLS__: false
+      __VUE_PROD_DEVTOOLS__: false,
+      __ASSET_MAP_SHA256__: JSON.stringify(assetMapSha256),
+      'import.meta.env.VITE_ASSET_MAP_SHA256': JSON.stringify(assetMapSha256)
     },
 
     // Path resolution
@@ -58,7 +65,11 @@ export default defineConfig(({ mode }) => {
     // Test configuration
     test: {
       environment: 'jsdom',
-      globals: true
+      globals: true,
+      define: {
+        __ASSET_MAP_SHA256__: JSON.stringify(assetMapSha256),
+        'import.meta.env.VITE_ASSET_MAP_SHA256': JSON.stringify(assetMapSha256)
+      }
     },
 
     // Build configuration
