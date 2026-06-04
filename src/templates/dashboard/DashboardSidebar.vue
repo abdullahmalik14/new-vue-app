@@ -58,10 +58,13 @@
                 :title="item.title">
                 <a :href="item.route || '#'" @click.prevent="handleMenuClick(item)"
                   class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active"
+                  :class="{ 'bg-sidebar-active': isActive(item) }"
                   :style="!item.enabled ? { pointerEvents: 'none', opacity: '0.5' } : {}">
                   <img :src="item.image" :alt="item.title"
-                    class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
-                  <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text">
+                    class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]"
+                    :class="{ '[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]': isActive(item) }" />
+                  <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text"
+                        :class="{ 'text-sidebar-active-text': isActive(item) }">
                     {{ item.title }}
                   </span>
                 </a>
@@ -120,11 +123,14 @@
             class="flex flex-col items-center justify-center cursor-pointer group"
             :style="!item.enabled ? { pointerEvents: 'none', opacity: '0.5' } : {}"
             @click.prevent="handleMenuClick(item)">
-            <div class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group-hover:bg-sidebar-active">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group-hover:bg-sidebar-active"
+                 :class="{ 'bg-sidebar-active': isActive(item) }">
               <img :src="item.image" :alt="item.title"
-                class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+                class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]"
+                :class="{ '[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]': isActive(item) }" />
             </div>
-            <span class="mt-1 text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] transition-all duration-200 group-hover:text-sidebar-active-text">
+            <span class="mt-1 text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] transition-all duration-200 group-hover:text-sidebar-active-text"
+                  :class="{ 'text-sidebar-active-text': isActive(item) }">
               {{ item.title }}
             </span>
           </a>
@@ -412,6 +418,15 @@ export default {
     }
   },
   methods: {
+    isActive(item) {
+      if (!item.route || !this.$route) return false;
+      // Handle exact match for dashboard home
+      if (item.route === '/dashboard' || item.route === '/dashboard/') {
+        return this.$route.path === '/dashboard' || this.$route.path === '/dashboard/';
+      }
+      // For other routes, check if the current path starts with the item's route
+      return this.$route.path.startsWith(item.route);
+    },
     async loadAssetWithRetry(flag, maxRetries = 2) {
       const { getAssetUrl } = await import("@/utils/assets/assetLibrary.js");
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
