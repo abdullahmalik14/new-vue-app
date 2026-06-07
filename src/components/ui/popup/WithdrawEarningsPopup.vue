@@ -1,5 +1,5 @@
 <template>
-  <PopupHandler
+  <BasePopupShell
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="popupConfig"
@@ -18,18 +18,18 @@
             <WithdrawEarningsStep5 v-if="engine.step === 5" :engine="engine" @close="handleClose" />
         </div>
     </div>
-  </PopupHandler>
+  </BasePopupShell>
 </template>
 
 <script setup>
-import PopupHandler from "./PopupHandler.vue";
+import BasePopupShell from "./BasePopupShell.vue";
 import { createStepStateEngine } from "@/utils/stateEngine";
 import { onMounted } from 'vue';
-import WithdrawEarningsStep1 from "./WithdrawEarningsSteps/WithdrawEarningsStep1.vue";
-import WithdrawEarningsStep2 from "./WithdrawEarningsSteps/WithdrawEarningsStep2.vue";
-import WithdrawEarningsStep3 from "./WithdrawEarningsSteps/WithdrawEarningsStep3.vue";
-import WithdrawEarningsStep4 from "./WithdrawEarningsSteps/WithdrawEarningsStep4.vue";
-import WithdrawEarningsStep5 from "./WithdrawEarningsSteps/WithdrawEarningsStep5.vue";
+import WithdrawEarningsStep1 from "./withdraw-earnings-steps/WithdrawEarningsStep1.vue";
+import WithdrawEarningsStep2 from "./withdraw-earnings-steps/WithdrawEarningsStep2.vue";
+import WithdrawEarningsStep3 from "./withdraw-earnings-steps/WithdrawEarningsStep3.vue";
+import WithdrawEarningsStep4 from "./withdraw-earnings-steps/WithdrawEarningsStep4.vue";
+import WithdrawEarningsStep5 from "./withdraw-earnings-steps/WithdrawEarningsStep5.vue";
 
 const props = defineProps({
   modelValue: {

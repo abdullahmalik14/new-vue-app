@@ -71,7 +71,7 @@ export const useChatStore = defineStore("chat", {
       saveState("chat_messages", this.messages);
     },
 
-    addMessageAction({ chatId, item }) {
+    syncChatMessage({ chatId, item }) {
       this.addMessage(chatId, item);
     },
 
@@ -90,7 +90,7 @@ export const useChatStore = defineStore("chat", {
       saveState("chat_messages", this.messages);
     },
 
-    prependMessagesAction({ chatId, items, pagingState }) {
+    syncChatHistoryPage({ chatId, items, pagingState }) {
       if (Array.isArray(items) && items.length > 0) {
         // Reverse array because historical messages arrive descending typically
         this.prependMessages(chatId, items.slice().reverse());

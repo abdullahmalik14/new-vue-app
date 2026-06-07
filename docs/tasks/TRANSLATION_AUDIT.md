@@ -1015,7 +1015,7 @@ If any component renders a translated string using `v-html` (e.g. for rich-text 
      const i18nVHtml = /v-html\s*=\s*["'][^"']*(\$t\s*\(|[^a-zA-Z_]t\s*\(\s*['"`])/;
      const files = [
        ['/src/components/ui/card/dashboard/TierCard.vue', 'TierCard'],
-       ['/src/templates/profileAbdullah/components/SubscriptionCard.vue', 'SubscriptionCard'],
+       ['/src/templates/profile/views/SubscriptionCard.vue', 'SubscriptionCard'],
      ];
      const results = [];
      for (const [path, label] of files) {

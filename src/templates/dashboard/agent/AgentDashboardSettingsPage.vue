@@ -1,0 +1,9 @@
+<template>
+    <DashboardSharedTwoColLayout>
+        <p>This is dashboard settings for agent</p>
+    </DashboardSharedTwoColLayout>
+</template>
+
+<script setup>
+import DashboardSharedTwoColLayout from "@/templates/dashboard/shared/DashboardSharedTwoColLayout.vue";
+</script>

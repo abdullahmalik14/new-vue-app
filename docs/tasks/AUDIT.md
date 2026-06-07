@@ -259,7 +259,7 @@ Multiple routes set these fields to `""` (empty string): `/dashboard` sets `"red
 ### L8 — `/dashboard/social-linking` uses a demo component in production
 **File**: `routeConfig.json` line ~276
 
-A live, auth-protected route points to `@/templates/dashboard/page/demo/SocialLinkingDemo.vue`. Authenticated users with any role (`"supportedRoles": ["all"]`) can reach this demo. If the demo component has placeholder data or doesn't enforce any permissions internally, this is unintended.
+A live, auth-protected route points to `@/templates/dashboard/demo/SocialLinkingDemo.vue`. Authenticated users with any role (`"supportedRoles": ["all"]`) can reach this demo. If the demo component has placeholder data or doesn't enforce any permissions internally, this is unintended.
 
 **Fix**: Replace with the real component, or disable the route until the real component exists.
 

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import PopupHandler from "@/components/ui/popup/PopupHandler.vue";
+import BasePopupShell from "@/components/ui/popup/BasePopupShell.vue";
 import PurchaseFlowSubscriptionOrderPopup from "@/components/ui/popup/purchase/PurchaseFlowSubscriptionOrderPopup.vue";
 
 const purchaseFlowOpen = ref(false);
@@ -67,7 +67,7 @@ const guestPurchaseFlowPopupConfig = computed(() => {
 </script>
 
 <template>
-  <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+  <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="guestPurchaseFlowPopupConfig">
     <div
       class="bg-white/90 backdrop-blur-[50px] shadow-[0px_4px_6px_-2px_#10182808,0px_12px_16px_-4px_#10182814] /* Mobile Styling */ w-full rounded-t-[0.625rem] /* Desktop Styling */ md:max-w-[31.25rem] md:rounded-[0.625rem] md:bg-white/10 dark:bg-[#181a1b]/90 md:dark:bg-[#181a1b]/10 md:backdrop-blur-[35px]">
@@ -163,5 +163,5 @@ const guestPurchaseFlowPopupConfig = computed(() => {
     </div>
     <PurchaseFlowSubscriptionOrderPopup v-model="purchaseFlowOpen" mode="upgrade"
       :currentSubscription="currentSubscription" :newSubscription="newSubscription" />
-  </PopupHandler>
+  </BasePopupShell>
 </template>

@@ -1,5 +1,5 @@
 <script setup>
-import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWrapperTwoColContainer.vue';
+import DashboardSharedTwoColLayout from '@/templates/dashboard/shared/DashboardSharedTwoColLayout.vue';
 import FlexTable from '@/components/ui/table/FlexTable.vue';
 import PayoutCard from '@/components/ui/card/dashboard/PayoutCard.vue';
 import PayoutSettingsPopup from '@/components/ui/popup/PayoutSettingsPopup.vue';
@@ -47,7 +47,7 @@ const tableThemeMobile = {
 </script>
 
 <template>
- <DashboardWrapperTwoColContainer>
+ <DashboardSharedTwoColLayout>
     <!-- main-wrapper -->
     <div class="flex flex-col md:flex-row">
       <!-- dashboard-template-main -->
@@ -256,5 +256,5 @@ const tableThemeMobile = {
     </div>
     <PayoutSettingsPopup v-model="showPayoutSettingsPopup" />
     <WithdrawEarningsPopup v-model="showWithdrawPopup" />
- </DashboardWrapperTwoColContainer>
+ </DashboardSharedTwoColLayout>
 </template>

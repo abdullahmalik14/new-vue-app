@@ -1306,7 +1306,7 @@ export const flowRegistry = {
         keyByPayload: true,
       },
       destinations: [
-        { type: "piniaAction", storeId: "chat", action: "addMessageAction" },
+        { type: "piniaAction", storeId: "chat", action: "syncChatMessage" },
       ],
       uiErrorMap: {
         SEND_MESSAGE_MISSING_CHAT_ID: "Chat ID is missing.",
@@ -1333,7 +1333,7 @@ export const flowRegistry = {
         keyByPayload: true,
       },
       destinations: [
-        { type: "piniaAction", storeId: "chat", action: "addMessageAction" },
+        { type: "piniaAction", storeId: "chat", action: "syncChatMessage" },
       ],
       uiErrorMap: {
         SEND_PRODUCT_RECOMMENDATION_MISSING_FIELDS:
@@ -1381,7 +1381,7 @@ export const flowRegistry = {
         {
           type: "piniaAction",
           storeId: "chat",
-          action: "prependMessagesAction",
+          action: "syncChatHistoryPage",
         },
       ],
       uiErrorMap: {
@@ -1620,7 +1620,7 @@ export const flowRegistry = {
         sources: [{ type: "pinia", storeId: "cart" }],
       },
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
       uiErrorMap: {
         FETCH_CART_FAILED: "Could not load your cart.",
@@ -1645,7 +1645,7 @@ export const flowRegistry = {
       timeouts: { requestMs: 12000, totalFlowMs: 18000 },
       concurrency: { policy: "firstWins" },
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
       uiErrorMap: {
         ADD_ITEM_FAILED: "Failed to add item.",
@@ -1659,7 +1659,7 @@ export const flowRegistry = {
     pipeline: {
       timeouts: { requestMs: 10000, totalFlowMs: 15000 },
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
     },
   },
@@ -1671,7 +1671,7 @@ export const flowRegistry = {
       timeouts: { requestMs: 10000, totalFlowMs: 15000 },
       concurrency: { policy: "latestWins" },
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
     },
   },
@@ -1680,7 +1680,7 @@ export const flowRegistry = {
     flow: renameCartFlow,
     pipeline: {
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
     },
   },
@@ -1689,7 +1689,7 @@ export const flowRegistry = {
     flow: applyCouponFlow,
     pipeline: {
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
     },
   },
@@ -1698,7 +1698,7 @@ export const flowRegistry = {
     flow: removeCouponFlow,
     pipeline: {
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
     },
   },
@@ -1707,7 +1707,7 @@ export const flowRegistry = {
     flow: applyFeesFlow,
     pipeline: {
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
     },
   },
@@ -1716,7 +1716,7 @@ export const flowRegistry = {
     flow: setAsDefaultFlow,
     pipeline: {
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
     },
   },
@@ -1725,7 +1725,7 @@ export const flowRegistry = {
     flow: mergeGuestCartFlow,
     pipeline: {
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
     },
   },
@@ -1734,7 +1734,7 @@ export const flowRegistry = {
     flow: attachLiveDataFlow,
     pipeline: {
       destinations: [
-        { type: "piniaAction", storeId: "cart", action: "setCartAction" },
+        { type: "piniaAction", storeId: "cart", action: "syncCartBundle" },
       ],
     },
   },

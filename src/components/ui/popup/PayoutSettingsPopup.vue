@@ -1,5 +1,5 @@
 <template>
-  <PopupHandler
+  <BasePopupShell
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="popupConfig"
@@ -13,16 +13,16 @@
         <PayoutSettingsStep2 v-if="engine.step === 2" :engine="engine" @close="handleClose" />
         <PayoutSettingsStep3 v-if="engine.step === 3" :engine="engine" @close="handleClose" />
     </div>
-  </PopupHandler>
+  </BasePopupShell>
 </template>
 
 <script setup>
-import PopupHandler from "./PopupHandler.vue";
+import BasePopupShell from "./BasePopupShell.vue";
 import { createStepStateEngine } from "@/utils/stateEngine";
 import { onMounted } from 'vue';
-import PayoutSettingsStep1 from "./PayoutSettingsSteps/PayoutSettingsStep1.vue";
-import PayoutSettingsStep2 from "./PayoutSettingsSteps/PayoutSettingsStep2.vue";
-import PayoutSettingsStep3 from "./PayoutSettingsSteps/PayoutSettingsStep3.vue";
+import PayoutSettingsStep1 from "./payout-settings-steps/PayoutSettingsStep1.vue";
+import PayoutSettingsStep2 from "./payout-settings-steps/PayoutSettingsStep2.vue";
+import PayoutSettingsStep3 from "./payout-settings-steps/PayoutSettingsStep3.vue";
 
 const props = defineProps({
   modelValue: {

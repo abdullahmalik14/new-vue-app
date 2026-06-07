@@ -1,5 +1,5 @@
 <template>
-  <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+  <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="mediaDetailsPopupConfig">
     <div
       class="h-full [background:linear-gradient(180deg,rgba(255,255,255,0.00)_0%,rgba(255,255,255,0.10)_50%,rgba(255,255,255,0.02)_100%),#0C111D] 
@@ -645,12 +645,12 @@
         </div>
       </div>
     </div>
-  </PopupHandler>
+  </BasePopupShell>
 </template>
 
 <script setup>
-import MediaCardV1 from "@/components/mediaCardsVariations/MediaCardV1.vue";
-import PopupHandler from "./PopupHandler.vue";
+import MediaCardV1 from "@/components/ui/media/media-cards/MediaCardV1.vue";
+import BasePopupShell from "./BasePopupShell.vue";
 import { ref, onMounted, onBeforeUnmount } from "vue";
 
 // Video Player Logic

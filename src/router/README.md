@@ -16,7 +16,7 @@ Single source of truth for routing, sections, bundling, and manifest generation.
   {
     "slug": "/dashboard",
     "section": "dashboard-global",
-    "componentPath": "@/templates/dashboard/page/role/Dashboard.vue",
+    "componentPath": "@/templates/dashboard/role/DashboardDevPlaygroundPage.vue",
     "requiresAuth": true,
     "enabled": true,
     "supportedRoles": ["all"],
@@ -78,17 +78,17 @@ Different components/bundles per role.
 
 **Simple**:
 ```json
-"componentPath": "@/templates/auth/page/role/AuthLogIn.vue"
+"componentPath": "@/templates/auth/page/role/LoginPage.vue"
 ```
 
 **Role-Specific**:
 ```json
 "customComponentPath": {
   "creator": {
-    "componentPath": "@/templates/dashboard/page/creator/DashboardCouponsCreator.vue"
+    "componentPath": "@/templates/dashboard/creator/CreatorDashboardCouponsPage.vue"
   },
   "fan": {
-    "componentPath": "@/templates/dashboard/page/fan/DashboardCouponsFan.vue"
+    "componentPath": "@/templates/dashboard/fan/FanDashboardCouponsPage.vue"
   }
 }
 ```
@@ -122,7 +122,7 @@ See this file for complete field descriptions, examples, and validation rules.
 {
   "slug": "/dashboard",
   "section": "dashboard-global",
-  "componentPath": "@/templates/dashboard/page/role/Dashboard.vue",
+  "componentPath": "@/templates/dashboard/role/DashboardDevPlaygroundPage.vue",
   "requiresAuth": true
 }
 
@@ -289,7 +289,7 @@ misc                    // Utility routes (404, etc.)
 {
   "slug": "/about",
   "section": "about",
-  "componentPath": "@/templates/about/AboutWrapper.vue",
+  "componentPath": "@/templates/about/AboutPage.vue",
   "requiresAuth": false,
   "supportedRoles": []
 }
@@ -300,7 +300,7 @@ misc                    // Utility routes (404, etc.)
 {
   "slug": "/dashboard",
   "section": "dashboard-global",
-  "componentPath": "@/templates/dashboard/page/role/Dashboard.vue",
+  "componentPath": "@/templates/dashboard/role/DashboardDevPlaygroundPage.vue",
   "requiresAuth": true,
   "redirectIfNotAuth": "/log-in",
   "supportedRoles": ["all"]
@@ -316,7 +316,7 @@ misc                    // Utility routes (404, etc.)
   },
   "inheritConfigFromParent": true,
   "supportedRoles": ["creator"],
-  "componentPath": "@/templates/dashboard/page/creator/DashboardOverviewCreator.vue"
+  "componentPath": "@/templates/dashboard/creator/CreatorDashboardOverviewPage.vue"
 }
 ```
 
@@ -325,7 +325,7 @@ misc                    // Utility routes (404, etc.)
 {
   "slug": "/dashboard",
   "section": "dashboard-global",
-  "componentPath": "@/templates/dashboard/page/role/Dashboard.vue",
+  "componentPath": "@/templates/dashboard/role/DashboardDevPlaygroundPage.vue",
   "requiresAuth": true,
   "dependencies": {
     "roles": {
@@ -349,7 +349,7 @@ misc                    // Utility routes (404, etc.)
 {
   "slug": "/log-in",
   "section": "auth",
-  "componentPath": "@/templates/auth/page/role/AuthLogIn.vue",
+  "componentPath": "@/templates/auth/page/role/LoginPage.vue",
   "requiresAuth": false,
   "redirectIfLoggedIn": "/dashboard",
   "preLoadSections": ["dashboard", "shop"]

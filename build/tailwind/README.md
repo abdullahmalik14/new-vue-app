@@ -202,7 +202,7 @@ node build/tailwind/generateIndividualCss.js --clean
 {
   "slug": "/dashboard",
   "section": "dashboard",
-  "componentPath": "@/templates/dashboard/page/Dashboard.vue",
+  "componentPath": "@/templates/dashboard/Dashboard.vue",
   "preLoadSections": ["shop", "profile"]
 }
 ```

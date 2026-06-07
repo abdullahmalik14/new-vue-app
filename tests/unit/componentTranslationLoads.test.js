@@ -6,15 +6,15 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
 const P07_FILES = [
-  'src/components/auth/AuthLogIn.vue',
-  'src/components/auth/AuthSignUp.vue',
-  'src/components/auth/AuthLostPassword.vue',
-  'src/components/auth/AuthResetPassword.vue',
-  'src/components/auth/AuthConfirmEmail.vue',
-  'src/components/auth/AuthSignUpOnboarding.vue',
-  'src/components/auth/AuthSignUpOnboardingKyc.vue',
-  'src/templates/dashboard/HeaderResponsive.vue',
-  'src/templates/dashboard/DashboardSidebar.vue',
+  'src/templates/auth/views/AuthLogIn.vue',
+  'src/templates/auth/views/AuthSignUp.vue',
+  'src/templates/auth/views/AuthLostPassword.vue',
+  'src/templates/auth/views/AuthResetPassword.vue',
+  'src/templates/auth/views/AuthConfirmEmail.vue',
+  'src/templates/auth/views/AuthSignUpOnboarding.vue',
+  'src/templates/auth/views/AuthSignUpOnboardingKyc.vue',
+  'src/templates/dashboard/shared/DashboardSharedHeader.vue',
+  'src/templates/dashboard/shared/DashboardSharedSidebar.vue',
   'src/assets/data/menuItems.js',
 ];
 

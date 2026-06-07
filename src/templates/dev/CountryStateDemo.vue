@@ -28,7 +28,7 @@
 
 <script>
 import { ref } from 'vue';
-import CountryStateSelect from '@/components/ui/form/select/CountryStateSelect.vue';
+import CountryStateSelect from '@/components/forms/select/CountryStateSelect.vue';
 import { log } from '@/utils/common/logHandler';
 
 export default {

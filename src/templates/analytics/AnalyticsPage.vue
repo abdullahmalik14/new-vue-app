@@ -1,5 +1,5 @@
 <template>
-  <DashboardWrapperTwoColContainer>
+  <DashboardSharedTwoColLayout>
     <div class="relative flex flex-col mt-6 gap-6 md:p-[40px]">
 
       <DashboardHeader />
@@ -715,15 +715,15 @@
         :insight-data="currentContributorsInsightData" />
 
     </div>
-  </DashboardWrapperTwoColContainer>
+  </DashboardSharedTwoColLayout>
 </template>
 
 <script setup>
-import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWrapperTwoColContainer.vue'
-import DashboardOrderCard from '@/components/ui/card/DashboardOrderCard.vue'
-import AnalyticsMainCardWrapper from '@/components/ui/card/AnalyticsMainCardWrapper.vue'
-import DashboardTrendCard from '@/components/ui/card/DashboardTrendCard.vue'
-import DashboardTrendContent from '@/components/ui/content/DashboardTrendContent.vue'
+import DashboardSharedTwoColLayout from '@/templates/dashboard/shared/DashboardSharedTwoColLayout.vue'
+import DashboardOrderCard from '@/components/ui/card/dashboard/DashboardOrderCard.vue'
+import AnalyticsMainCardWrapper from '@/components/ui/card/dashboard/AnalyticsMainCardWrapper.vue'
+import DashboardTrendCard from '@/components/ui/card/dashboard/DashboardTrendCard.vue'
+import DashboardTrendContent from '@/components/ui/card/dashboard/DashboardTrendContent.vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 import { FlowHandler } from '@/services/flow-system/FlowHandler'
 import flowRefreshManager from '@/services/flow-system/flowRefreshManager'
@@ -736,11 +736,11 @@ import FansTrendPopup from '@/components/ui/popup/FansTrendPopup.vue'
 import LikesTrendPopup from '@/components/ui/popup/LikesTrendPopup.vue'
 import ContributorsTrendPopup from '@/components/ui/popup/ContributorsTrendPopup.vue'
 import FlexTable from '@/components/ui/table/FlexTable.vue'
-import OrdersReceivedTable from '@/components/ui/table/dashboard/analyticsDashboardTables/OrdersReceivedTable.vue'
-import TopMediaTable from '@/components/ui/table/dashboard/analyticsDashboardTables/TopMediaTable.vue'
-import TopTagsTable from '@/components/ui/table/dashboard/analyticsDashboardTables/TopTagsTable.vue'
-import TopMerchTable from '@/components/ui/table/dashboard/analyticsDashboardTables/TopMerchTable.vue'
-import TopCountriesTable from '@/components/ui/table/dashboard/analyticsDashboardTables/TopCountriesTable.vue'
+import OrdersReceivedTable from '@/components/ui/table/dashboard/analytics-tables/OrdersReceivedTable.vue'
+import TopMediaTable from '@/components/ui/table/dashboard/analytics-tables/TopMediaTable.vue'
+import TopTagsTable from '@/components/ui/table/dashboard/analytics-tables/TopTagsTable.vue'
+import TopMerchTable from '@/components/ui/table/dashboard/analytics-tables/TopMerchTable.vue'
+import TopCountriesTable from '@/components/ui/table/dashboard/analytics-tables/TopCountriesTable.vue'
 import SparkLine from '@/components/ui/charts/SparkLine.vue'
 
 const store = useDashboardAnalyticsStore()

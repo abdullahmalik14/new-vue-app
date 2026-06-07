@@ -1249,8 +1249,8 @@ Call `clearScope` from component `onUnmounted`.
   - `src/components/auth/AuthConfirmEmail.vue` (`confirmEmailForm`)
   - `src/components/auth/AuthSignUpOnboarding.vue` (`onboardingForm`)
   - `src/components/auth/AuthLostPassword.vue` (`lostPasswordForm`)
-  - `src/components/ui/form/BookingForm/OneOnOneBookinStep1.vue` (`oneOnOneBooking`)
-  - `src/templates/dashboard/page/role/DashboardResetPassword.vue` (`resetPasswordForm`)
+  - `src/components/forms/BookingForm/OneOnOneBookinStep1.vue` (`oneOnOneBooking`)
+  - `src/templates/dashboard/role/DashboardResetPassword.vue` (`resetPasswordForm`)
 - Added unit coverage in `tests/unit/interactionsEngineScopeCleanup.test.js` for `unregister` and `clearScope` behavior.
 
 **How to test in the browser (one paste — logs result when the promise settles):**
@@ -1621,7 +1621,7 @@ There is no dependency tracking: no way to declare "when field X changes, re-val
 **What changed:**
 - `src/utils/validation/interactionsEngine.js` — `dependsOn` on `fieldConfig` (string or array); stored on field state; `_revalidateDependents()` runs after sync validation in `processFieldChange` / `validateField`.
 - `src/components/auth/AuthSignUp.vue` — `confirmPasswordConfig.dependsOn: ['password']`; removed manual confirm re-validation from password handler.
-- `src/templates/dashboard/page/role/DashboardResetPassword.vue` — `dependsOn: ['newPassword']` on confirm field.
+- `src/templates/dashboard/role/DashboardResetPassword.vue` — `dependsOn: ['newPassword']` on confirm field.
 - Test: `tests/unit/interactionsEngineDependsOn.test.js`.
 
 **How to test in the browser (one paste — logs result when the promise settles):**
@@ -2430,7 +2430,7 @@ The method loops all fields and calls `validationEngine.validateField` for each 
 
 ### P-09 · Booking step navigation runs two separate validation pipelines
 
-**File:** `src/components/ui/form/BookingForm/OneOnOneBookinStep1.vue` — lines 94–118
+**File:** `src/components/forms/BookingForm/OneOnOneBookinStep1.vue` — lines 94–118
 
 `goToNext()` gated on `interactionsEngine.validateScope('oneOnOneBooking')` while `props.engine.goToStep(2)` also runs `stateEngine` step-1 validators (`addFieldRequirement` for `eventTitle`, `basePrice`, etc.), causing duplicate/conflicting validation pipelines.
 
@@ -2871,7 +2871,7 @@ Unlike `validationRules.js` (which scopes to `[interaction-container]`), this ch
 ---
 
 ### L-18 · Booking step treats `interactionsEngine.validateScope` as full-step validation
-**File:** `src/components/ui/form/BookingForm/OneOnOneBookinStep1.vue` lines 94–118  
+**File:** `src/components/forms/BookingForm/OneOnOneBookinStep1.vue` lines 94–118  
 **Severity:** Medium
 
 `goToNext()` gates navigation on `interactionsEngine.validateScope('oneOnOneBooking')`, but only `eventTitle` is registered in that scope. Other required booking fields (duration, price, availability, etc.) are not registered and are not validated by this call. The step can advance after title-only validation while other invalid data remains.
@@ -2887,7 +2887,7 @@ Unlike `validationRules.js` (which scopes to `[interaction-container]`), this ch
 **How to test in the browser (one paste — logs result when the promise settles):**
 ```js
 (async () => {
-  const src = await fetch('/src/components/ui/form/BookingForm/OneOnOneBookinStep1.vue').then((r) => r.text());
+  const src = await fetch('/src/components/forms/BookingForm/OneOnOneBookinStep1.vue').then((r) => r.text());
   return {
     usesFlowValidate: src.includes('props.engine.validate(1)'),
     noValidateScope: !src.includes('interactionsEngine.validateScope'),

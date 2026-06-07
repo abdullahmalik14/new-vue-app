@@ -1,14 +1,14 @@
 <script setup>
-import PopupHandler from '@/components/ui/popup/PopupHandler.vue';
-import CheckoutMediaPreview from '../ReuseableComponents/CheckoutMediaPreview.vue';
-import PaymentMethodNotLoggedIn from '../ReuseableComponents/PaymentMethodNotLoggedIn.vue';
-import SectionHeader from '../ReuseableComponents/SectionHeader.vue';
-import SubscriptionPlanCard from '../ReuseableComponents/SubscriptionPlanCard.vue';
-import BaseInput from '@/components/input/BaseInput.vue';
-import CheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
-import ButtonComponent from '@/components/button/ButtonComponent.vue';
-import CheckoutNotes from '../ReuseableComponents/CheckoutNotes.vue';
-import TotalAmountRow from '../ReuseableComponents/TotalAmountRow.vue';
+import BasePopupShell from '@/components/ui/popup/BasePopupShell.vue';
+import CheckoutMediaPreview from '../checkout/CheckoutMediaPreview.vue';
+import PaymentMethodNotLoggedIn from '../checkout/PaymentMethodNotLoggedIn.vue';
+import SectionHeader from '../checkout/SectionHeader.vue';
+import SubscriptionPlanCard from '../checkout/SubscriptionPlanCard.vue';
+import BaseInput from '@/components/forms/inputs/BaseInput.vue';
+import CheckboxGroup from '@/components/forms/checkboxes/CheckboxGroup.vue';
+import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
+import CheckoutNotes from '../checkout/CheckoutNotes.vue';
+import TotalAmountRow from '../checkout/TotalAmountRow.vue';
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -35,7 +35,7 @@ const subscribeNotLoginConfig = {
 </script>
 
 <template>
-<PopupHandler
+<BasePopupShell
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="subscribeNotLoginConfig"
@@ -255,7 +255,7 @@ const subscribeNotLoginConfig = {
             </CheckboxGroup>
 
             <!-- button -->
-            <ButtonComponent
+            <PrimaryButton
                 text="Next"
                 variant="disableBtn"
                 :rightIcon="'https://i.ibb.co.com/8LKPbgm1/arrow-right.webp'"
@@ -266,5 +266,5 @@ const subscribeNotLoginConfig = {
       </div>
     </div>
   </div>
-  </PopupHandler>
+  </BasePopupShell>
 </template>

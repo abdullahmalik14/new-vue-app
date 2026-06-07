@@ -4,11 +4,11 @@
  */
 
 // Export the path for diagnostics (not used directly by router import)
-export const NOT_FOUND_COMPONENT_PATH = '@/templates/misc/NotFound.vue';
+export const NOT_FOUND_COMPONENT_PATH = '@/templates/misc/NotFoundPage.vue';
 
 export function loadNotFoundComponent() {
   // Use a literal import for bundler friendliness while centralizing location
-  return import('@/templates/misc/NotFound.vue');
+  return import('@/templates/misc/NotFoundPage.vue');
 }
 
 

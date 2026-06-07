@@ -21,7 +21,7 @@
         class="pointer-events-none absolute inset-y-0 right-10 flex items-center"
         aria-hidden="true"
       >
-        <Spinner size="sm" color="text-[#004eeb] dark:text-[#3f9dff]" />
+        <LoadingSpinner size="sm" color="text-[#004eeb] dark:text-[#3f9dff]" />
       </div>
     </div>
 
@@ -43,8 +43,8 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import UnifiedSelect from '@/components/ui/popup/dropdown/dashboard/customThemeSelect/UnifiedSelect.vue';
-import Spinner from '@/components/ui/spinner/Spinner.vue';
+import UnifiedSelect from '@/components/ui/dropdowns/select/UnifiedSelect.vue';
+import LoadingSpinner from '@/components/ui/spinners/LoadingSpinner.vue';
 import { useDisplayedLocaleSync } from '@/composables/useDisplayedLocaleSync.js';
 import {
   setActiveLocale,

@@ -6,7 +6,7 @@ const routeCatalog = [
   {
     slug: '/dashboard',
     enabled: true,
-    componentPath: '@/templates/dashboard/page/role/Dashboard.vue'
+    componentPath: '@/templates/dashboard/role/DashboardDevPlaygroundPage.vue'
   },
   {
     slug: '/dashboard/analytics',
@@ -22,7 +22,7 @@ const routeCatalog = [
     slug: '/dashboard/payout',
     enabled: true,
     customComponentPath: {
-      creator: { componentPath: '@/templates/dashboard/page/creator/DashboardPayoutCreator.vue' }
+      creator: { componentPath: '@/templates/dashboard/creator/CreatorDashboardPayoutPage.vue' }
     }
   },
   {
@@ -32,7 +32,7 @@ const routeCatalog = [
   {
     slug: '/sign-up',
     enabled: true,
-    componentPath: '@/templates/auth/page/role/AuthSignUp.vue'
+    componentPath: '@/templates/auth/page/role/SignUpPage.vue'
   },
   {
     slug: '/:pathMatch(.*)*',

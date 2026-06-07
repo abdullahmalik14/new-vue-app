@@ -9,14 +9,14 @@ const baseRoutes = [
   {
     slug: '/log-in',
     section: 'auth',
-    componentPath: '@/templates/auth/page/role/AuthLogIn.vue',
+    componentPath: '@/templates/auth/page/role/LoginPage.vue',
     supportedRoles: ['all'],
     preLoadSections: ['dashboard', 'shop']
   },
   {
     slug: '/dashboard',
     section: 'dashboard-global',
-    componentPath: '@/templates/dashboard/page/DashboardPage.vue',
+    componentPath: '@/templates/dashboard/DashboardPage.vue',
     supportedRoles: ['creator', 'fan', 'agent', 'vendor'],
     preLoadSections: []
   },
@@ -119,7 +119,7 @@ describe('jsonConfigValidator preLoadSections (M-08)', () => {
           creator: 'dashboard-creator',
           fan: 'dashboard-fan'
         },
-        componentPath: '@/templates/dashboard/page/DashboardPage.vue',
+        componentPath: '@/templates/dashboard/DashboardPage.vue',
         supportedRoles: ['creator', 'fan'],
         preLoadSections: {
           creator: ['shop'],
@@ -184,7 +184,7 @@ describe('jsonConfigValidator supportedRoles (B4)', () => {
       {
         slug: '/profile',
         section: 'profile',
-        componentPath: '@/templates/profile/Profile.vue',
+        componentPath: '@/templates/profile/ProfilePage.vue',
         supportedRoles: ['any'],
       },
     ]);
@@ -260,7 +260,7 @@ describe('jsonConfigValidator section (A6)', () => {
       {
         slug: '/dashboard/overview',
         section: 'dashboard-creator',
-        componentPath: '@/templates/dashboard/page/creator/DashboardOverviewCreator.vue',
+        componentPath: '@/templates/dashboard/creator/CreatorDashboardOverviewPage.vue',
         supportedRoles: ['creator'],
         assetPreload: [{ flag: 'dashboard.logo', type: 'sprite', priority: 'urgent' }],
       },
@@ -277,7 +277,7 @@ describe('jsonConfigValidator section (A6)', () => {
       {
         slug: '/dashboard',
         section: 'dashboard-global',
-        componentPath: '@/templates/dashboard/page/role/Dashboard.vue',
+        componentPath: '@/templates/dashboard/role/DashboardDevPlaygroundPage.vue',
         supportedRoles: ['all'],
         assetPreload: [{ flag: 'dashboard.typo.flag', type: 'image' }],
       },

@@ -1,5 +1,5 @@
 <script setup>
-import PopupHandler from './PopupHandler.vue'
+import BasePopupShell from './BasePopupShell.vue'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 // props define karo
@@ -93,7 +93,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <PopupHandler
+  <BasePopupShell
     :modelValue="props.modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="config"
@@ -208,5 +208,5 @@ onBeforeUnmount(() => {
         <slot />
       </div>
     </div>
-  </PopupHandler>
+  </BasePopupShell>
 </template>

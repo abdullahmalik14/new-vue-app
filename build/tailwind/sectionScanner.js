@@ -230,9 +230,9 @@ export function generateContentPathsForSection(sectionName, sectionMetadata, bas
     // (e.g. /dashboard/analytics, /payout in misc) so Tailwind utilities like hidden/md:block survive
     // when unloadSectionCss removes the previous section stylesheet.
     contentPaths.push(`${baseDir}/components/layout/**/*.vue`);
-    contentPaths.push(`${baseDir}/components/dashboard/**/*.vue`);
-    contentPaths.push(`${baseDir}/templates/dashboard/DashboardSidebar.vue`);
-    contentPaths.push(`${baseDir}/templates/dashboard/HeaderResponsive.vue`);
+    contentPaths.push(`${baseDir}/templates/dashboard/shared/**/*.vue`);
+    contentPaths.push(`${baseDir}/templates/dashboard/shared/DashboardSharedSidebar.vue`);
+    contentPaths.push(`${baseDir}/templates/dashboard/shared/DashboardSharedHeader.vue`);
     contentPaths.push(`${baseDir}/App.vue`);
 
     // Add component paths

@@ -101,8 +101,8 @@ function applyMappedAnalyticsState(store, mapped, timestamp) {
   if (mapped.recentOrders) store.recentOrders = mapped.recentOrders;
 }
 
-export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
-  state: () => ({
+function createInitialDashboardAnalyticsState() {
+  return {
     subscriptionsBundle: {
       daily: [],
       weekly: [],
@@ -176,7 +176,11 @@ export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
       etag: null,
       lastUpdated: null,
     },
-  }),
+  };
+}
+
+export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
+  state: createInitialDashboardAnalyticsState,
 
   getters: {
     subscriberInsights(state) {
@@ -207,16 +211,7 @@ export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
     },
 
     resetAnalyticsState() {
-      this.subscriptionsBundle = {
-        daily: [],
-        weekly: [],
-        monthly: [],
-        yearly: [],
-        grandTotal: null,
-      };
-      this.lastUpdated = null;
-      this.bundleLoaded = false;
-      this.metadata = { etag: null, lastUpdated: null };
+      Object.assign(this, createInitialDashboardAnalyticsState());
     },
   },
 

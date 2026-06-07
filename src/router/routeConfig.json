@@ -7,7 +7,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthConfirmEmail.vue",
+    "componentPath": "@/templates/auth/page/role/ConfirmEmailPage.vue",
     "preLoadSections": [
       "dashboard"
     ]
@@ -20,7 +20,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthTwitter.vue",
+    "componentPath": "@/templates/auth/page/role/TwitterAuthPage.vue",
     "preLoadSections": [],
     "hideLayout": true
   },
@@ -31,7 +31,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/misc/NotFound.vue",
+    "componentPath": "@/templates/misc/NotFoundPage.vue",
     "preLoadSections": []
   },
   {
@@ -44,7 +44,7 @@
     ],
     "redirectIfNotAuth": "/log-in",
     "assetPreloadRef": "dashboardMenuIcons",
-    "componentPath": "@/templates/dashboard/page/role/Dashboard.vue",
+    "componentPath": "@/templates/dashboard/role/DashboardDevPlaygroundPage.vue",
     "dependencies": {
       "roles": {
         "creator": {
@@ -97,7 +97,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthLogIn.vue",
+    "componentPath": "@/templates/auth/page/role/LoginPage.vue",
     "assetPreload": [
       {
         "src": "https://i.ibb.co/jPw7ChWb/auth-bg.webp",
@@ -122,7 +122,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthLostPassword.vue",
+    "componentPath": "@/templates/auth/page/role/LostPasswordPage.vue",
     "preLoadSections": [
       "dashboard"
     ]
@@ -134,7 +134,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthResetPassword.vue",
+    "componentPath": "@/templates/auth/page/role/ResetPasswordPage.vue",
     "preLoadSections": [
       "dashboard"
     ]
@@ -147,7 +147,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthSignUp.vue",
+    "componentPath": "@/templates/auth/page/role/SignUpPage.vue",
     "preLoadSections": [
       "dashboard"
     ]
@@ -161,7 +161,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/dashboard/page/creator/DashboardCallAndChatSettings.vue"
+    "componentPath": "@/templates/dashboard/creator/CreatorDashboardCallAndChatSettingsPage.vue"
   },
   {
     "slug": "/dashboard/account/change-password",
@@ -178,7 +178,7 @@
       "agent",
       "vendor"
     ],
-    "componentPath": "@/templates/dashboard/page/role/DashboardChangePassword.vue"
+    "componentPath": "@/templates/dashboard/role/DashboardChangePasswordPage.vue"
   },
   {
     "slug": "/dashboard/reset-password",
@@ -188,7 +188,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/dashboard/page/role/DashboardResetPassword.vue"
+    "componentPath": "@/templates/dashboard/role/DashboardResetPasswordPage.vue"
   },
   {
     "slug": "/dashboard/social-linking",
@@ -200,7 +200,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/dashboard/page/demo/SocialLinkingDemo.vue"
+    "componentPath": "@/templates/dashboard/demo/SocialLinkingDemoPage.vue"
   },
   {
     "slug": "/dashboard/telegram-post",
@@ -211,7 +211,7 @@
       "all"
     ],
     "redirectIfNotAuth": "/log-in",
-    "componentPath": "@/templates/dashboard/page/role/TelegramPost.vue"
+    "componentPath": "@/templates/dashboard/role/TelegramPostPage.vue"
   },
   {
     "slug": "/dashboard/twitter-post",
@@ -222,7 +222,7 @@
       "all"
     ],
     "redirectIfNotAuth": "/log-in",
-    "componentPath": "@/templates/dashboard/page/role/TwitterPost.vue"
+    "componentPath": "@/templates/dashboard/role/TwitterPostPage.vue"
   },
   {
     "slug": "/dashboard/store/coupons",
@@ -237,10 +237,10 @@
     ],
     "customComponentPath": {
       "creator": {
-        "componentPath": "@/templates/dashboard/page/creator/DashboardCouponsCreator.vue"
+        "componentPath": "@/templates/dashboard/creator/CreatorDashboardCouponsPage.vue"
       },
       "fan": {
-        "componentPath": "@/templates/dashboard/page/fan/DashboardCouponsFan.vue"
+        "componentPath": "@/templates/dashboard/fan/FanDashboardCouponsPage.vue"
       }
     }
   },
@@ -257,10 +257,10 @@
     ],
     "customComponentPath": {
       "creator": {
-        "componentPath": "@/templates/dashboard/page/creator/DashboardCustomProductRequestsCreator.vue"
+        "componentPath": "@/templates/dashboard/creator/CreatorDashboardCustomProductRequestsPage.vue"
       },
       "fan": {
-        "componentPath": "@/templates/dashboard/page/fan/DashboardCustomProductRequestsFan.vue"
+        "componentPath": "@/templates/dashboard/fan/FanDashboardCustomProductRequestsPage.vue"
       }
     }
   },
@@ -273,7 +273,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/dashboard/page/creator/DashboardCustomProductSettingsCreator.vue"
+    "componentPath": "@/templates/dashboard/creator/CreatorDashboardCustomProductSettingsPage.vue"
   },
   {
     "slug": "/dashboard/edit-profile",
@@ -292,16 +292,16 @@
     ],
     "customComponentPath": {
       "creator": {
-        "componentPath": "@/templates/dashboard/page/creator/DashboardEditProfileCreator.vue"
+        "componentPath": "@/templates/dashboard/creator/CreatorDashboardEditProfilePage.vue"
       },
       "fan": {
-        "componentPath": "@/templates/dashboard/page/fan/DashboardEditProfileFan.vue"
+        "componentPath": "@/templates/dashboard/fan/FanDashboardEditProfilePage.vue"
       },
       "agent": {
-        "componentPath": "@/templates/dashboard/page/agent/DashboardEditProfileAgent.vue"
+        "componentPath": "@/templates/dashboard/agent/AgentDashboardEditProfilePage.vue"
       },
       "vendor": {
-        "componentPath": "@/templates/dashboard/page/vendor/DashboardEditProfileVendor.vue"
+        "componentPath": "@/templates/dashboard/vendor/VendorDashboardEditProfilePage.vue"
       }
     }
   },
@@ -320,7 +320,7 @@
       "agent",
       "vendor"
     ],
-    "componentPath": "@/templates/dashboard/page/role/DashboardFollowing.vue"
+    "componentPath": "@/templates/dashboard/role/DashboardFollowingPage.vue"
   },
   {
     "slug": "/dashboard/settings/live-stream-settings",
@@ -331,7 +331,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/dashboard/page/creator/DashboardLiveStreamSettingsCreator.vue"
+    "componentPath": "@/templates/dashboard/creator/CreatorDashboardLiveStreamSettingsPage.vue"
   },
   {
     "slug": "/dashboard/my-media",
@@ -342,7 +342,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/dashboard/page/creator/DashboardMyMediaCreator.vue"
+    "componentPath": "@/templates/dashboard/creator/CreatorDashboardMyMediaPage.vue"
   },
   {
     "slug": "/dashboard/settings/newsletter-settings",
@@ -361,16 +361,16 @@
     ],
     "customComponentPath": {
       "creator": {
-        "componentPath": "@/templates/dashboard/page/creator/DashboardNewsletterSettingsCreator.vue"
+        "componentPath": "@/templates/dashboard/creator/CreatorDashboardNewsletterSettingsPage.vue"
       },
       "fan": {
-        "componentPath": "@/templates/dashboard/page/fan/DashboardNewsletterSettingsFan.vue"
+        "componentPath": "@/templates/dashboard/fan/FanDashboardNewsletterSettingsPage.vue"
       },
       "agent": {
-        "componentPath": "@/templates/dashboard/page/agent/DashboardNewsletterSettingsAgent.vue"
+        "componentPath": "@/templates/dashboard/agent/AgentDashboardNewsletterSettingsPage.vue"
       },
       "vendor": {
-        "componentPath": "@/templates/dashboard/page/vendor/DashboardNewsletterSettingsVendor.vue"
+        "componentPath": "@/templates/dashboard/vendor/VendorDashboardNewsletterSettingsPage.vue"
       }
     }
   },
@@ -383,7 +383,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/dashboard/page/creator/DashboardOverviewCreator.vue",
+    "componentPath": "@/templates/dashboard/creator/CreatorDashboardOverviewPage.vue",
     "assetPreload": [
       {
         "name": "dashboard-metrics-lib",
@@ -414,13 +414,13 @@
     ],
     "customComponentPath": {
       "creator": {
-        "componentPath": "@/templates/dashboard/page/creator/DashboardPayoutSettingsCreator.vue"
+        "componentPath": "@/templates/dashboard/creator/CreatorDashboardPayoutSettingsPage.vue"
       },
       "agent": {
-        "componentPath": "@/templates/dashboard/page/agent/DashboardPayoutSettingsAgent.vue"
+        "componentPath": "@/templates/dashboard/agent/AgentDashboardPayoutSettingsPage.vue"
       },
       "vendor": {
-        "componentPath": "@/templates/dashboard/page/vendor/DashboardPayoutSettingsVendor.vue"
+        "componentPath": "@/templates/dashboard/vendor/VendorDashboardPayoutSettingsPage.vue"
       }
     }
   },
@@ -439,13 +439,13 @@
     ],
     "customComponentPath": {
       "creator": {
-        "componentPath": "@/templates/dashboard/page/creator/DashboardPayoutCreator.vue"
+        "componentPath": "@/templates/dashboard/creator/CreatorDashboardPayoutPage.vue"
       },
       "agent": {
-        "componentPath": "@/templates/dashboard/page/agent/DashboardPayoutAgent.vue"
+        "componentPath": "@/templates/dashboard/agent/AgentDashboardPayoutPage.vue"
       },
       "vendor": {
-        "componentPath": "@/templates/dashboard/page/vendor/DashboardPayoutVendor.vue"
+        "componentPath": "@/templates/dashboard/vendor/VendorDashboardPayoutPage.vue"
       }
     }
   },
@@ -464,7 +464,7 @@
       "agent",
       "vendor"
     ],
-    "componentPath": "@/templates/dashboard/page/role/DashboardPrivacySecurity.vue"
+    "componentPath": "@/templates/dashboard/role/DashboardPrivacySecurityPage.vue"
   },
   {
     "slug": "/dashboard/settings/private-chat-settings",
@@ -477,7 +477,7 @@
     ],
     "customComponentPath": {
       "creator": {
-        "componentPath": "@/templates/dashboard/page/creator/DashboardPrivateChatSettingsCreator.vue"
+        "componentPath": "@/templates/dashboard/creator/CreatorDashboardPrivateChatSettingsPage.vue"
       }
     }
   },
@@ -498,16 +498,16 @@
     ],
     "customComponentPath": {
       "creator": {
-        "componentPath": "@/templates/dashboard/page/creator/DashboardChatsCreator.vue"
+        "componentPath": "@/templates/dashboard/creator/CreatorDashboardChatsPage.vue"
       },
       "fan": {
-        "componentPath": "@/templates/dashboard/page/fan/DashboardChatsFan.vue"
+        "componentPath": "@/templates/dashboard/fan/FanDashboardChatsPage.vue"
       },
       "agent": {
-        "componentPath": "@/templates/dashboard/page/agent/DashboardChatsAgent.vue"
+        "componentPath": "@/templates/dashboard/agent/AgentDashboardChatsPage.vue"
       },
       "vendor": {
-        "componentPath": "@/templates/dashboard/page/vendor/DashboardChatsVendor.vue"
+        "componentPath": "@/templates/dashboard/vendor/VendorDashboardChatsPage.vue"
       }
     }
   },
@@ -522,7 +522,7 @@
     ],
     "customComponentPath": {
       "creator": {
-        "componentPath": "@/templates/dashboard/page/creator/DashboardProductListingsCreator.vue"
+        "componentPath": "@/templates/dashboard/creator/CreatorDashboardProductListingsPage.vue"
       }
     }
   },
@@ -541,7 +541,7 @@
       "agent",
       "vendor"
     ],
-    "componentPath": "@/templates/dashboard/page/role/DashboardPurchasedMedia.vue"
+    "componentPath": "@/templates/dashboard/role/DashboardPurchasedMediaPage.vue"
   },
   {
     "slug": "/dashboard/shop/purchases",
@@ -558,7 +558,7 @@
       "agent",
       "vendor"
     ],
-    "componentPath": "@/templates/dashboard/page/role/DashboardPurchases.vue"
+    "componentPath": "@/templates/dashboard/role/DashboardPurchasesPage.vue"
   },
   {
     "slug": "/dashboard/referrals",
@@ -575,7 +575,7 @@
       "agent",
       "vendor"
     ],
-    "componentPath": "@/templates/dashboard/page/role/DashboardReferrals.vue"
+    "componentPath": "@/templates/dashboard/role/DashboardReferralsPage.vue"
   },
   {
     "slug": "/dashboard/settings",
@@ -594,16 +594,16 @@
     ],
     "customComponentPath": {
       "creator": {
-        "componentPath": "@/templates/dashboard/page/creator/DashboardSettingsCreator.vue"
+        "componentPath": "@/templates/dashboard/creator/CreatorDashboardSettingsPage.vue"
       },
       "fan": {
-        "componentPath": "@/templates/dashboard/page/fan/DashboardSettingsFan.vue"
+        "componentPath": "@/templates/dashboard/fan/FanDashboardSettingsPage.vue"
       },
       "agent": {
-        "componentPath": "@/templates/dashboard/page/agent/DashboardSettingsAgent.vue"
+        "componentPath": "@/templates/dashboard/agent/AgentDashboardSettingsPage.vue"
       },
       "vendor": {
-        "componentPath": "@/templates/dashboard/page/vendor/DashboardSettingsVendor.vue"
+        "componentPath": "@/templates/dashboard/vendor/VendorDashboardSettingsPage.vue"
       }
     }
   },
@@ -622,7 +622,7 @@
       "agent",
       "vendor"
     ],
-    "componentPath": "@/templates/dashboard/page/role/DashboardShipping.vue"
+    "componentPath": "@/templates/dashboard/role/DashboardShippingPage.vue"
   },
   {
     "slug": "/dashboard/settings/subscription-settings",
@@ -633,7 +633,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/dashboard/page/creator/DashboardSubscriptionSettingsCreator.vue"
+    "componentPath": "@/templates/dashboard/creator/CreatorDashboardSubscriptionSettingsPage.vue"
   },
   {
     "slug": "/dashboard/store/subscription",
@@ -644,7 +644,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/dashboard/page/creator/DashboardSubscriptionCreator.vue"
+    "componentPath": "@/templates/dashboard/creator/CreatorDashboardSubscriptionPage.vue"
   },
   {
     "slug": "/dashboard/store/your-orders",
@@ -655,7 +655,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/dashboard/page/creator/DashboardYourOrdersCreator.vue"
+    "componentPath": "@/templates/dashboard/creator/CreatorDashboardYourOrdersPage.vue"
   },
   {
     "slug": "/dashboard/store/your-posts",
@@ -666,7 +666,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/dashboard/page/creator/DashboardYourPostsCreator.vue"
+    "componentPath": "@/templates/dashboard/creator/CreatorDashboardYourPostsPage.vue"
   },
   {
     "slug": "/sign-up/onboarding",
@@ -676,7 +676,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/creator/AuthSignUpOnboardingCreator.vue",
+    "componentPath": "@/templates/auth/page/creator/CreatorSignUpOnboardingPage.vue",
     "preLoadSections": [
       "dashboard"
     ],
@@ -721,7 +721,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/auth/page/creator/AuthSignUpOnboardingKycCreator.vue",
+    "componentPath": "@/templates/auth/page/creator/CreatorSignUpOnboardingKycPage.vue",
     "preLoadSections": [
       "dashboard"
     ],
@@ -766,7 +766,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthFacebook.vue"
+    "componentPath": "@/templates/auth/page/role/FacebookAuthPage.vue"
   },
   {
     "slug": "/auth/callback/social/google",
@@ -776,7 +776,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthGoogle.vue"
+    "componentPath": "@/templates/auth/page/role/GoogleAuthPage.vue"
   },
   {
     "slug": "/auth/callback/social/twitter",
@@ -786,7 +786,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthTwitter.vue"
+    "componentPath": "@/templates/auth/page/role/TwitterAuthPage.vue"
   },
   {
     "slug": "/auth/callback/social/telegram",
@@ -796,7 +796,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthTelegram.vue"
+    "componentPath": "@/templates/auth/page/role/TelegramAuthPage.vue"
   },
   {
     "slug": "/sign-up/onboarding/kyc/callback",
@@ -809,7 +809,7 @@
       "agent",
       "vendor"
     ],
-    "componentPath": "@/templates/auth/page/role/AuthSignUpOnboardingKycCallback.vue",
+    "componentPath": "@/templates/auth/page/role/SignUpOnboardingKycCallbackPage.vue",
     "preLoadSections": [
       "dashboard"
     ],
@@ -832,7 +832,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/templates/auth/page/creator/AuthSignUpOnboardingKycStatusCreator.vue",
+    "componentPath": "@/templates/auth/page/creator/CreatorSignUpOnboardingKycStatusPage.vue",
     "preLoadSections": [
       "dashboard"
     ],
@@ -855,7 +855,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/about/AboutWrapper.vue",
+    "componentPath": "@/templates/about/AboutPage.vue",
     "preLoadSections": [
       "dashboard"
     ]
@@ -868,7 +868,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/contact/ContactWrapper.vue",
+    "componentPath": "@/templates/contact/ContactPage.vue",
     "preLoadSections": [
       "discover"
     ]
@@ -881,7 +881,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/profileAbdullah/ProfileWrapper.vue",
+    "componentPath": "@/templates/profile/ProfilePage.vue",
     "preLoadSections": []
   },
   {
@@ -892,7 +892,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/templates/discover/DiscoverWrapper.vue",
+    "componentPath": "@/templates/discover/DiscoverPage.vue",
     "assetPreload": [
       {
         "src": "/media/sample.jpg",
@@ -909,7 +909,7 @@
       "all"
     ],
     "enabled": true,
-    "componentPath": "@/templates/shop/ShopWrapper.vue",
+    "componentPath": "@/templates/shop/ShopPage.vue",
     "preLoadSections": [
       "dashboard"
     ]
@@ -942,7 +942,7 @@
     "slug": "/dev/datepicker-showcase",
     "envAccess": "development",
     "section": "dev",
-    "componentPath": "@/components/datePicker/DatePickerShowcase.vue",
+    "componentPath": "@/components/forms/date-picker/DatePickerShowcase.vue",
     "supportedRoles": [
       "all"
     ]
@@ -951,7 +951,7 @@
     "slug": "/dev/bookingform",
     "envAccess": "development",
     "section": "dev",
-    "componentPath": "@/components/ui/form/BookingForm/UnifiedBookingForm.vue",
+    "componentPath": "@/templates/dev/UnifiedBookingFormPage.vue",
     "supportedRoles": [
       "all"
     ]
@@ -960,7 +960,7 @@
     "slug": "/demo/audit/base-input",
     "envAccess": "development",
     "section": "demo",
-    "componentPath": "@/components/demoAuditComponents/BaseInputDemo.vue",
+    "componentPath": "@/templates/dev/demo-audit/BaseInputDemo.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -970,7 +970,7 @@
     "slug": "/demo/audit/input-dashboard",
     "envAccess": "development",
     "section": "demo",
-    "componentPath": "@/components/demoAuditComponents/InputComponentDashboardDemo.vue",
+    "componentPath": "@/templates/dev/demo-audit/DashboardTextInputDemo.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -980,7 +980,7 @@
     "slug": "/demo/audit/auth-components",
     "envAccess": "development",
     "section": "demo",
-    "componentPath": "@/components/demoAuditComponents/AuthComponentDemo.vue",
+    "componentPath": "@/templates/dev/demo-audit/AuthComponentDemo.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -990,7 +990,7 @@
     "slug": "/demo/audit/input-default",
     "envAccess": "development",
     "section": "demo",
-    "componentPath": "@/components/demoAuditComponents/InputDefaultComponentDemo.vue",
+    "componentPath": "@/templates/dev/demo-audit/BaseTextInputDemo.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -1000,7 +1000,7 @@
     "slug": "/demo/audit/code-input",
     "envAccess": "development",
     "section": "demo",
-    "componentPath": "@/components/demoAuditComponents/CodeInputAuthComponentDemo.vue",
+    "componentPath": "@/templates/dev/demo-audit/AuthCodeInputDemo.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -1010,7 +1010,7 @@
     "slug": "/demo/audit/checkbox-group",
     "envAccess": "development",
     "section": "demo",
-    "componentPath": "@/components/demoAuditComponents/CheckboxGroupDemo.vue",
+    "componentPath": "@/templates/dev/demo-audit/CheckboxGroupDemo.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -1020,7 +1020,7 @@
     "slug": "/demo/audit/checkbox-switch",
     "envAccess": "development",
     "section": "demo",
-    "componentPath": "@/components/demoAuditComponents/CheckboxSwitchDemo.vue",
+    "componentPath": "@/templates/dev/demo-audit/CheckboxSwitchDemo.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -1029,7 +1029,7 @@
   {
     "slug": "/settings",
     "section": "misc",
-    "componentPath": "@/templates/settings/Settings.vue",
+    "componentPath": "@/templates/settings/SettingsPage.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -1038,7 +1038,7 @@
   {
     "slug": "/plan",
     "section": "misc",
-    "componentPath": "@/components/ui/global/plan/Plan.vue",
+    "componentPath": "@/components/plan/Plan.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -1053,13 +1053,13 @@
       "all"
     ],
     "enabled": true,
-    "componentPath": "@/components/dropdownHandler/demo/DemoDropdowns.vue"
+    "componentPath": "@/components/ui/dropdowns/demo/DemoDropdowns.vue"
   },
   {
     "slug": "/edit-profile",
     "envAccess": "development",
     "section": "profile",
-    "componentPath": "@/templates/editProfile/EditProfilePage.vue",
+    "componentPath": "@/templates/edit-profile/EditProfilePage.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -1068,7 +1068,7 @@
   {
     "slug": "/MediaUploader",
     "section": "misc",
-    "componentPath": "@/components/ui/global/media/uploader/MediaUploader.vue",
+    "componentPath": "@/templates/misc/MediaUploaderPage.vue",
     "supportedRoles": [
       "all"
     ]
@@ -1097,7 +1097,7 @@
     "slug": "/chats",
     "envAccess": "development",
     "section": "dev",
-    "componentPath": "@/templates/dashboard/page/demo/DemoChats.vue",
+    "componentPath": "@/templates/dashboard/demo/DemoChatsPage.vue",
     "supportedRoles": [
       "all"
     ]
