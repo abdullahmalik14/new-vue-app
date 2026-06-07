@@ -1842,7 +1842,7 @@ export const flowRegistry = {
         {
           type: "piniaAction",
           storeId: "dashboard",
-          action: "setAnalyticsAction",
+          action: "syncAnalyticsBundle",
         },
       ],
       uiErrorMap: {

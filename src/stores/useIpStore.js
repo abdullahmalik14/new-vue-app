@@ -48,27 +48,28 @@ function normalizeIpAfterRestore(store) {
 export const useIpStore = defineStore('ip', {
   state: () => ({
     ip: null,
-    details: null
+    details: null,
   }),
 
   getters: {
     getIp: (state) => state.ip,
-    getDetails: (state) => state.details
+    getDetails: (state) => state.details,
   },
 
   actions: {
     setIp(ip, details = null) {
       this.ip = ip;
       this.details = details;
-      console.log("📍 [Pinia Store] IP updated:", ip);
+      console.log('📍 [Pinia Store] IP updated:', ip);
     },
 
     removeIp() {
-      console.log("📍 [Pinia Store] Removing IP:", this.ip);
+      console.log('📍 [Pinia Store] Removing IP:', this.ip);
       this.ip = null;
       this.details = null;
-    }
+    },
   },
+
   persist: {
     key: IP_PERSIST_KEY,
     storage: persistStorageAdapter,
@@ -88,4 +89,3 @@ export const useIpStore = defineStore('ip', {
     },
   },
 });
-

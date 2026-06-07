@@ -83,15 +83,15 @@
 
                         <div class="flex justify-between items-end">
                           <span>
-                            <span :data-value="store.subscribers?.daily?.new"
+                            <span :data-value="store.subscriberInsights?.daily?.new"
                               class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                                store.subscribers?.daily?.new ?? '--' }}</span>
+                                store.subscriberInsights?.daily?.new ?? '--' }}</span>
                           </span>
 
                           <!-- right part only show when data are here -->
                           <div v-if="
-                            store.subscribers?.daily?.newPercentage !== undefined &&
-                            store.subscribers?.daily?.newPercentage !== null
+                            store.subscriberInsights?.daily?.newPercentage !== undefined &&
+                            store.subscriberInsights?.daily?.newPercentage !== null
                           ">
                             <div class="flex flex-col items-end gap-1">
                               <span class="flex gap-1 items-center">
@@ -99,7 +99,7 @@
                                   class="h-5 w-5" />
                                 <span
                                   class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium">{{
-                                    store.subscribers?.daily?.newPercentage }}%</span>
+                                    store.subscriberInsights?.daily?.newPercentage }}%</span>
                               </span>
                               <span
                                 class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
@@ -109,7 +109,7 @@
 
                           </div>
                         </div>
-                        <div class="w-full" v-if="store.subscribers?.daily?.new != null">
+                        <div class="w-full" v-if="store.subscriberInsights?.daily?.new != null">
                           <SparkLine :data="[3, 4, 3, 5, 4, 6, 5, 7, 6, 8]" color="#22c55e" :height="28" />
                         </div>
                       </div>
@@ -128,14 +128,14 @@
 
                         <div class="flex justify-between items-end">
                           <span>
-                            <span :data-value="store.subscribers?.daily?.recurring"
+                            <span :data-value="store.subscriberInsights?.daily?.recurring"
                               class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                                store.subscribers?.daily?.recurring ?? '--' }}</span>
+                                store.subscriberInsights?.daily?.recurring ?? '--' }}</span>
                           </span>
                           <!-- right part only show when data are here -->
                           <div v-if="
-                            store.subscribers?.daily?.recurringPercentage !== undefined &&
-                            store.subscribers?.daily?.recurringPercentage !== null
+                            store.subscriberInsights?.daily?.recurringPercentage !== undefined &&
+                            store.subscriberInsights?.daily?.recurringPercentage !== null
                           ">
 
 
@@ -146,7 +146,7 @@
                                   class="h-5 w-5" />
                                 <span
                                   class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium">{{
-                                    store.subscribers?.daily?.recurringPercentage }}%</span>
+                                    store.subscriberInsights?.daily?.recurringPercentage }}%</span>
                               </span>
                               <span
                                 class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
@@ -154,7 +154,7 @@
                             </div>
                           </div>
                         </div>
-                        <div v-if="store.subscribers?.daily?.recurring != null" class="w-full">
+                        <div v-if="store.subscriberInsights?.daily?.recurring != null" class="w-full">
                           <SparkLine :data="[5, 6, 5, 4, 5, 6, 7, 6, 5, 6]" color="#22c55e" :width="70" :height="28" />
                         </div>
                       </div>
@@ -724,7 +724,7 @@ import DashboardOrderCard from '@/components/ui/card/DashboardOrderCard.vue'
 import AnalyticsMainCardWrapper from '@/components/ui/card/AnalyticsMainCardWrapper.vue'
 import DashboardTrendCard from '@/components/ui/card/DashboardTrendCard.vue'
 import DashboardTrendContent from '@/components/ui/content/DashboardTrendContent.vue'
-import { useDashboardAnalytics } from '@/stores/DashboardAnalytics'
+import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 import { FlowHandler } from '@/services/flow-system/FlowHandler'
 import flowRefreshManager from '@/services/flow-system/flowRefreshManager'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
@@ -743,7 +743,7 @@ import TopMerchTable from '@/components/ui/table/dashboard/analyticsDashboardTab
 import TopCountriesTable from '@/components/ui/table/dashboard/analyticsDashboardTables/TopCountriesTable.vue'
 import SparkLine from '@/components/ui/charts/SparkLine.vue'
 
-const store = useDashboardAnalytics()
+const store = useDashboardAnalyticsStore()
 const { lastUpdated } = storeToRefs(store)
 
 // --- Contributors Table Data ---
@@ -903,7 +903,7 @@ const currentEarningsInsightData = computed(() => {
 const currentSubscribersInsightData = computed(() => {
   let p = subscribersPeriod.value.toLowerCase()
   if (p === 'all-time') p = 'yearly'
-  return store.subscribers[p] || { new: null, recurring: null }
+  return store.subscriberInsights[p] || { new: null, recurring: null }
 })
 
 const currentFansInsightData = computed(() => {

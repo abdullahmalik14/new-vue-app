@@ -52,7 +52,7 @@
 <script setup>
 import TrendPopup from './TrendPopup.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
-import { useDashboardAnalytics } from '@/stores/DashboardAnalytics'
+import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -61,7 +61,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'update:period'])
-const store = useDashboardAnalytics()
+const store = useDashboardAnalyticsStore()
 
 // Active period mapping
 const activePeriod = computed(() => {

@@ -92,12 +92,12 @@ import DashboardTrendCard from '@/components/ui/card/DashboardTrendCard.vue'
 import DashboardTrendContent from '@/components/ui/content/DashboardTrendContent.vue'
 import FlexTable from '@/components/ui/table/FlexTable.vue'
 
-import { useDashboardAnalytics } from '@/stores/DashboardAnalytics'
+import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
-const store = useDashboardAnalytics()
+const store = useDashboardAnalyticsStore()
 
 const topMediaTabs = ['Views', 'P2V Sales']
 const selectedTopMediaTab = ref('Views')

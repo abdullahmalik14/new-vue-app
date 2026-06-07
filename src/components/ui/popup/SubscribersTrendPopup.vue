@@ -206,14 +206,14 @@
 <script setup>
 import TrendPopup from './TrendPopup.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
-import { useDashboardAnalytics } from '@/stores/DashboardAnalytics'
+import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
 const props = defineProps({ modelValue: Boolean, period: String, insightData: Object })
 const emit = defineEmits(['update:modelValue', 'update:period'])
 
 const hasData = computed(() => props.insightData && props.insightData.new != null)
 
-const store = useDashboardAnalytics()
+const store = useDashboardAnalyticsStore()
 const bundle = computed(() => store.subscriptionsBundle || {})
 
 // Active period mapping

@@ -201,7 +201,7 @@
 import { ref, computed } from 'vue'
 import AnalyticsMainCardWrapper from '@/components/ui/card/AnalyticsMainCardWrapper.vue'
 import FlexTable from '@/components/ui/table/FlexTable.vue'
-import { useDashboardAnalytics } from '@/stores/DashboardAnalytics'
+import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
 // --- Orders Tabs ---
 const orderTabs = ['Subscriptions', 'Pay to View', 'Merch', 'Custom Request', 'Wishtender']
@@ -231,7 +231,7 @@ const customRequestOrdersColumns = merchOrdersColumns
 
 
 const currentRows = computed(() => {
-  const store = useDashboardAnalytics()
+  const store = useDashboardAnalyticsStore()
   const recent = store.recentOrders || {}
   
   if (!store.bundleLoaded) return []
@@ -246,7 +246,7 @@ const currentRows = computed(() => {
 })
 
 const totalOrdersCount = computed(() => {
-  const store = useDashboardAnalytics()
+  const store = useDashboardAnalyticsStore()
   const recent = store.recentOrders || {}
   return (recent.subscriptions?.length || 0) +
          (recent.p2v?.length || 0) +

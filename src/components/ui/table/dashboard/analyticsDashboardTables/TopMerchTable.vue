@@ -68,12 +68,12 @@ import DashboardTrendContent from '@/components/ui/content/DashboardTrendContent
 import FlexTable from '@/components/ui/table/FlexTable.vue'
 
 import { computed } from 'vue'
-import { useDashboardAnalytics } from '@/stores/DashboardAnalytics'
+import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
-const store = useDashboardAnalytics()
+const store = useDashboardAnalyticsStore()
 
 const topMerchColumns = [
   { key: 'merch', label: 'Merch', basis: 'basis-1/2', grow: true, align: 'left' },
