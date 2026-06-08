@@ -24,7 +24,7 @@ import {
   getTemporaryPageLocaleBase,
   clearTemporaryPageLocaleAndRestore,
   getLocaleDisplayName,
-} from '@/utils/translation';
+} from '@/systems/i18n';
 
 const visible = ref(isTemporaryPageLocaleActive());
 const isBusy = ref(false);

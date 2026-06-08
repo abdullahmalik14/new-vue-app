@@ -3,12 +3,15 @@
 import {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
-  RespondToAuthChallengeCommand
+  RespondToAuthChallengeCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { registerNewUser, linkSocialAccount } from "./awsCognitoHandler";
-import { getCognitoClient, lookupCognitoUserByAttribute } from "./awsCognitoUtilities";
-import { log } from "../common/logHandler";
-import { registerUser, checkUserExists } from '../backend/scyllaDbClient';
+import {
+  getCognitoClient,
+  lookupCognitoUserByAttribute,
+} from "./awsCognitoUtilities";
+import { log } from "../../infrastructure/logging/logHandler.js";
+import { registerUser, checkUserExists } from "../../infrastructure/backend/scyllaDbClient";
 /**
  * @file telegramCognitoHandler.js
  * @description Telegram Login integration with AWS Cognito CUSTOM_AUTH
@@ -40,7 +43,10 @@ function generateStrongRandomPassword() {
     password += allChars[array[i] % allChars.length];
   }
 
-  return password.split("").sort(() => Math.random() - 0.5).join("");
+  return password
+    .split("")
+    .sort(() => Math.random() - 0.5)
+    .join("");
 }
 
 /**
@@ -53,8 +59,6 @@ function determineUsername(telegramUserId) {
   return `telegram_${telegramUserId}@social.local`;
 }
 
-
-
 /**
  * Authenticate user with Cognito CUSTOM_AUTH
  * @param {string} username
@@ -66,7 +70,7 @@ async function authenticateWithCustomAuth(username) {
     "authenticateWithCustomAuth",
     "start",
     "Begin CUSTOM_AUTH authentication",
-    { username }
+    { username },
   );
 
   try {
@@ -82,20 +86,20 @@ async function authenticateWithCustomAuth(username) {
         ClientId: clientId,
         AuthFlow: "CUSTOM_AUTH",
         AuthParameters: {
-          USERNAME: username
+          USERNAME: username,
         },
         ClientMetadata: {
           _trusted_backend: "true",
-          social_provider: "telegram"
-        }
-      })
+          social_provider: "telegram",
+        },
+      }),
     );
 
     if (response.AuthenticationResult) {
       return {
         idToken: response.AuthenticationResult.IdToken,
         accessToken: response.AuthenticationResult.AccessToken,
-        refreshToken: response.AuthenticationResult.RefreshToken
+        refreshToken: response.AuthenticationResult.RefreshToken,
       };
     }
 
@@ -107,16 +111,16 @@ async function authenticateWithCustomAuth(username) {
           Session: response.Session,
           ChallengeResponses: {
             USERNAME: username,
-            ANSWER: "auto-approved"
-          }
-        })
+            ANSWER: "auto-approved",
+          },
+        }),
       );
 
       if (challengeResponse.AuthenticationResult) {
         return {
           idToken: challengeResponse.AuthenticationResult.IdToken,
           accessToken: challengeResponse.AuthenticationResult.AccessToken,
-          refreshToken: challengeResponse.AuthenticationResult.RefreshToken
+          refreshToken: challengeResponse.AuthenticationResult.RefreshToken,
         };
       }
     }
@@ -132,8 +136,8 @@ async function authenticateWithCustomAuth(username) {
         username,
         error: error.message,
         errorName: error.name,
-        stack: error.stack
-      }
+        stack: error.stack,
+      },
     );
     throw error;
   }
@@ -153,8 +157,8 @@ async function createTelegramUser(username, telegramUser) {
     "Begin Telegram user creation",
     {
       username,
-      telegramUserId: telegramUser?.id
-    }
+      telegramUserId: telegramUser?.id,
+    },
   );
 
   const tempPassword = generateStrongRandomPassword();
@@ -163,7 +167,7 @@ async function createTelegramUser(username, telegramUser) {
   // (You must create custom:telegram_id in the Cognito user pool attributes.)
   const userAttributes = {
     "custom:telegram_id": String(telegramUser.id),
-    "custom:password_source": "system"
+    "custom:password_source": "system",
   };
 
   // Optional: if your pool has 'name' enabled, you can safely set it.
@@ -178,7 +182,10 @@ async function createTelegramUser(username, telegramUser) {
 
   // Telegram provides username sometimes, but it's not guaranteed.
   // Only include it if you have created custom:telegram_username in your pool.
-  if (telegramUser.username && import.meta.env.VITE_COGNITO_HAS_TELEGRAM_USERNAME === "true") {
+  if (
+    telegramUser.username &&
+    import.meta.env.VITE_COGNITO_HAS_TELEGRAM_USERNAME === "true"
+  ) {
     userAttributes["custom:telegram_username"] = String(telegramUser.username);
   }
 
@@ -188,10 +195,26 @@ async function createTelegramUser(username, telegramUser) {
   registerUser(username, {
     telegram_id: String(telegramUser.id),
     user_id: result.userSub,
-    email: username // Use synthetic username as email for ScyllaDB if no email provided
+    email: username, // Use synthetic username as email for ScyllaDB if no email provided
   })
-    .then(() => log('telegramCognitoHandler.js', 'createTelegramUser', 'scylla-sync-success', 'Synced Telegram user to ScyllaDB', { username }))
-    .catch(err => log('telegramCognitoHandler.js', 'createTelegramUser', 'scylla-sync-error', 'Failed to sync Telegram user to ScyllaDB', { error: err.message }));
+    .then(() =>
+      log(
+        "telegramCognitoHandler.js",
+        "createTelegramUser",
+        "scylla-sync-success",
+        "Synced Telegram user to ScyllaDB",
+        { username },
+      ),
+    )
+    .catch((err) =>
+      log(
+        "telegramCognitoHandler.js",
+        "createTelegramUser",
+        "scylla-sync-error",
+        "Failed to sync Telegram user to ScyllaDB",
+        { error: err.message },
+      ),
+    );
 
   return result;
 }
@@ -202,7 +225,10 @@ async function createTelegramUser(username, telegramUser) {
  * @param {string} intent - 'login' or 'signup'
  * @returns {Promise<object>} Session tokens
  */
-export async function authenticateOrSignUpTelegramUser(telegramUser, intent = 'login') {
+export async function authenticateOrSignUpTelegramUser(
+  telegramUser,
+  intent = "login",
+) {
   const telegramUserId = String(telegramUser.id);
   const syntheticUsername = `telegram_${telegramUserId}@social.local`;
 
@@ -210,32 +236,61 @@ export async function authenticateOrSignUpTelegramUser(telegramUser, intent = 'l
     throw new Error("Missing Telegram user id");
   }
 
-  log('telegramCognitoHandler.js', 'authenticateOrSignUpTelegramUser', 'start', 'Auth/Signup logic start', {
-    telegramUserId,
-    intent
-  });
+  log(
+    "telegramCognitoHandler.js",
+    "authenticateOrSignUpTelegramUser",
+    "start",
+    "Auth/Signup logic start",
+    {
+      telegramUserId,
+      intent,
+    },
+  );
 
   try {
     // 1. Check ScyllaDB for existing link (Source of Truth)
-    log('telegramCognitoHandler.js', 'authenticateOrSignUpTelegramUser', 'check-scylla', 'Checking ScyllaDB for existing user by Telegram ID', { telegramUserId });
-    const existingUser = await checkUserExists('telegram', telegramUserId);
+    log(
+      "telegramCognitoHandler.js",
+      "authenticateOrSignUpTelegramUser",
+      "check-scylla",
+      "Checking ScyllaDB for existing user by Telegram ID",
+      { telegramUserId },
+    );
+    const existingUser = await checkUserExists("telegram", telegramUserId);
 
     if (existingUser && existingUser.user_id) {
       // Found linked user! Login with their Cognito user_id (sub)
-      log('telegramCognitoHandler.js', 'authenticateOrSignUpTelegramUser', 'scylla-found', 'Found user in ScyllaDB. Logging in.', { sub: existingUser.user_id });
+      log(
+        "telegramCognitoHandler.js",
+        "authenticateOrSignUpTelegramUser",
+        "scylla-found",
+        "Found user in ScyllaDB. Logging in.",
+        { sub: existingUser.user_id },
+      );
       return await authenticateWithCustomAuth(existingUser.user_id);
     }
 
     // 2. User Not Found -> Create New User
-    if (intent === 'login') {
+    if (intent === "login") {
       // Social login typically implies "sign up if not exists", so we proceed to creation
-      log('telegramCognitoHandler.js', 'authenticateOrSignUpTelegramUser', 'not-found-creating', 'User not found, creating new account');
+      log(
+        "telegramCognitoHandler.js",
+        "authenticateOrSignUpTelegramUser",
+        "not-found-creating",
+        "User not found, creating new account",
+      );
     }
 
     // Double-check ScyllaDB one more time before creating (race condition safety)
-    const finalCheck = await checkUserExists('telegram', telegramUserId);
+    const finalCheck = await checkUserExists("telegram", telegramUserId);
     if (finalCheck) {
-      log('telegramCognitoHandler.js', 'authenticateOrSignUpTelegramUser', 'race-detected', 'User was created between checks, logging in', { sub: finalCheck.user_id });
+      log(
+        "telegramCognitoHandler.js",
+        "authenticateOrSignUpTelegramUser",
+        "race-detected",
+        "User was created between checks, logging in",
+        { sub: finalCheck.user_id },
+      );
       return await authenticateWithCustomAuth(finalCheck.user_id);
     }
 
@@ -247,7 +302,7 @@ export async function authenticateOrSignUpTelegramUser(telegramUser, intent = 'l
     } catch (postCreateAuthError) {
       if (postCreateAuthError?.name === "UserNotConfirmedException") {
         throw new Error(
-          "Cognito created the Telegram user but left it UNCONFIRMED, so CUSTOM_AUTH is blocked. Fix: add a Cognito Pre Sign-up Lambda trigger that auto-confirms users created via this social flow."
+          "Cognito created the Telegram user but left it UNCONFIRMED, so CUSTOM_AUTH is blocked. Fix: add a Cognito Pre Sign-up Lambda trigger that auto-confirms users created via this social flow.",
         );
       }
       throw postCreateAuthError;
@@ -262,8 +317,8 @@ export async function authenticateOrSignUpTelegramUser(telegramUser, intent = 'l
         telegramUserId,
         error: error.message,
         errorName: error.name,
-        stack: error.stack
-      }
+        stack: error.stack,
+      },
     );
     throw error;
   }
@@ -277,9 +332,7 @@ export async function authenticateOrSignUpTelegramUser(telegramUser, intent = 'l
  */
 export async function linkTelegramAccount(telegramUser) {
   if (!telegramUser || !telegramUser.id) {
-    throw new Error('Invalid Telegram user data');
+    throw new Error("Invalid Telegram user data");
   }
-  return linkSocialAccount('telegram', String(telegramUser.id));
+  return linkSocialAccount("telegram", String(telegramUser.id));
 }
-
-

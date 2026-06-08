@@ -1,6 +1,6 @@
 import FlowHandler from "@/services/flow-system/FlowHandler.js";
 import { flowRegistry } from "@/services/flow-system/flowRegistry.js";
-import { log } from "@/utils/common/logHandler.js";
+import { log } from "@/infrastructure/logging/logHandler.js";
 import {
   assessCircuit,
   resolveCircuitConfig,

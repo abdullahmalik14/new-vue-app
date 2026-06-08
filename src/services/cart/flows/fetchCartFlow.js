@@ -1,12 +1,16 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
-import { getHttpStatus, getEtag, isApiNotModified } from "@/services/flow-system/runtime/httpMetaRuntime.js";
+import {
+  getHttpStatus,
+  getEtag,
+  isApiNotModified,
+} from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { getCartApiBaseUrl, asFlowError } from "../cartApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 /**
  * Flow to fetch the current user's cart including items and summary.
  * Implements ETag support for efficient polling.
- * 
+ *
  * @param {Object} params
  * @param {Object} params.payload - Input parameters (sessionId, userId, etc.)
  * @param {Object} params.context - Pipeline context (headers, signal, etc.)
@@ -14,17 +18,20 @@ import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowR
  */
 export async function fetchCartFlow({ payload, context, api }) {
   const baseUrl = getCartApiBaseUrl(context);
-  const sessionId = payload?.sessionId || localStorage.getItem("sessionId") || "guest";
+  const sessionId =
+    payload?.sessionId || localStorage.getItem("sessionId") || "guest";
   const endpoint = `${baseUrl}/cart/${sessionId}`;
 
   try {
     const response = await api.get(endpoint, {
-      ...buildFlowRequestOptions(context) });
+      ...buildFlowRequestOptions(context),
+    });
 
     if (response?.ok === false) {
       return fail({
         code: "FETCH_CART_FAILED",
-        message: response?.error || "Failed to fetch cart. Please try again later.",
+        message:
+          response?.error || "Failed to fetch cart. Please try again later.",
         details: response,
       });
     }
@@ -35,7 +42,7 @@ export async function fetchCartFlow({ payload, context, api }) {
 
     // If 304, the pipeline runtime (readPipeline.js) handles merging from cache if configured.
     // For manual handling, you'd extract cached data here if needed.
-    
+
     return ok(
       {
         items: response?.items || [],
@@ -53,13 +60,13 @@ export async function fetchCartFlow({ payload, context, api }) {
         etag,
         notModified,
         fetchedAt: Date.now(),
-      }
+      },
     );
   } catch (error) {
     return asFlowError(
       error,
       "FETCH_CART_UNEXPECTED",
-      "An unexpected error occurred while fetching your cart."
+      "An unexpected error occurred while fetching your cart.",
     );
   }
 }

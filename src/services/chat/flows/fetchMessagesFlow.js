@@ -26,7 +26,10 @@ export async function fetchMessagesFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.get(url, { ...buildFlowRequestOptions(context), params: query  });
+    const response = await api.get(url, {
+      ...buildFlowRequestOptions(context),
+      params: query,
+    });
 
     const status = getHttpStatus(response, 200);
     if (response?.ok === false) {

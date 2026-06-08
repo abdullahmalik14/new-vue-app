@@ -1,6 +1,14 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
-import { getHttpStatus, getEtag, isApiNotModified } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getEventsApiBaseUrl, asFlowError, toNumberOr } from "@/services/events/eventsApiUtils.js";
+import {
+  getHttpStatus,
+  getEtag,
+  isApiNotModified,
+} from "@/services/flow-system/runtime/httpMetaRuntime.js";
+import {
+  getEventsApiBaseUrl,
+  asFlowError,
+  toNumberOr,
+} from "@/services/events/eventsApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function buildParams(payload = {}) {
@@ -25,7 +33,8 @@ export async function fetchCreatorEventsFlow({ payload, context, api }) {
 
   try {
     const response = await api.get(`${baseUrl}/events`, {
-      ...buildFlowRequestOptions(context), params: buildParams(payload),
+      ...buildFlowRequestOptions(context),
+      params: buildParams(payload),
     });
 
     const status = getHttpStatus(response, 200);
@@ -39,7 +48,7 @@ export async function fetchCreatorEventsFlow({ payload, context, api }) {
           status,
           notModified: true,
           etag,
-        }
+        },
       );
     }
 
@@ -67,13 +76,13 @@ export async function fetchCreatorEventsFlow({ payload, context, api }) {
         flow: "events.fetchCreatorEvents",
         status,
         etag,
-      }
+      },
     );
   } catch (error) {
     return asFlowError(
       error,
       "FETCH_CREATOR_EVENTS_UNEXPECTED",
-      "Unexpected error while fetching creator events."
+      "Unexpected error while fetching creator events.",
     );
   }
 }

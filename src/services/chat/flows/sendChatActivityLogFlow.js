@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getChatApiBaseUrl, asFlowError } from "@/services/chat/chatApiUtils.js";
+import {
+  getChatApiBaseUrl,
+  asFlowError,
+} from "@/services/chat/chatApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function sendChatActivityLogFlow({ payload, context, api }) {
@@ -8,10 +11,16 @@ export async function sendChatActivityLogFlow({ payload, context, api }) {
   const { chatId, senderId, text, meta } = payload;
 
   if (!chatId) {
-    return fail({ code: "SEND_ACTIVITY_LOG_MISSING_CHAT_ID", message: "chatId is required." });
+    return fail({
+      code: "SEND_ACTIVITY_LOG_MISSING_CHAT_ID",
+      message: "chatId is required.",
+    });
   }
   if (!text) {
-    return fail({ code: "SEND_ACTIVITY_LOG_MISSING_TEXT", message: "text is required." });
+    return fail({
+      code: "SEND_ACTIVITY_LOG_MISSING_TEXT",
+      message: "text is required.",
+    });
   }
 
   try {
@@ -30,8 +39,11 @@ export async function sendChatActivityLogFlow({ payload, context, api }) {
 
     if (response?.ok === false) {
       return fail(
-        { code: "SEND_ACTIVITY_LOG_FAILED", message: response?.error || "Failed to send activity log." },
-        { flow: "chat.sendChatActivityLog", status }
+        {
+          code: "SEND_ACTIVITY_LOG_FAILED",
+          message: response?.error || "Failed to send activity log.",
+        },
+        { flow: "chat.sendChatActivityLog", status },
       );
     }
 

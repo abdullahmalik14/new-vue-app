@@ -2,7 +2,7 @@ import { apiConfig } from './apiConfig.js';
 import MockApi from './MockApi.js';
 import mockApiConfig from './mockApi.config.js';
 import { APIHandler } from './apiHandler.js'; // Import APIHandler directly
-import PerfTracker from '../../utils/common/performanceTracker.js';
+import PerfTracker from '../../infrastructure/logging/performanceTracker.js';
 
 const inFlightHttpRequests = new Map();
 

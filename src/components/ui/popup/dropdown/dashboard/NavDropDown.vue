@@ -52,7 +52,7 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 
 import { menuItems, resolveMenuItemsWithAssets } from "@/assets/data/menuItems.js";
-import { getI18nInstance } from "@/utils/translation/i18nInstance.js";
+import { getI18nInstance } from "@/systems/i18n/i18nInstance.js";
 
 const resolvedMenuItems = ref([]);
 

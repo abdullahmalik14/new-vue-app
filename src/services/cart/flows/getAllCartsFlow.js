@@ -5,7 +5,7 @@ import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowR
 /**
  * getAllCartsFlow
  * Retrieves all carts associated with a user ID.
- * 
+ *
  * @param {Object} payload
  * @param {string} payload.userId - The authenticated user ID.
  * @param {number} payload.limit - Pagination limit (default: 100).
@@ -23,8 +23,8 @@ export const getAllCartsFlow = async (payload) => {
   // Business Logic: Pagination limit (Audit 2.8)
   const safeLimit = Math.min(Math.max(limit, 1), 1000);
 
-  const response = await api.get(`/api/carts/user/${userId}`, { 
-    params: { limit: safeLimit } 
+  const response = await api.get(`/api/carts/user/${userId}`, {
+    params: { limit: safeLimit },
   });
 
   if (!response.ok) {

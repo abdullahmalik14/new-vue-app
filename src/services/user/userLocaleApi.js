@@ -1,6 +1,6 @@
 import apiWrapper from '@/lib/mock-api-demo/apiWrapper.js';
-import { log } from '@/utils/common/logHandler.js';
-import { SUPPORTED_LOCALES } from '@/utils/translation/localeManager.js';
+import { log } from '@/infrastructure/logging/logHandler.js';
+import { SUPPORTED_LOCALES } from '@/systems/i18n/localeManager.js';
 
 const PROFILE_ENDPOINT = '/users/me';
 const MOCK_PROFILE_STORAGE_KEY = 'mock_users_me_profile';

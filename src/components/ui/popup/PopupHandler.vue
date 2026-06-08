@@ -83,7 +83,7 @@ A single, reusable Vue 3 SFC that handles BOTH centered popups and slide-ins.
  */
 
 import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { usePopupStack } from '../../../utils/usePopupStack.js';
+import { usePopupStack } from '../../../composables/usePopupStack.js';
 
 const props = defineProps({
   /**

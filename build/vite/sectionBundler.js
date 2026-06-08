@@ -10,9 +10,9 @@ import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { loadJsonConfigSync } from '../../src/utils/common/jsonConfigLoaderNode.js';
-import { validateRouteConfig } from '../../src/utils/build/jsonConfigValidator.js';
-import { isRouteAccessibleInCurrentEnvironment } from '../../src/utils/route/routeEnvAccess.js';
-import { validateRouteComponentPathsOnDisk } from '../../src/utils/route/routeComponentPathValidator.node.js';
+import { validateRouteConfig } from '../../src/systems/build/jsonConfigValidator.js';
+import { isRouteAccessibleInCurrentEnvironment } from '../../src/systems/routing/routeEnvAccess.js';
+import { validateRouteComponentPathsOnDisk } from '../../src/systems/routing/routeComponentPathValidator.node.js';
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);

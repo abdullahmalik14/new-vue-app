@@ -8,17 +8,22 @@ import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowR
  */
 export async function applyFeesFlow({ payload, context, api }) {
   const baseUrl = getCartApiBaseUrl(context);
-  const sessionId = payload?.sessionId || localStorage.getItem("sessionId") || "guest";
+  const sessionId =
+    payload?.sessionId || localStorage.getItem("sessionId") || "guest";
   const { fees } = payload || {};
 
-  if (!fees || typeof fees !== 'object') {
+  if (!fees || typeof fees !== "object") {
     return fail({ code: "INVALID_FEES", message: "Fees object is required" });
   }
 
   const url = `${baseUrl}/cart/${sessionId}/fees`;
 
   try {
-    const response = await api.post(url, fees, buildFlowRequestOptions(context));
+    const response = await api.post(
+      url,
+      fees,
+      buildFlowRequestOptions(context),
+    );
 
     if (response?.ok === false) {
       return fail({

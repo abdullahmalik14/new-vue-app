@@ -1,5 +1,8 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
-import { getRentalApiBaseUrl, asFlowError } from "@/services/rental/rentalApiUtils.js";
+import {
+  getRentalApiBaseUrl,
+  asFlowError,
+} from "@/services/rental/rentalApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function createRentalReservationFlow({ payload, context, api }) {
@@ -7,10 +10,15 @@ export async function createRentalReservationFlow({ payload, context, api }) {
   const headers = context.requestHeaders || {};
 
   try {
-    const response = await api.post(`${baseUrl}/rentals/reservations`, payload, buildFlowRequestOptions(context));
+    const response = await api.post(
+      `${baseUrl}/rentals/reservations`,
+      payload,
+      buildFlowRequestOptions(context),
+    );
 
     const reservationIdRaw = response?.reservationId || response?.id || null;
-    const reservationId = reservationIdRaw == null ? null : String(reservationIdRaw);
+    const reservationId =
+      reservationIdRaw == null ? null : String(reservationIdRaw);
     if (!reservationId) {
       return fail({
         code: "CREATE_RENTAL_RESERVATION_FAILED",
@@ -23,20 +31,22 @@ export async function createRentalReservationFlow({ payload, context, api }) {
       {
         reservationId,
         status: response?.status || "pending",
-        amountTokens: Number(response?.amountTokens || payload?.amountTokens || 0),
+        amountTokens: Number(
+          response?.amountTokens || payload?.amountTokens || 0,
+        ),
         paymentReference: response?.paymentReference || null,
         holdExpiresAt: response?.holdExpiresAt || null,
       },
       {
         flow: "rental.createReservation",
         status: "success",
-      }
+      },
     );
   } catch (error) {
     return asFlowError(
       error,
       "CREATE_RENTAL_RESERVATION_UNEXPECTED",
-      "Unexpected error while creating rental reservation."
+      "Unexpected error while creating rental reservation.",
     );
   }
 }

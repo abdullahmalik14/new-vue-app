@@ -69,7 +69,7 @@
 
 **Pattern Applied**:
 ```javascript
-import { log } from '../common/logHandler.js';
+import { log } from '../../infrastructure/logging/logHandler.js';
 import PerfTracker from '../common/performanceTracker.js';
 
 const perfTracker = new PerfTracker('moduleName', {

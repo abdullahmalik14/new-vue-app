@@ -1,13 +1,18 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getBookingsApiBaseUrl, asFlowError } from "@/services/bookings/bookingsApiUtils.js";
+import {
+  getBookingsApiBaseUrl,
+  asFlowError,
+} from "@/services/bookings/bookingsApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function updateBookingFlow({ payload, context, api }) {
   const baseUrl = getBookingsApiBaseUrl(context);
   const headers = context.requestHeaders || {};
   const bookingId = payload?.bookingId ? String(payload.bookingId).trim() : "";
-  const actionType = payload?.actionType ? String(payload.actionType).trim().toLowerCase() : "";
+  const actionType = payload?.actionType
+    ? String(payload.actionType).trim().toLowerCase()
+    : "";
 
   if (!bookingId) {
     return fail({
@@ -25,11 +30,7 @@ export async function updateBookingFlow({ payload, context, api }) {
     });
   }
 
-  const {
-    bookingId: _bookingId,
-    addons,
-    ...requestBody
-  } = payload || {};
+  const { bookingId: _bookingId, addons, ...requestBody } = payload || {};
 
   if (requestBody.requestedAddOns === undefined && addons !== undefined) {
     requestBody.requestedAddOns = addons;
@@ -47,7 +48,8 @@ export async function updateBookingFlow({ payload, context, api }) {
     if (response?.ok === false) {
       return fail({
         code: "BOOKING_UPDATE_FAILED",
-        message: response?.message || response?.error || "Could not update booking.",
+        message:
+          response?.message || response?.error || "Could not update booking.",
         details: response,
       });
     }

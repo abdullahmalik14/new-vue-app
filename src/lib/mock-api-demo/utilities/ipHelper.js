@@ -1,5 +1,5 @@
 import { useIpStore } from '@/stores/ipStore.js';
-import PerfTracker from '@/utils/common/performanceTracker.js';
+import PerfTracker from '@/infrastructure/logging/performanceTracker.js';
 
 /**
  * IP Address Utility

@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getEventsApiBaseUrl, asFlowError } from "@/services/events/eventsApiUtils.js";
+import {
+  getEventsApiBaseUrl,
+  asFlowError,
+} from "@/services/events/eventsApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function fetchEventFlow({ payload, context, api }) {
@@ -13,7 +16,10 @@ export async function fetchEventFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.get(`${baseUrl}/events/${eventId}`, buildFlowRequestOptions(context));
+    const response = await api.get(
+      `${baseUrl}/events/${eventId}`,
+      buildFlowRequestOptions(context),
+    );
 
     const status = getHttpStatus(response, 200);
 
@@ -27,9 +33,13 @@ export async function fetchEventFlow({ payload, context, api }) {
 
     return ok(
       { item: response?.item || null },
-      { flow: "events.fetchEvent", status }
+      { flow: "events.fetchEvent", status },
     );
   } catch (error) {
-    return asFlowError(error, "FETCH_EVENT_UNEXPECTED", "Unexpected error while fetching event.");
+    return asFlowError(
+      error,
+      "FETCH_EVENT_UNEXPECTED",
+      "Unexpected error while fetching event.",
+    );
   }
 }

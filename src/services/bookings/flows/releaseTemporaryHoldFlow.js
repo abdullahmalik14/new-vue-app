@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getBookingsApiBaseUrl, asFlowError } from "@/services/bookings/bookingsApiUtils.js";
+import {
+  getBookingsApiBaseUrl,
+  asFlowError,
+} from "@/services/bookings/bookingsApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function releaseTemporaryHoldFlow({ payload, context, api }) {
@@ -17,14 +20,20 @@ export async function releaseTemporaryHoldFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.delete(`${baseUrl}/temporary-holds/${temporaryHoldId}`, buildFlowRequestOptions(context));
+    const response = await api.delete(
+      `${baseUrl}/temporary-holds/${temporaryHoldId}`,
+      buildFlowRequestOptions(context),
+    );
 
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {
       return fail({
         code: "RELEASE_TEMPORARY_HOLD_FAILED",
-        message: response?.message || response?.error || "Failed to release temporary hold.",
+        message:
+          response?.message ||
+          response?.error ||
+          "Failed to release temporary hold.",
         details: response,
       });
     }

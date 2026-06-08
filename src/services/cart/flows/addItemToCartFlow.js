@@ -4,13 +4,14 @@ import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowR
 
 /**
  * Flow to add an item to the shopping cart.
- * 
+ *
  * @param {Object} params
  * @param {Object} params.payload - Input parameters (productId, quantity, etc.)
  */
 export async function addItemToCartFlow({ payload, context, api }) {
   const baseUrl = getCartApiBaseUrl(context);
-  const sessionId = payload?.sessionId || localStorage.getItem("sessionId") || "guest";
+  const sessionId =
+    payload?.sessionId || localStorage.getItem("sessionId") || "guest";
   const url = `${baseUrl}/cart/${sessionId}/items`;
 
   // Validation: Check for required fields
@@ -26,13 +27,18 @@ export async function addItemToCartFlow({ payload, context, api }) {
   const vendorId = payload?.vendorId || "admin";
 
   try {
-    const response = await api.post(url, {
-      productId: payload.productId,
-      quantity: payload.quantity || 1,
-      type: payload.type || "standard",
-      vendor: vendorId,
-    }, {
-      ...buildFlowRequestOptions(context) });
+    const response = await api.post(
+      url,
+      {
+        productId: payload.productId,
+        quantity: payload.quantity || 1,
+        type: payload.type || "standard",
+        vendor: vendorId,
+      },
+      {
+        ...buildFlowRequestOptions(context),
+      },
+    );
 
     if (response?.ok === false) {
       return fail({
@@ -51,13 +57,13 @@ export async function addItemToCartFlow({ payload, context, api }) {
         flow: "cart.addItem",
         status: response?.status || 200,
         addedAt: Date.now(),
-      }
+      },
     );
   } catch (error) {
     return asFlowError(
       error,
       "ADD_ITEM_UNEXPECTED",
-      "An unexpected error occurred while adding the item."
+      "An unexpected error occurred while adding the item.",
     );
   }
 }

@@ -4,7 +4,10 @@ import { asFlowError } from "@/services/chat/chatApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function getWpBaseUrl() {
-  if (typeof import.meta !== "undefined" && import.meta.env?.VITE_WEB_BASE_URL) {
+  if (
+    typeof import.meta !== "undefined" &&
+    import.meta.env?.VITE_WEB_BASE_URL
+  ) {
     return import.meta.env.VITE_WEB_BASE_URL;
   }
   return "";
@@ -14,7 +17,10 @@ export async function fetchGroupUserIdsFlow({ payload, context, api }) {
   const { creatorId, section, tierId } = payload || {};
 
   if (!creatorId || !section) {
-    return fail({ code: "FETCH_GROUP_USER_IDS_MISSING_FIELDS", message: "creatorId and section are required." });
+    return fail({
+      code: "FETCH_GROUP_USER_IDS_MISSING_FIELDS",
+      message: "creatorId and section are required.",
+    });
   }
 
   const baseUrl = getWpBaseUrl();
@@ -32,13 +38,23 @@ export async function fetchGroupUserIdsFlow({ payload, context, api }) {
 
     if (response?.ok === false) {
       return fail(
-        { code: "FETCH_GROUP_USER_IDS_FAILED", message: response?.error || "Failed to fetch group user IDs." },
-        { flow: "chat.fetchGroupUserIds", status }
+        {
+          code: "FETCH_GROUP_USER_IDS_FAILED",
+          message: response?.error || "Failed to fetch group user IDs.",
+        },
+        { flow: "chat.fetchGroupUserIds", status },
       );
     }
 
-    return ok({ userIds: response?.user_ids || [] }, { flow: "chat.fetchGroupUserIds", status });
+    return ok(
+      { userIds: response?.user_ids || [] },
+      { flow: "chat.fetchGroupUserIds", status },
+    );
   } catch (error) {
-    return asFlowError(error, "FETCH_GROUP_USER_IDS_UNEXPECTED", "An unexpected error occurred while fetching group user IDs.");
+    return asFlowError(
+      error,
+      "FETCH_GROUP_USER_IDS_UNEXPECTED",
+      "An unexpected error occurred while fetching group user IDs.",
+    );
   }
 }

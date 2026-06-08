@@ -24,7 +24,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { AuthWrapper } from '@/templates/auth/Auth.js';
-import { log } from '@/utils/common/logHandler.js';
+import { log } from '@/infrastructure/logging/logHandler.js';
 
 const route = useRoute();
 const isProcessing = ref(true);

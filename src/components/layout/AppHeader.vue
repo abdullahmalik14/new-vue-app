@@ -33,7 +33,7 @@
 
 <script setup>
 import { onMounted, onUnmounted } from 'vue';
-import { log } from '../../utils/common/logHandler.js';
+import { log } from '../../infrastructure/logging/logHandler.js';
 import LanguageSwitcher from '../ui/nav/language/LanguageSwitcher.vue';
 
 // Component name for logging

@@ -225,8 +225,8 @@ export const menuItems = [
  * @returns {Promise<Array>} - Menu items with resolved image URLs and translated titles
  */
 export async function resolveMenuItemsWithAssets(items = menuItems, userRole = null) {
-  const { getAssetUrls } = await import("@/utils/assets/assetLibrary.js");
-  const { getI18nInstance } = await import("@/utils/translation/i18nInstance.js");
+  const { getAssetUrls } = await import("@/systems/assets/assetLibrary.js");
+  const { getI18nInstance } = await import("@/systems/i18n/i18nInstance.js");
 
   const isAssetFlagCandidate = (value) => {
     if (typeof value !== "string") {

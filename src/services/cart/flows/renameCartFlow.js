@@ -9,7 +9,8 @@ import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowR
  */
 export async function renameCartFlow({ payload, context, api }) {
   const baseUrl = getCartApiBaseUrl(context);
-  const sessionId = payload?.sessionId || localStorage.getItem("sessionId") || "guest";
+  const sessionId =
+    payload?.sessionId || localStorage.getItem("sessionId") || "guest";
   const label = SafeUtils.ensureString(payload?.label);
 
   // Security: Input length limit (Audit 2.4 / 3.21)
@@ -30,7 +31,11 @@ export async function renameCartFlow({ payload, context, api }) {
   const url = `${baseUrl}/cart/${sessionId}/label`;
 
   try {
-    const response = await api.patch(url, { label }, buildFlowRequestOptions(context));
+    const response = await api.patch(
+      url,
+      { label },
+      buildFlowRequestOptions(context),
+    );
 
     if (response?.ok === false) {
       return fail({
@@ -41,6 +46,10 @@ export async function renameCartFlow({ payload, context, api }) {
 
     return ok(response, { flow: "cart.rename", label });
   } catch (error) {
-    return asFlowError(error, "RENAME_UNEXPECTED", "An unexpected error occurred.");
+    return asFlowError(
+      error,
+      "RENAME_UNEXPECTED",
+      "An unexpected error occurred.",
+    );
   }
 }

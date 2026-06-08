@@ -167,8 +167,8 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { getUserData, saveTelegramToken, postTelegramMessage } from '@/utils/backend/scyllaDbClient';
-import { log } from '@/utils/common/logHandler';
+import { getUserData, saveTelegramToken, postTelegramMessage } from '@/infrastructure/backend/scyllaDbClient';
+import { log } from '@/infrastructure/logging/logHandler';
 
 // Auth store
 const authStore = useAuthStore();

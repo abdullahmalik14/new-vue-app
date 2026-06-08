@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getBookingsApiBaseUrl, asFlowError } from "@/services/bookings/bookingsApiUtils.js";
+import {
+  getBookingsApiBaseUrl,
+  asFlowError,
+} from "@/services/bookings/bookingsApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function fetchBookingFlow({ payload, context, api }) {
@@ -16,8 +19,12 @@ export async function fetchBookingFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.get(`${baseUrl}/bookings/${encodeURIComponent(bookingId)}`, {
-      ...buildFlowRequestOptions(context) });
+    const response = await api.get(
+      `${baseUrl}/bookings/${encodeURIComponent(bookingId)}`,
+      {
+        ...buildFlowRequestOptions(context),
+      },
+    );
 
     const status = getHttpStatus(response, 200);
 
@@ -31,9 +38,13 @@ export async function fetchBookingFlow({ payload, context, api }) {
 
     return ok(
       { item: response?.item || response || null },
-      { flow: "bookings.fetchBooking", status }
+      { flow: "bookings.fetchBooking", status },
     );
   } catch (error) {
-    return asFlowError(error, "FETCH_BOOKING_UNEXPECTED", "Unexpected error while fetching booking.");
+    return asFlowError(
+      error,
+      "FETCH_BOOKING_UNEXPECTED",
+      "Unexpected error while fetching booking.",
+    );
   }
 }

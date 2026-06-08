@@ -52,7 +52,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { useRoute } from "vue-router";
 import { AuthWrapper } from "@/templates/auth/Auth.js";
-import { log } from "@/utils/common/logHandler.js";
+import { log } from "@/infrastructure/logging/logHandler.js";
 import Heading from "@/components/default/Heading.vue";
 import Paragraph from "@/components/default/Paragraph.vue";
 import { ExclamationCircleIcon } from "@heroicons/vue/24/solid";

@@ -85,8 +85,8 @@ import { linkTwitterAccount } from "@/utils/auth/twitterCognitoHandler.js";
 import { linkTelegramAccount } from "@/utils/auth/telegramCognitoHandler.js";
 import { initiateTwitterLogin } from "@/utils/auth/socialAuthHandler.js";
 import { initiateTelegramLogin } from "@/utils/auth/telegramAuthHandler.js";
-import { getAssetUrl } from "@/utils/assets/assetLibrary";
-import { linkSocialAccount as scyllaLink, unlinkSocialAccount as scyllaUnlink, checkUserExists } from "@/utils/backend/scyllaDbClient.js";
+import { getAssetUrl } from "@/systems/assets/assetLibrary";
+import { linkSocialAccount as scyllaLink, unlinkSocialAccount as scyllaUnlink, checkUserExists } from "@/infrastructure/backend/scyllaDbClient.js";
 
 const isLoading = ref(false);
 const isLoadingAttributes = ref(true);

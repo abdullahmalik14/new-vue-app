@@ -54,7 +54,7 @@ import {
   resetLocaleToDefault,
   extractLocaleSelection,
   SUPPORTED_LOCALES,
-} from '@/utils/translation';
+} from '@/systems/i18n';
 
 const emit = defineEmits(['locale-changed', 'locale-change-error']);
 

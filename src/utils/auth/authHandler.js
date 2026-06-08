@@ -2,7 +2,7 @@
 
 import { awsCognitoHandler } from './awsCognitoHandler';
 import { authHandlerDev } from './authHandlerDev';
-import { log } from '../common/logHandler';
+import { log } from '@/infrastructure/logging/logHandler';
 /**
  * @file authHandler.js
  * @description Authentication handler factory with runtime toggle

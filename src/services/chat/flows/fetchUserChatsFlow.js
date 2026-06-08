@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getChatApiBaseUrl, asFlowError } from "@/services/chat/chatApiUtils.js";
+import {
+  getChatApiBaseUrl,
+  asFlowError,
+} from "@/services/chat/chatApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function fetchUserChatsFlow({ payload, context, api }) {
@@ -27,8 +30,11 @@ export async function fetchUserChatsFlow({ payload, context, api }) {
 
     if (response?.ok === false) {
       return fail(
-        { code: "FETCH_USER_CHATS_FAILED", message: response?.error || "Failed to fetch chats." },
-        { flow: "chat.fetchUserChats", status }
+        {
+          code: "FETCH_USER_CHATS_FAILED",
+          message: response?.error || "Failed to fetch chats.",
+        },
+        { flow: "chat.fetchUserChats", status },
       );
     }
 
@@ -38,10 +44,19 @@ export async function fetchUserChatsFlow({ payload, context, api }) {
     }));
 
     return ok(
-      { items, userId, nextCursor: response?.nextCursor ?? null, append: !!cursor },
-      { flow: "chat.fetchUserChats", status }
+      {
+        items,
+        userId,
+        nextCursor: response?.nextCursor ?? null,
+        append: !!cursor,
+      },
+      { flow: "chat.fetchUserChats", status },
     );
   } catch (error) {
-    return asFlowError(error, "FETCH_USER_CHATS_UNEXPECTED", "An unexpected error occurred while fetching chats.");
+    return asFlowError(
+      error,
+      "FETCH_USER_CHATS_UNEXPECTED",
+      "An unexpected error occurred while fetching chats.",
+    );
   }
 }

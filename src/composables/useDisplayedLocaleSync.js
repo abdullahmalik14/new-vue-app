@@ -3,7 +3,7 @@ import { useRoute } from 'vue-router';
 import {
   getDisplayedLocale,
   SUPPORTED_LOCALES,
-} from '@/utils/translation/localeManager.js';
+} from '@/systems/i18n/localeManager.js';
 
 /**
  * Keep a locale switcher ref aligned with URL + in-memory active locale.

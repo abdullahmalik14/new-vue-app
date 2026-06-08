@@ -7,7 +7,8 @@ import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowR
  */
 export async function removeItemFromCartFlow({ payload, context, api }) {
   const baseUrl = getCartApiBaseUrl(context);
-  const sessionId = payload?.sessionId || localStorage.getItem("sessionId") || "guest";
+  const sessionId =
+    payload?.sessionId || localStorage.getItem("sessionId") || "guest";
   const url = `${baseUrl}/cart/${sessionId}/items/${payload.productId}`;
 
   if (payload?.productId == null || payload?.productId === "") {
@@ -19,7 +20,8 @@ export async function removeItemFromCartFlow({ payload, context, api }) {
 
   try {
     const response = await api.delete(url, {
-      ...buildFlowRequestOptions(context) });
+      ...buildFlowRequestOptions(context),
+    });
 
     if (response?.ok === false) {
       return fail({
@@ -38,13 +40,13 @@ export async function removeItemFromCartFlow({ payload, context, api }) {
         flow: "cart.removeItem",
         status: response?.status || 200,
         removedAt: Date.now(),
-      }
+      },
     );
   } catch (error) {
     return asFlowError(
       error,
       "REMOVE_ITEM_UNEXPECTED",
-      "An unexpected error occurred while removing the item."
+      "An unexpected error occurred while removing the item.",
     );
   }
 }

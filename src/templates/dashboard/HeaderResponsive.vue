@@ -91,11 +91,11 @@ import NavDropdown from "@/components/ui/popup/dropdown/dashboard/NavDropDown.vu
 import { ref, onMounted } from "vue";
 import NotificationPopup from "@/components/ui/popup/NotificationPopup.vue";
 import AvatarProfilePopup from "@/components/ui/popup/AvatarProfilePopup.vue";
-import { getAssetUrl } from "@/utils/assets/assetLibrary.js";
+import { getAssetUrl } from "@/systems/assets/assetLibrary.js";
 import {
   getSharedComponentAssetMapping,
   groupComponentSlotsByPreloadTier,
-} from "@/utils/assets/resolveSharedComponentAssets.js";
+} from "@/systems/assets/resolveSharedComponentAssets.js";
 
 const isNavOpen = ref(false);
 const isNotificationOpen = ref(false);

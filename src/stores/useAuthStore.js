@@ -3,13 +3,13 @@
 import { defineStore } from 'pinia';
 import { jwtDecode } from 'jwt-decode';
 import { authHandler } from '../utils/auth/authHandler';
-import { log } from '../utils/common/logHandler';
+import { log } from '../infrastructure/logging/logHandler';
 import FlowHandler from '@/services/flow-system/FlowHandler.js';
 import flowRefreshManager from '@/services/flow-system/flowRefreshManager.js';
 import {
   getPreferredLocaleFromTokenClaims,
   normalizePreferredLocaleCode,
-} from '../utils/translation/cognitoLocaleProfile.js';
+} from '../systems/i18n/cognitoLocaleProfile.js';
 /**
  * @file useAuthStore.js
  * @description Pinia store for authentication state management
@@ -184,7 +184,7 @@ export const useAuthStore = defineStore('auth', {
           }
         });
 
-        void import('../utils/translation/userLocaleProfile.js').then(({ applyUserPreferredLocaleOnAuth }) =>
+        void import('../systems/i18n/userLocaleProfile.js').then(({ applyUserPreferredLocaleOnAuth }) =>
           applyUserPreferredLocaleOnAuth()
         );
 

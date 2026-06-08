@@ -8,7 +8,7 @@
 
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { validateI18n } from '../src/utils/translation/validateI18n.js';
+import { validateI18n } from '../src/systems/i18n/validateI18n.js';
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 

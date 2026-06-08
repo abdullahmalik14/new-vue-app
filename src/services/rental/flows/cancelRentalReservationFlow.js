@@ -1,5 +1,8 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
-import { getRentalApiBaseUrl, asFlowError } from "@/services/rental/rentalApiUtils.js";
+import {
+  getRentalApiBaseUrl,
+  asFlowError,
+} from "@/services/rental/rentalApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function cancelRentalReservationFlow({ payload, context, api }) {
@@ -19,7 +22,7 @@ export async function cancelRentalReservationFlow({ payload, context, api }) {
       {
         reason: payload.reason || "user_cancelled",
       },
-      buildFlowRequestOptions(context)
+      buildFlowRequestOptions(context),
     );
 
     if (!response?.ok) {
@@ -39,13 +42,13 @@ export async function cancelRentalReservationFlow({ payload, context, api }) {
       {
         flow: "rental.cancelReservation",
         status: "success",
-      }
+      },
     );
   } catch (error) {
     return asFlowError(
       error,
       "CANCEL_RENTAL_RESERVATION_UNEXPECTED",
-      "Unexpected error while cancelling rental reservation."
+      "Unexpected error while cancelling rental reservation.",
     );
   }
 }

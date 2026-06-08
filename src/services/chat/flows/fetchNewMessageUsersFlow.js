@@ -4,7 +4,10 @@ import { asFlowError } from "@/services/chat/chatApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function getWpBaseUrl() {
-  if (typeof import.meta !== "undefined" && import.meta.env?.VITE_WEB_BASE_URL) {
+  if (
+    typeof import.meta !== "undefined" &&
+    import.meta.env?.VITE_WEB_BASE_URL
+  ) {
     return import.meta.env.VITE_WEB_BASE_URL;
   }
   return "";
@@ -14,7 +17,10 @@ export async function fetchNewMessageUsersFlow({ payload, context, api }) {
   const { creatorId, search, section, page, perPage } = payload || {};
 
   if (!creatorId) {
-    return fail({ code: "FETCH_NEW_MESSAGE_USERS_MISSING_CREATOR", message: "creatorId is required." });
+    return fail({
+      code: "FETCH_NEW_MESSAGE_USERS_MISSING_CREATOR",
+      message: "creatorId is required.",
+    });
   }
 
   const baseUrl = getWpBaseUrl();
@@ -35,13 +41,20 @@ export async function fetchNewMessageUsersFlow({ payload, context, api }) {
 
     if (response?.ok === false) {
       return fail(
-        { code: "FETCH_NEW_MESSAGE_USERS_FAILED", message: response?.error || "Failed to fetch new message users." },
-        { flow: "chat.fetchNewMessageUsers", status }
+        {
+          code: "FETCH_NEW_MESSAGE_USERS_FAILED",
+          message: response?.error || "Failed to fetch new message users.",
+        },
+        { flow: "chat.fetchNewMessageUsers", status },
       );
     }
 
     return ok(response, { flow: "chat.fetchNewMessageUsers", status });
   } catch (error) {
-    return asFlowError(error, "FETCH_NEW_MESSAGE_USERS_UNEXPECTED", "An unexpected error occurred while fetching new message users.");
+    return asFlowError(
+      error,
+      "FETCH_NEW_MESSAGE_USERS_UNEXPECTED",
+      "An unexpected error occurred while fetching new message users.",
+    );
   }
 }

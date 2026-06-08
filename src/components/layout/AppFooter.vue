@@ -51,12 +51,12 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../../stores/useAuthStore.js';
-import { log } from '../../utils/common/logHandler.js';
-import { logError } from '../../utils/common/errorHandler.js';
+import { log } from '../../infrastructure/logging/logHandler.js';
+import { logError } from '../../infrastructure/errors/errorHandler.js';
 import routeConfigImport from '../../router/routeConfig.json';
 import { loadJsonConfigFromImport } from '../../utils/common/jsonConfigLoader.js';
-import { validateRouteConfig } from '../../utils/build/jsonConfigValidator.js';
-import { createRoutePrefetchIntentHandler } from '../../utils/route/useRoutePrefetch.js';
+import { validateRouteConfig } from '../../systems/build/jsonConfigValidator.js';
+import { createRoutePrefetchIntentHandler } from '../../systems/routing/useRoutePrefetch.js';
 
 // Component name for logging
 const componentName = 'AppFooter';

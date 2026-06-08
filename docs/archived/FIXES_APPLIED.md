@@ -106,8 +106,8 @@
 
 **Pattern Used**:
 ```javascript
-import { log } from '../common/logHandler.js';
-import PerfTracker from '../common/performanceTracker.js';
+import { log } from '../../infrastructure/logging/logHandler.js';
+import PerfTracker from '../../infrastructure/performance/performanceTracker.js';
 
 const perfTracker = new PerfTracker('moduleName', {
   enabled: import.meta.env.VITE_ENABLE_LOGGER === 'true'

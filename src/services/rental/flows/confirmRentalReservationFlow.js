@@ -1,5 +1,8 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
-import { getRentalApiBaseUrl, asFlowError } from "@/services/rental/rentalApiUtils.js";
+import {
+  getRentalApiBaseUrl,
+  asFlowError,
+} from "@/services/rental/rentalApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function confirmRentalReservationFlow({ payload, context, api }) {
@@ -17,7 +20,7 @@ export async function confirmRentalReservationFlow({ payload, context, api }) {
     const response = await api.post(
       `${baseUrl}/rentals/reservations/${payload.reservationId}/confirm`,
       payload,
-      buildFlowRequestOptions(context)
+      buildFlowRequestOptions(context),
     );
 
     if (!response?.ok || !response?.reservationId) {
@@ -38,13 +41,13 @@ export async function confirmRentalReservationFlow({ payload, context, api }) {
       {
         flow: "rental.confirmReservation",
         status: "success",
-      }
+      },
     );
   } catch (error) {
     return asFlowError(
       error,
       "CONFIRM_RENTAL_RESERVATION_UNEXPECTED",
-      "Unexpected error while confirming rental reservation."
+      "Unexpected error while confirming rental reservation.",
     );
   }
 }

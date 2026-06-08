@@ -29,7 +29,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getAssetUrlForCss } from '@/utils/assets/assetLibrary'
+import { getAssetUrlForCss } from '@/systems/assets/assetLibrary'
 import AuthHeader from './AuthHeader.vue'
 import AuthFooter from './AuthFooter.vue'
 

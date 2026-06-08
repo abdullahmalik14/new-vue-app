@@ -20,7 +20,11 @@ export async function mergeGuestCartFlow({ payload, context, api }) {
   const url = `${baseUrl}/cart/merge`;
 
   try {
-    const response = await api.post(url, { sessionId: guestSessionId, userId }, buildFlowRequestOptions(context));
+    const response = await api.post(
+      url,
+      { sessionId: guestSessionId, userId },
+      buildFlowRequestOptions(context),
+    );
 
     if (response?.ok === false) {
       return fail({

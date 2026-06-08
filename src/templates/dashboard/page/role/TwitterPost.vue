@@ -142,9 +142,9 @@
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { getTwitterTokens, saveTwitterTokens, postTwitterMessage } from '@/utils/backend/scyllaDbClient';
+import { getTwitterTokens, saveTwitterTokens, postTwitterMessage } from '@/infrastructure/backend/scyllaDbClient';
 import { initiateTwitterLogin, exchangeTwitterCodeForTokens } from '@/utils/auth/socialAuthHandler';
-import { log } from '@/utils/common/logHandler';
+import { log } from '@/infrastructure/logging/logHandler';
 
 // Auth store
 const authStore = useAuthStore();

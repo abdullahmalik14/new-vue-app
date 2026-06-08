@@ -17,11 +17,11 @@ import {
   markGuardRedirectNavigation,
   consumeGuardRedirectNavigation,
   shouldClearGuardLoopHistoryAfterNavigation
-} from '../utils/route/index.js';
-import { isRouteAccessibleInCurrentEnvironment } from '../utils/route/routeEnvAccess.js';
-import { log } from '../utils/common/logHandler.js';
-import { trackStep } from '../utils/common/performanceTrackerAccess.js';
-import { logError, reportApplicationError } from '../utils/common/errorHandler.js';
+} from '../systems/routing/index.js';
+import { isRouteAccessibleInCurrentEnvironment } from '../systems/routing/routeEnvAccess.js';
+import { log } from '../infrastructure/logging/logHandler.js';
+import { trackStep } from '../infrastructure/logging/performanceTrackerAccess.js';
+import { logError, reportApplicationError } from '../infrastructure/errors/errorHandler.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
 import { usePreloadStore } from '../stores/usePreloadStore.js';
 import {
@@ -35,33 +35,33 @@ import {
   resolveLocaleForUrlInjection,
   getLeadingLocaleFromPath,
   stripLeadingLocaleFromPath,
-} from '../utils/translation/localeManager.js';
-import { resolveRoleSectionVariant } from '../utils/section/sectionResolver.js';
-import { preloadSection } from '../utils/section/sectionPreloader.js';
-import { preloadSectionCriticalImages } from '../utils/assets/assetPreloader.js';
+} from '../systems/i18n/localeManager.js';
+import { resolveRoleSectionVariant } from '../systems/sections/sectionResolver.js';
+import { preloadSection } from '../systems/sections/sectionPreloader.js';
+import { preloadSectionCriticalImages } from '../systems/assets/assetPreloader.js';
 import {
   getRoutePreloadPlan,
   resolveEffectiveRouteConfig,
   startBackgroundSectionPreloads
-} from '../utils/section/sectionPreloadOrchestrator.js';
-import { loadNotFoundComponent } from '../utils/route/notFoundComponentLoader.js';
-import { findComponentLoader } from '../utils/route/routeComponentLoader.js';
+} from '../systems/sections/sectionPreloadOrchestrator.js';
+import { loadNotFoundComponent } from '../systems/routing/notFoundComponentLoader.js';
+import { findComponentLoader } from '../systems/routing/routeComponentLoader.js';
 import {
   isChunkLoadNavigationError,
   recoverFromChunkLoadError,
-} from '../utils/route/navigationErrorHandler.js';
-import { resolveRouterScrollPosition } from '../utils/route/scrollBehavior.js';
+} from '../systems/routing/navigationErrorHandler.js';
+import { resolveRouterScrollPosition } from '../systems/routing/scrollBehavior.js';
 import {
   startNavigationProgress,
   finishNavigationProgress,
   failNavigationProgress,
-} from '../utils/route/navigationProgress.js';
+} from '../systems/routing/navigationProgress.js';
 import {
   buildVueRouterAliases,
   createRedirectFromRouteRecords,
-} from '../utils/route/routeAliases.js';
-import { startCurrentSectionResourceLoads, resolveCurrentSectionForNavigation } from '../utils/route/routeNavigationData.js';
-import { syncHreflangTagsForPath, clearHreflangTags } from '../utils/translation/hreflangTags.js';
+} from '../systems/routing/routeAliases.js';
+import { startCurrentSectionResourceLoads, resolveCurrentSectionForNavigation } from '../systems/routing/routeNavigationData.js';
+import { syncHreflangTagsForPath, clearHreflangTags } from '../systems/i18n/hreflangTags.js';
 
 const DEFAULT_LOCALE = 'en';
 
@@ -746,4 +746,4 @@ export {
   prefetchRouteComponent,
   createRoutePrefetchIntentHandler,
   prefetchSectionAssetsForRoute,
-} from '../utils/route/index.js';
+} from '../systems/routing/index.js';

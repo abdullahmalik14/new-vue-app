@@ -44,13 +44,13 @@
 <script setup>
 import { computed, onErrorCaptured, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { log } from '@/utils/common/logHandler.js';
-import { reportApplicationError } from '@/utils/common/errorHandler.js';
-import { getDefaultDashboardSlug } from '@/utils/route/routeDefaults.js';
+import { log } from '@/infrastructure/logging/logHandler.js';
+import { reportApplicationError } from '@/infrastructure/errors/errorHandler.js';
+import { getDefaultDashboardSlug } from '@/systems/routing/routeDefaults.js';
 import {
   createRouteRenderError,
   shouldClearRouteErrorOnNavigation,
-} from '@/utils/route/routeErrorBoundary.js';
+} from '@/systems/routing/routeErrorBoundary.js';
 
 const props = defineProps({
   routeKey: {

@@ -9,7 +9,8 @@ import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowR
  */
 export async function applyCouponFlow({ payload, context, api }) {
   const baseUrl = getCartApiBaseUrl(context);
-  const sessionId = payload?.sessionId || localStorage.getItem("sessionId") || "guest";
+  const sessionId =
+    payload?.sessionId || localStorage.getItem("sessionId") || "guest";
   const couponCode = SafeUtils.ensureString(payload?.couponCode);
 
   if (!couponCode) {
@@ -19,7 +20,11 @@ export async function applyCouponFlow({ payload, context, api }) {
   const url = `${baseUrl}/cart/${sessionId}/coupons`;
 
   try {
-    const response = await api.post(url, { couponCode }, buildFlowRequestOptions(context));
+    const response = await api.post(
+      url,
+      { couponCode },
+      buildFlowRequestOptions(context),
+    );
 
     if (response?.ok === false) {
       return fail({

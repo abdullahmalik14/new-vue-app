@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getBookingsApiBaseUrl, asFlowError } from "@/services/bookings/bookingsApiUtils.js";
+import {
+  getBookingsApiBaseUrl,
+  asFlowError,
+} from "@/services/bookings/bookingsApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function createTemporaryHoldFlow({ payload, context, api }) {
@@ -19,14 +22,21 @@ export async function createTemporaryHoldFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.post(`${baseUrl}/temporary-holds`, payload, buildFlowRequestOptions(context));
+    const response = await api.post(
+      `${baseUrl}/temporary-holds`,
+      payload,
+      buildFlowRequestOptions(context),
+    );
 
     const status = getHttpStatus(response, 201);
 
     if (response?.ok === false) {
       return fail({
         code: "CREATE_TEMPORARY_HOLD_FAILED",
-        message: response?.message || response?.error || "Failed to create temporary hold.",
+        message:
+          response?.message ||
+          response?.error ||
+          "Failed to create temporary hold.",
         details: response,
       });
     }
@@ -34,9 +44,11 @@ export async function createTemporaryHoldFlow({ payload, context, api }) {
     const temporaryHold = response?.temporaryHold || response?.item || null;
     return ok(
       {
-        temporaryHoldId: response?.temporaryHoldId || temporaryHold?.temporaryHoldId || null,
+        temporaryHoldId:
+          response?.temporaryHoldId || temporaryHold?.temporaryHoldId || null,
         expiresAt: response?.expiresAt || temporaryHold?.expiresAt || null,
-        guestHoldToken: response?.guestHoldToken || temporaryHold?.guestHoldToken || null,
+        guestHoldToken:
+          response?.guestHoldToken || temporaryHold?.guestHoldToken || null,
         temporaryHold,
       },
       {

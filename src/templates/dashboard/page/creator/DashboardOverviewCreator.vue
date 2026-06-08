@@ -19,8 +19,8 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import DashboardWrapperTwoColContainer from '@/components/dashboard/DashboardWrapperTwoColContainer.vue';
-import AssetHandler from '@/utils/assets/assetsHandlerNew.js';
-import { loadAssetsForSection } from '@/utils/assets/assetLibrary.js';
+import AssetHandler from '@/systems/assets/assetsHandlerNew.js';
+import { loadAssetsForSection } from '@/systems/assets/assetLibrary.js';
 
 const ASSET_DEPENDENCIES = ['dashboard-metrics-lib'];
 

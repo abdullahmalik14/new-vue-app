@@ -1,5 +1,5 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { getAssetUrl } from '../utils/assets/assetLibrary.js';
+import { getAssetUrl } from '../systems/assets/assetLibrary.js';
 
 /**
  * Reactive asset URL resolver (M-08).

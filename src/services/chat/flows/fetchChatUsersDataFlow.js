@@ -4,7 +4,10 @@ import { asFlowError } from "@/services/chat/chatApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function getWpBaseUrl() {
-  if (typeof import.meta !== "undefined" && import.meta.env?.VITE_WEB_BASE_URL) {
+  if (
+    typeof import.meta !== "undefined" &&
+    import.meta.env?.VITE_WEB_BASE_URL
+  ) {
     return import.meta.env.VITE_WEB_BASE_URL;
   }
   return "";
@@ -14,7 +17,10 @@ export async function fetchChatUsersDataFlow({ payload, context, api }) {
   const { userIds } = payload;
 
   if (!Array.isArray(userIds) || userIds.length === 0) {
-    return fail({ code: "FETCH_CHAT_USERS_MISSING_IDS", message: "userIds array is required." });
+    return fail({
+      code: "FETCH_CHAT_USERS_MISSING_IDS",
+      message: "userIds array is required.",
+    });
   }
 
   const baseUrl = getWpBaseUrl();
@@ -30,14 +36,21 @@ export async function fetchChatUsersDataFlow({ payload, context, api }) {
 
     if (response?.ok === false) {
       return fail(
-        { code: "FETCH_CHAT_USERS_FAILED", message: response?.error || "Failed to fetch user data." },
-        { flow: "chat.fetchChatUsersData", status }
+        {
+          code: "FETCH_CHAT_USERS_FAILED",
+          message: response?.error || "Failed to fetch user data.",
+        },
+        { flow: "chat.fetchChatUsersData", status },
       );
     }
 
     const users = response?.users || {};
     return ok({ users }, { flow: "chat.fetchChatUsersData", status });
   } catch (error) {
-    return asFlowError(error, "FETCH_CHAT_USERS_UNEXPECTED", "An unexpected error occurred while fetching chat user data.");
+    return asFlowError(
+      error,
+      "FETCH_CHAT_USERS_UNEXPECTED",
+      "An unexpected error occurred while fetching chat user data.",
+    );
   }
 }

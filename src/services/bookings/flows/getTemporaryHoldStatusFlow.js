@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getBookingsApiBaseUrl, asFlowError } from "@/services/bookings/bookingsApiUtils.js";
+import {
+  getBookingsApiBaseUrl,
+  asFlowError,
+} from "@/services/bookings/bookingsApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function getTemporaryHoldStatusFlow({ payload, context, api }) {
@@ -17,14 +20,20 @@ export async function getTemporaryHoldStatusFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.get(`${baseUrl}/temporary-holds/${temporaryHoldId}`, buildFlowRequestOptions(context));
+    const response = await api.get(
+      `${baseUrl}/temporary-holds/${temporaryHoldId}`,
+      buildFlowRequestOptions(context),
+    );
 
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {
       return fail({
         code: "GET_TEMPORARY_HOLD_STATUS_FAILED",
-        message: response?.message || response?.error || "Failed to fetch temporary hold status.",
+        message:
+          response?.message ||
+          response?.error ||
+          "Failed to fetch temporary hold status.",
         details: response,
       });
     }

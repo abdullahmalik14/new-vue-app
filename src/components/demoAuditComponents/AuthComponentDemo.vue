@@ -308,7 +308,7 @@ import {
   InformationCircleIcon,
   CheckCircleIcon,
 } from '@heroicons/vue/24/outline';
-import { getAssetUrl } from '@/utils/assets/assetLibrary'
+import { getAssetUrl } from '@/systems/assets/assetLibrary'
 
 const bgUrl = ref('')
 

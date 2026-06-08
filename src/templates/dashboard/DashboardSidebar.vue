@@ -219,8 +219,8 @@ import { menuItems, resolveMenuItemsWithAssets } from "../../assets/data/menuIte
 import PopupHandler from "@/components/ui/popup/PopupHandler.vue";
 import AvatarProfilePopup from "@/components/ui/popup/AvatarProfilePopup.vue";
 import NotificationPopup from "@/components/ui/popup/NotificationPopup.vue";
-import { getI18nInstance } from "@/utils/translation/i18nInstance.js";
-import { createRoutePrefetchIntentHandler } from "@/utils/route/useRoutePrefetch.js";
+import { getI18nInstance } from "@/systems/i18n/i18nInstance.js";
+import { createRoutePrefetchIntentHandler } from "@/systems/routing/useRoutePrefetch.js";
 
 import { useAuthStore } from "@/stores/useAuthStore";
 export default {
@@ -429,7 +429,7 @@ export default {
       return this.$route.path.startsWith(item.route);
     },
     async loadAssetWithRetry(flag, maxRetries = 2) {
-      const { getAssetUrl } = await import("@/utils/assets/assetLibrary.js");
+      const { getAssetUrl } = await import("@/systems/assets/assetLibrary.js");
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
           const url = await getAssetUrl(flag);
@@ -465,7 +465,7 @@ export default {
     },
     async loadAllAssets() {
       try {
-        const { resolveSharedComponentAssets } = await import('@/utils/assets/resolveSharedComponentAssets.js');
+        const { resolveSharedComponentAssets } = await import('@/systems/assets/resolveSharedComponentAssets.js');
         this.assets = {
           logo: null,
           avatar: null,

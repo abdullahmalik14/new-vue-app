@@ -1,7 +1,7 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
 import { asFlowError } from "@/services/chat/chatApiUtils.js";
-import { buildWpApiUrl } from "@/utils/wpApiBaseUrl.js";
+import { buildWpApiUrl } from "@/infrastructure/http/wpApiBaseUrl.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 import {
   normalizeProductForChat,
@@ -34,7 +34,11 @@ function endpointForProduct(product = {}) {
   return null;
 }
 
-export async function fetchProductRecommendationStatusFlow({ payload, context, api }) {
+export async function fetchProductRecommendationStatusFlow({
+  payload,
+  context,
+  api,
+}) {
   const product = normalizeProductForChat(payload?.product || payload);
   if (!product) {
     return fail({
@@ -70,22 +74,25 @@ export async function fetchProductRecommendationStatusFlow({ payload, context, a
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {
-      return fail({
-        code: "FETCH_PRODUCT_RECOMMENDATION_STATUS_FAILED",
-        message: response?.error || "Failed to check product access.",
-        details: response,
-      }, { flow: "chat.fetchProductRecommendationStatus", status });
+      return fail(
+        {
+          code: "FETCH_PRODUCT_RECOMMENDATION_STATUS_FAILED",
+          message: response?.error || "Failed to check product access.",
+          details: response,
+        },
+        { flow: "chat.fetchProductRecommendationStatus", status },
+      );
     }
 
-    return ok(
-      normalizeProductRecommendationStatus({ product, response }),
-      { flow: "chat.fetchProductRecommendationStatus", status }
-    );
+    return ok(normalizeProductRecommendationStatus({ product, response }), {
+      flow: "chat.fetchProductRecommendationStatus",
+      status,
+    });
   } catch (error) {
     return asFlowError(
       error,
       "FETCH_PRODUCT_RECOMMENDATION_STATUS_UNEXPECTED",
-      "Unexpected error while checking product access."
+      "Unexpected error while checking product access.",
     );
   }
 }

@@ -1,4 +1,4 @@
-import { log } from "@/utils/common/logHandler.js";
+import { log } from "@/infrastructure/logging/logHandler.js";
 
 export function runWithAbortAndTimeout(promiseFactory, { signal, timeoutMs } = {}) {
   if (signal?.aborted) {

@@ -1,6 +1,14 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
-import { getHttpStatus, getEtag, isApiNotModified } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getBookingsApiBaseUrl, asFlowError, toNumber } from "@/services/bookings/bookingsApiUtils.js";
+import {
+  getHttpStatus,
+  getEtag,
+  isApiNotModified,
+} from "@/services/flow-system/runtime/httpMetaRuntime.js";
+import {
+  getBookingsApiBaseUrl,
+  asFlowError,
+  toNumber,
+} from "@/services/bookings/bookingsApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function buildEventsParams(payload = {}) {
@@ -31,9 +39,10 @@ function buildBookedSlotParams(payload = {}, { includeEventId = false } = {}) {
 
 function shouldUseFanBookedSlotsEndpoint(payload = {}) {
   const fanId = toNumber(payload.fanId, null);
-  const userRole = typeof payload.userRole === "string"
-    ? payload.userRole.trim().toLowerCase()
-    : "";
+  const userRole =
+    typeof payload.userRole === "string"
+      ? payload.userRole.trim().toLowerCase()
+      : "";
 
   return userRole === "fan" && fanId != null;
 }
@@ -57,7 +66,11 @@ function readCachedRawEvents(context) {
   return Array.isArray(cached) ? cached : [];
 }
 
-function resolveCombinedStatus(eventsStatus, eventsNotModified, bookedSlotsResponse) {
+function resolveCombinedStatus(
+  eventsStatus,
+  eventsNotModified,
+  bookedSlotsResponse,
+) {
   return eventsNotModified
     ? getHttpStatus(bookedSlotsResponse, 200)
     : eventsStatus;
@@ -69,7 +82,11 @@ function shouldFetchFirstTimeDiscountStatus(payload = {}) {
   return creatorId != null && fanId != null && fanId > 0;
 }
 
-export async function fetchCreatorBookingContextFlow({ payload, context, api }) {
+export async function fetchCreatorBookingContextFlow({
+  payload,
+  context,
+  api,
+}) {
   const baseUrl = getBookingsApiBaseUrl(context);
   const headers = context.requestHeaders || {};
 
@@ -83,7 +100,8 @@ export async function fetchCreatorBookingContextFlow({ payload, context, api }) 
   try {
     // Required order: events first, then booked slots.
     const eventsResponse = await api.get(`${baseUrl}/events`, {
-      ...buildFlowRequestOptions(context), params: buildEventsParams(payload),
+      ...buildFlowRequestOptions(context),
+      params: buildEventsParams(payload),
     });
 
     const eventsStatus = getHttpStatus(eventsResponse, 200);
@@ -100,24 +118,32 @@ export async function fetchCreatorBookingContextFlow({ payload, context, api }) 
     const eventsNotModified = isApiNotModified(eventsResponse);
     const rawEvents = eventsNotModified
       ? readCachedRawEvents(context)
-      : (Array.isArray(eventsResponse?.items) ? eventsResponse.items : []);
+      : Array.isArray(eventsResponse?.items)
+        ? eventsResponse.items
+        : [];
 
-    const bookedSlotsResponse = await api.get(resolveBookedSlotsEndpoint(baseUrl, payload), {
-      ...buildFlowRequestOptions(context),
-      params: buildBookedSlotParams(payload, {
-        includeEventId: !shouldUseFanBookedSlotsEndpoint(payload),
-      }),
-    });
+    const bookedSlotsResponse = await api.get(
+      resolveBookedSlotsEndpoint(baseUrl, payload),
+      {
+        ...buildFlowRequestOptions(context),
+        params: buildBookedSlotParams(payload, {
+          includeEventId: !shouldUseFanBookedSlotsEndpoint(payload),
+        }),
+      },
+    );
 
     if (bookedSlotsResponse?.ok === false) {
       return fail({
         code: "FETCH_CREATOR_BOOKED_SLOTS_FAILED",
-        message: bookedSlotsResponse?.error || "Failed to fetch creator booked slots.",
+        message:
+          bookedSlotsResponse?.error || "Failed to fetch creator booked slots.",
         details: bookedSlotsResponse,
       });
     }
 
-    const bookedSlots = Array.isArray(bookedSlotsResponse?.slots) ? bookedSlotsResponse.slots : [];
+    const bookedSlots = Array.isArray(bookedSlotsResponse?.slots)
+      ? bookedSlotsResponse.slots
+      : [];
     let isFirstBookingForCreator = null;
 
     const creatorId = toNumber(payload.creatorId, null);
@@ -133,12 +159,16 @@ export async function fetchCreatorBookingContextFlow({ payload, context, api }) 
       if (eligibilityResponse?.ok === false) {
         return fail({
           code: "FETCH_FIRST_TIME_DISCOUNT_STATUS_FAILED",
-          message: eligibilityResponse?.error || "Failed to fetch first-time discount status.",
+          message:
+            eligibilityResponse?.error ||
+            "Failed to fetch first-time discount status.",
           details: eligibilityResponse,
         });
       }
 
-      isFirstBookingForCreator = Boolean(eligibilityResponse?.isFirstBookingForCreator);
+      isFirstBookingForCreator = Boolean(
+        eligibilityResponse?.isFirstBookingForCreator,
+      );
     }
 
     return ok(
@@ -150,17 +180,21 @@ export async function fetchCreatorBookingContextFlow({ payload, context, api }) 
       },
       {
         flow: "bookings.fetchCreatorBookingContext",
-        status: resolveCombinedStatus(eventsStatus, eventsNotModified, bookedSlotsResponse),
+        status: resolveCombinedStatus(
+          eventsStatus,
+          eventsNotModified,
+          bookedSlotsResponse,
+        ),
         etag,
         eventsNotModified,
         fetchedAt: Date.now(),
-      }
+      },
     );
   } catch (error) {
     return asFlowError(
       error,
       "FETCH_CREATOR_BOOKING_CONTEXT_UNEXPECTED",
-      "Unexpected error while loading booking context."
+      "Unexpected error while loading booking context.",
     );
   }
 }

@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getBookingsApiBaseUrl, asFlowError } from "@/services/bookings/bookingsApiUtils.js";
+import {
+  getBookingsApiBaseUrl,
+  asFlowError,
+} from "@/services/bookings/bookingsApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function updateTemporaryHoldUserFlow({ payload, context, api }) {
@@ -29,13 +32,18 @@ export async function updateTemporaryHoldUserFlow({ payload, context, api }) {
     if (response?.ok === false) {
       return fail({
         code: "UPDATE_TEMPORARY_HOLD_USER_FAILED",
-        message: response?.message || response?.error || "Failed to update temporary hold user.",
+        message:
+          response?.message ||
+          response?.error ||
+          "Failed to update temporary hold user.",
         details: response,
       });
     }
 
-    return ok({ temporaryHoldId, userId: response?.userId || userId || null }, { flow: "bookings.updateTemporaryHoldUser", status });
-
+    return ok(
+      { temporaryHoldId, userId: response?.userId || userId || null },
+      { flow: "bookings.updateTemporaryHoldUser", status },
+    );
   } catch (error) {
     return asFlowError(
       error,

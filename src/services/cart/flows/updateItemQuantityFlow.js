@@ -7,7 +7,8 @@ import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowR
  */
 export async function updateItemQuantityFlow({ payload, context, api }) {
   const baseUrl = getCartApiBaseUrl(context);
-  const sessionId = payload?.sessionId || localStorage.getItem("sessionId") || "guest";
+  const sessionId =
+    payload?.sessionId || localStorage.getItem("sessionId") || "guest";
   const url = `${baseUrl}/cart/${sessionId}/items/${payload.productId}/quantity`;
 
   if (payload?.productId == null || payload?.productId === "") {
@@ -26,10 +27,15 @@ export async function updateItemQuantityFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.patch(url, {
-      quantity: quantity,
-    }, {
-      ...buildFlowRequestOptions(context) });
+    const response = await api.patch(
+      url,
+      {
+        quantity: quantity,
+      },
+      {
+        ...buildFlowRequestOptions(context),
+      },
+    );
 
     if (response?.ok === false) {
       return fail({
@@ -48,13 +54,13 @@ export async function updateItemQuantityFlow({ payload, context, api }) {
         flow: "cart.updateQuantity",
         status: response?.status || 200,
         updatedAt: Date.now(),
-      }
+      },
     );
   } catch (error) {
     return asFlowError(
       error,
       "UPDATE_QUANTITY_UNEXPECTED",
-      "An unexpected error occurred while updating the quantity."
+      "An unexpected error occurred while updating the quantity.",
     );
   }
 }

@@ -5,7 +5,7 @@
  * This is the single source of truth for build-time behavior alongside routeConfig.json
  */
 
-import { log } from '../src/utils/common/logHandler.js';
+import { log } from '../src/infrastructure/logging/logHandler.js';
 
 /**
  * Sections that should ALWAYS be preloaded (eagerly bundled)

@@ -29,7 +29,7 @@
 <script>
 import { ref } from 'vue';
 import CountryStateSelect from '@/components/ui/form/select/CountryStateSelect.vue';
-import { log } from '@/utils/common/logHandler';
+import { log } from '@/infrastructure/logging/logHandler';
 
 export default {
   name: 'CountryStateDemo',

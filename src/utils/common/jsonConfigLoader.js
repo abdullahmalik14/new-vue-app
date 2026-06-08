@@ -6,9 +6,9 @@
  * All operations tracked with global window.performanceTracker.
  */
 
-import { getValueFromCache, removeFromCache, setValueWithExpiration } from './cacheHandler.js';
-import { log } from './logHandler.js';
-import { logError } from './errorHandler.js';
+import { getValueFromCache, removeFromCache, setValueWithExpiration } from '../../infrastructure/cache/cacheHandler.js';
+import { log } from '../../infrastructure/logging/logHandler.js';
+import { logError } from '../../infrastructure/errors/errorHandler.js';
 
 // Cache configuration
 const JSON_CONFIG_CACHE_KEY_PREFIX = 'json_config_';

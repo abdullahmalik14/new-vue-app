@@ -20,7 +20,7 @@ import {
 } from "@/services/flow-system/runtime/etagRuntime.js";
 import { applyDestinations } from "@/services/flow-system/runtime/destinationRuntime.js";
 import { scheduleBackgroundRevalidateOnce } from "@/services/flow-system/utils/backgroundRevalidate.js";
-import { log } from "@/utils/common/logHandler.js";
+import { log } from "@/infrastructure/logging/logHandler.js";
 import {
   resolveReadFromConfig,
   readConfiguredSourceSnapshots,

@@ -35,7 +35,7 @@ import {
   getLocaleSwitcherOptions,
   translateCurrentPageTemporarily,
   SUPPORTED_LOCALES,
-} from '@/utils/translation';
+} from '@/systems/i18n';
 
 const localeOptions = getLocaleSwitcherOptions();
 const route = useRoute();

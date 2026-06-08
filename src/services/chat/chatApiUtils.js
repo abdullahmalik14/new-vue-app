@@ -4,7 +4,11 @@ export { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowR
 
 function getFallbackBaseUrl() {
   // If Vite env isn't defined, default to local backend
-  if (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_SCYLLADB_API_URL) {
+  if (
+    typeof import.meta !== "undefined" &&
+    import.meta.env &&
+    import.meta.env.VITE_SCYLLADB_API_URL
+  ) {
     return import.meta.env.VITE_SCYLLADB_API_URL;
   }
   return "http://localhost:3001";
@@ -39,7 +43,11 @@ export function buildChatApiUrl(baseUrl, ...segments) {
   return path ? `${base}/${path}` : base;
 }
 
-export function asFlowError(error, defaultCode = "CHAT_API_ERROR", defaultMessage = "A chat API error occurred.") {
+export function asFlowError(
+  error,
+  defaultCode = "CHAT_API_ERROR",
+  defaultMessage = "A chat API error occurred.",
+) {
   const norm = normalizeUnknownError(error);
   return fail({
     code: norm.error?.code || defaultCode,

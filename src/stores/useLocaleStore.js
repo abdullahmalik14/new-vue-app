@@ -1,8 +1,8 @@
 // vueApp-main-new/src/stores/useLocaleStore.js
 
 import { defineStore } from 'pinia';
-import { log } from '../utils/common/logHandler';
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '../utils/translation/localeConstants.js';
+import { log } from '../infrastructure/logging/logHandler';
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '../systems/i18n/localeConstants.js';
 import {
   attachStorageQuotaMonitor,
   buildPersistKey,

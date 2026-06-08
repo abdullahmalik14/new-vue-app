@@ -1,4 +1,4 @@
-import { getAppBuildHash } from '../build/appBuildHash.js';
+import { getAppBuildHash } from '../../systems/build/appBuildHash.js';
 
 const DEFAULT_PERSIST_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 const DEFAULT_STORAGE_WARN_RATIO = 0.8;

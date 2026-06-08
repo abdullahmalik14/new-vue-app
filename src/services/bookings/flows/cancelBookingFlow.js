@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getBookingsApiBaseUrl, asFlowError } from "@/services/bookings/bookingsApiUtils.js";
+import {
+  getBookingsApiBaseUrl,
+  asFlowError,
+} from "@/services/bookings/bookingsApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function cancelBookingFlow({ payload, context, api }) {
@@ -23,7 +26,8 @@ export async function cancelBookingFlow({ payload, context, api }) {
         actor: payload?.actor || "creator",
         reason: payload?.reason || "",
         waiveFees: !!payload?.waiveFees,
-        args: payload?.args && typeof payload.args === "object" ? payload.args : {},
+        args:
+          payload?.args && typeof payload.args === "object" ? payload.args : {},
       },
       buildFlowRequestOptions(context),
     );
@@ -40,7 +44,8 @@ export async function cancelBookingFlow({ payload, context, api }) {
 
     return ok(
       {
-        bookingId: response?.bookingId || response?.item?.bookingId || bookingId,
+        bookingId:
+          response?.bookingId || response?.item?.bookingId || bookingId,
         item: response?.item || null,
         reverse: response?.reverse || null,
       },

@@ -93,11 +93,11 @@
 import { ref, onMounted, watch, computed, onBeforeUnmount, inject } from "vue";
 import { RouterLink, useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { getActiveLocale } from "@/utils/translation/localeManager.js";
+import { getActiveLocale } from "@/systems/i18n/localeManager.js";
 import { authHandler, getCurrentAuthMode } from "@/utils/auth/authHandler";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { getAssetUrl } from "@/utils/assets/assetLibrary";
-import { createAssetHandler } from "@/utils/assets/assetHandlerFactory.js";
+import { getAssetUrl } from "@/systems/assets/assetLibrary";
+import { createAssetHandler } from "@/systems/assets/assetHandlerFactory.js";
 import { interactionsEngine } from "@/utils/validation/interactionsEngine.js";
 import {
   InformationCircleIcon,

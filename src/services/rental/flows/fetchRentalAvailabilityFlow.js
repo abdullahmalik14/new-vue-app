@@ -1,6 +1,13 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
-import { getHttpStatus, getEtag, isApiNotModified } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getRentalApiBaseUrl, asFlowError } from "@/services/rental/rentalApiUtils.js";
+import {
+  getHttpStatus,
+  getEtag,
+  isApiNotModified,
+} from "@/services/flow-system/runtime/httpMetaRuntime.js";
+import {
+  getRentalApiBaseUrl,
+  asFlowError,
+} from "@/services/rental/rentalApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 function buildParams(payload = {}) {
@@ -30,9 +37,13 @@ export async function fetchRentalAvailabilityFlow({ payload, context, api }) {
   }
 
   try {
-    const response = await api.get(`${baseUrl}/rentals/catalog/${payload.rentalId}/availability`, {
-      ...buildFlowRequestOptions(context), params: buildParams(payload),
-    });
+    const response = await api.get(
+      `${baseUrl}/rentals/catalog/${payload.rentalId}/availability`,
+      {
+        ...buildFlowRequestOptions(context),
+        params: buildParams(payload),
+      },
+    );
 
     const status = getHttpStatus(response, 200);
     const etag = getEtag(response);
@@ -52,7 +63,7 @@ export async function fetchRentalAvailabilityFlow({ payload, context, api }) {
           status,
           notModified: true,
           etag,
-        }
+        },
       );
     }
 
@@ -70,20 +81,24 @@ export async function fetchRentalAvailabilityFlow({ payload, context, api }) {
         date: response?.date || payload.date,
         timezone: response?.timezone || payload.timezone || null,
         slots: Array.isArray(response?.slots) ? response.slots : [],
-        blockedSlots: Array.isArray(response?.blockedSlots) ? response.blockedSlots : [],
-        bookedSlots: Array.isArray(response?.bookedSlots) ? response.bookedSlots : [],
+        blockedSlots: Array.isArray(response?.blockedSlots)
+          ? response.blockedSlots
+          : [],
+        bookedSlots: Array.isArray(response?.bookedSlots)
+          ? response.bookedSlots
+          : [],
       },
       {
         flow: "rental.fetchAvailability",
         status,
         etag,
-      }
+      },
     );
   } catch (error) {
     return asFlowError(
       error,
       "FETCH_RENTAL_AVAILABILITY_UNEXPECTED",
-      "Unexpected error while fetching rental availability."
+      "Unexpected error while fetching rental availability.",
     );
   }
 }

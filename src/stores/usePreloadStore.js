@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { log } from '../utils/common/logHandler.js';
-import { syncPreloadStoreBuildHash } from '../utils/build/appBuildHash.js';
+import { log } from '../infrastructure/logging/logHandler.js';
+import { syncPreloadStoreBuildHash } from '../systems/build/appBuildHash.js';
 import {
   attachStorageQuotaMonitor,
   buildPersistKey,

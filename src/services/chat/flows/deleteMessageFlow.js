@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getChatApiBaseUrl, asFlowError } from "@/services/chat/chatApiUtils.js";
+import {
+  getChatApiBaseUrl,
+  asFlowError,
+} from "@/services/chat/chatApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function deleteMessageFlow({ payload, context, api }) {
@@ -8,15 +11,27 @@ export async function deleteMessageFlow({ payload, context, api }) {
   const { chatId, messageId } = payload;
 
   if (!chatId || !messageId) {
-    return fail({ code: "DELETE_MESSAGE_MISSING_FIELDS", message: "chatId and messageId are required." });
+    return fail({
+      code: "DELETE_MESSAGE_MISSING_FIELDS",
+      message: "chatId and messageId are required.",
+    });
   }
 
   try {
-    const response = await api.delete(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}`, buildFlowRequestOptions(context));
+    const response = await api.delete(
+      `${baseUrl}/chats/${encodeURIComponent(chatId)}/messages/${encodeURIComponent(messageId)}`,
+      buildFlowRequestOptions(context),
+    );
     const status = getHttpStatus(response, 200);
 
     if (response?.ok === false) {
-      return fail({ code: "DELETE_MESSAGE_FAILED", message: response?.error || "Failed to delete message." }, { flow: "chat.deleteMessage", status });
+      return fail(
+        {
+          code: "DELETE_MESSAGE_FAILED",
+          message: response?.error || "Failed to delete message.",
+        },
+        { flow: "chat.deleteMessage", status },
+      );
     }
 
     return ok({}, { flow: "chat.deleteMessage", status });

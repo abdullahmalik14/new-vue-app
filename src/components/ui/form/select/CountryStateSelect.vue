@@ -43,8 +43,8 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue';
-import { preloadJSON } from '@/utils/assets/assetPreloader';
-import { log } from '@/utils/common/logHandler';
+import { preloadJSON } from '@/systems/assets/assetPreloader';
+import { log } from '@/infrastructure/logging/logHandler';
 
 export default {
   name: 'CountryStateSelect',

@@ -1,6 +1,9 @@
 import { fail, ok } from "@/services/flow-system/flowTypes.js";
 import { getHttpStatus } from "@/services/flow-system/runtime/httpMetaRuntime.js";
-import { getChatApiBaseUrl, asFlowError } from "@/services/chat/chatApiUtils.js";
+import {
+  getChatApiBaseUrl,
+  asFlowError,
+} from "@/services/chat/chatApiUtils.js";
 import { buildFlowRequestOptions } from "@/services/flow-system/utils/buildFlowRequestOptions.js";
 
 export async function sendMessageFlow({ payload, context, api }) {
@@ -9,28 +12,41 @@ export async function sendMessageFlow({ payload, context, api }) {
   const { chatId, type, ...restPayload } = payload;
 
   if (!chatId) {
-    return fail({ code: "SEND_MESSAGE_MISSING_CHAT_ID", message: "chatId is required." });
+    return fail({
+      code: "SEND_MESSAGE_MISSING_CHAT_ID",
+      message: "chatId is required.",
+    });
   }
 
   const messagePayload = {
     ...restPayload,
-    contentType: type || "text"
+    contentType: type || "text",
   };
 
   try {
-    const response = await api.post(`${baseUrl}/chats/${encodeURIComponent(chatId)}/messages`, messagePayload, buildFlowRequestOptions(context));
-    
+    const response = await api.post(
+      `${baseUrl}/chats/${encodeURIComponent(chatId)}/messages`,
+      messagePayload,
+      buildFlowRequestOptions(context),
+    );
+
     const status = getHttpStatus(response, 201);
     if (response?.ok === false) {
-      return fail({ code: "SEND_MESSAGE_FAILED", message: response?.error || "Failed to send message" }, { flow: "chat.sendMessage", status });
+      return fail(
+        {
+          code: "SEND_MESSAGE_FAILED",
+          message: response?.error || "Failed to send message",
+        },
+        { flow: "chat.sendMessage", status },
+      );
     }
-    
+
     const raw = response?.item || {};
     const item = {
       ...raw,
       senderId: raw.sender_id,
-      text: raw.content?.text ?? raw.text ?? '',
-      status: 'sent',
+      text: raw.content?.text ?? raw.text ?? "",
+      status: "sent",
     };
 
     return ok({ item, chatId }, { flow: "chat.sendMessage", status });

@@ -15,7 +15,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getAssetUrl } from '@/utils/assets/assetLibrary';
+import { getAssetUrl } from '@/systems/assets/assetLibrary';
 
 const globeIcon = ref('');
 const logoUrl = ref('');
