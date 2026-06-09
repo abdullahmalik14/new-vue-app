@@ -69,7 +69,7 @@ export default {
   }
   },
   components: {
-    Paragraph
+    BaseParagraph
   },
   computed: {
     formattedValue() {
