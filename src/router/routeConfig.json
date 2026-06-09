@@ -1078,7 +1078,7 @@
     "section": "dashboard-global",
     "requiresAuth": true,
     "redirectIfNotAuth": "/log-in",
-    "componentPath": "@/templates/payout/PayoutPage.vue",
+    "componentPath": "@/dev/templates/payout/PayoutPage.vue",
     "supportedRoles": [
       "all"
     ]

@@ -3,7 +3,7 @@
  * Browser-safe — Node disk checks live in routeComponentPathValidator.node.js.
  */
 
-const ALLOWED_COMPONENT_PREFIXES = ['src/templates/', 'src/components/'];
+const ALLOWED_COMPONENT_PREFIXES = ['src/templates/', 'src/components/', 'src/dev/'];
 
 /**
  * @typedef {object} RouteComponentPathRef

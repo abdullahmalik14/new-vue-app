@@ -4,7 +4,8 @@
 
 const componentModules = import.meta.glob([
   '@/templates/**/*.vue',
-  '@/components/**/*.vue'
+  '@/components/**/*.vue',
+  '@/dev/**/*.vue'
 ], { eager: false });
 
 /**
