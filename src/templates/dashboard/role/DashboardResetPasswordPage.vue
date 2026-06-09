@@ -3,7 +3,7 @@
     <div class="flex flex-col gap-6">
       <BaseHeading :text="t('auth.resetPassword.title', 'Reset Password')" tag="h1" theme="AuthHeading" />
 
-      <Paragraph
+      <BaseParagraph
         :text="t('auth.resetPassword.subtitle', 'Enter your current password and a new password to update your credentials.')"
         font-size="text-base" font-color="text-gray-400" />
 

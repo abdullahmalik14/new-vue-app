@@ -35,7 +35,7 @@
           <div ref="widgetContainer" class="flex items-center justify-center min-h-[60px] w-full"></div>
           
           <div class="text-center max-w-sm">
-            <Paragraph
+            <BaseParagraph
               :text="widgetHelpText"
               font-size="text-xs"
               font-weight="font-normal"
