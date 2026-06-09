@@ -6,18 +6,18 @@ import {
 } from "@/utils/stateEngine";
 
 // Components
-import PopupHandler from "@/components/ui/popup/PopupHandler.vue";
-import BaseSelect from "../ReuseableComponents/BaseSelect.vue";
-import CheckboxGroup from "@/components/checkbox/CheckboxGroup.vue";
-import BaseInput from "@/components/input/BaseInput.vue";
-import AddressCard from "../ReuseableComponents/AddressCard.vue";
-import SectionToggleHeader from "../ReuseableComponents/SectionToggleHeader.vue";
-import CheckoutNotes from "../ReuseableComponents/CheckoutNotes.vue";
-import ButtonComponent from "@/components/button/ButtonComponent.vue";
-import TotalAmountRow from "../ReuseableComponents/TotalAmountRow.vue";
-import PaymentMethodNotLoggedIn from "../ReuseableComponents/PaymentMethodNotLoggedIn.vue";
-import PaymentMethodLoggedIn from "../ReuseableComponents/PaymentMethodLoggedIn.vue";
-import OrderSummary from "../ReuseableComponents/OrderSummary.vue";
+import BasePopupShell from "@/components/ui/popup/BasePopupShell.vue";
+import BaseSelect from "../checkout/BaseSelect.vue";
+import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
+import BaseInput from "@/components/forms/inputs/BaseInput.vue";
+import AddressCard from "../checkout/AddressCard.vue";
+import SectionToggleHeader from "../checkout/SectionToggleHeader.vue";
+import CheckoutNotes from "../checkout/CheckoutNotes.vue";
+import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import TotalAmountRow from "../checkout/TotalAmountRow.vue";
+import PaymentMethodNotLoggedIn from "../checkout/PaymentMethodNotLoggedIn.vue";
+import PaymentMethodLoggedIn from "../checkout/PaymentMethodLoggedIn.vue";
+import OrderSummary from "../checkout/OrderSummary.vue";
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -255,7 +255,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <PopupHandler
+  <BasePopupShell
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="guestPurchaseFlowPopupConfig"
@@ -411,7 +411,7 @@ onUnmounted(() => {
                         >Log in</span
                       >
                     </button>
-                    <ButtonComponent
+                    <PrimaryButton
                       text="Continue with X (Twitter)"
                       variant="actionGreen"
                       leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp"
@@ -808,7 +808,7 @@ onUnmounted(() => {
                     >Privacy Policy</a
                   >.
                 </CheckboxGroup>
-                <ButtonComponent
+                <PrimaryButton
                   :key="isStepValid"
                   :text="buttonText"
                   :variant="
@@ -825,5 +825,5 @@ onUnmounted(() => {
         </Teleport>
       </div>
     </div>
-  </PopupHandler>
+  </BasePopupShell>
 </template>

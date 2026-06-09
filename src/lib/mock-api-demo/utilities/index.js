@@ -1,7 +1,7 @@
 import { userIdUtility } from './userId.js';
 import { ipUtility } from './ipHelper.js';
 import { networkUtility } from './onlineOffline.js';
-import { useIpStore } from '@/stores/ipStore.js'; // Use real Pinia store
+import { useIpStore } from '@/stores/useIpStore.js'; // Use real Pinia store
 import { browserUtility } from './browserHelper.js';
 
 // Initialize utilities function

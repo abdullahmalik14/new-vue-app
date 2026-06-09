@@ -6,18 +6,18 @@ import {
 } from "@/utils/stateEngine";
 
 // Components
-import PopupHandler from "@/components/ui/popup/PopupHandler.vue";
-import BaseSelect from "../ReuseableComponents/BaseSelect.vue";
-import CheckboxGroup from "@/components/checkbox/CheckboxGroup.vue";
-import BaseInput from "@/components/input/BaseInput.vue";
-import AddressCard from "../ReuseableComponents/AddressCard.vue";
-import SectionToggleHeader from "../ReuseableComponents/SectionToggleHeader.vue";
-import CheckoutNotes from "../ReuseableComponents/CheckoutNotes.vue";
-import ButtonComponent from "@/components/button/ButtonComponent.vue";
-import TotalAmountRow from "../ReuseableComponents/TotalAmountRow.vue";
-import PaymentMethodNotLoggedIn from "../ReuseableComponents/PaymentMethodNotLoggedIn.vue";
-import PaymentMethodLoggedIn from "../ReuseableComponents/PaymentMethodLoggedIn.vue";
-import SubscriptionPlanCard from "../ReuseableComponents/SubscriptionPlanCard.vue";
+import BasePopupShell from "@/components/ui/popup/BasePopupShell.vue";
+import BaseSelect from "../checkout/BaseSelect.vue";
+import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
+import BaseInput from "@/components/forms/inputs/BaseInput.vue";
+import AddressCard from "../checkout/AddressCard.vue";
+import SectionToggleHeader from "../checkout/SectionToggleHeader.vue";
+import CheckoutNotes from "../checkout/CheckoutNotes.vue";
+import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import TotalAmountRow from "../checkout/TotalAmountRow.vue";
+import PaymentMethodNotLoggedIn from "../checkout/PaymentMethodNotLoggedIn.vue";
+import PaymentMethodLoggedIn from "../checkout/PaymentMethodLoggedIn.vue";
+import SubscriptionPlanCard from "../checkout/SubscriptionPlanCard.vue";
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -197,7 +197,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+  <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="purchaseFlowSubscriptionPopupConfig">
     <div
       class="bg-[#333333] h-full overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] [&.dark]:bg-[#35393b]">
@@ -418,7 +418,7 @@ onUnmounted(() => {
                     Policy</a>.
                 </CheckboxGroup>
 
-                <ButtonComponent :key="isStepValid" :text="buttonText" :variant="isStepValid ? 'checkoutProceedpayment' : 'disableBtn'
+                <PrimaryButton :key="isStepValid" :text="buttonText" :variant="isStepValid ? 'checkoutProceedpayment' : 'disableBtn'
                   " :disabled="!isStepValid" :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'"
                   :rightIconClass="arrowIconClass" @click="handleNextStep" />
               </div>
@@ -427,5 +427,5 @@ onUnmounted(() => {
         </Teleport>
       </div>
     </div>
-  </PopupHandler>
+  </BasePopupShell>
 </template>

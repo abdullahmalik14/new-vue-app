@@ -1,0 +1,806 @@
+Expanded Vue App Naming Convention
+Files, Folders, Classes, Methods, Functions, Constants, Events, and Config Names
+1. Core naming rule
+
+Every name should answer one question clearly:
+
+What is this responsible for?
+
+Avoid vague names:
+
+Bad:
+helper
+utils
+manager
+handler
+data
+common
+misc
+actions
+processor
+service
+
+Use specific names:
+
+Good:
+routeResolver
+assetPreloader
+bookingAvailabilityValidator
+cartRequestMapper
+chatMessageNormalizer
+sectionCssLoader
+2. Folder naming
+
+Use kebab-case for folders.
+
+Correct:
+flow-system/
+form-validation/
+route-config/
+asset-preload/
+user-profile/
+dashboard-sidebar/
+
+Incorrect:
+flowSystem/
+FlowSystem/
+flow_system/
+routeConfig/
+
+Folders should describe the domain or layer, not the class inside.
+
+Good:
+systems/assets/
+systems/sections/
+services/cart/
+services/bookings/
+infrastructure/cache/
+components/forms/
+templates/dashboard/
+3. Vue component names
+
+Use PascalCase.
+
+Correct:
+DashboardSidebar.vue
+LoginForm.vue
+UserAvatar.vue
+RouteErrorBoundary.vue
+NavigationProgressBar.vue
+
+Incorrect:
+dashboard-sidebar.vue
+dashboardSidebar.vue
+login_form.vue
+Component naming pattern
+[Domain][Purpose].vue
+
+Examples:
+
+CartSummary.vue
+CartItemCard.vue
+BookingCalendar.vue
+BookingTimeSlotPicker.vue
+ChatMessageBubble.vue
+ChatConversationList.vue
+DashboardSidebar.vue
+DashboardHeader.vue
+ProfileAvatarUploader.vue
+Base/reusable UI components
+
+Use Base, App, or clear UI type names.
+
+BaseModal.vue
+BaseButton.vue
+BaseInput.vue
+BaseDropdown.vue
+AppHeader.vue
+AppFooter.vue
+IconButton.vue
+LoadingSpinner.vue
+EmptyState.vue
+
+Use Base only for generic reusable components.
+
+Good:
+BaseModal.vue
+BaseButton.vue
+
+Bad:
+BaseDashboard.vue
+BaseCart.vue
+4. Page/template names
+
+Route-level templates should use Page.vue.
+
+Correct:
+LoginPage.vue
+RegisterPage.vue
+DashboardOverviewPage.vue
+EditProfilePage.vue
+ShopProductPage.vue
+BookingDetailsPage.vue
+
+Avoid:
+Login.vue
+Dashboard.vue
+EditProfile.vue
+
+Layouts should use Layout.vue.
+
+DashboardLayout.vue
+AuthLayout.vue
+ShopLayout.vue
+SettingsLayout.vue
+
+Role-specific pages should include the role.
+
+CreatorDashboardPage.vue
+FanDashboardPage.vue
+AgentDashboardPage.vue
+VendorDashboardPage.vue
+
+Shared dashboard files should clearly say shared.
+
+DashboardSharedHeader.vue
+DashboardSharedSidebar.vue
+DashboardSharedLayout.vue
+5. JavaScript module names
+
+Use camelCase for normal JS modules.
+
+routeResolver.js
+routeGuards.js
+assetPreloader.js
+assetLibrary.js
+sectionCssLoader.js
+translationLoader.js
+cacheHandler.js
+logHandler.js
+
+Use the file name to describe the module’s main job.
+
+Good:
+bookingAvailabilityValidator.js
+cartResponseMapper.js
+routeAliasResolver.js
+assetUrlPolicy.js
+
+Bad:
+bookingUtils.js
+cartHelpers.js
+routeFunctions.js
+assetStuff.js
+6. Class names
+
+Use PascalCase for classes.
+
+class FlowHandler {}
+class SocketHandler {}
+class MetricsManager {}
+class CamMicPermissions {}
+class ApiClient {}
+class CacheHandler {}
+Recommended class naming patterns
+Use Handler when the class coordinates actions
+FlowHandler
+SocketHandler
+InteractionHandler
+UploadHandler
+
+Use Handler when the class receives inputs/events and decides what to do.
+
+Use Manager when the class owns lifecycle/state
+ModalManager
+PopupManager
+DeviceManager
+SessionManager
+SubscriptionManager
+
+Use Manager when it creates, updates, tracks, or controls a system over time.
+
+Use Client for external communication
+HttpClient
+ApiClient
+ScyllaDbClient
+WordPressApiClient
+SocketClient
+
+Use Client when it talks to an external API, backend, database, socket, or service.
+
+Use Resolver when the class/function determines one result from inputs
+RouteResolver
+SectionResolver
+LocaleResolver
+AssetUrlResolver
+PermissionResolver
+Use Loader when it loads resources
+TranslationLoader
+ManifestLoader
+SectionCssLoader
+AssetMapLoader
+Use Preloader when it warms cache in advance
+AssetPreloader
+SectionPreloader
+RouteComponentPreloader
+Use Validator when it checks correctness
+RouteConfigValidator
+AssetMapValidator
+BookingPayloadValidator
+EmailValidator
+Use Mapper when it changes data shape
+CartRequestMapper
+CartResponseMapper
+BookingRequestMapper
+ChatMessageMapper
+Use Normalizer when it cleans inconsistent data into one shape
+ChatMessageNormalizer
+ApiResponseNormalizer
+UserProfileNormalizer
+Use Factory when it creates configured objects
+RouteFactory
+HttpClientFactory
+FlowContextFactory
+Use Registry when it stores named definitions
+FlowRegistry
+ComponentRegistry
+RouteAliasRegistry
+7. Function and method names
+
+Use camelCase.
+
+Method names should start with a verb.
+
+Correct:
+getUserProfile()
+loadTranslationsForSection()
+resolveRouteFromPath()
+validateBookingPayload()
+mapCartResponse()
+preloadSection()
+clearPreloadCache()
+createBooking()
+cancelBooking()
+
+Incorrect:
+userProfile()
+translations()
+routePath()
+bookingPayload()
+cartResponse()
+section()
+cache()
+8. Recommended verb prefixes
+Getters
+
+Use get when returning data.
+
+getCurrentUser()
+getRouteConfiguration()
+getAssetUrl()
+getBookingById()
+getCartItems()
+
+Use find when the result may not exist.
+
+findRouteBySlug()
+findUserById()
+findActiveBooking()
+findMatchingAsset()
+
+Use has for boolean existence checks.
+
+hasSection(sectionName)
+hasAsset(assetUrl)
+hasPermission(permissionName)
+hasActiveSubscription(userId)
+
+Use is for boolean state.
+
+isAuthenticated()
+isRouteEnabled()
+isValidEmail()
+isBookingAvailable()
+isPreloadComplete()
+
+Use can for permission checks.
+
+canAccessRoute()
+canCreateBooking()
+canSendMessage()
+canUseCamera()
+
+Use should for decision logic.
+
+shouldPreloadSection()
+shouldRedirectUser()
+shouldShowErrorMessage()
+shouldRetryRequest()
+Loaders
+
+Use load when fetching/loading required data.
+
+loadRouteComponent()
+loadTranslationsForSection()
+loadAssetMapConfig()
+loadManifest()
+loadUserSession()
+
+Use preload only when it is background cache warming.
+
+preloadSection()
+preloadSectionCss()
+preloadAsset()
+preloadRouteComponent()
+preloadTranslationsForSection()
+
+Use fetch only for network requests.
+
+fetchCartItems()
+fetchBookingAvailability()
+fetchChatMessages()
+fetchAssetMapManifest()
+Mutations / actions
+
+Use create, update, delete, remove, clear, reset.
+
+createBooking()
+updateCartQuantity()
+deleteMessage()
+removeCartItem()
+clearPreloadCache()
+resetRouteState()
+
+Use set for direct assignment.
+
+setActiveLocale()
+setCurrentRoute()
+setBuildHash()
+setUserSession()
+
+Use add when appending.
+
+addAsset()
+addSection()
+addMessage()
+addNotification()
+
+Use sync when aligning state with another source.
+
+syncPreloadStoreBuildHash()
+syncCartFromBackend()
+syncUserSession()
+Mapping / validation
+
+Use map for shape transformation.
+
+mapCartRequest()
+mapCartResponse()
+mapBookingPayload()
+mapChatMessageResponse()
+
+Use normalize for cleanup into a standard internal format.
+
+normalizeApiResponse()
+normalizeRouteConfig()
+normalizeAssetDefinition()
+normalizeChatMessage()
+
+Use sanitize for removing unsafe input.
+
+sanitizeTextInput()
+sanitizeAssetUrl()
+sanitizeFormPayload()
+
+Use validate for checking rules.
+
+validateRouteConfig()
+validateAssetMap()
+validateBookingPayload()
+validateEmailAddress()
+
+Use assert when the method should throw on failure.
+
+assertAllowedAssetUrl()
+assertValidRouteConfig()
+assertAuthenticatedUser()
+9. Avoid weak method names
+
+Avoid:
+
+handle()
+process()
+run()
+doThing()
+execute()
+init()
+start()
+setup()
+check()
+make()
+
+Unless they are very clearly scoped.
+
+Better:
+
+handleRouteNavigation()
+processFlowResponse()
+runRegisteredFlow()
+executeCartCheckoutFlow()
+initializeSocketConnection()
+startNavigationProgress()
+setupInteractionDirectives()
+checkRoutePermission()
+createBookingPayload()
+
+run() is acceptable only for central systems where the meaning is obvious:
+
+FlowHandler.run("cart.updateQuantity", payload);
+
+But inside normal services, prefer specific names.
+
+10. Constants
+
+Use UPPER_SNAKE_CASE for true constants.
+
+const DEFAULT_LOCALE = "en";
+const PRELOAD_PRIORITY_HIGH = "high";
+const MAX_RETRY_ATTEMPTS = 3;
+const ROUTE_CONFIG_CACHE_KEY = "route_config";
+
+Use camelCase for local values that are not constants.
+
+const activeLocale = resolveActiveLocale();
+const currentRoute = resolveRouteFromPath(path);
+const sectionName = resolveSectionIdentifier(id);
+11. Boolean names
+
+Boolean names must read naturally.
+
+const isAuthenticated = true;
+const hasLoadedAssets = true;
+const canAccessDashboard = true;
+const shouldPreloadSection = true;
+const requiresAuth = true;
+
+Avoid unclear booleans:
+
+const auth = true;
+const access = true;
+const preload = true;
+const status = true;
+const valid = true;
+12. Event names
+
+Use kebab-case for DOM/custom events.
+
+"route-change-start"
+"route-change-complete"
+"section-preload-start"
+"section-preload-complete"
+"cart-item-added"
+"chat-message-sent"
+"booking-created"
+"modal-opened"
+
+Event handlers should use handle.
+
+handleRouteChangeStart()
+handleSectionPreloadComplete()
+handleCartItemAdded()
+handleChatMessageSent()
+13. Flow names
+
+Flow files should be action-based and end in Flow.js.
+
+updateCartQuantityFlow.js
+removeCartItemFlow.js
+applyCouponFlow.js
+fetchChatMessagesFlow.js
+sendChatMessageFlow.js
+createBookingFlow.js
+cancelBookingFlow.js
+
+Flow keys should use dot notation:
+
+"cart.updateQuantity"
+"cart.removeItem"
+"cart.applyCoupon"
+"chat.fetchMessages"
+"chat.sendMessage"
+"booking.create"
+"booking.cancel"
+Flow naming pattern
+domain.actionObject
+
+Examples:
+
+cart.updateQuantity
+cart.removeItem
+cart.applyCoupon
+booking.create
+booking.cancel
+booking.fetchAvailability
+chat.sendMessage
+chat.markMessageRead
+14. Service method names
+
+Services should expose business actions, not raw technical names.
+
+cartApi.fetchCartItems()
+cartApi.updateCartQuantity()
+cartApi.removeCartItem()
+cartApi.applyCoupon()
+
+bookingsApi.fetchBookingAvailability()
+bookingsApi.createBooking()
+bookingsApi.cancelBooking()
+
+chatApi.fetchMessages()
+chatApi.sendMessage()
+chatApi.markMessageAsRead()
+
+Avoid:
+
+cartApi.get()
+cartApi.post()
+cartApi.call()
+cartApi.send()
+cartApi.request()
+
+Low-level HTTP methods belong only in httpClient.
+
+15. HTTP client method names
+
+Low-level HTTP client can use HTTP verbs.
+
+httpClient.get()
+httpClient.post()
+httpClient.put()
+httpClient.patch()
+httpClient.delete()
+
+But domain services should not expose raw HTTP naming.
+
+16. Mapper method names
+
+Use direction and domain.
+
+mapCartUpdateRequest()
+mapCartResponse()
+mapBookingCreateRequest()
+mapBookingResponse()
+mapChatMessageResponse()
+mapUserProfileResponse()
+
+For collections:
+
+mapCartItemsResponse()
+mapBookingListResponse()
+mapChatMessagesResponse()
+17. Validator method names
+
+Use validate + Thing.
+
+validateCartPayload()
+validateBookingPayload()
+validateChatMessagePayload()
+validateRouteConfig()
+validateAssetMap()
+
+For specific checks:
+
+isValidEmailAddress()
+isValidBookingTimeRange()
+isAllowedAssetUrl()
+hasRequiredBookingFields()
+
+For throwing validation:
+
+assertValidBookingPayload()
+assertAllowedAssetUrl()
+assertRouteConfigIsValid()
+18. Store action names
+
+Pinia store actions should describe state mutation.
+
+setCurrentUser()
+setActiveLocale()
+addPreloadedSection()
+addPreloadedAsset()
+removeCartItem()
+updateCartQuantity()
+clearCart()
+clearPreloadState()
+syncBuildHash()
+
+Avoid generic store methods:
+
+update()
+save()
+change()
+process()
+handle()
+19. Store getter names
+
+Use boolean/readable names.
+
+isAuthenticated
+cartItemCount
+hasPreloadedAssets
+hasPreloadedSection
+activeLocale
+currentUserRole
+
+For methods:
+
+hasSection(sectionName)
+hasAsset(assetUrl)
+getCartItem(productId)
+getUserPermission(permissionName)
+20. Composable names
+
+Composable file and function names must start with use.
+
+usePopupStack()
+useRoutePrefetch()
+useAssetPrefetch()
+useBreakpoints()
+useFormState()
+useDeviceState()
+
+Composable methods inside can be action-based:
+
+const {
+  openPopup,
+  closePopup,
+  closeAllPopups,
+  isPopupOpen
+} = usePopupStack();
+21. Infrastructure names
+
+Infrastructure files should be technical and low-level.
+
+httpClient.js
+apiClient.js
+wpApiBaseUrl.js
+cacheHandler.js
+logHandler.js
+errorHandler.js
+performanceTracker.js
+performanceTrackerAccess.js
+scyllaDbClient.js
+Infrastructure method examples
+httpClient.get()
+httpClient.post()
+cacheHandler.getValue()
+cacheHandler.setValueWithExpiration()
+logHandler.log()
+errorHandler.reportApplicationError()
+performanceTracker.trackStep()
+22. Systems names
+
+Systems are frontend app-level orchestration.
+
+Examples:
+
+systems/routing/routeResolver.js
+systems/routing/routeGuards.js
+systems/sections/sectionPreloader.js
+systems/assets/assetPreloader.js
+systems/i18n/translationLoader.js
+systems/interactions/engine.js
+systems/build/manifestLoader.js
+
+System method examples:
+
+resolveRouteFromPath()
+runAllRouteGuards()
+preloadSection()
+preloadAsset()
+loadTranslationsForSection()
+registerInteractionDirective()
+loadManifest()
+23. Recommended suffixes
+
+Use these consistently:
+
+Resolver      Determines final value from inputs
+Loader        Loads required resource
+Preloader     Warms cache before needed
+Validator     Checks correctness
+Mapper        Converts one shape to another
+Normalizer    Converts inconsistent data to standard shape
+Sanitizer     Removes unsafe data
+Handler       Coordinates event/action handling
+Manager       Owns lifecycle or state
+Client        Talks to external service
+Registry      Stores named definitions
+Factory       Creates configured objects
+Adapter       Connects incompatible interface to expected one
+Provider      Supplies app-level dependencies/config
+Boundary      Catches errors around a UI area
+24. Naming examples by layer
+systems/routing/
+  routeResolver.js
+    resolveRouteFromPath()
+    resolveRouteByName()
+    resolveEffectiveRouteConfig()
+
+  routeGuards.js
+    runAllRouteGuards()
+    guardCheckAuthentication()
+    guardCheckRoleAccess()
+
+systems/sections/
+  sectionPreloader.js
+    preloadSection()
+    preloadMultipleSections()
+    clearSectionPreloadState()
+
+  sectionResolver.js
+    resolveSectionIdentifier()
+    resolveRoleSectionVariant()
+
+systems/assets/
+  assetPreloader.js
+    preloadAsset()
+    preloadAssets()
+    preloadSectionAssets()
+
+  assetPolicy.js
+    assertAllowedAssetUrl()
+    validateAssetPreloadEntry()
+
+services/cart/
+  cartApi.js
+    fetchCartItems()
+    updateCartQuantity()
+    removeCartItem()
+
+  flows/updateCartQuantityFlow.js
+    updateCartQuantityFlow()
+
+  mappers/cartRequestMapper.js
+    mapCartUpdateRequest()
+
+  validators/cartPayloadValidator.js
+    validateCartPayload()
+
+infrastructure/http/
+  httpClient.js
+    get()
+    post()
+    patch()
+    delete()
+
+infrastructure/cache/
+  cacheHandler.js
+    getValue()
+    setValueWithExpiration()
+    removeFromCache()
+25. Final naming summary
+Folders:              kebab-case
+Vue components:        PascalCase.vue
+Pages/templates:       PascalCase + Page.vue / Layout.vue
+JS modules:            camelCase.js
+Class files:           PascalCase.js
+Class names:           PascalCase
+Functions/methods:     camelCase, verb first
+Constants:             UPPER_SNAKE_CASE
+Booleans:              is/has/can/should/requires
+Events:                kebab-case
+Pinia stores:          useNameStore.js
+Composables:           useName.js
+Flows:                 actionObjectFlow.js
+Flow keys:             domain.actionObject
+Mappers:               domainRequestMapper.js / domainResponseMapper.js
+Validators:            domainPayloadValidator.js
+Config JSON:           camelCase.json
+Public manifests:      kebab-case.json
+CSS/assets:            kebab-case
+Tests:                 sameFileName.test.js
+
+Final rule:
+
+A good name should make the file, class, or method understandable before opening it.

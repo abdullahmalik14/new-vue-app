@@ -1,5 +1,5 @@
 <script setup>
-import CheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
+import CheckboxGroup from '@/components/forms/checkboxes/CheckboxGroup.vue';
 // Agar aap chahein to yahan props define kar sakte hain future mein data pass karne ke liye
 </script>
 

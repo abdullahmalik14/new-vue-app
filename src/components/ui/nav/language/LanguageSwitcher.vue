@@ -1,4 +1,4 @@
-<!-- File: src/components/ui/global/nav/language/LanguageSwitcher.vue -->
+<!-- File: src/components/ui/nav/language/LanguageSwitcher.vue -->
 <template>
   <form ref="formRef" class="inline-flex items-center gap-2" :aria-label="$t('ui.languageSelector')" @submit.prevent>
     <label :for="selectId" class="sr-only">{{ $t('ui.language') }}</label>
@@ -16,7 +16,7 @@
         {{ opt.label }} ({{ opt.traditionalName }})
       </option>
     </select>
-    <Spinner v-if="isBusy" size="sm" color="text-blue-600" />
+    <LoadingSpinner v-if="isBusy" size="sm" color="text-blue-600" />
   </form>
 </template>
 
@@ -30,7 +30,7 @@
 
 import { ref, computed, watch, useId } from 'vue';
 import { useRoute } from 'vue-router';
-import Spinner from '@/components/ui/spinner/Spinner.vue';
+import LoadingSpinner from '@/components/ui/spinners/LoadingSpinner.vue';
 import { useDisplayedLocaleSync } from '@/composables/useDisplayedLocaleSync.js';
 
 import {

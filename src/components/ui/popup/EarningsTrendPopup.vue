@@ -189,7 +189,7 @@
 import TrendPopup from './TrendPopup.vue'
 import FlexTable from '@/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
-import { useDashboardAnalytics } from '@/stores/DashboardAnalytics'
+import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -201,7 +201,7 @@ const emit = defineEmits(['update:modelValue', 'update:period'])
 
 const hasData = computed(() => props.insightData && props.insightData.total != null)
 
-const store = useDashboardAnalytics()
+const store = useDashboardAnalyticsStore()
 
 // Linden: 'on open should be default bar chart for week'
 const activePeriod = computed(() => {

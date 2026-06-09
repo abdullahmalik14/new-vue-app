@@ -17,15 +17,15 @@
             <!-- ===== SECTION: MediaCardVariants ===== -->
             <div class="flex flex-col gap-12">
                 <div class="flex flex-col gap-4">
-                    <Heading text="Media Card Variations (V1)" tag="h1" theme="defaultPrimaryHeading" version="basic"
+                    <BaseHeading text="Media Card Variations (V1)" tag="h1" theme="defaultPrimaryHeading" version="basic"
                         class="!text-black" />
-                    <Paragraph text="Multiple display logic and layout variants for our primary media card."
+                    <BaseParagraph text="Multiple display logic and layout variants for our primary media card."
                         class="!text-slate-500" />
                 </div>
 
                 <!-- 1. Creator: My Media -->
                 <section class="flex flex-col gap-6">
-                    <Heading text="1. Creator: My Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                    <BaseHeading text="1. Creator: My Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
                         class="!text-black" />
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                         <MediaCardV1 v-for="item in myMediaList" :key="item.id" :media="item" variant="default"
@@ -36,7 +36,7 @@
 
                 <!-- 2. Fan: Continue Watching -->
                 <section class="flex flex-col gap-6">
-                    <Heading text="2. Fan: Continue Watching" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                    <BaseHeading text="2. Fan: Continue Watching" tag="h2" theme="defaultSecondaryHeading" version="basic"
                         class="!text-black" />
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                         <MediaCardV1 :media="myMediaList[0]" variant="resume" />
@@ -46,7 +46,7 @@
 
                 <!-- 3. Fan: Latest Media -->
                 <section class="flex flex-col gap-6">
-                    <Heading text="3. Fan: Latest Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                    <BaseHeading text="3. Fan: Latest Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
                         class="!text-black" />
                     <div class="flex items-start gap-4">
                         <MediaCardV1 :media="latestMediaItem" variant="latest" />
@@ -56,7 +56,7 @@
 
                 <!-- 4. Fan: Purchased Media -->
                 <section class="flex flex-col gap-6">
-                    <Heading text="4. Fan: Purchased Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                    <BaseHeading text="4. Fan: Purchased Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
                         class="!text-black" />
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                         <MediaCardV1 :media="purchasedMediaItem" variant="purchased" @menu-action="handleAction" />
@@ -66,7 +66,7 @@
 
                 <!-- 5. Fan: Grid View (Zoom Effect) -->
                 <section class="flex flex-col gap-6">
-                    <Heading text="5. Fan: Grid View (Zoom Effect)" tag="h2" theme="defaultSecondaryHeading"
+                    <BaseHeading text="5. Fan: Grid View (Zoom Effect)" tag="h2" theme="defaultSecondaryHeading"
                         version="basic" class="!text-black" />
                     <div
                         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-2 xl:gap-4 w-full gap-y-[5.5rem] md:gap-y-[5rem] xl:gap-y-[5.5rem]">
@@ -77,9 +77,9 @@
                 </section>
 
                 <div class="">
-                    <Heading text="Media Card Variations (V2)" tag="h1" theme="defaultPrimaryHeading" version="basic"
+                    <BaseHeading text="Media Card Variations (V2)" tag="h1" theme="defaultPrimaryHeading" version="basic"
                         class="!text-black" />
-                    <Paragraph text="An alternative design language for cards with hover expansion effects."
+                    <BaseParagraph text="An alternative design language for cards with hover expansion effects."
                         class="!text-slate-500 mt-2" />
                 </div>
 
@@ -104,15 +104,15 @@
                 </div>
             </div>
 
-            <!-- ===== SECTION: InputComponentDashboard ===== -->
+            <!-- ===== SECTION: DashboardTextInput ===== -->
             <section class="flex flex-col gap-10">
-                <DemoSectionHeader title="InputComponentDashboard" />
+                <DemoSectionHeader title="DashboardTextInput" />
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
                     <div class="flex flex-col gap-3">
 
-                        <InputComponentDashboard v-model="inputs.basic" placeholder="carrot_popxoxo123" showLabel
+                        <DashboardTextInput v-model="inputs.basic" placeholder="carrot_popxoxo123" showLabel
                             labelText="Username"
                             description="Usernames cannot be changed after your first month on our website, but special circumstances may allow for exceptions. Please contact us if you need assistance with changing your username." />
 
@@ -121,7 +121,7 @@
 
                     <div class="flex flex-col gap-3">
 
-                        <InputComponentDashboard v-model="inputs.basic" placeholder="mscarrot_pops@gmail.com" showLabel
+                        <DashboardTextInput v-model="inputs.basic" placeholder="mscarrot_pops@gmail.com" showLabel
                             labelText="Email" />
 
                         <ShowCodeToggle :code="demoSnippets.icd.email" />
@@ -129,7 +129,7 @@
 
                     <div class="flex flex-col gap-3">
 
-                        <InputComponentDashboard v-model="inputs.basic" placeholder="" showLabel
+                        <DashboardTextInput v-model="inputs.basic" placeholder="" showLabel
                             labelText="First Name" />
 
                         <ShowCodeToggle :code="demoSnippets.icd.firstName" />
@@ -137,7 +137,7 @@
 
                     <div class="flex flex-col gap-3">
 
-                        <InputComponentDashboard v-model="inputs.basic" placeholder="" showLabel
+                        <DashboardTextInput v-model="inputs.basic" placeholder="" showLabel
                             labelText="Last Name" />
 
                         <ShowCodeToggle :code="demoSnippets.icd.lastName" />
@@ -145,14 +145,14 @@
 
                     <div class="flex flex-col gap-3">
 
-                        <InputComponentDashboard v-model="inputs.basic" placeholder="Event Title" showLabel
+                        <DashboardTextInput v-model="inputs.basic" placeholder="Event Title" showLabel
                             labelText="Title" />
 
                         <ShowCodeToggle :code="demoSnippets.icd.title" />
                     </div>
 
                     <div class="flex flex-col gap-3">
-                        <InputComponentDashboard placeholder="Search by username & email" v-model="inputs.basic"
+                        <DashboardTextInput placeholder="Search by username & email" v-model="inputs.basic"
                             showLabel label-text="Co-performer (Optional)" :left-icon="MagnifyingGlassIcon"
                             optionalLabel class="w-full" />
 
@@ -162,7 +162,7 @@
                     <!-- 2. Password with Toggle -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Password with Toggle</span>
-                        <InputComponentDashboard v-model="inputs.password" placeholder="Old Password" showLabel
+                        <DashboardTextInput v-model="inputs.password" placeholder="Old Password" showLabel
                             labelText="Old Password" @rightIconClick="inputs.showPass = !inputs.showPass" />
                         <ShowCodeToggle :code="demoSnippets.icd.password" />
                     </div>
@@ -171,7 +171,7 @@
                     <!-- 4. With Right Icon -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Right Icon</span>
-                        <InputComponentDashboard v-model="inputs.email" placeholder="Enter email..." showLabel
+                        <DashboardTextInput v-model="inputs.email" placeholder="Enter email..." showLabel
                             labelText="Email Support" :rightIcon="EnvelopeIcon" />
                         <ShowCodeToggle :code="demoSnippets.icd.rightIcon" />
                     </div>
@@ -179,7 +179,7 @@
                     <!-- 5. Required Display -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Required (*)</span>
-                        <InputComponentDashboard v-model="inputs.email" placeholder="Required field" showLabel
+                        <DashboardTextInput v-model="inputs.email" placeholder="Required field" showLabel
                             labelText="Full Name" requiredDisplay="*" />
                         <ShowCodeToggle :code="demoSnippets.icd.requiredStar" />
                     </div>
@@ -191,7 +191,7 @@
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Both Icons (Left &
                             Right)</span>
                         <div class="min-h-[100px] flex items-center">
-                            <InputComponentDashboard v-model="inputs.email" placeholder="Search with filters..."
+                            <DashboardTextInput v-model="inputs.email" placeholder="Search with filters..."
                                 showLabel labelText="Advanced Search" :leftIcon="MagnifyingGlassIcon"
                                 :rightIcon="Bars3Icon" clickableRightIcon />
                         </div>
@@ -202,7 +202,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Textarea</span>
 
-                        <InputComponentDashboard id="input_g" type="textarea" show-label v-model="inputs.bio"
+                        <DashboardTextInput id="input_g" type="textarea" show-label v-model="inputs.bio"
                             textAreaRows="3" label-text="" placeholder="Description (Optional)"
                             description="0/200 characters" />
 
@@ -220,7 +220,7 @@
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 —
                             defaultPrimaryHeading</span>
                         <div class="p-2  flex items-center">
-                            <Heading text="Primary H1" tag="h1" theme="defaultPrimaryHeading" class="!text-black"
+                            <BaseHeading text="Primary H1" tag="h1" theme="defaultPrimaryHeading" class="!text-black"
                                 version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h1Primary" />
@@ -231,7 +231,7 @@
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 —
                             defaultSecondaryHeading</span>
                         <div class="p-2  flex items-center">
-                            <Heading text="Secondary H2" tag="h2" theme="defaultSecondaryHeading" class="!text-black"
+                            <BaseHeading text="Secondary H2" tag="h2" theme="defaultSecondaryHeading" class="!text-black"
                                 version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h2Secondary" />
@@ -241,7 +241,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">h3 — sectionHeading</span>
                         <div class="p-2  flex items-center">
-                            <Heading text="Section H3" tag="h3" theme="sectionHeading" class="!text-black"
+                            <BaseHeading text="Section H3" tag="h3" theme="sectionHeading" class="!text-black"
                                 version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h3Section" />
@@ -251,7 +251,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 — dashboardHeading</span>
                         <div class="p-2  flex items-center">
-                            <Heading text="Dashboard Title" tag="h2" theme="dashboardHeading" version="basic" />
+                            <BaseHeading text="Dashboard Title" tag="h2" theme="dashboardHeading" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h2Dashboard" />
                     </div>
@@ -260,7 +260,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 — AuthHeading</span>
                         <div class="p-2  flex items-center">
-                            <Heading text="Login" tag="h2" theme="AuthHeading" class="!text-black" version="basic" />
+                            <BaseHeading text="Login" tag="h2" theme="AuthHeading" class="!text-black" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h2Auth" />
                     </div>
@@ -269,7 +269,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">h4 — formHeading</span>
                         <div class="p-2  flex items-center">
-                            <Heading text="Profile Settings" tag="h4" theme="formHeading" version="basic" />
+                            <BaseHeading text="Profile Settings" tag="h4" theme="formHeading" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h4Form" />
                     </div>
@@ -278,7 +278,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 — demoHeadings</span>
                         <div class="p-2  flex items-center">
-                            <Heading text="Demo H1 Bold" tag="h1" theme="demoHeadings" version="basic" />
+                            <BaseHeading text="Demo H1 Bold" tag="h1" theme="demoHeadings" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h1Demo" />
                     </div>
@@ -287,7 +287,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">h3 — demoHeadings</span>
                         <div class="p-2  flex items-center">
-                            <Heading text="Demo H3 Medium" tag="h3" theme="demoHeadings" version="basic" />
+                            <BaseHeading text="Demo H3 Medium" tag="h3" theme="demoHeadings" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h3Demo" />
                     </div>
@@ -296,7 +296,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Left Icon</span>
 
-                        <Heading text="With Icon" tag="h3" theme="defaultSecondaryHeading" class="!text-black"
+                        <BaseHeading text="With Icon" tag="h3" theme="defaultSecondaryHeading" class="!text-black"
                             version="basic" :leftIcon="StarIcon" />
 
                         <ShowCodeToggle :code="demoSnippets.heading.withIcon" />
@@ -306,7 +306,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 — orderHeading</span>
                         <div class="p-2  flex items-center">
-                            <Heading text="Order #1234" tag="h1" theme="orderHeading" version="basic" />
+                            <BaseHeading text="Order #1234" tag="h1" theme="orderHeading" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.order" />
                     </div>
@@ -321,7 +321,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Default</span>
                         <div class="p-2  flex items-center">
-                            <Paragraph text="This is a default paragraph with standard styling." class="!text-black" />
+                            <BaseParagraph text="This is a default paragraph with standard styling." class="!text-black" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.default" />
                     </div>
@@ -330,7 +330,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Small (text-sm)</span>
                         <div class="p-2  flex items-center">
-                            <Paragraph text="Small text paragraph for captions." class="!text-black text-sm" />
+                            <BaseParagraph text="Small text paragraph for captions." class="!text-black text-sm" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.small" />
                     </div>
@@ -339,7 +339,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Large (text-xl)</span>
                         <div class="p-2  flex items-center">
-                            <Paragraph text="Large paragraph text." class="!text-black text-xl" />
+                            <BaseParagraph text="Large paragraph text." class="!text-black text-xl" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.large" />
                     </div>
@@ -348,7 +348,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Bold</span>
                         <div class="p-2  flex items-center">
-                            <Paragraph text="Bold paragraph text." class="!text-black font-bold" />
+                            <BaseParagraph text="Bold paragraph text." class="!text-black font-bold" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.bold" />
                     </div>
@@ -357,7 +357,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Custom Color (Blue)</span>
                         <div class="p-2  flex items-center">
-                            <Paragraph text="Blue paragraph text." fontColor="text-blue-600" />
+                            <BaseParagraph text="Blue paragraph text." fontColor="text-blue-600" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.blue" />
                     </div>
@@ -366,7 +366,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Error Red</span>
                         <div class="p-2  flex items-center">
-                            <Paragraph text="This field is required." fontColor="text-red-500" fontSize="text-sm" />
+                            <BaseParagraph text="This field is required." fontColor="text-red-500" fontSize="text-sm" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.error" />
                     </div>
@@ -375,7 +375,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Success Green</span>
                         <div class="p-2  flex items-center">
-                            <Paragraph text="Action successful!" fontColor="text-green-600" fontWeight="font-medium" />
+                            <BaseParagraph text="Action successful!" fontColor="text-green-600" fontWeight="font-medium" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.success" />
                     </div>
@@ -384,7 +384,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Italic</span>
                         <div class="p-2  flex items-center">
-                            <Paragraph text="Italic paragraph text for notes." fontFamily="italic"
+                            <BaseParagraph text="Italic paragraph text for notes." fontFamily="italic"
                                 fontColor="text-gray-500" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.italic" />
@@ -394,7 +394,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Left Icon</span>
                         <div class="p-2  flex items-center">
-                            <Paragraph text="Info message here" :leftIcon="InformationCircleIcon" fontSize="text-sm"
+                            <BaseParagraph text="Info message here" :leftIcon="InformationCircleIcon" fontSize="text-sm"
                                 fontColor="text-blue-600" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.withIcon" />
@@ -404,7 +404,7 @@
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">Extra Small (text-xs)</span>
                         <div class="p-2  flex items-center">
-                            <Paragraph text="Helper text displayed below the input field." fontSize="text-xs"
+                            <BaseParagraph text="Helper text displayed below the input field." fontSize="text-xs"
                                 fontColor="text-gray-400" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.xs" />
@@ -583,14 +583,14 @@
                     <!-- 12. Using Img Src -->
                     <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
 
-                        <Spinner src="https://i.ibb.co.com/TM7mTrZJ/spinner.webp" size="2xl" />
+                        <LoadingSpinner src="https://i.ibb.co.com/TM7mTrZJ/spinner.webp" size="2xl" />
 
                         <ShowCodeToggle :code="demoSnippets.spinner.img" />
                     </div>
 
                     <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
 
-                        <Spinner thickness="3.5" size="lg" color="text-green-500" trackColor="text-white" />
+                        <LoadingSpinner thickness="3.5" size="lg" color="text-green-500" trackColor="text-white" />
 
                         <ShowCodeToggle :code="demoSnippets.spinner.styled" />
                     </div>
@@ -598,7 +598,7 @@
 
                     <div class="flex flex-col items-center gap-3 p-2 lg:col-span-1">
 
-                        <Spinner thickness="1" size="3xl" color="text-green-500" trackColor="text-white" />
+                        <LoadingSpinner thickness="1" size="3xl" color="text-green-500" trackColor="text-white" />
 
                         <ShowCodeToggle :code="demoSnippets.spinner.thin" />
                     </div>
@@ -612,20 +612,20 @@
 
                     <!-- Auth Pink -->
                     <div class="flex flex-col gap-4">
-                        <ButtonComponent :text="buttonText" variant="authPink" type="submit" />
+                        <PrimaryButton :text="buttonText" variant="authPink" type="submit" />
                         <ShowCodeToggle :code="demoSnippets.buttons.authPink" />
                     </div>
 
                     <!-- Auth Transparent (Telegram) -->
                     <div class="flex flex-col gap-4">
-                        <ButtonComponent text="Continue with Telegram" variant="authTransparent" size="lg"
+                        <PrimaryButton text="Continue with Telegram" variant="authTransparent" size="lg"
                             :leftIcon="telegramIcon" leftIconClass="w-8 h-8" />
                         <ShowCodeToggle :code="demoSnippets.buttons.authTransparent" />
                     </div>
 
                     <!-- New Events -->
                     <div class="flex flex-col gap-4">
-                        <ButtonComponent text="NEW EVENTS" variant="none"
+                        <PrimaryButton text="NEW EVENTS" variant="none"
                             customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]"
                             :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'"
                             :leftIconClass="`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`" />
@@ -634,7 +634,7 @@
 
                     <!-- Polygon Next -->
                     <div class="flex flex-col gap-4">
-                        <ButtonComponent text="Next" variant="polygonLeft"
+                        <PrimaryButton text="Next" variant="polygonLeft"
                             :rightIcon="'https://i.ibb.co.com/hx8ztZFf/svgviewer-png-output-8.webp'" :rightIconClass="`
                                 w-6 h-6 transition duration-200
                                 filter brightness-0 invert-0
@@ -645,7 +645,7 @@
 
                     <!-- Publish Schedule -->
                     <div class="flex flex-col gap-4">
-                        <ButtonComponent text="PUBLISH SCHEDULE" variant="polygonLeft"
+                        <PrimaryButton text="PUBLISH SCHEDULE" variant="polygonLeft"
                             :leftIcon="'https://i.ibb.co/S74jfvBw/Icon-1.png'" :leftIconClass="`
                             w-6 h-6 transition duration-200
                             filter brightness-0
@@ -658,7 +658,7 @@
                     <div class="flex flex-col gap-4">
                     <!-- Add-on Service -->
                     <div class="flex flex-col gap-4">
-                        <ButtonComponent text="add-on service" variant="none"
+                        <PrimaryButton text="add-on service" variant="none"
                             customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
                             :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" :leftIconClass="`
                             w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]
@@ -668,7 +668,7 @@
 
                     <!-- Add-on Service V2 -->
                     <div class="flex flex-col gap-4">
-                        <ButtonComponent text="add-on service" variant="none"
+                        <PrimaryButton text="add-on service" variant="none"
                             customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
                             :leftIcon="'https://i.ibb.co.com/bRYvsTVs/Icon.png'" :leftIconClass="`
                             w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]
@@ -678,7 +678,7 @@
 
                     <!-- Proceed Payment -->
                     <div class="flex flex-col gap-4">
-                        <ButtonComponent text="Proceed Payment" variant="checkoutProceedpayment"
+                        <PrimaryButton text="Proceed Payment" variant="checkoutProceedpayment"
                             :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'"
                             :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]`" />
                         <ShowCodeToggle :code="demoSnippets.buttons.proceedPayment" />
@@ -688,7 +688,7 @@
 
                     <!-- Action Green (X) -->
                     <div class="flex flex-col gap-4">
-                        <ButtonComponent text="Continue with X (Twitter)" variant="actionGreen"
+                        <PrimaryButton text="Continue with X (Twitter)" variant="actionGreen"
                             leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp"
                             leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]" />
                         <ShowCodeToggle :code="demoSnippets.buttons.actionGreenX" />
@@ -706,19 +706,19 @@
 import { ref, reactive, defineComponent, h } from 'vue';
 
 // Components
-import Spinner from '@/components/ui/spinner/Spinner.vue';
-import MediaCardV1 from '@/components/mediaCardsVariations/MediaCardV1.vue';
-import MediaCardV2 from '@/components/mediaCardsVariations/MediaCardV2.vue';
-import InputComponentDashboard from '@/components/input/InputComponentDashboard.vue';
-import Heading from '@/components/default/Heading.vue';
-import Paragraph from '@/components/default/Paragraph.vue';
+import LoadingSpinner from '@/components/ui/spinners/LoadingSpinner.vue';
+import MediaCardV1 from '@/components/ui/media/media-cards/MediaCardV1.vue';
+import MediaCardV2 from '@/components/ui/media/media-cards/MediaCardV2.vue';
+import DashboardTextInput from '@/components/forms/inputs/DashboardTextInput.vue';
+import BaseHeading from '@/components/ui/typography/BaseHeading.vue';
+import BaseParagraph from '@/components/ui/typography/BaseParagraph.vue';
 import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vue';
-import QuillEditor from '@/components/input/QuillEditor.vue';
-import SubscriptionCard from '@/templates/profileAbdullah/components/SubscriptionCard.vue';
+import QuillEditor from '@/components/forms/inputs/QuillEditor.vue';
+import SubscriptionCard from '@/templates/profile/views/SubscriptionCard.vue';
 import CountryStateDemo from '@/templates/dev/CountryStateDemo.vue';
 import DemoSectionHeader from '@/templates/dev/DemoSectionHeader.vue';
 import DemoCard from '@/templates/dev/DemoCard.vue';
-import ButtonComponent from '@/components/button/ButtonComponent.vue';
+import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
 import { tierData } from "/public/data/TierData.js";
 // Heroicons
 import {
@@ -729,7 +729,7 @@ import {
 } from '@heroicons/vue/24/outline';
 import TierCard from '@/components/ui/card/dashboard/TierCard.vue';
 import EventCard from '@/components/ui/card/dashboard/EventCard.vue';
-import Cart from '@/components/Cart.vue';
+import Cart from '@/components/ui/cart/Cart.vue';
 
 
 // ─────────────────────────────────────────────
@@ -770,14 +770,14 @@ const ShowCodeToggle = defineComponent({
 
 // ===== Reactive model values =====
 const vals = reactive({
-    // InputComponentDashboard
+    // DashboardTextInput
     icd1: '', icd2: '', icd3: '', icd4: '', icd5: '', icd6: '',
     icd7: '', icd8: '', icd9: '', icd10: '', icd11: '', icd12: '',
     // BaseInput
     bi1: '', bi2: '', bi3: 'Readonly Text', bi4: 5, bi5: '', bi6: '', bi7: '', bi8: 'bad@', bi9: 'good@email.com', bi10: '',
-    // InputAuthComponent
+    // AuthTextInput
     ia1: '', ia2: '', ia3: '', ia4: '', ia5: '', ia6: '', ia7: 'disabled text', ia8: '', ia9: '', ia10: '',
-    // InputDefaultComponent
+    // BaseTextInput
     id1: '', id2: '', id3: '', id4: 'bademail', id5: '', id6: '', id7: '', id8: 0, id9: '', id10: '',
     // CodeInput
     ci1: '', ci2: '', ci3: '', ci4: '', ci5: '', ci6: '',
@@ -975,41 +975,41 @@ const demoSnippets = {
         video: `<!-- Template -->\n<MediaCardV2 :media="videoCard" />\n\n<!-- Script Data -->\nconst videoCard = ref({\n  id: 3,\n  type: 'video',\n  videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',\n  poster: 'https://i.ibb.co.com/jk1F8MqJ/featured-media-bg.webp',\n  title: 'Took a walk in the park this morning',\n  duration: '14:55',\n  timeAgo: '5mo',\n  likes: 0,\n  views: 4,\n  isLocked: true,               \n  showTag: false,\n  tagText: '',\n  tagColor: 'green'\n});`,
     },
     heading: {
-        h1Primary: `<Heading \n  text="Primary H1" \n  tag="h1" \n  theme="defaultPrimaryHeading" \n  version="basic" \n  class="!text-black" \n/>`,
-        h2Secondary: `<Heading \n  text="Secondary H2" \n  tag="h2" \n  theme="defaultSecondaryHeading" \n  version="basic" \n  class="!text-black" \n/>`,
-        h3Section: `<Heading \n  text="Section H3" \n  tag="h3" \n  theme="sectionHeading" \n  version="basic" \n  class="!text-black" \n/>`,
-        h2Dashboard: `<Heading \n  text="Dashboard Title" \n  tag="h2" \n  theme="dashboardHeading" \n  version="basic" \n/>`,
-        h2Auth: `<Heading \n  text="Login" \n  tag="h2" \n  theme="AuthHeading" \n  version="basic" \n  class="!text-black" \n/>`,
-        h4Form: `<Heading \n  text="Profile Settings" \n  tag="h4" \n  theme="formHeading" \n  version="basic" \n/>`,
-        h1Demo: `<Heading \n  text="Demo H1 Bold" \n  tag="h1" \n  theme="demoHeadings" \n  version="basic" \n/>`,
-        h3Demo: `<Heading \n  text="Demo H3 Medium" \n  tag="h3" \n  theme="demoHeadings" \n  version="basic" \n/>`,
-        withIcon: `<Heading \n  text="With Icon" \n  tag="h3" \n  theme="defaultSecondaryHeading" \n  version="basic" \n  class="!text-black" \n  :leftIcon="StarIcon" \n/>`,
-        order: `<Heading \n  text="Order #1234" \n  tag="h1" \n  theme="orderHeading" \n  version="basic" \n/>`,
+        h1Primary: `<BaseHeading \n  text="Primary H1" \n  tag="h1" \n  theme="defaultPrimaryHeading" \n  version="basic" \n  class="!text-black" \n/>`,
+        h2Secondary: `<BaseHeading \n  text="Secondary H2" \n  tag="h2" \n  theme="defaultSecondaryHeading" \n  version="basic" \n  class="!text-black" \n/>`,
+        h3Section: `<BaseHeading \n  text="Section H3" \n  tag="h3" \n  theme="sectionHeading" \n  version="basic" \n  class="!text-black" \n/>`,
+        h2Dashboard: `<BaseHeading \n  text="Dashboard Title" \n  tag="h2" \n  theme="dashboardHeading" \n  version="basic" \n/>`,
+        h2Auth: `<BaseHeading \n  text="Login" \n  tag="h2" \n  theme="AuthHeading" \n  version="basic" \n  class="!text-black" \n/>`,
+        h4Form: `<BaseHeading \n  text="Profile Settings" \n  tag="h4" \n  theme="formHeading" \n  version="basic" \n/>`,
+        h1Demo: `<BaseHeading \n  text="Demo H1 Bold" \n  tag="h1" \n  theme="demoHeadings" \n  version="basic" \n/>`,
+        h3Demo: `<BaseHeading \n  text="Demo H3 Medium" \n  tag="h3" \n  theme="demoHeadings" \n  version="basic" \n/>`,
+        withIcon: `<BaseHeading \n  text="With Icon" \n  tag="h3" \n  theme="defaultSecondaryHeading" \n  version="basic" \n  class="!text-black" \n  :leftIcon="StarIcon" \n/>`,
+        order: `<BaseHeading \n  text="Order #1234" \n  tag="h1" \n  theme="orderHeading" \n  version="basic" \n/>`,
     },
     paragraph: {
-        default: `<Paragraph \n  text="This is a default paragraph with standard styling." \n  class="!text-black" \n/>`,
-        small: `<Paragraph \n  text="Small text paragraph for captions." \n  class="!text-black text-sm" \n/>`,
-        large: `<Paragraph \n  text="Large paragraph text." \n  class="!text-black text-xl" \n/>`,
-        bold: `<Paragraph \n  text="Bold paragraph text." \n  class="!text-black font-bold" \n/>`,
-        blue: `<Paragraph \n  text="Blue paragraph text." \n  fontColor="text-blue-600" \n/>`,
-        error: `<Paragraph \n  text="This field is required." \n  fontColor="text-red-500" \n  fontSize="text-sm" \n/>`,
-        success: `<Paragraph \n  text="Action successful!" \n  fontColor="text-green-600" \n  fontWeight="font-medium" \n/>`,
-        italic: `<Paragraph \n  text="Italic paragraph text for notes." \n  fontFamily="italic" \n  fontColor="text-gray-500" \n/>`,
-        withIcon: `<Paragraph \n  text="Info message here" \n  :leftIcon="InformationCircleIcon" \n  fontSize="text-sm" \n  fontColor="text-blue-600" \n/>`,
-        xs: `<Paragraph \n  text="Helper text displayed below the input field." \n  fontSize="text-xs" \n  fontColor="text-gray-400" \n/>`,
+        default: `<BaseParagraph \n  text="This is a default paragraph with standard styling." \n  class="!text-black" \n/>`,
+        small: `<BaseParagraph \n  text="Small text paragraph for captions." \n  class="!text-black text-sm" \n/>`,
+        large: `<BaseParagraph \n  text="Large paragraph text." \n  class="!text-black text-xl" \n/>`,
+        bold: `<BaseParagraph \n  text="Bold paragraph text." \n  class="!text-black font-bold" \n/>`,
+        blue: `<BaseParagraph \n  text="Blue paragraph text." \n  fontColor="text-blue-600" \n/>`,
+        error: `<BaseParagraph \n  text="This field is required." \n  fontColor="text-red-500" \n  fontSize="text-sm" \n/>`,
+        success: `<BaseParagraph \n  text="Action successful!" \n  fontColor="text-green-600" \n  fontWeight="font-medium" \n/>`,
+        italic: `<BaseParagraph \n  text="Italic paragraph text for notes." \n  fontFamily="italic" \n  fontColor="text-gray-500" \n/>`,
+        withIcon: `<BaseParagraph \n  text="Info message here" \n  :leftIcon="InformationCircleIcon" \n  fontSize="text-sm" \n  fontColor="text-blue-600" \n/>`,
+        xs: `<BaseParagraph \n  text="Helper text displayed below the input field." \n  fontSize="text-xs" \n  fontColor="text-gray-400" \n/>`,
     },
     icd: {
-        default: `<InputComponentDashboard \n  v-model="inputs.basic" \n  placeholder="carrot_popxoxo123" \n  showLabel \n  labelText="Username" \n  description="Usernames cannot be changed..." \n/>`,
-        email: `<InputComponentDashboard \n  v-model="inputs.basic" \n  placeholder="mscarrot_pops@gmail.com" \n  showLabel \n  labelText="Email" \n/>`,
-        firstName: `<InputComponentDashboard \n  v-model="inputs.basic" \n  placeholder="" \n  showLabel \n  labelText="First Name" \n/>`,
-        lastName: `<InputComponentDashboard \n  v-model="inputs.basic" \n  placeholder="" \n  showLabel \n  labelText="Last Name" \n/>`,
-        title: `<InputComponentDashboard \n  v-model="inputs.basic" \n  placeholder="Event Title" \n  showLabel \n  labelText="Title" \n/>`,
-        coPerformer: `<InputComponentDashboard \n  placeholder="Search by username & email" \n  v-model="inputs.basic" \n  showLabel \n  label-text="Co-performer (Optional)" \n  :left-icon="MagnifyingGlassIcon" \n  optionalLabel \n/>`,
-        password: `<InputComponentDashboard \n  v-model="inputs.password" \n  placeholder="Old Password" \n  showLabel \n  labelText="Old Password" \n  @rightIconClick="inputs.showPass = !inputs.showPass" \n/>`,
-        rightIcon: `<InputComponentDashboard \n  v-model="inputs.email" \n  placeholder="Enter email..." \n  showLabel \n  labelText="Email Support" \n  :rightIcon="EnvelopeIcon" \n/>`,
-        requiredStar: `<InputComponentDashboard \n  v-model="inputs.email" \n  placeholder="Required field" \n  showLabel \n  labelText="Full Name" \n  requiredDisplay="*" \n/>`,
-        bothIcons: `<InputComponentDashboard \n  v-model="inputs.email" \n  placeholder="Search with filters..." \n  showLabel \n  labelText="Advanced Search" \n  :leftIcon="MagnifyingGlassIcon" \n  :rightIcon="Bars3Icon" \n  clickableRightIcon \n/>`,
-        textarea: `<InputComponentDashboard \n  id="input_g" \n  type="textarea" \n  show-label \n  v-model="inputs.bio" \n  textAreaRows="3" \n  label-text="" \n  placeholder="Description (Optional)" \n  description="0/200 characters" \n/>`,
+        default: `<DashboardTextInput \n  v-model="inputs.basic" \n  placeholder="carrot_popxoxo123" \n  showLabel \n  labelText="Username" \n  description="Usernames cannot be changed..." \n/>`,
+        email: `<DashboardTextInput \n  v-model="inputs.basic" \n  placeholder="mscarrot_pops@gmail.com" \n  showLabel \n  labelText="Email" \n/>`,
+        firstName: `<DashboardTextInput \n  v-model="inputs.basic" \n  placeholder="" \n  showLabel \n  labelText="First Name" \n/>`,
+        lastName: `<DashboardTextInput \n  v-model="inputs.basic" \n  placeholder="" \n  showLabel \n  labelText="Last Name" \n/>`,
+        title: `<DashboardTextInput \n  v-model="inputs.basic" \n  placeholder="Event Title" \n  showLabel \n  labelText="Title" \n/>`,
+        coPerformer: `<DashboardTextInput \n  placeholder="Search by username & email" \n  v-model="inputs.basic" \n  showLabel \n  label-text="Co-performer (Optional)" \n  :left-icon="MagnifyingGlassIcon" \n  optionalLabel \n/>`,
+        password: `<DashboardTextInput \n  v-model="inputs.password" \n  placeholder="Old Password" \n  showLabel \n  labelText="Old Password" \n  @rightIconClick="inputs.showPass = !inputs.showPass" \n/>`,
+        rightIcon: `<DashboardTextInput \n  v-model="inputs.email" \n  placeholder="Enter email..." \n  showLabel \n  labelText="Email Support" \n  :rightIcon="EnvelopeIcon" \n/>`,
+        requiredStar: `<DashboardTextInput \n  v-model="inputs.email" \n  placeholder="Required field" \n  showLabel \n  labelText="Full Name" \n  requiredDisplay="*" \n/>`,
+        bothIcons: `<DashboardTextInput \n  v-model="inputs.email" \n  placeholder="Search with filters..." \n  showLabel \n  labelText="Advanced Search" \n  :leftIcon="MagnifyingGlassIcon" \n  :rightIcon="Bars3Icon" \n  clickableRightIcon \n/>`,
+        textarea: `<DashboardTextInput \n  id="input_g" \n  type="textarea" \n  show-label \n  v-model="inputs.bio" \n  textAreaRows="3" \n  label-text="" \n  placeholder="Description (Optional)" \n  description="0/200 characters" \n/>`,
     },
     notification: {
         warning: `<NotificationCard \n  variant="warning" \n  title="Media Content Required" \n  description="Your profile currently has no media..." \n  timestamp="1w" \n  :icon="FilmIcon" \n  :badgeIcon="ArrowUpTrayIcon" \n  dismissLabel="Dismiss" \n  actionLabel="Take Action" \n  v-model="notifOpen.warning" \n/>`,
@@ -1038,20 +1038,20 @@ const demoSnippets = {
         default: `<!-- Template -->\n<Cart />\n\n<!-- Interaction Logic (Custom Events) -->\n// To add an item via console or script:\nwindow.dispatchEvent(new CustomEvent('cart:add', {\n  detail: {\n    item: {\n      title: "NBA Hoops Card",\n      productId: "nba123",\n      qty: 1,\n      price: 12.23,\n      originalPrice: 20.00,\n      shipping: 12.23,\n      seller: "Princess Carrot Pop",\n      image: "https://i.ibb.co.com/70sHrpv/featured-media-bg.webp",\n      promoCodes: ["PROMOCODE2025", "MEMBER BENEFIT"]\n    }\n  }\n}));`,
     },
     spinner: {
-        img: `<Spinner \n  src="https://i.ibb.co.com/TM7mTrZJ/spinner.webp" \n  size="2xl" \n/>`,
-        styled: `<Spinner \n  thickness="3.5" \n  size="lg" \n  color="text-green-500" \n  trackColor="text-white" \n/>`,
-        thin: `<Spinner \n  thickness="1" \n  size="3xl" \n  color="text-green-500" \n  trackColor="text-white" \n/>`,
+        img: `<LoadingSpinner \n  src="https://i.ibb.co.com/TM7mTrZJ/spinner.webp" \n  size="2xl" \n/>`,
+        styled: `<LoadingSpinner \n  thickness="3.5" \n  size="lg" \n  color="text-green-500" \n  trackColor="text-white" \n/>`,
+        thin: `<LoadingSpinner \n  thickness="1" \n  size="3xl" \n  color="text-green-500" \n  trackColor="text-white" \n/>`,
     },
     buttons: {
-        authPink: `<ButtonComponent \n  :text="buttonText" \n  variant="authPink" \n  type="submit" \n/>`,
-        authTransparent: `<ButtonComponent \n  text="Continue with Telegram" \n  variant="authTransparent" \n  size="lg" \n  :leftIcon="telegramIcon" \n  leftIconClass="w-8 h-8" \n/>`,
-        newEvents: `<ButtonComponent \n  text="NEW EVENTS" \n  variant="none" \n  customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" \n  :leftIconClass="\`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]\`" \n/>`,
-        polygonNext: `<ButtonComponent \n  text="Next" \n  variant="polygonLeft" \n  :rightIcon="'https://i.ibb.co.com/hx8ztZFf/svgviewer-png-output-8.webp'" \n  :rightIconClass="\`w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]\`" \n  btnBg="#07f468" \n  btnHoverBg="black" \n  btnText="black" \n  btnHoverText="#07f468" \n/>`,
-        publishSchedule: `<ButtonComponent \n  text="PUBLISH SCHEDULE" \n  variant="polygonLeft" \n  :leftIcon="'https://i.ibb.co.com/S74jfvBw/Icon-1.png'" \n  :leftIconClass="\`w-6 h-6 transition duration-200 filter brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]\`" \n/>`,
-        addonService: `<ButtonComponent \n  text="add-on service" \n  variant="none" \n  customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" \n  :leftIconClass="\`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)] rounded-sm outline outline-[1.50px] outline-offset-[-0.75px]\`" \n/>`,
-        addonServiceV2: `<ButtonComponent \n  text="add-on service" \n  variant="none" \n  customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/bRYvsTVs/Icon.png'" \n  :leftIconClass="\`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]\`" \n/>`,
-        proceedPayment: `<ButtonComponent \n  text="Proceed Payment" \n  variant="checkoutProceedpayment" \n  :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'" \n  :rightIconClass="\`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]\`" \n/>`,
-        actionGreenX: `<ButtonComponent \n  text="Continue with X (Twitter)" \n  variant="actionGreen" \n  leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp" \n  leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]" \n/>`,
+        authPink: `<PrimaryButton \n  :text="buttonText" \n  variant="authPink" \n  type="submit" \n/>`,
+        authTransparent: `<PrimaryButton \n  text="Continue with Telegram" \n  variant="authTransparent" \n  size="lg" \n  :leftIcon="telegramIcon" \n  leftIconClass="w-8 h-8" \n/>`,
+        newEvents: `<PrimaryButton \n  text="NEW EVENTS" \n  variant="none" \n  customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" \n  :leftIconClass="\`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]\`" \n/>`,
+        polygonNext: `<PrimaryButton \n  text="Next" \n  variant="polygonLeft" \n  :rightIcon="'https://i.ibb.co.com/hx8ztZFf/svgviewer-png-output-8.webp'" \n  :rightIconClass="\`w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]\`" \n  btnBg="#07f468" \n  btnHoverBg="black" \n  btnText="black" \n  btnHoverText="#07f468" \n/>`,
+        publishSchedule: `<PrimaryButton \n  text="PUBLISH SCHEDULE" \n  variant="polygonLeft" \n  :leftIcon="'https://i.ibb.co.com/S74jfvBw/Icon-1.png'" \n  :leftIconClass="\`w-6 h-6 transition duration-200 filter brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]\`" \n/>`,
+        addonService: `<PrimaryButton \n  text="add-on service" \n  variant="none" \n  customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" \n  :leftIconClass="\`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)] rounded-sm outline outline-[1.50px] outline-offset-[-0.75px]\`" \n/>`,
+        addonServiceV2: `<PrimaryButton \n  text="add-on service" \n  variant="none" \n  customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/bRYvsTVs/Icon.png'" \n  :leftIconClass="\`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]\`" \n/>`,
+        proceedPayment: `<PrimaryButton \n  text="Proceed Payment" \n  variant="checkoutProceedpayment" \n  :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'" \n  :rightIconClass="\`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]\`" \n/>`,
+        actionGreenX: `<PrimaryButton \n  text="Continue with X (Twitter)" \n  variant="actionGreen" \n  leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp" \n  leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]" \n/>`,
     }
 };
 

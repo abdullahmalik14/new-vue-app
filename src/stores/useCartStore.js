@@ -86,7 +86,7 @@ export const useCartStore = defineStore("cart", {
     /**
      * Updates the store with fresh cart data from the pipeline.
      */
-    setCartAction(payload) {
+    syncCartBundle(payload) {
       const { items, summary, etag, label, couponCode, cartType, isDefault, userId } = payload || {};
       
       this.items = Array.isArray(items) ? items : Object.values(items || {});

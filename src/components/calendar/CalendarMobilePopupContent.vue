@@ -65,7 +65,7 @@
         </div>
 
         <div class="p-4 mt-auto flex-shrink-0">
-            <ButtonComponent @click="$emit('open-new-events')" text="NEW EVENTS" variant="none"
+            <PrimaryButton @click="$emit('open-new-events')" text="NEW EVENTS" variant="none"
                 customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]"
                 :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'"
                 :leftIconClass="`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`" />
@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-import ButtonComponent from '@/components/button/ButtonComponent.vue';
+import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
 import EventsWidget from './EventsWidget.vue';
 
 defineProps({

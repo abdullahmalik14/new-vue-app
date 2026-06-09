@@ -1,5 +1,5 @@
 <template>
-  <PopupHandler
+  <BasePopupShell
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="avatarPopupConfig"
@@ -79,14 +79,14 @@
           </div>
 
         </div>
-  </PopupHandler>
+  </BasePopupShell>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
-import PopupHandler from "./PopupHandler.vue";
-import AvatarSelector from "@/components/AvatarSelector.vue";        
-import BackgroundSelector from "@/components/BackgroundSelector.vue"; 
+import BasePopupShell from "./BasePopupShell.vue";
+import AvatarSelector from "@/components/ui/profile/AvatarSelector.vue";        
+import BackgroundSelector from "@/components/ui/profile/BackgroundSelector.vue"; 
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },

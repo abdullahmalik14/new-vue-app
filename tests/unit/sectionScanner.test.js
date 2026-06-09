@@ -8,9 +8,7 @@ import {
 const ROUTE_CONFIG_PATH = join(process.cwd(), 'src/router/routeConfig.json');
 
 const SHARED_DASHBOARD_CHROME_MARKERS = [
-  'components/dashboard/',
-  'templates/dashboard/DashboardSidebar.vue',
-  'templates/dashboard/HeaderResponsive.vue',
+  'templates/dashboard/shared/',
 ];
 
 describe('sectionScanner shared dashboard chrome', () => {
@@ -37,7 +35,7 @@ describe('sectionScanner shared dashboard chrome', () => {
     const paths = generateContentPathsForSection('misc', misc);
     const normalized = paths.map((p) => p.replace(/\\/g, '/'));
 
-    expect(normalized.some((p) => p.includes('components/dashboard/'))).toBe(true);
-    expect(normalized.some((p) => p.includes('DashboardSidebar.vue'))).toBe(true);
+    expect(normalized.some((p) => p.includes('templates/dashboard/shared/'))).toBe(true);
+    expect(normalized.some((p) => p.includes('DashboardSharedSidebar.vue'))).toBe(true);
   });
 });

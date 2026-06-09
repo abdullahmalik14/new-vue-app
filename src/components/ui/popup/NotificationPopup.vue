@@ -1,5 +1,5 @@
 <template>
-  <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)" :config="config">
+  <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)" :config="config">
     <div
       class="w-full flex flex-col items-start overflow-hidden 
       shadow-[4px_0_10px_0_rgba(0,0,0,0.08)] bg-panel-light/70 
@@ -604,12 +604,12 @@
         </div>
       </div>
     </div>
-  </PopupHandler>
+  </BasePopupShell>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import PopupHandler from "./PopupHandler.vue";
+import BasePopupShell from "./BasePopupShell.vue";
 
 const props = defineProps({
   modelValue: {

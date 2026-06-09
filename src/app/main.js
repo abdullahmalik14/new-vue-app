@@ -14,7 +14,7 @@
 import { createApp, watch } from "vue";
 import { createPinia, storeToRefs } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
-import { useDashboardAnalytics } from '@/stores/DashboardAnalytics';
+import { useDashboardAnalyticsStore } from "../stores/useDashboardAnalyticsStore.js";
 import flowRefreshManager from "@/services/flow-system/flowRefreshManager";
 import { createI18n } from "vue-i18n";
 import '@/assets/styles/rtl-foundation.css';
@@ -168,7 +168,7 @@ FlowHandler.configure({
   piniaStores: {
     chat: useChatStore(pinia),
     cart: useCartStore(pinia),
-    dashboard: useDashboardAnalytics(pinia),
+    dashboard: useDashboardAnalyticsStore(pinia),
   },
   getUserId: () => {
     const auth = useAuthStore();
@@ -177,7 +177,7 @@ FlowHandler.configure({
 });
 
 // Initialize Dashboard Analytics
-const dashboardStore = useDashboardAnalytics(pinia);
+const dashboardStore = useDashboardAnalyticsStore(pinia);
 window.dashboardStore = dashboardStore;
 const { earnings } = storeToRefs(dashboardStore);
 

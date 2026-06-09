@@ -22,14 +22,14 @@
     >
       {{ $t('ui.translatePageAction') }}
     </button>
-    <Spinner v-if="isBusy" size="sm" />
+    <LoadingSpinner v-if="isBusy" size="sm" />
   </form>
 </template>
 
 <script setup>
 import { ref, computed, useId } from 'vue';
 import { useRoute } from 'vue-router';
-import Spinner from '@/components/ui/spinner/Spinner.vue';
+import LoadingSpinner from '@/components/ui/spinners/LoadingSpinner.vue';
 import {
   getActiveLocale,
   getLocaleSwitcherOptions,

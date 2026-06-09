@@ -1,4 +1,4 @@
-import { useIpStore } from '@/stores/ipStore.js';
+import { useIpStore } from '@/stores/useIpStore.js';
 import PerfTracker from '@/infrastructure/logging/performanceTracker.js';
 
 /**

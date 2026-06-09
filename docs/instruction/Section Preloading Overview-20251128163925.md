@@ -56,7 +56,7 @@ The `dist/section-manifest.json` file — which maps each section to its bundled
 ## Adding a New Route or Section
 When introducing a new section, you must:
 1. **Create the component file**
-    *   Example: `/src/templates/dashboard/page/creator/Studio.vue`
+    *   Example: `/src/templates/dashboard/creator/Studio.vue`
 2. **Add a new entry in** **`routeConfig.json`** **and ensure it has:**
     *   `slug`: Must match the intended route path.
     *   `section`: Must match your build’s section bundle name.

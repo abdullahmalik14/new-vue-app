@@ -1,13 +1,13 @@
 <script setup>
-import CheckboxGroup from "@/components/checkbox/CheckboxGroup.vue";
-import CheckoutMediaPreview from "../ReuseableComponents/CheckoutMediaPreview.vue";
-import CheckoutNotes from "../ReuseableComponents/CheckoutNotes.vue";
-import PaymentMethodLoggedIn from "../ReuseableComponents/PaymentMethodLoggedIn.vue";
-import SectionHeader from "../ReuseableComponents/SectionHeader.vue";
-import SubscriptionPlanCard from "../ReuseableComponents/SubscriptionPlanCard.vue";
-import ButtonComponent from "@/components/button/ButtonComponent.vue";
-import PopupHandler from "@/components/ui/popup/PopupHandler.vue";
-import TotalAmountRow from "../ReuseableComponents/TotalAmountRow.vue";
+import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
+import CheckoutMediaPreview from "../checkout/CheckoutMediaPreview.vue";
+import CheckoutNotes from "../checkout/CheckoutNotes.vue";
+import PaymentMethodLoggedIn from "../checkout/PaymentMethodLoggedIn.vue";
+import SectionHeader from "../checkout/SectionHeader.vue";
+import SubscriptionPlanCard from "../checkout/SubscriptionPlanCard.vue";
+import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import BasePopupShell from "@/components/ui/popup/BasePopupShell.vue";
+import TotalAmountRow from "../checkout/TotalAmountRow.vue";
 
 
 const props = defineProps({
@@ -36,7 +36,7 @@ const subscribeLoginConfig = {
 </script>
 
 <template>
-    <PopupHandler
+    <BasePopupShell
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="subscribeLoginConfig"
@@ -290,7 +290,7 @@ const subscribeLoginConfig = {
             </CheckboxGroup>
 
             <!-- button -->
-            <ButtonComponent
+            <PrimaryButton
               text="Proceed Payment"
               variant="checkoutProceedpayment"
               :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'"
@@ -301,5 +301,5 @@ const subscribeLoginConfig = {
       </div>
     </div>
   </div>
-  </PopupHandler>
+  </BasePopupShell>
 </template>

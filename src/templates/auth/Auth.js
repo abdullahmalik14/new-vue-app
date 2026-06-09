@@ -1,3 +1,2 @@
-// Auth entry point - exports wrapper for auth templates
-export { default as AuthWrapper } from './AuthWrapper.vue'
-
+// Auth entry point - exports layout for auth templates
+export { default as AuthLayout } from './AuthLayout.vue'

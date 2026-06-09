@@ -508,22 +508,22 @@
 
 
     <!-- popups -->
-    <PopupHandler v-model="calendarPopupOpen" :config="calendarPopupConfig">
+    <BasePopupShell v-model="calendarPopupOpen" :config="calendarPopupConfig">
       <CalendarMobilePopupContent :view="view" :events-data="eventsData" @set-view="setView" @join-click="handleJoin"
         @reply-click="handleReply" @open-new-events="newEventsPopupOpen = true" />
-    </PopupHandler>
+    </BasePopupShell>
 
-    <PopupHandler v-model="newEventsPopupOpen" :config="newEventsPopupConfig">
+    <BasePopupShell v-model="newEventsPopupOpen" :config="newEventsPopupConfig">
       <NewEventsPopup />
-    </PopupHandler>
+    </BasePopupShell>
 
-    <PopupHandler v-model="eventDetailsPopupOpen" :config="eventDetailsPopupConfig">
+    <BasePopupShell v-model="eventDetailsPopupOpen" :config="eventDetailsPopupConfig">
       <CalendarEventDetailsPopup :event="selectedEvent" />
-    </PopupHandler>
+    </BasePopupShell>
 
-    <PopupHandler v-model="isDatePopupOpen" :config="datePopupConfig">
+    <BasePopupShell v-model="isDatePopupOpen" :config="datePopupConfig">
       <MobileDateSelector :current-date="cursor" @update:date="handleDateUpdate" @close="isDatePopupOpen = false" />
-    </PopupHandler>
+    </BasePopupShell>
 
 
   </section>
@@ -534,12 +534,12 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { SOD, addDays, addMonths, startOfWeek, endOfWeek, startOfMonth, endOfMonth, timeToMinutes, overlaps, monthNames } from '@/utils/calendarHelpers.js';
-import CheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
+import CheckboxGroup from '@/components/forms/checkboxes/CheckboxGroup.vue';
 import { onUnmounted } from 'vue';
 import EventDropdownContent from './EventDropdownContent.vue';
-import PopupHandler from '../ui/popup/PopupHandler.vue';
+import BasePopupShell from '../ui/popup/BasePopupShell.vue';
 import EventsWidget from './EventsWidget.vue';
-import ButtonComponent from '@/components/button/ButtonComponent.vue';
+import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
 import NewEventsPopup from './NewEventsPopup.vue';
 import CalendarMobilePopupContent from './CalendarMobilePopupContent.vue';
 import CalendarEventDetailsPopup from './CalendarEventDetailsPopup.vue';

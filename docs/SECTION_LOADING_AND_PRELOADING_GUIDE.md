@@ -232,7 +232,7 @@ async function loadRouteComponent(route) {
     return componentModule.default || componentModule;
   } catch (error) {
     // Fallback to NotFound component
-    return import('@/templates/misc/NotFound.vue');
+    return import('@/templates/misc/NotFoundPage.vue');
   }
 }
 ```

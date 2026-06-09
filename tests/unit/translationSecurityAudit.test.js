@@ -60,7 +60,7 @@ describe('translation security audit (S-03)', () => {
 
     expect(vhtmlFiles.sort().map((p) => p.replace(/\\/g, '/'))).toEqual([
       'src/components/ui/card/dashboard/TierCard.vue',
-      'src/templates/profileAbdullah/components/SubscriptionCard.vue',
+      'src/templates/profile/views/SubscriptionCard.vue',
     ]);
   });
 });

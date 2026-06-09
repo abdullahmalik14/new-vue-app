@@ -15,31 +15,31 @@ describe('routeComponentPathValidator (M10)', () => {
   it('collectComponentPathsFromRoute gathers base and role-specific paths', () => {
     const paths = collectComponentPathsFromRoute({
       slug: '/dashboard',
-      componentPath: '@/templates/dashboard/page/role/Dashboard.vue',
+      componentPath: '@/templates/dashboard/role/DashboardDevPlaygroundPage.vue',
       customComponentPath: {
         creator: {
-          componentPath: '@/templates/dashboard/page/creator/DashboardCreator.vue',
+          componentPath: '@/templates/dashboard/creator/DashboardCreator.vue',
         },
       },
     });
 
     expect(paths).toEqual([
-      { path: '@/templates/dashboard/page/role/Dashboard.vue', source: 'componentPath' },
+      { path: '@/templates/dashboard/role/DashboardDevPlaygroundPage.vue', source: 'componentPath' },
       {
-        path: '@/templates/dashboard/page/creator/DashboardCreator.vue',
+        path: '@/templates/dashboard/creator/DashboardCreator.vue',
         source: 'customComponentPath.creator',
       },
     ]);
   });
 
   it('componentPathToRelativeFile maps @/ alias to src path', () => {
-    expect(componentPathToRelativeFile('@/templates/auth/page/role/AuthLogIn.vue')).toBe(
-      'src/templates/auth/page/role/AuthLogIn.vue',
+    expect(componentPathToRelativeFile('@/templates/auth/page/role/LoginPage.vue')).toBe(
+      'src/templates/auth/page/role/LoginPage.vue',
     );
   });
 
   it('validateRouteComponentPathsOnDisk passes for an existing route component', () => {
-    const relative = 'src/templates/auth/page/role/AuthLogIn.vue';
+    const relative = 'src/templates/auth/page/role/LoginPage.vue';
     if (!existsSync(join(projectRoot, relative))) {
       return;
     }
@@ -48,7 +48,7 @@ describe('routeComponentPathValidator (M10)', () => {
       [
         {
           slug: '/log-in',
-          componentPath: '@/templates/auth/page/role/AuthLogIn.vue',
+          componentPath: '@/templates/auth/page/role/LoginPage.vue',
         },
       ],
       projectRoot,
@@ -75,11 +75,11 @@ describe('routeComponentPathValidator (M10)', () => {
 
   it('validateRouteComponentPathsWithResolver uses glob resolver', () => {
     const resolveLoader = vi.fn((path) =>
-      path === '@/templates/auth/page/role/AuthLogIn.vue' ? () => Promise.resolve({}) : null,
+      path === '@/templates/auth/page/role/LoginPage.vue' ? () => Promise.resolve({}) : null,
     );
 
     const valid = validateRouteComponentPathsWithResolver(
-      [{ slug: '/log-in', componentPath: '@/templates/auth/page/role/AuthLogIn.vue' }],
+      [{ slug: '/log-in', componentPath: '@/templates/auth/page/role/LoginPage.vue' }],
       resolveLoader,
     );
     const invalid = validateRouteComponentPathsWithResolver(
