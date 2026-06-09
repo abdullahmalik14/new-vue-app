@@ -30,7 +30,7 @@
           />
         </div>
 
-        <Paragraph
+        <BaseParagraph
             :text="message"
             font-size="text-[14px]"
             font-weight="font-[400]"
