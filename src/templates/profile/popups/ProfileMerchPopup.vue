@@ -1,5 +1,5 @@
 <template>
-    <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+    <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
         :config="profileMerchPopupConfig">
         <!-- wrapper   -->
         <div ref="popupWrapper"
@@ -380,7 +380,7 @@
                 </div>
             </div>
         </div>
-    </BasePopupShell>
+    </PopupHandler>
 </template>
 
 <script setup>
@@ -388,7 +388,7 @@ import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import lightGallery from 'lightgallery';
 import lgZoom from 'lightgallery/plugins/zoom';
 import lgThumbnail from 'lightgallery/plugins/thumbnail';
-import BasePopupShell from '@/components/ui/popup/BasePopupShell.vue';
+import PopupHandler from "@/dev/components/ui/popup/PopupHandler.vue";
 import { Splide, SplideSlide } from '@splidejs/vue-splide';
 import '@splidejs/vue-splide/css';
 import 'lightgallery/css/lightgallery.css';
@@ -430,7 +430,7 @@ const emit = defineEmits(["update:modelValue"]);
 watch(() => props.modelValue, async (val) => {
     if (val) {
         await nextTick();
-        // Small delay to ensure BasePopupShell has finished its transition
+        // Small delay to ensure PopupHandler has finished its transition
         setTimeout(() => {
             mainSplide.value?.splide?.refresh();
             thumbSplide.value?.splide?.refresh();

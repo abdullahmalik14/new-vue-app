@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import BaseInput from '@/components/forms/inputs/BaseInput.vue';
+import BaseInput from "@/dev/components/ui/inputs/BaseInput.vue";
 
 const props = defineProps({
     cashAmount: {

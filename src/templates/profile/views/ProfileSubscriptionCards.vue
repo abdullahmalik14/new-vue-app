@@ -26,7 +26,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import SubscriptionCard from './SubscriptionCard.vue';
-import UpgradeTierPopup from "@/components/ui/popup/purchase/UpgradeTierPopup.vue";
+import UpgradeTierPopup from "@/dev/components/ui/popup/purchase/UpgradeTierPopup.vue";
 
 const cards = ref([
     {

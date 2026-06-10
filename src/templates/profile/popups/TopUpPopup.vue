@@ -1,5 +1,5 @@
 <script setup>
-import BasePopupShell from '@/components/ui/popup/BasePopupShell.vue';
+import PopupHandler from "@/dev/components/ui/popup/PopupHandler.vue";
 import { createStepStateEngine } from '@/utils/stateEngine';
 import TopUpStep1 from '@/templates/profile/views/top-up-steps/TopUpStep1.vue';
 import TopUpStep2 from '@/templates/profile/views/top-up-steps/TopUpStep2.vue';
@@ -54,7 +54,7 @@ onMounted(() => {
 </script>
 
 <template>
-        <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+        <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
                 :config="profileCallPopupConfig">
 
 
@@ -81,5 +81,5 @@ onMounted(() => {
                         </div>
                 </div>
 
-        </BasePopupShell>
+        </PopupHandler>
 </template>

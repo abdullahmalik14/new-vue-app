@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import BasePopupShell from '@/components/ui/popup/BasePopupShell.vue';
+import PopupHandler from "@/dev/components/ui/popup/PopupHandler.vue";
 
 const props = defineProps({
     modelValue: { type: Boolean, default: false },
@@ -66,7 +66,7 @@ const profileSeeMorePopupConfig = computed(() => {
 </script>
 
 <template>
-    <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+    <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
         :config="profileSeeMorePopupConfig">
 
         <div
@@ -103,5 +103,5 @@ const profileSeeMorePopupConfig = computed(() => {
             </div>
         </div>
 
-    </BasePopupShell>
+    </PopupHandler>
 </template>

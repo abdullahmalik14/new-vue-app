@@ -1,5 +1,5 @@
 <template>
-    <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+    <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
         :config="profileLoginPopupConfig">
         <!-- Close Icon -->
         <div @click="handleClose"
@@ -46,19 +46,19 @@
             </AuthLayout>
 
         </div>
-    </BasePopupShell>
+    </PopupHandler>
 </template>
 
 <script setup>
 import { ref, provide, watch } from "vue";
-import BasePopupShell from "@/components/ui/popup/BasePopupShell.vue";
-import { AuthLayout } from "@/templates/auth/Auth.js";
-import AuthLogIn from "@/templates/auth/views/AuthLogIn.vue";
-import AuthSignUp from "@/templates/auth/views/AuthSignUp.vue";
-import AuthLostPassword from "@/templates/auth/views/AuthLostPassword.vue";
-import AuthResetPassword from "@/templates/auth/views/AuthResetPassword.vue";
-import AuthConfirmEmail from "@/templates/auth/views/AuthConfirmEmail.vue";
-import AuthSignUpOnboarding from "@/templates/auth/views/AuthSignUpOnboarding.vue";
+import PopupHandler from "@/dev/components/ui/popup/PopupHandler.vue";
+import { AuthLayout } from "@/dev/templates/auth/Auth.js";
+import AuthLogIn from "@/dev/templates/auth/views/AuthLogIn.vue";
+import AuthSignUp from "@/dev/templates/auth/views/AuthSignUp.vue";
+import AuthLostPassword from "@/dev/templates/auth/views/AuthLostPassword.vue";
+import AuthResetPassword from "@/dev/templates/auth/views/AuthResetPassword.vue";
+import AuthConfirmEmail from "@/dev/templates/auth/views/AuthConfirmEmail.vue";
+import AuthSignUpOnboarding from "@/dev/templates/auth/views/AuthSignUpOnboarding.vue";
 
 // ─── Props & Emits ──────────────────────────────────────────────────────────
 const props = defineProps({

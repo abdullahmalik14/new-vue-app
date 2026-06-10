@@ -1,5 +1,5 @@
 <script setup>
-import BasePopupShell from '@/components/ui/popup/BasePopupShell.vue';
+import PopupHandler from "@/dev/components/ui/popup/PopupHandler.vue";
 import { createStepStateEngine } from '@/utils/stateEngine';
 import TipStep1 from '@/templates/profile/views/tip-token-steps/TipStep1.vue';
 import TipStep2 from '@/templates/profile/views/tip-token-steps/TipStep2.vue';
@@ -76,7 +76,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+    <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
         :config="profileCallPopupConfig">
         <!-- close-icon -->
         <div @click="handleClose"
@@ -126,5 +126,5 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-    </BasePopupShell>
+    </PopupHandler>
 </template>

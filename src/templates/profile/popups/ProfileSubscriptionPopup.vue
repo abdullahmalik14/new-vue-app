@@ -1,5 +1,5 @@
 <script setup>
-import BasePopupShell from '@/components/ui/popup/BasePopupShell.vue';
+import PopupHandler from "@/dev/components/ui/popup/PopupHandler.vue";
 import ProfileSubscriptionCards from '../views/ProfileSubscriptionCards.vue';
 
 
@@ -28,7 +28,7 @@ const profileSubscriptionPopupConfig = {
 </script>
 
 <template>
-    <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+    <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
         :config="profileSubscriptionPopupConfig">
         <div
             class="h-full w-full relative flex pt-[24px] pb-[24px] flex-col gap-4 bg-black/20 backdrop-blur-[200px] overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] ">
@@ -85,6 +85,6 @@ const profileSubscriptionPopupConfig = {
 
         </div>
 
-    </BasePopupShell>
+    </PopupHandler>
 
 </template>

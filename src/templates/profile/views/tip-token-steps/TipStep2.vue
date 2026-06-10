@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue';
-import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vue';
+import NotificationCard from "@/dev/components/ui/card/dashboard/NotificationCard.vue";
 
 const props = defineProps({
     engine: {

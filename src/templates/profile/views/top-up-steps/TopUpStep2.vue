@@ -1,13 +1,13 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
-import BaseInput from '@/components/forms/inputs/BaseInput.vue';
-import CheckboxGroup from '@/components/forms/checkboxes/CheckboxGroup.vue';
-import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
-import BaseSelect from '@/components/ui/popup/checkout/BaseSelect.vue';
-import SectionToggleHeader from '@/components/ui/popup/checkout/SectionToggleHeader.vue';
-import PaymentMethodNotLoggedIn from '@/components/ui/popup/checkout/PaymentMethodNotLoggedIn.vue';
-import PaymentMethodLoggedIn from '@/components/ui/popup/checkout/PaymentMethodLoggedIn.vue';
-import AddressCard from '@/components/ui/popup/checkout/AddressCard.vue';
+import BaseInput from "@/dev/components/ui/inputs/BaseInput.vue";
+import CheckboxGroup from "@/dev/components/ui/checkboxes/CheckboxGroup.vue";
+import PrimaryButton from "@/dev/components/ui/buttons/PrimaryButton.vue";
+import BaseSelect from "@/dev/components/ui/popup/checkout/BaseSelect.vue";
+import SectionToggleHeader from "@/dev/components/ui/popup/checkout/SectionToggleHeader.vue";
+import PaymentMethodNotLoggedIn from "@/dev/components/ui/popup/checkout/PaymentMethodNotLoggedIn.vue";
+import PaymentMethodLoggedIn from "@/dev/components/ui/popup/checkout/PaymentMethodLoggedIn.vue";
+import AddressCard from "@/dev/components/ui/popup/checkout/AddressCard.vue";
 
 const props = defineProps({
     engine: {

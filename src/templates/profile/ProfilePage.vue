@@ -429,11 +429,11 @@
 
 <script setup>
 import BaseHeading from "@/components/ui/typography/BaseHeading.vue";
-import FeedPollCard from "@/components/ui/card/dashboard/FeedPollCard.vue";
-import FeedMediaCard from "@/components/ui/card/dashboard/FeedMediaCard.vue";
+import FeedPollCard from "@/dev/components/ui/card/dashboard/FeedPollCard.vue";
+import FeedMediaCard from "@/dev/components/ui/card/dashboard/FeedMediaCard.vue";
 import { ref, onMounted, onUnmounted } from "vue";
-import PlayMediaCards from "@/components/ui/card/dashboard/PlayMediaCards.vue";
-import MerchCard from "@/components/ui/card/dashboard/MerchCard.vue";
+import PlayMediaCards from "@/dev/components/ui/card/dashboard/PlayMediaCards.vue";
+import MerchCard from "@/dev/components/ui/card/dashboard/MerchCard.vue";
 
 // Asset Path
 import checkoutHeader from '/images/checkout-header.webp'
@@ -451,7 +451,7 @@ import HeaderUserProfileResponsive from "./HeaderUserProfileResponsive.vue";
 import HeaderUserProfileDesktop from "./HeaderUserProfileDesktop.vue";
 import ProfileHeaderOptionButtons from "./ProfileHeaderOptionButtons.vue";
 import ProfileMediaTabHeading from "./ProfileMediaTabHeading.vue";
-import ProfileMediaDetailsPopup from "@/components/ui/popup/ProfileMediaDetailsPopup.vue";
+import ProfileMediaDetailsPopup from "@/dev/components/ui/popup/ProfileMediaDetailsPopup.vue";
 import ProfileMerchPopup from "@/templates/profile/popups/ProfileMerchPopup.vue";
 
 const profileMediaDetailsPopupOpen = ref(false);

@@ -1,5 +1,5 @@
 <script setup>
-import BasePopupShell from '@/components/ui/popup/BasePopupShell.vue';
+import PopupHandler from "@/dev/components/ui/popup/PopupHandler.vue";
 
 const props = defineProps({
     modelValue: { type: Boolean, default: false },
@@ -26,7 +26,7 @@ const profileCallPopupConfig = {
 </script>
 
 <template>
-    <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+    <PopupHandler :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
         :config="profileCallPopupConfig">
         <div
             class="relative h-full backdrop-blur-md overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] flex flex-col justify-between">
@@ -259,5 +259,5 @@ const profileCallPopupConfig = {
 
 
         </div>
-    </BasePopupShell>
+    </PopupHandler>
 </template>
