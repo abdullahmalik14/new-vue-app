@@ -1,6 +1,6 @@
 <template>
   <TrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="onPeriodChange" title="Subscriptions Insight"
+    @update:period="handlePeriodChange" title="Subscriptions Insight"
     logo="https://i.ibb.co.com/MyhfGRNH/svgviewer-png-output-12.webp">
     <div v-if="hasData" :class="isDaily ? 'flex flex-row gap-6' : 'flex flex-col gap-6'">
 
@@ -59,48 +59,48 @@
           <!-- Weekly bar/line -->
           <div data-chart-container data-chart-id="subs-weekly-bar"
             :hidden="isDaily || !(activePeriod === 'weekly' && subsView === 'bar') || undefined"
-            class="absolute inset-0" :data-chart-config='subsBarCfg("subs-weekly")'>
+            class="absolute inset-0" :data-chart-config='getSubsBarCfg("subs-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="subs-weekly-line"
             :hidden="isDaily || !(activePeriod === 'weekly' && subsView === 'line') || undefined"
-            class="absolute inset-0" :data-chart-config='subsLineCfg("subs-weekly")'>
+            class="absolute inset-0" :data-chart-config='getSubsLineCfg("subs-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Monthly bar/line -->
           <div data-chart-container data-chart-id="subs-monthly-bar"
             :hidden="isDaily || !(activePeriod === 'monthly' && subsView === 'bar') || undefined"
-            class="absolute inset-0" :data-chart-config='subsBarCfg("subs-monthly")'>
+            class="absolute inset-0" :data-chart-config='getSubsBarCfg("subs-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="subs-monthly-line"
             :hidden="isDaily || !(activePeriod === 'monthly' && subsView === 'line') || undefined"
-            class="absolute inset-0" :data-chart-config='subsLineCfg("subs-monthly")'>
+            class="absolute inset-0" :data-chart-config='getSubsLineCfg("subs-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Yearly bar/line -->
           <div data-chart-container data-chart-id="subs-yearly-bar"
             :hidden="isDaily || !(activePeriod === 'yearly' && subsView === 'bar') || undefined"
-            class="absolute inset-0" :data-chart-config='subsBarCfg("subs-yearly")'>
+            class="absolute inset-0" :data-chart-config='getSubsBarCfg("subs-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="subs-yearly-line"
             :hidden="isDaily || !(activePeriod === 'yearly' && subsView === 'line') || undefined"
-            class="absolute inset-0" :data-chart-config='subsLineCfg("subs-yearly")'>
+            class="absolute inset-0" :data-chart-config='getSubsLineCfg("subs-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Alltime bar/line -->
           <div data-chart-container data-chart-id="subs-alltime-bar"
             :hidden="isDaily || !(activePeriod === 'alltime' && subsView === 'bar') || undefined"
-            class="absolute inset-0" :data-chart-config='subsBarCfg("subs-alltime")'>
+            class="absolute inset-0" :data-chart-config='getSubsBarCfg("subs-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="subs-alltime-line"
             :hidden="isDaily || !(activePeriod === 'alltime' && subsView === 'line') || undefined"
-            class="absolute inset-0" :data-chart-config='subsLineCfg("subs-alltime")'>
+            class="absolute inset-0" :data-chart-config='getSubsLineCfg("subs-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
@@ -141,48 +141,48 @@
           <!-- Weekly -->
           <div data-chart-container data-chart-id="tiers-weekly-bar"
             :hidden="isDaily || !(activePeriod === 'weekly' && tiersView === 'bar') || undefined"
-            class="absolute inset-0" :data-chart-config='tiersBarCfg("subs-weekly")'>
+            class="absolute inset-0" :data-chart-config='getTiersBarCfg("subs-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="tiers-weekly-line"
             :hidden="isDaily || !(activePeriod === 'weekly' && tiersView === 'line') || undefined"
-            class="absolute inset-0" :data-chart-config='tiersLineCfg("subs-weekly")'>
+            class="absolute inset-0" :data-chart-config='getTiersLineCfg("subs-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Monthly -->
           <div data-chart-container data-chart-id="tiers-monthly-bar"
             :hidden="isDaily || !(activePeriod === 'monthly' && tiersView === 'bar') || undefined"
-            class="absolute inset-0" :data-chart-config='tiersBarCfg("subs-monthly")'>
+            class="absolute inset-0" :data-chart-config='getTiersBarCfg("subs-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="tiers-monthly-line"
             :hidden="isDaily || !(activePeriod === 'monthly' && tiersView === 'line') || undefined"
-            class="absolute inset-0" :data-chart-config='tiersLineCfg("subs-monthly")'>
+            class="absolute inset-0" :data-chart-config='getTiersLineCfg("subs-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Yearly -->
           <div data-chart-container data-chart-id="tiers-yearly-bar"
             :hidden="isDaily || !(activePeriod === 'yearly' && tiersView === 'bar') || undefined"
-            class="absolute inset-0" :data-chart-config='tiersBarCfg("subs-yearly")'>
+            class="absolute inset-0" :data-chart-config='getTiersBarCfg("subs-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="tiers-yearly-line"
             :hidden="isDaily || !(activePeriod === 'yearly' && tiersView === 'line') || undefined"
-            class="absolute inset-0" :data-chart-config='tiersLineCfg("subs-yearly")'>
+            class="absolute inset-0" :data-chart-config='getTiersLineCfg("subs-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Alltime -->
           <div data-chart-container data-chart-id="tiers-alltime-bar"
             :hidden="isDaily || !(activePeriod === 'alltime' && tiersView === 'bar') || undefined"
-            class="absolute inset-0" :data-chart-config='tiersBarCfg("subs-alltime")'>
+            class="absolute inset-0" :data-chart-config='getTiersBarCfg("subs-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="tiers-alltime-line"
             :hidden="isDaily || !(activePeriod === 'alltime' && tiersView === 'line') || undefined"
-            class="absolute inset-0" :data-chart-config='tiersLineCfg("subs-alltime")'>
+            class="absolute inset-0" :data-chart-config='getTiersLineCfg("subs-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
@@ -236,21 +236,21 @@ const SUBS_LABELS = { sub: "New Subscriber", tip: "Recurring Subscriber" }
 const TIERS_STYLES = { free: { color: "#4CC9F0", name: "Free" }, tier1: { color: "#4361EE", name: "Tier 1" }, tier2: { color: "#3A0CA3", name: "Tier 2" }, tier3: { color: "#AE4AEF", name: "Tier 3" }, tier4: { color: "#98A2B3", name: "Tier 4" }, tier5: { color: "#F72485", name: "Tier 5" } }
 const TIERS_LABELS = { free: "Free", tier1: "Tier 1", tier2: "Tier 2", tier3: "Tier 3", tier4: "Tier 4", tier5: "Tier 5" }
 
-function subsBarCfg(dk) {
+function getSubsBarCfg(dk) {
   return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["sub", "tip"], stacked: true, seriesStyles: SUBS_STYLES, seriesLabels: SUBS_LABELS, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: LEGEND })
 }
-function subsLineCfg(dk) {
+function getSubsLineCfg(dk) {
   return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["sub", "tip"], stacked: true, seriesStyles: SUBS_STYLES, seriesLabels: SUBS_LABELS, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: LEGEND })
 }
-function tiersBarCfg(dk) {
+function getTiersBarCfg(dk) {
   return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["free", "tier1", "tier2", "tier3", "tier4", "tier5"], stacked: true, seriesStyles: TIERS_STYLES, seriesLabels: TIERS_LABELS, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: LEGEND })
 }
-function tiersLineCfg(dk) {
+function getTiersLineCfg(dk) {
   return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["free", "tier1", "tier2", "tier3", "tier4", "tier5"], stacked: true, seriesStyles: TIERS_STYLES, seriesLabels: TIERS_LABELS, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: LEGEND })
 }
 
 // ===== STAT DATA =====
-function calcPct(curr, prev) {
+function calculatePercentage(curr, prev) {
   if (curr == null || !prev) return null
   return Math.round(((curr - prev) / prev) * 100)
 }
@@ -269,8 +269,8 @@ const statData = computed(() => {
   return {
     new: last.sub ?? null,
     recurring: last.tip ?? null,
-    newPct: calcPct(last.sub, prev.sub),
-    recurringPct: calcPct(last.tip, prev.tip),
+    newPct: calculatePercentage(last.sub, prev.sub),
+    recurringPct: calculatePercentage(last.tip, prev.tip),
   }
 })
 
@@ -363,7 +363,7 @@ async function setTiersView(v) {
   await nextTick()
   if (!isDaily.value) await renderChart(`tiers-${activePeriod.value}-${v}`)
 }
-async function onPeriodChange(val) {
+async function handlePeriodChange(val) {
   emit('update:period', val)
   await nextTick()
   await renderCurrentCharts()

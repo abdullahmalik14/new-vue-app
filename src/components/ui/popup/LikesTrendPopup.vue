@@ -3,7 +3,7 @@
     :model-value="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
     :period="period"
-    @update:period="onPeriodChange"
+    @update:period="handlePeriodChange"
     title="Likes Insight"
     logo="https://i.ibb.co.com/rGSXLKX4/money.webp"
   >
@@ -26,18 +26,18 @@
         <div v-if="hasData" class="absolute top-[40px] left-0 right-0 bottom-[30px]">
           <!-- Bar/Line Container -->
           <div data-chart-container data-chart-id="likes-chart-bar" :hidden="likesView!=='bar'||undefined" class="absolute inset-0"
-            :data-chart-config='likesBarCfg("likes-chart")'>
+            :data-chart-config='getLikesBarCfg("likes-chart")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="likes-chart-line" :hidden="likesView!=='line'||undefined" class="absolute inset-0"
-            :data-chart-config='likesLineCfg("likes-chart")'>
+            :data-chart-config='getLikesLineCfg("likes-chart")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
         
         <!-- Empty State -->
         <div v-else class="absolute inset-0 flex flex-col justify-center items-center gap-6 w-full text-center bg-light-bg-container dark:bg-dark-bg-container z-20">
-          <img src="https://i.ibb.co.com/vx2RDHM3/svgviewer-png-output-3.webp" alt="illustration" class="w-24 h-24 object-contain" />
+          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="illustration" class="w-24 h-24 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
             <a href="#" class="text-sm text-primary-600 dark:text-primary-400 underline">Learn ways to earn</a>
@@ -92,7 +92,7 @@ const LIKES_STYLES = {
 const LIKES_LABELS = { media:"Media", merch:"Merch", profile:"Profile", feed:"Feed" }
 const BREAKDOWN_KEYS = ["media","merch","profile","feed"]
 
-function likesBarCfg(dk) {
+function getLikesBarCfg(dk) {
   return JSON.stringify({
     type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, 
     breakdownKeys:BREAKDOWN_KEYS, stacked:true, seriesStyles:LIKES_STYLES, seriesLabels:LIKES_LABELS, 
@@ -102,7 +102,7 @@ function likesBarCfg(dk) {
   })
 }
 
-function likesLineCfg(dk) {
+function getLikesLineCfg(dk) {
   return JSON.stringify({
     type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, 
     breakdownKeys:BREAKDOWN_KEYS, stacked:true, seriesStyles:LIKES_STYLES, seriesLabels:LIKES_LABELS, 
@@ -182,7 +182,7 @@ async function setLikesView(v) {
   await renderChart(`likes-chart-${v}`)
 }
 
-async function onPeriodChange(val) {
+async function handlePeriodChange(val) {
   emit('update:period', val)
   await nextTick()
   await renderCurrentCharts()

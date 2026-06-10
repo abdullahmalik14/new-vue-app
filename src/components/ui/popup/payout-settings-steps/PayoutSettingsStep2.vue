@@ -440,7 +440,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import EyeSlashIcon from "@heroicons/vue/24/outline/EyeSlashIcon";
-import BasePlanDropdown from '@/components/plan/parts/BasePlanDropdown.vue';
+import BasePlanDropdown from '@/dev/components/plan/parts/BasePlanDropdown.vue';
 import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
 import DashboardTextInput from '@/components/forms/inputs/DashboardTextInput.vue';
 

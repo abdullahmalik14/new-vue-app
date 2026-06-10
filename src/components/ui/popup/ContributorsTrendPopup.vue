@@ -3,7 +3,7 @@
     :model-value="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
     :period="period"
-    @update:period="onPeriodChange"
+    @update:period="handlePeriodChange"
     title="Contributors Insight"
     logo="https://i.ibb.co.com/rGSXLKX4/money.webp"
   >
@@ -25,16 +25,16 @@
 
         <div v-if="insightData?.topContributors?.length > 0" class="absolute top-[40px] left-0 right-0 bottom-[10px]">
           <div data-chart-container data-chart-id="contrib-top-bar" :hidden="contribView!=='bar'||undefined" class="absolute inset-0"
-            :data-chart-config='contribBarCfg("contrib-top")'>
+            :data-chart-config='getContribBarCfg("contrib-top")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="contrib-top-line" :hidden="contribView!=='line'||undefined" class="absolute inset-0"
-            :data-chart-config='contribLineCfg("contrib-top")'>
+            :data-chart-config='getContribLineCfg("contrib-top")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img src="https://i.ibb.co.com/vx2RDHM3/svgviewer-png-output-3.webp" alt="list" class="w-32 h-32 object-contain" />
+          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
             <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to earn</a>
@@ -58,16 +58,16 @@
 
         <div v-if="insightData?.topFans?.length > 0" class="absolute top-[40px] left-0 right-0 bottom-[10px]">
           <div data-chart-container data-chart-id="contrib-fans-bar" :hidden="fansView!=='bar'||undefined" class="absolute inset-0"
-            :data-chart-config='contribBarCfg("contrib-fans")'>
+            :data-chart-config='getContribBarCfg("contrib-fans")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="contrib-fans-line" :hidden="fansView!=='line'||undefined" class="absolute inset-0"
-            :data-chart-config='contribLineCfg("contrib-fans")'>
+            :data-chart-config='getContribLineCfg("contrib-fans")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img src="https://i.ibb.co.com/vx2RDHM3/svgviewer-png-output-3.webp" alt="list" class="w-32 h-32 object-contain" />
+          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
             <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to earn</a>
@@ -91,16 +91,16 @@
 
         <div v-if="insightData?.topOrderSpenders?.length > 0" class="absolute top-[40px] left-0 right-0 bottom-[10px]">
           <div data-chart-container data-chart-id="contrib-spenders-bar" :hidden="spendersView!=='bar'||undefined" class="absolute inset-0"
-            :data-chart-config='contribBarCfg("contrib-spenders")'>
+            :data-chart-config='getContribBarCfg("contrib-spenders")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="contrib-spenders-line" :hidden="spendersView!=='line'||undefined" class="absolute inset-0"
-            :data-chart-config='contribLineCfg("contrib-spenders")'>
+            :data-chart-config='getContribLineCfg("contrib-spenders")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img src="https://i.ibb.co.com/vx2RDHM3/svgviewer-png-output-3.webp" alt="list" class="w-32 h-32 object-contain" />
+          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
             <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to earn</a>
@@ -158,7 +158,7 @@ const CATEGORY_STYLES = {
 const CATEGORY_LABELS = { subscription:"Subscription", paytoview:"Pay to View", merch:"Merch", wishtender:"Wishtender", customrequest:"Custom Request" }
 const BREAKDOWN_KEYS = ["subscription","paytoview","merch","wishtender","customrequest"]
 
-function contribBarCfg(dk) {
+function getContribBarCfg(dk) {
   return JSON.stringify({
     type:"bar", period:"slot", datasetKey:dk,
     fields:{ category:"name", total:"tokens" },
@@ -175,7 +175,7 @@ function contribBarCfg(dk) {
   })
 }
 
-function contribLineCfg(dk) {
+function getContribLineCfg(dk) {
   return JSON.stringify({
     type:"line", period:"slot", datasetKey:dk,
     fields:{ category:"name", total:"tokens" },
@@ -259,7 +259,7 @@ async function setSpendersView(v) {
   await renderChart(`contrib-spenders-${v}`)
 }
 
-async function onPeriodChange(val) {
+async function handlePeriodChange(val) {
   emit('update:period', val)
   await nextTick()
   await renderAllCharts()

@@ -128,7 +128,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import BasePlanDropdown from '@/components/plan/parts/BasePlanDropdown.vue';
+import BasePlanDropdown from '@/dev/components/plan/parts/BasePlanDropdown.vue';
 import DashboardTextInput from '@/components/forms/inputs/DashboardTextInput.vue';
 
 const props = defineProps({

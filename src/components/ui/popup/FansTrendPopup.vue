@@ -1,6 +1,6 @@
 <template>
   <TrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="onPeriodChange" title="Fans Insight"
+    @update:period="handlePeriodChange" title="Fans Insight"
     logo="https://i.ibb.co.com/rGSXLKX4/money.webp">
     <div v-if="hasData" class="flex flex-col gap-4">
       <!-- row: stats -->
@@ -17,7 +17,7 @@
             </span>
             <div class="inline-flex items-center gap-2" v-if="followersPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
-                <img v-if="followersPct >= 0" src="https://i.ibb.co.com/93tZHrmQ/svgviewer-png-output-4.webp" alt="trend-up" class="h-5 w-5" />
+                <img v-if="followersPct >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-5 w-5" />
                 <div :class="followersPct >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ followersPct >= 0 ? '+' : '' }}{{ followersPct }}%</div>
               </div>
               <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ getVsLabel(period) }}</div>
@@ -37,7 +37,7 @@
             </span>
             <div class="inline-flex items-center gap-2" v-if="visitsPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
-                <img v-if="visitsPct >= 0" src="https://i.ibb.co.com/93tZHrmQ/svgviewer-png-output-4.webp" alt="trend-up" class="h-5 w-5" />
+                <img v-if="visitsPct >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-5 w-5" />
                 <div :class="visitsPct >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ visitsPct >= 0 ? '+' : '' }}{{ visitsPct }}%</div>
               </div>
               <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ getVsLabel(period) }}</div>
@@ -63,41 +63,41 @@
         <div class="absolute top-[40px] left-0 right-0 bottom-[30px]">
           <!-- Weekly bar/line -->
           <div data-chart-container data-chart-id="fans-weekly-bar" :hidden="!(activePeriod==='weekly'&&trendView==='bar')||undefined" class="absolute inset-0"
-            :data-chart-config='fansBarCfg("fans-weekly")'>
+            :data-chart-config='getFansBarCfg("fans-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="fans-weekly-line" :hidden="!(activePeriod==='weekly'&&trendView==='line')||undefined" class="absolute inset-0"
-            :data-chart-config='fansLineCfg("fans-weekly")'>
+            :data-chart-config='getFansLineCfg("fans-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Monthly bar/line -->
           <div data-chart-container data-chart-id="fans-monthly-bar" :hidden="!(activePeriod==='monthly'&&trendView==='bar')||undefined" class="absolute inset-0"
-            :data-chart-config='fansBarCfg("fans-monthly")'>
+            :data-chart-config='getFansBarCfg("fans-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="fans-monthly-line" :hidden="!(activePeriod==='monthly'&&trendView==='line')||undefined" class="absolute inset-0"
-            :data-chart-config='fansLineCfg("fans-monthly")'>
+            :data-chart-config='getFansLineCfg("fans-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Yearly bar/line -->
           <div data-chart-container data-chart-id="fans-yearly-bar" :hidden="!(activePeriod==='yearly'&&trendView==='bar')||undefined" class="absolute inset-0"
-            :data-chart-config='fansBarCfg("fans-yearly")'>
+            :data-chart-config='getFansBarCfg("fans-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="fans-yearly-line" :hidden="!(activePeriod==='yearly'&&trendView==='line')||undefined" class="absolute inset-0"
-            :data-chart-config='fansLineCfg("fans-yearly")'>
+            :data-chart-config='getFansLineCfg("fans-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Alltime bar/line -->
           <div data-chart-container data-chart-id="fans-alltime-bar" :hidden="!(activePeriod==='alltime'&&trendView==='bar')||undefined" class="absolute inset-0"
-            :data-chart-config='fansBarCfg("fans-alltime")'>
+            :data-chart-config='getFansBarCfg("fans-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="fans-alltime-line" :hidden="!(activePeriod==='alltime'&&trendView==='line')||undefined" class="absolute inset-0"
-            :data-chart-config='fansLineCfg("fans-alltime")'>
+            :data-chart-config='getFansLineCfg("fans-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
@@ -112,7 +112,7 @@
           </div>
           <div class="absolute top-[60px] left-0 right-0 bottom-4 p-2">
             <div data-chart-container data-chart-id="traffic-sources-donut" class="w-full h-full"
-              :data-chart-config='sourcesDonutCfg("traffic-sources-donut")'>
+              :data-chart-config='getSourcesDonutCfg("traffic-sources-donut")'>
               <div amchart data-role="chart" style="width:100%;height:100%;"></div>
             </div>
           </div>
@@ -173,7 +173,7 @@
 
 <script setup>
 import TrendPopup from './TrendPopup.vue'
-import FlexTable from '@/components/ui/table/FlexTable.vue'
+import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
@@ -203,14 +203,14 @@ const LEGEND = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex
 const FANS_STYLES = { newFollowers:{color:"#4CC9F0",name:"New Followers"}, profileVisits:{color:"#4361EE",name:"Profile Visit"} }
 const FANS_LABELS = { newFollowers:"New Followers", profileVisits:"Profile Visit" }
 
-function fansBarCfg(dk) {
+function getFansBarCfg(dk) {
   return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:true, seriesStyles:FANS_STYLES, seriesLabels:FANS_LABELS, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:LEGEND })
 }
-function fansLineCfg(dk) {
+function getFansLineCfg(dk) {
   return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:false, seriesStyles:FANS_STYLES, seriesLabels:FANS_LABELS, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:LEGEND })
 }
 
-function sourcesDonutCfg(dk) {
+function getSourcesDonutCfg(dk) {
   const styles = {
     Instagram: { color:"#E1306C", name:"Instagram" },
     TikTok: { color:"#000000", name:"TikTok" },
@@ -279,7 +279,7 @@ async function setTrendView(v) {
   if (!isDaily.value) await renderChart(`fans-${activePeriod.value}-${v}`)
 }
 
-async function onPeriodChange(val) {
+async function handlePeriodChange(val) {
   emit('update:period', val)
   await nextTick()
   await renderCurrentCharts()

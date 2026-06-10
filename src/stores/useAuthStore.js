@@ -2,7 +2,7 @@
 
 import { defineStore } from 'pinia';
 import { jwtDecode } from 'jwt-decode';
-import { authHandler } from '../utils/auth/authHandler';
+import { authHandler } from '../dev/utils/auth/authHandler';
 import { log } from '../infrastructure/logging/logHandler';
 import FlowHandler from '@/services/flow-system/FlowHandler.js';
 import flowRefreshManager from '@/services/flow-system/flowRefreshManager.js';

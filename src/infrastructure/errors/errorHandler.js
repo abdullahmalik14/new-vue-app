@@ -1,88 +1,73 @@
 /**
- * ErrorHandler - Simple error logging utility
+ * ErrorHandler - Application Error Management System
  * 
- * Provides basic error logging without complex wrappers.
- * Use standard try/catch blocks in code with this logging utility.
+ * Responsible for handling, reporting, and logging application errors.
+ * Use reportApplicationError for critical issues that need tracking,
+ * and logError for internal error visibility.
  */
 
 import { log } from '../logging/logHandler.js';
 
+class ErrorHandler {
+  /**
+   * Main error reporting method as per architecture guidelines.
+   * Logs locally and forwards to external reporters (e.g. Sentry).
+   */
+  reportApplicationError(fileName, methodName, description, error, additionalData = {}) {
+    this.logError(fileName, methodName, description, error, additionalData);
 
-/**
- * @function logError
- * @description Log an error with context (always logs, even in production)
- * @param {string} fileName - Source file name
- * @param {string} methodName - Method or function name
- * @param {string} description - Error description
- * @param {Error|string} error - Error object or message
- * @param {object} additionalData - Additional context data
- * @returns {void}
- */
-export function logError(fileName, methodName, description, error, additionalData = {}) {
-  // Extract error details
-  const errorMessage = error instanceof Error ? error.message : String(error);
-  const errorStack = error instanceof Error ? error.stack : undefined;
-
-  // Build error data
-  const errorData = {
-    ...additionalData,
-    error: errorMessage,
-    ...(errorStack && { stack: errorStack })
-  };
-
-  // Log using standard log method
-  log(fileName, methodName, 'error', description, errorData);
-
-  // ALWAYS print to console (even in production for debugging)
-  console.error(`[${fileName}] [${methodName}] ${description}`, errorData);
-}
-
-/**
- * @function isError
- * @description Check if value is an Error object
- * @param {any} value - Value to check
- * @returns {boolean} - True if value is an Error
- */
-export function isError(value) {
-  return value instanceof Error;
-}
-
-/**
- * Log an error and optionally forward to an external reporter (e.g. Sentry via window.reportAppError).
- *
- * @param {string} fileName
- * @param {string} methodName
- * @param {string} description
- * @param {Error|string} error
- * @param {object} additionalData
- * @returns {void}
- */
-export function reportApplicationError(fileName, methodName, description, error, additionalData = {}) {
-  logError(fileName, methodName, description, error, additionalData);
-
-  if (typeof window !== 'undefined' && typeof window.reportAppError === 'function') {
-    try {
-      window.reportAppError({
-        fileName,
-        methodName,
-        description,
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-        ...additionalData,
-      });
-    } catch (reportingError) {
-      logError(
-        'errorHandler.js',
-        'reportApplicationError',
-        'External error reporter failed',
-        reportingError,
-        { originalDescription: description },
-      );
+    if (typeof window !== 'undefined' && typeof window.reportAppError === 'function') {
+      try {
+        window.reportAppError({
+          fileName,
+          methodName,
+          description,
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          ...additionalData,
+        });
+      } catch (reportingError) {
+        this.logError(
+          'errorHandler.js',
+          'reportApplicationError',
+          'External error reporter failed',
+          reportingError,
+          { originalDescription: description },
+        );
+      }
     }
+  }
+
+  /**
+   * Log an error locally with context
+   */
+  logError(fileName, methodName, description, error, additionalData = {}) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    const errorData = {
+      ...additionalData,
+      error: errorMessage,
+      ...(errorStack && { stack: errorStack })
+    };
+
+    log(fileName, methodName, 'error', description, errorData);
+    console.error(`[${fileName}] [${methodName}] ${description}`, errorData);
+  }
+
+  isError(value) {
+    return value instanceof Error;
+  }
+
+  handleErrorSilently(error, operationContext, additionalData = null) {
+    this.logError('errorHandler.js', 'handleErrorSilently', `Error in ${operationContext}`, error, additionalData);
   }
 }
 
-// Export for backward compatibility (but prefer direct try/catch usage)
-export function handleErrorSilently(error, operationContext, additionalData = null) {
-  logError('errorHandler.js', 'handleErrorSilently', `Error in ${operationContext}`, error, additionalData);
-}
+export const errorHandler = new ErrorHandler();
+
+// Legacy exports for backward compatibility across the codebase
+export const logError = errorHandler.logError.bind(errorHandler);
+export const reportApplicationError = errorHandler.reportApplicationError.bind(errorHandler);
+export const isError = errorHandler.isError.bind(errorHandler);
+export const handleErrorSilently = errorHandler.handleErrorSilently.bind(errorHandler);

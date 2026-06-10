@@ -1,5 +1,5 @@
-import { getAuthHandler } from '@/utils/auth/authHandler.js';
-import { awsCognitoHandler, updateUserProfile } from '@/utils/auth/awsCognitoHandler.js';
+import { getAuthHandler } from '@/dev/utils/auth/authHandler.js';
+import { awsCognitoHandler, updateUserProfile } from '@/dev/utils/auth/awsCognitoHandler.js';
 import { SUPPORTED_LOCALES } from './localeManager.js';
 import { log } from '@/infrastructure/logging/logHandler.js';
 

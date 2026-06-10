@@ -1,6 +1,6 @@
 <template>
   <TrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="onPeriodChange" title="Earnings Insight"
+    @update:period="handlePeriodChange" title="Earnings Insight"
     logo="https://i.ibb.co.com/rGSXLKX4/money.webp">
     <div v-if="hasData" class="flex flex-col gap-4">
 
@@ -22,7 +22,7 @@
               class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
             <div class="inline-flex items-center gap-2" v-if="earningsPctChange !== null">
               <div class="flex justify-center items-center gap-1">
-                <img v-if="earningsPctChange >= 0" src="https://i.ibb.co.com/93tZHrmQ/svgviewer-png-output-4.webp" alt="trend-up" class="h-4 w-4" />
+                <img v-if="earningsPctChange >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-4 w-4" />
                 <div :class="earningsPctChange >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-xs md:text-sm font-medium font-['Poppins']">{{ earningsPctChange >= 0 ? '+' : '' }}{{ earningsPctChange }}%</div>
               </div>
               <div class="text-slate-500 text-xs font-normal font-['Poppins']">{{ getVsLabel(period) }}</div>
@@ -44,7 +44,7 @@
               class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
             <div class="inline-flex items-center gap-2" v-if="tokensPctChange !== null">
               <div class="flex justify-center items-center gap-1">
-                <img v-if="tokensPctChange >= 0" src="https://i.ibb.co.com/93tZHrmQ/svgviewer-png-output-4.webp" alt="trend-up" class="h-4 w-4" />
+                <img v-if="tokensPctChange >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-4 w-4" />
                 <div :class="tokensPctChange >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-xs md:text-sm font-medium font-['Poppins']">{{ tokensPctChange >= 0 ? '+' : '' }}{{ tokensPctChange }}%</div>
               </div>
               <div class="text-slate-500 text-xs font-normal font-['Poppins']">{{ getVsLabel(period) }}</div>
@@ -74,14 +74,14 @@
                :data-chart-config='JSON.stringify({type:"donut",period:"slot",datasetKey:"sales-donut",fields:{category:"name",total:"value"},categoryKeyMap:{subscription:"subscription",paytoview:"paytoview",merch:"merch",wishtender:"wishtender",customrequest:"customrequest"},seriesStyles:SALES_STYLES,legentHint:LEGEND})'>
                <div amchart data-role="chart" style="width:100%;height:100%;"></div>
              </div>
-             <div data-chart-container data-chart-id="sales-weekly-bar" :hidden="isDaily||!(activePeriod==='weekly'&&salesView==='bar')||undefined" class="absolute inset-0" :data-chart-config='salesBarCfg("sales-weekly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="sales-weekly-line" :hidden="isDaily||!(activePeriod==='weekly'&&salesView==='line')||undefined" class="absolute inset-0" :data-chart-config='salesLineCfg("sales-weekly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="sales-monthly-bar" :hidden="isDaily||!(activePeriod==='monthly'&&salesView==='bar')||undefined" class="absolute inset-0" :data-chart-config='salesBarCfg("sales-monthly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="sales-monthly-line" :hidden="isDaily||!(activePeriod==='monthly'&&salesView==='line')||undefined" class="absolute inset-0" :data-chart-config='salesLineCfg("sales-monthly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="sales-yearly-bar" :hidden="isDaily||!(activePeriod==='yearly'&&salesView==='bar')||undefined" class="absolute inset-0" :data-chart-config='salesBarCfg("sales-yearly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="sales-yearly-line" :hidden="isDaily||!(activePeriod==='yearly'&&salesView==='line')||undefined" class="absolute inset-0" :data-chart-config='salesLineCfg("sales-yearly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="sales-alltime-bar" :hidden="isDaily||!(activePeriod==='alltime'&&salesView==='bar')||undefined" class="absolute inset-0" :data-chart-config='salesBarCfg("sales-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="sales-alltime-line" :hidden="isDaily||!(activePeriod==='alltime'&&salesView==='line')||undefined" class="absolute inset-0" :data-chart-config='salesLineCfg("sales-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="sales-weekly-bar" :hidden="isDaily||!(activePeriod==='weekly'&&salesView==='bar')||undefined" class="absolute inset-0" :data-chart-config='getSalesBarCfg("sales-weekly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="sales-weekly-line" :hidden="isDaily||!(activePeriod==='weekly'&&salesView==='line')||undefined" class="absolute inset-0" :data-chart-config='getSalesLineCfg("sales-weekly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="sales-monthly-bar" :hidden="isDaily||!(activePeriod==='monthly'&&salesView==='bar')||undefined" class="absolute inset-0" :data-chart-config='getSalesBarCfg("sales-monthly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="sales-monthly-line" :hidden="isDaily||!(activePeriod==='monthly'&&salesView==='line')||undefined" class="absolute inset-0" :data-chart-config='getSalesLineCfg("sales-monthly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="sales-yearly-bar" :hidden="isDaily||!(activePeriod==='yearly'&&salesView==='bar')||undefined" class="absolute inset-0" :data-chart-config='getSalesBarCfg("sales-yearly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="sales-yearly-line" :hidden="isDaily||!(activePeriod==='yearly'&&salesView==='line')||undefined" class="absolute inset-0" :data-chart-config='getSalesLineCfg("sales-yearly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="sales-alltime-bar" :hidden="isDaily||!(activePeriod==='alltime'&&salesView==='bar')||undefined" class="absolute inset-0" :data-chart-config='getSalesBarCfg("sales-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="sales-alltime-line" :hidden="isDaily||!(activePeriod==='alltime'&&salesView==='line')||undefined" class="absolute inset-0" :data-chart-config='getSalesLineCfg("sales-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
           </div>
         </div>
 
@@ -104,14 +104,14 @@
                :data-chart-config='JSON.stringify({type:"donut",period:"slot",datasetKey:"tokens-donut",fields:{category:"name",total:"value"},categoryKeyMap:{tipTokens:"tipTokens",callTokens:"callTokens",chatTokens:"chatTokens",liveStreamTokens:"liveStreamTokens"},seriesStyles:TOKENS_STYLES,legentHint:LEGEND})'>
                <div amchart data-role="chart" style="width:100%;height:100%;"></div>
              </div>
-             <div data-chart-container data-chart-id="tokens-weekly-bar" :hidden="isDaily||!(activePeriod==='weekly'&&tokensView==='bar')||undefined" class="absolute inset-0" :data-chart-config='tokensBarCfg("tokens-weekly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="tokens-weekly-line" :hidden="isDaily||!(activePeriod==='weekly'&&tokensView==='line')||undefined" class="absolute inset-0" :data-chart-config='tokensLineCfg("tokens-weekly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="tokens-monthly-bar" :hidden="isDaily||!(activePeriod==='monthly'&&tokensView==='bar')||undefined" class="absolute inset-0" :data-chart-config='tokensBarCfg("tokens-monthly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="tokens-monthly-line" :hidden="isDaily||!(activePeriod==='monthly'&&tokensView==='line')||undefined" class="absolute inset-0" :data-chart-config='tokensLineCfg("tokens-monthly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="tokens-yearly-bar" :hidden="isDaily||!(activePeriod==='yearly'&&tokensView==='bar')||undefined" class="absolute inset-0" :data-chart-config='tokensBarCfg("tokens-yearly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="tokens-yearly-line" :hidden="isDaily||!(activePeriod==='yearly'&&tokensView==='line')||undefined" class="absolute inset-0" :data-chart-config='tokensLineCfg("tokens-yearly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="tokens-alltime-bar" :hidden="isDaily||!(activePeriod==='alltime'&&tokensView==='bar')||undefined" class="absolute inset-0" :data-chart-config='tokensBarCfg("tokens-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
-             <div data-chart-container data-chart-id="tokens-alltime-line" :hidden="isDaily||!(activePeriod==='alltime'&&tokensView==='line')||undefined" class="absolute inset-0" :data-chart-config='tokensLineCfg("tokens-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="tokens-weekly-bar" :hidden="isDaily||!(activePeriod==='weekly'&&tokensView==='bar')||undefined" class="absolute inset-0" :data-chart-config='getTokensBarCfg("tokens-weekly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="tokens-weekly-line" :hidden="isDaily||!(activePeriod==='weekly'&&tokensView==='line')||undefined" class="absolute inset-0" :data-chart-config='getTokensLineCfg("tokens-weekly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="tokens-monthly-bar" :hidden="isDaily||!(activePeriod==='monthly'&&tokensView==='bar')||undefined" class="absolute inset-0" :data-chart-config='getTokensBarCfg("tokens-monthly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="tokens-monthly-line" :hidden="isDaily||!(activePeriod==='monthly'&&tokensView==='line')||undefined" class="absolute inset-0" :data-chart-config='getTokensLineCfg("tokens-monthly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="tokens-yearly-bar" :hidden="isDaily||!(activePeriod==='yearly'&&tokensView==='bar')||undefined" class="absolute inset-0" :data-chart-config='getTokensBarCfg("tokens-yearly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="tokens-yearly-line" :hidden="isDaily||!(activePeriod==='yearly'&&tokensView==='line')||undefined" class="absolute inset-0" :data-chart-config='getTokensLineCfg("tokens-yearly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="tokens-alltime-bar" :hidden="isDaily||!(activePeriod==='alltime'&&tokensView==='bar')||undefined" class="absolute inset-0" :data-chart-config='getTokensBarCfg("tokens-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+             <div data-chart-container data-chart-id="tokens-alltime-line" :hidden="isDaily||!(activePeriod==='alltime'&&tokensView==='line')||undefined" class="absolute inset-0" :data-chart-config='getTokensLineCfg("tokens-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
           </div>
         </div>
       </div>
@@ -145,7 +145,7 @@
           <!-- Right: Chart Placeholder -->
           <div class="flex-1 min-w-0 flex flex-col p-2 min-h-[300px] relative">
             <div data-chart-container data-chart-id="countries-map" class="absolute inset-0 top-0 w-full h-[calc(100%-30px)]"
-              :data-chart-config='countriesMapCfg("countries-map")'>
+              :data-chart-config='getCountriesMapCfg("countries-map")'>
               <div amchart data-role="chart" style="width:100%;height:100%;"></div>
             </div>
             
@@ -187,7 +187,7 @@
 
 <script setup>
 import TrendPopup from './TrendPopup.vue'
-import FlexTable from '@/components/ui/table/FlexTable.vue'
+import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
@@ -223,13 +223,13 @@ const SALES_LABELS = { subscription:"Subscription", paytoview:"Pay to view", mer
 const TOKENS_STYLES = { tipTokens:{color:"#4CC9F0",name:"Tip"}, callTokens:{color:"#4361EE",name:"Call"}, chatTokens:{color:"#7209B7",name:"Chat"}, liveStreamTokens:{color:"#F72585",name:"Live streaming"} }
 const TOKENS_LABELS = { tipTokens:"Tip", callTokens:"Call", chatTokens:"Chat", liveStreamTokens:"Live streaming" }
 
-function salesBarCfg(dk) { return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["subscription","paytoview","merch","wishtender","customrequest"], stacked:true, seriesStyles:SALES_STYLES, seriesLabels:SALES_LABELS, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"$",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:LEGEND }) }
-function salesLineCfg(dk) { return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["subscription","paytoview","merch","wishtender","customrequest"], stacked:true, seriesStyles:SALES_STYLES, seriesLabels:SALES_LABELS, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"$",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:LEGEND }) }
+function getSalesBarCfg(dk) { return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["subscription","paytoview","merch","wishtender","customrequest"], stacked:true, seriesStyles:SALES_STYLES, seriesLabels:SALES_LABELS, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"$",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:LEGEND }) }
+function getSalesLineCfg(dk) { return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["subscription","paytoview","merch","wishtender","customrequest"], stacked:true, seriesStyles:SALES_STYLES, seriesLabels:SALES_LABELS, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"$",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:LEGEND }) }
 
-function tokensBarCfg(dk) { return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"totalTokens"}, breakdownKeys:["tipTokens","callTokens","chatTokens","liveStreamTokens"], stacked:true, seriesStyles:TOKENS_STYLES, seriesLabels:TOKENS_LABELS, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:" tokens"}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:LEGEND }) }
-function tokensLineCfg(dk) { return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"totalTokens"}, breakdownKeys:["tipTokens","callTokens","chatTokens","liveStreamTokens"], stacked:true, seriesStyles:TOKENS_STYLES, seriesLabels:TOKENS_LABELS, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:" tokens"}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:LEGEND }) }
+function getTokensBarCfg(dk) { return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"totalTokens"}, breakdownKeys:["tipTokens","callTokens","chatTokens","liveStreamTokens"], stacked:true, seriesStyles:TOKENS_STYLES, seriesLabels:TOKENS_LABELS, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:" tokens"}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:LEGEND }) }
+function getTokensLineCfg(dk) { return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"totalTokens"}, breakdownKeys:["tipTokens","callTokens","chatTokens","liveStreamTokens"], stacked:true, seriesStyles:TOKENS_STYLES, seriesLabels:TOKENS_LABELS, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:" tokens"}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:LEGEND }) }
 
-function countriesMapCfg(dk) { return JSON.stringify({ type:"map", period:"slot", datasetKey:dk, groupColors: { "base": "#e8e8e8", "g1": "#3A0CA3", "g2": "#7209B7", "g3": "#F72585", "g4": "#4CC9F0", "g5": "#00f2fe" }, tooltip: { color: "#344054", valuePrefix: "USD$ " } }) }
+function getCountriesMapCfg(dk) { return JSON.stringify({ type:"map", period:"slot", datasetKey:dk, groupColors: { "base": "#e8e8e8", "g1": "#3A0CA3", "g2": "#7209B7", "g3": "#F72585", "g4": "#4CC9F0", "g5": "#00f2fe" }, tooltip: { color: "#344054", valuePrefix: "USD$ " } }) }
 
 function injectChartData() {
   if (!window.chartsHandler) return
@@ -322,7 +322,7 @@ async function renderCurrentCharts() {
 async function setSalesView(v) { salesView.value = v; await nextTick(); if (!isDaily.value) await renderChart(`sales-${activePeriod.value}-${v}`) }
 async function setTokensView(v) { tokensView.value = v; await nextTick(); if (!isDaily.value) await renderChart(`tokens-${activePeriod.value}-${v}`) }
 
-async function onPeriodChange(val) {
+async function handlePeriodChange(val) {
   emit('update:period', val)
   await nextTick()
   await renderCurrentCharts()
