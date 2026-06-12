@@ -6,7 +6,7 @@ import PaymentMethodLoggedIn from "../checkout/PaymentMethodLoggedIn.vue";
 import SectionHeader from "../checkout/SectionHeader.vue";
 import SubscriptionPlanCard from "../checkout/SubscriptionPlanCard.vue";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
-import BasePopupShell from "@/components/ui/popup/BasePopupShell.vue";
+import BasePopup from "@/components/ui/popup/BasePopup.vue";
 import TotalAmountRow from "../checkout/TotalAmountRow.vue";
 
 
@@ -36,7 +36,7 @@ const subscribeLoginConfig = {
 </script>
 
 <template>
-    <BasePopupShell
+    <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="subscribeLoginConfig"
@@ -301,5 +301,5 @@ const subscribeLoginConfig = {
       </div>
     </div>
   </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>

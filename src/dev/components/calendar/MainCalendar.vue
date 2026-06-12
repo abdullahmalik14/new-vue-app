@@ -508,22 +508,22 @@
 
 
     <!-- popups -->
-    <BasePopupShell v-model="calendarPopupOpen" :config="calendarPopupConfig">
+    <BasePopup v-model="calendarPopupOpen" :config="calendarPopupConfig">
       <CalendarMobilePopupContent :view="view" :events-data="eventsData" @set-view="setView" @join-click="handleJoin"
         @reply-click="handleReply" @open-new-events="newEventsPopupOpen = true" />
-    </BasePopupShell>
+    </BasePopup>
 
-    <BasePopupShell v-model="newEventsPopupOpen" :config="newEventsPopupConfig">
+    <BasePopup v-model="newEventsPopupOpen" :config="newEventsPopupConfig">
       <NewEventsPopup />
-    </BasePopupShell>
+    </BasePopup>
 
-    <BasePopupShell v-model="eventDetailsPopupOpen" :config="eventDetailsPopupConfig">
+    <BasePopup v-model="eventDetailsPopupOpen" :config="eventDetailsPopupConfig">
       <CalendarEventDetailsPopup :event="selectedEvent" />
-    </BasePopupShell>
+    </BasePopup>
 
-    <BasePopupShell v-model="isDatePopupOpen" :config="datePopupConfig">
+    <BasePopup v-model="isDatePopupOpen" :config="datePopupConfig">
       <MobileDateSelector :current-date="cursor" @update:date="handleDateUpdate" @close="isDatePopupOpen = false" />
-    </BasePopupShell>
+    </BasePopup>
 
 
   </section>
@@ -537,7 +537,7 @@ import { SOD, addDays, addMonths, startOfWeek, endOfWeek, startOfMonth, endOfMon
 import CheckboxGroup from '@/components/forms/checkboxes/CheckboxGroup.vue';
 import { onUnmounted } from 'vue';
 import EventDropdownContent from './EventDropdownContent.vue';
-import BasePopupShell from '@/components/ui/popup/BasePopupShell.vue';
+import BasePopup from '@/components/ui/popup/BasePopup.vue';
 import EventsWidget from './EventsWidget.vue';
 import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
 import NewEventsPopup from './NewEventsPopup.vue';

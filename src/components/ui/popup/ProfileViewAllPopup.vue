@@ -1,5 +1,5 @@
 <template>
-  <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+  <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="viewAllPopupConfig">
     <!-- popup-wrapper -->
     <div
@@ -246,11 +246,11 @@
         </div>
       </div>
     </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>
 
 <script setup>
-import BasePopupShell from "./BasePopupShell.vue";
+import BasePopup from "./BasePopup.vue";
 import { onMounted, onUnmounted, ref, computed } from "vue";
 import MediaCardV1 from "@/components/ui/media/media-cards/MediaCardV1.vue";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";

@@ -1,5 +1,5 @@
 <template>
-  <BasePopupShell
+  <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="avatarPopupConfig"
@@ -79,12 +79,12 @@
           </div>
 
         </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
-import BasePopupShell from "./BasePopupShell.vue";
+import BasePopup from "./BasePopup.vue";
 import AvatarSelector from "@/components/ui/profile/AvatarSelector.vue";        
 import BackgroundSelector from "@/components/ui/profile/BackgroundSelector.vue"; 
 

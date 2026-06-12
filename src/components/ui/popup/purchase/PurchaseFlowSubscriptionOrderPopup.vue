@@ -6,7 +6,7 @@ import {
 } from "@/utils/stateEngine";
 
 // Components
-import BasePopupShell from "@/components/ui/popup/BasePopupShell.vue";
+import BasePopup from "@/components/ui/popup/BasePopup.vue";
 import BaseSelect from "../checkout/BaseSelect.vue";
 import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import BaseInput from "@/components/forms/inputs/BaseInput.vue";
@@ -197,7 +197,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+  <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="purchaseFlowSubscriptionPopupConfig">
     <div
       class="bg-[#333333] h-full overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] [&.dark]:bg-[#35393b]">
@@ -427,5 +427,5 @@ onUnmounted(() => {
         </Teleport>
       </div>
     </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>

@@ -72,13 +72,13 @@
       </div>
     </div>
     <NavDropdown v-model="isNavOpen" title="Menu" logo="your-logo-url" />
-    <NotificationPopup :config="notificationPopupConfig" v-model="isNotificationOpen" @update:modelValue="
+    <DashboardNotificationPopup :config="notificationPopupConfig" v-model="isNotificationOpen" @update:modelValue="
       (val) => {
         isNotificationOpen = val;
       }
     " />
 
-    <AvatarProfilePopup :config="avatarPopupconfig" v-model="isProfileOpen" @update:modelValue="
+    <DashboardProfilePopup :config="avatarPopupConfig" v-model="isProfileOpen" @update:modelValue="
       (val) => {
         isProfileOpen = val;
       }
@@ -89,8 +89,8 @@
 <script setup>
 import NavDropdown from '@/components/ui/nav/dashboard/NavDropdown.vue';
 import { ref, onMounted } from "vue";
-import NotificationPopup from "@/components/ui/popup/NotificationPopup.vue";
-import AvatarProfilePopup from "@/components/ui/popup/AvatarProfilePopup.vue";
+import DashboardNotificationPopup from "@/components/ui/popup/DashboardNotificationPopup.vue";
+import DashboardProfilePopup from "@/components/ui/popup/DashboardProfilePopup.vue";
 import { getAssetUrl } from "@/systems/assets/assetLibrary.js";
 import {
   getSharedComponentAssetMapping,
@@ -218,7 +218,7 @@ const notificationPopupConfig = {
   closeEffect: "cubic-bezier(0.4, 0, 0.2, 1)",
 };
 
-const avatarPopupconfig = {
+const avatarPopupConfig = {
   actionType: "slidein",
   from: "right",
   offset: "0px",

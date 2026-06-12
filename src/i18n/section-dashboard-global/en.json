@@ -4,7 +4,25 @@
     "welcome": "Welcome back!",
     "overview": "Overview",
     "settings": "Settings",
-    "profile": "Profile",
+    "profile": {
+      "name": "lindenMay",
+      "handle": "@linden",
+      "status": {
+        "away": "Away",
+        "offline": "Offline"
+      },
+      "viewProfile": "View profile",
+      "goLive": "Go Live",
+      "videoCallStatus": "Video call status",
+      "audioCallStatus": "Audio call status",
+      "changeCustomMessages": "Change Custom Messages",
+      "repostStatusX": "Repost status message to X",
+      "writeStatus": "Write status here...",
+      "awayMessage": "Away Message...",
+      "mock": {
+        "defaultStatus": "I am all dressed up ready to eat some chicken 💋"
+      }
+    },
     "logout": "Logout",
     "more": "More",
     "menu": {
@@ -24,6 +42,24 @@
       "subscribersFollowers": "Subscribers & Followers",
       "yourPosts": "Your Posts",
       "referrals": "Referrals"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "tabs": {
+        "all": "All",
+        "unread": "Unread",
+        "customRequests": "Custom Requests",
+        "account": "Account"
+      },
+      "action": {
+        "dismiss": "Dismiss",
+        "takeAction": "Take Action"
+      },
+      "mock": {
+        "mediaRequired": "Media Content Required: Your profile currently has no media. Enhance your profile's visibility by adding at least 5 media items.",
+        "mediaApproved": "Congratulations: Your media 'Audio with placeholder and no preview' has been approved.",
+        "bankRequired": "Bank Details Required: To ensure seamless transactions, please complete your bank information."
+      }
     }
   },
   "common": {

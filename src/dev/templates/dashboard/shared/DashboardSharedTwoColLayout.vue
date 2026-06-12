@@ -7,10 +7,8 @@
     <DashboardSharedSidebar class="hidden md:block" />
 
     <!-- Body / Main Content -->
-    <div class="flex-1 bg-[#F9FAFBE5] min-h-screen md:bg-transparent md:h-auto dark:bg-background-dark-app before:content-[''] 
-        before:fixed before:bg-[url('https://i.ibb.co.com/dw910Z5b/gradient-main-bg.webp')]
-         before:bg-cover before:w-full before:bg-no-repeat before:h-full 
-         before:left-0 before:top-0 before:pointer-events-none ">
+    <div class="flex-1 bg-[#F9FAFBE5] min-h-screen md:bg-transparent md:h-auto dark:bg-background-dark-app relative isolate">
+      <div v-if="bgUrl" class="fixed inset-0 pointer-events-none -z-10 bg-cover bg-no-repeat w-full h-full" :style="{ backgroundImage: `url(${bgUrl})` }"></div>
       <slot />
     </div>
   </div>
@@ -19,6 +17,18 @@
 <script setup>
 import DashboardSharedHeader  from "@/dev/templates/dashboard/shared/DashboardSharedHeader.vue";
 import DashboardSharedSidebar from "./DashboardSharedSidebar.vue";
+import { ref, onMounted } from 'vue';
+import { getAssetUrl } from '@/systems/assets/assetLibrary.js';
+
+const bgUrl = ref('');
+
+onMounted(async () => {
+  try {
+    bgUrl.value = await getAssetUrl('dashboard.bg.gradient');
+  } catch (error) {
+    console.warn('[DashboardSharedTwoColLayout] Failed to load background gradient', error);
+  }
+});
 </script>
 
 <style scoped>

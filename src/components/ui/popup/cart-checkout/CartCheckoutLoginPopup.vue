@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import BasePopupShell from "@/components/ui/popup/BasePopupShell.vue";
+import BasePopup from "@/components/ui/popup/BasePopup.vue";
 import SectionHeader from "../checkout/SectionHeader.vue";
 import OrderSummary from "../checkout/OrderSummary.vue";
 import PaymentMethodLoggedIn from "../checkout/PaymentMethodLoggedIn.vue";
@@ -70,7 +70,7 @@ const cartItems = [
 </script>
 
 <template>
-  <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
+  <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="cartcheckoutLoginConfig">
     <div
       class="bg-[#272727] font-sans p-0 m-0 box-border overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none]">
@@ -269,5 +269,5 @@ const cartItems = [
         </div>
       </div>
     </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>

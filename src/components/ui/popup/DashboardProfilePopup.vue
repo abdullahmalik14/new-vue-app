@@ -1,5 +1,5 @@
 <template>
-  <BasePopupShell
+  <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="config"
@@ -22,12 +22,12 @@
           >
             <img
               class="block w-6 h-6 pointer-events-none md:hidden"
-              src="https://i.ibb.co/N2VqD6yD/svgviewer-png-output-60.webp"
+              v-if="profileAssets.closeMobile" :src="profileAssets.closeMobile"
               alt="back-button"
             />
             <img
               class="hidden w-5 h-5 pointer-events-none md:block"
-              src="https://i.ibb.co/KxKfkV17/svgviewer-png-output-59.webp"
+              v-if="profileAssets.closeDesktop" :src="profileAssets.closeDesktop"
               alt="back-button"
             />
           </a>
@@ -35,24 +35,22 @@
           <!-- Profile cover section -->
           <div
             class="relative z-[4] flex flex-col items-start self-stretch gap-4 bg-cover bg-no-repeat bg-center"
-            style="
-              background-image: url('https://i.ibb.co.com/F4cf3W53/profile-slidein-bg.webp');
-            "
+            :style="{ backgroundImage: profileAssets.profileBg ? `url(${profileAssets.profileBg})` : '' }"
           >
             <div
-              class="flex flex-col items-start self-stretch gap-4 p-4 bg-cover-overlay"
+              class="flex flex-col items-start self-stretch gap-4 p-4 bg-profile-cover-overlay"
             >
               <!-- Profile info row -->
               <div class="flex items-start self-stretch gap-4 pr-6">
                 <!-- Avatar with status dot -->
                 <a href="#" class="relative flex w-14 h-14 rounded-[1.875rem] outline-none">
                   <img
-                    src="https://i.ibb.co/jkjtwC9C/svgviewer-png-output-17.webp"
+                    v-if="profileAssets.avatar" :src="profileAssets.avatar"
                     alt="avatar"
                     class="object-cover w-14 h-14 pointer-events-none rounded-[1.875rem] bg-avatar-bg-light"
                   />
                   <span
-                    class="absolute bottom-0 right-0 flex w-3.5 h-3.5 rounded-[0.438rem] bg-status-dot-light"
+                    class="absolute bottom-0 right-0 flex w-3.5 h-3.5 rounded-[0.438rem] bg-profile-status-dot"
                     >&nbsp;</span
                   >
                 </a>
@@ -63,17 +61,17 @@
                   <div class="flex flex-wrap items-center gap-2 self-stretch">
                     <div class="flex items-center gap-2">
                       <span class="text-lg font-semibold leading-7 text-white"
-                        >lindenMay</span
+                        >{{ $t('dashboard.profile.name', 'lindenMay') }}</span
                       >
                       <img
-                        src="https://i.ibb.co/HfYg6YgT/svgviewer-png-output-61.webp"
+                        v-if="profileAssets.verified" :src="profileAssets.verified"
                         alt="verified-icon"
                         class="w-4 h-4"
                       />
                     </div>
                     <span
-                      class="text-xs font-normal leading-[1.125rem] text-handle-light"
-                      >@linden</span
+                      class="text-xs font-normal leading-[1.125rem] text-user-handle"
+                      >{{ $t('dashboard.profile.handle', '@linden') }}</span
                     >
                   </div>
 
@@ -88,10 +86,10 @@
                       >
                         <span
                           class="text-sm font-medium uppercase leading-5 text-black pointer-events-none"
-                          >Away</span
+                          >{{ $t('dashboard.profile.status.away', 'Away') }}</span
                         >
                         <img
-                          src="https://i.ibb.co/hFStx6J8/svgviewer-png-output-62.webp"
+                          v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
                           alt="arrow-down"
                           class="w-3 h-3 pointer-events-none"
                         />
@@ -109,7 +107,7 @@
                     <input
                       type="checkbox"
                       class="peer h-0 w-0 opacity-0"
-                      id="dash-toggle-switch-11"
+                      id="dashboard-profile-popup-toggle-status-repost"
                       checked=""
                     />
                     <span
@@ -121,10 +119,10 @@
                   </label>
                   <div class="flex items-center gap-1">
                     <span class="text-xs leading-[1.125rem] text-white"
-                      >Repost status message to X</span
+                      >{{ $t('dashboard.profile.repostStatusX', 'Repost status message to X') }}</span
                     >
                     <img
-                      src="https://i.ibb.co/d03k8TJZ/svgviewer-png-output-63.webp"
+                      v-if="profileAssets.info" :src="profileAssets.info"
                       alt="info"
                       class="w-4 h-4 cursor-pointer"
                     />
@@ -138,7 +136,7 @@
                   <input
                     type="text"
                     class="flex-1 text-sm font-medium dark:text-text leading-6 bg-transparent outline-none border-none placeholder-black dark:placeholder:text-text"
-                    placeholder="Write status here..."
+                    :placeholder="$t('dashboard.profile.writeStatus', 'Write status here...')"
                     value="Second update message....."
                   />
                   <a
@@ -146,7 +144,7 @@
                     class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out"
                   >
                     <img
-                      src="https://i.ibb.co/YBg4y12W/svgviewer-png-output-64.webp"
+                      v-if="profileAssets.edit" :src="profileAssets.edit"
                       alt="edit"
                       class="w-full h-full filter brightness-0 saturate-100 invert-0 sepia-4 saturate-17 hue-rotate-99 brightness-98 contrast-105 pointer-events-none"
                     />
@@ -163,7 +161,7 @@
                     class="outline-none border-none bg-black shadow-[4px_4px_0_0] shadow-accent-pink-light hover:bg-accent-green-light hover:shadow-black transition-all duration-150 ease-in-out relative flex justify-center items-center w-8 h-8 md:w-10 md:h-10"
                   >
                     <img
-                      src="https://i.ibb.co/tMGmRCVx/svgviewer-png-output-65.webp"
+                      v-if="profileAssets.settings" :src="profileAssets.settings"
                       alt="settings"
                       class="w-4 h-4 md:w-6 md:h-6 transition-all duration-150 ease-in-out pointer-events-none"
                     />
@@ -212,7 +210,7 @@
                         Go Live
                       </span>
                       <img
-                        src="https://i.ibb.co/NgZgkRR9/svgviewer-png-output-66.webp"
+                        v-if="profileAssets.menuStats" :src="profileAssets.menuStats"
                         alt="go-live"
                         class="h-5 w-5 md:h-6 md:w-6 transition-all duration-150 ease-in-out [filter:brightness(0)_saturate(100%)_invert(55%)_sepia(10%)_saturate(5098%)_hue-rotate(296deg)_brightness(98%)_contrast(101%)]"
                       />
@@ -240,18 +238,16 @@
                     class="flex items-center justify-center w-[2.625rem] h-[2.625rem] mr-1"
                   >
                     <img
-                      src="https://i.ibb.co/ycRzCzqS/svgviewer-png-output-67.webp"
+                      v-if="profileAssets.menuDesign" :src="profileAssets.menuDesign"
                       alt="video-call"
                       class="w-[2.625rem] h-[2.625rem]"
                     />
                   </span>
                   <span
                     class="text-sm font-medium uppercase leading-5 text-text-muted-light dark:text-text-muted-dark"
-                  >
-                    Video call status
-                  </span>
+                  >{{ $t('dashboard.profile.videoCallStatus', 'Video call status') }}</span>
                   <img
-                    src="https://i.ibb.co/d03k8TJZ/svgviewer-png-output-63.webp"
+                    v-if="profileAssets.info" :src="profileAssets.info"
                     alt="info"
                     class="w-4 h-4 cursor-pointer"
                   />
@@ -272,7 +268,7 @@
                         Offline
                       </span>
                       <img
-                        src="https://i.ibb.co/hFStx6J8/svgviewer-png-output-62.webp"
+                        v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
                         alt="arrow-down"
                         class="w-3 h-3 pointer-events-none dark:[filter:brightness(0)_invert(100%)]"
                       />
@@ -288,7 +284,7 @@
                 <input
                   type="text"
                   class="flex-1 text-xs font-medium leading-6 bg-transparent outline-none border-none text-text-muted-light placeholder:text-text-muted-light dark:text-text-muted-dark dark:placeholder:text-text-muted-dark"
-                  placeholder="Write status here..."
+                  :placeholder="$t('dashboard.profile.writeStatus', 'Write status here...')"
                   value="I am all dressed up ready to eat some chicken 💋"
                 />
                 <a
@@ -296,7 +292,7 @@
                   class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out"
                 >
                   <img
-                    src="https://i.ibb.co/YBg4y12W/svgviewer-png-output-64.webp"
+                    v-if="profileAssets.edit" :src="profileAssets.edit"
                     alt="edit"
                     class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(0)_sepia(4%)_saturate(17%)_hue-rotate(99deg)_brightness(98%)_contrast(105%)] pointer-events-none"
                   />
@@ -309,7 +305,7 @@
                   <input
                     type="checkbox"
                     class="peer h-0 w-0 opacity-0"
-                    id="profile-slidein-switch-1"
+                    id="dashboard-profile-popup-toggle-video-repost"
                   />
                   <span
                     class="absolute inset-0 cursor-pointer rounded-[0.75rem] bg-[#98a2b380] transition-all duration-100 ease-in-out peer-checked:bg-[#0c111d] dark:bg-[#434c5b80] dark:peer-checked:bg-[#0a0e17]"
@@ -321,11 +317,9 @@
                 <div class="flex items-center gap-1">
                   <span
                     class="text-xs leading-[1.125rem] text-text-secondary-light dark:text-text-secondary-dark"
-                  >
-                    Repost status message to X
-                  </span>
+                  >{{ $t('dashboard.profile.repostStatusX', 'Repost status message to X') }}</span>
                   <img
-                    src="https://i.ibb.co/d03k8TJZ/svgviewer-png-output-63.webp"
+                    v-if="profileAssets.info" :src="profileAssets.info"
                     alt="info"
                     class="w-4 h-4 cursor-pointer"
                   />
@@ -346,18 +340,16 @@
                     class="flex items-center justify-center w-[2.625rem] h-[2.625rem] mr-1"
                   >
                     <img
-                      src="https://i.ibb.co/qYbwXyPZ/svgviewer-png-output-68.webp"
+                      v-if="profileAssets.menuCopy" :src="profileAssets.menuCopy"
                       alt="audio-call"
                       class="w-[2.625rem] h-[2.625rem]"
                     />
                   </span>
                   <span
                     class="text-sm font-medium uppercase leading-5 text-text-muted-light dark:text-text-muted-dark"
-                  >
-                    Audio call status
-                  </span>
+                  >{{ $t('dashboard.profile.audioCallStatus', 'Audio call status') }}</span>
                   <img
-                    src="https://i.ibb.co/d03k8TJZ/svgviewer-png-output-63.webp"
+                    v-if="profileAssets.info" :src="profileAssets.info"
                     alt="info"
                     class="w-4 h-4 cursor-pointer"
                   />
@@ -378,7 +370,7 @@
                         Offline
                       </span>
                       <img
-                        src="https://i.ibb.co/hFStx6J8/svgviewer-png-output-62.webp"
+                        v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
                         alt="arrow-down"
                         class="w-3 h-3 pointer-events-none dark:[filter:brightness(0)_invert(100%)]"
                       />
@@ -394,14 +386,14 @@
                 <input
                   type="text"
                   class="flex-1 text-xs font-medium leading-6 bg-transparent outline-none border-none text-text-muted-light placeholder:text-text-muted-light dark:text-text-muted-dark dark:placeholder:text-text-muted-dark"
-                  placeholder="Away Message..."
+                  :placeholder="$t('dashboard.profile.awayMessage', 'Away Message...')"
                 />
                 <a
                   href="#"
                   class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out"
                 >
                   <img
-                    src="https://i.ibb.co/YBg4y12W/svgviewer-png-output-64.webp"
+                    v-if="profileAssets.edit" :src="profileAssets.edit"
                     alt="edit"
                     class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(0)_sepia(4%)_saturate(17%)_hue-rotate(99deg)_brightness(98%)_contrast(105%)] pointer-events-none"
                   />
@@ -414,7 +406,7 @@
                   <input
                     type="checkbox"
                     class="peer h-0 w-0 opacity-0"
-                    id="profile-slidein-switch-1"
+                    id="dashboard-profile-popup-toggle-audio-repost"
                   />
                   <span
                     class="absolute inset-0 cursor-pointer rounded-[0.75rem] bg-[#98a2b380] transition-all duration-100 ease-in-out peer-checked:bg-[#0c111d] dark:bg-[#434c5b80] dark:peer-checked:bg-[#0a0e17]"
@@ -426,11 +418,9 @@
                 <div class="flex items-center gap-1">
                   <span
                     class="text-xs leading-[1.125rem] text-text-secondary-light dark:text-text-secondary-dark"
-                  >
-                    Repost status message to X
-                  </span>
+                  >{{ $t('dashboard.profile.repostStatusX', 'Repost status message to X') }}</span>
                   <img
-                    src="https://i.ibb.co/d03k8TJZ/svgviewer-png-output-63.webp"
+                    v-if="profileAssets.info" :src="profileAssets.info"
                     alt="info"
                     class="w-4 h-4 cursor-pointer"
                   />
@@ -451,7 +441,7 @@
                     class="flex items-center justify-center w-[2.625rem] h-[2.625rem] mr-1"
                   >
                     <img
-                      src="https://i.ibb.co/5XV4sbJN/svgviewer-png-output-69.webp"
+                      v-if="profileAssets.menuView" :src="profileAssets.menuView"
                       alt="chat"
                       class="w-[2.625rem] h-[2.625rem]"
                     />
@@ -462,7 +452,7 @@
                     Chat status
                   </span>
                   <img
-                    src="https://i.ibb.co/d03k8TJZ/svgviewer-png-output-63.webp"
+                    v-if="profileAssets.info" :src="profileAssets.info"
                     alt="info"
                     class="w-4 h-4 cursor-pointer"
                   />
@@ -483,7 +473,7 @@
                         Offline
                       </span>
                       <img
-                        src="https://i.ibb.co/hFStx6J8/svgviewer-png-output-62.webp"
+                        v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
                         alt="arrow-down"
                         class="w-3 h-3 pointer-events-none dark:[filter:brightness(0)_invert(100%)]"
                       />
@@ -499,7 +489,7 @@
                 <input
                   type="text"
                   class="flex-1 text-xs font-medium leading-6 bg-transparent outline-none border-none text-text-muted-light placeholder:text-text-muted-light dark:text-text-muted-dark dark:placeholder:text-text-muted-dark"
-                  placeholder="Write status here..."
+                  :placeholder="$t('dashboard.profile.writeStatus', 'Write status here...')"
                   value="Can't type with my greasy fingers, call me instead 💋"
                 />
                 <a
@@ -507,7 +497,7 @@
                   class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out"
                 >
                   <img
-                    src="https://i.ibb.co/YBg4y12W/svgviewer-png-output-64.webp"
+                    v-if="profileAssets.edit" :src="profileAssets.edit"
                     alt="edit"
                     class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(0)_sepia(4%)_saturate(17%)_hue-rotate(99deg)_brightness(98%)_contrast(105%)] pointer-events-none"
                   />
@@ -520,7 +510,7 @@
                   <input
                     type="checkbox"
                     class="peer h-0 w-0 opacity-0"
-                    id="profile-slidein-switch-1"
+                    id="dashboard-profile-popup-toggle-chat-repost"
                   />
                   <span
                     class="absolute inset-0 cursor-pointer rounded-[0.75rem] bg-[#98a2b380] transition-all duration-100 ease-in-out peer-checked:bg-[#0c111d] dark:bg-[#434c5b80] dark:peer-checked:bg-[#0a0e17]"
@@ -532,11 +522,9 @@
                 <div class="flex items-center gap-1">
                   <span
                     class="text-xs leading-[1.125rem] text-text-secondary-light dark:text-text-secondary-dark"
-                  >
-                    Repost status message to X
-                  </span>
+                  >{{ $t('dashboard.profile.repostStatusX', 'Repost status message to X') }}</span>
                   <img
-                    src="https://i.ibb.co/d03k8TJZ/svgviewer-png-output-63.webp"
+                    v-if="profileAssets.info" :src="profileAssets.info"
                     alt="info"
                     class="w-4 h-4 cursor-pointer"
                   />
@@ -559,7 +547,7 @@
                 Advanced Repost Settings
               </span>
               <img
-                src="https://i.ibb.co/wZmNXbZp/svgviewer-png-output-70.webp"
+                v-if="profileAssets.liveArrow" :src="profileAssets.liveArrow"
                 alt="settings"
                 class="w-4 h-4 pointer-events-none"
               />
@@ -579,7 +567,7 @@
                   <input
                     type="checkbox"
                     class="peer h-0 w-0 opacity-0"
-                    id="profile-slidein-switch-2"
+                    id="dashboard-profile-popup-toggle-auto-signin"
                     checked
                   />
                   <span
@@ -604,7 +592,7 @@
                   <input
                     type="checkbox"
                     class="peer h-0 w-0 opacity-0"
-                    id="profile-slidein-switch-3"
+                    id="dashboard-profile-popup-toggle-auto-logout"
                     checked
                   />
                   <span
@@ -629,7 +617,7 @@
                   <input
                     type="checkbox"
                     class="peer h-0 w-0 opacity-0"
-                    id="profile-slidein-switch-4"
+                    id="dashboard-profile-popup-toggle-auto-statuses"
                     checked
                   />
                   <span
@@ -654,7 +642,7 @@
                   <input
                     type="checkbox"
                     class="peer h-0 w-0 opacity-0"
-                    id="profile-slidein-switch-5"
+                    id="dashboard-profile-popup-toggle-auto-messages"
                   />
                   <span
                     class="absolute inset-0 cursor-pointer rounded-[0.75rem] bg-[#98a2b380] transition-all duration-100 ease-in-out peer-checked:bg-[#0c111d] dark:bg-[#434c5b80] dark:peer-checked:bg-[#0a0e17]"
@@ -666,9 +654,7 @@
                 <div class="flex items-center gap-1">
                   <span
                     class="text-xs leading-[1.125rem] text-text-secondary-light dark:text-text-secondary-dark"
-                  >
-                    Change Custom Messages
-                  </span>
+                  >{{ $t('dashboard.profile.changeCustomMessages', 'Change Custom Messages') }}</span>
                 </div>
               </div>
             </div>
@@ -676,11 +662,41 @@
         </div>
       </div>
     </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>
 
 <script setup>
-import BasePopupShell from "./BasePopupShell.vue";
+defineOptions({ name: 'DashboardProfilePopup' });
+import BasePopup from "./BasePopup.vue";
+import { ref, onBeforeMount } from 'vue';
+import { resolveSharedComponentAssets } from '@/systems/assets/resolveSharedComponentAssets.js';
+
+const profileAssets = ref({
+  closeMobile: null,
+  closeDesktop: null,
+  profileBg: null,
+  avatar: null,
+  verified: null,
+  arrowDown: null,
+  info: null,
+  edit: null,
+  settings: null,
+  menuStats: null,
+  menuDesign: null,
+  menuCopy: null,
+  menuView: null,
+  liveArrow: null
+});
+
+onBeforeMount(async () => {
+  try {
+    const resolved = await resolveSharedComponentAssets('dashboardProfilePopup');
+    Object.assign(profileAssets.value, resolved);
+  } catch (error) {
+    console.error('[DashboardProfilePopup] Failed to load assets:', error);
+  }
+});
+
 
 const props = defineProps({
   modelValue: {

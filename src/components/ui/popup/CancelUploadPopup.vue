@@ -1,5 +1,5 @@
 <template>
-  <BasePopupShell
+  <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="uploadCancelConfig"
@@ -29,11 +29,11 @@
         </div>
       </div>
     </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>
 
 <script setup>
-import BasePopupShell from './BasePopupShell.vue';
+import BasePopup from './BasePopup.vue';
 
 
 const props = defineProps({

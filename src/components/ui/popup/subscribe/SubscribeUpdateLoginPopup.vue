@@ -1,5 +1,5 @@
 <script setup>
-import BasePopupShell from '@/components/ui/popup/BasePopupShell.vue';
+import BasePopup from '@/components/ui/popup/BasePopup.vue';
 import CheckoutMediaPreview from '../checkout/CheckoutMediaPreview.vue';
 import SectionHeader from '../checkout/SectionHeader.vue';
 import SubscriptionPlanCard from '../checkout/SubscriptionPlanCard.vue';
@@ -35,7 +35,7 @@ const subscribeUpdateLoginConfig = {
 </script>
 
 <template>
-    <BasePopupShell
+    <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="subscribeUpdateLoginConfig"
@@ -276,6 +276,6 @@ const subscribeUpdateLoginConfig = {
       </div>
     </div>
   </div>
-  </BasePopupShell>
+  </BasePopup>
 
 </template>

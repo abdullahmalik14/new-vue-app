@@ -1,5 +1,5 @@
 <template>
-  <BasePopupShell
+  <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="popupConfig"
@@ -18,11 +18,11 @@
             <WithdrawEarningsStep5 v-if="engine.step === 5" :engine="engine" @close="handleClose" />
         </div>
     </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>
 
 <script setup>
-import BasePopupShell from "./BasePopupShell.vue";
+import BasePopup from "./BasePopup.vue";
 import { createStepStateEngine } from "@/utils/stateEngine";
 import { onMounted } from 'vue';
 import WithdrawEarningsStep1 from "./withdraw-earnings-steps/WithdrawEarningsStep1.vue";

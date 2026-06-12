@@ -6,7 +6,7 @@ import {
 } from "@/utils/stateEngine";
 
 // Components
-import BasePopupShell from "@/components/ui/popup/BasePopupShell.vue";
+import BasePopup from "@/components/ui/popup/BasePopup.vue";
 import BaseSelect from "../checkout/BaseSelect.vue";
 import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import BaseInput from "@/components/forms/inputs/BaseInput.vue";
@@ -270,7 +270,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BasePopupShell
+  <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="purchaseTipPopupConfig"
@@ -621,5 +621,5 @@ onUnmounted(() => {
         </Teleport>
       </div>
     </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>

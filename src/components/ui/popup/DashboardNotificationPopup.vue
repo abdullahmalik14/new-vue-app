@@ -1,5 +1,5 @@
 <template>
-  <BasePopupShell :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)" :config="config">
+  <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)" :config="config">
     <div
       class="w-full flex flex-col items-start overflow-hidden 
       shadow-[4px_0_10px_0_rgba(0,0,0,0.08)] bg-panel-light/70 
@@ -12,15 +12,13 @@
         class="flex items-center self-stretch gap-2 p-2 pb-0 md:bg-transparent bg-background-header-light dark:bg-background-header-dark md:dark:bg-transparent">
         <div class="flex-1 flex items-center gap-2">
           <span class="flex items-center justify-start">
-            <img src="https://i.ibb.co/cX3Y4YZx/svgviewer-png-output-71.webp" alt="Notifications"
+            <img v-if="notificationAssets.bell" :src="notificationAssets.bell" alt="Notifications"
               class="w-5 h-5 pointer-events-none" />
           </span>
-          <span class="text-sm font-semibold leading-5 text-text-secondary-light dark:text-text-secondary-dark">
-            Notifications
-          </span>
+          <span class="text-sm font-semibold leading-5 text-text-secondary-light dark:text-text-secondary-dark">{{ $t('dashboard.notification.title', 'Notifications') }}</span>
           <div class="flex">
             <span class="flex items-center justify-center w-6 h-6 p-1 rounded-[0.313rem] cursor-pointer">
-              <img src="https://i.ibb.co/JR1WLL0s/svgviewer-png-output-72.webp" alt="settings"
+              <img v-if="notificationAssets.settings" :src="notificationAssets.settings" alt="settings"
                 class="w-4 h-4 [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)]" />
             </span>
           </div>
@@ -31,10 +29,10 @@
             class="flex items-center justify-center w-6 h-6 md:w-auto md:h-auto p-0 md:p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-panel-light-buttonHover dark:hover:bg-panel-dark-buttonHover cursor-pointer">
             <img
               class="w-6 h-6 pointer-events-none hidden md:block [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)]"
-              src="https://i.ibb.co/KxKfkV17/svgviewer-png-output-59.webp" alt="close" />
+              v-if="notificationAssets.closeDesktop" :src="notificationAssets.closeDesktop" alt="close" />
             <img
               class="block w-6 h-6 pointer-events-none md:hidden [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)]"
-              src="https://i.ibb.co/N2VqD6yD/svgviewer-png-output-60.webp" alt="close" />
+              v-if="notificationAssets.closeMobile" :src="notificationAssets.closeMobile" alt="close" />
           </a>
         </div>
       </div>
@@ -49,24 +47,24 @@
             class="md: flex flex-col self-stretch items-start gap-2 p-2 pb-0 md:p-2 md:pb-0 md:pr-0 md:pl-0 md:bg-transparent bg-background-header-light dark:bg-background-header-dark md:dark:bg-transparent fixed md:static w-full z-[99]">
             <ul
               class="flex flex-row justify-between items-center self-stretch overflow-x-auto whitespace-nowrap scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <li class="flex-1 flex" v-for="tab in tabs" :key="tab.id">
-                <a href="#" @click.prevent="activeTab = tab.id" :class="[
+              <li class="flex-1 flex" v-for="tab in tabs" :key="tab.tabId">
+                <a href="#" @click.prevent="activeTab = tab.tabId" :class="[
                   'w-full flex flex-col items-center gap-2.5 whitespace-nowrap px-4 py-2 transition-all duration-200 ease-in-out',
-                  activeTab === tab.id
+                  activeTab === tab.tabId
                     ? 'opacity-100 shadow-[0_-1.5px_0_0_inset] shadow-border-tab-active-light dark:shadow-border-tab-active-dark'
                     : 'opacity-70 hover:opacity-100'
                 ]">
                   <span class="flex items-center gap-0.5 h-8 pointer-events-none">
                     <span :class="[
                       'text-sm uppercase leading-5',
-                      activeTab === tab.id
+                      activeTab === tab.tabId
                         ? 'font-semibold text-text-tab-active-light dark:text-text-tab-active-dark'
                         : 'font-medium text-text-tab-light dark:text-text-tab-dark'
-                    ]">{{ tab.label }}</span>
+                    ]">{{ $t(tab.translationKey, tab.fallback) }}</span>
                     <span class="flex flex-col items-center self-stretch gap-2.5">
                       <small
                         class="text-[0.625rem] font-medium leading-none tracking-[0.016rem] text-text-badge-light dark:text-text-badge-dark">{{
-                          tab.badge }}</small>
+                          tab.badgeCount }}</small>
                     </span>
                   </span>
                 </a>
@@ -90,11 +88,11 @@
                         <!-- Warning Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(253,176,34,0.1)] dark:bg-[rgba(183,119,2,0.1)]">
-                          <img src="https://i.ibb.co/d4xcGw6t/svgviewer-png-output-73.webp" alt="film"
+                          <img v-if="notificationAssets.film" :src="notificationAssets.film" alt="film"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(81%)_sepia(13%)_saturate(5746%)_hue-rotate(341deg)_brightness(102%)_contrast(98%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#fdb022] dark:bg-[#b77702]">
-                            <img src="https://i.ibb.co/nNXJP9LJ/svgviewer-png-output-74.webp" alt="upload"
+                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="upload"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
@@ -107,9 +105,7 @@
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
                               <p
                                 class="text-sm leading-5 font-normal text-text-notification-light dark:text-text-notification-dark">
-                                Media Content Required: Your profile currently
-                                has no media. Enhance your profile's visibility
-                                by adding at least 5 media items.
+                                {{ $t('dashboard.notifications.mock.mediaRequired', 'Media Content Required: Your profile currently has no media. Enhance your profile\'s visibility by adding at least 5 media items.') }}
                               </p>
                             </div>
 
@@ -127,9 +123,9 @@
                                 <a 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out md:flex hidden">
                                   <span
-                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">Dismiss</span>
+                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
                                   <span>
-                                    <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </a>
@@ -138,10 +134,9 @@
                                 <a 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out">
                                   <span
-                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-warning-light dark:text-cta-warning-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">Take
-                                    Action</span>
+                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-warning-light dark:text-cta-warning-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
                                   <span>
-                                    <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(24%)_sepia(100%)_saturate(1622%)_hue-rotate(10deg)_brightness(98%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </a>
@@ -162,18 +157,18 @@
                         <!-- notification-close -->
                         <a 
                           class="absolute right-0 top-0 flex justify-center items-center w-6 h-6 hidden md:block">
-                          <img src="https://i.ibb.co/jvsPTy91/svgviewer-png-output-81.webp" alt="close"
+                          <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="close"
                             class="w-4 h-4 pointer-events-none" />
                         </a>
 
                         <!-- Success Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(46,211,183,0.1)] dark:bg-[rgba(35,168,151,0.1)]">
-                          <img src="https://i.ibb.co.com/27y6kPNB/placeholder-jpeg.webp" alt="placeholder"
+                          <img v-if="notificationAssets.placeholder" :src="notificationAssets.placeholder" alt="placeholder"
                             class="w-full h-full" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#2ed3b7] dark:bg-[#23a897]">
-                            <img src="https://i.ibb.co/nNXJP9LJ/svgviewer-png-output-74.webp" alt="upload"
+                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="upload"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
@@ -186,8 +181,7 @@
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
                               <p
                                 class="text-sm leading-5 font-normal text-text-notification-light dark:text-text-notification-dark">
-                                Congratulations: Your media 'Audio with
-                                placeholder and no preview' has been approved.
+                                {{ $t('dashboard.notifications.mock.mediaApproved', 'Congratulations: Your media \'Audio with placeholder and no preview\' has been approved.') }}
                               </p>
                             </div>
 
@@ -214,18 +208,18 @@
                         <!-- notification-close -->
                         <a 
                           class="absolute right-0 top-0 flex justify-center items-center w-6 h-6 hidden md:block">
-                          <img src="https://i.ibb.co/jvsPTy91/svgviewer-png-output-81.webp" alt="close"
+                          <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="close"
                             class="w-4 h-4 pointer-events-none" />
                         </a>
 
                         <!-- Info Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(34,204,238,0.1)] dark:bg-[rgba(14,152,180,0.1)]">
-                          <img src="https://i.ibb.co/sdtcNrtm/svgviewer-png-output-76.webp" alt="bank-deposit"
+                          <img v-if="notificationAssets.userPlaceholder" :src="notificationAssets.userPlaceholder" alt="bank-deposit"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(67%)_sepia(37%)_saturate(913%)_hue-rotate(145deg)_brightness(95%)_contrast(97%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#2ce] dark:bg-[#0e98b4]">
-                            <img src="https://i.ibb.co/VW3pDzp0/svgviewer-png-output-79.webp" alt="info"
+                            <img v-if="notificationAssets.comment" :src="notificationAssets.comment" alt="info"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
@@ -238,9 +232,7 @@
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
                               <p
                                 class="text-sm leading-5 font-normal text-text-notification-light dark:text-text-notification-dark">
-                                Bank Details Required: To ensure seamless
-                                transactions, please complete your bank
-                                information.
+                                {{ $t('dashboard.notifications.mock.bankRequired', 'Bank Details Required: To ensure seamless transactions, please complete your bank information.') }}
                               </p>
                             </div>
 
@@ -267,18 +259,18 @@
                         <!-- notification-close -->
                         <a 
                           class="absolute right-0 top-0 flex justify-center items-center w-6 h-6 hidden md:block">
-                          <img src="https://i.ibb.co/jvsPTy91/svgviewer-png-output-81.webp" alt="close"
+                          <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="close"
                             class="w-4 h-4 pointer-events-none" />
                         </a>
 
                         <!-- Destructive Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(255,68,5,0.1)] dark:bg-[rgba(201,51,0,0.1)]">
-                          <img src="https://i.ibb.co/p60ycFJX/svgviewer-png-output-77.webp" alt="plane"
+                          <img v-if="notificationAssets.heart" :src="notificationAssets.heart" alt="plane"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(42%)_sepia(53%)_saturate(6174%)_hue-rotate(356deg)_brightness(98%)_contrast(105%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#ff4405] dark:bg-[#c93300]">
-                            <img src="https://i.ibb.co/Kxgt1PZ5/svgviewer-png-output-78.webp" alt="text-input"
+                            <img v-if="notificationAssets.tip" :src="notificationAssets.tip" alt="text-input"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
@@ -291,9 +283,7 @@
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
                               <p
                                 class="text-sm leading-5 font-normal text-text-notification-light dark:text-text-notification-dark">
-                                Bank Details Required: To ensure seamless
-                                transactions, please complete your bank
-                                information.
+                                {{ $t('dashboard.notifications.mock.bankRequired', 'Bank Details Required: To ensure seamless transactions, please complete your bank information.') }}
                               </p>
                             </div>
 
@@ -320,11 +310,11 @@
                         <!-- Warning Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(253,176,34,0.1)] dark:bg-[rgba(183,119,2,0.1)]">
-                          <img src="https://i.ibb.co/d4xcGw6t/svgviewer-png-output-73.webp" alt="film"
+                          <img v-if="notificationAssets.film" :src="notificationAssets.film" alt="film"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(81%)_sepia(13%)_saturate(5746%)_hue-rotate(341deg)_brightness(102%)_contrast(98%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#fdb022] dark:bg-[#b77702]">
-                            <img src="https://i.ibb.co/nNXJP9LJ/svgviewer-png-output-74.webp" alt="upload"
+                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="upload"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
@@ -337,9 +327,7 @@
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
                               <p
                                 class="text-sm leading-5 font-normal text-text-notification-light dark:text-text-notification-dark">
-                                Media Content Required: Your profile currently
-                                has no media. Enhance your profile's visibility
-                                by adding at least 5 media items.
+                                {{ $t('dashboard.notifications.mock.mediaRequired', 'Media Content Required: Your profile currently has no media. Enhance your profile\'s visibility by adding at least 5 media items.') }}
                               </p>
                             </div>
 
@@ -357,9 +345,9 @@
                                 <a 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out md:flex hidden">
                                   <span
-                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">Dismiss</span>
+                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
                                   <span>
-                                    <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </a>
@@ -368,10 +356,9 @@
                                 <a 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out">
                                   <span
-                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-warning-light dark:text-cta-warning-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">Take
-                                    Action</span>
+                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-warning-light dark:text-cta-warning-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
                                   <span>
-                                    <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(24%)_sepia(100%)_saturate(1622%)_hue-rotate(10deg)_brightness(98%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </a>
@@ -392,11 +379,11 @@
                         <!-- Success Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(46,211,183,0.1)] dark:bg-[rgba(35,168,151,0.1)]">
-                          <img src="https://i.ibb.co.com/27y6kPNB/placeholder-jpeg.webp" alt="placeholder"
+                          <img v-if="notificationAssets.placeholder" :src="notificationAssets.placeholder" alt="placeholder"
                             class="w-full h-full" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#2ed3b7] dark:bg-[#23a897]">
-                            <img src="https://i.ibb.co/nNXJP9LJ/svgviewer-png-output-74.webp" alt="upload"
+                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="upload"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
@@ -409,8 +396,7 @@
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
                               <p
                                 class="text-sm leading-5 font-normal text-text-notification-light dark:text-text-notification-dark">
-                                Congratulations: Your media 'Audio with
-                                placeholder and no preview' has been approved.
+                                {{ $t('dashboard.notifications.mock.mediaApproved', 'Congratulations: Your media \'Audio with placeholder and no preview\' has been approved.') }}
                               </p>
                             </div>
 
@@ -428,9 +414,9 @@
                                 <a 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out md:flex hidden">
                                   <span
-                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">Dismiss</span>
+                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
                                   <span>
-                                    <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </a>
@@ -439,10 +425,9 @@
                                 <a 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out">
                                   <span
-                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-success-light dark:text-cta-success-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">Take
-                                    Action</span>
+                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-success-light dark:text-cta-success-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
                                   <span>
-                                    <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(34%)_sepia(63%)_saturate(508%)_hue-rotate(123deg)_brightness(94%)_contrast(97%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </a>
@@ -463,11 +448,11 @@
                         <!-- Info Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(34,204,238,0.1)] dark:bg-[rgba(14,152,180,0.1)]">
-                          <img src="https://i.ibb.co/sdtcNrtm/svgviewer-png-output-76.webp" alt="bank-deposit"
+                          <img v-if="notificationAssets.userPlaceholder" :src="notificationAssets.userPlaceholder" alt="bank-deposit"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(67%)_sepia(37%)_saturate(913%)_hue-rotate(145deg)_brightness(95%)_contrast(97%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#2ce] dark:bg-[#0e98b4]">
-                            <img src="https://i.ibb.co/VW3pDzp0/svgviewer-png-output-79.webp" alt="info"
+                            <img v-if="notificationAssets.comment" :src="notificationAssets.comment" alt="info"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
@@ -480,9 +465,7 @@
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
                               <p
                                 class="text-sm leading-5 font-normal text-text-notification-light dark:text-text-notification-dark">
-                                Bank Details Required: To ensure seamless
-                                transactions, please complete your bank
-                                information.
+                                {{ $t('dashboard.notifications.mock.bankRequired', 'Bank Details Required: To ensure seamless transactions, please complete your bank information.') }}
                               </p>
                             </div>
 
@@ -500,9 +483,9 @@
                                 <a 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out md:flex hidden">
                                   <span
-                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">Dismiss</span>
+                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
                                   <span>
-                                    <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </a>
@@ -511,10 +494,9 @@
                                 <a 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out">
                                   <span
-                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-info-light dark:text-cta-info-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">Take
-                                    Action</span>
+                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-info-light dark:text-cta-info-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
                                   <span>
-                                    <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(39%)_sepia(96%)_saturate(762%)_hue-rotate(157deg)_brightness(88%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </a>
@@ -535,11 +517,11 @@
                         <!-- Destructive Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(255,68,5,0.1)] dark:bg-[rgba(201,51,0,0.1)]">
-                          <img src="https://i.ibb.co/p60ycFJX/svgviewer-png-output-77.webp" alt="plane"
+                          <img v-if="notificationAssets.heart" :src="notificationAssets.heart" alt="plane"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(42%)_sepia(53%)_saturate(6174%)_hue-rotate(356deg)_brightness(98%)_contrast(105%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#ff4405] dark:bg-[#c93300]">
-                            <img src="https://i.ibb.co/Kxgt1PZ5/svgviewer-png-output-78.webp" alt="text-input"
+                            <img v-if="notificationAssets.tip" :src="notificationAssets.tip" alt="text-input"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
@@ -552,9 +534,7 @@
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
                               <p
                                 class="text-sm leading-5 font-normal text-text-notification-light dark:text-text-notification-dark">
-                                Bank Details Required: To ensure seamless
-                                transactions, please complete your bank
-                                information.
+                                {{ $t('dashboard.notifications.mock.bankRequired', 'Bank Details Required: To ensure seamless transactions, please complete your bank information.') }}
                               </p>
                             </div>
 
@@ -572,9 +552,9 @@
                                 <a 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out md:flex hidden">
                                   <span
-                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">Dismiss</span>
+                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
                                   <span>
-                                    <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </a>
@@ -583,10 +563,9 @@
                                 <a 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out">
                                   <span
-                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-destructive-light dark:text-cta-destructive-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">Take
-                                    Action</span>
+                                    class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-destructive-light dark:text-cta-destructive-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
                                   <span>
-                                    <img src="https://i.ibb.co/TD1xRhhB/svgviewer-png-output-75.webp" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(12%)_sepia(50%)_saturate(4284%)_hue-rotate(351deg)_brightness(115%)_contrast(102%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </a>
@@ -604,12 +583,39 @@
         </div>
       </div>
     </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import BasePopupShell from "./BasePopupShell.vue";
+defineOptions({ name: 'DashboardNotificationPopup' });
+import { ref, onBeforeMount } from "vue";
+import BasePopup from "./BasePopup.vue";
+import { resolveSharedComponentAssets } from '@/systems/assets/resolveSharedComponentAssets.js';
+
+const notificationAssets = ref({
+  closeMobile: null,
+  closeDesktop: null,
+  bell: null,
+  settings: null,
+  film: null,
+  upload: null,
+  dismiss: null,
+  closeSmall: null,
+  placeholder: null,
+  userPlaceholder: null,
+  comment: null,
+  heart: null,
+  tip: null
+});
+
+onBeforeMount(async () => {
+  try {
+    const resolved = await resolveSharedComponentAssets('dashboardNotificationPopup');
+    Object.assign(notificationAssets.value, resolved);
+  } catch (error) {
+    console.error('[DashboardNotificationPopup] Failed to load assets:', error);
+  }
+});
 
 const props = defineProps({
   modelValue: {
@@ -621,11 +627,16 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
+const NOTIFICATION_TAB_ID_ALL = 'all';
+const NOTIFICATION_TAB_ID_UNREAD = 'unread';
+const NOTIFICATION_TAB_ID_CUSTOM_REQUESTS = 'custom-requests';
+const NOTIFICATION_TAB_ID_ACCOUNT = 'account';
+
 const tabs = [
-  { id: 'all', label: 'All', badge: '400+' },
-  { id: 'unread', label: 'Unread', badge: '400+' },
-  { id: 'custom-requests', label: 'Custom Requests', badge: '1' },
-  { id: 'account', label: 'Account', badge: '6' }
+  { tabId: NOTIFICATION_TAB_ID_ALL, translationKey: 'dashboard.notifications.tabs.all', fallback: 'All', badgeCount: '400+' },
+  { tabId: NOTIFICATION_TAB_ID_UNREAD, translationKey: 'dashboard.notifications.tabs.unread', fallback: 'Unread', badgeCount: '400+' },
+  { tabId: NOTIFICATION_TAB_ID_CUSTOM_REQUESTS, translationKey: 'dashboard.notifications.tabs.customRequests', fallback: 'Custom Requests', badgeCount: '1' },
+  { tabId: NOTIFICATION_TAB_ID_ACCOUNT, translationKey: 'dashboard.notifications.tabs.account', fallback: 'Account', badgeCount: '6' }
 ];
 
 const activeTab = ref('all');

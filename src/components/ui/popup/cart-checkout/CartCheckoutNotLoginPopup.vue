@@ -1,5 +1,5 @@
 <template>
-  <BasePopupShell
+  <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="cartcheckoutNotLoginConfig"
@@ -257,7 +257,7 @@
         </div>
       </div>
     </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>
 
 <script setup>
@@ -269,7 +269,7 @@ import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import PaymentMethodNotLoggedIn from "../checkout/PaymentMethodNotLoggedIn.vue";
 import CheckoutNotes from "../checkout/CheckoutNotes.vue";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
-import BasePopupShell from "@/components/ui/popup/BasePopupShell.vue";
+import BasePopup from "@/components/ui/popup/BasePopup.vue";
 import BaseSelect from "../checkout/BaseSelect.vue";
 import { ref } from "vue";
 import TotalAmountRow from "../checkout/TotalAmountRow.vue";

@@ -6,6 +6,11 @@
       "priority": "high"
     },
     {
+      "flag": "dashboard.bg.gradient",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
       "flag": "dashboard.avatar",
       "type": "image",
       "priority": "high"
@@ -104,6 +109,116 @@
       "flag": "dashboard.menu.blog",
       "type": "image",
       "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.bg",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.verified",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.arrowDown",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.info",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.edit",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.settings",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.menuStats",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.menuDesign",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.menuCopy",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.menuView",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.profile.liveArrow",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.bell",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.settings",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.film",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.upload",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.dismiss",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.closeSmall",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.placeholder",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.userPlaceholder",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.comment",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.heart",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.notification.tip",
+      "type": "image",
+      "priority": "normal"
     }
   ],
   "dashboardSidebarChrome": {
@@ -123,5 +238,36 @@
     "notification": "dashboard.notification",
     "language": "dashboard.language",
     "hamburger": "dashboard.hamburger"
+  },
+  "dashboardProfilePopup": {
+    "closeMobile": "dashboard.close.mobile",
+    "closeDesktop": "dashboard.close.desktop",
+    "profileBg": "dashboard.profile.bg",
+    "avatar": "dashboard.avatar",
+    "verified": "dashboard.profile.verified",
+    "arrowDown": "dashboard.profile.arrowDown",
+    "info": "dashboard.profile.info",
+    "edit": "dashboard.profile.edit",
+    "settings": "dashboard.profile.settings",
+    "menuStats": "dashboard.profile.menuStats",
+    "menuDesign": "dashboard.profile.menuDesign",
+    "menuCopy": "dashboard.profile.menuCopy",
+    "menuView": "dashboard.profile.menuView",
+    "liveArrow": "dashboard.profile.liveArrow"
+  },
+  "dashboardNotificationPopup": {
+    "closeMobile": "dashboard.close.mobile",
+    "closeDesktop": "dashboard.close.desktop",
+    "bell": "dashboard.notification.bell",
+    "settings": "dashboard.notification.settings",
+    "film": "dashboard.notification.film",
+    "upload": "dashboard.notification.upload",
+    "dismiss": "dashboard.notification.dismiss",
+    "closeSmall": "dashboard.notification.closeSmall",
+    "placeholder": "dashboard.notification.placeholder",
+    "userPlaceholder": "dashboard.notification.userPlaceholder",
+    "comment": "dashboard.notification.comment",
+    "heart": "dashboard.notification.heart",
+    "tip": "dashboard.notification.tip"
   }
 }

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { createStepStateEngine, attachEngineLogging } from '@/utils/stateEngine';
-import BasePopupShell from '@/components/ui/popup/BasePopupShell.vue';
+import BasePopup from '@/components/ui/popup/BasePopup.vue';
 import TierCard from '@/components/ui/card/dashboard/TierCard.vue';
 import PlanDetail from '@/dev/components/plan/PlanDetail.vue';
 import PlanVariation from '@/dev/components/plan/PlanVariation.vue';
@@ -378,7 +378,7 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <BasePopupShell
+            <BasePopup
                 :modelValue="isPreviewPopupOpen"
                 @update:modelValue="val => isPreviewPopupOpen = val"
                 :config="previewPopupConfig"
@@ -388,7 +388,7 @@ onUnmounted(() => {
                     <TierCard :tier="currentTierData" />
                     </div>
                 </div>
-            </BasePopupShell>
+            </BasePopup>
 
         </div>
     </div>

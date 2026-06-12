@@ -1,5 +1,5 @@
 <template>
-  <BasePopupShell
+  <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
     :config="imageCropConfig"
@@ -149,12 +149,12 @@
           </button>
         </div>
       </div>
-  </BasePopupShell>
+  </BasePopup>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
-import BasePopupShell from "./BasePopupShell.vue";
+import BasePopup from "./BasePopup.vue";
 
 const props = defineProps({
   imageSrc: {
