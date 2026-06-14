@@ -1,0 +1,472 @@
+
+==============================
+AnalyticsPage.vue
+==============================
+L592: TEXT Learn how to earn
+L722: IMPORT DashboardSharedTwoColLayout
+L723: IMPORT DashboardOrderCard
+L724: IMPORT AnalyticsMainCardWrapper
+L725: IMPORT DashboardTrendCard
+L726: IMPORT DashboardTrendContent
+L729: IMPORT flowRefreshManager
+L732: IMPORT TrendPopup
+L733: IMPORT EarningsTrendPopup
+L734: IMPORT SubscribersTrendPopup
+L735: IMPORT FansTrendPopup
+L736: IMPORT LikesTrendPopup
+L737: IMPORT ContributorsTrendPopup
+L738: IMPORT FlexTable
+L739: IMPORT OrdersReceivedTable
+L740: IMPORT TopMediaTable
+L741: IMPORT TopTagsTable
+L742: IMPORT TopMerchTable
+L743: IMPORT TopCountriesTable
+L744: IMPORT SparkLine
+L746: VAR store
+L750: VAR contributorsColumns
+L755: VAR currentContributorsInsightData
+L756: VAR cData
+L757: VAR p
+L760: VAR getPeriodArr
+L766: VAR mapAnalyticsData
+L790: VAR contributorsTheme
+L801: VAR earningsTopCountriesColumns
+L806: VAR earningsTopCountriesTheme
+L817: VAR fansTopCountriesColumns
+L823: VAR trendsTabs
+L824: VAR selectedTrendTab
+L825: VAR isTrendDropdownOpen
+L828: VAR subscribersPeriod
+L829: VAR earningsPeriod
+L830: VAR fansPeriod
+L831: VAR likesPeriod
+L832: VAR contributorsPeriod
+L834: FUNC getVsLabel
+L844: VAR countryNameMap
+L859: VAR isoMap
+L874: VAR currentEarningsInsightData
+L875: VAR tab
+L877: VAR arr
+L878: VAR latest
+L880: VAR countries
+L891: VAR summary
+L903: VAR currentSubscribersInsightData
+L904: VAR p
+L909: VAR currentFansInsightData
+L910: VAR p
+L913: VAR fansData
+L919: VAR bundleSources
+L920: VAR periodSources
+L923: VAR mappedCountries
+L939: VAR currentLikesInsightData
+L943: VAR trendComparisonLabel
+L955: VAR isSubscribersOpen
+L956: FUNC openSubscribers
+L960: VAR isEarningsOpen
+L961: FUNC openEarnings
+L965: VAR isFansOpen
+L966: FUNC openFans
+L970: VAR isLikesOpen
+L971: FUNC openLikes
+L975: VAR isContributorsOpen
+L976: FUNC openContributors
+L982: FUNC formatTime
+L984: VAR date
+L990: VAR isRefreshing
+L992: FUNC handleRefresh
+L997: VAR result
+
+==============================
+DashboardOrderCard.vue
+==============================
+
+==============================
+AnalyticsMainCardWrapper.vue
+==============================
+
+==============================
+DashboardTrendCard.vue
+==============================
+
+==============================
+DashboardTrendContent.vue
+==============================
+L23: PROPS found
+
+==============================
+TrendPopup.vue
+==============================
+L2: IMPORT BasePopup
+L6: VAR props
+L6: PROPS found
+L13: VAR emit
+L15: VAR config
+L36: VAR options
+L44: VAR selected
+L49: VAR isOpen
+L50: VAR dropdownDirection
+L51: VAR optionsRef
+L53: VAR selectedLabel
+L57: FUNC toggleDropdown
+L62: FUNC selectOption
+L67: FUNC positionDropdown
+L69: VAR rect
+L70: VAR spaceBelow
+L71: VAR spaceAbove
+L72: VAR optionsHeight
+L78: FUNC handleClickOutside
+
+==============================
+EarningsTrendPopup.vue
+==============================
+L61: TEXT Sales Insights
+L91: TEXT Token Insights
+L122: TEXT Top Countries
+L181: TEXT No trend to show at the moment
+L182: TEXT Learn ways to earn
+L189: IMPORT TrendPopup
+L190: IMPORT FlexTable
+L194: VAR props
+L194: PROPS found
+L200: VAR emit
+L202: VAR hasData
+L204: VAR store
+L207: VAR activePeriod
+L208: VAR p
+L212: VAR isDaily
+L214: VAR salesView
+L215: VAR tokensView
+L216: VAR topCountriesWithRank
+L220: VAR LEGEND
+L221: VAR SALES_STYLES
+L222: VAR SALES_LABELS
+L223: VAR TOKENS_STYLES
+L224: VAR TOKENS_LABELS
+L226: FUNC getSalesBarCfg
+L227: FUNC getSalesLineCfg
+L229: FUNC getTokensBarCfg
+L230: FUNC getTokensLineCfg
+L232: FUNC getCountriesMapCfg
+L234: FUNC injectChartData
+L236: VAR b
+L250: VAR lastDaily
+L269: VAR tc
+L270: VAR mapData
+L272: VAR ALL_ISO_CODES
+L273: VAR topIds
+L274: VAR baseData
+L288: FUNC ensureReady
+L290: VAR hasData
+L295: FUNC renderChart
+L297: VAR container
+L301: VAR host
+L306: FUNC renderCurrentCharts
+L313: VAR p
+L322: FUNC setSalesView
+L323: FUNC setTokensView
+L325: FUNC handlePeriodChange
+L335: VAR earningsTopCountriesColumns
+L340: VAR earningsTopCountriesTheme
+L351: VAR earningsPctChange
+L352: VAR b
+L353: VAR p
+L354: VAR arr
+L356: VAR curr
+L357: VAR prev
+L362: VAR tokensPctChange
+L363: VAR b
+L364: VAR p
+L365: VAR arr
+L367: VAR curr
+L368: VAR prev
+L373: FUNC getVsLabel
+
+==============================
+SubscribersTrendPopup.vue
+==============================
+L11: TEXT New Subscribers
+L18: TEXT Recurring Subscribers
+L30: TEXT Subscriptions Insight
+L112: TEXT Tiers Breakdown
+L207: IMPORT TrendPopup
+L211: VAR props
+L211: PROPS found
+L212: VAR emit
+L214: VAR hasData
+L216: VAR store
+L217: VAR bundle
+L220: VAR activePeriod
+L222: VAR p
+L227: VAR isDaily
+L229: VAR subsView
+L230: VAR tiersView
+L233: VAR LEGEND
+L234: VAR SUBS_STYLES
+L235: VAR SUBS_LABELS
+L236: VAR TIERS_STYLES
+L237: VAR TIERS_LABELS
+L239: FUNC getSubsBarCfg
+L242: FUNC getSubsLineCfg
+L245: FUNC getTiersBarCfg
+L248: FUNC getTiersLineCfg
+L253: FUNC calculatePercentage
+L258: VAR statData
+L259: VAR p
+L260: VAR b
+L262: VAR gt
+L265: VAR arrMap
+L266: VAR arr
+L267: VAR last
+L268: VAR prev
+L277: VAR newCount
+L278: VAR recurringCount
+L279: VAR newPct
+L280: VAR recurringPct
+L281: VAR vsLabel
+L282: VAR m
+L287: FUNC injectChartData
+L289: VAR b
+L292: VAR daily
+L293: VAR lastDaily
+L325: FUNC ensureReady
+L327: VAR hasData
+L332: FUNC renderChart
+L334: VAR container
+L339: VAR host
+L344: FUNC renderCurrentCharts
+L350: VAR p
+L356: FUNC setSubsView
+L361: FUNC setTiersView
+L366: FUNC handlePeriodChange
+
+==============================
+FansTrendPopup.vue
+==============================
+L52: TEXT Followers & Visits Trend
+L111: TEXT Traffic Source
+L125: TEXT Top Countries
+L167: TEXT No trend to show at the moment
+L168: TEXT Learn ways to earn
+L175: IMPORT TrendPopup
+L176: IMPORT FlexTable
+L180: VAR props
+L180: PROPS found
+L186: VAR emit
+L188: VAR hasData
+L190: VAR store
+L192: VAR activePeriod
+L194: VAR p
+L198: VAR isDaily
+L200: VAR trendView
+L202: VAR LEGEND
+L203: VAR FANS_STYLES
+L204: VAR FANS_LABELS
+L206: FUNC getFansBarCfg
+L209: FUNC getFansLineCfg
+L213: FUNC getSourcesDonutCfg
+L214: VAR styles
+L222: VAR keyMap
+L230: FUNC injectChartData
+L232: VAR sources
+L236: VAR fi
+L237: VAR mapFansData
+L249: FUNC ensureReady
+L251: VAR hasData
+L256: FUNC renderChart
+L258: VAR container
+L262: VAR host
+L267: FUNC renderCurrentCharts
+L271: VAR p
+L276: FUNC setTrendView
+L282: FUNC handlePeriodChange
+L291: VAR fansTopCountriesColumns
+L296: VAR fansTopCountriesTheme
+L307: VAR fanInsightsData
+L309: VAR followersPct
+L310: VAR b
+L311: VAR p
+L312: VAR arr
+L314: VAR curr
+L315: VAR prev
+L320: VAR visitsPct
+L321: VAR b
+L322: VAR p
+L323: VAR arr
+L325: VAR curr
+L326: VAR prev
+L331: FUNC getVsLabel
+
+==============================
+LikesTrendPopup.vue
+==============================
+L15: TEXT Likes Insight
+L42: TEXT No trend to show at the moment
+L43: TEXT Learn ways to earn
+L53: IMPORT TrendPopup
+L57: VAR props
+L57: PROPS found
+L63: VAR emit
+L64: VAR store
+L67: VAR activePeriod
+L68: VAR p
+L73: VAR likesView
+L75: VAR likesDataAvailable
+L77: VAR hasData
+L85: VAR LEGEND
+L86: VAR LIKES_STYLES
+L92: VAR LIKES_LABELS
+L93: VAR BREAKDOWN_KEYS
+L95: FUNC getLikesBarCfg
+L105: FUNC getLikesLineCfg
+L116: FUNC fetchLikesData
+L119: VAR urlParams
+L120: VAR source
+L121: VAR bundleFile
+L122: VAR res
+L123: VAR bundle
+L130: FUNC injectChartData
+L132: VAR likesBundle
+L133: VAR p
+L134: VAR dataArr
+L140: VAR mapForChart
+L156: FUNC ensureReady
+L158: VAR hasCfg
+L163: FUNC renderChart
+L165: VAR container
+L169: VAR host
+L174: FUNC renderCurrentCharts
+L179: FUNC setLikesView
+L185: FUNC handlePeriodChange
+
+==============================
+ContributorsTrendPopup.vue
+==============================
+L15: TEXT Top Contributors
+L39: TEXT No trend to show at the moment
+L40: TEXT Learn ways to earn
+L48: TEXT Top Fans
+L72: TEXT No trend to show at the moment
+L73: TEXT Learn ways to earn
+L81: TEXT Top Order Spenders
+L105: TEXT No trend to show at the moment
+L106: TEXT Learn ways to earn
+L117: TEXT No trend to show at the moment
+L118: TEXT Learn ways to earn
+L125: IMPORT TrendPopup
+L128: VAR props
+L128: PROPS found
+L134: VAR emit
+L136: VAR hasData
+L138: VAR topC
+L139: VAR topF
+L140: VAR topS
+L145: VAR contribView
+L146: VAR fansView
+L147: VAR spendersView
+L150: VAR LEGEND
+L151: VAR CATEGORY_STYLES
+L158: VAR CATEGORY_LABELS
+L159: VAR BREAKDOWN_KEYS
+L161: FUNC getContribBarCfg
+L178: FUNC getContribLineCfg
+L196: FUNC injectChartData
+L198: VAR d
+L202: VAR mapForChart
+L221: FUNC ensureReady
+L223: VAR hasData
+L228: FUNC renderChart
+L230: VAR container
+L234: VAR host
+L239: FUNC renderAllCharts
+L246: FUNC setContribView
+L251: FUNC setFansView
+L256: FUNC setSpendersView
+L262: FUNC handlePeriodChange
+
+==============================
+OrdersReceivedTable.vue
+==============================
+L160: TEXT Details
+L176: TEXT You don't have any orders at the moment
+L188: TEXT All Orders
+L214: IMPORT AnalyticsMainCardWrapper
+L215: IMPORT FlexTable
+L219: VAR orderTabs
+L220: VAR selectedTab
+L221: VAR isDropdownOpen
+L224: VAR ordersColumns
+L232: VAR merchOrdersColumns
+L241: VAR customRequestOrdersColumns
+L245: VAR currentRows
+L246: VAR store
+L247: VAR recent
+L260: VAR totalOrdersCount
+L261: VAR store
+L262: VAR recent
+L270: VAR currentColumns
+L277: VAR ordersTheme
+
+==============================
+TopMediaTable.vue
+==============================
+L103: IMPORT DashboardTrendCard
+L104: IMPORT DashboardTrendContent
+L105: IMPORT FlexTable
+L109: VAR props
+L109: PROPS found
+L112: VAR store
+L114: VAR topMediaTabs
+L115: VAR selectedTopMediaTab
+L117: VAR topMediaColumns
+L123: VAR p2vSalesColumns
+L129: FUNC formatDuration
+L131: VAR h
+L132: VAR m
+L136: VAR topMediaRows
+L137: VAR data
+L148: VAR p2vSalesRows
+L149: VAR data
+L160: VAR topMediaTheme
+
+==============================
+TopTagsTable.vue
+==============================
+L66: IMPORT DashboardTrendCard
+L67: IMPORT DashboardTrendContent
+L68: IMPORT FlexTable
+L73: VAR props
+L73: PROPS found
+L76: VAR store
+L78: VAR topTagsColumns
+L83: VAR topTagsRows
+L84: VAR data
+L93: VAR topTagsTheme
+
+==============================
+TopMerchTable.vue
+==============================
+L78: IMPORT DashboardTrendCard
+L79: IMPORT DashboardTrendContent
+L80: IMPORT FlexTable
+L85: VAR props
+L85: PROPS found
+L88: VAR store
+L90: VAR topMerchColumns
+L96: VAR topMerchRows
+L97: VAR data
+L108: VAR topMerchTheme
+
+==============================
+TopCountriesTable.vue
+==============================
+L66: IMPORT DashboardTrendCard
+L67: IMPORT DashboardTrendContent
+L68: IMPORT FlexTable
+L73: VAR props
+L73: PROPS found
+L76: VAR store
+L78: VAR countryNameMap
+L110: VAR topCountriesColumns
+L115: VAR topCountriesRows
+L116: VAR data
+L125: VAR topCountriesTheme

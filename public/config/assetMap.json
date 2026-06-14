@@ -5,11 +5,23 @@
     "icon.search": "/assets/icons/search.svg",
     "icon.social.telegram": "/images/telegram.svg",
     "script.cognito": "/vendor/amazon-cognito-identity-6.3.15.min.js",
-    "image.hero": "/assets/images/hero-dev.jpg"
+    "image.hero": "/assets/images/hero-dev.jpg",
+    "dashboard.analytics.icon1": "/dev/cdn/analytics/icons/icon-1.webp",
+    "dashboard.analytics.icon2": "/dev/cdn/analytics/icons/icon-2.webp",
+    "dashboard.analytics.icon3": "/dev/cdn/analytics/icons/icon-3.webp",
+    "dashboard.analytics.icon4": "/dev/cdn/analytics/icons/icon-4.webp",
+    "dashboard.analytics.icon5": "/dev/cdn/analytics/icons/icon-5.webp",
+    "dashboard.analytics.money": "/dev/cdn/analytics/icons/money.webp"
   },
   "staging": {
     "icon.cart": "/assets/icons/cart-staging.svg",
-    "logo.main": "/assets/logos/logo-staging.png"
+    "logo.main": "/assets/logos/logo-staging.png",
+    "dashboard.analytics.icon1": "/dev/cdn/analytics/icons/icon-1.webp",
+    "dashboard.analytics.icon2": "/dev/cdn/analytics/icons/icon-2.webp",
+    "dashboard.analytics.icon3": "/dev/cdn/analytics/icons/icon-3.webp",
+    "dashboard.analytics.icon4": "/dev/cdn/analytics/icons/icon-4.webp",
+    "dashboard.analytics.icon5": "/dev/cdn/analytics/icons/icon-5.webp",
+    "dashboard.analytics.money": "/dev/cdn/analytics/icons/money.webp"
   },
   "production": {
     "icon.cart": "https://cdn.example.com/assets/icons/cart.svg",
@@ -74,6 +86,12 @@
     "dashboard.notification.userPlaceholder": "https://i.ibb.co/sdtcNrtm/svgviewer-png-output-76.webp",
     "dashboard.notification.comment": "https://i.ibb.co/VW3pDzp0/svgviewer-png-output-79.webp",
     "dashboard.notification.heart": "https://i.ibb.co/p60ycFJX/svgviewer-png-output-77.webp",
-    "dashboard.notification.tip": "https://i.ibb.co/Kxgt1PZ5/svgviewer-png-output-78.webp"
+    "dashboard.notification.tip": "https://i.ibb.co/Kxgt1PZ5/svgviewer-png-output-78.webp",
+    "dashboard.analytics.icon1": "/dev/cdn/analytics/icons/icon-1.webp",
+    "dashboard.analytics.icon2": "/dev/cdn/analytics/icons/icon-2.webp",
+    "dashboard.analytics.icon3": "/dev/cdn/analytics/icons/icon-3.webp",
+    "dashboard.analytics.icon4": "/dev/cdn/analytics/icons/icon-4.webp",
+    "dashboard.analytics.icon5": "/dev/cdn/analytics/icons/icon-5.webp",
+    "dashboard.analytics.money": "/dev/cdn/analytics/icons/money.webp"
   }
 }

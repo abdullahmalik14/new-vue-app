@@ -595,7 +595,7 @@
     "section": "dashboard-global",
     "requiresAuth": true,
     "redirectIfNotAuth": "/log-in",
-    "componentPath": "@/dev/templates/analytics/AnalyticsPage.vue",
+    "componentPath": "@/dev/templates/analytics/DashboardAnalyticsPage.vue",
     "supportedRoles": [
       "all"
     ],
@@ -641,6 +641,10 @@
         "priority": "high"
       }
     ]
+  },
+   {
+    "slug": "/home",
+  "componentPath": "@/dev/templates/home/Home.vue"
   },
   {
     "slug": "/:pathMatch(.*)*",

@@ -57,7 +57,7 @@ onMounted(() => {
   if (window.performanceTracker) {
     window.performanceTracker.step({
       flowName: 'AnalyticsRender',
-      stepName: 'TopTagsTable Mounted',
+      stepName: 'DashboardAnalyticsTopTagsTable Mounted',
       status: 'success'
     });
   }
@@ -73,7 +73,7 @@ import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
-const store = useDashboardAnalyticsStore()
+const analyticsStore = useDashboardAnalyticsStore()
 
 const topTagsColumns = [
   { key: 'tag', label: 'Tags', basis: 'basis-1/2', grow: true, align: 'left' },
@@ -81,7 +81,7 @@ const topTagsColumns = [
 ]
 
 const topTagsRows = computed(() => {
-  const data = store.trendingTags?.[props.period] || [];
+  const data = analyticsStore.trendingTags?.[props.period] || [];
   return data.map((item, index) => ({
     id: index,
     rank: item.rank || index + 1,

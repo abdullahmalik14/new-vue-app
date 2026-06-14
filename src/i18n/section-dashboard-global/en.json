@@ -60,6 +60,58 @@
         "mediaApproved": "Congratulations: Your media 'Audio with placeholder and no preview' has been approved.",
         "bankRequired": "Bank Details Required: To ensure seamless transactions, please complete your bank information."
       }
+    },
+    "analytics": {
+      "page": {
+        "overviewTitle": "Overview/Insight",
+        "lastUpdated": "Last updated at",
+        "refresh": "Refresh",
+        "refreshing": "Refreshing...",
+        "learnHowToEarn": "Learn how you can earn"
+      },
+      "trends": {
+        "salesInsights": "Sales Insights",
+        "tokenInsights": "Token Insights",
+        "topCountries": "Top Countries",
+        "noTrend": "No trend to show at the moment",
+        "learnToEarn": "Learn ways to earn",
+        "newSubscribers": "New Subscribers",
+        "recurringSubscribers": "Recurring Subscribers",
+        "subscriptionsInsight": "Subscriptions Insight",
+        "tiersBreakdown": "Tiers Breakdown",
+        "followersAndVisits": "Followers & Visits Trend",
+        "trafficSource": "Traffic Source",
+        "likesInsight": "Likes Insight",
+        "topContributors": "Top Contributors",
+        "topFans": "Top Fans",
+        "topOrderSpenders": "Top Order Spenders"
+      },
+      "likes": {
+        "media": "Media Likes",
+        "merch": "Merch Likes",
+        "profile": "Profile Likes",
+        "feed": "Feed Likes"
+      },
+      "contributors": {
+        "contributor": "Contributor",
+        "fan": "Fan",
+        "spender": "Spender"
+      },
+      "tables": {
+        "orders": {
+          "details": "Details",
+          "noOrders": "You don't have any orders at the moment",
+          "allOrders": "All Orders",
+          "orderLabel": "Order#"
+        },
+        "tabs": {
+          "subscriptions": "Subscriptions",
+          "payToView": "Pay to View",
+          "merch": "Merch",
+          "customRequest": "Custom Request",
+          "wishtender": "Wishtender"
+        }
+      }
     }
   },
   "common": {

@@ -57,7 +57,7 @@ onMounted(() => {
   if (window.performanceTracker) {
     window.performanceTracker.step({
       flowName: 'AnalyticsRender',
-      stepName: 'TopCountriesTable Mounted',
+      stepName: 'DashboardAnalyticsTopCountriesTable Mounted',
       status: 'success'
     });
   }
@@ -73,7 +73,7 @@ import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
-const store = useDashboardAnalyticsStore()
+const analyticsStore = useDashboardAnalyticsStore()
 
 const countryNameMap = {
   'Country 36': 'Australia',
@@ -113,7 +113,7 @@ const topCountriesColumns = [
 ]
 
 const topCountriesRows = computed(() => {
-  const data = store.trendingCountries?.[props.period] || [];
+  const data = analyticsStore.trendingCountries?.[props.period] || [];
   return data.map((item, index) => ({
     id: index,
     rank: item.rank || index + 1,

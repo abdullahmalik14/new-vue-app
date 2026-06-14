@@ -26,6 +26,7 @@
     "@amcharts/amcharts5-geodata": "^5.1.5",
     "@aws-sdk/client-cognito-identity-provider": "^3.948.0",
     "@heroicons/vue": "^2.2.0",
+    "@splidejs/splide-extension-auto-scroll": "^0.5.3",
     "@splidejs/vue-splide": "^0.6.12",
     "@vueup/vue-quill": "^1.2.0",
     "amazon-cognito-identity-js": "^6.3.15",

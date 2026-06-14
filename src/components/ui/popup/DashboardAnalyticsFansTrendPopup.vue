@@ -1,8 +1,8 @@
 <template>
-  <TrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
+  <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
     @update:period="handlePeriodChange" title="Fans Insight"
     logo="https://i.ibb.co.com/rGSXLKX4/money.webp">
-    <div v-if="hasData" class="flex flex-col gap-4">
+    <div v-if="hasFansData" class="flex flex-col gap-4">
       <!-- row: stats -->
       <div class="grid grid-cols-2">
         <!-- New Followers -->
@@ -20,7 +20,7 @@
                 <img v-if="followersPct >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-5 w-5" />
                 <div :class="followersPct >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ followersPct >= 0 ? '+' : '' }}{{ followersPct }}%</div>
               </div>
-              <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ getVsLabel(period) }}</div>
+              <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ formatComparisonLabel(period) }}</div>
             </div>
           </div>
         </div>
@@ -40,7 +40,7 @@
                 <img v-if="visitsPct >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-5 w-5" />
                 <div :class="visitsPct >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ visitsPct >= 0 ? '+' : '' }}{{ visitsPct }}%</div>
               </div>
-              <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ getVsLabel(period) }}</div>
+              <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ formatComparisonLabel(period) }}</div>
             </div>
           </div>
         </div>
@@ -49,54 +49,54 @@
       <!-- row: Followers/Visit Trend Chart (hidden for Daily) -->
       <div v-if="!isDaily" class="flex flex-col gap-3 p-4 bg-light-bg-container dark:bg-dark-bg-container rounded w-full h-[25rem] relative">
         <div class="flex justify-between items-center z-10 relative">
-          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">Followers & Visits Trend</h3>
+          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{ $t('dashboard.analytics.trends.followersAndVisits') }}</h3>
           <div class="flex gap-1 bg-[#F9FAFB] p-1 rounded-lg border border-[#EAECF0]">
-            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="trendView==='bar'?'bg-white shadow-sm':'bg-transparent'" @click="setTrendView('bar')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="trendView==='bar'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="activeTrendViewMode==='bar'?'bg-white shadow-sm':'bg-transparent'" @click="setTrendView('bar')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="activeTrendViewMode==='bar'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             </button>
-            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="trendView==='line'?'bg-white shadow-sm':'bg-transparent'" @click="setTrendView('line')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="trendView==='line'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="activeTrendViewMode==='line'?'bg-white shadow-sm':'bg-transparent'" @click="setTrendView('line')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="activeTrendViewMode==='line'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             </button>
           </div>
         </div>
 
         <div class="absolute top-[40px] left-0 right-0 bottom-[30px]">
           <!-- Weekly bar/line -->
-          <div data-chart-container data-chart-id="fans-weekly-bar" :hidden="!(activePeriod==='weekly'&&trendView==='bar')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-weekly-bar" :hidden="!(activePeriod==='weekly'&&activeTrendViewMode==='bar')||undefined" class="absolute inset-0"
             :data-chart-config='getFansBarCfg("fans-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="fans-weekly-line" :hidden="!(activePeriod==='weekly'&&trendView==='line')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-weekly-line" :hidden="!(activePeriod==='weekly'&&activeTrendViewMode==='line')||undefined" class="absolute inset-0"
             :data-chart-config='getFansLineCfg("fans-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Monthly bar/line -->
-          <div data-chart-container data-chart-id="fans-monthly-bar" :hidden="!(activePeriod==='monthly'&&trendView==='bar')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-monthly-bar" :hidden="!(activePeriod==='monthly'&&activeTrendViewMode==='bar')||undefined" class="absolute inset-0"
             :data-chart-config='getFansBarCfg("fans-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="fans-monthly-line" :hidden="!(activePeriod==='monthly'&&trendView==='line')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-monthly-line" :hidden="!(activePeriod==='monthly'&&activeTrendViewMode==='line')||undefined" class="absolute inset-0"
             :data-chart-config='getFansLineCfg("fans-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Yearly bar/line -->
-          <div data-chart-container data-chart-id="fans-yearly-bar" :hidden="!(activePeriod==='yearly'&&trendView==='bar')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-yearly-bar" :hidden="!(activePeriod==='yearly'&&activeTrendViewMode==='bar')||undefined" class="absolute inset-0"
             :data-chart-config='getFansBarCfg("fans-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="fans-yearly-line" :hidden="!(activePeriod==='yearly'&&trendView==='line')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-yearly-line" :hidden="!(activePeriod==='yearly'&&activeTrendViewMode==='line')||undefined" class="absolute inset-0"
             :data-chart-config='getFansLineCfg("fans-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Alltime bar/line -->
-          <div data-chart-container data-chart-id="fans-alltime-bar" :hidden="!(activePeriod==='alltime'&&trendView==='bar')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-alltime-bar" :hidden="!(activePeriod==='alltime'&&activeTrendViewMode==='bar')||undefined" class="absolute inset-0"
             :data-chart-config='getFansBarCfg("fans-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="fans-alltime-line" :hidden="!(activePeriod==='alltime'&&trendView==='line')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-alltime-line" :hidden="!(activePeriod==='alltime'&&activeTrendViewMode==='line')||undefined" class="absolute inset-0"
             :data-chart-config='getFansLineCfg("fans-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
@@ -105,10 +105,10 @@
 
       <!-- row: charts -->
       <div class="flex flex-col md:flex-row gap-4">
-        <!-- Traffic Source -->
+        <!-- {{ $t('dashboard.analytics.trends.trafficSource') }} -->
         <div class="flex flex-col gap-4 p-4 w-full h-[25.875rem] bg-light-bg-container dark:bg-dark-bg-container relative">
           <div class="flex justify-between items-center gap-2 relative z-10">
-            <h3 class="text-light-text-darkgray dark:text-white text-lg font-semibold">Traffic Source</h3>
+            <h3 class="text-light-text-darkgray dark:text-white text-lg font-semibold">{{ $t('dashboard.analytics.trends.trafficSource') }}</h3>
           </div>
           <div class="absolute top-[60px] left-0 right-0 bottom-4 p-2">
             <div data-chart-container data-chart-id="traffic-sources-donut" class="w-full h-full"
@@ -118,11 +118,11 @@
           </div>
         </div>
 
-        <!-- Top Countries -->
+        <!-- {{ $t('dashboard.analytics.trends.topCountries') }} -->
         <div
           class="flex flex-col gap-4 p-4 w-full h-[25.875rem] bg-light-bg-container dark:bg-dark-bg-container overflow-hidden">
           <div class="flex justify-between items-center gap-2">
-            <h3 class="text-light-text-darkgray dark:text-white text-lg font-semibold">Top Countries</h3>
+            <h3 class="text-light-text-darkgray dark:text-white text-lg font-semibold">{{ $t('dashboard.analytics.trends.topCountries') }}</h3>
           </div>
 
           <div v-if="insightData?.topCountries?.length > 0" class="w-full h-full overflow-hidden">
@@ -164,15 +164,15 @@
         <img src="/images/noTrendImg.png" alt="illustration" class="w-32 h-32 object-contain" />
       </div>
       <div class="flex flex-col gap-1">
-        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
-        <a href="#" class="text-xs text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to earn</a>
+        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
+        <a href="#" class="text-xs text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
       </div>
     </div>
-  </TrendPopup>
+  </DashboardAnalyticsTrendPopup>
 </template>
 
 <script setup>
-import TrendPopup from './TrendPopup.vue'
+import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
@@ -185,9 +185,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'update:period'])
 
-const hasData = computed(() => props.insightData && props.insightData.newFollowers != null)
+const hasFansData = computed(() => props.insightData && props.insightData.newFollowers != null)
 
-const store = useDashboardAnalyticsStore()
+const analyticsStore = useDashboardAnalyticsStore()
 
 const activePeriod = computed(() => {
   // Linden: 'on open should be default bar chart for week'
@@ -197,17 +197,17 @@ const activePeriod = computed(() => {
 })
 const isDaily = computed(() => activePeriod.value === 'daily')
 
-const trendView = ref('bar')
+const activeTrendViewMode = ref('bar')
 
-const LEGEND = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
-const FANS_STYLES = { newFollowers:{color:"#4CC9F0",name:"New Followers"}, profileVisits:{color:"#4361EE",name:"Profile Visit"} }
-const FANS_LABELS = { newFollowers:"New Followers", profileVisits:"Profile Visit" }
+const legendConfig = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
+const fansChartStyles = { newFollowers:{color:"#4CC9F0",name:"New Followers"}, profileVisits:{color:"#4361EE",name:"Profile Visit"} }
+const fansChartLabels = { newFollowers:"New Followers", profileVisits:"Profile Visit" }
 
 function getFansBarCfg(dk) {
-  return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:true, seriesStyles:FANS_STYLES, seriesLabels:FANS_LABELS, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:LEGEND })
+  return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:true, seriesStyles:fansChartStyles, seriesLabels:fansChartLabels, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig })
 }
 function getFansLineCfg(dk) {
-  return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:false, seriesStyles:FANS_STYLES, seriesLabels:FANS_LABELS, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:LEGEND })
+  return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:false, seriesStyles:fansChartStyles, seriesLabels:fansChartLabels, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig })
 }
 
 function getSourcesDonutCfg(dk) {
@@ -233,7 +233,7 @@ function injectChartData() {
   window.chartsHandler._configs.data['traffic-sources-donut'] = { slot: sources }
 
   // Inject fans trend data per period
-  const fi = store.fanInsights || {}
+  const fi = analyticsStore.fanInsights || {}
   const mapFansData = (arr) => (arr || []).map(item => ({
     period: item.period || '',
     newFollowers: item.newFollowers || 0,
@@ -248,8 +248,8 @@ function injectChartData() {
 
 async function ensureReady() {
   if (!window.chartsHandler) return
-  const hasData = window.chartsHandler._configs?.data && Object.keys(window.chartsHandler._configs.data).length > 0
-  if (!hasData) await window.chartsHandler.loadChartConfigsAndData()
+  const hasFansData = window.chartsHandler._configs?.data && Object.keys(window.chartsHandler._configs.data).length > 0
+  if (!hasFansData) await window.chartsHandler.loadChartConfigsAndData()
   injectChartData()
 }
 
@@ -269,12 +269,12 @@ async function renderCurrentCharts() {
   await renderChart('traffic-sources-donut')
   if (!isDaily.value) {
     const p = activePeriod.value
-    await renderChart(`fans-${p}-${trendView.value}`)
+    await renderChart(`fans-${p}-${activeTrendViewMode.value}`)
   }
 }
 
 async function setTrendView(v) {
-  trendView.value = v
+  activeTrendViewMode.value = v
   await nextTick()
   if (!isDaily.value) await renderChart(`fans-${activePeriod.value}-${v}`)
 }
@@ -304,17 +304,17 @@ const fansTopCountriesTheme = {
 }
 
 // Compute dynamic percentage changes (replaces hardcoded 20%)
-const fanInsightsData = computed(() => store.fanInsights || {})
+const fanInsightsData = computed(() => analyticsStore.fanInsights || {})
 
 const followersPct = computed(() => {
   const b = fanInsightsData.value
   const p = activePeriod.value
   const arr = b[p] || []
   if (arr.length < 2) return null
-  const curr = arr[arr.length - 1]?.newFollowers || 0
-  const prev = arr[arr.length - 2]?.newFollowers || 0
-  if (prev === 0) return null
-  return Math.round(((curr - prev) / prev) * 100)
+  const currentPeriodData = arr[arr.length - 1]?.newFollowers || 0
+  const previousPeriodData = arr[arr.length - 2]?.newFollowers || 0
+  if (previousPeriodData === 0) return null
+  return Math.round(((currentPeriodData - previousPeriodData) / previousPeriodData) * 100)
 })
 
 const visitsPct = computed(() => {
@@ -322,13 +322,13 @@ const visitsPct = computed(() => {
   const p = activePeriod.value
   const arr = b[p] || []
   if (arr.length < 2) return null
-  const curr = arr[arr.length - 1]?.profileVisits || 0
-  const prev = arr[arr.length - 2]?.profileVisits || 0
-  if (prev === 0) return null
-  return Math.round(((curr - prev) / prev) * 100)
+  const currentPeriodData = arr[arr.length - 1]?.profileVisits || 0
+  const previousPeriodData = arr[arr.length - 2]?.profileVisits || 0
+  if (previousPeriodData === 0) return null
+  return Math.round(((currentPeriodData - previousPeriodData) / previousPeriodData) * 100)
 })
 
-function getVsLabel(period) {
+function formatComparisonLabel(period) {
   switch ((period || '').toLowerCase()) {
     case 'daily': return 'vs last 24 hour'
     case 'weekly': return 'vs last week'

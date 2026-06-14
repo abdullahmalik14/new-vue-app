@@ -1,5 +1,5 @@
 <template>
-  <TrendPopup
+  <DashboardAnalyticsTrendPopup
     :model-value="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
     :period="period"
@@ -7,28 +7,28 @@
     title="Contributors Insight"
     logo="https://i.ibb.co.com/rGSXLKX4/money.webp"
   >
-    <div v-if="hasData" class="flex flex-col gap-4">
+    <div v-if="hasContributorsData" class="flex flex-col gap-4">
 
-      <!-- Top Contributors -->
+      <!-- {{ $t('dashboard.analytics.trends.topContributors') }} -->
       <div class="flex flex-col gap-3 p-4 rounded-sm w-full h-[22rem] relative">
         <div class="flex justify-between items-center z-10 relative">
-          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">Top Contributors</h3>
+          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{ $t('dashboard.analytics.trends.topContributors') }}</h3>
           <div class="flex gap-1 bg-[#F9FAFB] p-1 rounded-lg border border-[#EAECF0]">
-            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="contribView==='bar'?'bg-white shadow-sm':'bg-transparent'" @click="setContribView('bar')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="contribView==='bar'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="activeContribViewMode==='bar'?'bg-white shadow-sm':'bg-transparent'" @click="setContribView('bar')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="activeContribViewMode==='bar'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             </button>
-            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="contribView==='line'?'bg-white shadow-sm':'bg-transparent'" @click="setContribView('line')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="contribView==='line'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="activeContribViewMode==='line'?'bg-white shadow-sm':'bg-transparent'" @click="setContribView('line')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="activeContribViewMode==='line'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             </button>
           </div>
         </div>
 
         <div v-if="insightData?.topContributors?.length > 0" class="absolute top-[40px] left-0 right-0 bottom-[10px]">
-          <div data-chart-container data-chart-id="contrib-top-bar" :hidden="contribView!=='bar'||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="contrib-top-bar" :hidden="activeContribViewMode!=='bar'||undefined" class="absolute inset-0"
             :data-chart-config='getContribBarCfg("contrib-top")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="contrib-top-line" :hidden="contribView!=='line'||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="contrib-top-line" :hidden="activeContribViewMode!=='line'||undefined" class="absolute inset-0"
             :data-chart-config='getContribLineCfg("contrib-top")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
@@ -36,32 +36,32 @@
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
           <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
-            <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
-            <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to earn</a>
+            <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
+            <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
           </div>
         </div>
       </div>
 
-      <!-- Top Fans -->
+      <!-- {{ $t('dashboard.analytics.trends.topFans') }} -->
       <div class="flex flex-col gap-3 p-4 rounded-sm w-full h-[22rem] relative">
         <div class="flex justify-between items-center z-10 relative">
-          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">Top Fans</h3>
+          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{ $t('dashboard.analytics.trends.topFans') }}</h3>
           <div class="flex gap-1 bg-[#F9FAFB] p-1 rounded-lg border border-[#EAECF0]">
-            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="fansView==='bar'?'bg-white shadow-sm':'bg-transparent'" @click="setFansView('bar')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="fansView==='bar'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="activeFansViewMode==='bar'?'bg-white shadow-sm':'bg-transparent'" @click="setFansView('bar')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="activeFansViewMode==='bar'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             </button>
-            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="fansView==='line'?'bg-white shadow-sm':'bg-transparent'" @click="setFansView('line')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="fansView==='line'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="activeFansViewMode==='line'?'bg-white shadow-sm':'bg-transparent'" @click="setFansView('line')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="activeFansViewMode==='line'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             </button>
           </div>
         </div>
 
         <div v-if="insightData?.topFans?.length > 0" class="absolute top-[40px] left-0 right-0 bottom-[10px]">
-          <div data-chart-container data-chart-id="contrib-fans-bar" :hidden="fansView!=='bar'||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="contrib-fans-bar" :hidden="activeFansViewMode!=='bar'||undefined" class="absolute inset-0"
             :data-chart-config='getContribBarCfg("contrib-fans")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="contrib-fans-line" :hidden="fansView!=='line'||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="contrib-fans-line" :hidden="activeFansViewMode!=='line'||undefined" class="absolute inset-0"
             :data-chart-config='getContribLineCfg("contrib-fans")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
@@ -69,32 +69,32 @@
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
           <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
-            <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
-            <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to earn</a>
+            <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
+            <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
           </div>
         </div>
       </div>
 
-      <!-- Top Order Spenders -->
+      <!-- {{ $t('dashboard.analytics.trends.topOrderSpenders') }} -->
       <div class="flex flex-col gap-3 p-4 rounded-sm  backdrop-blur-[25px] dark:bg-dark-bg-container w-full h-[22rem] relative">
         <div class="flex justify-between items-center z-10 relative">
-          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">Top Order Spenders</h3>
+          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{ $t('dashboard.analytics.trends.topOrderSpenders') }}</h3>
           <div class="flex gap-1 bg-[#F9FAFB] p-1 rounded-lg border border-[#EAECF0]">
-            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="spendersView==='bar'?'bg-white shadow-sm':'bg-transparent'" @click="setSpendersView('bar')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="spendersView==='bar'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="activeSpendersViewMode==='bar'?'bg-white shadow-sm':'bg-transparent'" @click="setSpendersView('bar')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="activeSpendersViewMode==='bar'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             </button>
-            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="spendersView==='line'?'bg-white shadow-sm':'bg-transparent'" @click="setSpendersView('line')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="spendersView==='line'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="activeSpendersViewMode==='line'?'bg-white shadow-sm':'bg-transparent'" @click="setSpendersView('line')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="activeSpendersViewMode==='line'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             </button>
           </div>
         </div>
 
         <div v-if="insightData?.topOrderSpenders?.length > 0" class="absolute top-[40px] left-0 right-0 bottom-[10px]">
-          <div data-chart-container data-chart-id="contrib-spenders-bar" :hidden="spendersView!=='bar'||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="contrib-spenders-bar" :hidden="activeSpendersViewMode!=='bar'||undefined" class="absolute inset-0"
             :data-chart-config='getContribBarCfg("contrib-spenders")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="contrib-spenders-line" :hidden="spendersView!=='line'||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="contrib-spenders-line" :hidden="activeSpendersViewMode!=='line'||undefined" class="absolute inset-0"
             :data-chart-config='getContribLineCfg("contrib-spenders")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
@@ -102,8 +102,8 @@
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
           <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
-            <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
-            <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to earn</a>
+            <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
+            <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
           </div>
         </div>
       </div>
@@ -114,15 +114,15 @@
         <img src="/images/noTrendImg.png" alt="illustration" class="w-32 h-32 object-contain" />
       </div>
       <div class="flex flex-col gap-1">
-        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
-        <a href="#" class="text-xs text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to earn</a>
+        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
+        <a href="#" class="text-xs text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
       </div>
     </div>
-  </TrendPopup>
+  </DashboardAnalyticsTrendPopup>
 </template>
 
 <script setup>
-import TrendPopup from './TrendPopup.vue'
+import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 
 const props = defineProps({
@@ -133,29 +133,29 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'update:period'])
 
-const hasData = computed(() => {
+const hasContributorsData = computed(() => {
   if (!props.insightData) return false
-  const topC = props.insightData.topContributors || []
-  const topF = props.insightData.topFans || []
-  const topS = props.insightData.topSpenders || []
-  return topC.length > 0 || topF.length > 0 || topS.length > 0
+  const topContributors = props.insightData.topContributors || []
+  const topFans = props.insightData.topFans || []
+  const topSpenders = props.insightData.topSpenders || []
+  return topContributors.length > 0 || topFans.length > 0 || topSpenders.length > 0
 })
 
 // View toggle state per section
-const contribView = ref('bar')
-const fansView = ref('bar')
-const spendersView = ref('bar')
+const activeContribViewMode = ref('bar')
+const activeFansViewMode = ref('bar')
+const activeSpendersViewMode = ref('bar')
 
 // ===== CHART CONFIG HELPERS =====
-const LEGEND = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
-const CATEGORY_STYLES = {
+const legendConfig = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
+const contributorsChartStyles = {
   subscription:  { color:"#4CC9F0", name:"Subscription" },
   paytoview:     { color:"#4361EE", name:"Pay to View" },
   merch:         { color:"#7209B7", name:"Merch" },
   wishtender:    { color:"#F72585", name:"Wishtender" },
   customrequest: { color:"#3A0CA3", name:"Custom Request" },
 }
-const CATEGORY_LABELS = { subscription:"Subscription", paytoview:"Pay to View", merch:"Merch", wishtender:"Wishtender", customrequest:"Custom Request" }
+const contributorsChartLabels = { subscription:"Subscription", paytoview:"Pay to View", merch:"Merch", wishtender:"Wishtender", customrequest:"Custom Request" }
 const BREAKDOWN_KEYS = ["subscription","paytoview","merch","wishtender","customrequest"]
 
 function getContribBarCfg(dk) {
@@ -164,14 +164,14 @@ function getContribBarCfg(dk) {
     fields:{ category:"name", total:"tokens" },
     breakdownKeys: BREAKDOWN_KEYS,
     stacked:true,
-    seriesStyles: CATEGORY_STYLES,
-    seriesLabels: CATEGORY_LABELS,
+    seriesStyles: contributorsChartStyles,
+    seriesLabels: contributorsChartLabels,
     bar:{ widthPercent:50 },
     axisLabelColor:"#475467", axisLabelFontSize:"10px",
     xAxis:{ minGridDistance:60 },
     tooltip:{ aggregated:{ enabled:true, mode:"codepen", valuePrefix:"$", valueSuffix:"" }},
     yAxis:{ autoMax:true, autoMaxBuffer:0.12, strict:true },
-    legentHint: LEGEND
+    legentHint: legendConfig
   })
 }
 
@@ -181,14 +181,14 @@ function getContribLineCfg(dk) {
     fields:{ category:"name", total:"tokens" },
     breakdownKeys: BREAKDOWN_KEYS,
     stacked:true,
-    seriesStyles: CATEGORY_STYLES,
-    seriesLabels: CATEGORY_LABELS,
+    seriesStyles: contributorsChartStyles,
+    seriesLabels: contributorsChartLabels,
     axisLabelColor:"#475467", axisLabelFontSize:"10px",
     xAxis:{ minGridDistance:60 },
     tooltip:{ aggregated:{ enabled:true, mode:"codepen", valuePrefix:"$", valueSuffix:"" }},
     yAxis:{ autoMax:true, autoMaxBuffer:0.12, strict:true },
     line:{ strokeWidth:4 },
-    legentHint: LEGEND
+    legentHint: legendConfig
   })
 }
 
@@ -220,8 +220,8 @@ function injectChartData() {
 // ===== CHART RENDERING =====
 async function ensureReady() {
   if (!window.chartsHandler) return
-  const hasData = window.chartsHandler._configs?.data && Object.keys(window.chartsHandler._configs.data).length > 0
-  if (!hasData) await window.chartsHandler.loadChartConfigsAndData()
+  const hasContributorsData = window.chartsHandler._configs?.data && Object.keys(window.chartsHandler._configs.data).length > 0
+  if (!hasContributorsData) await window.chartsHandler.loadChartConfigsAndData()
   injectChartData()
 }
 
@@ -238,23 +238,23 @@ async function renderChart(chartId) {
 
 async function renderAllCharts() {
   await ensureReady()
-  await renderChart(`contrib-top-${contribView.value}`)
-  await renderChart(`contrib-fans-${fansView.value}`)
-  await renderChart(`contrib-spenders-${spendersView.value}`)
+  await renderChart(`contrib-top-${activeContribViewMode.value}`)
+  await renderChart(`contrib-fans-${activeFansViewMode.value}`)
+  await renderChart(`contrib-spenders-${activeSpendersViewMode.value}`)
 }
 
 async function setContribView(v) {
-  contribView.value = v
+  activeContribViewMode.value = v
   await nextTick()
   await renderChart(`contrib-top-${v}`)
 }
 async function setFansView(v) {
-  fansView.value = v
+  activeFansViewMode.value = v
   await nextTick()
   await renderChart(`contrib-fans-${v}`)
 }
 async function setSpendersView(v) {
-  spendersView.value = v
+  activeSpendersViewMode.value = v
   await nextTick()
   await renderChart(`contrib-spenders-${v}`)
 }

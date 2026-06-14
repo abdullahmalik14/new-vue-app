@@ -1,5 +1,5 @@
 <template>
-  <AnalyticsMainCardWrapper>
+  <DashboardAnalyticsMainCardWrapper>
     <div class="flex flex-col justify-start items-start gap-6 ">
       <!-- Header & Tabs -->
       <div
@@ -55,8 +55,8 @@
 
       <!-- Table -->
       <div class="self-stretch w-full">
-        <div v-if="currentRows && currentRows.length > 0" class="w-full">
-          <FlexTable :columns="currentColumns" :rows="currentRows" :theme="ordersTheme"
+        <div v-if="activeOrderRows && activeOrderRows.length > 0" class="w-full">
+          <FlexTable :columns="currentColumns" :rows="activeOrderRows" :theme="ordersTheme"
             :inner-scroll="true" max-height="60vh" :sticky-header="true">
             <!-- Order Slot -->
             <template #cell.order="{ row }">
@@ -157,7 +157,7 @@
             <template #cell.details>
               <div
                 class="px-4 flex items-center justify-end gap-1.5 opacity-0 group-hover/row:opacity-100 transition-opacity cursor-pointer h-full w-full bg-gradient-to-l from-white/80 via-white/40 to-transparent">
-                <span class="hidden lg:inline text-blue-600 text-[13px] font-normal whitespace-nowrap">Details</span>
+                <span class="hidden lg:inline text-blue-600 text-[13px] font-normal whitespace-nowrap">{{ $t('dashboard.analytics.tables.orders.details') }}</span>
                 <div class="w-3.5 h-3.5 flex items-center justify-center">
                   <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M1 11L11 1M11 1H4M11 1V8" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round"
@@ -173,7 +173,7 @@
         <div v-else class="py-12 flex flex-col justify-center items-center gap-4 w-full">
           <img src="/images/shopping-cart.png" alt="Empty Cart" class="w-32 h-32 opacity-80" />
           <div class="flex flex-col items-center gap-1">
-            <p class="text-slate-700 text-base font-normal">You don't have any orders at the moment</p>
+            <p class="text-slate-700 text-base font-normal">{{ $t('dashboard.analytics.tables.orders.noOrders') }}</p>
             <a href="#" class="text-slate-700 text-base font-normal underline decoration-slate-400">Learn how
               you
               can earn</a>
@@ -185,7 +185,7 @@
       <div class="w-full flex justify-end">
         <button
           class="inline-flex items-center gap-2.5 pr-2 pl-6 py-1 bg-white border border-gray-200 rounded-none [clip-path:polygon(0_100%,100%_100%,100%_0,16%_0)] shadow-sm hover:bg-gray-50 transition-colors">
-          <span class="text-blue-700 text-base font-medium">All Orders</span>
+          <span class="text-blue-700 text-base font-medium">{{ $t('dashboard.analytics.tables.orders.allOrders') }}</span>
           <span class="text-blue-700 text-[10px] font-bold -translate-y-2 -ml-1">{{ totalOrdersCount }}</span>
           <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M1 5H13M13 5L9 1M13 5L9 9" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round"
@@ -194,7 +194,7 @@
         </button>
       </div>
     </div>
-  </AnalyticsMainCardWrapper>
+  </DashboardAnalyticsMainCardWrapper>
 </template>
 
 <script setup>
@@ -204,14 +204,14 @@ onMounted(() => {
   if (window.performanceTracker) {
     window.performanceTracker.step({
       flowName: 'AnalyticsRender',
-      stepName: 'OrdersReceivedTable Mounted',
+      stepName: 'DashboardAnalyticsOrdersReceivedTable Mounted',
       status: 'success'
     });
   }
 });
 
 import { ref, computed } from 'vue'
-import AnalyticsMainCardWrapper from '@/components/ui/card/dashboard/AnalyticsMainCardWrapper.vue'
+import DashboardAnalyticsMainCardWrapper from '@/components/ui/card/dashboard/DashboardAnalyticsMainCardWrapper.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
@@ -222,7 +222,7 @@ const isDropdownOpen = ref(false)
 
 // --- Orders Table Data ---
 const ordersColumns = [
-  { key: 'order', label: 'Order#', basis: { default: 'grow md:grow-0 md:basis-[300px]' }, align: 'left' },
+  { key: 'order', label: t('dashboard.analytics.tables.orders.orderLabel'), basis: { default: 'grow md:grow-0 md:basis-[300px]' }, align: 'left' },
   { key: 'from', label: 'From', basis: 'basis-[220px]', align: 'left', hiddenAt: ['xs', 'sm'] },
   { key: 'date', label: 'Date', basis: 'basis-[180px]', align: 'left', hiddenAt: ['xs', 'sm'] },
   { key: 'total', label: 'Total', basis: { default: 'ml-auto basis-[110px]' }, align: 'right' },
@@ -242,29 +242,29 @@ const customRequestOrdersColumns = merchOrdersColumns
 
 
 
-const currentRows = computed(() => {
-  const store = useDashboardAnalyticsStore()
-  const recent = store.recentOrders || {}
+const activeOrderRows = computed(() => {
+  const analyticsStore = useDashboardAnalyticsStore()
+  const recentOrdersData = analyticsStore.recentOrders || {}
   
-  if (!store.bundleLoaded) return []
+  if (!analyticsStore.bundleLoaded) return []
 
   switch (selectedTab.value) {
-    case 'Merch': return recent.merch || []
-    case 'Pay to View': return recent.p2v || []
-    case 'Custom Request': return recent.customRequest || []
-    case 'Wishtender': return recent.wishtender || []
-    default: return recent.subscriptions || []
+    case 'Merch': return recentOrdersData.merch || []
+    case 'Pay to View': return recentOrdersData.p2v || []
+    case 'Custom Request': return recentOrdersData.customRequest || []
+    case 'Wishtender': return recentOrdersData.wishtender || []
+    default: return recentOrdersData.subscriptions || []
   }
 })
 
 const totalOrdersCount = computed(() => {
-  const store = useDashboardAnalyticsStore()
-  const recent = store.recentOrders || {}
-  return (recent.subscriptions?.length || 0) +
-         (recent.p2v?.length || 0) +
-         (recent.merch?.length || 0) +
-         (recent.customRequest?.length || 0) +
-         (recent.wishtender?.length || 0)
+  const analyticsStore = useDashboardAnalyticsStore()
+  const recentOrdersData = analyticsStore.recentOrders || {}
+  return (recentOrdersData.subscriptions?.length || 0) +
+         (recentOrdersData.p2v?.length || 0) +
+         (recentOrdersData.merch?.length || 0) +
+         (recentOrdersData.customRequest?.length || 0) +
+         (recentOrdersData.wishtender?.length || 0)
 })
 
 const currentColumns = computed(() => {

@@ -69,7 +69,7 @@ onMounted(() => {
   if (window.performanceTracker) {
     window.performanceTracker.step({
       flowName: 'AnalyticsRender',
-      stepName: 'TopMerchTable Mounted',
+      stepName: 'DashboardAnalyticsTopMerchTable Mounted',
       status: 'success'
     });
   }
@@ -85,7 +85,7 @@ import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
-const store = useDashboardAnalyticsStore()
+const analyticsStore = useDashboardAnalyticsStore()
 
 const topMerchColumns = [
   { key: 'merch', label: 'Merch', basis: 'basis-1/2', grow: true, align: 'left' },
@@ -94,7 +94,7 @@ const topMerchColumns = [
 ]
 
 const topMerchRows = computed(() => {
-  const data = store.trendingMerch?.[props.period] || [];
+  const data = analyticsStore.trendingMerch?.[props.period] || [];
   return data.map((item, index) => ({
     id: index,
     rank: item.rank || index + 1,

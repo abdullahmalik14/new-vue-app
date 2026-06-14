@@ -5,7 +5,7 @@
       <DashboardHeader />
 
       <!-- overview/insight section -->
-      <AnalyticsMainCardWrapper>
+      <DashboardAnalyticsMainCardWrapper>
         <div>
           <!-- section-header -->
           <div class="flex flex-col items-start justify-between sm:flex-row sm:items-center p-4">
@@ -15,15 +15,14 @@
                 <img src="/dev/cdn/analytics/icons/icon-1.webp" alt="overview/insight"
                   class="w-6 h-6" />
               </span>
-              <h2 data-label="Overview/Insight"
+              <h2 data-label="{{ $t('dashboard.analytics.page.overviewTitle') }}"
                 class="m-0 font-medium text-xl font-sans leading-[1.875rem] text-light-text-quaternary dark:text-dark-text-quaternary">
                 Overview/Insight
               </h2>
             </div>
             <!-- last-date -->
             <div class="flex items-center gap-4 w-full justify-between sm:justify-end sm:w-auto">
-              <span class="text-sm font-sans leading-5 text-light-text-quaternary dark:text-dark-text-quaternary">Last
-                updated at
+              <span class="text-sm font-sans leading-5 text-light-text-quaternary dark:text-dark-text-quaternary">{{ $t('dashboard.analytics.page.lastUpdated') }}
                 <span :data-value="lastUpdated"
                   class="text-sm font-sans leading-5 text-light-text-quaternary dark:text-dark-text-quaternary">{{
                     formatTime(lastUpdated) }}</span></span>
@@ -83,15 +82,15 @@
 
                         <div class="flex justify-between items-end">
                           <span>
-                            <span :data-value="store.subscriberInsights?.daily?.new"
+                            <span :data-value="analyticsStore.subscriberInsights?.daily?.new"
                               class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                                store.subscriberInsights?.daily?.new ?? '--' }}</span>
+                                analyticsStore.subscriberInsights?.daily?.new ?? '--' }}</span>
                           </span>
 
                           <!-- right part only show when data are here -->
                           <div v-if="
-                            store.subscriberInsights?.daily?.newPercentage !== undefined &&
-                            store.subscriberInsights?.daily?.newPercentage !== null
+                            analyticsStore.subscriberInsights?.daily?.newPercentage !== undefined &&
+                            analyticsStore.subscriberInsights?.daily?.newPercentage !== null
                           ">
                             <div class="flex flex-col items-end gap-1">
                               <span class="flex gap-1 items-center">
@@ -99,7 +98,7 @@
                                   class="h-5 w-5" />
                                 <span
                                   class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium">{{
-                                    store.subscriberInsights?.daily?.newPercentage }}%</span>
+                                    analyticsStore.subscriberInsights?.daily?.newPercentage }}%</span>
                               </span>
                               <span
                                 class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
@@ -109,7 +108,7 @@
 
                           </div>
                         </div>
-                        <div class="w-full" v-if="store.subscriberInsights?.daily?.new != null">
+                        <div class="w-full" v-if="analyticsStore.subscriberInsights?.daily?.new != null">
                           <SparkLine :data="[3, 4, 3, 5, 4, 6, 5, 7, 6, 8]" color="#22c55e" :height="28" />
                         </div>
                       </div>
@@ -128,14 +127,14 @@
 
                         <div class="flex justify-between items-end">
                           <span>
-                            <span :data-value="store.subscriberInsights?.daily?.recurring"
+                            <span :data-value="analyticsStore.subscriberInsights?.daily?.recurring"
                               class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                                store.subscriberInsights?.daily?.recurring ?? '--' }}</span>
+                                analyticsStore.subscriberInsights?.daily?.recurring ?? '--' }}</span>
                           </span>
                           <!-- right part only show when data are here -->
                           <div v-if="
-                            store.subscriberInsights?.daily?.recurringPercentage !== undefined &&
-                            store.subscriberInsights?.daily?.recurringPercentage !== null
+                            analyticsStore.subscriberInsights?.daily?.recurringPercentage !== undefined &&
+                            analyticsStore.subscriberInsights?.daily?.recurringPercentage !== null
                           ">
 
 
@@ -146,7 +145,7 @@
                                   class="h-5 w-5" />
                                 <span
                                   class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium">{{
-                                    store.subscriberInsights?.daily?.recurringPercentage }}%</span>
+                                    analyticsStore.subscriberInsights?.daily?.recurringPercentage }}%</span>
                               </span>
                               <span
                                 class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
@@ -154,7 +153,7 @@
                             </div>
                           </div>
                         </div>
-                        <div v-if="store.subscriberInsights?.daily?.recurring != null" class="w-full">
+                        <div v-if="analyticsStore.subscriberInsights?.daily?.recurring != null" class="w-full">
                           <SparkLine :data="[5, 6, 5, 4, 5, 6, 7, 6, 5, 6]" color="#22c55e" :width="70" :height="28" />
                         </div>
                       </div>
@@ -199,12 +198,12 @@
                           FOLLOWERS</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="store.fans?.daily?.newFollowers"
+                          <span :data-value="analyticsStore.fans?.daily?.newFollowers"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
-                            {{ store.fans?.daily?.newFollowers ?? '--' }}</span>
+                            {{ analyticsStore.fans?.daily?.newFollowers ?? '--' }}</span>
                           <div v-if="
-                            store.fans?.daily?.newFollowersPercentage !== undefined &&
-                            store.fans?.daily?.newFollowersPercentage !== null
+                            analyticsStore.fans?.daily?.newFollowersPercentage !== undefined &&
+                            analyticsStore.fans?.daily?.newFollowersPercentage !== null
                           ">
 
 
@@ -214,7 +213,7 @@
                                   class="h-5 w-5" />
                                 <span
                                   class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium">{{
-                                    Math.abs(store.fans?.daily?.newFollowersPercentage) }}%</span>
+                                    Math.abs(analyticsStore.fans?.daily?.newFollowersPercentage) }}%</span>
                               </span>
                               <span
                                 class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
@@ -223,7 +222,7 @@
 
                           </div>
                         </div>
-                        <div v-if="store.fans?.daily?.newFollowers != null" class="w-full">
+                        <div v-if="analyticsStore.fans?.daily?.newFollowers != null" class="w-full">
                           <SparkLine :data="[8, 7, 6, 7, 5, 6, 4, 5, 4, 3]" color="#ef4444" :width="60" :height="24" />
                         </div>
                       </div>
@@ -234,12 +233,12 @@
                           VISIT</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="store.fans?.daily?.profileVisit"
+                          <span :data-value="analyticsStore.fans?.daily?.profileVisit"
                             class="text-[1.875rem] font-semibold font-sans leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
-                            {{ store.fans?.daily?.profileVisit ?? '--' }}</span>
+                            {{ analyticsStore.fans?.daily?.profileVisit ?? '--' }}</span>
                           <div v-if="
-                            store.fans?.daily?.profileVisitPercentage !== undefined &&
-                            store.fans?.daily?.profileVisitPercentage !== null
+                            analyticsStore.fans?.daily?.profileVisitPercentage !== undefined &&
+                            analyticsStore.fans?.daily?.profileVisitPercentage !== null
                           " class="flex flex-col items-end gap-1">
 
 
@@ -250,7 +249,7 @@
                                   class="h-5 w-5" />
                                 <span
                                   class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium">{{
-                                    Math.abs(store.fans?.daily?.profileVisitPercentage) }}%</span>
+                                    Math.abs(analyticsStore.fans?.daily?.profileVisitPercentage) }}%</span>
                               </span>
                               <span
                                 class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
@@ -259,7 +258,7 @@
 
                           </div>
                         </div>
-                        <div v-if="store.fans?.daily?.profileVisit != null" class="w-full">
+                        <div v-if="analyticsStore.fans?.daily?.profileVisit != null" class="w-full">
                           <SparkLine :data="[20, 22, 21, 24, 23, 26, 25, 28, 27, 31]" color="#ef4444" :width="60"
                             :height="24" />
                         </div>
@@ -300,35 +299,35 @@
                   <div class="flex justify-between items-end">
                     <span>
                       <span
-                        :data-value="store.earningsInsights?.daily?.total"
+                        :data-value="analyticsStore.earningsInsights?.daily?.total"
                         class="text-[2.25rem] font-semibold leading-[2.75rem] font-sans tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                          store.earningsInsights?.daily?.total != null ?
-                            Number(store.earningsInsights.daily.total).toLocaleString('en-US') :
+                          analyticsStore.earningsInsights?.daily?.total != null ?
+                            Number(analyticsStore.earningsInsights.daily.total).toLocaleString('en-US') :
                             '--'
                         }}</span>
-                      <span v-if="store.earningsInsights?.daily?.total != null"
+                      <span v-if="analyticsStore.earningsInsights?.daily?.total != null"
                         class="text-base font-medium leading-6 font-sans text-light-text-secondary dark:text-dark-text-secondary ml-1">USD</span>
                     </span>
-                    <div v-if="store.earningsInsights?.daily?.percentage !== null"
+                    <div v-if="analyticsStore.earningsInsights?.daily?.percentage !== null"
                       class="flex flex-col items-end gap-1">
 
                       <div>
                         <span class="flex gap-1 items-center">
                           <img
-                            :src="store.earningsInsights.daily.percentage >= 0 ? '/dev/cdn/analytics/icons/icon-4.webp' : '/dev/cdn/analytics/icons/icon-5.webp'"
-                            :alt="store.earningsInsights.daily.percentage >= 0 ? 'trend-up' : 'trend-down'"
+                            :src="analyticsStore.earningsInsights.daily.percentage >= 0 ? '/dev/cdn/analytics/icons/icon-4.webp' : '/dev/cdn/analytics/icons/icon-5.webp'"
+                            :alt="analyticsStore.earningsInsights.daily.percentage >= 0 ? 'trend-up' : 'trend-down'"
                             class="h-5 w-5" />
                           <span
-                            :class="store.earningsInsights.daily.percentage >= 0 ? 'text-light-text-trendGreen' : 'text-light-text-trendRed'"
-                            class="leading-5 text-sm font-medium">{{ Math.abs(store.earningsInsights.daily.percentage)
+                            :class="analyticsStore.earningsInsights.daily.percentage >= 0 ? 'text-light-text-trendGreen' : 'text-light-text-trendRed'"
+                            class="leading-5 text-sm font-medium">{{ Math.abs(analyticsStore.earningsInsights.daily.percentage)
                             }}%</span>
                         </span>
                       </div>
 
                     </div>
                   </div>
-                  <div v-if="store.earningsInsights?.daily?.total != null" class="w-full mt-auto">
-                    <SparkLine :data="store.earningsInsights.daily.sparklineData" color="#22c55e" :height="28" />
+                  <div v-if="analyticsStore.earningsInsights?.daily?.total != null" class="w-full mt-auto">
+                    <SparkLine :data="analyticsStore.earningsInsights.daily.sparklineData" color="#22c55e" :height="28" />
                   </div>
                 </div>
               </DashboardOrderCard>
@@ -368,13 +367,13 @@
                           class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">MEDIA</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="store.likes?.media"
+                          <span :data-value="analyticsStore.likes?.media"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
-                            {{ store.likes?.media != null ? Number(store.likes.media).toLocaleString('en-US') : '--'
+                            {{ analyticsStore.likes?.media != null ? Number(analyticsStore.likes.media).toLocaleString('en-US') : '--'
                             }}</span>
                           <div v-if="
-                            store.likes?.mediaPercentage !== undefined &&
-                            store.likes?.mediaPercentage !== null
+                            analyticsStore.likes?.mediaPercentage !== undefined &&
+                            analyticsStore.likes?.mediaPercentage !== null
                           " class="flex flex-col items-end gap-1">
 
                             <div>
@@ -383,7 +382,7 @@
                                   class="h-5 w-5" />
                                 <span
                                   class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium">{{
-                                    Math.abs(store.likes?.mediaPercentage) }}%</span>
+                                    Math.abs(analyticsStore.likes?.mediaPercentage) }}%</span>
                               </span>
                               <span
                                 class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
@@ -393,7 +392,7 @@
                           </div>
 
                         </div>
-                        <div v-if="store.likes?.media != null" class="w-full">
+                        <div v-if="analyticsStore.likes?.media != null" class="w-full">
                           <SparkLine :data="[95, 90, 88, 85, 82, 80, 78, 76]" color="#ef4444" :width="55"
                             :height="22" />
                         </div>
@@ -404,12 +403,12 @@
                           class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">MERCH</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="store.likes?.merch"
+                          <span :data-value="analyticsStore.likes?.merch"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">{{
-                              store.likes?.merch ?? '--' }}</span>
+                              analyticsStore.likes?.merch ?? '--' }}</span>
                           <div v-if="
-                            store.likes?.merchPercentage !== undefined &&
-                            store.likes?.merchPercentage !== null
+                            analyticsStore.likes?.merchPercentage !== undefined &&
+                            analyticsStore.likes?.merchPercentage !== null
                           " class="flex flex-col items-end gap-1">
 
 
@@ -420,7 +419,7 @@
                                   class="h-5 w-5" />
                                 <span
                                   class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium">{{
-                                    Math.abs(store.likes?.merchPercentage) }}%</span>
+                                    Math.abs(analyticsStore.likes?.merchPercentage) }}%</span>
                               </span>
                               <span
                                 class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
@@ -428,7 +427,7 @@
                             </div>
                           </div>
                         </div>
-                        <div v-if="store.likes?.merch != null" class="w-full">
+                        <div v-if="analyticsStore.likes?.merch != null" class="w-full">
                           <SparkLine :data="[5, 4, 4, 3, 3, 3, 2, 2]" color="#ef4444" :width="55" :height="22" />
                         </div>
                       </div>
@@ -446,13 +445,13 @@
                           class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">PROFILE</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="store.likes?.profile"
+                          <span :data-value="analyticsStore.likes?.profile"
                             class="text-[1.875rem] font-semibold font-sans leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">{{
-                              store.likes?.profile != null ? Number(store.likes.profile).toLocaleString('en-US') : '--'
+                              analyticsStore.likes?.profile != null ? Number(analyticsStore.likes.profile).toLocaleString('en-US') : '--'
                             }}</span>
                           <div v-if="
-                            store.likes?.profilePercentage !== undefined &&
-                            store.likes?.profilePercentage !== null
+                            analyticsStore.likes?.profilePercentage !== undefined &&
+                            analyticsStore.likes?.profilePercentage !== null
                           " class="flex flex-col items-end gap-1">
 
                             <div>
@@ -461,7 +460,7 @@
                                   class="h-5 w-5" />
                                 <span
                                   class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium">{{
-                                    Math.abs(store.likes?.profilePercentage) }}%</span>
+                                    Math.abs(analyticsStore.likes?.profilePercentage) }}%</span>
                               </span>
                               <span
                                 class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
@@ -470,7 +469,7 @@
 
                           </div>
                         </div>
-                        <div v-if="store.likes?.profile != null" class="w-full">
+                        <div v-if="analyticsStore.likes?.profile != null" class="w-full">
                           <SparkLine :data="[8000, 8500, 9000, 9500, 10000, 10500, 11000, 12000]" color="#22c55e"
                             :width="55" :height="22" />
                         </div>
@@ -481,13 +480,13 @@
                           class="text-xs font-medium leading-[1.125rem] font-sans whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">FEED</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="store.likes?.feed"
+                          <span :data-value="analyticsStore.likes?.feed"
                             class="text-[1.875rem] font-semibold leading-[2.375rem] font-sans text-light-text-primary dark:text-dark-text-primary">{{
-                              store.likes?.feed != null ? Number(store.likes.feed).toLocaleString('en-US') : '--'
+                              analyticsStore.likes?.feed != null ? Number(analyticsStore.likes.feed).toLocaleString('en-US') : '--'
                             }}</span>
                           <div v-if="
-                            store.likes?.feedPercentage !== undefined &&
-                            store.likes?.feedPercentage !== null
+                            analyticsStore.likes?.feedPercentage !== undefined &&
+                            analyticsStore.likes?.feedPercentage !== null
                           " class="flex flex-col items-end gap-1">
 
                             <div>
@@ -496,7 +495,7 @@
                                   class="h-5 w-5" />
                                 <span
                                   class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium">{{
-                                    Math.abs(store.likes?.feedPercentage) }}%</span>
+                                    Math.abs(analyticsStore.likes?.feedPercentage) }}%</span>
                               </span>
                               <span
                                 class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
@@ -504,7 +503,7 @@
                             </div>
                           </div>
                         </div>
-                        <div v-if="store.likes?.feed != null" class="w-full">
+                        <div v-if="analyticsStore.likes?.feed != null" class="w-full">
                           <SparkLine :data="[2800, 3000, 3200, 3500, 3700, 3900, 4200, 4500]" color="#22c55e"
                             :width="55" :height="22" />
                         </div>
@@ -599,13 +598,13 @@
             </div>
           </div>
         </div>
-      </AnalyticsMainCardWrapper>
+      </DashboardAnalyticsMainCardWrapper>
 
       <!-- Orders Received section -->
-      <OrdersReceivedTable />
+      <DashboardAnalyticsOrdersReceivedTable />
 
       <!-- Trends Section -->
-      <AnalyticsMainCardWrapper>
+      <DashboardAnalyticsMainCardWrapper>
         <div class="relative gap-6 flex flex-col">
           <!-- section-header -->
           <div class="flex flex-col gap-4 sm:flex-row px-4 pt-4 pb-0 justify-between items-start md:items-center">
@@ -624,8 +623,7 @@
             <div class="flex flex-col md:flex-row md:items-center gap-4 w-full sm:w-auto">
               <!-- last-date -->
               <!-- <div class="flex items-center gap-4 w-full justify-between sm:justify-end sm:w-auto">
-              <span class="text-sm leading-5 font-sans text-light-text-quaternary dark:text-dark-text-quaternary">Last
-                updated at
+              <span class="text-sm leading-5 font-sans text-light-text-quaternary dark:text-dark-text-quaternary">{{ $t('dashboard.analytics.page.lastUpdated') }}
                 <span class="text-sm leading-5 font-sans text-light-text-quaternary dark:text-dark-text-quaternary">7:14
                   PM</span></span>
               <button
@@ -681,37 +679,37 @@
           <div class="analytics-container px-4 pt-0 pb-4 flex flex-col gap-4">
             <!-- row -->
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3">
-              <TopMediaTable :period="selectedTrendTab.toLowerCase()" />
-              <TopTagsTable :period="selectedTrendTab.toLowerCase()" />
-              <TopMerchTable :period="selectedTrendTab.toLowerCase()" />
-              <TopCountriesTable :period="selectedTrendTab.toLowerCase()" />
+              <DashboardAnalyticsTopMediaTable :period="selectedTrendTab.toLowerCase()" />
+              <DashboardAnalyticsTopTagsTable :period="selectedTrendTab.toLowerCase()" />
+              <DashboardAnalyticsTopMerchTable :period="selectedTrendTab.toLowerCase()" />
+              <DashboardAnalyticsTopCountriesTable :period="selectedTrendTab.toLowerCase()" />
             </div>
           </div>
 
 
         </div>
-      </AnalyticsMainCardWrapper>
+      </DashboardAnalyticsMainCardWrapper>
 
       <!-- Subscribers popup -->
-      <SubscribersTrendPopup v-model="isSubscribersOpen" v-model:period="subscribersPeriod"
+      <DashboardAnalyticsSubscribersTrendPopup v-model="isSubscribersOpen" v-model:period="subscribersPeriod"
         :insight-data="currentSubscribersInsightData" />
 
 
 
       <!-- Earnings popup -->
-      <EarningsTrendPopup v-model="isEarningsOpen" v-model:period="earningsPeriod"
+      <DashboardAnalyticsEarningsTrendPopup v-model="isEarningsOpen" v-model:period="earningsPeriod"
         :insight-data="currentEarningsInsightData" />
 
 
       <!-- fans popup -->
-      <FansTrendPopup v-model="isFansOpen" v-model:period="fansPeriod" :insight-data="currentFansInsightData" />
+      <DashboardAnalyticsFansTrendPopup v-model="isFansOpen" v-model:period="fansPeriod" :insight-data="currentFansInsightData" />
 
 
       <!-- likes popup -->
-      <LikesTrendPopup v-model="isLikesOpen" v-model:period="likesPeriod" :insight-data="currentLikesInsightData" />
+      <DashboardAnalyticsLikesTrendPopup v-model="isLikesOpen" v-model:period="likesPeriod" :insight-data="currentLikesInsightData" />
 
       <!-- contributors popup -->
-      <ContributorsTrendPopup v-model="isContributorsOpen" v-model:period="contributorsPeriod"
+      <DashboardAnalyticsContributorsTrendPopup v-model="isContributorsOpen" v-model:period="contributorsPeriod"
         :insight-data="currentContributorsInsightData" />
 
     </div>
@@ -721,7 +719,7 @@
 <script setup>
 import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/DashboardSharedTwoColLayout.vue'
 import DashboardOrderCard from '@/components/ui/card/dashboard/DashboardOrderCard.vue'
-import AnalyticsMainCardWrapper from '@/components/ui/card/dashboard/AnalyticsMainCardWrapper.vue'
+import DashboardAnalyticsMainCardWrapper from '@/components/ui/card/dashboard/DashboardAnalyticsMainCardWrapper.vue'
 import DashboardTrendCard from '@/components/ui/card/dashboard/DashboardTrendCard.vue'
 import DashboardTrendContent from '@/components/ui/card/dashboard/DashboardTrendContent.vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
@@ -729,22 +727,22 @@ import { FlowHandler } from '@/services/flow-system/FlowHandler'
 import flowRefreshManager from '@/services/flow-system/flowRefreshManager'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import TrendPopup from '@/components/ui/popup/TrendPopup.vue'
-import EarningsTrendPopup from '@/components/ui/popup/EarningsTrendPopup.vue'
-import SubscribersTrendPopup from '@/components/ui/popup/SubscribersTrendPopup.vue'
-import FansTrendPopup from '@/components/ui/popup/FansTrendPopup.vue'
-import LikesTrendPopup from '@/components/ui/popup/LikesTrendPopup.vue'
-import ContributorsTrendPopup from '@/components/ui/popup/ContributorsTrendPopup.vue'
+import DashboardAnalyticsTrendPopup from '@/components/ui/popup/DashboardAnalyticsTrendPopup.vue'
+import DashboardAnalyticsEarningsTrendPopup from '@/components/ui/popup/DashboardAnalyticsEarningsTrendPopup.vue'
+import DashboardAnalyticsSubscribersTrendPopup from '@/components/ui/popup/DashboardAnalyticsSubscribersTrendPopup.vue'
+import DashboardAnalyticsFansTrendPopup from '@/components/ui/popup/DashboardAnalyticsFansTrendPopup.vue'
+import DashboardAnalyticsLikesTrendPopup from '@/components/ui/popup/DashboardAnalyticsLikesTrendPopup.vue'
+import DashboardAnalyticsContributorsTrendPopup from '@/components/ui/popup/DashboardAnalyticsContributorsTrendPopup.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
-import OrdersReceivedTable from '@/dev/components/ui/table/dashboard/analytics-tables/OrdersReceivedTable.vue'
-import TopMediaTable from '@/dev/components/ui/table/dashboard/analytics-tables/TopMediaTable.vue'
-import TopTagsTable from '@/dev/components/ui/table/dashboard/analytics-tables/TopTagsTable.vue'
-import TopMerchTable from '@/dev/components/ui/table/dashboard/analytics-tables/TopMerchTable.vue'
-import TopCountriesTable from '@/dev/components/ui/table/dashboard/analytics-tables/TopCountriesTable.vue'
+import DashboardAnalyticsOrdersReceivedTable from '@/dev/components/ui/table/dashboard/analytics-tables/DashboardAnalyticsOrdersReceivedTable.vue'
+import DashboardAnalyticsTopMediaTable from '@/dev/components/ui/table/dashboard/analytics-tables/DashboardAnalyticsTopMediaTable.vue'
+import DashboardAnalyticsTopTagsTable from '@/dev/components/ui/table/dashboard/analytics-tables/DashboardAnalyticsTopTagsTable.vue'
+import DashboardAnalyticsTopMerchTable from '@/dev/components/ui/table/dashboard/analytics-tables/DashboardAnalyticsTopMerchTable.vue'
+import DashboardAnalyticsTopCountriesTable from '@/dev/components/ui/table/dashboard/analytics-tables/DashboardAnalyticsTopCountriesTable.vue'
 import SparkLine from '@/components/ui/charts/SparkLine.vue'
 
-const store = useDashboardAnalyticsStore()
-const { lastUpdated } = storeToRefs(store)
+const analyticsStore = useDashboardAnalyticsStore()
+const { lastUpdated } = storeToRefs(analyticsStore)
 
 // --- Contributors Table Data ---
 const contributorsColumns = [
@@ -753,7 +751,7 @@ const contributorsColumns = [
 ]
 
 const currentContributorsInsightData = computed(() => {
-  const cData = store.contributors || {};
+  const cData = analyticsStore.contributors || {};
   let p = contributorsPeriod.value.toLowerCase()
   if (p === 'all-time') p = 'alltime'
 
@@ -831,7 +829,7 @@ const fansPeriod = ref('weekly')
 const likesPeriod = ref('weekly')
 const contributorsPeriod = ref('weekly')
 
-function getVsLabel(period) {
+function formatComparisonLabel(period) {
   switch (period.toLowerCase()) {
     case 'daily': return 'vs last 24 hour'
     case 'weekly': return 'vs last week'
@@ -841,7 +839,7 @@ function getVsLabel(period) {
   }
 }
 
-const countryNameMap = {
+const countryCodeMap = {
   'Country 36': 'Australia',
   'Country 840': 'United States of America',
   'Country 826': 'United Kingdom',
@@ -874,13 +872,13 @@ const isoMap = {
 const currentEarningsInsightData = computed(() => {
   let tab = earningsPeriod.value.toLowerCase()
   if (tab === 'all-time') tab = 'alltime'
-  const arr = store.earnings[tab]
+  const arr = analyticsStore.earnings[tab]
   const latest = arr && arr.length ? { ...arr[arr.length - 1] } : null
   if (latest) {
-    const countries = store.countries?.[tab] || []
+    const countries = analyticsStore.countries?.[tab] || []
     latest.topCountries = countries.map((c, i) => ({
       rank: c.rank || i + 1,
-      country: countryNameMap[c.country] || c.country,
+      country: countryCodeMap[c.country] || c.country,
       iso: isoMap[c.country] || c.iso || null,
       salesRaw: c.salesUSD || 0,
       salesUSD: c.salesUSD || 0,
@@ -888,7 +886,7 @@ const currentEarningsInsightData = computed(() => {
       sales: (c.salesUSD || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     }))
     // FIX: Use the summary object if available, otherwise calculate the sum
-    const summary = store.earnings.summaries?.[tab]
+    const summary = analyticsStore.earnings.summaries?.[tab]
     if (summary && summary.totalEarningsUSD != null) {
       latest.total = summary.totalEarningsUSD
       latest.totalTokens = summary.tokensReceived
@@ -903,26 +901,26 @@ const currentEarningsInsightData = computed(() => {
 const currentSubscribersInsightData = computed(() => {
   let p = subscribersPeriod.value.toLowerCase()
   if (p === 'all-time') p = 'yearly'
-  return store.subscriberInsights[p] || { new: null, recurring: null }
+  return analyticsStore.subscriberInsights[p] || { new: null, recurring: null }
 })
 
 const currentFansInsightData = computed(() => {
   let p = fansPeriod.value.toLowerCase()
   if (p === 'all-time') p = 'alltime'
-  // store.fans[p] is an OBJECT (not an array) with: newFollowers, profileVisit, topCountries, etc.
-  const fansData = store.fans[p] || store.fans['yearly']
+  // analyticsStore.fans[p] is an OBJECT (not an array) with: newFollowers, profileVisit, topCountries, etc.
+  const fansData = analyticsStore.fans[p] || analyticsStore.fans['yearly']
   if (!fansData || fansData.newFollowers == null) {
     return { newFollowers: null, profileVisit: null, topCountries: [], sources: [] }
   }
 
   // Get traffic sources from bundle (fans_traffic or fanInsights.sources)
-  const bundleSources = store.fanInsights?.sources || {}
+  const bundleSources = analyticsStore.fanInsights?.sources || {}
   const periodSources = bundleSources[p] || []
 
   // Map country names for display
   const mappedCountries = (fansData.topCountries || []).map(c => ({
     ...c,
-    country: countryNameMap[c.country] || c.country,
+    country: countryCodeMap[c.country] || c.country,
     visits: (c.visits || 0).toLocaleString('en-US')
   }))
 
@@ -937,7 +935,7 @@ const currentFansInsightData = computed(() => {
 })
 
 const currentLikesInsightData = computed(() => {
-  return store.likes || {}
+  return analyticsStore.likes || {}
 })
 
 const trendComparisonLabel = computed(() => {
@@ -1015,7 +1013,7 @@ onMounted(() => {
   if (window.performanceTracker) {
     window.performanceTracker.step({
       flowName: 'AnalyticsRender',
-      stepName: 'AnalyticsPage Mounted',
+      stepName: 'DashboardAnalyticsPage Mounted',
       status: 'success'
     });
   }

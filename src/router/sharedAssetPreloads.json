@@ -269,5 +269,45 @@
     "comment": "dashboard.notification.comment",
     "heart": "dashboard.notification.heart",
     "tip": "dashboard.notification.tip"
+  },
+  "dashboardAnalyticsIcons": [
+    {
+      "flag": "dashboard.analytics.icon1",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.analytics.icon2",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.analytics.icon3",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.analytics.icon4",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.analytics.icon5",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.analytics.money",
+      "type": "image",
+      "priority": "normal"
+    }
+  ],
+  "dashboardAnalyticsChrome": {
+    "icon1": "dashboard.analytics.icon1",
+    "icon2": "dashboard.analytics.icon2",
+    "icon3": "dashboard.analytics.icon3",
+    "icon4": "dashboard.analytics.icon4",
+    "icon5": "dashboard.analytics.icon5",
+    "money": "dashboard.analytics.money"
   }
 }

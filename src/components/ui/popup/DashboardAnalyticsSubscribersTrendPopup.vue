@@ -1,21 +1,21 @@
 <template>
-  <TrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="handlePeriodChange" title="Subscriptions Insight"
+  <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
+    @update:period="handlePeriodChange" title="{{ $t('dashboard.analytics.trends.subscriptionsInsight') }}"
     logo="https://i.ibb.co.com/MyhfGRNH/svgviewer-png-output-12.webp">
-    <div v-if="hasData" :class="isDaily ? 'flex flex-row gap-6' : 'flex flex-col gap-6'">
+    <div v-if="hasSubscribersData" :class="isDaily ? 'flex flex-row gap-6' : 'flex flex-col gap-6'">
 
       <!-- STAT CARDS (Hidden to match Figma) -->
       <!--
       <div class="grid grid-cols-2 gap-4">
         <div class="flex flex-col gap-2 rounded bg-light-bg-container dark:bg-dark-bg-container p-4 text-center">
-          <h3 class="text-sm font-semibold text-[#101828] dark:text-white">New Subscribers</h3>
+          <h3 class="text-sm font-semibold text-[#101828] dark:text-white">{{ $t('dashboard.analytics.trends.newSubscribers') }}</h3>
           <span class="text-3xl font-semibold text-gray-900 dark:text-white">{{ newCount ?? '--' }}</span>
           <span v-if="newPct !== null" :class="newPct >= 0 ? 'text-emerald-600' : 'text-red-500'" class="text-sm font-medium">
             {{ newPct >= 0 ? '+' : '' }}{{ newPct }}% {{ vsLabel }}
           </span>
         </div>
         <div class="flex flex-col gap-2 rounded bg-light-bg-container dark:bg-dark-bg-container p-4 text-center">
-          <h3 class="text-sm font-semibold text-[#101828] dark:text-white">Recurring Subscribers</h3>
+          <h3 class="text-sm font-semibold text-[#101828] dark:text-white">{{ $t('dashboard.analytics.trends.recurringSubscribers') }}</h3>
           <span class="text-3xl font-semibold text-gray-900 dark:text-white">{{ recurringCount ?? '--' }}</span>
           <span v-if="recurringPct !== null" :class="recurringPct >= 0 ? 'text-emerald-600' : 'text-red-500'" class="text-sm font-medium">
             {{ recurringPct >= 0 ? '+' : '' }}{{ recurringPct }}% {{ vsLabel }}
@@ -27,21 +27,21 @@
       <!-- SUBSCRIPTIONS INSIGHT -->
       <div :class="isDaily ? 'flex-1' : 'w-full'" class="flex flex-col gap-3 p-4   h-[25rem] relative">
         <div class="flex justify-between items-center z-10 relative">
-          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">Subscriptions Insight</h3>
+          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{ $t('dashboard.analytics.trends.subscriptionsInsight') }}</h3>
           <div v-if="!isDaily" class="flex gap-1 bg-[#F9FAFB] p-1 rounded-lg border border-[#EAECF0]">
             <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
-              :class="subsView === 'bar' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setSubsView('bar')">
+              :class="activeSubsViewMode === 'bar' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setSubsView('bar')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                :stroke="subsView === 'bar' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
+                :stroke="activeSubsViewMode === 'bar' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
                 <line x1="18" y1="20" x2="18" y2="10" />
                 <line x1="12" y1="20" x2="12" y2="4" />
                 <line x1="6" y1="20" x2="6" y2="14" />
               </svg>
             </button>
             <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
-              :class="subsView === 'line' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setSubsView('line')">
+              :class="activeSubsViewMode === 'line' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setSubsView('line')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                :stroke="subsView === 'line' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
+                :stroke="activeSubsViewMode === 'line' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
               </svg>
             </button>
@@ -58,48 +58,48 @@
 
           <!-- Weekly bar/line -->
           <div data-chart-container data-chart-id="subs-weekly-bar"
-            :hidden="isDaily || !(activePeriod === 'weekly' && subsView === 'bar') || undefined"
+            :hidden="isDaily || !(activePeriod === 'weekly' && activeSubsViewMode === 'bar') || undefined"
             class="absolute inset-0" :data-chart-config='getSubsBarCfg("subs-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="subs-weekly-line"
-            :hidden="isDaily || !(activePeriod === 'weekly' && subsView === 'line') || undefined"
+            :hidden="isDaily || !(activePeriod === 'weekly' && activeSubsViewMode === 'line') || undefined"
             class="absolute inset-0" :data-chart-config='getSubsLineCfg("subs-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Monthly bar/line -->
           <div data-chart-container data-chart-id="subs-monthly-bar"
-            :hidden="isDaily || !(activePeriod === 'monthly' && subsView === 'bar') || undefined"
+            :hidden="isDaily || !(activePeriod === 'monthly' && activeSubsViewMode === 'bar') || undefined"
             class="absolute inset-0" :data-chart-config='getSubsBarCfg("subs-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="subs-monthly-line"
-            :hidden="isDaily || !(activePeriod === 'monthly' && subsView === 'line') || undefined"
+            :hidden="isDaily || !(activePeriod === 'monthly' && activeSubsViewMode === 'line') || undefined"
             class="absolute inset-0" :data-chart-config='getSubsLineCfg("subs-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Yearly bar/line -->
           <div data-chart-container data-chart-id="subs-yearly-bar"
-            :hidden="isDaily || !(activePeriod === 'yearly' && subsView === 'bar') || undefined"
+            :hidden="isDaily || !(activePeriod === 'yearly' && activeSubsViewMode === 'bar') || undefined"
             class="absolute inset-0" :data-chart-config='getSubsBarCfg("subs-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="subs-yearly-line"
-            :hidden="isDaily || !(activePeriod === 'yearly' && subsView === 'line') || undefined"
+            :hidden="isDaily || !(activePeriod === 'yearly' && activeSubsViewMode === 'line') || undefined"
             class="absolute inset-0" :data-chart-config='getSubsLineCfg("subs-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Alltime bar/line -->
           <div data-chart-container data-chart-id="subs-alltime-bar"
-            :hidden="isDaily || !(activePeriod === 'alltime' && subsView === 'bar') || undefined"
+            :hidden="isDaily || !(activePeriod === 'alltime' && activeSubsViewMode === 'bar') || undefined"
             class="absolute inset-0" :data-chart-config='getSubsBarCfg("subs-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="subs-alltime-line"
-            :hidden="isDaily || !(activePeriod === 'alltime' && subsView === 'line') || undefined"
+            :hidden="isDaily || !(activePeriod === 'alltime' && activeSubsViewMode === 'line') || undefined"
             class="absolute inset-0" :data-chart-config='getSubsLineCfg("subs-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
@@ -109,21 +109,21 @@
       <!-- TIERS BREAKDOWN -->
       <div :class="isDaily ? 'flex-1' : 'w-full'" class="flex flex-col gap-3 p-4 h-[25rem] relative">
         <div class="flex justify-between items-center z-10 relative">
-          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">Tiers Breakdown</h3>
+          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{ $t('dashboard.analytics.trends.tiersBreakdown') }}</h3>
           <div v-if="!isDaily" class="flex gap-1 bg-[#F9FAFB] p-1 rounded-lg border border-[#EAECF0]">
             <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
-              :class="tiersView === 'bar' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setTiersView('bar')">
+              :class="activeTiersViewMode === 'bar' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setTiersView('bar')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                :stroke="tiersView === 'bar' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
+                :stroke="activeTiersViewMode === 'bar' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
                 <line x1="18" y1="20" x2="18" y2="10" />
                 <line x1="12" y1="20" x2="12" y2="4" />
                 <line x1="6" y1="20" x2="6" y2="14" />
               </svg>
             </button>
             <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
-              :class="tiersView === 'line' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setTiersView('line')">
+              :class="activeTiersViewMode === 'line' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setTiersView('line')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                :stroke="tiersView === 'line' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
+                :stroke="activeTiersViewMode === 'line' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
               </svg>
             </button>
@@ -134,54 +134,54 @@
           <!-- Daily Donut -->
           <div data-chart-container data-chart-id="tiers-daily-donut" :hidden="!isDaily || undefined"
             class="absolute inset-0"
-            :data-chart-config='JSON.stringify({ type: "donut", period: "slot", datasetKey: "tiers-donut", fields: { category: "name", total: "value" }, categoryKeyMap: { Free: "Free", "Tier 1": "Tier 1", "Tier 2": "Tier 2", "Tier 3": "Tier 3", "Tier 4": "Tier 4", "Tier 5": "Tier 5" }, seriesStyles: { Free: { color: "#4CC9F0", name: "Free" }, "Tier 1": { color: "#4361EE", name: "Tier 1" }, "Tier 2": { color: "#3A0CA3", name: "Tier 2" }, "Tier 3": { color: "#AE4AEF", name: "Tier 3" }, "Tier 4": { color: "#98A2B3", name: "Tier 4" }, "Tier 5": { color: "#F72485", name: "Tier 5" } }, legentHint: LEGEND })'>
+            :data-chart-config='JSON.stringify({ type: "donut", period: "slot", datasetKey: "tiers-donut", fields: { category: "name", total: "value" }, categoryKeyMap: { Free: "Free", "Tier 1": "Tier 1", "Tier 2": "Tier 2", "Tier 3": "Tier 3", "Tier 4": "Tier 4", "Tier 5": "Tier 5" }, seriesStyles: { Free: { color: "#4CC9F0", name: "Free" }, "Tier 1": { color: "#4361EE", name: "Tier 1" }, "Tier 2": { color: "#3A0CA3", name: "Tier 2" }, "Tier 3": { color: "#AE4AEF", name: "Tier 3" }, "Tier 4": { color: "#98A2B3", name: "Tier 4" }, "Tier 5": { color: "#F72485", name: "Tier 5" } }, legentHint: legendConfig })'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Weekly -->
           <div data-chart-container data-chart-id="tiers-weekly-bar"
-            :hidden="isDaily || !(activePeriod === 'weekly' && tiersView === 'bar') || undefined"
+            :hidden="isDaily || !(activePeriod === 'weekly' && activeTiersViewMode === 'bar') || undefined"
             class="absolute inset-0" :data-chart-config='getTiersBarCfg("subs-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="tiers-weekly-line"
-            :hidden="isDaily || !(activePeriod === 'weekly' && tiersView === 'line') || undefined"
+            :hidden="isDaily || !(activePeriod === 'weekly' && activeTiersViewMode === 'line') || undefined"
             class="absolute inset-0" :data-chart-config='getTiersLineCfg("subs-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Monthly -->
           <div data-chart-container data-chart-id="tiers-monthly-bar"
-            :hidden="isDaily || !(activePeriod === 'monthly' && tiersView === 'bar') || undefined"
+            :hidden="isDaily || !(activePeriod === 'monthly' && activeTiersViewMode === 'bar') || undefined"
             class="absolute inset-0" :data-chart-config='getTiersBarCfg("subs-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="tiers-monthly-line"
-            :hidden="isDaily || !(activePeriod === 'monthly' && tiersView === 'line') || undefined"
+            :hidden="isDaily || !(activePeriod === 'monthly' && activeTiersViewMode === 'line') || undefined"
             class="absolute inset-0" :data-chart-config='getTiersLineCfg("subs-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Yearly -->
           <div data-chart-container data-chart-id="tiers-yearly-bar"
-            :hidden="isDaily || !(activePeriod === 'yearly' && tiersView === 'bar') || undefined"
+            :hidden="isDaily || !(activePeriod === 'yearly' && activeTiersViewMode === 'bar') || undefined"
             class="absolute inset-0" :data-chart-config='getTiersBarCfg("subs-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="tiers-yearly-line"
-            :hidden="isDaily || !(activePeriod === 'yearly' && tiersView === 'line') || undefined"
+            :hidden="isDaily || !(activePeriod === 'yearly' && activeTiersViewMode === 'line') || undefined"
             class="absolute inset-0" :data-chart-config='getTiersLineCfg("subs-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Alltime -->
           <div data-chart-container data-chart-id="tiers-alltime-bar"
-            :hidden="isDaily || !(activePeriod === 'alltime' && tiersView === 'bar') || undefined"
+            :hidden="isDaily || !(activePeriod === 'alltime' && activeTiersViewMode === 'bar') || undefined"
             class="absolute inset-0" :data-chart-config='getTiersBarCfg("subs-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
           <div data-chart-container data-chart-id="tiers-alltime-line"
-            :hidden="isDaily || !(activePeriod === 'alltime' && tiersView === 'line') || undefined"
+            :hidden="isDaily || !(activePeriod === 'alltime' && activeTiersViewMode === 'line') || undefined"
             class="absolute inset-0" :data-chart-config='getTiersLineCfg("subs-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
@@ -200,21 +200,21 @@
           earn</a>
       </div>
     </div>
-  </TrendPopup>
+  </DashboardAnalyticsTrendPopup>
 </template>
 
 <script setup>
-import TrendPopup from './TrendPopup.vue'
+import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
 const props = defineProps({ modelValue: Boolean, period: String, insightData: Object })
 const emit = defineEmits(['update:modelValue', 'update:period'])
 
-const hasData = computed(() => props.insightData && props.insightData.new != null)
+const hasSubscribersData = computed(() => props.insightData && props.insightData.new != null)
 
-const store = useDashboardAnalyticsStore()
-const bundle = computed(() => store.subscriptionsBundle || {})
+const analyticsStore = useDashboardAnalyticsStore()
+const bundle = computed(() => analyticsStore.subscriptionsBundle || {})
 
 // Active period mapping
 const activePeriod = computed(() => {
@@ -226,33 +226,33 @@ const activePeriod = computed(() => {
 
 const isDaily = computed(() => activePeriod.value === 'daily')
 
-const subsView = ref('bar')
-const tiersView = ref('bar')
+const activeSubsViewMode = ref('bar')
+const activeTiersViewMode = ref('bar')
 
 // ===== CONFIG HELPERS (Said's field names) =====
-const LEGEND = { enabled: true, class: "absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass: "inline-flex items-center gap-1.5 px-2 py-1", markerClass: "w-2.5 h-2.5 rounded-full", labelClass: "text-slate-500 text-xs font-medium font-sans" }
-const SUBS_STYLES = { sub: { color: "#4CC9F0", name: "New Subscriber" }, tip: { color: "#4361EE", name: "Recurring Subscriber" } }
-const SUBS_LABELS = { sub: "New Subscriber", tip: "Recurring Subscriber" }
-const TIERS_STYLES = { free: { color: "#4CC9F0", name: "Free" }, tier1: { color: "#4361EE", name: "Tier 1" }, tier2: { color: "#3A0CA3", name: "Tier 2" }, tier3: { color: "#AE4AEF", name: "Tier 3" }, tier4: { color: "#98A2B3", name: "Tier 4" }, tier5: { color: "#F72485", name: "Tier 5" } }
-const TIERS_LABELS = { free: "Free", tier1: "Tier 1", tier2: "Tier 2", tier3: "Tier 3", tier4: "Tier 4", tier5: "Tier 5" }
+const legendConfig = { enabled: true, class: "absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass: "inline-flex items-center gap-1.5 px-2 py-1", markerClass: "w-2.5 h-2.5 rounded-full", labelClass: "text-slate-500 text-xs font-medium font-sans" }
+const subsChartStyles = { sub: { color: "#4CC9F0", name: "New Subscriber" }, tip: { color: "#4361EE", name: "Recurring Subscriber" } }
+const subsChartLabels = { sub: "New Subscriber", tip: "Recurring Subscriber" }
+const tiersChartStyles = { free: { color: "#4CC9F0", name: "Free" }, tier1: { color: "#4361EE", name: "Tier 1" }, tier2: { color: "#3A0CA3", name: "Tier 2" }, tier3: { color: "#AE4AEF", name: "Tier 3" }, tier4: { color: "#98A2B3", name: "Tier 4" }, tier5: { color: "#F72485", name: "Tier 5" } }
+const tiersChartLabels = { free: "Free", tier1: "Tier 1", tier2: "Tier 2", tier3: "Tier 3", tier4: "Tier 4", tier5: "Tier 5" }
 
 function getSubsBarCfg(dk) {
-  return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["sub", "tip"], stacked: true, seriesStyles: SUBS_STYLES, seriesLabels: SUBS_LABELS, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: LEGEND })
+  return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["sub", "tip"], stacked: true, seriesStyles: subsChartStyles, seriesLabels: subsChartLabels, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: legendConfig })
 }
 function getSubsLineCfg(dk) {
-  return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["sub", "tip"], stacked: true, seriesStyles: SUBS_STYLES, seriesLabels: SUBS_LABELS, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: LEGEND })
+  return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["sub", "tip"], stacked: true, seriesStyles: subsChartStyles, seriesLabels: subsChartLabels, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: legendConfig })
 }
 function getTiersBarCfg(dk) {
-  return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["free", "tier1", "tier2", "tier3", "tier4", "tier5"], stacked: true, seriesStyles: TIERS_STYLES, seriesLabels: TIERS_LABELS, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: LEGEND })
+  return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["free", "tier1", "tier2", "tier3", "tier4", "tier5"], stacked: true, seriesStyles: tiersChartStyles, seriesLabels: tiersChartLabels, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: legendConfig })
 }
 function getTiersLineCfg(dk) {
-  return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["free", "tier1", "tier2", "tier3", "tier4", "tier5"], stacked: true, seriesStyles: TIERS_STYLES, seriesLabels: TIERS_LABELS, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: LEGEND })
+  return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["free", "tier1", "tier2", "tier3", "tier4", "tier5"], stacked: true, seriesStyles: tiersChartStyles, seriesLabels: tiersChartLabels, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: legendConfig })
 }
 
 // ===== STAT DATA =====
-function calculatePercentage(curr, prev) {
-  if (curr == null || !prev) return null
-  return Math.round(((curr - prev) / prev) * 100)
+function calculatePercentage(currentPeriodData, previousPeriodData) {
+  if (currentPeriodData == null || !previousPeriodData) return null
+  return Math.round(((currentPeriodData - previousPeriodData) / previousPeriodData) * 100)
 }
 
 const statData = computed(() => {
@@ -265,12 +265,12 @@ const statData = computed(() => {
   const arrMap = { daily: b.daily, weekly: b.weekly, monthly: b.monthly }
   const arr = arrMap[p] || []
   const last = arr[arr.length - 1] || {}
-  const prev = arr[arr.length - 2] || {}
+  const previousPeriodData = arr[arr.length - 2] || {}
   return {
     new: last.sub ?? null,
     recurring: last.tip ?? null,
-    newPct: calculatePercentage(last.sub, prev.sub),
-    recurringPct: calculatePercentage(last.tip, prev.tip),
+    newPct: calculatePercentage(last.sub, previousPeriodData.sub),
+    recurringPct: calculatePercentage(last.tip, previousPeriodData.tip),
   }
 })
 
@@ -324,8 +324,8 @@ function injectChartData() {
 // ===== CHART RENDERING =====
 async function ensureReady() {
   if (!window.chartsHandler) return
-  const hasData = window.chartsHandler._configs?.data && Object.keys(window.chartsHandler._configs.data).length > 0
-  if (!hasData) await window.chartsHandler.loadChartConfigsAndData()
+  const hasSubscribersData = window.chartsHandler._configs?.data && Object.keys(window.chartsHandler._configs.data).length > 0
+  if (!hasSubscribersData) await window.chartsHandler.loadChartConfigsAndData()
   injectChartData()
 }
 
@@ -348,18 +348,18 @@ async function renderCurrentCharts() {
     await renderChart('tiers-daily-donut')
   } else {
     const p = activePeriod.value
-    await renderChart(`subs-${p}-${subsView.value}`)
-    await renderChart(`tiers-${p}-${tiersView.value}`)
+    await renderChart(`subs-${p}-${activeSubsViewMode.value}`)
+    await renderChart(`tiers-${p}-${activeTiersViewMode.value}`)
   }
 }
 
 async function setSubsView(v) {
-  subsView.value = v
+  activeSubsViewMode.value = v
   await nextTick()
   if (!isDaily.value) await renderChart(`subs-${activePeriod.value}-${v}`)
 }
 async function setTiersView(v) {
-  tiersView.value = v
+  activeTiersViewMode.value = v
   await nextTick()
   if (!isDaily.value) await renderChart(`tiers-${activePeriod.value}-${v}`)
 }

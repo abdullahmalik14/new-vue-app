@@ -43,7 +43,7 @@
                   <span class="text-white text-xs font-bold font-['Poppins'] leading-5">{{ row.rank }}</span>
                 </div>
               </div>
-              <div 
+              <div
                 :data-value="row.title"
                 class="text-gray-900 text-xs font-semibold font-['Poppins'] leading-4 line-clamp-2 md:line-clamp-3">
                 {{ row.title }}
@@ -93,7 +93,7 @@ onMounted(() => {
   if (window.performanceTracker) {
     window.performanceTracker.step({
       flowName: 'AnalyticsRender',
-      stepName: 'TopMediaTable Mounted',
+      stepName: 'DashboardAnalyticsTopMediaTable Mounted',
       status: 'success'
     });
   }
@@ -109,7 +109,7 @@ import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
-const store = useDashboardAnalyticsStore()
+const analyticsStore = useDashboardAnalyticsStore()
 
 const topMediaTabs = ['Views', 'P2V Sales']
 const selectedTopMediaTab = ref('Views')
@@ -134,7 +134,7 @@ function formatDuration(sec) {
 }
 
 const topMediaRows = computed(() => {
-  const data = store.trendingMedia?.[props.period] || [];
+  const data = analyticsStore.trendingMedia?.[props.period] || [];
   return data.map((item, index) => ({
     id: index,
     rank: item.rank || index + 1,
@@ -146,7 +146,7 @@ const topMediaRows = computed(() => {
 });
 
 const p2vSalesRows = computed(() => {
-  const data = store.trendingMedia?.[props.period] || [];
+  const data = analyticsStore.trendingMedia?.[props.period] || [];
   return data.map((item, index) => ({
     id: index,
     rank: item.rank || index + 1,
