@@ -416,7 +416,7 @@ async function performConfirmation() {
     sessionStorage.removeItem('pendingSignupPassword')
     sessionStorage.removeItem('pendingSignupEmail')
 
-    const loginQuery = {
+    const postConfirmLoginQuery = {
       email: email.value.trim(),
       emailConfirmed: '1',
     }
@@ -424,9 +424,9 @@ async function performConfirmation() {
     isLoading.value = false
     isSubmitting.value = false
     if (popupRouteNavigationHandler) {
-      popupRouteNavigationHandler(`/log-in?email=${encodeURIComponent(loginQuery.email)}&emailConfirmed=1`)
+      popupRouteNavigationHandler(`/log-in?email=${encodeURIComponent(postConfirmLoginQuery.email)}&emailConfirmed=1`)
     } else {
-      await router.push({ path: '/log-in', query: loginQuery })
+      await router.push({ path: '/log-in', query: postConfirmLoginQuery })
     }
   } catch (err) {
     console.error("[CONFIRM_EMAIL] Confirmation error:", err)

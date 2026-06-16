@@ -4,271 +4,316 @@
 **Reference:** Expanded Vue App Naming Convention.txt  
 **Complete:** Batches 1–4 cover all routed application code
 
-Only items needing a change are listed.
+Only items needing a change are listed. **Phase 4.5 triage** applied 2026-06-16.
+
+Status values: `done` | `deferred` | `dropped`
 
 ---
 
 type: filename
 filename: AuthLogIn.vue
-Status: suggested
+Status: deferred
+deferredTo: Phase 5
 suggested: LogInPage.vue
 
 type: filename
 filename: AuthSignUp.vue
-Status: suggested
+Status: deferred
+deferredTo: Phase 5
 suggested: SignUpPage.vue
 
 type: filename
 filename: AuthLostPassword.vue
-Status: suggested
+Status: deferred
+deferredTo: Phase 5
 suggested: LostPasswordPage.vue
 
 type: filename
 filename: AuthResetPassword.vue
-Status: suggested
+Status: deferred
+deferredTo: Phase 5
 suggested: ResetPasswordPage.vue
 
 type: filename
 filename: AuthConfirmEmail.vue
-Status: suggested
+Status: deferred
+deferredTo: Phase 5
 suggested: ConfirmEmailPage.vue
 
 type: filename
 filename: AuthSignUpOnboarding.vue
-Status: suggested
+Status: deferred
+deferredTo: Phase 5
 suggested: SignUpOnboardingPage.vue
 
 type: filename
 filename: AuthSignUpOnboardingKyc.vue
-Status: suggested
+Status: deferred
+deferredTo: Phase 5
 suggested: SignUpOnboardingKycPage.vue
 
 type: filename
 filename: NavDropdown.vue
-Status: suggested
+Status: done
+doneIn: Phase 3d
 suggested: NavigationDropdown.vue
 
 type: method
 filename: ShopPage.vue
 method: preloadDashboard
-Status: suggested
+Status: dropped
+reason: method not present in codebase
 suggested: navigateToDashboard
 
 type: method
 filename: ProfileLoginPopup.vue
 method: popupNavigate
-Status: suggested
+Status: deferred
+reason: provider file not in workspace checkout
 suggested: handlePopupRouteNavigation
 
 type: method
 filename: ProfileLoginPopup.vue
 method: goBack
-Status: suggested
+Status: deferred
+reason: provider file not in workspace checkout
 suggested: handlePopupBackNavigation
 
 type: method
 filename: DashboardSharedSidebar.vue
 method: isActive
-Status: suggested
+Status: done
+doneIn: Phase 4.3 (already aligned as isSidebarMenuItemRouteActive / isMenuItemRouteActive)
 suggested: isSidebarMenuItemRouteActive
 
 type: method
 filename: DashboardSharedSidebar.vue
 method: goBackSubmenu
-Status: suggested
+Status: done
+doneIn: Phase 4.3 (already navigateBackInSubmenu)
 suggested: navigateBackInSubmenu
 
 type: method
 filename: NavDropdown.vue
 method: handleMenuClick
-Status: suggested
+Status: done
+doneIn: Phase 4.5 (NavigationDropdown.vue)
 suggested: handleNavigationMenuClick
 
 type: method
 filename: NavDropdown.vue
 method: handleSubmenuClick
-Status: suggested
+Status: done
+doneIn: Phase 4.5 (NavigationDropdown.vue)
 suggested: handleNavigationSubmenuClick
 
 type: name
 filename: ProfileLoginPopup.vue
 name: popupNavHandler
-Status: suggested
+Status: deferred
+reason: provider file not in workspace; consumers renamed in Phase 4.4
 suggested: popupRouteNavigationHandler
 
 type: name
 filename: ProfileLoginPopup.vue
 name: popupGoBack
-Status: suggested
+Status: deferred
+reason: provider file not in workspace checkout
 suggested: popupBackNavigationHandler
 
 type: name
 filename: ProfileLoginPopup.vue
 name: step
-Status: suggested
+Status: deferred
+reason: provider file not in workspace checkout
 suggested: authPopupStep
 
 type: name
 filename: ProfileLoginPopup.vue
 method: popupNavigate
 name: url
-Status: suggested
+Status: deferred
+reason: provider file not in workspace checkout
 suggested: navigationTargetPath
 
 type: name
 filename: ProfileLoginPopup.vue
 method: popupNavigate
 name: urlObj
-Status: suggested
+Status: deferred
+reason: provider file not in workspace checkout
 suggested: navigationTargetUrl
 
 type: name
 filename: ProfileLoginPopup.vue
 name: val
-Status: suggested
+Status: deferred
+reason: provider file not in workspace checkout
 suggested: isPopupOpen
 
 type: name
 filename: AppFooter.vue
 name: route
-Status: suggested
+Status: done
+doneIn: pre-existing (uses navigableRoutes / routeItem)
 suggested: navigableRoute
 
 type: name
 filename: AuthLogIn.vue
 name: popupNavHandler
-Status: suggested
+Status: done
+doneIn: Phase 4.4
 suggested: popupRouteNavigationHandler
 
 type: name
 filename: AuthSignUp.vue
 name: popupNavHandler
-Status: suggested
+Status: done
+doneIn: Phase 4.4
 suggested: popupRouteNavigationHandler
 
 type: name
 filename: AuthConfirmEmail.vue
 name: loginQuery
-Status: suggested
+Status: done
+doneIn: Phase 4.5
 suggested: postConfirmLoginQuery
 
 type: name
 filename: AuthConfirmEmail.vue
 name: popupNavHandler
-Status: suggested
+Status: done
+doneIn: Phase 4.4
 suggested: popupRouteNavigationHandler
 
 type: name
 filename: TwitterAuthPage.vue
 name: errorParam
-Status: suggested
+Status: done
+doneIn: Phase 4.5
 suggested: oauthErrorQueryParam
 
 type: name
 filename: LanguageSwitcher.vue
 name: metaPre
-Status: suggested
+Status: done
+doneIn: Phase 4.5
 suggested: routeMetaPreloadSections
 
 type: name
 filename: LanguageSwitcher.vue
 name: winPre
-Status: suggested
+Status: done
+doneIn: Phase 4.5
 suggested: windowPreloadSections
 
 type: name
 filename: LanguageSwitcher.vue
 method: onChange
 name: ev
-Status: suggested
+Status: done
+doneIn: Phase 4.5
 suggested: changeEvent
 
 type: name
 filename: SettingsLanguageField.vue
 name: metaPre
-Status: suggested
+Status: done
+doneIn: Phase 4.5
 suggested: routeMetaPreloadSections
 
 type: name
 filename: NavDropdown.vue
 method: handleMenuClick
 name: e
-Status: suggested
+Status: done
+doneIn: Phase 4.5 (NavigationDropdown.vue)
 suggested: clickEvent
 
 type: name
 filename: NavDropdown.vue
 method: handleSubmenuClick
 name: e
-Status: suggested
+Status: done
+doneIn: Phase 4.5 (NavigationDropdown.vue)
 suggested: clickEvent
 
 type: name
 filename: DashboardSharedSidebar.vue
 method: calculateOverflow
 name: headerH
-Status: suggested
+Status: done
+doneIn: Phase 4.3 (already headerHeight)
 suggested: headerHeight
 
 type: name
 filename: DashboardSharedSidebar.vue
 method: calculateOverflow
 name: footerH
-Status: suggested
+Status: done
+doneIn: Phase 4.3 (already footerHeight)
 suggested: footerHeight
 
 type: name
 filename: DashboardSharedSidebar.vue
 method: calculateOverflow
 name: logoH
-Status: suggested
+Status: done
+doneIn: Phase 4.3 (already logoHeight)
 suggested: logoHeight
 
 type: name
 filename: DashboardSharedSidebar.vue
 method: calculateOverflow
 name: itemH
-Status: suggested
+Status: deferred
+reason: low-value shorthand; menuItemHeight already used in dev sidebar
 suggested: menuItemHeight
 
 type: name
 filename: DashboardSharedSidebar.vue
 method: calculateOverflow
 name: moreBtnH
-Status: suggested
+Status: deferred
+reason: low-value local shorthand
 suggested: moreButtonHeight
 
 type: name
 filename: DashboardSharedSidebar.vue
 method: goBackSubmenu
 name: prev
-Status: suggested
+Status: deferred
+reason: low-value catch-block param in Options API sidebar
 suggested: previousSubmenuState
 
 type: name
 filename: DashboardSharedSidebar.vue
 method: loadAssetWithRetry
 name: e
-Status: suggested
+Status: deferred
+reason: low-value catch-block param
 suggested: loadError
 
 type: name
 filename: DashboardSharedSidebar.vue
 method: loadAssetWithRetry
 name: r
-Status: suggested
+Status: deferred
+reason: low-value Promise resolve param
 suggested: delayResolve
 
 type: name
 filename: DashboardSharedSidebar.vue
 method: loadTranslations
 name: e
-Status: suggested
+Status: deferred
+reason: low-value catch-block param
 suggested: translationLoadError
 
 type: name
 filename: DashboardSharedSidebar.vue
 method: resolveMenuItems
 name: e
-Status: suggested
+Status: deferred
+reason: low-value catch-block param
 suggested: menuResolveError

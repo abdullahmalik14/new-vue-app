@@ -691,4 +691,43 @@ refactor(auth): rename popup route navigation inject key
 
 ---
 
+## Phase 4.5 — Batch 4 triage and remaining symbol renames (2026-06-16)
+
+**Master plan:** Phase 4 exit — triage remaining `type: method` / `type: name` from batch 4  
+**Audit reference:** [route-naming-audit-batch-4.md](./route-naming-audit-batch-4.md)
+
+### What changed
+
+**Adopted renames (Phase 4.5):**
+- `NavigationDropdown.vue` — `handleMenuClick`/`handleSubmenuClick` → `handleNavigationMenuClick`/`handleNavigationSubmenuClick`; click params `e` → `clickEvent`
+- `AuthConfirmEmail.vue` — `loginQuery` → `postConfirmLoginQuery`
+- `TwitterAuthPage.vue` — `errorParam` → `oauthErrorQueryParam`
+- `LanguageSwitcher.vue` — `metaPre`/`winPre` → `routeMetaPreloadSections`/`windowPreloadSections`; `onChange(ev)` → `onChange(changeEvent)`
+- `SettingsLanguageField.vue` — `metaPre`/`winPre` → `routeMetaPreloadSections`/`windowPreloadSections`
+
+**Triage outcomes (batch 4 audit updated):**
+| Outcome | Count | Examples |
+|---------|-------|----------|
+| **done** (prior phases + 4.5) | 24 | popup inject keys, NavDropdown filename, sidebar overflow heights |
+| **deferred → Phase 5** | 7 | Auth `*Page.vue` filename renames |
+| **deferred** (missing file / low value) | 12 | `ProfileLoginPopup.vue` provider symbols; sidebar catch-block params |
+| **dropped** | 1 | `ShopPage.preloadDashboard` (not in codebase) |
+
+**Batches 1–3:** Remaining `type: method` / `type: name` entries deferred as low-value or build-script locals unless already covered by Phases 4.1–4.3. Full batch-4 audit file is the Phase 4 consumer-template exit record.
+
+### How tested
+
+```bash
+rg "handleMenuClick|handleSubmenuClick|loginQuery|errorParam|metaPre|winPre" src/   # zero hits (log strings excepted)
+npm run build   # succeeds
+```
+
+### Suggested commit
+
+```
+refactor(routing): triage batch 4 symbols and rename remaining adopts
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

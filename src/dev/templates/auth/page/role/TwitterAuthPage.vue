@@ -50,13 +50,13 @@ async function handleTwitterCallback() {
     // Extract code and state from URL
     const code = route.query.code;
     const state = route.query.state;
-    const errorParam = route.query.error;
+    const oauthErrorQueryParam = route.query.error;
 
     // Debug logging
     console.log('[AuthTwitter] Callback received:', {
       code: code ? 'present' : 'missing',
       state: state || 'missing',
-      errorParam: errorParam || 'none',
+      oauthErrorQueryParam: oauthErrorQueryParam || 'none',
       fullQuery: route.query,
       hasOpener: !!window.opener
     });
@@ -66,8 +66,8 @@ async function handleTwitterCallback() {
       localStorageKeys: 'Code_verifier stored in parent window memory'
     };
 
-    if (errorParam) {
-      throw new Error(`Twitter OAuth error: ${errorParam}. ${route.query.error_description || ''}`);
+    if (oauthErrorQueryParam) {
+      throw new Error(`Twitter OAuth error: ${oauthErrorQueryParam}. ${route.query.error_description || ''}`);
     }
 
     if (!code || !state) {

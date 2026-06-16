@@ -81,10 +81,10 @@ const currentSection = computed(() => {
 });
 
 const preLoadSections = computed(() => {
-  const metaPre = Array.isArray(route?.meta?.preLoadSections) ? route.meta.preLoadSections : null;
-  if (metaPre?.length) return metaPre;
-  const winPre = typeof window !== 'undefined' ? window.__PRELOAD_SECTIONS__ : null;
-  return Array.isArray(winPre) ? winPre : [];
+  const routeMetaPreloadSections = Array.isArray(route?.meta?.preLoadSections) ? route.meta.preLoadSections : null;
+  if (routeMetaPreloadSections?.length) return routeMetaPreloadSections;
+  const windowPreloadSections = typeof window !== 'undefined' ? window.__PRELOAD_SECTIONS__ : null;
+  return Array.isArray(windowPreloadSections) ? windowPreloadSections : [];
 });
 
 async function applyLocaleChange(finalLocale, prev) {

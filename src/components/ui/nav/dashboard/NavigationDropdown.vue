@@ -77,8 +77,8 @@ watch(() => authStore.userRole, () => {
   loadMenuItems();
 });
 
-const handleMenuClick = (e, item) => {
-  e.preventDefault();
+const handleNavigationMenuClick = (clickEvent, item) => {
+  clickEvent.preventDefault();
   if (item.submenuItems && item.submenuItems.length > 0) {
     selectedMenuItem.value = item;
     showSubmenuPopup.value = true;
@@ -88,8 +88,8 @@ const handleMenuClick = (e, item) => {
   }
 };
 
-const handleSubmenuClick = (e, childItem) => {
-  e.preventDefault();
+const handleNavigationSubmenuClick = (clickEvent, childItem) => {
+  clickEvent.preventDefault();
   if (childItem.isEnabled && childItem.route) {
     router.push(childItem.route);
     showSubmenuPopup.value = false;
@@ -120,7 +120,7 @@ const handleSubmenuClick = (e, childItem) => {
               <!-- DS-02: Vue template looping instead of document.createElement imperative logic -->
               <div v-for="item in (resolvedMenuItems.length ? resolvedMenuItems : menuItems)" :key="item.menuItemId || item.translationKey"
                 class="sidebar-item group" :class="{ 'disabled opacity-50 pointer-events-none': !item.isEnabled }">
-                <a @click="(e) => handleMenuClick(e, item)" :href="item.route || '#'" :title="$t(item.translationKey, item.fallbackLabel)"
+                <a @click="(clickEvent) => handleNavigationMenuClick(clickEvent, item)" :href="item.route || '#'" :title="$t(item.translationKey, item.fallbackLabel)"
                    class="main-menu-item flex flex-col outline-none items-center justify-center self-stretch gap-0.5 p-2 rounded min-w-[4.5rem] min-h-[4.5rem] group-hover:bg-sidebar-active transition-all duration-200 cursor-pointer">
                   <img :src="item.iconUrl" :alt="$t(item.translationKey, item.fallbackLabel)"
                        class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
@@ -196,7 +196,7 @@ const handleSubmenuClick = (e, childItem) => {
           
           <!-- Default Menu Item -->
           <button v-else :disabled="!child.isEnabled"
-            @click="(e) => child.isEnabled && handleSubmenuClick(e, child)" :class="[
+            @click="(clickEvent) => child.isEnabled && handleNavigationSubmenuClick(clickEvent, child)" :class="[
               'relative flex w-full gap-3 outline-none rounded-md px-4 py-2 justify-center group transition-all duration-200',
               child.isEnabled
                 ? 'hover:bg-transparent cursor-pointer'

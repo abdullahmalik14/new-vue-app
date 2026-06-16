@@ -69,10 +69,10 @@ const currentSection = computed(() => {
 });
 
 const preLoadSections = computed(() => {
-  const metaPre = Array.isArray(route?.meta?.preLoadSections) ? route.meta.preLoadSections : null;
-  if (metaPre && metaPre.length) return metaPre;
-  const winPre = typeof window !== 'undefined' ? window.__PRELOAD_SECTIONS__ : null;
-  return Array.isArray(winPre) ? winPre : [];
+  const routeMetaPreloadSections = Array.isArray(route?.meta?.preLoadSections) ? route.meta.preLoadSections : null;
+  if (routeMetaPreloadSections && routeMetaPreloadSections.length) return routeMetaPreloadSections;
+  const windowPreloadSections = typeof window !== 'undefined' ? window.__PRELOAD_SECTIONS__ : null;
+  return Array.isArray(windowPreloadSections) ? windowPreloadSections : [];
 });
 
 function restoreSelectValue(locale) {
@@ -83,8 +83,8 @@ function restoreSelectValue(locale) {
   }
 }
 
-async function onChange(ev) {
-  const target = ev?.target ?? null;
+async function onChange(changeEvent) {
+  const target = changeEvent?.target ?? null;
   if (!target || !('value' in target)) return;
   if (!selectRef.value) return;
 
