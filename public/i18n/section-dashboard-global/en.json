@@ -4,7 +4,25 @@
     "welcome": "Welcome back!",
     "overview": "Overview",
     "settings": "Settings",
-    "profile": "Profile",
+    "profile": {
+      "name": "lindenMay",
+      "handle": "{'@'}linden",
+      "status": {
+        "away": "Away",
+        "offline": "Offline"
+      },
+      "viewProfile": "View profile",
+      "goLive": "Go Live",
+      "videoCallStatus": "Video call status",
+      "audioCallStatus": "Audio call status",
+      "changeCustomMessages": "Change Custom Messages",
+      "repostStatusX": "Repost status message to X",
+      "writeStatus": "Write status here...",
+      "awayMessage": "Away Message...",
+      "mock": {
+        "defaultStatus": "I am all dressed up ready to eat some chicken 💋"
+      }
+    },
     "logout": "Logout",
     "more": "More",
     "menu": {
@@ -24,6 +42,94 @@
       "subscribersFollowers": "Subscribers & Followers",
       "yourPosts": "Your Posts",
       "referrals": "Referrals"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "tabs": {
+        "all": "All",
+        "unread": "Unread",
+        "customRequests": "Custom Requests",
+        "account": "Account"
+      },
+      "action": {
+        "dismiss": "Dismiss",
+        "takeAction": "Take Action"
+      },
+      "mock": {
+        "mediaRequired": "Media Content Required: Your profile currently has no media. Enhance your profile's visibility by adding at least 5 media items.",
+        "mediaApproved": "Congratulations: Your media 'Audio with placeholder and no preview' has been approved.",
+        "bankRequired": "Bank Details Required: To ensure seamless transactions, please complete your bank information."
+      }
+    },
+    "analytics": {
+      "page": {
+        "overviewTitle": "Overview/Insight",
+        "lastUpdated": "Last updated at",
+        "refresh": "Refresh",
+        "refreshing": "Refreshing...",
+        "learnHowToEarn": "Learn how you can earn"
+      },
+      "trends": {
+        "salesInsights": "Sales Insights",
+        "tokenInsights": "Token Insights",
+        "topCountries": "Top Countries",
+        "noTrend": "No trend to show at the moment",
+        "learnToEarn": "Learn ways to earn",
+        "newSubscribers": "New Subscribers",
+        "recurringSubscribers": "Recurring Subscribers",
+        "subscriptionsInsight": "Subscriptions Insight",
+        "tiersBreakdown": "Tiers Breakdown",
+        "followersAndVisits": "Followers & Visits Trend",
+        "trafficSource": "Traffic Source",
+        "likesInsight": "Likes Insight",
+        "topContributors": "Top Contributors",
+        "topFans": "Top Fans",
+        "topOrderSpenders": "Top Order Spenders"
+      },
+      "likes": {
+        "media": "Media Likes",
+        "merch": "Merch Likes",
+        "profile": "Profile Likes",
+        "feed": "Feed Likes"
+      },
+      "contributors": {
+        "contributor": "Contributor",
+        "fan": "Fan",
+        "spender": "Spender"
+      },
+      "tables": {
+        "orders": {
+          "details": "Details",
+          "noOrders": "You don't have any orders at the moment",
+          "allOrders": "All Orders",
+          "orderLabel": "Order#"
+        },
+        "tabs": {
+          "subscriptions": "Subscriptions",
+          "payToView": "Pay to View",
+          "merch": "Merch",
+          "customRequest": "Custom Request",
+          "wishtender": "Wishtender"
+        }
+      },
+      "legends": {
+        "customrequest": "Custom Request",
+        "tipTokens": "Tip Tokens",
+        "p2v": "Pay to View",
+        "merch": "Merch",
+        "sub": "Subscription",
+        "wishtender": "Wishtender",
+        "callTokens": "Call Tokens",
+        "chatTokens": "Chat Tokens",
+        "liveStreamTokens": "Live Stream Tokens",
+        "free": "Free",
+        "tier1": "Tier 1",
+        "tier2": "Tier 2",
+        "tier3": "Tier 3",
+        "tier4": "Tier 4",
+        "tier5": "Tier 5",
+        "paytoview": "Pay to View"
+      }
     }
   },
   "common": {

@@ -14,6 +14,50 @@
 
             </div>
 
+            
+            <!-- ===== SECTION: Analytics Dashboard Components ===== -->
+            <section class="flex flex-col gap-6">
+                <DemoSectionHeader title="Analytics Dashboard Components" />
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Dashboard Tabs -->
+                    <div class="flex flex-col gap-3 lg:col-span-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">DashboardTabs</span>
+                        <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-100 w-full max-w-md">
+                            <DashboardTabs v-model="demoTabsModel" :tabs="['Daily', 'Weekly', 'Monthly', 'Yearly']" />
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Stat Indicator -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">DashboardStatIndicator (Positive)</span>
+                        <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center">
+                            <DashboardStatIndicator percentage="17.5" period-label="vs yesterday" />
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">DashboardStatIndicator (Negative)</span>
+                        <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center">
+                            <DashboardStatIndicator percentage="-5.2" period-label="vs last week" />
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Button -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">DashboardPrimaryButton</span>
+                        <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center">
+                            <DashboardPrimaryButton text="All Orders 25">
+                              <template #suffix>
+                                <div class="w-5 h-5 flex justify-center items-center">
+                                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-700 transition-transform group-hover:translate-x-0.5"><path d="M4.16666 10H15.8333M15.8333 10L9.99999 4.16667M15.8333 10L9.99999 15.8333" stroke="currentColor" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                </div>
+                              </template>
+                            </DashboardPrimaryButton>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- ===== SECTION: MediaCardVariants ===== -->
             <div class="flex flex-col gap-12">
                 <div class="flex flex-col gap-4">
@@ -599,20 +643,20 @@
 
                     <!-- Auth Pink -->
                     <div class="flex flex-col gap-4">
-                        <PrimaryButton :text="buttonText" variant="authPink" type="submit" />
+                        <DashboardPrimaryButton :text="buttonText" variant="authPink" type="submit" />
                         <ShowCodeToggle :code="demoSnippets.buttons.authPink" />
                     </div>
 
                     <!-- Auth Transparent (Telegram) -->
                     <div class="flex flex-col gap-4">
-                        <PrimaryButton text="Continue with Telegram" variant="authTransparent" size="lg"
+                        <DashboardPrimaryButton text="Continue with Telegram" variant="authTransparent" size="lg"
                             :leftIcon="telegramIcon" leftIconClass="w-8 h-8" />
                         <ShowCodeToggle :code="demoSnippets.buttons.authTransparent" />
                     </div>
 
                     <!-- New Events -->
                     <div class="flex flex-col gap-4">
-                        <PrimaryButton text="NEW EVENTS" variant="none"
+                        <DashboardPrimaryButton text="NEW EVENTS" variant="none"
                             customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]"
                             :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'"
                             :leftIconClass="`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`" />
@@ -621,7 +665,7 @@
 
                     <!-- Polygon Next -->
                     <div class="flex flex-col gap-4">
-                        <PrimaryButton text="Next" variant="polygonLeft"
+                        <DashboardPrimaryButton text="Next" variant="polygonLeft"
                             :rightIcon="'https://i.ibb.co.com/hx8ztZFf/svgviewer-png-output-8.webp'" :rightIconClass="`
                                 w-6 h-6 transition duration-200
                                 filter brightness-0 invert-0
@@ -632,7 +676,7 @@
 
                     <!-- Publish Schedule -->
                     <div class="flex flex-col gap-4">
-                        <PrimaryButton text="PUBLISH SCHEDULE" variant="polygonLeft"
+                        <DashboardPrimaryButton text="PUBLISH SCHEDULE" variant="polygonLeft"
                             :leftIcon="'https://i.ibb.co/S74jfvBw/Icon-1.png'" :leftIconClass="`
                             w-6 h-6 transition duration-200
                             filter brightness-0
@@ -645,7 +689,7 @@
                     <div class="flex flex-col gap-4">
                     <!-- Add-on Service -->
                     <div class="flex flex-col gap-4">
-                        <PrimaryButton text="add-on service" variant="none"
+                        <DashboardPrimaryButton text="add-on service" variant="none"
                             customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
                             :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" :leftIconClass="`
                             w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]
@@ -655,7 +699,7 @@
 
                     <!-- Add-on Service V2 -->
                     <div class="flex flex-col gap-4">
-                        <PrimaryButton text="add-on service" variant="none"
+                        <DashboardPrimaryButton text="add-on service" variant="none"
                             customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
                             :leftIcon="'https://i.ibb.co.com/bRYvsTVs/Icon.png'" :leftIconClass="`
                             w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]
@@ -665,7 +709,7 @@
 
                     <!-- Proceed Payment -->
                     <div class="flex flex-col gap-4">
-                        <PrimaryButton text="Proceed Payment" variant="checkoutProceedpayment"
+                        <DashboardPrimaryButton text="Proceed Payment" variant="checkoutProceedpayment"
                             :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'"
                             :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]`" />
                         <ShowCodeToggle :code="demoSnippets.buttons.proceedPayment" />
@@ -675,7 +719,7 @@
 
                     <!-- Action Green (X) -->
                     <div class="flex flex-col gap-4">
-                        <PrimaryButton text="Continue with X (Twitter)" variant="actionGreen"
+                        <DashboardPrimaryButton text="Continue with X (Twitter)" variant="actionGreen"
                             leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp"
                             leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]" />
                         <ShowCodeToggle :code="demoSnippets.buttons.actionGreenX" />
@@ -705,7 +749,9 @@ import QuillEditor from '@/components/forms/inputs/QuillEditor.vue';
 import CountryStateDemo from '@/dev/templates/demo/CountryStateDemo.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
 import DemoCard from '@/dev/templates/demo/DemoCard.vue';
-import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
+import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue';
+import DashboardStatIndicator from '@/components/ui/badge/dashboard/DashboardStatIndicator.vue';
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import { tierData } from "/public/data/TierData.js";
 // Heroicons
 import {
@@ -1030,15 +1076,15 @@ const demoSnippets = {
         thin: `<LoadingSpinner \n  thickness="1" \n  size="3xl" \n  color="text-green-500" \n  trackColor="text-white" \n/>`,
     },
     buttons: {
-        authPink: `<PrimaryButton \n  :text="buttonText" \n  variant="authPink" \n  type="submit" \n/>`,
-        authTransparent: `<PrimaryButton \n  text="Continue with Telegram" \n  variant="authTransparent" \n  size="lg" \n  :leftIcon="telegramIcon" \n  leftIconClass="w-8 h-8" \n/>`,
-        newEvents: `<PrimaryButton \n  text="NEW EVENTS" \n  variant="none" \n  customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" \n  :leftIconClass="\`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]\`" \n/>`,
-        polygonNext: `<PrimaryButton \n  text="Next" \n  variant="polygonLeft" \n  :rightIcon="'https://i.ibb.co.com/hx8ztZFf/svgviewer-png-output-8.webp'" \n  :rightIconClass="\`w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]\`" \n  btnBg="#07f468" \n  btnHoverBg="black" \n  btnText="black" \n  btnHoverText="#07f468" \n/>`,
-        publishSchedule: `<PrimaryButton \n  text="PUBLISH SCHEDULE" \n  variant="polygonLeft" \n  :leftIcon="'https://i.ibb.co.com/S74jfvBw/Icon-1.png'" \n  :leftIconClass="\`w-6 h-6 transition duration-200 filter brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]\`" \n/>`,
-        addonService: `<PrimaryButton \n  text="add-on service" \n  variant="none" \n  customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" \n  :leftIconClass="\`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)] rounded-sm outline outline-[1.50px] outline-offset-[-0.75px]\`" \n/>`,
-        addonServiceV2: `<PrimaryButton \n  text="add-on service" \n  variant="none" \n  customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/bRYvsTVs/Icon.png'" \n  :leftIconClass="\`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]\`" \n/>`,
-        proceedPayment: `<PrimaryButton \n  text="Proceed Payment" \n  variant="checkoutProceedpayment" \n  :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'" \n  :rightIconClass="\`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]\`" \n/>`,
-        actionGreenX: `<PrimaryButton \n  text="Continue with X (Twitter)" \n  variant="actionGreen" \n  leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp" \n  leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]" \n/>`,
+        authPink: `<DashboardPrimaryButton \n  :text="buttonText" \n  variant="authPink" \n  type="submit" \n/>`,
+        authTransparent: `<DashboardPrimaryButton \n  text="Continue with Telegram" \n  variant="authTransparent" \n  size="lg" \n  :leftIcon="telegramIcon" \n  leftIconClass="w-8 h-8" \n/>`,
+        newEvents: `<DashboardPrimaryButton \n  text="NEW EVENTS" \n  variant="none" \n  customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" \n  :leftIconClass="\`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]\`" \n/>`,
+        polygonNext: `<DashboardPrimaryButton \n  text="Next" \n  variant="polygonLeft" \n  :rightIcon="'https://i.ibb.co.com/hx8ztZFf/svgviewer-png-output-8.webp'" \n  :rightIconClass="\`w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]\`" \n  btnBg="#07f468" \n  btnHoverBg="black" \n  btnText="black" \n  btnHoverText="#07f468" \n/>`,
+        publishSchedule: `<DashboardPrimaryButton \n  text="PUBLISH SCHEDULE" \n  variant="polygonLeft" \n  :leftIcon="'https://i.ibb.co.com/S74jfvBw/Icon-1.png'" \n  :leftIconClass="\`w-6 h-6 transition duration-200 filter brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]\`" \n/>`,
+        addonService: `<DashboardPrimaryButton \n  text="add-on service" \n  variant="none" \n  customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" \n  :leftIconClass="\`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)] rounded-sm outline outline-[1.50px] outline-offset-[-0.75px]\`" \n/>`,
+        addonServiceV2: `<DashboardPrimaryButton \n  text="add-on service" \n  variant="none" \n  customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]" \n  :leftIcon="'https://i.ibb.co.com/bRYvsTVs/Icon.png'" \n  :leftIconClass="\`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]\`" \n/>`,
+        proceedPayment: `<DashboardPrimaryButton \n  text="Proceed Payment" \n  variant="checkoutProceedpayment" \n  :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'" \n  :rightIconClass="\`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]\`" \n/>`,
+        actionGreenX: `<DashboardPrimaryButton \n  text="Continue with X (Twitter)" \n  variant="actionGreen" \n  leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp" \n  leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]" \n/>`,
     }
 };
 
@@ -1216,6 +1262,7 @@ const videoCard = ref({
 
 // Button Showcase Data
 const buttonText = ref("Auth Button");
+const demoTabsModel = ref('Daily');
 const telegramIcon = "https://i.ibb.co.com/8LKPbgm1/telegram.webp"; // Using a consistent placeholder if not found
 
 </script>

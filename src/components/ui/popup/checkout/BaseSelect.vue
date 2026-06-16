@@ -1,4 +1,7 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 
 const props = defineProps({

@@ -649,6 +649,9 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import MediaCardV1 from "@/components/ui/media/media-cards/MediaCardV1.vue";
 import BasePopup from "./BasePopup.vue";
 import { ref, onMounted, onBeforeUnmount } from "vue";

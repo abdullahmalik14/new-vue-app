@@ -4,7 +4,7 @@ import CheckboxSwitch from '@/components/forms/checkboxes/CheckboxSwitch.vue';
 import BaseInput from '@/components/forms/inputs/BaseInput.vue';
 import RadioGroup from '@/components/forms/radio/dashboard/RadioGroup.vue';
 import ReusableSearchInput from '@/dev/components/media/uploader/parts/ReusableSearchInput.vue';
-import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import CheckboxGroup from '@/components/forms/checkboxes/CheckboxGroup.vue';
 import { defineProps } from 'vue';
 
@@ -207,7 +207,7 @@ const copyLink = async () => {
                         inputClass="h-7"
                         subTitleClass="text-[#0C111D] dark:text-[#dbd8d3] text-base font-medium"
                     />
-                            <PrimaryButton
+                            <DashboardPrimaryButton
                             text="Send invite"
                             variant="simpleBtn"
                             :leftIcon="'https://i.ibb.co.com/PZcHd96N/send-01.webp'"

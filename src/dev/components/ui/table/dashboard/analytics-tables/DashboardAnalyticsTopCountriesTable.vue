@@ -22,9 +22,7 @@
           <!-- tags column -->
           <template #cell.tags="{ row }">
             <div class="flex justify-start items-center gap-2.5 h-full w-full sm:px-1">
-              <div class="w-5 h-5 bg-black flex justify-center items-center shrink-0">
-                <span class="text-white text-sm font-bold font-['Poppins']">{{ row.rank }}</span>
-              </div>
+              <DashboardTableBadge type="rank" :text="row.rank" />
               <div 
                 :data-value="row.country"
                 class="flex-1 text-gray-900 text-xs font-semibold font-['Poppins'] leading-4 line-clamp-2">
@@ -66,6 +64,7 @@ onMounted(() => {
 import DashboardTrendCard from '@/components/ui/card/dashboard/DashboardTrendCard.vue'
 import DashboardTrendContent from '@/components/ui/card/dashboard/DashboardTrendContent.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
+import DashboardTableBadge from '@/components/ui/badge/dashboard/DashboardTableBadge.vue'
 
 import { computed } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'

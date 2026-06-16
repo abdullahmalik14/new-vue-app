@@ -50,7 +50,7 @@
         </div>
 
         <!-- Confirm button -->
-        <PrimaryButton :text="buttonText" variant="authPink" size="lg"
+        <DashboardPrimaryButton :text="buttonText" variant="authPink" size="lg"
           :disabled="isLoading || isSubmitting || !isCognitoScriptReady || !isCodeValid" type="submit" />
       </form>
 
@@ -74,7 +74,7 @@ import { InformationCircleIcon } from "@heroicons/vue/24/outline"
 import AuthTextInput from "@/components/forms/inputs/AuthTextInput.vue"
 import AuthCodeInput from "@/components/forms/inputs/AuthCodeInput.vue"
 import BaseHeading from "@/components/ui/typography/BaseHeading.vue"
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue"
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue"
 import BaseParagraph from "@/components/ui/typography/BaseParagraph.vue"
 import apiWrapper from "@/lib/mock-api-demo/apiWrapper.js"
 import { userIdUtility } from "@/lib/mock-api-demo/utilities/userId.js"

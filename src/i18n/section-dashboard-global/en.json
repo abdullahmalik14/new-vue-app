@@ -6,7 +6,7 @@
     "settings": "Settings",
     "profile": {
       "name": "lindenMay",
-      "handle": "@linden",
+      "handle": "{'@'}linden",
       "status": {
         "away": "Away",
         "offline": "Offline"
@@ -111,6 +111,29 @@
           "customRequest": "Custom Request",
           "wishtender": "Wishtender"
         }
+      },
+      "legends": {
+        "customrequest": "Custom Request",
+        "tipTokens": "Tip Tokens",
+        "p2v": "Pay to View",
+        "merch": "Merch",
+        "sub": "Subscription",
+        "wishtender": "Wishtender",
+        "callTokens": "Call Tokens",
+        "chatTokens": "Chat Tokens",
+        "liveStreamTokens": "Live Stream Tokens",
+        "free": "Free",
+        "tier1": "Tier 1",
+        "tier2": "Tier 2",
+        "tier3": "Tier 3",
+        "tier4": "Tier 4",
+        "tier5": "Tier 5",
+        "paytoview": "Pay to View",
+        "subscription": "Subscription",
+        "profileVisit": "Profile Visit",
+        "newFollowers": "New Followers",
+        "newSubscriber": "New Subscriber",
+        "recurringSubscriber": "Recurring Subscriber"
       }
     }
   },

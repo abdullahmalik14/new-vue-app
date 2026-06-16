@@ -1,4 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
+import BaseHeading from '@/components/ui/typography/BaseHeading.vue'
 import BasePopup from './BasePopup.vue'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
@@ -108,9 +112,7 @@ onBeforeUnmount(() => {
         <!-- title -->
         <div class="flex items-center gap-2">
           <img :src="props.logo" alt="logo" class="w-6 h-6" />
-          <h3 class="text-lg md:text-2xl font-semibold text-[#0c111d] dark:text-[#dbd8d3]">
-            {{ props.title }}
-          </h3>
+          <h3 class="text-lg md:text-2xl font-semibold text-[#0c111d] dark:text-[#dbd8d3] m-0">{{ props.title }}</h3>
         </div>
 
         <div class="flex items-center gap-4 w-full md:w-auto">

@@ -61,7 +61,7 @@
               </div>
 
               <div>
-                <PrimaryButton text="Log In" variant="authPink" size="lg" v-interactions="loginSubmitInteractions" />
+                <DashboardPrimaryButton text="Log In" variant="authPink" size="lg" v-interactions="loginSubmitInteractions" />
               </div>
             </form>
           </div>
@@ -137,13 +137,13 @@
               </div>
 
               <div>
-                <PrimaryButton text="Sign up" variant="authPink" size="lg" v-interactions="signupSubmitInteractions" />
+                <DashboardPrimaryButton text="Sign up" variant="authPink" size="lg" v-interactions="signupSubmitInteractions" />
               </div>
 
-              <PrimaryButton :text="'Continue with X (twitter)'" variant="authTransparent" size="lg" :leftIcon="xIcon"
+              <DashboardPrimaryButton :text="'Continue with X (twitter)'" variant="authTransparent" size="lg" :leftIcon="xIcon"
                 leftIconClass="w-8 h-8" />
 
-              <PrimaryButton :text="'Continue with Telegram'" variant="authTransparent" size="lg" />
+              <DashboardPrimaryButton :text="'Continue with Telegram'" variant="authTransparent" size="lg" />
 
             </form>
           </div>
@@ -173,7 +173,7 @@
               </div>
 
               <div>
-                <PrimaryButton text="Confirm" variant="authPink" size="lg" @click="handleVerify" />
+                <DashboardPrimaryButton text="Confirm" variant="authPink" size="lg" @click="handleVerify" />
               </div>
 
               <ShowCodeToggle :code="codeSnippets.verificationCode" />
@@ -248,7 +248,7 @@
               </div>
 
               <div>
-                <PrimaryButton text="Continue" variant="authPink" size="lg" v-interactions="onboardingSubmitInteractions" />
+                <DashboardPrimaryButton text="Continue" variant="authPink" size="lg" v-interactions="onboardingSubmitInteractions" />
               </div>
             </div>
           </div>
@@ -284,7 +284,7 @@
               </div>
 
               <div>
-                <PrimaryButton text="Continue" variant="authPink" size="lg" v-interactions="onboardingUsernameSubmitInteractions" />
+                <DashboardPrimaryButton text="Continue" variant="authPink" size="lg" v-interactions="onboardingUsernameSubmitInteractions" />
               </div>
             </div>
           </div>
@@ -302,7 +302,7 @@ import AuthTextInput from '@/components/forms/inputs/AuthTextInput.vue';
 import AuthCodeInput from '@/components/forms/inputs/AuthCodeInput.vue';
 import ValidationRulesShowcase from '@/dev/templates/demo/demo-audit/ValidationRulesShowcase.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
-import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import Checkbox from '@/components/forms/checkboxes/CheckboxGroup.vue';
 import {
   InformationCircleIcon,

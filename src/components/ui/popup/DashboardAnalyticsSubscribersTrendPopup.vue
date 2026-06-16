@@ -1,6 +1,6 @@
 <template>
   <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="handlePeriodChange" title="{{ $t('dashboard.analytics.trends.subscriptionsInsight') }}"
+    @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.subscriptionsInsight')"
     logo="https://i.ibb.co.com/MyhfGRNH/svgviewer-png-output-12.webp">
     <div v-if="hasSubscribersData" :class="isDaily ? 'flex flex-row gap-6' : 'flex flex-col gap-6'">
 
@@ -204,6 +204,9 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
@@ -231,22 +234,20 @@ const activeTiersViewMode = ref('bar')
 
 // ===== CONFIG HELPERS (Said's field names) =====
 const legendConfig = { enabled: true, class: "absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass: "inline-flex items-center gap-1.5 px-2 py-1", markerClass: "w-2.5 h-2.5 rounded-full", labelClass: "text-slate-500 text-xs font-medium font-sans" }
-const subsChartStyles = { sub: { color: "#4CC9F0", name: "New Subscriber" }, tip: { color: "#4361EE", name: "Recurring Subscriber" } }
-const subsChartLabels = { sub: "New Subscriber", tip: "Recurring Subscriber" }
-const tiersChartStyles = { free: { color: "#4CC9F0", name: "Free" }, tier1: { color: "#4361EE", name: "Tier 1" }, tier2: { color: "#3A0CA3", name: "Tier 2" }, tier3: { color: "#AE4AEF", name: "Tier 3" }, tier4: { color: "#98A2B3", name: "Tier 4" }, tier5: { color: "#F72485", name: "Tier 5" } }
-const tiersChartLabels = { free: "Free", tier1: "Tier 1", tier2: "Tier 2", tier3: "Tier 3", tier4: "Tier 4", tier5: "Tier 5" }
+const subsChartStyles = computed(() => ({ sub: { color: "#4CC9F0", name: t('dashboard.analytics.legends.newSubscriber', 'New Subscriber') }, tip: { color: "#4361EE", name: t('dashboard.analytics.legends.recurringSubscriber', 'Recurring Subscriber') } }))
+const tiersChartStyles = computed(() => ({ free: { color: "#4CC9F0", name: t('dashboard.analytics.legends.free', 'Free') }, tier1: { color: "#4361EE", name: t('dashboard.analytics.legends.tier1', 'Tier 1') }, tier2: { color: "#3A0CA3", name: t('dashboard.analytics.legends.tier2', 'Tier 2') }, tier3: { color: "#AE4AEF", name: t('dashboard.analytics.legends.tier3', 'Tier 3') }, tier4: { color: "#98A2B3", name: t('dashboard.analytics.legends.tier4', 'Tier 4') }, tier5: { color: "#F72485", name: t('dashboard.analytics.legends.tier5', 'Tier 5') } }))
 
 function getSubsBarCfg(dk) {
-  return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["sub", "tip"], stacked: true, seriesStyles: subsChartStyles, seriesLabels: subsChartLabels, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: legendConfig })
+  return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["sub", "tip"], stacked: true, seriesStyles: subsChartStyles.value, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: legendConfig })
 }
 function getSubsLineCfg(dk) {
-  return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["sub", "tip"], stacked: true, seriesStyles: subsChartStyles, seriesLabels: subsChartLabels, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: legendConfig })
+  return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["sub", "tip"], stacked: true, seriesStyles: subsChartStyles.value, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: legendConfig })
 }
 function getTiersBarCfg(dk) {
-  return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["free", "tier1", "tier2", "tier3", "tier4", "tier5"], stacked: true, seriesStyles: tiersChartStyles, seriesLabels: tiersChartLabels, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: legendConfig })
+  return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["free", "tier1", "tier2", "tier3", "tier4", "tier5"], stacked: true, seriesStyles: tiersChartStyles.value, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: legendConfig })
 }
 function getTiersLineCfg(dk) {
-  return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["free", "tier1", "tier2", "tier3", "tier4", "tier5"], stacked: true, seriesStyles: tiersChartStyles, seriesLabels: tiersChartLabels, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: legendConfig })
+  return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["free", "tier1", "tier2", "tier3", "tier4", "tier5"], stacked: true, seriesStyles: tiersChartStyles.value, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "", totalLabel: "Total Subscribers:" } }, yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: legendConfig })
 }
 
 // ===== STAT DATA =====

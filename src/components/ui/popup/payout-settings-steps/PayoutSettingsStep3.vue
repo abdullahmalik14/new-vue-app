@@ -63,7 +63,7 @@
         </div>
         
         <div class="flex justify-between items-center gap-2 w-full mt-auto pt-6 z-10">
-            <PrimaryButton 
+            <DashboardPrimaryButton 
                 @click="saveDetails"
                 class="ml-auto"
                 variant="none" 
@@ -74,14 +74,17 @@
                 <template #leftIcon>
                     <img src="https://i.ibb.co.com/Fb2Xxf9S/tick-circle.webp" alt="tick circle" class="w-6 h-6 [filter:brightness(0)_saturate(100%)_invert(53%)_sepia(97%)_saturate(459%)_hue-rotate(93deg)_brightness(114%)_contrast(94%)] group-hover/button:[filter:brightness(0)_saturate(100%)]">
                 </template>
-            </PrimaryButton>
+            </DashboardPrimaryButton>
         </div>
     </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import { ref } from 'vue';
-import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import DashboardTextInput from '@/components/forms/inputs/DashboardTextInput.vue';
 
 const props = defineProps({

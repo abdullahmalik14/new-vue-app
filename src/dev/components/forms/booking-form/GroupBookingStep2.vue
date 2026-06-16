@@ -4,7 +4,7 @@ import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
 import DashboardTextInput from "@/components/forms/inputs/DashboardTextInput.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import BookingSectionsWrapper from "@/dev/components/forms/booking-form/parts/BookingSectionsWrapper.vue";
 import BaseInput from "@/components/forms/inputs/BaseInput.vue";
 
@@ -184,7 +184,7 @@ const publishSchedule = async () => {
     <div class="w-full bg-[#D0D5DD] h-[1px] mb-[80px]"></div>
 
     <div class="absolute right-0 bottom-0">
-      <PrimaryButton @click="publishSchedule" text="PUBLISH SCHEDULE" variant="polygonLeft"
+      <DashboardPrimaryButton @click="publishSchedule" text="PUBLISH SCHEDULE" variant="polygonLeft"
         :leftIcon="'https://i.ibb.co/S74jfvBw/Icon-1.png'" :leftIconClass="`
           w-6 h-6 transition duration-200
           filter brightness-0

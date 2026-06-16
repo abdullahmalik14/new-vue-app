@@ -85,19 +85,19 @@ const hasLikesData = computed(() => {
 
 // ===== CONFIG HELPERS =====
 const legendConfig = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
-const likesChartStyles = {
+const likesChartStyles = computed(() => ({
   media:   { color:"#4CC9F0", name: t("dashboard.analytics.likes.media") },
   merch:   { color:"#4361EE", name: t("dashboard.analytics.likes.merch") },
   profile: { color:"#7209B7", name: t("dashboard.analytics.likes.profile") },
   feed:    { color:"#F72585", name: t("dashboard.analytics.likes.feed") }
-}
-const likesChartLabels = { media:"Media", merch:"Merch", profile:"Profile", feed:"Feed" }
+}))
+const likesChartLabels = { media: "Media Likes", merch: "Merch Likes", profile: "Profile Likes", feed: "Feed Likes" }
 const BREAKDOWN_KEYS = ["media","merch","profile","feed"]
 
 function getLikesBarCfg(dk) {
   return JSON.stringify({
     type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, 
-    breakdownKeys:BREAKDOWN_KEYS, stacked:true, seriesStyles:likesChartStyles, seriesLabels:likesChartLabels, 
+    breakdownKeys:BREAKDOWN_KEYS, stacked:true, seriesStyles:likesChartStyles.value, seriesLabels:likesChartLabels, 
     bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, 
     tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, 
     yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig 
@@ -107,7 +107,7 @@ function getLikesBarCfg(dk) {
 function getLikesLineCfg(dk) {
   return JSON.stringify({
     type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, 
-    breakdownKeys:BREAKDOWN_KEYS, stacked:true, seriesStyles:likesChartStyles, seriesLabels:likesChartLabels, 
+    breakdownKeys:BREAKDOWN_KEYS, stacked:true, seriesStyles:likesChartStyles.value, seriesLabels:likesChartLabels, 
     axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, 
     tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, 
     yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig 

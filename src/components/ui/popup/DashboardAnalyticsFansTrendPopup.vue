@@ -175,6 +175,7 @@
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
 const props = defineProps({
@@ -184,6 +185,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'update:period'])
+const { t } = useI18n()
 
 const hasFansData = computed(() => props.insightData && props.insightData.newFollowers != null)
 
@@ -200,14 +202,14 @@ const isDaily = computed(() => activePeriod.value === 'daily')
 const activeTrendViewMode = ref('bar')
 
 const legendConfig = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
-const fansChartStyles = { newFollowers:{color:"#4CC9F0",name:"New Followers"}, profileVisits:{color:"#4361EE",name:"Profile Visit"} }
-const fansChartLabels = { newFollowers:"New Followers", profileVisits:"Profile Visit" }
+const fansChartStyles = computed(() => ({ profileVisits: { color: "#4CC9F0", name: t('dashboard.analytics.legends.profileVisit', 'Profile Visit') }, newFollowers: { color: "#4361EE", name: t('dashboard.analytics.legends.newFollowers', 'New Followers') } }))
+const fansChartLabels = { profileVisits: "Profile Visit", newFollowers: "New Followers" }
 
 function getFansBarCfg(dk) {
-  return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:true, seriesStyles:fansChartStyles, seriesLabels:fansChartLabels, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig })
+  return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:true, seriesStyles:fansChartStyles.value, seriesLabels:fansChartLabels, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig })
 }
 function getFansLineCfg(dk) {
-  return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:false, seriesStyles:fansChartStyles, seriesLabels:fansChartLabels, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig })
+  return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:false, seriesStyles:fansChartStyles.value, seriesLabels:fansChartLabels, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig })
 }
 
 function getSourcesDonutCfg(dk) {

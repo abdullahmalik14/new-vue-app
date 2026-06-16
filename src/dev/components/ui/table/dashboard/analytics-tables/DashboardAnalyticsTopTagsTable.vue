@@ -22,14 +22,8 @@
           <!-- tag column -->
           <template #cell.tag="{ row }">
             <div class="flex justify-start items-center gap-2.5 h-full w-full sm:px-1">
-              <div class="w-5 h-5 bg-black flex justify-center items-center shrink-0">
-                <span class="text-white text-sm font-bold font-['Poppins']">{{ row.rank }}</span>
-              </div>
-              <div class="px-1.5 py-0.5 bg-gray-200 rounded-md border border-gray-200 flex justify-start items-center">
-                <span 
-                  :data-value="row.name"
-                  class="text-slate-700 text-xs font-medium font-['Poppins']">{{ row.name }}</span>
-              </div>
+              <DashboardTableBadge type="rank" :text="row.rank" />
+              <DashboardTableBadge type="tag" :text="row.name" />
             </div>
           </template>
 
@@ -66,6 +60,7 @@ onMounted(() => {
 import DashboardTrendCard from '@/components/ui/card/dashboard/DashboardTrendCard.vue'
 import DashboardTrendContent from '@/components/ui/card/dashboard/DashboardTrendContent.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
+import DashboardTableBadge from '@/components/ui/badge/dashboard/DashboardTableBadge.vue'
 
 import { computed } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'

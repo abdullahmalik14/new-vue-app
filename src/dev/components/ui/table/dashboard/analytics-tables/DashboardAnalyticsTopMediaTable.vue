@@ -16,17 +16,10 @@
         </div>
 
         <!-- tabs-button-group -->
-        <div
-          class="flex w-full sm:w-auto bg-white/30 rounded-lg justify-start items-start overflow-hidden border border-gray-200 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]">
-          <div v-for="tab in topMediaTabs" :key="tab" @click="selectedTopMediaTab = tab" 
-            :data-value="tab"
-            :class="[
-            'flex-1 sm:flex-initial whitespace-nowrap cursor-pointer h-full px-4 py-2 flex justify-center items-center gap-2 transition-all font-[\'Poppins\'] text-sm outline-none border-r border-gray-200 last:border-r-0',
-            selectedTopMediaTab === tab ? 'bg-white text-gray-800 font-bold' : 'bg-transparent text-gray-500 font-medium hover:bg-gray-50'
-          ]">
-            {{ tab }}
-          </div>
-        </div>
+        <DashboardTabs 
+          :tabs="topMediaTabs" 
+          v-model="selectedTopMediaTab" 
+        />
       </div>
 
       <!-- tabs-content -->
@@ -102,6 +95,7 @@ onMounted(() => {
 import { ref, computed } from 'vue'
 import DashboardTrendCard from '@/components/ui/card/dashboard/DashboardTrendCard.vue'
 import DashboardTrendContent from '@/components/ui/card/dashboard/DashboardTrendContent.vue'
+import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'

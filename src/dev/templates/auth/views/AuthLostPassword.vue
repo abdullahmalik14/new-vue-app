@@ -36,7 +36,7 @@
         </p>
 
         <!-- submit button -->
-        <PrimaryButton :text="buttonText" variant="authPink" size="lg" :disabled="isLoading || !isCognitoScriptReady"
+        <DashboardPrimaryButton :text="buttonText" variant="authPink" size="lg" :disabled="isLoading || !isCognitoScriptReady"
           type="submit" />
       </form>
     </div>
@@ -54,7 +54,7 @@ import { interactionsEngine } from "@/utils/validation/interactionsEngine.js"
 import { InformationCircleIcon } from "@heroicons/vue/24/outline"
 import BaseHeading from "@/components/ui/typography/BaseHeading.vue"
 import BaseParagraph from "@/components/ui/typography/BaseParagraph.vue"
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue"
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue"
 import AuthTextInput from "@/components/forms/inputs/AuthTextInput.vue"
 
 const { t, locale: i18nLocale } = useI18n()

@@ -539,7 +539,7 @@ import { onUnmounted } from 'vue';
 import EventDropdownContent from './EventDropdownContent.vue';
 import BasePopup from '@/components/ui/popup/BasePopup.vue';
 import EventsWidget from './EventsWidget.vue';
-import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import NewEventsPopup from './NewEventsPopup.vue';
 import CalendarMobilePopupContent from './CalendarMobilePopupContent.vue';
 import CalendarEventDetailsPopup from './CalendarEventDetailsPopup.vue';

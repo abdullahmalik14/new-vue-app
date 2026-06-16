@@ -1,4 +1,7 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import { ref, onMounted, onUnmounted, nextTick, computed } from "vue";
 import {
   createStepStateEngine,
@@ -13,7 +16,7 @@ import BaseInput from "@/components/forms/inputs/BaseInput.vue";
 import AddressCard from "../checkout/AddressCard.vue";
 import SectionToggleHeader from "../checkout/SectionToggleHeader.vue";
 import CheckoutNotes from "../checkout/CheckoutNotes.vue";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import TotalAmountRow from "../checkout/TotalAmountRow.vue";
 import PaymentMethodNotLoggedIn from "../checkout/PaymentMethodNotLoggedIn.vue";
 import PaymentMethodLoggedIn from "../checkout/PaymentMethodLoggedIn.vue";
@@ -411,7 +414,7 @@ onUnmounted(() => {
                         >Log in</span
                       >
                     </button>
-                    <PrimaryButton
+                    <DashboardPrimaryButton
                       text="Continue with X (Twitter)"
                       variant="actionGreen"
                       leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp"
@@ -808,7 +811,7 @@ onUnmounted(() => {
                     >Privacy Policy</a
                   >.
                 </CheckboxGroup>
-                <PrimaryButton
+                <DashboardPrimaryButton
                   :key="isStepValid"
                   :text="buttonText"
                   :variant="

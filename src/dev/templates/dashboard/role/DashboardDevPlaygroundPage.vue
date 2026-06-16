@@ -10,18 +10,18 @@ import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/Dashbo
 
     <Cookies />
 
-    <PrimaryButton text="Cancel" variant="hoverBgWhite" size="lg" />
+    <DashboardPrimaryButton text="Cancel" variant="hoverBgWhite" size="lg" />
 
-    <PrimaryButton text="Save" variant="greyBg" size="lg" />
+    <DashboardPrimaryButton text="Save" variant="greyBg" size="lg" />
 
-    <PrimaryButton text="Save" variant="polygonRight"
+    <DashboardPrimaryButton text="Save" variant="polygonRight"
       :leftIcon="'https://i.ibb.co/Sw3WhF1p/svgviewer-png-output-9.webp'" :leftIconClass="`
   w-6 h-6 transition duration-200
   filter brightness-0 invert
   group-hover:[filter:brightness(0)_saturate(100%)_invert(0%)_sepia(96%)_saturate(7494%)_hue-rotate(96deg)_brightness(112%)_contrast(97%)]
 `" />
 
-    <PrimaryButton text="Next" variant="polygonLeft"
+    <DashboardPrimaryButton text="Next" variant="polygonLeft"
       :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'" :rightIconClass="`
   w-6 h-6 transition duration-200
   filter brightness-0 invert-0   
@@ -44,93 +44,93 @@ import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/Dashbo
     <br />
     <br />
 
-    <PrimaryButton text="View All Popup" variant="mediaBtn" @click="isViewAllPopupOpen = true" />
+    <DashboardPrimaryButton text="View All Popup" variant="mediaBtn" @click="isViewAllPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Profle media details popup" variant="mediaBtn"
+    <DashboardPrimaryButton text="Profle media details popup" variant="mediaBtn"
       @click="profileMediaDetailsPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Avatar upload popup" variant="mediaBtn" @click="avatarPopupOpen = true" />
+    <DashboardPrimaryButton text="Avatar upload popup" variant="mediaBtn" @click="avatarPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Image Crop Popup" variant="mediaBtn" @click="imageCropPopupOpen = true" />
+    <DashboardPrimaryButton text="Image Crop Popup" variant="mediaBtn" @click="imageCropPopupOpen = true" />
 
     <br />
-    <PrimaryButton text="Cancel Upload Popup" variant="mediaBtn" @click="cancelUploadPopupOpen = true" />
+    <DashboardPrimaryButton text="Cancel Upload Popup" variant="mediaBtn" @click="cancelUploadPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Buy Now Login Popup" variant="mediaBtn" @click="buyNowLoginPopupOpen = true" />
+    <DashboardPrimaryButton text="Buy Now Login Popup" variant="mediaBtn" @click="buyNowLoginPopupOpen = true" />
     <br />
 
-    <PrimaryButton text="Buy Now Not Login Popup" variant="mediaBtn" @click="buyNowNotLoginPopupOpen = true" />
+    <DashboardPrimaryButton text="Buy Now Not Login Popup" variant="mediaBtn" @click="buyNowNotLoginPopupOpen = true" />
     <br />
 
-    <PrimaryButton text="Cart Checkout Login Popup" variant="mediaBtn" @click="cartCheckoutLoginPopupOpen = true" />
+    <DashboardPrimaryButton text="Cart Checkout Login Popup" variant="mediaBtn" @click="cartCheckoutLoginPopupOpen = true" />
     <br />
 
-    <PrimaryButton text="Cart Checkout Not Login Popup" variant="mediaBtn"
+    <DashboardPrimaryButton text="Cart Checkout Not Login Popup" variant="mediaBtn"
       @click="cartCheckoutNotLoginPopupOpen = true" />
     <br />
 
-    <PrimaryButton text="Subscribe Login Popup" variant="mediaBtn" @click="subscribeLoginPopupOpen = true" />
+    <DashboardPrimaryButton text="Subscribe Login Popup" variant="mediaBtn" @click="subscribeLoginPopupOpen = true" />
     <br />
 
-    <PrimaryButton text="Subscribe Not Login Popup" variant="mediaBtn" @click="subscribeNotLoginPopupOpen = true" />
+    <DashboardPrimaryButton text="Subscribe Not Login Popup" variant="mediaBtn" @click="subscribeNotLoginPopupOpen = true" />
     <br />
 
-    <PrimaryButton text="Subscribe update Login Popup" variant="mediaBtn"
+    <DashboardPrimaryButton text="Subscribe update Login Popup" variant="mediaBtn"
       @click="subscribeUpdateLoginPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Purchase Tip Popup" variant="mediaBtn" @click="purchaseTipPopupOpen = true" />
+    <DashboardPrimaryButton text="Purchase Tip Popup" variant="mediaBtn" @click="purchaseTipPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Purchase Flow Subscription Popup" variant="mediaBtn"
+    <DashboardPrimaryButton text="Purchase Flow Subscription Popup" variant="mediaBtn"
       @click="purchaseFlowSubscriptionPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Guest Purchase Flow Popup" variant="mediaBtn" @click="guestPurchaseFlowPopupOpen = true" />
+    <DashboardPrimaryButton text="Guest Purchase Flow Popup" variant="mediaBtn" @click="guestPurchaseFlowPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Upgrade Tier Popup" variant="mediaBtn" @click="upgradeTierPopupOpen = true" />
+    <DashboardPrimaryButton text="Upgrade Tier Popup" variant="mediaBtn" @click="upgradeTierPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="1on1 Booking FlowPopup open" variant="mediaBtn"
+    <DashboardPrimaryButton text="1on1 Booking FlowPopup open" variant="mediaBtn"
       @click="oneOnOneBookingFlowPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Ticket Event Popup Open" variant="mediaBtn" @click="ticketEventPopupOpen = true" />
+    <DashboardPrimaryButton text="Ticket Event Popup Open" variant="mediaBtn" @click="ticketEventPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Crowd Funding Event Popup" variant="mediaBtn" @click="crowdFundingEventPopupOpen = true" />
+    <DashboardPrimaryButton text="Crowd Funding Event Popup" variant="mediaBtn" @click="crowdFundingEventPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Tip Popup" variant="mediaBtn" @click="tipPopupOpen = true" />
+    <DashboardPrimaryButton text="Tip Popup" variant="mediaBtn" @click="tipPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Profile Login Popup" variant="mediaBtn" @click="profileLoginPopupOpen = true" />
+    <DashboardPrimaryButton text="Profile Login Popup" variant="mediaBtn" @click="profileLoginPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Profile Merch Popup" variant="mediaBtn" @click="profileMerchPopupOpen = true" />
+    <DashboardPrimaryButton text="Profile Merch Popup" variant="mediaBtn" @click="profileMerchPopupOpen = true" />
 
     <br />
 
-    <PrimaryButton text="Top Up Popup" variant="mediaBtn" @click="topUpPopupOpen = true" />
+    <DashboardPrimaryButton text="Top Up Popup" variant="mediaBtn" @click="topUpPopupOpen = true" />
 
     <br />
 
@@ -233,7 +233,7 @@ import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/Dashbo
 
 <!-- <script setup>
 import DashboardSharedTwoColLayout from "@/dev/templates/dashboard/shared/DashboardSharedTwoColLayout.vue";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import Cookies from "@/components/ui/badge/dashboard/Cookies.vue";
 import Cart from "@/components/ui/cart/Cart.vue";
 import OrderReceived from "@/dev/components/ui/table/dashboard/OrderReceived.vue";

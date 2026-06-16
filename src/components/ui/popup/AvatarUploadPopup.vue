@@ -83,6 +83,9 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import { ref, computed } from "vue";
 import BasePopup from "./BasePopup.vue";
 import AvatarSelector from "@/components/ui/profile/AvatarSelector.vue";        

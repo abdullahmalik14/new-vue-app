@@ -84,7 +84,7 @@
       class="flex justify-end md:mt-0 mt-4"
       @click="handleSubmit"
     >
-      <PrimaryButton
+      <DashboardPrimaryButton
         text="SUBMIT MEDIA FOR APPROVAL"
         variant="polygonLeft"
         :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'"
@@ -99,7 +99,7 @@
 
 <script setup>
 import { computed } from "vue";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import NotificationCard from "@/components/ui/card/dashboard/NotificationCard.vue";
 import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import { ExclamationTriangleIcon } from "@heroicons/vue/24/solid";

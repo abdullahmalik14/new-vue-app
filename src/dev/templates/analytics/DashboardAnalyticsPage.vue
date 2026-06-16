@@ -5,7 +5,7 @@
       <DashboardHeader />
 
       <!-- overview/insight section -->
-      <DashboardAnalyticsMainCardWrapper>
+      <DashboardSectionWrapper>
         <div>
           <!-- section-header -->
           <div class="flex flex-col items-start justify-between sm:flex-row sm:items-center p-4">
@@ -15,10 +15,7 @@
                 <img src="/dev/cdn/analytics/icons/icon-1.webp" alt="overview/insight"
                   class="w-6 h-6" />
               </span>
-              <h2 data-label="{{ $t('dashboard.analytics.page.overviewTitle') }}"
-                class="m-0 font-medium text-xl font-sans leading-[1.875rem] text-light-text-quaternary dark:text-dark-text-quaternary">
-                Overview/Insight
-              </h2>
+              <h2 class="m-0 font-medium text-xl font-sans leading-[1.875rem] text-light-text-quaternary dark:text-dark-text-quaternary">{{ $t('dashboard.analytics.page.overviewTitle') }}</h2>
             </div>
             <!-- last-date -->
             <div class="flex items-center gap-4 w-full justify-between sm:justify-end sm:w-auto">
@@ -26,17 +23,21 @@
                 <span :data-value="lastUpdated"
                   class="text-sm font-sans leading-5 text-light-text-quaternary dark:text-dark-text-quaternary">{{
                     formatTime(lastUpdated) }}</span></span>
-              <button @click="handleRefresh" data-label="Refresh" :disabled="isRefreshing"
-                class="group flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-light-bg-button dark:bg-dark-bg-button [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none hover:bg-light-primary dark:hover:bg-dark-primaryHover [outline:none] border-0 disabled:opacity-50 disabled:cursor-not-allowed">
-                <span :class="{ 'animate-spin': isRefreshing }">
-                  <img src="/dev/cdn/analytics/icons/icon-2.webp" alt="refresh"
-                    class="w-[.875rem] h-[.875rem] group-hover:[filter:brightness(0)_invert(1)]" />
-                </span>
-                <span
-                  class="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary group-hover:text-white dark:group-hover:text-[#e8e6e3]">
-                  {{ isRefreshing ? 'Refreshing...' : 'Refresh' }}
-                </span>
-              </button>
+              <DashboardPrimaryButton 
+                variant="none"
+                @click="handleRefresh" 
+                data-label="Refresh" 
+                :disabled="isRefreshing"
+                customClass="group flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-white border border-gray-200 shadow-sm dark:bg-dark-bg-container dark:border-gray-700 [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none hover:bg-gray-50 dark:hover:bg-dark-primaryHover [outline:none] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                textClass="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary  dark:group-hover:text-[#e8e6e3]"
+                :text="isRefreshing ? $t('dashboard.analytics.page.refreshing') : $t('dashboard.analytics.page.refresh')" :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
+                <template #leftIcon>
+                  <span :class="{ 'animate-spin': isRefreshing }">
+                    <img src="/dev/cdn/analytics/icons/icon-2.webp" alt="refresh"
+                      class="w-[.875rem] h-[.875rem] " />
+                  </span>
+                </template>
+              </DashboardPrimaryButton>
             </div>
           </div>
 
@@ -50,23 +51,24 @@
                   <!-- hover-overlay -->
                   <div
                     class="absolute hidden group-hover/container:flex items-start justify-end w-full h-full top-0 left-0 z-[10000]">
-                    <button @click="openSubscribers"
-                      class="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-light-bg-button dark:bg-dark-bg-button [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover/container:bg-light-primary dark:hover/container:bg-dark-primaryHover">
-                      <span
-                        class="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary group-hover/button:text-white dark:group-hover/button:text-[#e8e6e3]">Trend</span>
-                      <span>
-                        <img src="/dev/cdn/analytics/icons/icon-3.webp" alt="expand"
-                          class="w-[.875rem] h-[.875rem] group-hover/button:[filter:brightness(0)_invert(1)]" />
-                      </span>
-                    </button>
+                    <DashboardPrimaryButton 
+                      variant="none"
+                      @click="openSubscribers"
+                      customClass="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-transparent [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors"
+                      text="Trend"
+                      textClass="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary" :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
+                      <template #rightIcon>
+                        <span>
+                          <img src="/dev/cdn/analytics/icons/icon-3.webp" alt="expand"
+                            class="w-[.875rem] h-[.875rem]" />
+                        </span>
+                      </template>
+                    </DashboardPrimaryButton>
                   </div>
 
                   <!-- title -->
                   <div class="flex items-center gap-2">
-                    <h3 data-label="Subscribers"
-                      class="m-0 font-sans font-medium text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">
-                      Subscribers
-                    </h3>
+                    <h3 class="m-0 font-sans font-medium text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">Subscribers</h3>
                   </div>
 
                   <!-- data-content (new) -->
@@ -77,7 +79,7 @@
                       <div class="flex flex-col gap-2 flex-grow flex-shrink [flex-basis: auto] min-w-0 min-h-0">
                         <div class="relative">
                           <span
-                            class="text-xs font-sans font-medium leading-[1.125rem] text-light-text-tertiary dark:text-dark-text-tertiary uppercase">NEW</span>
+                            class="text-xs font-sans font-medium leading-[1.125rem] text-light-text-tertiary dark:text-dark-text-tertiary uppercase">{{ $t('dashboard.analytics.trends.newSubscribers').split(' ')[0].toUpperCase() }}</span>
                         </div>
 
                         <div class="flex justify-between items-end">
@@ -88,25 +90,7 @@
                           </span>
 
                           <!-- right part only show when data are here -->
-                          <div v-if="
-                            analyticsStore.subscriberInsights?.daily?.newPercentage !== undefined &&
-                            analyticsStore.subscriberInsights?.daily?.newPercentage !== null
-                          ">
-                            <div class="flex flex-col items-end gap-1">
-                              <span class="flex gap-1 items-center">
-                                <img src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up"
-                                  class="h-5 w-5" />
-                                <span
-                                  class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium">{{
-                                    analyticsStore.subscriberInsights?.daily?.newPercentage }}%</span>
-                              </span>
-                              <span
-                                class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
-                                yesterday</span>
-
-                            </div>
-
-                          </div>
+                          <DashboardStatIndicator v-if="analyticsStore.subscriberInsights?.daily?.newPercentage !== undefined && analyticsStore.subscriberInsights?.daily?.newPercentage !== null" :percentage="analyticsStore.subscriberInsights?.daily?.newPercentage" period-label="vs yesterday" />
                         </div>
                         <div class="w-full" v-if="analyticsStore.subscriberInsights?.daily?.new != null">
                           <SparkLine :data="[3, 4, 3, 5, 4, 6, 5, 7, 6, 8]" color="#22c55e" :height="28" />
@@ -122,7 +106,7 @@
                       <div class="flex flex-col gap-2 flex-grow flex-shrink [flex-basis: auto] min-w-0 min-h-0">
                         <div class="relative">
                           <span
-                            class="text-xs font-sans font-medium leading-[1.125rem] text-light-text-tertiary dark:text-dark-text-tertiary">RECURRING</span>
+                            class="text-xs font-sans font-medium leading-[1.125rem] text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.trends.recurringSubscribers').split(' ')[0].toUpperCase() }}</span>
                         </div>
 
                         <div class="flex justify-between items-end">
@@ -132,26 +116,7 @@
                                 analyticsStore.subscriberInsights?.daily?.recurring ?? '--' }}</span>
                           </span>
                           <!-- right part only show when data are here -->
-                          <div v-if="
-                            analyticsStore.subscriberInsights?.daily?.recurringPercentage !== undefined &&
-                            analyticsStore.subscriberInsights?.daily?.recurringPercentage !== null
-                          ">
-
-
-                            <div class="flex flex-col items-end gap-1">
-
-                              <span class="flex gap-1 items-center">
-                                <img src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up"
-                                  class="h-5 w-5" />
-                                <span
-                                  class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium">{{
-                                    analyticsStore.subscriberInsights?.daily?.recurringPercentage }}%</span>
-                              </span>
-                              <span
-                                class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
-                                yesterday</span>
-                            </div>
-                          </div>
+                          <DashboardStatIndicator v-if="analyticsStore.subscriberInsights?.daily?.recurringPercentage !== undefined && analyticsStore.subscriberInsights?.daily?.recurringPercentage !== null" :percentage="analyticsStore.subscriberInsights?.daily?.recurringPercentage" period-label="vs yesterday" />
                         </div>
                         <div v-if="analyticsStore.subscriberInsights?.daily?.recurring != null" class="w-full">
                           <SparkLine :data="[5, 6, 5, 4, 5, 6, 7, 6, 5, 6]" color="#22c55e" :width="70" :height="28" />
@@ -168,23 +133,24 @@
                   <!-- hover-overlay -->
                   <div
                     class="absolute hidden group-hover/container:flex items-start justify-end w-full h-full top-0 left-0 z-[10000]">
-                    <button @click="openFans"
-                      class="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-light-bg-button dark:bg-dark-bg-button [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover/container:bg-light-primary dark:hover/container:bg-dark-primaryHover">
-                      <span
-                        class="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary group-hover/button:text-white dark:group-hover/button:text-[#e8e6e3]">Trend</span>
-                      <span>
-                        <img src="/dev/cdn/analytics/icons/icon-3.webp" alt="expand"
-                          class="w-[.875rem] h-[.875rem] group-hover/button:[filter:brightness(0)_invert(1)]" />
-                      </span>
-                    </button>
+                    <DashboardPrimaryButton 
+                      variant="none"
+                      @click="openFans"
+                      customClass="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-transparent [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors"
+                      text="Trend"
+                      textClass="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary" :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
+                      <template #rightIcon>
+                        <span>
+                          <img src="/dev/cdn/analytics/icons/icon-3.webp" alt="expand"
+                            class="w-[.875rem] h-[.875rem]" />
+                        </span>
+                      </template>
+                    </DashboardPrimaryButton>
                   </div>
 
                   <!-- title -->
                   <div class="flex items-center gap-2">
-                    <h3 data-label="Fans"
-                      class="m-0 font-medium font-sans text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">
-                      Fans
-                    </h3>
+                    <h3 class="m-0 font-medium font-sans text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">Fans</h3>
                   </div>
 
                   <!-- data-content (new followers - profile visit) -->
@@ -201,26 +167,7 @@
                           <span :data-value="analyticsStore.fans?.daily?.newFollowers"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
                             {{ analyticsStore.fans?.daily?.newFollowers ?? '--' }}</span>
-                          <div v-if="
-                            analyticsStore.fans?.daily?.newFollowersPercentage !== undefined &&
-                            analyticsStore.fans?.daily?.newFollowersPercentage !== null
-                          ">
-
-
-                            <div class="flex flex-col items-end gap-1">
-                              <span class="flex gap-1 items-center">
-                                <img src="/dev/cdn/analytics/icons/icon-5.webp" alt="trend-down"
-                                  class="h-5 w-5" />
-                                <span
-                                  class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium">{{
-                                    Math.abs(analyticsStore.fans?.daily?.newFollowersPercentage) }}%</span>
-                              </span>
-                              <span
-                                class="text-light-text-secondary dark:text-dark-text-secondary leading-[1.125rem] text-xs">vs
-                                yesterday</span>
-                            </div>
-
-                          </div>
+                          <DashboardStatIndicator v-if="analyticsStore.fans?.daily?.newFollowersPercentage !== undefined && analyticsStore.fans?.daily?.newFollowersPercentage !== null" :percentage="analyticsStore.fans?.daily?.newFollowersPercentage" period-label="vs yesterday" />
                         </div>
                         <div v-if="analyticsStore.fans?.daily?.newFollowers != null" class="w-full">
                           <SparkLine :data="[8, 7, 6, 7, 5, 6, 4, 5, 4, 3]" color="#ef4444" :width="60" :height="24" />
@@ -277,23 +224,24 @@
                   <!-- hover-overlay -->
                   <div
                     class="absolute hidden group-hover/container:flex items-start justify-end w-full h-full top-0 left-0 z-[10000]">
-                    <button @click="openEarnings"
-                      class="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-light-bg-button dark:bg-dark-bg-button [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover/container:bg-light-primary dark:hover/container:bg-dark-primaryHover">
-                      <span
-                        class="text-xs font-medium leading-[1.125rem] font-sans text-light-primary dark:text-dark-primary group-hover/button:text-white dark:group-hover/button:text-[#e8e6e3]">Trend</span>
-                      <span>
-                        <img src="/dev/cdn/analytics/icons/icon-3.webp" alt="expand"
-                          class="w-[.875rem] h-[.875rem] group-hover/button:[filter:brightness(0)_invert(1)]" />
-                      </span>
-                    </button>
+                    <DashboardPrimaryButton 
+                      variant="none"
+                      @click="openEarnings"
+                      customClass="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-transparent [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors"
+                      text="Trend"
+                      textClass="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary" :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
+                      <template #rightIcon>
+                        <span>
+                          <img src="/dev/cdn/analytics/icons/icon-3.webp" alt="expand"
+                            class="w-[.875rem] h-[.875rem]" />
+                        </span>
+                      </template>
+                    </DashboardPrimaryButton>
                   </div>
 
                   <!-- title -->
                   <div class="flex items-center gap-2">
-                    <h3 data-label="Earnings"
-                      class="m-0 font-medium text-base leading-6 font-sans text-light-text-secondary dark:text-dark-text-secondary">
-                      Earnings
-                    </h3>
+                    <h3 class="m-0 font-medium text-base leading-6 font-sans text-light-text-secondary dark:text-dark-text-secondary">Earnings</h3>
                   </div>
 
                   <div class="flex justify-between items-end">
@@ -339,22 +287,23 @@
                   <!-- hover-overlay -->
                   <div
                     class="absolute hidden group-hover/container:flex items-start justify-end w-full h-full top-0 left-0 z-[10000]">
-                    <button @click="openLikes"
-                      class="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-light-bg-button dark:bg-dark-bg-button [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover/container:bg-light-primary dark:hover/container:bg-dark-primaryHover">
-                      <span
-                        class="text-xs font-medium leading-[1.125rem] font-sans text-light-primary dark:text-dark-primary group-hover/button:text-white dark:group-hover/button:text-[#e8e6e3]">Trend</span>
-                      <span>
-                        <img src="/dev/cdn/analytics/icons/icon-3.webp" alt="expand"
-                          class="w-[.875rem] h-[.875rem] group-hover/button:[filter:brightness(0)_invert(1)]" />
-                      </span>
-                    </button>
+                    <DashboardPrimaryButton 
+                      variant="none"
+                      @click="openLikes"
+                      customClass="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-transparent [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors"
+                      text="Trend"
+                      textClass="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary" :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
+                      <template #rightIcon>
+                        <span>
+                          <img src="/dev/cdn/analytics/icons/icon-3.webp" alt="expand"
+                            class="w-[.875rem] h-[.875rem]" />
+                        </span>
+                      </template>
+                    </DashboardPrimaryButton>
                   </div>
                   <!-- title -->
                   <div class="flex items-center gap-2">
-                    <h3 data-label="Likes"
-                      class="m-0 font-medium font-sans text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">
-                      Likes
-                    </h3>
+                    <h3 class="m-0 font-medium font-sans text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">Likes</h3>
                   </div>
 
                   <!-- data-content (media-merch) -->
@@ -525,23 +474,24 @@
                     <!-- hover-overlay -->
                     <div
                       class="absolute hidden group-hover/container:flex items-start justify-end w-full h-full top-0 left-0 z-[10000]">
-                      <button @click="openContributors"
-                        class="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-light-bg-button dark:bg-dark-bg-button [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover/container:bg-light-primary dark:hover/container:bg-dark-primaryHover">
-                        <span
-                          class="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary group-hover/button:text-white dark:group-hover/button:text-[#e8e6e3]">Trend</span>
+                      <DashboardPrimaryButton 
+                      variant="none"
+                      @click="openContributors"
+                      customClass="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-transparent [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors"
+                      text="Trend"
+                      textClass="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary" :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
+                      <template #rightIcon>
                         <span>
                           <img src="/dev/cdn/analytics/icons/icon-3.webp" alt="expand"
-                            class="w-[.875rem] h-[.875rem] group-hover/button:[filter:brightness(0)_invert(1)]" />
+                            class="w-[.875rem] h-[.875rem]" />
                         </span>
-                      </button>
+                      </template>
+                    </DashboardPrimaryButton>
                     </div>
 
                     <!-- title -->
                     <div class="flex items-center gap-2">
-                      <h3 data-label="Top Contributors"
-                        class="m-0 font-medium font-sans text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">
-                        Top Contributors
-                      </h3>
+                      <h3 class="m-0 font-medium font-sans text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">Top Contributors</h3>
                     </div>
                   </div>
 
@@ -598,13 +548,13 @@
             </div>
           </div>
         </div>
-      </DashboardAnalyticsMainCardWrapper>
+      </DashboardSectionWrapper>
 
       <!-- Orders Received section -->
       <DashboardAnalyticsOrdersReceivedTable />
 
       <!-- Trends Section -->
-      <DashboardAnalyticsMainCardWrapper>
+      <DashboardSectionWrapper>
         <div class="relative gap-6 flex flex-col">
           <!-- section-header -->
           <div class="flex flex-col gap-4 sm:flex-row px-4 pt-4 pb-0 justify-between items-start md:items-center">
@@ -626,52 +576,11 @@
               <span class="text-sm leading-5 font-sans text-light-text-quaternary dark:text-dark-text-quaternary">{{ $t('dashboard.analytics.page.lastUpdated') }}
                 <span class="text-sm leading-5 font-sans text-light-text-quaternary dark:text-dark-text-quaternary">7:14
                   PM</span></span>
-              <button
-                class="group flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-light-bg-button dark:bg-dark-bg-button [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none hover:bg-light-primary dark:hover:bg-dark-primaryHover [outline: none] border-0">
-                <span>
-                  <img src="/dev/cdn/analytics/icons/icon-2.webp" alt="refresh"
-                    class="w-[.875rem] h-[.875rem] group-hover:[filter:brightness(0)_invert(1)]" />
-                </span>
-                <span
-                  class="text-xs font-medium font-sans leading-[1.125rem] text-light-primary dark:text-dark-primary group-hover:text-white dark:group-hover:text-[#e8e6e3]">Refresh</span>
-              </button>
+              <DashboardPrimaryButton variant="none" text="Refresh" / :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
             </div> -->
 
               <!-- tabs -->
-              <div
-                class="trends-tabs-wrapper hidden md:flex w-full lg:w-auto bg-white/30 rounded-lg justify-start items-start overflow-hidden border border-gray-200">
-                <div v-for="tab in trendsTabs" :key="tab" @click="selectedTrendTab = tab" :data-value="tab" :class="[
-                  'flex-1 lg:flex-initial whitespace-nowrap trends-tabs-wrapper-button cursor-pointer h-full px-4 py-2 flex justify-center items-center gap-2 transition-all font-[\'Poppins\'] text-sm outline-none border-r border-gray-200 last:border-r-0',
-                  selectedTrendTab === tab ? 'bg-gray-50 text-gray-800 font-bold' : 'bg-transparent text-gray-500 font-medium hover:bg-gray-50'
-                ]">
-                  {{ tab }}
-                </div>
-              </div>
-
-              <!-- select-dropdown -->
-              <div class="md:hidden relative w-full sm:w-auto">
-                <button @click="isTrendDropdownOpen = !isTrendDropdownOpen" data-label="Trend Dropdown"
-                  class="w-full sm:w-[200px] px-4 py-2 bg-white/70 backdrop-blur-md border border-gray-200 rounded-lg flex justify-center gap-2 items-center outline-none hover:bg-white/90 transition-colors">
-                  <span class="text-gray-900 font-semibold text-sm">{{ selectedTrendTab }}</span>
-                  <div class="w-4 h-4 flex items-center justify-center transition-transform"
-                    :class="{ 'rotate-180': isTrendDropdownOpen }">
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M2.5 4.5L6 8L9.5 4.5" stroke="#667085" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                    </svg>
-                  </div>
-                </button>
-                <div v-if="isTrendDropdownOpen"
-                  class="absolute right-0 z-20 w-full sm:w-[200px] top-full mt-1.5 bg-white/90 backdrop-blur-md border border-gray-200 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden animate-in fade-in zoom-in duration-200">
-                  <div v-for="tab in trendsTabs" :key="tab" @click="selectedTrendTab = tab; isTrendDropdownOpen = false"
-                    :class="[
-                      'px-4 py-3 text-sm transition-colors cursor-pointer text-center',
-                      selectedTrendTab === tab ? 'bg-blue-50/80 text-blue-700 font-bold' : 'text-gray-600 hover:bg-gray-50/80'
-                    ]">
-                    {{ tab }}
-                  </div>
-                </div>
-              </div>
+              <DashboardTabs v-model="selectedTrendTab" :tabs="trendsTabs" />
             </div>
           </div>
 
@@ -688,7 +597,7 @@
 
 
         </div>
-      </DashboardAnalyticsMainCardWrapper>
+      </DashboardSectionWrapper>
 
       <!-- Subscribers popup -->
       <DashboardAnalyticsSubscribersTrendPopup v-model="isSubscribersOpen" v-model:period="subscribersPeriod"
@@ -717,9 +626,11 @@
 </template>
 
 <script setup>
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue'
 import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/DashboardSharedTwoColLayout.vue'
+import DashboardHeader from '@/components/ui/nav/AnalyticsDashboardDesktopHeaderPart.vue'
 import DashboardOrderCard from '@/components/ui/card/dashboard/DashboardOrderCard.vue'
-import DashboardAnalyticsMainCardWrapper from '@/components/ui/card/dashboard/DashboardAnalyticsMainCardWrapper.vue'
+import DashboardSectionWrapper from '@/components/ui/card/dashboard/DashboardSectionWrapper.vue'
 import DashboardTrendCard from '@/components/ui/card/dashboard/DashboardTrendCard.vue'
 import DashboardTrendContent from '@/components/ui/card/dashboard/DashboardTrendContent.vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
@@ -740,6 +651,8 @@ import DashboardAnalyticsTopTagsTable from '@/dev/components/ui/table/dashboard/
 import DashboardAnalyticsTopMerchTable from '@/dev/components/ui/table/dashboard/analytics-tables/DashboardAnalyticsTopMerchTable.vue'
 import DashboardAnalyticsTopCountriesTable from '@/dev/components/ui/table/dashboard/analytics-tables/DashboardAnalyticsTopCountriesTable.vue'
 import SparkLine from '@/components/ui/charts/SparkLine.vue'
+import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue'
+import DashboardStatIndicator from '@/components/ui/badge/dashboard/DashboardStatIndicator.vue'
 
 const analyticsStore = useDashboardAnalyticsStore()
 const { lastUpdated } = storeToRefs(analyticsStore)

@@ -85,7 +85,7 @@
         </p>
 
         <!-- Signup button -->
-        <PrimaryButton :text="buttonText" variant="authPink" size="lg" type="submit"
+        <DashboardPrimaryButton :text="buttonText" variant="authPink" size="lg" type="submit"
           :disabled="isLoading || !isCognitoScriptReady || usernameChecking" />
       </form>
     </div>
@@ -105,7 +105,7 @@ import { getActiveLocale } from "@/systems/i18n/localeManager.js"
 import BaseHeading from "@/components/ui/typography/BaseHeading.vue"
 import BaseParagraph from "@/components/ui/typography/BaseParagraph.vue"
 import AuthTextInput from "@/components/forms/inputs/AuthTextInput.vue"
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue"
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue"
 import apiWrapper from "@/lib/mock-api-demo/apiWrapper.js"
 import { userIdUtility } from "@/lib/mock-api-demo/utilities/userId.js"
 

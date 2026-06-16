@@ -144,7 +144,7 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <PrimaryButton
+        <DashboardPrimaryButton
           text="Validate all fields"
           variant="authPink"
           size="lg"
@@ -161,7 +161,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { InformationCircleIcon } from '@heroicons/vue/24/outline';
 import AuthTextInput from '@/components/forms/inputs/AuthTextInput.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
-import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import { registerAllowedScript, unregisterAllowedScript } from '@/interactions';
 
 const showcaseEmail = ref('user+tag@sub.example.co.uk');

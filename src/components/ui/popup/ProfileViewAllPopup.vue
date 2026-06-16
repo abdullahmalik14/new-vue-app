@@ -44,7 +44,7 @@
         <!-- tablet-nav -->
         <div class="hidden justify-between items-center gap-2 p-4 relative md:flex xl:hidden">
           <!-- back-button -->
-          <PrimaryButton @click="emit('update:modelValue', false)" text="Back" variant="profileMediaBtn"
+          <DashboardPrimaryButton @click="emit('update:modelValue', false)" text="Back" variant="profileMediaBtn"
             :leftIcon="'https://i.ibb.co.com/HLCwss7q/arrow-left.webp'"
             :leftIconClass="`w-8 h-8 [filter:brightness(0)_saturate(100%)_invert(81%)_sepia(45%)_saturate(3798%)_hue-rotate(87deg)_brightness(100%)_contrast(98%)] drop-shadow-[0px_0px_8px_0px_#00000080]`"
             class="bg-black/90" />
@@ -250,10 +250,13 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import BasePopup from "./BasePopup.vue";
 import { onMounted, onUnmounted, ref, computed } from "vue";
 import MediaCardV1 from "@/components/ui/media/media-cards/MediaCardV1.vue";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
 
 const props = defineProps({
