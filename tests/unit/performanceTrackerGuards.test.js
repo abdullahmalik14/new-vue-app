@@ -79,7 +79,7 @@ describe('performanceTracker guards (S-05)', () => {
       { isAuthenticated: false, userRole: 'guest' },
     );
 
-    expect(result.allow).toBe(true);
+    expect(result.isNavigationAllowed).toBe(true);
   });
 
   it('routeConfigLoader getRouteConfiguration works without performanceTracker (B1)', async () => {

@@ -5,7 +5,7 @@ import {
   createRedirectFromRouteRecords,
   findDuplicateRoutePathClaims,
   normalizeRoutePath,
-  routeConfigMatchesPath,
+  doesRouteConfigMatchPath,
 } from '../../src/systems/routing/routeAliasResolver.js';
 
 describe('routeAliases (M8)', () => {
@@ -26,15 +26,15 @@ describe('routeAliases (M8)', () => {
     ]);
   });
 
-  it('routeConfigMatchesPath resolves slug and aliases', () => {
+  it('doesRouteConfigMatchPath resolves slug and aliases', () => {
     const route = {
       slug: '/log-in',
       aliases: ['/sign-in'],
     };
 
-    expect(routeConfigMatchesPath(route, '/log-in')).toBe(true);
-    expect(routeConfigMatchesPath(route, '/sign-in')).toBe(true);
-    expect(routeConfigMatchesPath(route, '/login')).toBe(false);
+    expect(doesRouteConfigMatchPath(route, '/log-in')).toBe(true);
+    expect(doesRouteConfigMatchPath(route, '/sign-in')).toBe(true);
+    expect(doesRouteConfigMatchPath(route, '/login')).toBe(false);
   });
 
   it('createRedirectFromRouteRecords builds locale-aware redirects', () => {

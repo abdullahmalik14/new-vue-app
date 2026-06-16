@@ -5,10 +5,7 @@ import {
   isValidRouteEnvAccess,
   ROUTE_ENV_ACCESS,
 } from '../../src/systems/routing/routeEnvAccess.js';
-import {
-  guardCheckRouteEnvironmentAccess,
-  guardCheckRouteEnabled,
-} from '../../src/systems/routing/routeGuards.js';
+import { guardCheckRouteEnvironmentAccess } from '../../src/systems/routing/routeGuards.js';
 
 describe('routeEnvAccess S1 — development-only routes', () => {
   it('accepts valid envAccess values', () => {
@@ -62,11 +59,11 @@ describe('routeGuards S1 — guardCheckRouteEnvironmentAccess envAccess', () => 
     const result = guardCheckRouteEnvironmentAccess(route);
 
     if (import.meta.env.DEV) {
-      expect(result.allow).toBe(true);
+      expect(result.isNavigationAllowed).toBe(true);
     } else {
-      expect(result.allow).toBe(false);
-      expect(result.redirectTo).toBe('/404');
-      expect(result.reason).toContain('environment');
+      expect(result.isNavigationAllowed).toBe(false);
+      expect(result.redirectTargetPath).toBe('/404');
+      expect(result.blockReason).toContain('environment');
     }
   });
 });
@@ -81,13 +78,7 @@ describe('routeGuards B3 — enabled: false excluded at route generation', () =>
 
     const result = guardCheckRouteEnvironmentAccess(route);
 
-    expect(result.allow).toBe(true);
-    expect(result.reason).toContain('environment');
-  });
-
-  it('deprecated guardCheckRouteEnabled alias delegates to environment access', () => {
-    const route = { slug: '/about', enabled: false };
-
-    expect(guardCheckRouteEnabled(route).allow).toBe(true);
+    expect(result.isNavigationAllowed).toBe(true);
+    expect(result.blockReason).toContain('environment');
   });
 });

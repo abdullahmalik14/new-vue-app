@@ -525,4 +525,44 @@ npm run test:unit -- --run tests/unit/assetMapBuildValidation.test.js tests/unit
 
 ---
 
+## Phase 4.1 — Routing core symbol renames (2026-06-16)
+
+**Master plan:** Phase 4, batch 1 — routing core methods and guard result shape  
+**Audit reference:** [route-naming-audit-batch-1.md](./route-naming-audit-batch-1.md)
+
+### What changed
+
+**`routeGuards.js`**
+- `guardCheckUserRole` → `guardCheckRouteUserRole`
+- Guard result shape: `allow` → `isNavigationAllowed`, `redirectTo` → `redirectTargetPath`, `reason` → `blockReason`
+- Removed deprecated `guardCheckRouteEnabled` alias (use `guardCheckRouteEnvironmentAccess`)
+
+**`routeAliasResolver.js`**
+- `routeConfigMatchesPath` → `doesRouteConfigMatchPath`
+- Internal `register` → `registerPathClaim` in path-claim collectors
+
+**`routeResolver.js`**
+- `matchWildcardRoute` → `isPathMatchingWildcardRoute` (module-private)
+
+**`routeNavigation.js`**
+- `snapshotRouteConfig` → `createRouteConfigSnapshot` (module-private)
+
+Updated consumers: `createAppRouter.js`, `index.js`, 10 unit test files.
+
+### How tested
+
+```bash
+rg "guardCheckUserRole|guardCheckRouteEnabled|routeConfigMatchesPath|matchWildcardRoute|snapshotRouteConfig" src/ tests/   # zero hits
+npm run test:unit -- --run tests/unit/routeGuards.test.js tests/unit/routeAliases.test.js tests/unit/routeChain.test.js tests/unit/routeNavigation.test.js   # 52 passed (10 files)
+npm run build   # succeeds
+```
+
+### Suggested commit
+
+```
+refactor(routing): rename routing core guard and resolver symbols
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

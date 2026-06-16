@@ -35,9 +35,9 @@ describe('guardCheckRouteAdminAccess (M11)', () => {
       { userRole: 'creator', isAuthenticated: true },
     );
 
-    expect(result.allow).toBe(false);
-    expect(result.redirectTo).toBe('/404');
-    expect(result.reason).toContain('admin');
+    expect(result.isNavigationAllowed).toBe(false);
+    expect(result.redirectTargetPath).toBe('/404');
+    expect(result.blockReason).toContain('admin');
   });
 
   it('allows admin users through', () => {
@@ -46,6 +46,6 @@ describe('guardCheckRouteAdminAccess (M11)', () => {
       { userRole: 'admin', isAuthenticated: true },
     );
 
-    expect(result.allow).toBe(true);
+    expect(result.isNavigationAllowed).toBe(true);
   });
 });

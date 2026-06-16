@@ -514,7 +514,7 @@ router.beforeEach(async (to, from, next) => {
   const guardResult = await runAllRouteGuards(effectiveRouteConfig, effectiveFromRouteConfig, guardContext);
 
   // Handle guard result
-  if (guardResult.allow) {
+  if (guardResult.isNavigationAllowed) {
     log('createAppRouter.js', 'beforeEach', 'allow', 'Navigation allowed by guards', { to: to.path });
   trackStep({
           step: 'navigationAllowed',
@@ -528,20 +528,20 @@ router.beforeEach(async (to, from, next) => {
   } else {
     log('createAppRouter.js', 'beforeEach', 'block', 'Navigation blocked by guards', {
       to: to.path,
-      reason: guardResult.reason,
-      redirectTo: guardResult.redirectTo
+      blockReason: guardResult.blockReason,
+      redirectTargetPath: guardResult.redirectTargetPath
     });
   trackStep({
           step: 'navigationBlocked',
           file: 'createAppRouter.js',
           method: 'beforeEach',
           flag: 'nav-block',
-          purpose: `Navigation blocked: ${guardResult.reason}`
+          purpose: `Navigation blocked: ${guardResult.blockReason}`
         });
 
-    if (guardResult.redirectTo) {
+    if (guardResult.redirectTargetPath) {
       markGuardRedirectNavigation();
-      next(guardResult.redirectTo);
+      next(guardResult.redirectTargetPath);
     } else {
       failNavigationProgress();
       next(false);

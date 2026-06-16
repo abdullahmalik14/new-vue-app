@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  guardCheckUserRole,
+  guardCheckRouteUserRole,
   guardCheckDependencies,
 } from '../../src/systems/routing/routeGuards.js';
 
@@ -27,14 +27,14 @@ describe('routeGuards L6 — supportedRoles vs dependencies.roles', () => {
   });
 
   it('role guard allows non-creator when dependencies.roles entry exists', () => {
-    const result = guardCheckUserRole(kycRoute, {
+    const result = guardCheckRouteUserRole(kycRoute, {
       userRole: 'vendor',
       userProfile: { role: 'vendor', onboardingPassed: false },
       isAuthenticated: true,
     });
 
-    expect(result.allow).toBe(true);
-    expect(result.reason).toContain('dependency check');
+    expect(result.isNavigationAllowed).toBe(true);
+    expect(result.blockReason).toContain('dependency check');
   });
 
   it('dependency guard blocks non-creator when no dependency redirect applies (L6)', () => {
@@ -44,9 +44,9 @@ describe('routeGuards L6 — supportedRoles vs dependencies.roles', () => {
       isAuthenticated: true,
     });
 
-    expect(result.allow).toBe(false);
-    expect(result.redirectTo).toBe('/404');
-    expect(result.reason).toContain('not authorized');
+    expect(result.isNavigationAllowed).toBe(false);
+    expect(result.redirectTargetPath).toBe('/404');
+    expect(result.blockReason).toContain('not authorized');
   });
 
   it('dependency guard redirects non-creator when redirectIfComplete applies', () => {
@@ -56,8 +56,8 @@ describe('routeGuards L6 — supportedRoles vs dependencies.roles', () => {
       isAuthenticated: true,
     });
 
-    expect(result.allow).toBe(false);
-    expect(result.redirectTo).toBe('/dashboard');
+    expect(result.isNavigationAllowed).toBe(false);
+    expect(result.redirectTargetPath).toBe('/dashboard');
   });
 
   it('dependency guard allows creator in supportedRoles when deps met', () => {
@@ -71,7 +71,7 @@ describe('routeGuards L6 — supportedRoles vs dependencies.roles', () => {
       isAuthenticated: true,
     });
 
-    expect(result.allow).toBe(true);
+    expect(result.isNavigationAllowed).toBe(true);
   });
 });
 
@@ -129,7 +129,7 @@ describe('routeGuards onboarding redirect loop (L13 follow-up)', () => {
       isAuthenticated: true,
     });
 
-    expect(result.allow).toBe(true);
+    expect(result.isNavigationAllowed).toBe(true);
   });
 
   it('dashboard still sends incomplete onboarding to /sign-up/onboarding', () => {
@@ -143,8 +143,8 @@ describe('routeGuards onboarding redirect loop (L13 follow-up)', () => {
       isAuthenticated: true,
     });
 
-    expect(result.allow).toBe(false);
-    expect(result.redirectTo).toBe('/sign-up/onboarding');
+    expect(result.isNavigationAllowed).toBe(false);
+    expect(result.redirectTargetPath).toBe('/sign-up/onboarding');
   });
 
   it('onboarding redirects to kyc when onboarding complete and kyc incomplete', () => {
@@ -158,7 +158,7 @@ describe('routeGuards onboarding redirect loop (L13 follow-up)', () => {
       isAuthenticated: true,
     });
 
-    expect(result.allow).toBe(false);
-    expect(result.redirectTo).toBe('/sign-up/onboarding/kyc');
+    expect(result.isNavigationAllowed).toBe(false);
+    expect(result.redirectTargetPath).toBe('/sign-up/onboarding/kyc');
   });
 });

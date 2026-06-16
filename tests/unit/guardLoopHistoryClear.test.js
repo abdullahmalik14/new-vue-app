@@ -60,7 +60,7 @@ describe('L5 — guard loop history clear policy', () => {
     guardPreventNavigationLoop(route, from);
     const blocked = guardPreventNavigationLoop(route, from);
 
-    expect(blocked.allow).toBe(false);
-    expect(blocked.reason).toBe('Navigation loop detected');
+    expect(blocked.isNavigationAllowed).toBe(false);
+    expect(blocked.blockReason).toBe('Navigation loop detected');
   });
 });

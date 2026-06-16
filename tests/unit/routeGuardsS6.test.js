@@ -32,9 +32,9 @@ describe('routeGuards S6 — guard chain exception handling', () => {
       },
     );
 
-    expect(result.allow).toBe(false);
-    expect(result.redirectTo).toBe('/404');
-    expect(result.reason).toBe('Guard execution failed');
+    expect(result.isNavigationAllowed).toBe(false);
+    expect(result.redirectTargetPath).toBe('/404');
+    expect(result.blockReason).toBe('Guard execution failed');
     expect(result.errorCode).toBe('GUARD_CHAIN_FAILURE');
     expect(reportSpy).toHaveBeenCalledWith(
       'routeGuards.js',

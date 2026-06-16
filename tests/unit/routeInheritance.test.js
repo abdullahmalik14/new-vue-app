@@ -60,9 +60,9 @@ describe('S4 — inheritConfigFromParent requiresAuth', () => {
       userProfile: {},
     });
 
-    expect(result.allow).toBe(false);
-    expect(result.redirectTo).toBe('/log-in');
-    expect(result.reason).toBe('Authentication required');
+    expect(result.isNavigationAllowed).toBe(false);
+    expect(result.redirectTargetPath).toBe('/log-in');
+    expect(result.blockReason).toBe('Authentication required');
   });
 
   it('returns route unchanged when inheritConfigFromParent is false', () => {

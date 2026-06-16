@@ -25,7 +25,7 @@ const MAX_HISTORY_ENTRIES = 100;
  * @param {object|null|undefined} route
  * @returns {object|null}
  */
-function snapshotRouteConfig(route) {
+function createRouteConfigSnapshot(route) {
   if (!route) {
     return null;
   }
@@ -58,14 +58,14 @@ export function setCurrentActiveRoute(route) {
     previousActiveRoute = currentActiveRoute;
   }
 
-  const routeSnapshot = snapshotRouteConfig(route);
+  const routeSnapshot = createRouteConfigSnapshot(route);
 
   // Set new current (snapshot — not shared with meta.routeConfig reference)
   currentActiveRoute = routeSnapshot;
 
   // Parent chain for breadcrumbs / path introspection (A7)
   currentRouteChain = route?.slug
-    ? getRouteChainForPath(route.slug).map(snapshotRouteConfig).filter(Boolean)
+    ? getRouteChainForPath(route.slug).map(createRouteConfigSnapshot).filter(Boolean)
     : [];
 
   // Add to history

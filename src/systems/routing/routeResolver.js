@@ -20,7 +20,7 @@
 import { getRouteConfiguration } from './routeConfigLoader.js';
 import { log } from '../../infrastructure/logging/logHandler.js';
 import { deepMergePreferChild, safelyGetNestedProperty } from '../../utils/common/objectSafety.js';
-import { routeConfigMatchesPath } from './routeAliasResolver.js';
+import { doesRouteConfigMatchPath } from './routeAliasResolver.js';
 import { trackStep } from '../../infrastructure/logging/performanceTrackerAccess.js';
 
 /**
@@ -45,7 +45,7 @@ export function resolveRouteFromPath(targetPath) {
 
   // Try exact match first
   for (const route of allRoutes) {
-    if (routeConfigMatchesPath(route, targetPath)) {
+    if (doesRouteConfigMatchPath(route, targetPath)) {
       log('routeResolver.js', 'resolveRouteFromPath', 'exact-match', 'Exact route match found', {
         slug: route.slug,
         section: route.section
@@ -69,7 +69,7 @@ export function resolveRouteFromPath(targetPath) {
   for (const route of allRoutes) {
     if (route.slug.includes(':') || route.slug.includes('*')) {
       // Simple wildcard matching - can be enhanced with path-to-regexp
-      const wildcardMatch = matchWildcardRoute(targetPath, route.slug);
+      const wildcardMatch = isPathMatchingWildcardRoute(targetPath, route.slug);
       
       if (wildcardMatch) {
         log('routeResolver.js', 'resolveRouteFromPath', 'wildcard-match', 'Wildcard route match found', {
@@ -119,7 +119,7 @@ export function resolveExactRouteFromPath(targetPath) {
   const allRoutes = getRouteConfiguration();
 
   for (const route of allRoutes) {
-    if (routeConfigMatchesPath(route, targetPath)) {
+    if (doesRouteConfigMatchPath(route, targetPath)) {
       return route;
     }
   }
@@ -135,7 +135,7 @@ export function resolveExactRouteFromPath(targetPath) {
  * @param {string} routePattern - Route pattern with wildcards
  * @returns {boolean} - True if path matches pattern
  */
-function matchWildcardRoute(targetPath, routePattern) {
+function isPathMatchingWildcardRoute(targetPath, routePattern) {
   // Handle catch-all pattern
   if (routePattern === '/:pathMatch(.*)*') {
     return true;

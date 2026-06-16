@@ -91,7 +91,7 @@ function arePrerequisiteDependenciesMet(depKey, roleDependencies, userProfile) {
  * @param {object} toRoute - Target route object
  * @param {object} fromRoute - Current route object
  * @param {object} context - Additional context (user, auth state, etc.)
- * @returns {object} - Guard result { allow: boolean, redirectTo: string|null, reason: string }
+ * @returns {object} - Guard result { isNavigationAllowed: boolean, redirectTargetPath: string|null, blockReason: string }
  */
 export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
   log("routeGuards.js", "runAllRouteGuards", "start", "Starting guard chain", {
@@ -111,7 +111,7 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
 
     // 1. Check for navigation loops
     const loopGuard = guardPreventNavigationLoop(toRoute, fromRoute);
-    if (!loopGuard.allow) {
+    if (!loopGuard.isNavigationAllowed) {
       log(
         "routeGuards.js",
         "runAllRouteGuards",
@@ -124,7 +124,7 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
 
     // 2. Check environment access (envAccess only — enabled: false handled at route generation)
     const envGuard = guardCheckRouteEnvironmentAccess(toRoute);
-    if (!envGuard.allow) {
+    if (!envGuard.isNavigationAllowed) {
       log(
         "routeGuards.js",
         "runAllRouteGuards",
@@ -137,7 +137,7 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
 
     // 3. Check authentication requirements
     const authGuard = guardCheckAuthentication(toRoute, context);
-    if (!authGuard.allow) {
+    if (!authGuard.isNavigationAllowed) {
       log(
         "routeGuards.js",
         "runAllRouteGuards",
@@ -150,7 +150,7 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
 
     // 4. Check admin-only routes (M11)
     const adminGuard = guardCheckRouteAdminAccess(toRoute, context);
-    if (!adminGuard.allow) {
+    if (!adminGuard.isNavigationAllowed) {
       log(
         "routeGuards.js",
         "runAllRouteGuards",
@@ -162,8 +162,8 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
     }
 
     // 5. Check role requirements
-    const roleGuard = guardCheckUserRole(toRoute, context);
-    if (!roleGuard.allow) {
+    const roleGuard = guardCheckRouteUserRole(toRoute, context);
+    if (!roleGuard.isNavigationAllowed) {
       log(
         "routeGuards.js",
         "runAllRouteGuards",
@@ -176,7 +176,7 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
 
     // 6. Check dependencies (onboarding, KYC, etc.)
     const dependencyGuard = guardCheckDependencies(toRoute, context);
-    if (!dependencyGuard.allow) {
+    if (!dependencyGuard.isNavigationAllowed) {
       log(
         "routeGuards.js",
         "runAllRouteGuards",
@@ -189,9 +189,9 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
 
     // All guards passed
     const guardResult = {
-      allow: true,
-      redirectTo: null,
-      reason: "All guards passed",
+      isNavigationAllowed: true,
+      redirectTargetPath: null,
+      blockReason: "All guards passed",
     };
 
     // Track guard chain completion
@@ -234,9 +234,9 @@ export async function runAllRouteGuards(toRoute, fromRoute, context = {}) {
     });
 
     const guardErrorResult = {
-      allow: false,
-      redirectTo: getDefaultGuardErrorSlug(),
-      reason: "Guard execution failed",
+      isNavigationAllowed: false,
+      redirectTargetPath: getDefaultGuardErrorSlug(),
+      blockReason: "Guard execution failed",
       errorCode: "GUARD_CHAIN_FAILURE",
     };
 
@@ -282,9 +282,9 @@ export function guardPreventNavigationLoop(toRoute, fromRoute) {
   // This prevents false positives from legitimate user navigation between different pages
   if (toRoute?.slug !== fromRoute?.slug) {
     const result = {
-      allow: true,
-      redirectTo: null,
-      reason: "No loop – different path",
+      isNavigationAllowed: true,
+      redirectTargetPath: null,
+      blockReason: "No loop – different path",
     };
     log(
       "routeGuards.js",
@@ -333,9 +333,9 @@ export function guardPreventNavigationLoop(toRoute, fromRoute) {
     });
 
     const result = {
-      allow: false,
-      redirectTo: getDefaultNotFoundSlug(),
-      reason: "Navigation loop detected",
+      isNavigationAllowed: false,
+      redirectTargetPath: getDefaultNotFoundSlug(),
+      blockReason: "Navigation loop detected",
     };
 
     log(
@@ -349,7 +349,7 @@ export function guardPreventNavigationLoop(toRoute, fromRoute) {
   }
 
   // No loop detected
-  const result = { allow: true, redirectTo: null, reason: "No loop detected" };
+  const result = { isNavigationAllowed: true, redirectTargetPath: null, blockReason: "No loop detected" };
   log(
     "routeGuards.js",
     "guardPreventNavigationLoop",
@@ -399,9 +399,9 @@ export function guardCheckRouteEnvironmentAccess(route) {
     );
 
     const result = {
-      allow: false,
-      redirectTo: getDefaultNotFoundSlug(),
-      reason: "Route not available in this environment",
+      isNavigationAllowed: false,
+      redirectTargetPath: getDefaultNotFoundSlug(),
+      blockReason: "Route not available in this environment",
     };
 
     log(
@@ -415,9 +415,9 @@ export function guardCheckRouteEnvironmentAccess(route) {
   }
 
   const result = {
-    allow: true,
-    redirectTo: null,
-    reason: "Route available in this environment",
+    isNavigationAllowed: true,
+    redirectTargetPath: null,
+    blockReason: "Route available in this environment",
   };
   log(
     "routeGuards.js",
@@ -428,12 +428,6 @@ export function guardCheckRouteEnvironmentAccess(route) {
   );
   return result;
 }
-
-/** @deprecated Use guardCheckRouteEnvironmentAccess — enabled flag is handled at route generation (B3). */
-export function guardCheckRouteEnabled(route) {
-  return guardCheckRouteEnvironmentAccess(route);
-}
-
 /**
  * Check authentication requirements
  * Verifies if user is authenticated when route requires it
@@ -480,9 +474,9 @@ export function guardCheckAuthentication(route, context) {
       const redirectPath = route.redirectIfNotAuth || getDefaultLoginSlug();
 
       const result = {
-        allow: false,
-        redirectTo: redirectPath,
-        reason: "Authentication required",
+        isNavigationAllowed: false,
+        redirectTargetPath: redirectPath,
+        blockReason: "Authentication required",
       };
 
       log(
@@ -505,14 +499,14 @@ export function guardCheckAuthentication(route, context) {
       "Authenticated user accessing login page, redirecting",
       {
         slug: route.slug,
-        redirectTo: route.redirectIfLoggedIn,
+        redirectTargetPath: route.redirectIfLoggedIn,
       },
     );
 
     const result = {
-      allow: false,
-      redirectTo: route.redirectIfLoggedIn,
-      reason: "Already authenticated",
+      isNavigationAllowed: false,
+      redirectTargetPath: route.redirectIfLoggedIn,
+      blockReason: "Already authenticated",
     };
 
     log(
@@ -526,9 +520,9 @@ export function guardCheckAuthentication(route, context) {
   }
 
   const result = {
-    allow: true,
-    redirectTo: null,
-    reason: "Authentication check passed",
+    isNavigationAllowed: true,
+    redirectTargetPath: null,
+    blockReason: "Authentication check passed",
   };
   log(
     "routeGuards.js",
@@ -569,9 +563,9 @@ export function guardCheckRouteAdminAccess(route, context) {
 
   if (!isRouteAccessibleToAdmin(route, context)) {
     const result = {
-      allow: false,
-      redirectTo: getDefaultNotFoundSlug(),
-      reason: "Route requires admin access",
+      isNavigationAllowed: false,
+      redirectTargetPath: getDefaultNotFoundSlug(),
+      blockReason: "Route requires admin access",
     };
     log(
       "routeGuards.js",
@@ -584,9 +578,9 @@ export function guardCheckRouteAdminAccess(route, context) {
   }
 
   const result = {
-    allow: true,
-    redirectTo: null,
-    reason: "Admin access check passed",
+    isNavigationAllowed: true,
+    redirectTargetPath: null,
+    blockReason: "Admin access check passed",
   };
   log(
     "routeGuards.js",
@@ -606,10 +600,10 @@ export function guardCheckRouteAdminAccess(route, context) {
  * @param {object} context - Context with user role
  * @returns {object} - Guard result
  */
-export function guardCheckUserRole(route, context) {
+export function guardCheckRouteUserRole(route, context) {
   log(
     "routeGuards.js",
-    "guardCheckUserRole",
+    "guardCheckRouteUserRole",
     "start",
     "Checking user role requirements",
     {
@@ -621,7 +615,7 @@ export function guardCheckUserRole(route, context) {
   trackStep({
     step: "guardRoleCheck",
     file: "routeGuards.js",
-    method: "guardCheckUserRole",
+    method: "guardCheckRouteUserRole",
     flag: "role-check",
     purpose: "Check user role permissions",
   });
@@ -633,13 +627,13 @@ export function guardCheckUserRole(route, context) {
     route.supportedRoles.includes("all")
   ) {
     const result = {
-      allow: true,
-      redirectTo: null,
-      reason: "Route allows all roles",
+      isNavigationAllowed: true,
+      redirectTargetPath: null,
+      blockReason: "Route allows all roles",
     };
     log(
       "routeGuards.js",
-      "guardCheckUserRole",
+      "guardCheckRouteUserRole",
       "return",
       "Route allows all roles",
       result,
@@ -655,7 +649,7 @@ export function guardCheckUserRole(route, context) {
 
   log(
     "routeGuards.js",
-    "guardCheckUserRole",
+    "guardCheckRouteUserRole",
     "role-resolution",
     "Resolved user role",
     {
@@ -670,7 +664,7 @@ export function guardCheckUserRole(route, context) {
   if (!route.supportedRoles.includes(userRole)) {
     log(
       "routeGuards.js",
-      "guardCheckUserRole",
+      "guardCheckRouteUserRole",
       "warn",
       "User role not authorized for route",
       {
@@ -685,7 +679,7 @@ export function guardCheckUserRole(route, context) {
     if (context.isAuthenticated && userRole === "guest") {
       log(
         "routeGuards.js",
-        "guardCheckUserRole",
+        "guardCheckRouteUserRole",
         "info",
         "Authenticated user without role, redirecting to onboarding",
         {
@@ -694,14 +688,14 @@ export function guardCheckUserRole(route, context) {
       );
 
       const result = {
-        allow: false,
-        redirectTo: "/sign-up/onboarding",
-        reason: "User needs to complete onboarding to get role",
+        isNavigationAllowed: false,
+        redirectTargetPath: "/sign-up/onboarding",
+        blockReason: "User needs to complete onboarding to get role",
       };
 
       log(
         "routeGuards.js",
-        "guardCheckUserRole",
+        "guardCheckRouteUserRole",
         "return",
         "Returning redirect to onboarding",
         result,
@@ -714,7 +708,7 @@ export function guardCheckUserRole(route, context) {
     if (route.dependencies?.roles?.[userRole]) {
       log(
         "routeGuards.js",
-        "guardCheckUserRole",
+        "guardCheckRouteUserRole",
         "info",
         "Route has dependencies for this role, allowing through to dependency check",
         {
@@ -724,13 +718,13 @@ export function guardCheckUserRole(route, context) {
       );
 
       const result = {
-        allow: true,
-        redirectTo: null,
-        reason: "Allowing through to dependency check",
+        isNavigationAllowed: true,
+        redirectTargetPath: null,
+        blockReason: "Allowing through to dependency check",
       };
       log(
         "routeGuards.js",
-        "guardCheckUserRole",
+        "guardCheckRouteUserRole",
         "return",
         "Allowing through to dependency check",
         result,
@@ -739,14 +733,14 @@ export function guardCheckUserRole(route, context) {
     }
 
     const result = {
-      allow: false,
-      redirectTo: getDefaultNotFoundSlug(),
-      reason: `Role ${userRole} not authorized`,
+      isNavigationAllowed: false,
+      redirectTargetPath: getDefaultNotFoundSlug(),
+      blockReason: `Role ${userRole} not authorized`,
     };
 
     log(
       "routeGuards.js",
-      "guardCheckUserRole",
+      "guardCheckRouteUserRole",
       "return",
       "Returning role not authorized block",
       result,
@@ -754,10 +748,10 @@ export function guardCheckUserRole(route, context) {
     return result;
   }
 
-  const result = { allow: true, redirectTo: null, reason: "Role check passed" };
+  const result = { isNavigationAllowed: true, redirectTargetPath: null, blockReason: "Role check passed" };
   log(
     "routeGuards.js",
-    "guardCheckUserRole",
+    "guardCheckRouteUserRole",
     "return",
     "Role check passed",
     result,
@@ -794,7 +788,7 @@ export function guardCheckDependencies(route, context) {
 
   // If no dependencies, allow access
   if (!route.dependencies) {
-    const result = { allow: true, redirectTo: null, reason: "No dependencies" };
+    const result = { isNavigationAllowed: true, redirectTargetPath: null, blockReason: "No dependencies" };
     log(
       "routeGuards.js",
       "guardCheckDependencies",
@@ -808,9 +802,9 @@ export function guardCheckDependencies(route, context) {
   // If route doesn't require auth and user is a guest, skip dependencies
   if (route.requiresAuth === false && !context.isAuthenticated) {
     const result = {
-      allow: true,
-      redirectTo: null,
-      reason: "Guest on public route",
+      isNavigationAllowed: true,
+      redirectTargetPath: null,
+      blockReason: "Guest on public route",
     };
     log(
       "routeGuards.js",
@@ -940,9 +934,9 @@ export function guardCheckDependencies(route, context) {
         );
 
         const result = {
-          allow: false,
-          redirectTo: fallbackSlug || getDefaultDashboardSlug(),
-          reason: `Dependency already complete: ${depKey}`,
+          isNavigationAllowed: false,
+          redirectTargetPath: fallbackSlug || getDefaultDashboardSlug(),
+          blockReason: `Dependency already complete: ${depKey}`,
         };
 
         log(
@@ -975,9 +969,9 @@ export function guardCheckDependencies(route, context) {
         );
 
         const result = {
-          allow: false,
-          redirectTo: fallbackSlug || getDefaultDashboardSlug(),
-          reason: `Missing required dependency: ${depKey}`,
+          isNavigationAllowed: false,
+          redirectTargetPath: fallbackSlug || getDefaultDashboardSlug(),
+          blockReason: `Missing required dependency: ${depKey}`,
         };
 
         log(
@@ -1013,9 +1007,9 @@ export function guardCheckDependencies(route, context) {
     );
 
     const result = {
-      allow: false,
-      redirectTo: getDefaultNotFoundSlug(),
-      reason: `Role ${userRole} not authorized for route`,
+      isNavigationAllowed: false,
+      redirectTargetPath: getDefaultNotFoundSlug(),
+      blockReason: `Role ${userRole} not authorized for route`,
     };
 
     log(
@@ -1051,9 +1045,9 @@ export function guardCheckDependencies(route, context) {
       );
 
       const result = {
-        allow: false,
-        redirectTo: fallbackSlug,
-        reason: "Onboarding not completed",
+        isNavigationAllowed: false,
+        redirectTargetPath: fallbackSlug,
+        blockReason: "Onboarding not completed",
       };
 
       log(
@@ -1068,9 +1062,9 @@ export function guardCheckDependencies(route, context) {
   }
 
   const result = {
-    allow: true,
-    redirectTo: null,
-    reason: "All dependencies met",
+    isNavigationAllowed: true,
+    redirectTargetPath: null,
+    blockReason: "All dependencies met",
   };
   log(
     "routeGuards.js",

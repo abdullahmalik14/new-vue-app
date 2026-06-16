@@ -92,7 +92,7 @@ export function buildVueRouterAliases(aliases) {
  * @param {string} targetPath
  * @returns {boolean}
  */
-export function routeConfigMatchesPath(routeConfig, targetPath) {
+export function doesRouteConfigMatchPath(routeConfig, targetPath) {
   const normalizedTarget = normalizeRoutePath(targetPath);
   if (!normalizedTarget || !routeConfig) {
     return false;
@@ -154,7 +154,7 @@ export function createRedirectFromRouteRecords(route, options) {
 export function collectRoutePathClaims(routes) {
   const claims = new Map();
 
-  const register = (path, slug, kind) => {
+  const registerPathClaim = (path, slug, kind) => {
     if (!path) {
       return;
     }
@@ -165,15 +165,15 @@ export function collectRoutePathClaims(routes) {
   for (const route of routes) {
     const slug = normalizeRoutePath(route.slug);
     if (slug) {
-      register(slug, route.slug, 'slug');
+      registerPathClaim(slug, route.slug, 'slug');
     }
 
     for (const alias of normalizeAliasList(route.aliases)) {
-      register(alias, route.slug, 'alias');
+      registerPathClaim(alias, route.slug, 'alias');
     }
 
     for (const legacyPath of normalizeRedirectFromList(route.redirectFrom)) {
-      register(legacyPath, route.slug, 'redirectFrom');
+      registerPathClaim(legacyPath, route.slug, 'redirectFrom');
     }
   }
 
@@ -190,7 +190,7 @@ export function findDuplicateRoutePathClaims(routes) {
   const pathOwners = new Map();
   const duplicates = [];
 
-  const register = (path, slug, kind) => {
+  const registerPathClaim = (path, slug, kind) => {
     if (!path) {
       return;
     }
@@ -211,14 +211,14 @@ export function findDuplicateRoutePathClaims(routes) {
   };
 
   for (const route of routes) {
-    register(normalizeRoutePath(route.slug), route.slug, 'slug');
+    registerPathClaim(normalizeRoutePath(route.slug), route.slug, 'slug');
 
     for (const alias of normalizeAliasList(route.aliases)) {
-      register(alias, route.slug, 'alias');
+      registerPathClaim(alias, route.slug, 'alias');
     }
 
     for (const legacyPath of normalizeRedirectFromList(route.redirectFrom)) {
-      register(legacyPath, route.slug, 'redirectFrom');
+      registerPathClaim(legacyPath, route.slug, 'redirectFrom');
     }
   }
 
