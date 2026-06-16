@@ -61,9 +61,10 @@ vueApp-main-new/
 ├── docs/                    # Documentation (main docs)
 ├── src/                     # Application source code
 │   ├── components/          # Shared components
-│   ├── templates/           # Route-specific templates
-│   ├── utils/               # Utility functions
-│   ├── router/              # Routing configuration
+│   ├── dev/templates/       # Route page templates (@/dev/templates/…)
+│   ├── systems/routing/     # Route logic (guards, resolver, createAppRouter)
+│   ├── composables/         # useRoutePrefetch, etc.
+│   ├── router/              # routeConfig.json + thin index.js
 │   └── stores/              # Pinia state management
 ├── index.html               # Entry HTML file
 ├── vite.config.js           # Vite configuration
@@ -273,7 +274,7 @@ This app can be deployed to:
 | Build System | `build/README.md` | Build utilities and scripts |
 | Tailwind | `build/tailwind/README.md` | CSS generation system |
 | Utils | `src/utils/*/README.md` | Utility function documentation |
-| Router | `src/router/README.md` | Routing system documentation |
+| Router | [docs/route-tasks/RoutingExplained.md](docs/route-tasks/RoutingExplained.md) | Routing system (canonical) |
 
 ### Archived Documentation
 

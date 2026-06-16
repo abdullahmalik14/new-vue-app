@@ -817,4 +817,43 @@ refactor(routing): relocate route templates to canonical dev and dashboard folde
 
 ---
 
+## Phase 7 — Documentation audit (2026-06-16)
+
+**Master plan:** Phase 7 — align routing docs with post-refactor code  
+**Reports:** [loose-route-code-scan.md](./loose-route-code-scan.md) Issue 10, [systems-routing-audit.md](./systems-routing-audit.md) Issue 6
+
+### What changed
+
+**Canonical doc** — rewrote [RoutingExplained.md](./RoutingExplained.md):
+- Current folder layout (`createAppRouter.js`, `config/sharedAssetPreloads.json`, `@/dev/templates/`, composables prefetch)
+- Guard result shape `{ isNavigationAllowed, redirectTargetPath, blockReason }`
+- Component glob `@/components/**` + `@/dev/**` (no `@/templates/**`)
+- Navigation lifecycle symbol names after Phases 3–4
+- Replaced “Planned cleanup” with Phases 1–6 completion summary
+- Updated import map, file ownership, and agent maintenance checklist
+
+**Removed** stale routing READMEs (master plan: docs live only in RoutingExplained.md):
+- `src/router/README.md`
+- `src/systems/routing/README.md`
+
+**Redirect** — [docs/instruction/RoutingExplained.md](../instruction/RoutingExplained.md) now points to canonical doc.
+
+**Updated** — [route-code-index.md](./route-code-index.md) (paths, test status, config location), [README.md](../../README.md) API table.
+
+### How tested
+
+```bash
+rg "utils/route" docs/route-tasks/ tests/ src/router/ src/systems/routing/   # zero hits in active routing docs
+rg "router/README|routing/README" src/   # zero hits
+npm run build   # succeeds
+```
+
+### Suggested commit
+
+```
+docs(routing): align RoutingExplained with post-refactor architecture
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

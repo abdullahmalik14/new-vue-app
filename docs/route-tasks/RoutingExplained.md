@@ -1,8 +1,7 @@
 # Routing explained
 
-**Last updated:** 2026-06-10  
-**Audience:** Developers and AI agents working on navigation in this app.  
-**Project:** `new-vue-app-main/`
+**Last updated:** 2026-06-16  
+**Audience:** Developers and AI agents working on navigation in this app.
 
 | Section | Read this if you are… |
 |---------|------------------------|
@@ -11,8 +10,9 @@
 
 **Related docs**
 
-- Route JSON schema: [`new-vue-app-main/src/router/routeConfig.schema.md`](../new-vue-app-main/src/router/routeConfig.schema.md)
-- Work plan (moves, renames, order): [route-work-master-plan.md](./route-work-master-plan.md)
+- Route JSON schema: [`src/router/routeConfig.schema.md`](../../src/router/routeConfig.schema.md)
+- Refactor changelog: [route-cleanup-changelog.md](./route-cleanup-changelog.md)
+- Work plan (Phases 1–7): [route-work-master-plan.md](./route-work-master-plan.md)
 - Code index: [route-code-index.md](./route-code-index.md)
 - Naming audit: [route-naming-audit.md](./route-naming-audit.md)
 
@@ -35,36 +35,54 @@ You should **not** hard-code paths in `router/index.js`. Edit `routeConfig.json`
 ## Folder layout (current)
 
 ```text
-src/router/                    # Entry + config only (target: thin index.js)
-  index.js                     # createRouter + hooks (orchestration — being slimmed)
-  routeConfig.json             # All routes — single source of truth
-  routeDefaults.json           # Fallback slugs (/404, /log-in, /dashboard)
-  routeConfig.schema.md        # Field reference for routeConfig.json
-  sharedAssetPreloads.json     # Asset catalog (planned move to config/ or systems/assets/)
+src/router/                         # Entry + config only
+  index.js                          # Thin re-export of createAppRouter + prefetch exports
+  routeConfig.json                  # All routes — single source of truth
+  routeDefaults.json                # Fallback slugs (/404, /log-in, /dashboard)
+  routeConfig.schema.md             # Field reference for routeConfig.json
 
-src/systems/routing/           # Route logic (was src/utils/route/ — removed)
-  index.js                     # Barrel export
-  routeConfigLoader.js         # Load + validate + cache routeConfig
-  routeResolver.js             # Path → route, component, inheritance
-  routeGuards.js               # Guard pipeline
-  routeNavigation.js           # Active route + history
-  routeComponentLoader.js      # import.meta.glob map + findComponentLoader
-  routeAliases.js              # Aliases, redirectFrom, locale paths
-  navigationErrorHandler.js    # Chunk load recovery
-  scrollBehavior.js            # Scroll on navigate
-  routeTransition.js           # Transition names for App.vue
-  navigationProgress.js        # Top progress bar state
-  routeErrorBoundary.js        # Render error helpers (UI in RouteErrorBoundary.vue)
-  … (see route-code-index for full list)
+src/config/
+  sharedAssetPreloads.json          # Shared asset preload catalog (referenced by route config)
 
-src/app/main.js                # Installs router, startup section preload
-src/composables/               # useRoutePrefetch.js planned location
+src/systems/routing/                # Route logic (was src/utils/route/ — removed)
+  createAppRouter.js                # Router factory, hooks, route generation
+  routeConfigLoader.js              # Load + validate + cache routeConfig
+  routeResolver.js                  # Path → route, component, inheritance
+  routeGuards.js                    # Guard pipeline
+  routeNavigation.js                # Active route + history
+  routeComponentLoader.js           # import.meta.glob map + findComponentLoader
+  routeAliasResolver.js             # Aliases, redirectFrom, locale paths
+  routeComponentPreloader.js        # Component module prefetch
+  routeNavigationResourceLoader.js  # Current-section CSS/i18n/asset loads
+  navigationErrorHandler.js         # Chunk load recovery
+  scrollBehavior.js                 # Scroll on navigate
+  routeTransition.js                # Transition names for App.vue
+  navigationProgressTracker.js        # Top progress bar state
+  routeErrorBoundary.js             # Render error helpers
+  index.js                          # Barrel export
+  … (see route-code-index.md for full list)
+
+src/systems/assets/                 # Route asset preload (moved from systems/routing/)
+  routeAssetPreloader.js
+  routeAssetPreloadResolver.js
+  routeSectionAssetPreloadEntries.js
+
+src/composables/
+  useRoutePrefetch.js               # Combined component + section prefetch intent API
+
+src/dev/templates/                  # Route page templates (componentPath prefix @/dev/templates/…)
+  auth/page/*Page.vue               # Thin route wrappers
+  auth/views/Auth*.vue              # Auth screen compositions (popup-embeddable)
+  dev/                              # Dev/demo/showcase pages
+  dashboard/shared/                 # Shared dashboard pages (analytics, edit-profile, …)
+
+src/app/main.js                     # Installs router, startup section preload
 ```
 
 **Also involved (not in `systems/routing/`):**
 
 - `systems/i18n/localeManager.js` — locale in URL, `registerLocaleRouter`
-- `systems/i18n/hreflangTags.js` — SEO alternate links after navigation
+- `systems/i18n/routeHreflangTags.js` — SEO alternate links after navigation
 - `systems/sections/sectionPreloadOrchestrator.js` — preload plan after navigate
 - `systems/build/jsonConfigValidator.js` — `validateRouteConfig()` for build + runtime
 
@@ -73,16 +91,20 @@ src/composables/               # useRoutePrefetch.js planned location
 1. Add an entry to **`routeConfig.json`** with at least:
    - `slug` — e.g. `/my-page`
    - `section` — bundle name for JS/CSS/i18n
-   - `componentPath` — e.g. `@/templates/my-feature/MyPage.vue`
+   - `componentPath` — e.g. `@/dev/templates/my-feature/MyPage.vue`
    - `supportedRoles` — e.g. `["all"]` or `["creator"]`
    - `requiresAuth` — `true` / `false`
-2. Create the `.vue` file under `src/templates/` or `src/components/` (must match glob in `routeComponentLoader.js`).
+2. Create the `.vue` file under `src/dev/templates/` (must match glob in `routeComponentLoader.js`: `@/dev/**/*.vue`).
 3. Run validation:
    ```bash
    npm run test:unit -- --run tests/unit/jsonConfigValidator.test.js
+   npm run test:unit -- --run tests/unit/routeComponentPathValidator.test.js
    ```
 4. Dev smoke: open the slug, test as guest and logged-in user, check role restrictions.
-5. If the link appears in nav, add intent prefetch (`createRoutePrefetchIntentHandler`) on hover/focus.
+5. If the link appears in nav, add intent prefetch on hover/focus:
+   ```js
+   import { createRoutePrefetchIntentHandler } from '@/composables/useRoutePrefetch.js';
+   ```
 
 ## routeConfig.json — important fields
 
@@ -90,7 +112,7 @@ src/composables/               # useRoutePrefetch.js planned location
 |-------|---------|
 | `slug` | URL path (`/dashboard`, wildcards for 404) |
 | `section` | String or `{ "creator": "dashboard-creator", … }` |
-| `componentPath` | Default Vue file (`@/templates/...`) |
+| `componentPath` | Default Vue file (`@/dev/templates/...`) |
 | `customComponentPath` | Per-role `componentPath` overrides |
 | `requiresAuth` | Must be logged in |
 | `supportedRoles` | Allowed roles; use `["all"]` for unrestricted |
@@ -102,22 +124,26 @@ src/composables/               # useRoutePrefetch.js planned location
 | `envAccess` | `"development"` = dev-only routes |
 | `dependencies` | Onboarding / KYC gates per role |
 
-Full schema: [`new-vue-app-main/src/router/routeConfig.schema.md`](../new-vue-app-main/src/router/routeConfig.schema.md).
+Full schema: [`src/router/routeConfig.schema.md`](../../src/router/routeConfig.schema.md).
 
 ## Guard pipeline (order matters)
 
-Executed in `runAllRouteGuards()` (`systems/routing/routeGuards.js`), called from `router.beforeEach`:
+Executed in `runAllRouteGuards()` (`systems/routing/routeGuards.js`), called from `createAppRouter.js` `beforeEach`:
 
 1. Loop prevention — same slug repeated too often
 2. Environment access — `envAccess: development` outside dev
 3. Authentication — `requiresAuth`
 4. Admin-only — `adminOnly`
-5. Role — `supportedRoles`
+5. Role — `supportedRoles` (`guardCheckRouteUserRole`)
 6. Dependencies — onboarding, KYC, etc.
 
-**Note:** `enabled: false` routes are **skipped at route generation**, not in guards.
+**Note:** `enabled: false` routes are **skipped at route generation** (`buildVueRouterRecordsFromConfiguration`), not in guards.
 
-Guard result shape today: `{ allow, redirectTo, reason }` (naming cleanup planned).
+Guard result shape:
+
+```js
+{ isNavigationAllowed, redirectTargetPath, blockReason }
+```
 
 ## Navigation lifecycle
 
@@ -128,11 +154,11 @@ beforeEach
   → resolve meta.section for role
 
 beforeResolve
-  → startCurrentSectionResourceLoads (CSS, i18n, assets)
+  → loadCurrentSectionResources (CSS, i18n, assets)
 
 afterEach
   → setCurrentActiveRoute
-  → syncHreflangTagsForPath
+  → syncHreflangTagsForPath (routeHreflangTags.js)
   → background section preloads (getRoutePreloadPlan)
 
 onError
@@ -143,14 +169,14 @@ onError
 
 Not inline `import()` in the route table:
 
-1. `loadRouteComponent(route)` in `router/index.js`
+1. `loadRouteComponentViaGlob(route, role)` in `createAppRouter.js`
 2. `resolveComponentPathForRoute(route, role)` — role-aware path
-3. `findComponentLoader(path)` — lookup in `import.meta.glob(['@/templates/**/*.vue', '@/components/**/*.vue'])`
+3. `findComponentLoader(path)` — lookup in `import.meta.glob(['@/components/**/*.vue', '@/dev/**/*.vue'])`
 4. Missing file → `NotFoundPage.vue`
 
-## Using the router in Vue (pages / components)
+Route pages live under **`@/dev/templates/`**. Reusable widgets stay under `@/components/` but should not be registered as `componentPath` targets.
 
-Normal consumer usage — **not** route system code:
+## Using the router in Vue (pages / components)
 
 ```js
 import { useRouter, useRoute, RouterLink } from 'vue-router';
@@ -164,14 +190,14 @@ router.push('/dashboard');
 For prefetch on nav hover:
 
 ```js
-import { createRoutePrefetchIntentHandler } from '@/systems/routing/useRoutePrefetch.js';
+import { createRoutePrefetchIntentHandler } from '@/composables/useRoutePrefetch.js';
 
 const prefetchDashboard = createRoutePrefetchIntentHandler('/dashboard');
 ```
 
 ## Popup auth flow
 
-`ProfileLoginPopup.vue` provides `popupNavHandler` (inject) to intercept `router.push` inside the popup. Maps paths to wizard steps instead of full navigation.
+When `ProfileLoginPopup.vue` is present, it provides `popupRouteNavigationHandler` (inject) to intercept navigation inside the popup. Auth **screen** views live in `dev/templates/auth/views/Auth*.vue` (not the `*Page.vue` wrappers with `AuthLayout`).
 
 ## Debugging
 
@@ -183,7 +209,7 @@ const prefetchDashboard = createRoutePrefetchIntentHandler('/dashboard');
 | `getNavigationHistory()` | Recent navigations |
 | `resetRouteConfigurationCache()` | After editing JSON in dev |
 
-Enable dev logs via existing `logHandler` output in router hooks.
+Enable dev logs via `logHandler` output in router hooks.
 
 ## Validation commands
 
@@ -191,18 +217,23 @@ Enable dev logs via existing `logHandler` output in router hooks.
 # Route config schema (production JSON)
 npm run test:unit -- --run tests/unit/jsonConfigValidator.test.js
 
-# Route-related unit tests (fix imports if they still say utils/route)
+# Component paths resolve on disk
+npm run test:unit -- --run tests/unit/routeComponentPathValidator.test.js
+
+# Guards, resolver, prefetch
 npm run test:unit -- --run tests/unit/routeGuards.test.js
+npm run test:unit -- --run tests/unit/routeComponentPrefetch.test.js
 ```
 
-## Planned cleanup (see master plan)
+## Completed refactor (Phases 1–6)
 
-- Slim `router/index.js` → `systems/routing/createAppRouter.js`
-- Move `useRoutePrefetch.js` → `composables/`
-- Move asset prefetch modules → `systems/assets/`
-- Move `sharedAssetPreloads.json` out of `router/`
-- Fix test imports `utils/route` → `systems/routing`
-- Naming passes per `route-naming-audit.md`
+See [route-cleanup-changelog.md](./route-cleanup-changelog.md) for detail. Summary:
+
+- **Phase 1:** Test imports `utils/route` → `systems/routing`
+- **Phase 2:** Slim `router/index.js`; `createAppRouter.js`; asset catalog → `config/`; prefetch → `composables/` and `systems/assets/`
+- **Phase 3–4:** Module/symbol renames per naming audit
+- **Phase 5:** Auth route pages use `*Page.vue`; tests aligned to `@/dev/templates/`
+- **Phase 6:** Template files moved to canonical folders (`dev/`, `dashboard/shared/`, `misc/`); `/home` config completed
 
 ---
 
@@ -214,9 +245,10 @@ npm run test:unit -- --run tests/unit/routeGuards.test.js
 2. **Do not add route paths in `router/index.js`** — only `routeConfig.json`.
 3. **Do not import `routeConfig.json` from components** — use `getRouteConfiguration()` from `routeConfigLoader.js`.
 4. **Do not put new route logic in `app/main.js`** — use `systems/routing/` or `systems/sections/`.
-5. **Page components** live under `@/templates/**` (or `@/components/**`); paths must be in the glob map in `routeComponentLoader.js`.
+5. **Route `componentPath` targets** must live under `@/dev/templates/…` and match the glob in `routeComponentLoader.js`.
 6. **Tests** must import from `@/systems/routing/...`, not `@/utils/route/...`.
-7. **Routing docs live in `Developer Tasks/RoutingExplained.md`** — do not add `README.md` under `src/router/` or `src/systems/routing/`.
+7. **Routing docs live only in this file** — do not add `README.md` under `src/router/` or `src/systems/routing/`.
+8. **Preload must not block navigation** — background cache-warming only; lazy load remains the fallback.
 
 ## Canonical import map
 
@@ -226,10 +258,12 @@ npm run test:unit -- --run tests/unit/routeGuards.test.js
 | Resolve path | `@/systems/routing/routeResolver.js` → `resolveRouteFromPath` |
 | Guards | `@/systems/routing/routeGuards.js` → `runAllRouteGuards` |
 | Navigation state | `@/systems/routing/routeNavigation.js` |
-| Prefetch on intent | `@/systems/routing/useRoutePrefetch.js` (moving to composables) |
+| Prefetch on intent | `@/composables/useRoutePrefetch.js` → `createRoutePrefetchIntentHandler` |
 | Router instance | `@/router/index.js` default export |
 | Validate JSON | `@/systems/build/jsonConfigValidator.js` → `validateRouteConfig` |
 | Component loader | `@/systems/routing/routeComponentLoader.js` → `findComponentLoader` |
+| Section preload plan | `@/systems/sections/sectionPreloadOrchestrator.js` → `getRoutePreloadPlan` |
+| Asset preload | `@/systems/assets/routeAssetPreloader.js` |
 
 ## File ownership
 
@@ -238,25 +272,29 @@ npm run test:unit -- --run tests/unit/routeGuards.test.js
 | New URL / auth / section | `src/router/routeConfig.json` |
 | Guard rule | `systems/routing/routeGuards.js` |
 | Path matching / inheritance | `systems/routing/routeResolver.js` |
-| Locale in URL | `systems/i18n/localeManager.js` + hooks in `router/index.js` |
-| Post-nav preload | `systems/sections/sectionPreloadOrchestrator.js` + `router.afterEach` |
+| Locale in URL | `systems/i18n/localeManager.js` + hooks in `createAppRouter.js` |
+| Post-nav preload | `systems/sections/sectionPreloadOrchestrator.js` + `afterEach` |
 | Build-time route validation | `systems/build/jsonConfigValidator.js`, `build/vite/sectionBundler.js` |
-| Vue page UI | `src/templates/...` only |
+| Vue route page UI | `src/dev/templates/...` |
+| Auth screen (popup-capable) | `src/dev/templates/auth/views/Auth*.vue` |
 
 ## Stale references to fix if you touch tests/docs
 
 - `@/utils/route/*` → `@/systems/routing/*`
 - `@/utils/section/*` → `@/systems/sections/*`
-- `src/utils/route/routeComponentLoader.js` → `src/systems/routing/routeComponentLoader.js`
-- `createRoutePrefetchIntentHandler` from `routeComponentPrefetch.js` — prefer `useRoutePrefetch.js` barrel
+- `@/templates/...` in `componentPath` → `@/dev/templates/...`
+- `hreflangTags.js` → `routeHreflangTags.js`
+- `routeAliases.js` → `routeAliasResolver.js`
+- Guard result `{ allow, redirectTo }` → `{ isNavigationAllowed, redirectTargetPath }`
+- `popupNavHandler` → `popupRouteNavigationHandler`
 
-## When editing `router/index.js`
+## When editing routing code
 
-Today it still contains: `generateRoutesFromConfig`, `loadRouteComponent`, `beforeEach` / `beforeResolve` / `afterEach`, locale injection. Target state is a one-line re-export of `createAppRouter` from `systems/routing/`. If you add logic, prefer a new module under `systems/routing/` and import it.
+Orchestration lives in **`systems/routing/createAppRouter.js`**. `router/index.js` is a thin re-export. Add new logic in a dedicated module under `systems/routing/` (or `systems/sections/` / `systems/assets/`) and import it.
 
 ## `enabled: false` vs guards
 
-Disabled routes are filtered in `generateRoutesFromConfig()` — they never get a Vue Router record. Do not add a separate "enabled guard" unless product requirements change.
+Disabled routes are filtered in `buildVueRouterRecordsFromConfiguration()` — they never get a Vue Router record. Do not add a separate "enabled guard".
 
 ## Doc maintenance checklist (agents)
 
@@ -266,10 +304,17 @@ After any routing refactor, update **this file** if you change:
 - [ ] Guard order or result shape
 - [ ] Import paths / barrel exports
 - [ ] `routeConfig.json` required fields
-- [ ] Component loading mechanism
+- [ ] Component loading glob paths
 - [ ] Links to master plan / audits
 
-Run a quick grep for `utils/route` and `router/README` in `docs/` and `tests/` and fix stragglers.
+Run:
+
+```bash
+rg "utils/route" docs/route-tasks/ tests/ src/router/ src/systems/routing/
+rg "router/README|routing/README" src/
+```
+
+Fix stragglers in active docs; add a historical banner in archived docs if needed.
 
 ## Audit reports (this folder)
 
@@ -280,7 +325,7 @@ Run a quick grep for `utils/route` and `router/README` in `docs/` and `tests/` a
 | [route-naming-audit.md](./route-naming-audit.md) | Rename suggestions (filename / method / symbol) |
 | [loose-route-code-scan.md](./loose-route-code-scan.md) | Code in wrong layer |
 | [folder-structure-audit-router.md](./folder-structure-audit-router.md) | `router/` folder violations |
-| [systems-routing-audit.md](./systems-routing-audit.md) | `systems/routing/` vs `notes.md` |
+| [systems-routing-audit.md](./systems-routing-audit.md) | `systems/routing/` structure |
 
 ---
 

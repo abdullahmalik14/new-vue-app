@@ -20,7 +20,7 @@ src/systems/routing/  → guards, resolvers, navigation, loaders, hooks logic
 | `systems/routing/` | ✅ Main home for route logic (24 files) |
 | `router/index.js` | ❌ Still holds ~749 lines of orchestration (loose) |
 | `router/sharedAssetPreloads.json` | ❌ Asset config, not route config |
-| Tests + docs | ❌ Still reference dead `utils/route/` paths |
+| Tests + docs | ✅ Active tests/docs fixed (Phase 1 + Phase 7); archived docs may still mention `utils/route/` |
 | UI/templates using `useRouter()` | ✅ Normal — consumers, not route system code |
 
 ---
@@ -111,21 +111,21 @@ export { default } from '@/systems/routing/createAppRouter.js';
 
 ## Issue 9
 
-**Location:** `tests/unit/*.test.js` — 25+ files still import `@/utils/route/...` or `../../src/utils/route/...`
+**Status:** Fixed (Phase 1, 2026-06-16)
 
-**Why it is an issue:** `src/utils/route/` no longer exists. Code moved to `systems/routing/` but tests were not updated. No vite alias redirects `utils/route` → `systems/routing`.
+**Location:** `tests/unit/*.test.js` — previously imported `@/utils/route/...`
 
-**Suggested fix:** Find-replace test imports to `@/systems/routing/...`. Run unit tests to confirm.
+**Resolution:** Test imports updated to `@/systems/routing/`, `@/systems/assets/`, `@/composables/`.
 
 ---
 
 ## Issue 10
 
-**Location:** Archived docs under `docs/` still mention `utils/route/`
+**Status:** Fixed for active docs (Phase 7, 2026-06-16)
 
-**Why it is an issue:** Documentation still describes `src/utils/route/` as the canonical location. Misleading for manual audits and new work.
+**Location:** Routing documentation under `docs/` and `src/router/`
 
-**Suggested fix:** Canonical doc is [RoutingExplained.md](./RoutingExplained.md). `src/router/README.md` and `src/systems/routing/README.md` removed. Grep `docs/` and `tests/` for `utils/route` and fix. Mark archived docs as historical.
+**Resolution:** Canonical doc is [RoutingExplained.md](./RoutingExplained.md). Removed `src/router/README.md` and `src/systems/routing/README.md`. Updated [route-code-index.md](./route-code-index.md) and root [README.md](../../README.md). Archived/historical task docs may still mention `utils/route/` — treat as historical.
 
 ---
 

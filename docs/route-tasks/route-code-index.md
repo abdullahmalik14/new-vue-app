@@ -1,6 +1,6 @@
 # Route code index
 
-**Date:** 2026-06-10  
+**Date:** 2026-06-16  
 **Project:** `new-vue-app-main/src/`  
 **Purpose:** Every file and method/function where route-related code was found.
 
@@ -35,7 +35,9 @@
 
 ### `index.js` (barrel re-exports)
 
-Re-exports from: `routeConfigLoader`, `routeResolver`, `routeGuards`, `routeNavigation`, `routeComponentPrefetch`, `routeAssetPrefetch`, `useRoutePrefetch`, `routeTransition`, `routeErrorBoundary`, `routeAliases`, `routeNavigationData`, `routeAdminAccess`, `routeComponentPathValidator`, `navigationProgress`.
+Re-exports from: `routeConfigLoader`, `routeResolver`, `routeGuards`, `routeNavigation`, `routeComponentPreloader`, `routeAssetPreloader` (assets), `useRoutePrefetch` (composables), `routeTransition`, `routeErrorBoundary`, `routeAliasResolver`, `routeNavigationResourceLoader`, `routeAdminAccess`, `routeComponentPathValidator`, `navigationProgressTracker`.
+
+Orchestration: `createAppRouter.js` (not re-exported from barrel; imported by `router/index.js`).
 
 ---
 
@@ -48,9 +50,7 @@ Re-exports from: `routeConfigLoader`, `routeResolver`, `routeGuards`, `routeNavi
 | `resetRouteConfigurationCache` | export |
 | `getRouteConfiguration` | export |
 
-Imports: `router/routeConfig.json`, `router/sharedAssetPreloads.json`, `validateRouteConfig`, `resolveRouteAssetPreloads`, `validateRouteComponentPathsWithResolver`, `validateRouteAssetPreloadFlags`.
-
----
+Imports: `router/routeConfig.json`, `config/sharedAssetPreloads.json`, `validateRouteConfig`, `resolveRouteAssetPreloads`, `validateRouteComponentPathsWithResolver`, `validateRouteAssetPreloadFlags`.
 
 ### `routeResolver.js`
 
@@ -335,11 +335,11 @@ Imports: `router/routeDefaults.json`.
 |------|------|
 | `routeConfig.json` | Route definitions (slugs, components, guards meta) |
 | `routeDefaults.json` | Default slugs for errors/auth |
-| `sharedAssetPreloads.json` | Shared asset preload catalog *(misplaced in router/)* |
 | `routeConfig.schema.md` | Schema documentation |
-| `README.md` | Router docs *(still references old `utils/route/`)* |
 
----
+Shared asset catalog: `config/sharedAssetPreloads.json` (not in `router/`).
+
+Routing documentation: [RoutingExplained.md](./RoutingExplained.md) only — no `README.md` in `router/` or `systems/routing/`.
 
 ## 3. Cross-system route logic
 
@@ -367,7 +367,7 @@ Route-coupled exports used by `router/index.js` and navigation:
 
 ---
 
-### `systems/i18n/hreflangTags.js`
+### `systems/i18n/routeHreflangTags.js`
 
 | Symbol | Route role |
 |--------|------------|
@@ -573,40 +573,9 @@ Normal navigation UI (no `systems/routing` imports unless noted).
 
 ## 9. Unit tests (route-related)
 
-### Tests still importing dead `src/utils/route/` paths (broken)
+Route unit tests import from `@/systems/routing/`, `@/systems/assets/`, and `@/composables/` (Phase 1 fixed legacy `utils/route/` paths).
 
-| Test file | Imports from `utils/route/` |
-|-----------|----------------------------|
-| `routeAdminAccess.test.js` | `routeAdminAccess`, `routeGuards` |
-| `routeAliases.test.js` | `routeAliases` |
-| `routeChain.test.js` | `routeResolver` |
-| `routeComponentPathValidator.test.js` | `routeComponentPathValidator`, `.node` |
-| `routeEnvAccess.test.js` | `routeEnvAccess`, `routeGuards` |
-| `routeErrorBoundary.test.js` | `routeErrorBoundary` |
-| `routeGuards.test.js` | `routeGuards` |
-| `routeGuardsS6.test.js` | `routeGuards` |
-| `routeInheritance.test.js` | `routeResolver`, `routeGuards` (+ `utils/section/sectionPreloadOrchestrator`) |
-| `routeNavigation.test.js` | `routeNavigation` |
-| `routeNavigationData.test.js` | `routeNavigationData` |
-| `routeTransition.test.js` | `routeTransition` |
-| `scrollBehavior.test.js` | `scrollBehavior` |
-| `navigationErrorHandler.test.js` | `navigationErrorHandler` |
-| `navigationProgress.test.js` | `navigationProgress` |
-| `guardLoopHistoryClear.test.js` | `routeGuards` |
-| `resolveRouteAssetPreloads.test.js` | `resolveRouteAssetPreloads` |
-| `assetMapBuildValidation.test.js` | `resolveRouteAssetPreloads` |
-| `startupRouteResolution.test.js` | `@/utils/route/routeResolver`, `@/utils/translation/localeManager` |
-| `routeAssetPrefetch.test.js` | mocks `utils/route/routeComponentPrefetch` |
-| `useRoutePrefetch.test.js` | mocks `utils/route/routeComponentPrefetch`, `routeAssetPrefetch` |
-| `validateRouteAssetPreloadFlags.test.js` | `utils/assets/validateRouteAssetPreloadFlags` (path may also be stale) |
-
-### Tests reading `router/` config (paths OK)
-
-`assetMapBuildValidation.test.js`, `cognitoScriptSelfHost.test.js`, `dashboardLayoutSectionRoutes.test.js`, `jsonConfigValidator.test.js`, `resolveRouteAssetPreloads.test.js`, `routerExports.test.js`, `sectionScanner.test.js`, `sharedComponentAssetMappings.test.js`, `validateI18n.test.js`, `shopAssetPreloadConfig.test.js`
-
-### Other route tests
-
-`routeComponentPrefetch.test.js`, `performanceTrackerGuards.test.js`, `clearNavigationHistoryNaming.test.js`, `applyLocaleTemporarily.test.js`, `updateUrlWithLocale.test.js`, `routerLocaleInject.test.js`
+Key suites: `routeGuards.test.js`, `jsonConfigValidator.test.js`, `routeComponentPathValidator.test.js`, `routeComponentPrefetch.test.js`, `useRoutePrefetch.test.js`, `resolveRouteAssetPreloads.test.js`.
 
 ---
 
@@ -627,12 +596,13 @@ Normal navigation UI (no `systems/routing` imports unless noted).
 
 ---
 
-## Quick reference: where logic should live (`notes.md`)
+## Quick reference: where logic should live
 
-| Should be in | Currently also in |
-|--------------|-------------------|
-| `router/` entry + JSON | `router/index.js` (749 lines orchestration), `sharedAssetPreloads.json` |
-| `systems/routing/` | ✅ 23 modules |
-| `systems/assets/` | `routeAssetPrefetch.js`, `resolveRouteAssetPreloads.js` still in routing |
-| `composables/` | `useRoutePrefetch.js` still in routing |
-| `components/` | `AppFooter.vue` imports `routeConfig.json` directly |
+| Should be in | Status (post Phase 7) |
+|--------------|------------------------|
+| `router/` entry + JSON | ✅ `index.js` thin re-export; config JSON + schema only |
+| `systems/routing/` | ✅ Core modules + `createAppRouter.js` |
+| `systems/assets/` | ✅ `routeAssetPreloader.js`, `routeAssetPreloadResolver.js`, etc. |
+| `composables/` | ✅ `useRoutePrefetch.js` |
+| `config/` | ✅ `sharedAssetPreloads.json` |
+| `components/` | ✅ `AppFooter.vue` uses `getRouteConfiguration()` |
