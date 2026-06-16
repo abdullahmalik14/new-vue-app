@@ -110,7 +110,7 @@ export function normalizeLocalizedPath(path, supportedLocales = SUPPORTED_LOCALE
 let currentActiveLocale = null;
 
 /** @type {import('vue-router').Router | null} */
-let localeRouter = null;
+let registeredLocaleRouter = null;
 
 const COGNITO_PREFERRED_LOCALE_ATTR = "custom:preferred_locale";
 
@@ -122,7 +122,7 @@ const COGNITO_PREFERRED_LOCALE_ATTR = "custom:preferred_locale";
  * @returns {void}
  */
 export function registerLocaleRouter(router) {
-  localeRouter = router;
+  registeredLocaleRouter = router;
 }
 
 /**
@@ -495,16 +495,16 @@ export function resolveActiveLocaleForNavigation(to) {
     return pathLocale;
   }
 
-  const tempLocale = getTemporaryPageLocale();
-  if (tempLocale) {
+  const temporaryPageLocale = getTemporaryPageLocale();
+  if (temporaryPageLocale) {
     log(
       "localeManager.js",
       "resolveActiveLocaleForNavigation",
       "return",
       "Returning temporary page locale",
-      { locale: tempLocale, path: to?.path }
+      { locale: temporaryPageLocale, path: to?.path }
     );
-    return tempLocale;
+    return temporaryPageLocale;
   }
 
   return resolveActiveLocale();
@@ -920,7 +920,7 @@ export async function setActiveLocale(localeCode, options = {}) {
           }
 
           // Refresh bundle/CSS preload and translations for background preLoadSections
-          const { resolved: preloadedSectionsToRefresh } = getRoutePreloadPlan(
+          const { resolvedSectionNames: preloadedSectionsToRefresh } = getRoutePreloadPlan(
             currentRoute,
             userRole
           );
@@ -1090,7 +1090,7 @@ function buildPathWithLocalePrefix(currentPath, localeCode) {
   // L-15: Prepend base URL back for non-router fallback cases
   // When using router.replace(), router handles base URL automatically
   // For window.history.pushState fallback, we need to include base URL
-  if (baseUrl && baseUrl !== "/" && !localeRouter) {
+  if (baseUrl && baseUrl !== "/" && !registeredLocaleRouter) {
     return baseUrl.replace(/\/$/, "") + resultPath;
   }
 
@@ -1167,16 +1167,16 @@ async function updateUrlWithLocale(localeCode) {
   );
 
   try {
-    const currentRoute = localeRouter?.currentRoute?.value;
+    const currentRoute = registeredLocaleRouter?.currentRoute?.value;
     const currentPath = resolveLocalizedPathFromRoute(currentRoute);
     const newPath = buildPathWithLocalePrefix(currentPath, localeCode);
     const browserPath =
       typeof window !== "undefined" ? window.location.pathname : currentPath;
     const browserPathWithoutBase = stripBaseUrlFromPath(browserPath);
 
-    if (localeRouter && currentRoute) {
+    if (registeredLocaleRouter && currentRoute) {
       if (browserPathWithoutBase !== newPath || currentPath !== newPath) {
-        await localeRouter.replace({
+        await registeredLocaleRouter.replace({
           path: newPath,
           query: currentRoute.query,
           hash: currentRoute.hash,
@@ -1198,7 +1198,7 @@ async function updateUrlWithLocale(localeCode) {
     } else {
       const search = window.location.search;
       const hash = window.location.hash;
-      // L-15: newPath already includes base URL when localeRouter is not available
+      // L-15: newPath already includes base URL when registeredLocaleRouter is not available
       const newUrl = newPath + search + hash;
 
       window.history.pushState({}, "", newUrl);
@@ -1582,9 +1582,9 @@ export function syncTemporaryPageLocaleFromUrl(urlLocale) {
  * @returns {string}
  */
 export function resolveLocaleForUrlInjection() {
-  const tempLocale = getTemporaryPageLocale();
-  if (tempLocale) {
-    return tempLocale;
+  const temporaryPageLocale = getTemporaryPageLocale();
+  if (temporaryPageLocale) {
+    return temporaryPageLocale;
   }
   return getActiveLocale();
 }
@@ -1647,12 +1647,12 @@ export async function clearTemporaryPageLocaleAndRestore() {
  * @returns {Promise<void>}
  */
 export async function reapplyTemporaryPageLocaleForRoute(routePath) {
-  const tempLocale = getTemporaryPageLocale();
-  if (!tempLocale) {
+  const temporaryPageLocale = getTemporaryPageLocale();
+  if (!temporaryPageLocale) {
     return;
   }
 
-  await applyLocaleTemporarily(tempLocale, {
+  await applyLocaleTemporarily(temporaryPageLocale, {
     routePath,
     loadTranslations: true,
     awaitTranslations: false,

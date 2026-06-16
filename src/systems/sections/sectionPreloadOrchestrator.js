@@ -61,25 +61,25 @@ export function resolveEffectiveRouteConfig(routeConfig) {
  * @param {object|null|undefined} routeConfig
  * @param {string} userRole
  * @param {{ additionalSections?: Array<string> }} [options]
- * @returns {{ identifiers: Array<string>, resolved: Array<string> }}
+ * @returns {{ preloadSectionIdentifiers: Array<string>, resolvedSectionNames: Array<string> }}
  */
 export function getRoutePreloadPlan(routeConfig, userRole, { additionalSections = [] } = {}) {
   const effectiveRouteConfig = resolveEffectiveRouteConfig(routeConfig);
 
   if (!effectiveRouteConfig) {
-    return { identifiers: [], resolved: [] };
+    return { preloadSectionIdentifiers: [], resolvedSectionNames: [] };
   }
 
-  const identifiers = getPreloadSectionsForRoute(effectiveRouteConfig, userRole);
-  const resolved = [...new Set(
-    identifiers
+  const preloadSectionIdentifiers = getPreloadSectionsForRoute(effectiveRouteConfig, userRole);
+  const resolvedSectionNames = [...new Set(
+    preloadSectionIdentifiers
       .map((identifier) => resolveSectionIdentifier(identifier, userRole))
       .filter((sectionName) => typeof sectionName === 'string' && sectionName.length > 0)
   )];
 
   for (const section of additionalSections) {
-    if (typeof section === 'string' && section.length > 0 && !resolved.includes(section)) {
-      resolved.push(section);
+    if (typeof section === 'string' && section.length > 0 && !resolvedSectionNames.includes(section)) {
+      resolvedSectionNames.push(section);
     }
   }
 
@@ -87,12 +87,12 @@ export function getRoutePreloadPlan(routeConfig, userRole, { additionalSections 
     routeSlug: effectiveRouteConfig.slug ?? null,
     userRole,
     preLoadSections: effectiveRouteConfig.preLoadSections ?? null,
-    resolvedIdentifiers: identifiers,
-    resolvedSectionNames: resolved,
+    resolvedIdentifiers: preloadSectionIdentifiers,
+    resolvedSectionNames,
     ...(additionalSections.length > 0 ? { additionalSections } : {})
   });
 
-  return { identifiers, resolved };
+  return { preloadSectionIdentifiers, resolvedSectionNames };
 }
 
 /**
@@ -115,10 +115,11 @@ export function resolveCurrentRouteSectionName(routeConfig, userRole) {
 /**
  * Whether the default auth section should be preloaded on startup.
  *
- * @param {{ isAuthenticated: boolean, currentPath: string, resolvedSections: Array<string> }} params
+ * @param {{ isAuthenticated: boolean, currentPath: string, resolvedSections: Array<string> }} authPreloadCheckParams
  * @returns {boolean}
  */
-export function shouldPreloadDefaultAuthSection({ isAuthenticated, currentPath, resolvedSections }) {
+export function shouldPreloadDefaultAuthSection(authPreloadCheckParams) {
+  const { isAuthenticated, currentPath, resolvedSections } = authPreloadCheckParams;
   return !isAuthenticated || currentPath === '/log-in' || resolvedSections.includes('auth');
 }
 
@@ -143,10 +144,10 @@ export function preloadDefaultAuthSection(logContext) {
 
   log(file, method, 'preload-default', 'Preloading default auth section', { section: 'auth' });
 
-  return preloadSection('auth').catch((err) => {
+  return preloadSection('auth').catch((preloadError) => {
     log(file, method, 'preload-error', 'Default auth section preload failed (non-blocking)', {
       section: 'auth',
-      error: err.message
+      error: preloadError.message
     });
   });
 }
@@ -181,17 +182,17 @@ export function startBackgroundSectionPreloads({
     skipSection: skipSection ?? null,
     sectionStatus,
     alreadyPreloaded: sectionStatus
-      .filter((entry) => entry.willPreload && entry.isPreloaded)
-      .map((entry) => entry.section),
+      .filter((sectionStatusEntry) => sectionStatusEntry.willPreload && sectionStatusEntry.isPreloaded)
+      .map((sectionStatusEntry) => sectionStatusEntry.section),
     needsPreload: sectionStatus
-      .filter((entry) => entry.needsPreload)
-      .map((entry) => entry.section),
+      .filter((sectionStatusEntry) => sectionStatusEntry.needsPreload)
+      .map((sectionStatusEntry) => sectionStatusEntry.section),
     skippedSections: sectionStatus
-      .filter((entry) => entry.skipped)
-      .map((entry) => entry.section)
+      .filter((sectionStatusEntry) => sectionStatusEntry.skipped)
+      .map((sectionStatusEntry) => sectionStatusEntry.section)
   });
 
-  const promises = [];
+  const preloadPromises = [];
 
   for (const section of sections) {
     if (skipSection && section === skipSection) {
@@ -211,11 +212,11 @@ export function startBackgroundSectionPreloads({
       path
     });
 
-    promises.push(
-      preloadSection(section).catch((err) => {
+    preloadPromises.push(
+      preloadSection(section).catch((preloadError) => {
         log(file, method, 'preload-error', 'Section preload failed (non-blocking)', {
           section,
-          error: err.message
+          error: preloadError.message
         });
       })
     );
@@ -228,12 +229,12 @@ export function startBackgroundSectionPreloads({
           path
         });
       } else {
-        promises.push(
-          loadTranslationsForSection(section, locale).catch((err) => {
+        preloadPromises.push(
+          loadTranslationsForSection(section, locale).catch((preloadError) => {
             log(file, method, 'translation-error', 'Translation load failed (non-blocking)', {
               section,
               locale,
-              error: err.message
+              error: preloadError.message
             });
           })
         );
@@ -241,7 +242,7 @@ export function startBackgroundSectionPreloads({
     }
   }
 
-  return Promise.all(promises);
+  return Promise.all(preloadPromises);
 }
 
 /**

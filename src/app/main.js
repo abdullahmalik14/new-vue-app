@@ -446,7 +446,7 @@ function startStartupPreloadForCurrentRoute() {
   const currentSectionName = currentRoute
     ? resolveCurrentRouteSectionName(currentRoute, userRoleForPreload)
     : null;
-  const { resolved: baseSectionsToPreload } = getRoutePreloadPlan(
+  const { resolvedSectionNames: baseSectionsToPreload } = getRoutePreloadPlan(
     currentRoute,
     userRoleForPreload,
   );

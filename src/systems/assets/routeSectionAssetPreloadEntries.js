@@ -41,24 +41,24 @@ function getAssetPreloadDedupeKey(entry) {
  * @returns {object[]}
  */
 export function dedupeAssetPreloadEntries(entries) {
-  const byKey = new Map();
+  const entriesByDedupeKey = new Map();
 
   for (const entry of entries) {
-    const key = getAssetPreloadDedupeKey(entry);
-    if (!key) {
+    const dedupeKey = getAssetPreloadDedupeKey(entry);
+    if (!dedupeKey) {
       continue;
     }
 
-    const existing = byKey.get(key);
+    const existing = entriesByDedupeKey.get(dedupeKey);
     if (
       !existing ||
       getAssetPreloadPriorityValue(entry.priority) > getAssetPreloadPriorityValue(existing.priority)
     ) {
-      byKey.set(key, entry);
+      entriesByDedupeKey.set(dedupeKey, entry);
     }
   }
 
-  return Array.from(byKey.values());
+  return Array.from(entriesByDedupeKey.values());
 }
 
 /**
@@ -102,15 +102,15 @@ export function clearAssetPreloadSectionCache() {
  * @returns {{ assets: object[], routeCount: number, rawAssetCount: number }}
  */
 export function getAssetPreloadEntriesForSection(sectionName) {
-  const cached = sectionAssetPreloadCache.get(sectionName);
-  if (cached) {
-    log('getAssetPreloadEntriesForSection.js', 'getAssetPreloadEntriesForSection', 'cache-hit', 'Returning cached section asset preload rollup', {
+  const cachedSectionRollup = sectionAssetPreloadCache.get(sectionName);
+  if (cachedSectionRollup) {
+    log('routeSectionAssetPreloadEntries.js', 'getAssetPreloadEntriesForSection', 'cache-hit', 'Returning cached section asset preload rollup', {
       sectionName,
-      routeCount: cached.routeCount,
-      assetCount: cached.assets.length,
-      rawAssetCount: cached.rawAssetCount,
+      routeCount: cachedSectionRollup.routeCount,
+      assetCount: cachedSectionRollup.assets.length,
+      rawAssetCount: cachedSectionRollup.rawAssetCount,
     });
-    return cached;
+    return cachedSectionRollup;
   }
 
   const routes = getRouteConfiguration();
@@ -124,16 +124,16 @@ export function getAssetPreloadEntriesForSection(sectionName) {
   }
 
   const assets = dedupeAssetPreloadEntries(rawAssets);
-  const entry = { assets, routeCount: sectionRoutes.length, rawAssetCount: rawAssets.length };
-  sectionAssetPreloadCache.set(sectionName, entry);
+  const sectionAssetRollup = { assets, routeCount: sectionRoutes.length, rawAssetCount: rawAssets.length };
+  sectionAssetPreloadCache.set(sectionName, sectionAssetRollup);
 
-  log('getAssetPreloadEntriesForSection.js', 'getAssetPreloadEntriesForSection', 'success', 'Section asset preload rollup built', {
+  log('routeSectionAssetPreloadEntries.js', 'getAssetPreloadEntriesForSection', 'success', 'Section asset preload rollup built', {
     sectionName,
-    routeCount: entry.routeCount,
+    routeCount: sectionAssetRollup.routeCount,
     assetCount: assets.length,
     rawAssetCount: rawAssets.length,
     duplicateCount: rawAssets.length - assets.length,
   });
 
-  return entry;
+  return sectionAssetRollup;
 }

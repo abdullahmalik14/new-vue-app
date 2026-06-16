@@ -3,19 +3,19 @@
  */
 
 /**
- * @param {string} refKey
+ * @param {string} referenceKey
  * @param {Record<string, unknown[]>} sharedCatalog
  * @param {string} slug
  * @returns {unknown[]}
  */
-function resolveAssetPreloadRefKey(refKey, sharedCatalog, slug) {
-  const entries = sharedCatalog[refKey];
+function resolveAssetPreloadRefKey(referenceKey, sharedCatalog, slug) {
+  const catalogEntries = sharedCatalog[referenceKey];
 
-  if (!Array.isArray(entries)) {
-    throw new Error(`Unknown assetPreloadRef "${refKey}" on route ${slug}`);
+  if (!Array.isArray(catalogEntries)) {
+    throw new Error(`Unknown assetPreloadRef "${referenceKey}" on route ${slug}`);
   }
 
-  return entries;
+  return catalogEntries;
 }
 
 /**
@@ -29,26 +29,28 @@ export function resolveRouteAssetPreloads(routes, sharedCatalog = {}) {
   }
 
   return routes.map((route) => {
-    const ref = route.assetPreloadRef;
+    const assetPreloadReference = route.assetPreloadRef;
 
-    if (!ref) {
+    if (!assetPreloadReference) {
       return route;
     }
 
-    const refKeys = Array.isArray(ref) ? ref : [ref];
-    const fromRefs = refKeys.flatMap((key) => {
-      if (typeof key !== 'string' || !key.trim()) {
+    const assetPreloadReferenceKeys = Array.isArray(assetPreloadReference)
+      ? assetPreloadReference
+      : [assetPreloadReference];
+    const preloadsFromReferences = assetPreloadReferenceKeys.flatMap((referenceKey) => {
+      if (typeof referenceKey !== 'string' || !referenceKey.trim()) {
         throw new Error(`Invalid assetPreloadRef on route ${route.slug ?? '(unknown)'}`);
       }
-      return resolveAssetPreloadRefKey(key.trim(), sharedCatalog, route.slug ?? '(unknown)');
+      return resolveAssetPreloadRefKey(referenceKey.trim(), sharedCatalog, route.slug ?? '(unknown)');
     });
 
-    const inline = Array.isArray(route.assetPreload) ? route.assetPreload : [];
-    const { assetPreloadRef, ...rest } = route;
+    const inlineAssetPreloads = Array.isArray(route.assetPreload) ? route.assetPreload : [];
+    const { assetPreloadRef, ...routeWithoutPreloadReference } = route;
 
     return {
-      ...rest,
-      assetPreload: [...fromRefs, ...inline]
+      ...routeWithoutPreloadReference,
+      assetPreload: [...preloadsFromReferences, ...inlineAssetPreloads],
     };
   });
 }

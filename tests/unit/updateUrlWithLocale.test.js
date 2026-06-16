@@ -17,7 +17,7 @@ vi.mock('../../src/systems/routing/routeResolver.js', () => ({
 }));
 
 vi.mock('../../src/systems/sections/sectionPreloadOrchestrator.js', () => ({
-  getRoutePreloadPlan: vi.fn(() => ({ resolved: [] })),
+  getRoutePreloadPlan: vi.fn(() => ({ resolvedSectionNames: [] })),
   refreshSectionPreloadsOnLocaleChange: vi.fn(() => Promise.resolve()),
 }));
 

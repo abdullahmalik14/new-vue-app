@@ -643,8 +643,10 @@ router.afterEach(async (to, from) => {
     const authStore = useAuthStore();
     const userRole = authStore.currentUser?.role || 'guest';
 
-    const { identifiers: sectionsToPreload, resolved: resolvedSectionsToPreload } =
-      getRoutePreloadPlan(routeConfig, userRole);
+    const {
+      preloadSectionIdentifiers: sectionsToPreload,
+      resolvedSectionNames: resolvedSectionsToPreload,
+    } = getRoutePreloadPlan(routeConfig, userRole);
 
     // Log what we're about to preload for debugging
     log('createAppRouter.js', 'afterEach', 'preload-check', 'Checking preload sections', {

@@ -608,4 +608,46 @@ refactor(routing): rename router orchestration and prefetch symbols
 
 ---
 
+## Phase 4.3 — Cross-system symbol renames (2026-06-16)
+
+**Master plan:** Phase 4, batch 3 — assets, sections, i18n  
+**Audit reference:** [route-naming-audit-batch-1.md](./route-naming-audit-batch-1.md), [route-naming-audit-batch-2.md](./route-naming-audit-batch-2.md)
+
+### What changed
+
+**`routeAssetPreloadResolver.js`**
+- Local names: `ref` → `assetPreloadReference`, `refKeys` → `assetPreloadReferenceKeys`, `fromRefs` → `preloadsFromReferences`, `inline` → `inlineAssetPreloads`, `rest` → `routeWithoutPreloadReference`, `key` → `referenceKey`, `entries` → `catalogEntries`
+
+**`routeSectionAssetPreloadEntries.js`**
+- Internal names: `byKey` → `entriesByDedupeKey`, `cached` → `cachedSectionRollup`, `entry` → `sectionAssetRollup`, `key` → `dedupeKey`
+- Log file labels updated to `routeSectionAssetPreloadEntries.js`
+- Exported `getAssetPreloadEntriesForSection` kept (high blast radius — filename already renamed in Phase 3c)
+
+**`sectionPreloadOrchestrator.js`**
+- `getRoutePreloadPlan` return shape: `identifiers`/`resolved` → `preloadSectionIdentifiers`/`resolvedSectionNames`
+- Local names: `params` → `authPreloadCheckParams`, `err` → `preloadError`, `entry` → `sectionStatusEntry`, `promises` → `preloadPromises`
+
+**`localeManager.js`**
+- Module state: `localeRouter` → `registeredLocaleRouter`
+- Locals: `tempLocale` → `temporaryPageLocale`
+
+**Consumers updated:** `createAppRouter.js`, `main.js`, `updateUrlWithLocale.test.js`
+
+**`DashboardSharedSidebar.vue`** — no changes; audit targets (`isMenuItemRouteActive`, `updateVisibleMenuItems`, full height variable names) already aligned.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/unit/resolveRouteAssetPreloads.test.js tests/unit/getAssetPreloadEntriesForSection.test.js tests/unit/sectionPreloadOrchestrator.test.js tests/unit/updateUrlWithLocale.test.js   # 17 passed
+npm run build   # succeeds
+```
+
+### Suggested commit
+
+```
+refactor(routing): rename cross-system preload and locale symbols
+```
+
+---
+
 *Add a new section above this line for each completed phase.*
