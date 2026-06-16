@@ -283,4 +283,32 @@ npm run test:unit -- --run tests/unit/useRoutePrefetch.test.js   # 2 passed
 
 ---
 
+## Phase 2e — AppFooter uses getRouteConfiguration() (2026-06-16)
+
+**Master plan:** Phase 2, step 2e  
+**Audit reference:** [loose-route-code-scan.md](./loose-route-code-scan.md) Issue 3, RoutingExplained AI rule #3
+
+### Issue
+
+`AppFooter.vue` imported raw `routeConfig.json` and ran its own validation path instead of the cached, validated loader used by the router.
+
+### What changed
+
+- Replaced direct JSON import + `loadJsonConfigFromImport` / `validateRouteConfig` with `getRouteConfiguration()` from `routeConfigLoader.js`
+- Footer navigation behaviour unchanged (same filter/map logic)
+
+### Files touched
+
+`src/components/layout/AppFooter.vue`
+
+### How tested
+
+```bash
+npm run build   # succeeds
+```
+
+No dedicated AppFooter unit test exists.
+
+---
+
 *Add a new section above this line for each completed phase.*
