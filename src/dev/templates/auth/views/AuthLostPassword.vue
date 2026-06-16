@@ -67,7 +67,7 @@ const error = ref("")
 const isLoading = ref(false)
 const isCognitoScriptReady = ref(false)
 const assetHandler = ref(null)
-const popupNavHandler = inject('popupNavHandler', null)
+const popupRouteNavigationHandler = inject('popupRouteNavigationHandler', null)
 const popupGoBack = inject('popupGoBack', null)
 
 // Validation scope
@@ -372,8 +372,8 @@ async function handleForgot() {
     await authHandler.forgotPassword(email.value)
     message.value = t('auth.reset.codeSent') || "Reset code sent to your email."
     // Redirect to reset-password with prefilled email
-    if (popupNavHandler) {
-      popupNavHandler(`/reset-password?email=${encodeURIComponent(email.value)}`)
+    if (popupRouteNavigationHandler) {
+      popupRouteNavigationHandler(`/reset-password?email=${encodeURIComponent(email.value)}`)
     } else {
       setTimeout(() => router.push({ path: "/reset-password", query: { email: email.value } }), 600)
     }

@@ -650,4 +650,45 @@ refactor(routing): rename cross-system preload and locale symbols
 
 ---
 
+## Phase 4.4 — Auth popup inject key rename (2026-06-16)
+
+**Master plan:** Phase 4, item 6 — auth popup inject keys  
+**Audit reference:** [route-naming-audit-batch-4.md](./route-naming-audit-batch-4.md)
+
+### What was broken
+
+Auth views used the inject key `popupNavHandler`, which was too generic and did not match the route-navigation intent described in the naming audit.
+
+### Why it happened
+
+The key was named early in popup auth work before the route cleanup naming convention was applied.
+
+### What changed
+
+Renamed inject key and local variable **`popupNavHandler` → `popupRouteNavigationHandler`** in all auth views that consume it:
+
+- `AuthLogIn.vue`
+- `AuthSignUp.vue`
+- `AuthConfirmEmail.vue`
+- `AuthLostPassword.vue`
+- `AuthResetPassword.vue`
+- `AuthSignUpOnboarding.vue`
+
+**Note:** `ProfileLoginPopup.vue` (provider) is not present in this workspace checkout; when that file is added or synced, its `provide()` call must use `'popupRouteNavigationHandler'` to match these consumers.
+
+### How tested
+
+```bash
+rg popupNavHandler src/   # zero hits
+npm run build             # succeeds
+```
+
+### Suggested commit
+
+```
+refactor(auth): rename popup route navigation inject key
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

@@ -94,7 +94,7 @@ const router = useRouter()
 const route = useRoute()
 const assetHandler = ref(null)
 const codeInputRef = ref(null)
-const popupNavHandler = inject('popupNavHandler', null)
+const popupRouteNavigationHandler = inject('popupRouteNavigationHandler', null)
 const popupGoBack = inject('popupGoBack', null)
 
 // Get active locale from localeManager
@@ -423,8 +423,8 @@ async function performConfirmation() {
     console.log("[CONFIRM_EMAIL] Redirecting to login after confirmation")
     isLoading.value = false
     isSubmitting.value = false
-    if (popupNavHandler) {
-      popupNavHandler(`/log-in?email=${encodeURIComponent(loginQuery.email)}&emailConfirmed=1`)
+    if (popupRouteNavigationHandler) {
+      popupRouteNavigationHandler(`/log-in?email=${encodeURIComponent(loginQuery.email)}&emailConfirmed=1`)
     } else {
       await router.push({ path: '/log-in', query: loginQuery })
     }

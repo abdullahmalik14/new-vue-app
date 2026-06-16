@@ -87,7 +87,7 @@ const message = ref("")
 const error = ref("")
 const isCognitoScriptReady = ref(false)
 const assetHandler = ref(null)
-const popupNavHandler = inject('popupNavHandler', null)
+const popupRouteNavigationHandler = inject('popupRouteNavigationHandler', null)
 const popupGoBack = inject('popupGoBack', null)
 
 // Validation scope
@@ -447,8 +447,8 @@ async function handleReset() {
   try {
     await authHandler.confirmPassword(email.value, code.value, newPassword.value)
     message.value = t('auth.reset.success') || "Password reset successful. Please log in."
-    if (popupNavHandler) {
-      setTimeout(() => popupNavHandler('/log-in'), 800)
+    if (popupRouteNavigationHandler) {
+      setTimeout(() => popupRouteNavigationHandler('/log-in'), 800)
     } else {
       setTimeout(() => router.push("/log-in"), 800)
     }

@@ -20,9 +20,9 @@
             font-color="text-white" />
 
           <!-- Log in link — popup-aware -->
-          <component :is="popupNavHandler ? 'button' : RouterLink"
-            v-bind="popupNavHandler ? { type: 'button' } : { to: '/log-in' }"
-            @click="popupNavHandler ? popupNavHandler('/log-in') : undefined"
+          <component :is="popupRouteNavigationHandler ? 'button' : RouterLink"
+            v-bind="popupRouteNavigationHandler ? { type: 'button' } : { to: '/log-in' }"
+            @click="popupRouteNavigationHandler ? popupRouteNavigationHandler('/log-in') : undefined"
             class="text-base font-medium leading-6 text-[#f06]"
             :class="{ 'opacity-50 pointer-events-none': isLoading }">
             {{ t("auth.login.button") }}
@@ -132,7 +132,7 @@ const isCognitoScriptReady = ref(false);
 const router = useRouter();
 const assetHandler = ref(null);
 const auth = useAuthStore();
-const popupNavHandler = inject('popupNavHandler', null);
+const popupRouteNavigationHandler = inject('popupRouteNavigationHandler', null);
 const popupGoBack = inject('popupGoBack', null);
 
 onMounted(() => {
@@ -589,8 +589,8 @@ async function handleTwitterOAuthCode(code, state) {
   auth.startTokenRefreshLoop();
   // RouteGuard will handle redirects based on dependencies (onboarding/KYC)
   // NOTE: Do NOT set isLoading = false here. Maintain loading state during transition.
-  if (popupNavHandler) {
-    popupNavHandler('/dashboard');
+  if (popupRouteNavigationHandler) {
+    popupRouteNavigationHandler('/dashboard');
   } else {
     await router.push("/dashboard");
   }
@@ -714,8 +714,8 @@ async function handleTelegramUser(telegramUser) {
   auth.startTokenRefreshLoop();
   // RouteGuard will handle redirects based on dependencies (onboarding/KYC)
   // NOTE: Do NOT set isLoading = false here. Maintain loading state during transition.
-  if (popupNavHandler) {
-    popupNavHandler('/dashboard');
+  if (popupRouteNavigationHandler) {
+    popupRouteNavigationHandler('/dashboard');
   } else {
     await router.push("/dashboard");
   }
@@ -992,15 +992,15 @@ async function handleSignUp() {
       console.log(
         "[SIGNUP] Cognito mode → redirecting to /confirm-email (sign in after confirm)"
       );
-      if (popupNavHandler) {
-        popupNavHandler('/confirm-email');
+      if (popupRouteNavigationHandler) {
+        popupRouteNavigationHandler('/confirm-email');
       } else {
         await router.push("/confirm-email");
       }
     } else {
       console.log("[SIGNUP] Dev shim mode → redirecting to /log-in");
-      if (popupNavHandler) {
-        popupNavHandler('/log-in');
+      if (popupRouteNavigationHandler) {
+        popupRouteNavigationHandler('/log-in');
       } else {
         await router.push("/log-in");
       }

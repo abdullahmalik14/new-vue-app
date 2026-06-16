@@ -16,9 +16,9 @@
             font-color="text-white" />
 
           <!-- Sign Up link — popup-aware -->
-          <component :is="popupNavHandler ? 'button' : RouterLink"
-            v-bind="popupNavHandler ? { type: 'button' } : { to: '/sign-up' }"
-            @click="popupNavHandler ? popupNavHandler('/sign-up') : undefined"
+          <component :is="popupRouteNavigationHandler ? 'button' : RouterLink"
+            v-bind="popupRouteNavigationHandler ? { type: 'button' } : { to: '/sign-up' }"
+            @click="popupRouteNavigationHandler ? popupRouteNavigationHandler('/sign-up') : undefined"
             @mouseenter="prefetchSignUp" @focus="prefetchSignUp"
             class="text-base font-medium leading-6 text-[#f06]"
             :class="{ 'opacity-50 pointer-events-none': isLoading }">
@@ -40,9 +40,9 @@
               :show-errors="passwordErrors.length > 0" :errors="passwordErrors"
               :disabled="isLoading" />
             <!-- Forgot password link — popup-aware -->
-            <component :is="popupNavHandler ? 'button' : RouterLink"
-              v-bind="popupNavHandler ? { type: 'button' } : { to: '/lost-password' }"
-              @click="popupNavHandler ? popupNavHandler('/lost-password') : undefined"
+            <component :is="popupRouteNavigationHandler ? 'button' : RouterLink"
+              v-bind="popupRouteNavigationHandler ? { type: 'button' } : { to: '/lost-password' }"
+              @click="popupRouteNavigationHandler ? popupRouteNavigationHandler('/lost-password') : undefined"
               @mouseenter="prefetchLostPassword" @focus="prefetchLostPassword"
               class="w-fit opacity-70 text-xs capitalize text-text font-normal"
               :class="{ 'opacity-50 pointer-events-none': isLoading }">
@@ -136,7 +136,7 @@ const confirmMessage = ref("");
 const router = useRouter();
 const auth = useAuthStore();
 const isLoading = ref(false);
-const popupNavHandler = inject('popupNavHandler', null);
+const popupRouteNavigationHandler = inject('popupRouteNavigationHandler', null);
 const xIcon = ref("");
 const telegramIcon = ref("");
 const isCognitoScriptReady = ref(false);
@@ -567,8 +567,8 @@ async function handleLogin() {
     // RouteGuard will handle redirects based on dependencies (onboarding/KYC)
     // NOTE: Do NOT set isLoading = false here. We want the spinner to persist
     // until the router actually navigates away.
-    if (popupNavHandler) {
-      popupNavHandler('/dashboard');
+    if (popupRouteNavigationHandler) {
+      popupRouteNavigationHandler('/dashboard');
     } else {
       await router.push("/dashboard");
     }
@@ -760,8 +760,8 @@ async function handleTwitterOAuthCode(code, state) {
     console.log("[LOGIN] User authenticated, redirecting to dashboard");
     // RouteGuard will handle redirects based on dependencies (onboarding/KYC)
     // NOTE: Do NOT set isLoading = false here. Maintain loading state during transition.
-    if (popupNavHandler) {
-      popupNavHandler('/dashboard');
+    if (popupRouteNavigationHandler) {
+      popupRouteNavigationHandler('/dashboard');
     } else {
       await router.push('/dashboard');
     }
@@ -777,8 +777,8 @@ async function handleTwitterOAuthCode(code, state) {
 
     if (err.message && (err.message.includes('User not found') || err.message.includes('UserNotFoundException'))) {
       console.log("[LOGIN] User not found, redirecting to sign-up");
-      if (popupNavHandler) {
-        popupNavHandler('/sign-up?error=user_not_found');
+      if (popupRouteNavigationHandler) {
+        popupRouteNavigationHandler('/sign-up?error=user_not_found');
       } else {
         await router.push('/sign-up?error=user_not_found');
       }

@@ -121,7 +121,7 @@ const assetHandler = ref(null)
 const usernameChecking = ref(false)
 const usernameTaken = ref(false)
 let usernameDebounceTimer = null
-const popupNavHandler = inject('popupNavHandler', null)
+const popupRouteNavigationHandler = inject('popupRouteNavigationHandler', null)
 const popupGoBack = inject('popupGoBack', null)
 
 // Dropdown state
@@ -543,8 +543,8 @@ async function completeOnboarding() {
     auth.setTokenAndDecode(idToken)
 
     // RouteGuard will handle redirects - creators will be redirected to KYC if needed
-    if (popupNavHandler) {
-      popupNavHandler('/dashboard')
+    if (popupRouteNavigationHandler) {
+      popupRouteNavigationHandler('/dashboard')
     } else {
       router.push('/dashboard')
     }
