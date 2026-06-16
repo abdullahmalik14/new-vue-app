@@ -44,7 +44,7 @@
     ],
     "redirectIfNotAuth": "/log-in",
     "assetPreloadRef": "dashboardMenuIcons",
-    "componentPath": "@/dev/templates/dashboard/role/DashboardDevPlaygroundPage.vue",
+    "componentPath": "@/dev/templates/dev/DashboardDevPlaygroundPage.vue",
     "dependencies": {
       "roles": {
         "creator": {
@@ -171,7 +171,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/demo/SocialLinkingDemoPage.vue"
+    "componentPath": "@/dev/templates/dev/SocialLinkingDemoPage.vue"
   },
   {
     "slug": "/dashboard/telegram-post",
@@ -442,14 +442,14 @@
       "all"
     ],
     "enabled": true,
-    "componentPath": "@/dev/templates/demo/DemoPage.vue",
+    "componentPath": "@/dev/templates/dev/DemoPage.vue",
     "preLoadSections": []
   },
   {
     "slug": "/dev/datepicker-showcase",
     "envAccess": "development",
     "section": "dev",
-    "componentPath": "@/components/forms/date-picker/DatePickerShowcase.vue",
+    "componentPath": "@/dev/templates/dev/DatePickerShowcasePage.vue",
     "supportedRoles": [
       "all"
     ]
@@ -545,7 +545,7 @@
   {
     "slug": "/plan",
     "section": "misc",
-    "componentPath": "@/dev/templates/plan/Plan.vue",
+    "componentPath": "@/dev/templates/misc/PlanPage.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -560,13 +560,13 @@
       "all"
     ],
     "enabled": true,
-    "componentPath": "@/components/ui/dropdowns/demo/DemoDropdowns.vue"
+    "componentPath": "@/dev/templates/dev/DemoDropdownsPage.vue"
   },
   {
     "slug": "/edit-profile",
     "envAccess": "development",
     "section": "profile",
-    "componentPath": "@/dev/templates/edit-profile/EditProfilePage.vue",
+    "componentPath": "@/dev/templates/dashboard/shared/EditProfilePage.vue",
     "requiresAuth": false,
     "supportedRoles": [
       "all"
@@ -595,7 +595,7 @@
     "section": "dashboard-global",
     "requiresAuth": true,
     "redirectIfNotAuth": "/log-in",
-    "componentPath": "@/dev/templates/analytics/DashboardAnalyticsPage.vue",
+    "componentPath": "@/dev/templates/dashboard/shared/DashboardAnalyticsPage.vue",
     "supportedRoles": [
       "all"
     ],
@@ -642,9 +642,16 @@
       }
     ]
   },
-   {
+  {
     "slug": "/home",
-  "componentPath": "@/dev/templates/home/Home.vue"
+    "section": "misc",
+    "requiresAuth": false,
+    "enabled": true,
+    "supportedRoles": [
+      "all"
+    ],
+    "componentPath": "@/dev/templates/home/Home.vue",
+    "preLoadSections": []
   },
   {
     "slug": "/:pathMatch(.*)*",

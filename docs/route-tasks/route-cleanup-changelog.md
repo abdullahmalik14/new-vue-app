@@ -774,4 +774,47 @@ refactor(auth): align tests with dev auth page paths and close naming audit
 
 ---
 
+## Phase 6 — Router config and template path fixes (2026-06-16)
+
+**Master plan:** Phase 6 — folder structure alignment  
+**Audit reference:** [folder-structure-audit-router.md](./folder-structure-audit-router.md) Issues 4–12, 15
+
+### What changed
+
+**`/home` route config (Issue 11)** — added `section`, `supportedRoles`, `requiresAuth`, `enabled`, and `preLoadSections` so production config validation passes.
+
+**Dev/demo pages → `dev/templates/dev/` (Issues 6, 7, 9, 12)**
+- `DashboardDevPlaygroundPage.vue` from `dashboard/role/`
+- `SocialLinkingDemoPage.vue`, `DemoPage.vue` from `demo/`
+- `DatePickerShowcasePage.vue` from `components/forms/date-picker/`
+- `DemoDropdownsPage.vue` from `components/ui/dropdowns/demo/`
+
+**Dashboard feature pages → `dashboard/shared/` (Issues 4, 5)**
+- `DashboardAnalyticsPage.vue` from `analytics/`
+- `EditProfilePage.vue` from `edit-profile/`
+
+**Plan route page (Issue 8)** — `plan/Plan.vue` → `misc/PlanPage.vue`
+
+**`routeConfig.json`** — all above routes updated to new `@/dev/templates/...` paths; zero routes point at `@/components/`.
+
+**Glob alignment (Issue 15)** — removed unused `@/templates/**/*.vue` from [routeComponentLoader.js](../../src/systems/routing/routeComponentLoader.js); routes resolve via `@/dev/**`.
+
+**Tests** — updated fixture paths in `jsonConfigValidator.test.js`, `routeComponentPathValidator.test.js`, `routeComponentPrefetch.test.js`.
+
+### How tested
+
+```bash
+rg "componentPath.*@/components" src/router/routeConfig.json   # zero hits
+npm run test:unit -- --run tests/unit/jsonConfigValidator.test.js tests/unit/routeComponentPathValidator.test.js tests/unit/routeComponentPrefetch.test.js   # 28 passed
+npm run build   # succeeds
+```
+
+### Suggested commit
+
+```
+refactor(routing): relocate route templates to canonical dev and dashboard folders
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

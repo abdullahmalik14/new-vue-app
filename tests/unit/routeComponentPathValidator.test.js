@@ -14,7 +14,7 @@ describe('routeComponentPathValidator (M10)', () => {
   it('collectComponentPathsFromRoute gathers base and role-specific paths', () => {
     const paths = collectComponentPathsFromRoute({
       slug: '/dashboard',
-      componentPath: '@/templates/dashboard/role/DashboardDevPlaygroundPage.vue',
+      componentPath: '@/dev/templates/dev/DashboardDevPlaygroundPage.vue',
       customComponentPath: {
         creator: {
           componentPath: '@/templates/dashboard/creator/DashboardCreator.vue',
@@ -23,7 +23,7 @@ describe('routeComponentPathValidator (M10)', () => {
     });
 
     expect(paths).toEqual([
-      { path: '@/templates/dashboard/role/DashboardDevPlaygroundPage.vue', source: 'componentPath' },
+      { path: '@/dev/templates/dev/DashboardDevPlaygroundPage.vue', source: 'componentPath' },
       {
         path: '@/templates/dashboard/creator/DashboardCreator.vue',
         source: 'customComponentPath.creator',

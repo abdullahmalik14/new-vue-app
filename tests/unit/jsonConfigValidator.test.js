@@ -277,7 +277,7 @@ describe('jsonConfigValidator section (A6)', () => {
       {
         slug: '/dashboard',
         section: 'dashboard-global',
-        componentPath: '@/templates/dashboard/role/DashboardDevPlaygroundPage.vue',
+        componentPath: '@/dev/templates/dev/DashboardDevPlaygroundPage.vue',
         supportedRoles: ['all'],
         assetPreload: [{ flag: 'dashboard.typo.flag', type: 'image' }],
       },

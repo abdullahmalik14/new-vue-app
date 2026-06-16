@@ -6,12 +6,12 @@ const routeCatalog = [
   {
     slug: '/dashboard',
     enabled: true,
-    componentPath: '@/templates/dashboard/role/DashboardDevPlaygroundPage.vue'
+    componentPath: '@/dev/templates/dev/DashboardDevPlaygroundPage.vue'
   },
   {
     slug: '/dashboard/analytics',
     enabled: true,
-    componentPath: '@/templates/analytics/AnalyticsPage.vue'
+    componentPath: '@/dev/templates/dashboard/shared/DashboardAnalyticsPage.vue'
   },
   {
     slug: '/payout',
