@@ -41,13 +41,13 @@ describe('routeNavigation snapshots (A8)', () => {
   });
 
   it('stores parent route chain for nested paths (A7)', () => {
-    setCurrentActiveRoute({ slug: '/dashboard/settings/privacy-security' });
+    setCurrentActiveRoute({ slug: '/dashboard/analytics' });
 
     const chain = getCurrentRouteChain();
 
     expect(chain.length).toBeGreaterThanOrEqual(2);
     expect(chain[0].slug).toBe('/dashboard');
-    expect(chain[chain.length - 1].slug).toBe('/dashboard/settings/privacy-security');
+    expect(chain[chain.length - 1].slug).toBe('/dashboard/analytics');
   });
 
   it('keeps previous route snapshot when navigating again', () => {

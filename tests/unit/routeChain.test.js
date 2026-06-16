@@ -7,11 +7,11 @@ beforeEach(() => {
 
 describe('getRouteChainForPath (A7)', () => {
   it('returns progressive slug matches from root to target', () => {
-    const chain = getRouteChainForPath('/dashboard/settings/privacy-security');
+    const chain = getRouteChainForPath('/dashboard/analytics');
 
     expect(chain.length).toBeGreaterThanOrEqual(2);
     expect(chain[0].slug).toBe('/dashboard');
-    expect(chain[chain.length - 1].slug).toBe('/dashboard/settings/privacy-security');
+    expect(chain[chain.length - 1].slug).toBe('/dashboard/analytics');
   });
 
   it('returns a single entry for top-level routes', () => {
