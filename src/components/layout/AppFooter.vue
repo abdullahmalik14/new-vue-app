@@ -53,9 +53,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../../stores/useAuthStore.js';
 import { log } from '../../infrastructure/logging/logHandler.js';
 import { logError } from '../../infrastructure/errors/errorHandler.js';
-import routeConfigImport from '../../router/routeConfig.json';
-import { loadJsonConfigFromImport } from '../../utils/common/jsonConfigLoader.js';
-import { validateRouteConfig } from '../../systems/build/jsonConfigValidator.js';
+import { getRouteConfiguration } from '../../systems/routing/routeConfigLoader.js';
 import { createRoutePrefetchIntentHandler } from '../../composables/useRoutePrefetch.js';
 
 // Component name for logging
@@ -77,24 +75,13 @@ const currentYear = ref(new Date().getFullYear());
 // Processed routes for navigation
 const processedRoutes = ref([]);
 
-// Load and validate route config using global JSON config loader
+// Load route config via canonical loader (validation + cache)
 let routeConfig = [];
 try {
-  const result = loadJsonConfigFromImport(routeConfigImport, {
-    configName: 'route_config_footer',
-    skipValidation: false,
-    validator: validateRouteConfig
+  routeConfig = getRouteConfiguration();
+  log('AppFooter.vue', 'loadRouteConfig', 'success', 'Route config loaded successfully', {
+    routeCount: routeConfig.length
   });
-
-  if (result.success) {
-    routeConfig = result.data;
-    log('AppFooter.vue', 'loadRouteConfig', 'success', 'Route config loaded successfully', {
-      routeCount: routeConfig.length
-    });
-  } else {
-    logError('AppFooter.vue', 'loadRouteConfig', 'Failed to load route config', result.error);
-    routeConfig = [];
-  }
 } catch (error) {
   logError('AppFooter.vue', 'loadRouteConfig', 'Exception loading route config', error);
   routeConfig = [];
