@@ -9,7 +9,7 @@ const baseRoutes = [
   {
     slug: '/log-in',
     section: 'auth',
-    componentPath: '@/templates/auth/page/role/LoginPage.vue',
+    componentPath: '@/dev/templates/auth/page/role/LoginPage.vue',
     supportedRoles: ['all'],
     preLoadSections: ['dashboard', 'shop']
   },

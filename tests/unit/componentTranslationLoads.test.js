@@ -6,16 +6,16 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
 const P07_FILES = [
-  'src/templates/auth/views/AuthLogIn.vue',
-  'src/templates/auth/views/AuthSignUp.vue',
-  'src/templates/auth/views/AuthLostPassword.vue',
-  'src/templates/auth/views/AuthResetPassword.vue',
-  'src/templates/auth/views/AuthConfirmEmail.vue',
-  'src/templates/auth/views/AuthSignUpOnboarding.vue',
-  'src/templates/auth/views/AuthSignUpOnboardingKyc.vue',
-  'src/templates/dashboard/shared/DashboardSharedHeader.vue',
-  'src/templates/dashboard/shared/DashboardSharedSidebar.vue',
-  'src/assets/data/menuItems.js',
+  'src/dev/templates/auth/views/AuthLogIn.vue',
+  'src/dev/templates/auth/views/AuthSignUp.vue',
+  'src/dev/templates/auth/views/AuthLostPassword.vue',
+  'src/dev/templates/auth/views/AuthResetPassword.vue',
+  'src/dev/templates/auth/views/AuthConfirmEmail.vue',
+  'src/dev/templates/auth/views/AuthSignUpOnboarding.vue',
+  'src/dev/templates/auth/views/AuthSignUpOnboardingKyc.vue',
+  'src/dev/templates/dashboard/shared/DashboardSharedHeader.vue',
+  'src/dev/templates/dashboard/shared/DashboardSharedSidebar.vue',
+  'src/config/dashboardSidebarMenuItems.js',
 ];
 
 describe('component translation loads (P-07)', () => {

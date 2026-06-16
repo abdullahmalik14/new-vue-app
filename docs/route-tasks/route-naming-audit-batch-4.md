@@ -4,7 +4,7 @@
 **Reference:** Expanded Vue App Naming Convention.txt  
 **Complete:** Batches 1–4 cover all routed application code
 
-Only items needing a change are listed. **Phase 4.5 triage** applied 2026-06-16.
+Only items needing a change are listed. **Phase 4.5 triage** and **Phase 5 page naming** applied 2026-06-16.
 
 Status values: `done` | `deferred` | `dropped`
 
@@ -12,44 +12,51 @@ Status values: `done` | `deferred` | `dropped`
 
 type: filename
 filename: AuthLogIn.vue
-Status: deferred
-deferredTo: Phase 5
+Status: done
+doneIn: Phase 5 (route page layer: LoginPage.vue)
+note: views/AuthLogIn.vue screen composition unchanged
 suggested: LogInPage.vue
 
 type: filename
 filename: AuthSignUp.vue
-Status: deferred
-deferredTo: Phase 5
+Status: done
+doneIn: Phase 5 (route page layer: SignUpPage.vue)
+note: views/AuthSignUp.vue screen composition unchanged
 suggested: SignUpPage.vue
 
 type: filename
 filename: AuthLostPassword.vue
-Status: deferred
-deferredTo: Phase 5
+Status: done
+doneIn: Phase 5 (route page layer: LostPasswordPage.vue)
+note: views/AuthLostPassword.vue screen composition unchanged
 suggested: LostPasswordPage.vue
 
 type: filename
 filename: AuthResetPassword.vue
-Status: deferred
-deferredTo: Phase 5
+Status: done
+doneIn: Phase 5 (route page layer: ResetPasswordPage.vue)
+note: views/AuthResetPassword.vue screen composition unchanged
 suggested: ResetPasswordPage.vue
 
 type: filename
 filename: AuthConfirmEmail.vue
-Status: deferred
-deferredTo: Phase 5
+Status: done
+doneIn: Phase 5 (route page layer: ConfirmEmailPage.vue)
+note: views/AuthConfirmEmail.vue screen composition unchanged
 suggested: ConfirmEmailPage.vue
 
 type: filename
 filename: AuthSignUpOnboarding.vue
-Status: deferred
-deferredTo: Phase 5
+Status: done
+doneIn: Phase 5 (route page layer: CreatorSignUpOnboardingPage.vue)
+note: views/AuthSignUpOnboarding.vue screen composition unchanged
 suggested: SignUpOnboardingPage.vue
 
 type: filename
 filename: AuthSignUpOnboardingKyc.vue
-Status: deferred
-deferredTo: Phase 5
+Status: done
+doneIn: Phase 5 (route page layer: CreatorSignUpOnboardingKycPage.vue)
+note: views/AuthSignUpOnboardingKyc.vue screen composition unchanged
 suggested: SignUpOnboardingKycPage.vue
 
 type: filename

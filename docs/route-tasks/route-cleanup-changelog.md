@@ -730,4 +730,48 @@ refactor(routing): triage batch 4 symbols and rename remaining adopts
 
 ---
 
+## Phase 5 — Auth route page naming alignment (2026-06-16)
+
+**Master plan:** Phase 5 — template page renames  
+**Audit reference:** [route-naming-audit-batch-4.md](./route-naming-audit-batch-4.md)
+
+### What was already in place
+
+Auth **route entry points** under `src/dev/templates/auth/page/` were already `*Page.vue` wrappers (`LoginPage.vue`, `SignUpPage.vue`, etc.), and [routeConfig.json](../../src/router/routeConfig.json) already pointed at `@/dev/templates/auth/page/...`. No `git mv` was required for the route layer.
+
+### Policy: `views/` unchanged
+
+Per naming convention §4 and [UI_REFACTOR_CHANGELOG.md](../tasks/UI_REFACTOR_CHANGELOG.md), **`views/Auth*.vue` are screen compositions** (embedded by page wrappers and future popup auth), not route-level templates. They keep the `Auth*` filename in Phase 5.
+
+### What changed
+
+- **Tests** — updated stale `src/templates/auth/` and `@/templates/auth/` references to `src/dev/templates/auth/` and `@/dev/templates/auth/` in:
+  - `componentTranslationLoads.test.js`
+  - `routeComponentPathValidator.test.js` (removed silent skip when LoginPage missing)
+  - `routeComponentPrefetch.test.js`
+  - `jsonConfigValidator.test.js`
+- **componentTranslationLoads.test.js** — replaced missing `src/assets/data/menuItems.js` with `src/config/dashboardSidebarMenuItems.js`
+- **Docs** — [routeConfig.schema.md](../../src/router/routeConfig.schema.md) example now shows `@/dev/templates/auth/page/role/LoginPage.vue`
+- **Audit** — batch 4 auth `type: filename` entries marked **done** at route page layer
+
+### Deferred
+
+- `ProfileLoginPopup.vue` not in workspace checkout — when synced, import from `views/Auth*.vue`, not `page/*Page.vue` wrappers
+
+### How tested
+
+```bash
+rg "src/templates/auth|@/templates/auth" tests/   # zero hits
+npm run test:unit -- --run tests/unit/componentTranslationLoads.test.js tests/unit/routeComponentPathValidator.test.js tests/unit/routeComponentPrefetch.test.js
+npm run build
+```
+
+### Suggested commit
+
+```
+refactor(auth): align tests with dev auth page paths and close naming audit
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

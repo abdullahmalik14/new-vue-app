@@ -17,7 +17,7 @@ Can be:
 - **Object**: Role-based sections (e.g., `{ "creator": "dashboard-creator", "fan": "dashboard-fan" }`)
 
 ### `componentPath` (string)
-Path to the Vue component using @ alias. Example: "@/components/auth/AuthLogIn.vue"
+Path to the Vue component using @ alias. Example: "@/dev/templates/auth/page/role/LoginPage.vue"
 
 ## Common Optional Fields
 

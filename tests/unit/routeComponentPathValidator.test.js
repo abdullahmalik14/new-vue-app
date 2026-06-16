@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import {
@@ -33,22 +32,17 @@ describe('routeComponentPathValidator (M10)', () => {
   });
 
   it('componentPathToRelativeFile maps @/ alias to src path', () => {
-    expect(componentPathToRelativeFile('@/templates/auth/page/role/LoginPage.vue')).toBe(
-      'src/templates/auth/page/role/LoginPage.vue',
+    expect(componentPathToRelativeFile('@/dev/templates/auth/page/role/LoginPage.vue')).toBe(
+      'src/dev/templates/auth/page/role/LoginPage.vue',
     );
   });
 
   it('validateRouteComponentPathsOnDisk passes for an existing route component', () => {
-    const relative = 'src/templates/auth/page/role/LoginPage.vue';
-    if (!existsSync(join(projectRoot, relative))) {
-      return;
-    }
-
     const result = validateRouteComponentPathsOnDisk(
       [
         {
           slug: '/log-in',
-          componentPath: '@/templates/auth/page/role/LoginPage.vue',
+          componentPath: '@/dev/templates/auth/page/role/LoginPage.vue',
         },
       ],
       projectRoot,
@@ -75,11 +69,11 @@ describe('routeComponentPathValidator (M10)', () => {
 
   it('validateRouteComponentPathsWithResolver uses glob resolver', () => {
     const resolveLoader = vi.fn((path) =>
-      path === '@/templates/auth/page/role/LoginPage.vue' ? () => Promise.resolve({}) : null,
+      path === '@/dev/templates/auth/page/role/LoginPage.vue' ? () => Promise.resolve({}) : null,
     );
 
     const valid = validateRouteComponentPathsWithResolver(
-      [{ slug: '/log-in', componentPath: '@/templates/auth/page/role/LoginPage.vue' }],
+      [{ slug: '/log-in', componentPath: '@/dev/templates/auth/page/role/LoginPage.vue' }],
       resolveLoader,
     );
     const invalid = validateRouteComponentPathsWithResolver(

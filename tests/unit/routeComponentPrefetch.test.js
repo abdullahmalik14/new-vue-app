@@ -32,7 +32,7 @@ const routeCatalog = [
   {
     slug: '/sign-up',
     enabled: true,
-    componentPath: '@/templates/auth/page/role/SignUpPage.vue'
+    componentPath: '@/dev/templates/auth/page/role/SignUpPage.vue'
   },
   {
     slug: '/:pathMatch(.*)*',
