@@ -225,4 +225,62 @@ npm run test:unit -- --run tests/unit/useRoutePrefetch.test.js   # 2 passed
 
 ---
 
+## Phase 2c — Move resolveRouteAssetPreloads.js (2026-06-16)
+
+**Master plan:** Phase 2, step 2c  
+**Audit reference:** [systems-routing-audit.md](./systems-routing-audit.md) Issue 2
+
+### Issue
+
+`assetPreloadRef` expansion is asset config resolution, not routing logic.
+
+### What changed
+
+- `git mv` `src/systems/routing/resolveRouteAssetPreloads.js` → `src/systems/assets/resolveRouteAssetPreloads.js`
+- Updated imports in `routeConfigLoader.js`, `jsonConfigValidator.js`, tests
+- Exported from `systems/assets/index.js`
+
+### Files touched
+
+`src/systems/assets/resolveRouteAssetPreloads.js`, `src/systems/assets/index.js`, `src/systems/routing/routeConfigLoader.js`, `src/systems/build/jsonConfigValidator.js`, `tests/unit/resolveRouteAssetPreloads.test.js`, `tests/unit/assetMapBuildValidation.test.js`
+
+### How tested
+
+```bash
+rg "routing/resolveRouteAssetPreloads" src/ tests/   # zero hits
+npm run test:unit -- --run tests/unit/resolveRouteAssetPreloads.test.js
+# "throws for unknown assetPreloadRef keys" passes; count assertions pre-existing stale catalog size
+```
+
+---
+
+## Phase 2d — Move useRoutePrefetch.js (2026-06-16)
+
+**Master plan:** Phase 2, step 2d  
+**Audit reference:** [systems-routing-audit.md](./systems-routing-audit.md) Issue 3, [loose-route-code-scan.md](./loose-route-code-scan.md) Issue 4
+
+### Issue
+
+Vue composable lived inside `systems/routing/` instead of `composables/`.
+
+### What changed
+
+- `git mv` `src/systems/routing/useRoutePrefetch.js` → `src/composables/useRoutePrefetch.js`
+- Updated composable imports to `systems/routing/routeComponentPrefetch` and `systems/assets/routeAssetPrefetch`
+- Temporary re-export from `systems/routing/index.js`
+- Updated direct consumers: `AppFooter.vue`, `AuthLogIn.vue`, `DashboardSharedSidebar.vue`, tests
+
+### Files touched
+
+`src/composables/useRoutePrefetch.js`, `src/systems/routing/index.js`, `src/components/layout/AppFooter.vue`, `src/dev/templates/auth/views/AuthLogIn.vue`, `src/dev/templates/dashboard/shared/DashboardSharedSidebar.vue`, `tests/unit/useRoutePrefetch.test.js`
+
+### How tested
+
+```bash
+rg "routing/useRoutePrefetch" src/ tests/   # zero hits (router index re-exports via composables)
+npm run test:unit -- --run tests/unit/useRoutePrefetch.test.js   # 2 passed
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

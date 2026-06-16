@@ -74,7 +74,7 @@ export {
 export {
   useRoutePrefetch,
   createRoutePrefetchIntentHandler,
-} from './useRoutePrefetch.js';
+} from '../../composables/useRoutePrefetch.js';
 
 export {
   resolveRouteTransition,

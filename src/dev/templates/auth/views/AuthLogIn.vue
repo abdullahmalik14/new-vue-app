@@ -122,7 +122,7 @@ import {
   isTrustedOAuthOrigin,
   postOAuthAck,
 } from "@/dev/utils/auth/oauthPostMessage.js";
-import { createRoutePrefetchIntentHandler } from "@/systems/routing/useRoutePrefetch.js";
+import { createRoutePrefetchIntentHandler } from "@/composables/useRoutePrefetch.js";
 
 const { t, locale: i18nLocale } = useI18n();
 const route = useRoute();

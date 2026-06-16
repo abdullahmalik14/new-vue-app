@@ -27,7 +27,7 @@ describe('useRoutePrefetch (M-08)', () => {
   });
 
   it('createRoutePrefetchIntentHandler prefetches component and section assets', async () => {
-    const { createRoutePrefetchIntentHandler } = await import('../../src/systems/routing/useRoutePrefetch.js');
+    const { createRoutePrefetchIntentHandler } = await import('../../src/composables/useRoutePrefetch.js');
 
     createRoutePrefetchIntentHandler('/shop')();
 
@@ -36,7 +36,7 @@ describe('useRoutePrefetch (M-08)', () => {
   });
 
   it('prefetchOnIntent from composable matches combined handler', async () => {
-    const { useRoutePrefetch } = await import('../../src/systems/routing/useRoutePrefetch.js');
+    const { useRoutePrefetch } = await import('../../src/composables/useRoutePrefetch.js');
 
     useRoutePrefetch().prefetchOnIntent('/dashboard')();
 

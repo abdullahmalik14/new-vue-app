@@ -56,7 +56,7 @@ import { logError } from '../../infrastructure/errors/errorHandler.js';
 import routeConfigImport from '../../router/routeConfig.json';
 import { loadJsonConfigFromImport } from '../../utils/common/jsonConfigLoader.js';
 import { validateRouteConfig } from '../../systems/build/jsonConfigValidator.js';
-import { createRoutePrefetchIntentHandler } from '../../systems/routing/useRoutePrefetch.js';
+import { createRoutePrefetchIntentHandler } from '../../composables/useRoutePrefetch.js';
 
 // Component name for logging
 const componentName = 'AppFooter';

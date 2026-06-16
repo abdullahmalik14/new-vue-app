@@ -226,7 +226,7 @@ import BasePopup from "@/components/ui/popup/BasePopup.vue";
 import DashboardProfilePopup from "@/components/ui/popup/DashboardProfilePopup.vue";
 import DashboardNotificationPopup from "@/components/ui/popup/DashboardNotificationPopup.vue";
 import DashboardMenuCounter from "@/components/ui/nav/dashboard/DashboardMenuCounter.vue";
-import { createRoutePrefetchIntentHandler } from "@/systems/routing/useRoutePrefetch.js";
+import { createRoutePrefetchIntentHandler } from "@/composables/useRoutePrefetch.js";
 
 import { useAuthStore } from "@/stores/useAuthStore";
 export default {
