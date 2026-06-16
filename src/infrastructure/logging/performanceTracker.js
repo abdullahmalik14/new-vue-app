@@ -195,8 +195,9 @@
     }
   }
 
-  // UMD-style export
-  if (typeof module !== 'undefined' && module.exports) {
+  // UMD-style export for legacy script tags / AMD (skip when loaded as ESM — module.exports is read-only)
+  const isEsm = typeof import.meta !== 'undefined' && import.meta.url;
+  if (!isEsm && typeof module !== 'undefined' && module.exports) {
     module.exports = PerfTracker; // Node/CommonJS
   } else if (typeof define === 'function' && define.amd) {
     // eslint-disable-next-line no-undef
