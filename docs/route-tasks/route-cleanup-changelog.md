@@ -194,4 +194,35 @@ Some related tests still fail for pre-existing reasons (stale `utils/assets` / `
 
 ---
 
+## Phase 2b — Move routeAssetPrefetch.js (2026-06-16)
+
+**Master plan:** Phase 2, step 2b  
+**Audit reference:** [systems-routing-audit.md](./systems-routing-audit.md) Issue 1, [loose-route-code-scan.md](./loose-route-code-scan.md) Issue 5
+
+### Issue
+
+Route section asset prefetch is asset-layer logic but lived in `systems/routing/`.
+
+### What changed
+
+- `git mv` `src/systems/routing/routeAssetPrefetch.js` → `src/systems/assets/routeAssetPrefetch.js`
+- Fixed relative imports inside moved file (`assetPreloader`, `routeComponentPrefetch`)
+- Re-export from `systems/routing/index.js` and `systems/assets/index.js` for backward compatibility
+- Updated `useRoutePrefetch.js` import and test mocks/paths
+
+### Files touched
+
+`src/systems/assets/routeAssetPrefetch.js`, `src/systems/assets/index.js`, `src/systems/routing/index.js`, `src/systems/routing/useRoutePrefetch.js`, `tests/unit/routeAssetPrefetch.test.js`, `tests/unit/useRoutePrefetch.test.js`
+
+### How tested
+
+```bash
+rg "routing/routeAssetPrefetch" src/ tests/   # zero hits
+npm run test:unit -- --run tests/unit/useRoutePrefetch.test.js   # 2 passed
+```
+
+`routeAssetPrefetch.test.js` still fails on pre-existing `performanceTracker` UMD issue when loading full module chain.
+
+---
+
 *Add a new section above this line for each completed phase.*

@@ -50,7 +50,11 @@ export {
   PRELOAD_TIER_ORDER,
 } from './resolveSharedComponentAssets.js';
 
-export { validateSharedComponentAssetMappings } from './validateSharedComponentAssetMappings.js';
+export {
+  prefetchSectionAssetsForRoute,
+  createSectionAssetPrefetchIntentHandler,
+  resetRouteAssetPrefetchCache,
+} from './routeAssetPrefetch.js';
 
 // Export asset scanner functions
 export {
