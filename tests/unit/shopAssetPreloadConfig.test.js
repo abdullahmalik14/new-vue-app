@@ -6,7 +6,7 @@ describe('C-04 — /shop does not duplicate dashboard icons in shop section buck
   });
 
   it('shop route has no assetPreloadRef; dashboard-global owns dashboardMenuIcons', async () => {
-    const { getRouteConfiguration } = await import('../../src/utils/route/routeConfigLoader.js');
+    const { getRouteConfiguration } = await import('../../src/systems/routing/routeConfigLoader.js');
     const {
       getAssetPreloadEntriesForSection,
       clearAssetPreloadSectionCache,

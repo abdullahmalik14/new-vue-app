@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-const LOADER_PATH = '../../src/utils/section/sectionCssLoader.js';
+const LOADER_PATH = '../../src/systems/sections/sectionCssLoader.js';
 
 const getSectionBundlePaths = vi.fn();
 

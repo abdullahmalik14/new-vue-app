@@ -24,7 +24,7 @@ describe('resolveActiveLocaleForNavigation (L-09)', () => {
     useLocaleStore().setLocale('en');
 
     const { resolveActiveLocaleForNavigation, resolveActiveLocale } = await import(
-      '@/utils/translation/localeManager.js'
+      '@/systems/i18n/localeManager.js'
     );
 
     const to = { path: '/vi/log-in', params: { locale: 'vi' } };
@@ -39,7 +39,7 @@ describe('resolveActiveLocaleForNavigation (L-09)', () => {
     const {
       TEMP_LOCALE_SESSION_KEY,
       resolveActiveLocaleForNavigation,
-    } = await import('@/utils/translation/localeManager.js');
+    } = await import('@/systems/i18n/localeManager.js');
 
     sessionStorage.setItem(TEMP_LOCALE_SESSION_KEY, 'vi');
 

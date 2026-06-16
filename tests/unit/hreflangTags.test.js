@@ -2,13 +2,13 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
-} from '../../src/utils/translation/localeManager.js';
+} from '../../src/systems/i18n/localeManager.js';
 import {
   buildLocalePrefixedPath,
   buildHreflangAlternateUrls,
   syncHreflangTagsForPath,
   clearHreflangTags,
-} from '../../src/utils/translation/hreflangTags.js';
+} from '../../src/systems/i18n/hreflangTags.js';
 
 describe('hreflangTags (B-08)', () => {
   beforeEach(() => {

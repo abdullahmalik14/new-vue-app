@@ -20,7 +20,7 @@ describe('locale module graph (B-09)', () => {
   });
 
   it('localeConstants has no runtime imports from localeManager or useLocaleStore', () => {
-    const src = readFileSync(join(projectRoot, 'src/utils/translation/localeConstants.js'), 'utf8');
+    const src = readFileSync(join(projectRoot, 'src/systems/i18n/localeConstants.js'), 'utf8');
     const importLines = src
       .split('\n')
       .filter((line) => /^\s*import\s/.test(line))
@@ -30,21 +30,21 @@ describe('locale module graph (B-09)', () => {
   });
 
   it('localeManager re-exports constants from localeConstants', () => {
-    const src = readFileSync(join(projectRoot, 'src/utils/translation/localeManager.js'), 'utf8');
+    const src = readFileSync(join(projectRoot, 'src/systems/i18n/localeManager.js'), 'utf8');
 
     expect(src).toMatch(/from ['"].*localeConstants\.js['"]/);
     expect(src).not.toMatch(/^export const SUPPORTED_LOCALES/m);
   });
 
   it('translationLoader reads SUPPORTED_LOCALES from localeConstants', () => {
-    const src = readFileSync(join(projectRoot, 'src/utils/translation/translationLoader.js'), 'utf8');
+    const src = readFileSync(join(projectRoot, 'src/systems/i18n/translationLoader.js'), 'utf8');
 
     expect(src).toMatch(/SUPPORTED_LOCALES.*localeConstants\.js/);
   });
 
   it('store getter matches localeConstants list', async () => {
     const { SUPPORTED_LOCALES } = await import(
-      '../../src/utils/translation/localeConstants.js'
+      '../../src/systems/i18n/localeConstants.js'
     );
     const { useLocaleStore } = await import('../../src/stores/useLocaleStore.js');
 

@@ -6,8 +6,8 @@ import {
   collectComponentPathsFromRoute,
   componentPathToRelativeFile,
   validateRouteComponentPathsWithResolver,
-} from '../../src/utils/route/routeComponentPathValidator.js';
-import { validateRouteComponentPathsOnDisk } from '../../src/utils/route/routeComponentPathValidator.node.js';
+} from '../../src/systems/routing/routeComponentPathValidator.js';
+import { validateRouteComponentPathsOnDisk } from '../../src/systems/routing/routeComponentPathValidator.node.js';
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 

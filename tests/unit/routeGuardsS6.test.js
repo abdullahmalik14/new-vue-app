@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import * as errorHandler from '../../src/utils/common/errorHandler.js';
+import * as errorHandler from '../../src/infrastructure/errors/errorHandler.js';
 import * as objectSafety from '../../src/utils/common/objectSafety.js';
-import * as routeGuardsModule from '../../src/utils/route/routeGuards.js';
+import * as routeGuardsModule from '../../src/systems/routing/routeGuards.js';
 
 describe('routeGuards S6 — guard chain exception handling', () => {
   beforeEach(() => {

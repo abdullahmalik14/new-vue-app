@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-const LOCALE_MANAGER_PATH = '../../src/utils/translation/localeManager.js';
+const LOCALE_MANAGER_PATH = '../../src/systems/i18n/localeManager.js';
 
 vi.mock('../../src/stores/useLocaleStore.js', () => ({
   useLocaleStore: vi.fn(() => ({ locale: 'en', setLocale: vi.fn() })),
@@ -10,7 +10,7 @@ vi.mock('../../src/stores/useAuthStore.js', () => ({
   useAuthStore: vi.fn(() => ({ currentUser: { role: 'guest' } })),
 }));
 
-vi.mock('../../src/utils/translation/i18nInstance.js', () => ({
+vi.mock('../../src/systems/i18n/i18nInstance.js', () => ({
   getI18nInstance: vi.fn(() => null),
 }));
 

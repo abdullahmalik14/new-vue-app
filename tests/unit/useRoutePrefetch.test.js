@@ -4,14 +4,14 @@ import { createPinia, setActivePinia } from 'pinia';
 const prefetchRouteComponent = vi.fn(() => Promise.resolve());
 const prefetchSectionAssetsForRoute = vi.fn(() => Promise.resolve());
 
-vi.mock('../../src/utils/route/routeComponentPrefetch.js', () => ({
+vi.mock('../../src/systems/routing/routeComponentPrefetch.js', () => ({
   prefetchRouteComponent,
   createRoutePrefetchIntentHandler: (targetPath, options) => () => {
     prefetchRouteComponent(targetPath, options);
   },
 }));
 
-vi.mock('../../src/utils/route/routeAssetPrefetch.js', () => ({
+vi.mock('../../src/systems/routing/routeAssetPrefetch.js', () => ({
   prefetchSectionAssetsForRoute,
   createSectionAssetPrefetchIntentHandler: (targetPath, options) => () => {
     prefetchSectionAssetsForRoute(targetPath, options);
@@ -27,7 +27,7 @@ describe('useRoutePrefetch (M-08)', () => {
   });
 
   it('createRoutePrefetchIntentHandler prefetches component and section assets', async () => {
-    const { createRoutePrefetchIntentHandler } = await import('../../src/utils/route/useRoutePrefetch.js');
+    const { createRoutePrefetchIntentHandler } = await import('../../src/systems/routing/useRoutePrefetch.js');
 
     createRoutePrefetchIntentHandler('/shop')();
 
@@ -36,7 +36,7 @@ describe('useRoutePrefetch (M-08)', () => {
   });
 
   it('prefetchOnIntent from composable matches combined handler', async () => {
-    const { useRoutePrefetch } = await import('../../src/utils/route/useRoutePrefetch.js');
+    const { useRoutePrefetch } = await import('../../src/systems/routing/useRoutePrefetch.js');
 
     useRoutePrefetch().prefetchOnIntent('/dashboard')();
 

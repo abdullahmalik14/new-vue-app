@@ -14,7 +14,7 @@ describe('getDisplayedLocale', () => {
   it('prefers window.location.pathname over stale vue-router path', async () => {
     window.history.replaceState({}, '', '/vi/dashboard');
 
-    const { getDisplayedLocale } = await import('@/utils/translation/localeManager.js');
+    const { getDisplayedLocale } = await import('@/systems/i18n/localeManager.js');
 
     expect(getDisplayedLocale('/am/dashboard')).toBe('vi');
   });

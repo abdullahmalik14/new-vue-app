@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   guardCheckUserRole,
   guardCheckDependencies,
-} from '../../src/utils/route/routeGuards.js';
+} from '../../src/systems/routing/routeGuards.js';
 
 /** Mirrors /sign-up/onboarding/kyc non-creator redirect pattern */
 const kycRoute = {

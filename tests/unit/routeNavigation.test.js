@@ -6,7 +6,7 @@ import {
   getPreviousActiveRoute,
   getNavigationHistory,
   clearNavigationHistory,
-} from '../../src/utils/route/routeNavigation.js';
+} from '../../src/systems/routing/routeNavigation.js';
 
 beforeEach(() => {
   delete window.performanceTracker;

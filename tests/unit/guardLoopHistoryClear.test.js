@@ -5,7 +5,7 @@ import {
   shouldClearGuardLoopHistoryAfterNavigation,
   clearGuardNavigationHistory,
   guardPreventNavigationLoop,
-} from '../../src/utils/route/routeGuards.js';
+} from '../../src/systems/routing/routeGuards.js';
 
 describe('L5 — guard loop history clear policy', () => {
   beforeEach(() => {

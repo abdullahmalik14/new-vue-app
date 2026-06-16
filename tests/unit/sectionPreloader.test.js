@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 
-const LOADER_PATH = '../../src/utils/section/sectionPreloader.js';
+const LOADER_PATH = '../../src/systems/sections/sectionPreloader.js';
 
 const getSectionBundlePaths = vi.fn();
 const preloadSectionCss = vi.fn();
@@ -11,7 +11,7 @@ vi.mock('../../src/utils/build/manifestLoader.js', () => ({
   getSectionBundlePaths
 }));
 
-vi.mock('../../src/utils/section/sectionCssLoader.js', () => ({
+vi.mock('../../src/systems/sections/sectionCssLoader.js', () => ({
   preloadSectionCss,
   clearAllSectionCss: vi.fn(),
   clearSectionCssPreloadHint: vi.fn()

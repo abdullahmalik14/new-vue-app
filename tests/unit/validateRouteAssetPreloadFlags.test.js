@@ -3,7 +3,7 @@ import {
   validateRouteAssetPreloadFlags,
   collectAssetMapFlags,
   validateSharedCatalogAssetPreloadFlags,
-} from '../../src/utils/assets/validateRouteAssetPreloadFlags.js';
+} from '../../src/systems/assets/validateRouteAssetPreloadFlags.js';
 
 describe('validateRouteAssetPreloadFlags (M-04)', () => {
   const assetMap = {

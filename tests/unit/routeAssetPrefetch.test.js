@@ -3,11 +3,11 @@ import { createPinia, setActivePinia } from 'pinia';
 
 const preloadSectionAssets = vi.fn(() => Promise.resolve());
 
-vi.mock('../../src/utils/assets/assetPreloader.js', () => ({
+vi.mock('../../src/systems/assets/assetPreloader.js', () => ({
   preloadSectionAssets,
 }));
 
-vi.mock('../../src/utils/route/routeComponentPrefetch.js', () => ({
+vi.mock('../../src/systems/routing/routeComponentPrefetch.js', () => ({
   normalizeTargetPath: (target) => {
     if (typeof target === 'string') {
       return target.split('?')[0].split('#')[0];
@@ -31,12 +31,12 @@ describe('routeAssetPrefetch (M-08)', () => {
     setActivePinia(createPinia());
     preloadSectionAssets.mockClear();
 
-    const { resetRouteAssetPrefetchCache } = await import('../../src/utils/route/routeAssetPrefetch.js');
+    const { resetRouteAssetPrefetchCache } = await import('../../src/systems/routing/routeAssetPrefetch.js');
     resetRouteAssetPrefetchCache();
   });
 
   it('prefetches section assets for a hover target path', async () => {
-    const { prefetchSectionAssetsForRoute } = await import('../../src/utils/route/routeAssetPrefetch.js');
+    const { prefetchSectionAssetsForRoute } = await import('../../src/systems/routing/routeAssetPrefetch.js');
 
     await prefetchSectionAssetsForRoute('/shop');
 
@@ -45,7 +45,7 @@ describe('routeAssetPrefetch (M-08)', () => {
   });
 
   it('dedupes section asset prefetch for the same section', async () => {
-    const { prefetchSectionAssetsForRoute } = await import('../../src/utils/route/routeAssetPrefetch.js');
+    const { prefetchSectionAssetsForRoute } = await import('../../src/systems/routing/routeAssetPrefetch.js');
 
     await prefetchSectionAssetsForRoute('/shop');
     await prefetchSectionAssetsForRoute('/shop');

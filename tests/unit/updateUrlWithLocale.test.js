@@ -1,22 +1,22 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-const LOCALE_MANAGER_PATH = '../../src/utils/translation/localeManager.js';
+const LOCALE_MANAGER_PATH = '../../src/systems/i18n/localeManager.js';
 
 const loadTranslationsForSection = vi.fn(() => Promise.resolve({ ok: true }));
 const loadBaseTranslations = vi.fn(() => Promise.resolve({ ui: {} }));
 const clearTranslationCaches = vi.fn();
 
-vi.mock('../../src/utils/translation/translationLoader.js', () => ({
+vi.mock('../../src/systems/i18n/translationLoader.js', () => ({
   loadTranslationsForSection: (...args) => loadTranslationsForSection(...args),
   loadBaseTranslations: (...args) => loadBaseTranslations(...args),
   clearTranslationCaches: (...args) => clearTranslationCaches(...args),
 }));
 
-vi.mock('../../src/utils/route/routeResolver.js', () => ({
+vi.mock('../../src/systems/routing/routeResolver.js', () => ({
   resolveRouteFromPath: vi.fn(() => ({ section: 'auth', preLoadSections: [] })),
 }));
 
-vi.mock('../../src/utils/section/sectionPreloadOrchestrator.js', () => ({
+vi.mock('../../src/systems/sections/sectionPreloadOrchestrator.js', () => ({
   getRoutePreloadPlan: vi.fn(() => ({ resolved: [] })),
   refreshSectionPreloadsOnLocaleChange: vi.fn(() => Promise.resolve()),
 }));
@@ -29,13 +29,13 @@ vi.mock('../../src/stores/useLocaleStore.js', () => ({
   useLocaleStore: vi.fn(() => ({ locale: 'en', setLocale: vi.fn() })),
 }));
 
-vi.mock('../../src/utils/translation/i18nInstance.js', () => ({
+vi.mock('../../src/systems/i18n/i18nInstance.js', () => ({
   getI18nInstance: vi.fn(() => ({
     global: { locale: { value: 'en' } },
   })),
 }));
 
-vi.mock('../../src/utils/section/sectionResolver.js', () => ({
+vi.mock('../../src/systems/sections/sectionResolver.js', () => ({
   resolveRoleSectionVariant: vi.fn((section) => section),
 }));
 

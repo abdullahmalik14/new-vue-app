@@ -14,7 +14,7 @@ describe('temporary page locale (F-03)', () => {
       TEMP_LOCALE_BASE_KEY,
       getTemporaryPageLocale,
       isTemporaryPageLocaleActive,
-    } = await import('@/utils/translation/localeManager.js');
+    } = await import('@/systems/i18n/localeManager.js');
 
     sessionStorage.setItem(TEMP_LOCALE_BASE_KEY, 'en');
     sessionStorage.setItem(TEMP_LOCALE_SESSION_KEY, 'vi');
@@ -28,7 +28,7 @@ describe('temporary page locale (F-03)', () => {
       TEMP_LOCALE_SESSION_KEY,
       TEMP_LOCALE_BASE_KEY,
       clearTemporaryPageLocaleOnReload,
-    } = await import('@/utils/translation/localeManager.js');
+    } = await import('@/systems/i18n/localeManager.js');
 
     sessionStorage.setItem(TEMP_LOCALE_SESSION_KEY, 'vi');
     sessionStorage.setItem(TEMP_LOCALE_BASE_KEY, 'en');
@@ -54,7 +54,7 @@ describe('temporary page locale (F-03)', () => {
       TEMP_LOCALE_BASE_KEY,
       syncTemporaryPageLocaleFromUrl,
       getTemporaryPageLocale,
-    } = await import('@/utils/translation/localeManager.js');
+    } = await import('@/systems/i18n/localeManager.js');
 
     syncTemporaryPageLocaleFromUrl('vi');
 
@@ -72,7 +72,7 @@ describe('temporary page locale (F-03)', () => {
       TEMP_LOCALE_BASE_KEY,
       syncTemporaryPageLocaleFromUrl,
       getTemporaryPageLocale,
-    } = await import('@/utils/translation/localeManager.js');
+    } = await import('@/systems/i18n/localeManager.js');
 
     sessionStorage.setItem(TEMP_LOCALE_BASE_KEY, 'da');
     sessionStorage.setItem(TEMP_LOCALE_SESSION_KEY, 'vi');
@@ -92,7 +92,7 @@ describe('temporary page locale (F-03)', () => {
       TEMP_LOCALE_SESSION_KEY,
       TEMP_LOCALE_BASE_KEY,
       resolveLocaleForUrlInjection,
-    } = await import('@/utils/translation/localeManager.js');
+    } = await import('@/systems/i18n/localeManager.js');
 
     sessionStorage.setItem(TEMP_LOCALE_BASE_KEY, 'en');
     sessionStorage.setItem(TEMP_LOCALE_SESSION_KEY, 'vi');

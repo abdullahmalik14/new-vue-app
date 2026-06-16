@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-const LOADER_PATH = '../../src/utils/section/sectionResolver.js';
+const LOADER_PATH = '../../src/systems/sections/sectionResolver.js';
 
 beforeEach(() => {
   vi.resetModules();

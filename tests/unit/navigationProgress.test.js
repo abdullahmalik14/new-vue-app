@@ -4,7 +4,7 @@ import {
   finishNavigationProgress,
   failNavigationProgress,
   useNavigationProgress,
-} from '../../src/utils/route/navigationProgress.js';
+} from '../../src/systems/routing/navigationProgress.js';
 
 describe('navigationProgress (M1)', () => {
   beforeEach(() => {

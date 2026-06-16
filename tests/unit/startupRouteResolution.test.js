@@ -3,9 +3,9 @@ import { describe, it, expect } from 'vitest';
 describe('startup route resolution (L-11)', () => {
   it('normalizeLocalizedPath strips locale before resolveRouteFromPath matches slug', async () => {
     const { normalizeLocalizedPath } = await import(
-      '@/utils/translation/localeManager.js'
+      '@/systems/i18n/localeManager.js'
     );
-    const { resolveRouteFromPath } = await import('@/utils/route/routeResolver.js');
+    const { resolveRouteFromPath } = await import('@/systems/routing/routeResolver.js');
 
     const rawPath = '/vi/log-in';
     const normalized = normalizeLocalizedPath(rawPath);
@@ -22,9 +22,9 @@ describe('startup route resolution (L-11)', () => {
 
   it('hyphenated locale prefixes normalize correctly', async () => {
     const { normalizeLocalizedPath } = await import(
-      '@/utils/translation/localeManager.js'
+      '@/systems/i18n/localeManager.js'
     );
-    const { resolveRouteFromPath } = await import('@/utils/route/routeResolver.js');
+    const { resolveRouteFromPath } = await import('@/systems/routing/routeResolver.js');
 
     const normalized = normalizeLocalizedPath('/zh-tw/log-in');
 

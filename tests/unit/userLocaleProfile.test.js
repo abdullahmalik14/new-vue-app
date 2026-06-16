@@ -8,7 +8,7 @@ vi.mock('@/lib/mock-api-demo/apiWrapper.js', () => ({
   },
 }));
 
-vi.mock('@/utils/translation/localeManager.js', async (importOriginal) => {
+vi.mock('@/systems/i18n/localeManager.js', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -18,7 +18,7 @@ vi.mock('@/utils/translation/localeManager.js', async (importOriginal) => {
   };
 });
 
-vi.mock('@/utils/translation/cognitoLocaleProfile.js', () => ({
+vi.mock('@/systems/i18n/cognitoLocaleProfile.js', () => ({
   isCognitoLocaleProfileEnabled: vi.fn(() => false),
   getPreferredLocaleFromTokenClaims: vi.fn(() => null),
   savePreferredLocaleToCognito: vi.fn(async () => true),
@@ -38,7 +38,7 @@ describe('userLocaleProfile (F-02)', () => {
 
   it('applyUserPreferredLocaleOnAuth calls setActiveLocale when profile has preferredLocale', async () => {
     const apiWrapper = (await import('@/lib/mock-api-demo/apiWrapper.js')).default;
-    const { setActiveLocale } = await import('@/utils/translation/localeManager.js');
+    const { setActiveLocale } = await import('@/systems/i18n/localeManager.js');
     const { useAuthStore } = await import('@/stores/useAuthStore.js');
 
     apiWrapper.get.mockResolvedValue({ preferredLocale: 'vi' });
@@ -47,7 +47,7 @@ describe('userLocaleProfile (F-02)', () => {
     auth.idToken = 'token';
 
     const { applyUserPreferredLocaleOnAuth } = await import(
-      '@/utils/translation/userLocaleProfile.js'
+      '@/systems/i18n/userLocaleProfile.js'
     );
     await applyUserPreferredLocaleOnAuth();
 
@@ -61,7 +61,7 @@ describe('userLocaleProfile (F-02)', () => {
   it('syncPreferredLocaleToProfile skips when not authenticated', async () => {
     const apiWrapper = (await import('@/lib/mock-api-demo/apiWrapper.js')).default;
     const { syncPreferredLocaleToProfile } = await import(
-      '@/utils/translation/userLocaleProfile.js'
+      '@/systems/i18n/userLocaleProfile.js'
     );
 
     const ok = await syncPreferredLocaleToProfile('vi');

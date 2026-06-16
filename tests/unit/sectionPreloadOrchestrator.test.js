@@ -4,12 +4,12 @@ import { createPinia, setActivePinia } from 'pinia';
 const preloadSection = vi.fn();
 const resetSectionPreloadState = vi.fn();
 
-vi.mock('../../src/utils/section/sectionPreloader.js', () => ({
+vi.mock('../../src/systems/sections/sectionPreloader.js', () => ({
   preloadSection,
   resetSectionPreloadState
 }));
 
-vi.mock('../../src/utils/translation/translationLoader.js', () => ({
+vi.mock('../../src/systems/i18n/translationLoader.js', () => ({
   loadTranslationsForSection: vi.fn().mockResolvedValue(undefined),
   areTranslationsLoadedForSection: vi.fn(() => false),
 }));
@@ -22,7 +22,7 @@ beforeEach(async () => {
   resetSectionPreloadState.mockReset();
 
   const { areTranslationsLoadedForSection, loadTranslationsForSection } = await import(
-    '../../src/utils/translation/translationLoader.js'
+    '../../src/systems/i18n/translationLoader.js'
   );
   areTranslationsLoadedForSection.mockReturnValue(false);
   loadTranslationsForSection.mockClear();
@@ -30,7 +30,7 @@ beforeEach(async () => {
 
 describe('startBackgroundSectionPreloads (P-07 / Task 4b)', () => {
   it('calls preloadSection only for each background section', async () => {
-    const { startBackgroundSectionPreloads } = await import('../../src/utils/section/sectionPreloadOrchestrator.js');
+    const { startBackgroundSectionPreloads } = await import('../../src/systems/sections/sectionPreloadOrchestrator.js');
 
     await startBackgroundSectionPreloads({
       sections: ['auth', 'shop'],
@@ -43,10 +43,10 @@ describe('startBackgroundSectionPreloads (P-07 / Task 4b)', () => {
   });
 
   it('does not import or call preloadSectionCss directly', async () => {
-    const cssLoader = await import('../../src/utils/section/sectionCssLoader.js');
+    const cssLoader = await import('../../src/systems/sections/sectionCssLoader.js');
     const preloadSectionCssSpy = vi.spyOn(cssLoader, 'preloadSectionCss');
 
-    const { startBackgroundSectionPreloads } = await import('../../src/utils/section/sectionPreloadOrchestrator.js');
+    const { startBackgroundSectionPreloads } = await import('../../src/systems/sections/sectionPreloadOrchestrator.js');
 
     await startBackgroundSectionPreloads({
       sections: ['auth'],
@@ -60,12 +60,12 @@ describe('startBackgroundSectionPreloads (P-07 / Task 4b)', () => {
 
   it('skips background translation preload when section/locale already loaded (P-02)', async () => {
     const { areTranslationsLoadedForSection, loadTranslationsForSection } = await import(
-      '../../src/utils/translation/translationLoader.js'
+      '../../src/systems/i18n/translationLoader.js'
     );
     areTranslationsLoadedForSection.mockReturnValue(true);
 
     const { startBackgroundSectionPreloads } = await import(
-      '../../src/utils/section/sectionPreloadOrchestrator.js'
+      '../../src/systems/sections/sectionPreloadOrchestrator.js'
     );
 
     await startBackgroundSectionPreloads({
@@ -82,8 +82,8 @@ describe('startBackgroundSectionPreloads (P-07 / Task 4b)', () => {
 
 describe('refreshSectionPreloadsOnLocaleChange (M-07)', () => {
   it('resets preload state then re-runs bundles and translations', async () => {
-    const { loadTranslationsForSection } = await import('../../src/utils/translation/translationLoader.js');
-    const { refreshSectionPreloadsOnLocaleChange } = await import('../../src/utils/section/sectionPreloadOrchestrator.js');
+    const { loadTranslationsForSection } = await import('../../src/systems/i18n/translationLoader.js');
+    const { refreshSectionPreloadsOnLocaleChange } = await import('../../src/systems/sections/sectionPreloadOrchestrator.js');
 
     await refreshSectionPreloadsOnLocaleChange({
       sections: ['auth', 'shop', 'auth'],

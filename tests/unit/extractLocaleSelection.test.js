@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { extractLocaleSelection } from '@/utils/translation/localeManager.js';
+import { extractLocaleSelection } from '@/systems/i18n/localeManager.js';
 
 describe('extractLocaleSelection', () => {
   it('reads code from UnifiedSelect option object', () => {

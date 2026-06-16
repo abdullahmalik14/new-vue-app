@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-const LOCALE_MANAGER_PATH = '../../src/utils/translation/localeManager.js';
+const LOCALE_MANAGER_PATH = '../../src/systems/i18n/localeManager.js';
 
 beforeEach(() => {
   window.performanceTracker = { step: vi.fn() };

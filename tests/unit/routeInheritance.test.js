@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   inheritConfigurationFromParentRoute,
-} from '../../src/utils/route/routeResolver.js';
-import { resolveEffectiveRouteConfig } from '../../src/utils/section/sectionPreloadOrchestrator.js';
-import { guardCheckAuthentication } from '../../src/utils/route/routeGuards.js';
+} from '../../src/systems/routing/routeResolver.js';
+import { resolveEffectiveRouteConfig } from '../../src/systems/sections/sectionPreloadOrchestrator.js';
+import { guardCheckAuthentication } from '../../src/systems/routing/routeGuards.js';
 
 beforeEach(() => {
   delete window.performanceTracker;

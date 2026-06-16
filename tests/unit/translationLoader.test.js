@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-const LOADER_PATH = '../../src/utils/translation/translationLoader.js';
+const LOADER_PATH = '../../src/systems/i18n/translationLoader.js';
 
 vi.mock('../../src/utils/common/cacheHandler.js', () => ({
   getValueFromCache: vi.fn(() => null),
@@ -8,11 +8,11 @@ vi.mock('../../src/utils/common/cacheHandler.js', () => ({
   removeCacheKeysByPrefix: vi.fn(() => 0),
 }));
 
-vi.mock('../../src/utils/translation/localeManager.js', () => ({
+vi.mock('../../src/systems/i18n/localeManager.js', () => ({
   resolveActiveLocale: vi.fn(() => 'en'),
 }));
 
-vi.mock('../../src/utils/translation/i18nInstance.js', () => ({
+vi.mock('../../src/systems/i18n/i18nInstance.js', () => ({
   getI18nInstance: vi.fn(() => null)
 }));
 
@@ -404,7 +404,7 @@ describe('applyTranslationsToI18n setLocaleMessage fallback (B-06)', () => {
       localeMessages[code] = messages;
     });
 
-    const { getI18nInstance } = await import('../../src/utils/translation/i18nInstance.js');
+    const { getI18nInstance } = await import('../../src/systems/i18n/i18nInstance.js');
     getI18nInstance.mockReturnValue({
       global: {
         getLocaleMessage: (code) => localeMessages[code] || {},

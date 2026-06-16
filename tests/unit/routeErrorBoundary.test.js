@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   createRouteRenderError,
   shouldClearRouteErrorOnNavigation,
-} from '../../src/utils/route/routeErrorBoundary.js';
+} from '../../src/systems/routing/routeErrorBoundary.js';
 
 describe('routeErrorBoundary (M6)', () => {
   it('createRouteRenderError normalizes Error instances', () => {

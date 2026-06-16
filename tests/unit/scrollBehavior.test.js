@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveRouterScrollPosition } from '../../src/utils/route/scrollBehavior.js';
+import { resolveRouterScrollPosition } from '../../src/systems/routing/scrollBehavior.js';
 
 describe('resolveRouterScrollPosition B8', () => {
   it('restores saved back/forward position', () => {

@@ -14,7 +14,7 @@ describe('syncCurrentActiveLocaleFromStore (L-12)', () => {
       applyLocaleTemporarily,
       getActiveLocale,
       syncCurrentActiveLocaleFromStore,
-    } = await import('@/utils/translation/localeManager.js');
+    } = await import('@/systems/i18n/localeManager.js');
 
     await applyLocaleTemporarily('vi', { loadTranslations: false });
 
@@ -31,7 +31,7 @@ describe('syncCurrentActiveLocaleFromStore (L-12)', () => {
       getActiveLocale,
       syncCurrentActiveLocaleFromStore,
       setActiveLocale,
-    } = await import('@/utils/translation/localeManager.js');
+    } = await import('@/systems/i18n/localeManager.js');
 
     await setActiveLocale('vi', { updateUrl: false, syncProfile: false });
     syncCurrentActiveLocaleFromStore('not-a-locale');

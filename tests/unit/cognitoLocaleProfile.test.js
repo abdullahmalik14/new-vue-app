@@ -3,7 +3,7 @@ import {
   COGNITO_PREFERRED_LOCALE_ATTRIBUTE,
   getPreferredLocaleFromTokenClaims,
   normalizePreferredLocaleCode,
-} from '@/utils/translation/cognitoLocaleProfile.js';
+} from '@/systems/i18n/cognitoLocaleProfile.js';
 
 describe('cognitoLocaleProfile (F-02 Cognito)', () => {
   it('reads custom:preferred_locale from token claims', () => {

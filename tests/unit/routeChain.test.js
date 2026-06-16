@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { getRouteChainForPath } from '../../src/utils/route/routeResolver.js';
+import { getRouteChainForPath } from '../../src/systems/routing/routeResolver.js';
 
 beforeEach(() => {
   delete window.performanceTracker;

@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('../../src/utils/section/sectionPreloadOrchestrator.js', () => ({
+vi.mock('../../src/systems/sections/sectionPreloadOrchestrator.js', () => ({
   resolveEffectiveRouteConfig: (config) => config,
 }));
 
-import { resolveRouteTransition } from '../../src/utils/route/routeTransition.js';
+import { resolveRouteTransition } from '../../src/systems/routing/routeTransition.js';
 
 describe('resolveRouteTransition (M3)', () => {
   it('uses route-fade by default when transition is unset', () => {

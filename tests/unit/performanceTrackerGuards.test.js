@@ -4,7 +4,7 @@ const getRouteConfiguration = vi.fn(() => [
   { slug: '/log-in', section: 'auth', componentPath: '@/pages/auth/LogIn.vue' }
 ]);
 
-vi.mock('../../src/utils/route/routeConfigLoader.js', () => ({
+vi.mock('../../src/systems/routing/routeConfigLoader.js', () => ({
   getRouteConfiguration
 }));
 
@@ -37,7 +37,7 @@ describe('performanceTracker guards (S-05)', () => {
   });
 
   it('routeResolver resolveRouteFromPath works without performanceTracker (A4)', async () => {
-    const { resolveRouteFromPath } = await import('../../src/utils/route/routeResolver.js');
+    const { resolveRouteFromPath } = await import('../../src/systems/routing/routeResolver.js');
 
     const route = resolveRouteFromPath('/log-in');
 
@@ -51,7 +51,7 @@ describe('performanceTracker guards (S-05)', () => {
 
     try {
       const { trackStep, getPerformanceTracker } = await import(
-        '../../src/utils/common/performanceTrackerAccess.js'
+        '../../src/infrastructure/logging/performanceTrackerAccess.js'
       );
 
       expect(() =>
@@ -71,7 +71,7 @@ describe('performanceTracker guards (S-05)', () => {
   });
 
   it('routeGuards runAllRouteGuards works without performanceTracker (B1)', async () => {
-    const { runAllRouteGuards } = await import('../../src/utils/route/routeGuards.js');
+    const { runAllRouteGuards } = await import('../../src/systems/routing/routeGuards.js');
 
     const result = await runAllRouteGuards(
       { slug: '/log-in', requiresAuth: false, enabled: true, supportedRoles: ['all'] },
@@ -83,7 +83,7 @@ describe('performanceTracker guards (S-05)', () => {
   });
 
   it('routeConfigLoader getRouteConfiguration works without performanceTracker (B1)', async () => {
-    const { getRouteConfiguration } = await import('../../src/utils/route/routeConfigLoader.js');
+    const { getRouteConfiguration } = await import('../../src/systems/routing/routeConfigLoader.js');
 
     const routes = getRouteConfiguration();
 
@@ -96,7 +96,7 @@ describe('performanceTracker guards (S-05)', () => {
       setCurrentActiveRoute,
       getCurrentActiveRoute,
       clearNavigationHistory,
-    } = await import('../../src/utils/route/routeNavigation.js');
+    } = await import('../../src/systems/routing/routeNavigation.js');
 
     setCurrentActiveRoute({ slug: '/dashboard' });
 

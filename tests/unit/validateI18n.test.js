@@ -9,7 +9,7 @@ import {
   flattenTranslationKeys,
   hasTranslationKey,
   validateI18n,
-} from '../../src/utils/translation/validateI18n.js';
+} from '../../src/systems/i18n/validateI18n.js';
 
 describe('validateI18n helpers (F-10)', () => {
   it('flattenTranslationKeys returns dotted leaf paths', () => {

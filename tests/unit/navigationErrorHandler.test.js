@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   isChunkLoadNavigationError,
   isOnNavigationErrorRoute,
-} from '../../src/utils/route/navigationErrorHandler.js';
+} from '../../src/systems/routing/navigationErrorHandler.js';
 
 describe('navigationErrorHandler B6', () => {
   it('detects ChunkLoadError by name', () => {

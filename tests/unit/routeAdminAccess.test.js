@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { isAdminUser, isRouteAccessibleToAdmin } from '../../src/utils/route/routeAdminAccess.js';
-import { guardCheckRouteAdminAccess } from '../../src/utils/route/routeGuards.js';
+import { isAdminUser, isRouteAccessibleToAdmin } from '../../src/systems/routing/routeAdminAccess.js';
+import { guardCheckRouteAdminAccess } from '../../src/systems/routing/routeGuards.js';
 
 describe('routeAdminAccess (M11)', () => {
   it('isAdminUser detects admin role and isAdmin flag', () => {

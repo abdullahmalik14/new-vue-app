@@ -3,28 +3,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const loadTranslationsForSection = vi.fn(() => Promise.resolve({}));
 const areTranslationsLoadedForSection = vi.fn(() => false);
 
-vi.mock('../../src/utils/translation/translationLoader.js', () => ({
+vi.mock('../../src/systems/i18n/translationLoader.js', () => ({
   loadTranslationsForSection: (...args) => loadTranslationsForSection(...args),
   areTranslationsLoadedForSection: (...args) => areTranslationsLoadedForSection(...args),
 }));
 
-vi.mock('../../src/utils/section/sectionCssLoader.js', () => ({
+vi.mock('../../src/systems/sections/sectionCssLoader.js', () => ({
   loadSectionCss: vi.fn(() => Promise.resolve()),
   unloadSectionCss: vi.fn(),
 }));
 
-vi.mock('../../src/utils/assets/assetPreloader.js', () => ({
+vi.mock('../../src/systems/assets/assetPreloader.js', () => ({
   preloadSectionAssets: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../src/utils/section/sectionResolver.js', () => ({
+vi.mock('../../src/systems/sections/sectionResolver.js', () => ({
   resolveRoleSectionVariant: vi.fn((section, role) => section[role] || section.default),
 }));
 
 import {
   resolveCurrentSectionForNavigation,
   startCurrentSectionResourceLoads,
-} from '../../src/utils/route/routeNavigationData.js';
+} from '../../src/systems/routing/routeNavigationData.js';
 
 describe('routeNavigationData (M9)', () => {
   beforeEach(() => {

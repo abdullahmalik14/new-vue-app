@@ -4,11 +4,11 @@ import {
   isRouteAccessibleInCurrentEnvironment,
   isValidRouteEnvAccess,
   ROUTE_ENV_ACCESS,
-} from '../../src/utils/route/routeEnvAccess.js';
+} from '../../src/systems/routing/routeEnvAccess.js';
 import {
   guardCheckRouteEnvironmentAccess,
   guardCheckRouteEnabled,
-} from '../../src/utils/route/routeGuards.js';
+} from '../../src/systems/routing/routeGuards.js';
 
 describe('routeEnvAccess S1 — development-only routes', () => {
   it('accepts valid envAccess values', () => {

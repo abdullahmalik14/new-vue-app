@@ -67,7 +67,7 @@ describe('translation security audit (S-03)', () => {
 
 describe('translation JSON integrity policy (S-04 / S-05)', () => {
   it('documents same-origin translation fetch boundary in translationLoader', () => {
-    const loaderPath = join(projectRoot, 'src/utils/translation/translationLoader.js');
+    const loaderPath = join(projectRoot, 'src/systems/i18n/translationLoader.js');
     const loaderSource = readFileSync(loaderPath, 'utf8');
 
     expect(loaderSource).toContain('encodeURIComponent(safeSectionName)');

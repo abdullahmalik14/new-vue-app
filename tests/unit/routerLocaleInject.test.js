@@ -20,7 +20,7 @@ describe('router locale inject prefers store over stale URL (L-10 en switch)', (
     useLocaleStore().setLocale('en');
 
     const { getActiveLocale, resolveActiveLocale } = await import(
-      '@/utils/translation/localeManager.js'
+      '@/systems/i18n/localeManager.js'
     );
 
     expect(getActiveLocale()).toBe('en');

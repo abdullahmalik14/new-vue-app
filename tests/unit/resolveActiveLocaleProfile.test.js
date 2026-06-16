@@ -12,7 +12,7 @@ describe('resolveActiveLocale profile priority', () => {
   it('prefers Cognito profile locale over stale persisted localStorage', async () => {
     const { useLocaleStore } = await import('@/stores/useLocaleStore.js');
     const { useAuthStore } = await import('@/stores/useAuthStore.js');
-    const { resolveActiveLocale } = await import('@/utils/translation/localeManager.js');
+    const { resolveActiveLocale } = await import('@/systems/i18n/localeManager.js');
 
     const localeStore = useLocaleStore();
     localeStore.setLocale('am');

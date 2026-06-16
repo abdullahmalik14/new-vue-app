@@ -9,7 +9,7 @@ describe('router index exports (B7)', () => {
   }, 10000);
 
   it('runAllRouteGuards remains available from routeGuards.js', async () => {
-    const { runAllRouteGuards } = await import('../../src/utils/route/routeGuards.js');
+    const { runAllRouteGuards } = await import('../../src/systems/routing/routeGuards.js');
 
     expect(typeof runAllRouteGuards).toBe('function');
   });

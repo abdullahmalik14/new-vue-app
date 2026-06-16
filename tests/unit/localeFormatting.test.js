@@ -3,13 +3,13 @@ import { createI18n } from 'vue-i18n';
 import {
   I18N_DATETIME_FORMATS,
   I18N_NUMBER_FORMATS,
-} from '../../src/utils/translation/localeFormatConfig.js';
+} from '../../src/systems/i18n/localeFormatConfig.js';
 
-const FORMATTING_PATH = '../../src/utils/translation/localeFormatting.js';
-const I18N_INSTANCE_PATH = '../../src/utils/translation/i18nInstance.js';
-const LOCALE_MANAGER_PATH = '../../src/utils/translation/localeManager.js';
+const FORMATTING_PATH = '../../src/systems/i18n/localeFormatting.js';
+const I18N_INSTANCE_PATH = '../../src/systems/i18n/i18nInstance.js';
+const LOCALE_MANAGER_PATH = '../../src/systems/i18n/localeManager.js';
 
-vi.mock('../../src/utils/translation/localeManager.js', async (importOriginal) => {
+vi.mock('../../src/systems/i18n/localeManager.js', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,

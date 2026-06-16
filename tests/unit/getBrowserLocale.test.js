@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-const LOCALE_MANAGER_PATH = '../../src/utils/translation/localeManager.js';
+const LOCALE_MANAGER_PATH = '../../src/systems/i18n/localeManager.js';
 
 vi.mock('../../src/stores/useLocaleStore.js', () => ({
   useLocaleStore: vi.fn(() => ({ locale: null })),

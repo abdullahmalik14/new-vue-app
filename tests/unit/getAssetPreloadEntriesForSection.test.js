@@ -3,7 +3,7 @@ import { createPinia, setActivePinia } from 'pinia';
 
 const getRouteConfiguration = vi.fn();
 
-vi.mock('../../src/utils/route/routeConfigLoader.js', () => ({
+vi.mock('../../src/systems/routing/routeConfigLoader.js', () => ({
   getRouteConfiguration,
 }));
 

@@ -3,7 +3,7 @@ import {
   getLeadingLocaleFromPath,
   stripLeadingLocaleFromPath,
   SUPPORTED_LOCALES,
-} from '../../src/utils/translation/localeManager.js';
+} from '../../src/systems/i18n/localeManager.js';
 
 describe('A21 — shared locale path utilities', () => {
   it('getLeadingLocaleFromPath returns the first supported segment', () => {
