@@ -311,4 +311,41 @@ No dedicated AppFooter unit test exists.
 
 ---
 
+## Phase 2f — Extract createAppRouter.js (2026-06-16)
+
+**Master plan:** Phase 2, step 2f  
+**Audit reference:** [loose-route-code-scan.md](./loose-route-code-scan.md) Issue 1, [folder-structure-audit-router.md](./folder-structure-audit-router.md) Issue 2, [systems-routing-audit.md](./systems-routing-audit.md) Issue 4
+
+### Issue
+
+~750 lines of router orchestration (route generation, component loading, locale hooks, guards, preload, errors) lived in `src/router/index.js` instead of `systems/routing/`.
+
+### What changed
+
+- Moved orchestration to `src/systems/routing/createAppRouter.js` (default export: router instance)
+- Slimmed `src/router/index.js` to re-export default router + prefetch helpers from routing barrel
+- Log/trackStep file labels updated to `createAppRouter.js`
+
+### Files touched
+
+`src/systems/routing/createAppRouter.js` (new), `src/router/index.js` (12 lines)
+
+### How tested
+
+```bash
+npm run build   # succeeds
+npm run test:unit -- --run tests/unit/routeGuards.test.js tests/unit/scrollBehavior.test.js   # pass
+npm run test:unit -- --run tests/unit/routerExports.test.js   # pre-existing performanceTracker UMD failure on full router import
+```
+
+### Phase 2 exit (2a–2f)
+
+- [x] Asset catalog out of `router/`
+- [x] Asset prefetch modules in `systems/assets/`
+- [x] Composable in `composables/`
+- [x] AppFooter uses `getRouteConfiguration()`
+- [x] `router/index.js` thin re-export
+
+---
+
 *Add a new section above this line for each completed phase.*
