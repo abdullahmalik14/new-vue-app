@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveRouteAssetPreloads } from '../../src/systems/assets/resolveRouteAssetPreloads.js';
+import { resolveRouteAssetPreloads } from '../../src/systems/assets/routeAssetPreloadResolver.js';
 import sharedAssetPreloads from '../../src/config/sharedAssetPreloads.json';
 
 describe('resolveRouteAssetPreloads (P4)', () => {

@@ -11,7 +11,7 @@ vi.mock('../../src/systems/routing/routeComponentPreloader.js', () => ({
   },
 }));
 
-vi.mock('../../src/systems/assets/routeAssetPrefetch.js', () => ({
+vi.mock('../../src/systems/assets/routeAssetPreloader.js', () => ({
   prefetchSectionAssetsForRoute,
   createSectionAssetPrefetchIntentHandler: (targetPath, options) => () => {
     prefetchSectionAssetsForRoute(targetPath, options);

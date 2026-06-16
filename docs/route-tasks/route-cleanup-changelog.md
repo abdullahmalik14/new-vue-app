@@ -400,4 +400,28 @@ refactor(routing): rename core routing module filenames
 
 ---
 
+## Phase 3b — Asset preload module filename renames (2026-06-16)
+
+**Master plan:** Phase 3, batch 2 — asset filenames  
+**Audit reference:** [route-naming-audit-batch-1.md](./route-naming-audit-batch-1.md) (`routeAssetPrefetch`, `resolveRouteAssetPreloads`)
+
+### What changed
+
+| Old | New |
+|-----|-----|
+| `routeAssetPrefetch.js` | `routeAssetPreloader.js` |
+| `resolveRouteAssetPreloads.js` | `routeAssetPreloadResolver.js` |
+
+Updated imports in `systems/assets/index.js`, `systems/routing/index.js`, `routeConfigLoader.js`, `jsonConfigValidator.js`, `useRoutePrefetch.js`, and 4 test files.
+
+### How tested
+
+```bash
+rg "routeAssetPrefetch\.js|resolveRouteAssetPreloads\.js" src/ tests/ build/   # zero import hits (log strings only)
+npm run test:unit -- --run tests/unit/useRoutePrefetch.test.js   # 2 passed
+npm run test:unit -- --run tests/unit/resolveRouteAssetPreloads.test.js   # pre-existing stale entry-count assertions
+```
+
+---
+
 *Add a new section above this line for each completed phase.*
