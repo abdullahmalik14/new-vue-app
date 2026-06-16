@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-const VALIDATOR_PATH = '../../src/utils/build/jsonConfigValidator.js';
+const VALIDATOR_PATH = '../../src/systems/build/jsonConfigValidator.js';
 
 const baseRoutes = [
   {

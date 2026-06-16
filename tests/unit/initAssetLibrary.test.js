@@ -19,7 +19,7 @@ describe('initAssetLibrary (P-01)', () => {
       getAssetUrl,
       isAssetLibraryInitialized,
       getAssetMapConfigSource,
-    } = await import('../../src/utils/assets/assetLibrary.js');
+    } = await import('../../src/systems/assets/assetLibrary.js');
 
     const initResult = await initAssetLibrary();
 
@@ -39,7 +39,7 @@ describe('initAssetLibrary (P-01)', () => {
     vi.stubEnv('DEV', '');
 
     const { initAssetLibrary, clearAssetCaches } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetCaches();

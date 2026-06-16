@@ -16,7 +16,7 @@ describe('assetMapSource (S-06)', () => {
     vi.stubEnv('PROD', 'true');
     vi.stubEnv('DEV', '');
     const { shouldAllowRuntimeAssetMapFetch } = await import(
-      '../../src/utils/assets/assetMapSource.js'
+      '../../src/systems/assets/assetMapSource.js'
     );
     expect(shouldAllowRuntimeAssetMapFetch()).toBe(false);
   });
@@ -26,7 +26,7 @@ describe('assetMapSource (S-06)', () => {
     vi.stubEnv('DEV', 'true');
     vi.stubEnv('VITE_ASSET_MAP_RUNTIME_OVERRIDE', 'true');
     const { shouldAllowRuntimeAssetMapFetch } = await import(
-      '../../src/utils/assets/assetMapSource.js'
+      '../../src/systems/assets/assetMapSource.js'
     );
     expect(shouldAllowRuntimeAssetMapFetch()).toBe(true);
   });
@@ -37,7 +37,7 @@ describe('assetMapSource (S-06)', () => {
     vi.stubGlobal('__ASSET_MAP_SHA256__', expectedHash);
 
     const { verifyFetchedAssetMapText } = await import(
-      '../../src/utils/assets/assetMapSource.js'
+      '../../src/systems/assets/assetMapSource.js'
     );
     await expect(verifyFetchedAssetMapText(raw)).resolves.toBe(true);
     await expect(verifyFetchedAssetMapText('{"tampered":true}')).resolves.toBe(false);

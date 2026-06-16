@@ -13,7 +13,7 @@ describe('areAssetsLoadedForSection (L-04)', () => {
   it('returns true when section metadata exists only in cacheHandler', async () => {
     const { setValueWithExpiration } = await import('../../src/utils/common/cacheHandler.js');
     const { clearAssetCaches, areAssetsLoadedForSection, getAssetStatistics } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetCaches();
@@ -36,7 +36,7 @@ describe('areAssetsLoadedForSection (L-04)', () => {
 
   it('returns false when section is not in memory or cache', async () => {
     const { clearAssetCaches, areAssetsLoadedForSection } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetCaches();

@@ -8,8 +8,8 @@ import {
   extractBoundAttributeExpression,
   scanScriptForAssetFlagReferences,
   resolveAssetSlotFlagsFromScript,
-} from '../../src/utils/assets/assetScanner.js';
-import { getPreloadedAssetsCount } from '../../src/utils/assets/assetPreloader.js';
+} from '../../src/systems/assets/assetScanner.js';
+import { getPreloadedAssetsCount } from '../../src/systems/assets/assetPreloader.js';
 
 describe('assetScanner — normalizeAssetDefinition (L-11)', () => {
   beforeEach(() => {

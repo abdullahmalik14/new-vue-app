@@ -11,7 +11,7 @@ describe('assertAllowedPreloadUrl (S-03 / S-04)', () => {
 
   it('allows same-origin relative paths', async () => {
     const { assertAllowedPreloadUrl } = await import(
-      '../../src/utils/assets/assertAllowedPreloadUrl.js'
+      '../../src/systems/assets/assertAllowedPreloadUrl.js'
     );
     expect(assertAllowedPreloadUrl('/vendor/foo.js', { assetType: 'script' })).toEqual({
       ok: true,
@@ -22,7 +22,7 @@ describe('assertAllowedPreloadUrl (S-03 / S-04)', () => {
 
   it('blocks javascript: scheme', async () => {
     const { assertAllowedPreloadUrl } = await import(
-      '../../src/utils/assets/assertAllowedPreloadUrl.js'
+      '../../src/systems/assets/assertAllowedPreloadUrl.js'
     );
     expect(assertAllowedPreloadUrl('javascript:alert(1)', { assetType: 'script' })).toEqual({
       ok: false,
@@ -34,7 +34,7 @@ describe('assertAllowedPreloadUrl (S-03 / S-04)', () => {
     vi.stubEnv('PROD', 'true');
     vi.stubEnv('DEV', '');
     const { assertAllowedPreloadUrl } = await import(
-      '../../src/utils/assets/assertAllowedPreloadUrl.js'
+      '../../src/systems/assets/assertAllowedPreloadUrl.js'
     );
     expect(
       assertAllowedPreloadUrl('https://evil.example.com/payload.js', { assetType: 'script' }),
@@ -46,7 +46,7 @@ describe('assertAllowedPreloadUrl (S-03 / S-04)', () => {
     vi.stubEnv('DEV', '');
     vi.stubEnv('VITE_ASSET_ALLOWED_HOSTS', 'cdn.example.com');
     const { assertAllowedPreloadUrl } = await import(
-      '../../src/utils/assets/assertAllowedPreloadUrl.js'
+      '../../src/systems/assets/assertAllowedPreloadUrl.js'
     );
     expect(
       assertAllowedPreloadUrl('https://cdn.example.com/pkg.js', { assetType: 'script' }),

@@ -13,7 +13,7 @@ describe('validateAssetMap production HTTP (S-06)', () => {
     vi.stubEnv('PROD', 'true');
     vi.stubEnv('DEV', '');
 
-    vi.doMock('../../src/utils/assets/assetMapSource.js', async (importOriginal) => {
+    vi.doMock('../../src/systems/assets/assetMapSource.js', async (importOriginal) => {
       const actual = await importOriginal();
       const bundled = actual.getBundledAssetMap();
       return {
@@ -31,7 +31,7 @@ describe('validateAssetMap production HTTP (S-06)', () => {
     vi.resetModules();
 
     const { clearAssetMapConfigCache, validateAssetMap } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetMapConfigCache();
@@ -44,14 +44,14 @@ describe('validateAssetMap production HTTP (S-06)', () => {
       ),
     ).toBe(true);
 
-    vi.doUnmock('../../src/utils/assets/assetMapSource.js');
+    vi.doUnmock('../../src/systems/assets/assetMapSource.js');
   });
 
   it('allows localhost http:// in production without errors', async () => {
     vi.stubEnv('PROD', 'true');
     vi.stubEnv('DEV', '');
 
-    vi.doMock('../../src/utils/assets/assetMapSource.js', async (importOriginal) => {
+    vi.doMock('../../src/systems/assets/assetMapSource.js', async (importOriginal) => {
       const actual = await importOriginal();
       const bundled = actual.getBundledAssetMap();
       return {
@@ -69,7 +69,7 @@ describe('validateAssetMap production HTTP (S-06)', () => {
     vi.resetModules();
 
     const { clearAssetMapConfigCache, validateAssetMap } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetMapConfigCache();
@@ -80,6 +80,6 @@ describe('validateAssetMap production HTTP (S-06)', () => {
     expect(httpErrors).toEqual([]);
     expect(httpWarnings).toEqual([]);
 
-    vi.doUnmock('../../src/utils/assets/assetMapSource.js');
+    vi.doUnmock('../../src/systems/assets/assetMapSource.js');
   });
 });

@@ -21,7 +21,7 @@ describe('section asset map merge (B-01)', () => {
       getAssetUrl,
       loadSectionAssetMap,
       getKnownBundledSectionNames,
-    } = await import('../../src/utils/assets/assetLibrary.js');
+    } = await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetCaches();
     expect(getKnownBundledSectionNames()).toContain('auth');
@@ -46,7 +46,7 @@ describe('section asset map merge (B-01)', () => {
     vi.stubEnv('DEV', 'true');
 
     const { clearAssetCaches, getAssetUrl, loadSectionAssetMap } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetCaches();
@@ -65,7 +65,7 @@ describe('section asset map merge (B-01)', () => {
     vi.stubEnv('DEV', 'true');
 
     const { clearAssetCaches, getAssetUrl } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
     const { getValueFromCache } = await import('../../src/utils/common/cacheHandler.js');
 

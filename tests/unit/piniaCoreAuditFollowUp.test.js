@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { computed, createApp } from 'vue';
 import { createPinia, setActivePinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
-import { syncPreloadStoreBuildHash } from '../../src/utils/build/appBuildHash.js';
+import { syncPreloadStoreBuildHash } from '../../src/systems/build/appBuildHash.js';
 import { useCartStore } from '../../src/stores/useCartStore.js';
 import { useLocaleStore } from '../../src/stores/useLocaleStore.js';
 import { usePreloadStore } from '../../src/stores/usePreloadStore.js';

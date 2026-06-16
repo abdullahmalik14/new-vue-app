@@ -8,7 +8,7 @@ vi.mock('../../src/systems/assets/routeSectionAssetPreloadEntries.js', () => ({
   getAssetPreloadEntriesForSection,
 }));
 
-vi.mock('../../src/utils/assets/assetLibrary.js', () => ({
+vi.mock('../../src/systems/assets/assetLibrary.js', () => ({
   getAssetUrl: vi.fn().mockResolvedValue('/assets/logo.png'),
   getAssetUrls: vi.fn().mockResolvedValue({ 'dashboard.logo': '/assets/logo.png' }),
 }));
@@ -43,7 +43,7 @@ describe('preloadSectionAssets URL short-circuit (C-07)', () => {
 
   it('skips preloadAssets when every resolved section URL is already in the store', async () => {
     autoResolveLinkPreloads();
-    const mod = await import('../../src/utils/assets/assetPreloader.js');
+    const mod = await import('../../src/systems/assets/assetPreloader.js');
     const preloadAssetsSpy = vi.spyOn(mod, 'preloadAssets');
     const store = usePreloadStore();
 
@@ -57,7 +57,7 @@ describe('preloadSectionAssets URL short-circuit (C-07)', () => {
 
   it('calls preloadAssets when at least one resolved URL is missing from the store', async () => {
     autoResolveLinkPreloads();
-    const mod = await import('../../src/utils/assets/assetPreloader.js');
+    const mod = await import('../../src/systems/assets/assetPreloader.js');
 
     await mod.preloadSectionAssets('dashboard-global');
 
@@ -73,7 +73,7 @@ describe('preloadSectionAssets URL short-circuit (C-07)', () => {
       routeCount: 1,
     });
 
-    const assetLibrary = await import('../../src/utils/assets/assetLibrary.js');
+    const assetLibrary = await import('../../src/systems/assets/assetLibrary.js');
     assetLibrary.getAssetUrls.mockClear();
     assetLibrary.getAssetUrl.mockClear();
     assetLibrary.getAssetUrls.mockResolvedValue({
@@ -82,7 +82,7 @@ describe('preloadSectionAssets URL short-circuit (C-07)', () => {
     });
 
     autoResolveLinkPreloads();
-    const mod = await import('../../src/utils/assets/assetPreloader.js');
+    const mod = await import('../../src/systems/assets/assetPreloader.js');
 
     await mod.preloadSectionAssets('dashboard-global');
 

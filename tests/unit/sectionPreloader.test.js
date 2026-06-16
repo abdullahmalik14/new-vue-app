@@ -7,7 +7,7 @@ const getSectionBundlePaths = vi.fn();
 const preloadSectionCss = vi.fn();
 const preloadSectionAssets = vi.fn();
 
-vi.mock('../../src/utils/build/manifestLoader.js', () => ({
+vi.mock('../../src/systems/build/manifestLoader.js', () => ({
   getSectionBundlePaths
 }));
 
@@ -17,7 +17,7 @@ vi.mock('../../src/systems/sections/sectionCssLoader.js', () => ({
   clearSectionCssPreloadHint: vi.fn()
 }));
 
-vi.mock('../../src/utils/assets/assetPreloader.js', () => ({
+vi.mock('../../src/systems/assets/assetPreloader.js', () => ({
   preloadSectionAssets
 }));
 

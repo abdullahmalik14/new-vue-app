@@ -26,13 +26,13 @@ describe('assetPreloader performanceTracker guards (B-02)', () => {
 
   it('preloadImage does not throw when performanceTracker is missing', async () => {
     autoResolveLinkPreloads();
-    const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadImage } = await import('../../src/systems/assets/assetPreloader.js');
     await expect(preloadImage('/assets/test-icon.webp')).resolves.toBeUndefined();
   });
 
   it('preloadScript does not throw when performanceTracker is missing', async () => {
     autoResolveLinkPreloads();
-    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadScript } = await import('../../src/systems/assets/assetPreloader.js');
     await expect(
       preloadScript('/vendor/amazon-cognito-identity-6.3.15.min.js'),
     ).resolves.toBeUndefined();
@@ -40,19 +40,19 @@ describe('assetPreloader performanceTracker guards (B-02)', () => {
 
   it('preloadSectionAssets does not throw when performanceTracker is missing', async () => {
     autoResolveLinkPreloads();
-    const { preloadSectionAssets } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadSectionAssets } = await import('../../src/systems/assets/assetPreloader.js');
     await expect(preloadSectionAssets('auth')).resolves.toBeUndefined();
   });
 
   it('extractAssetsFromComponent does not throw when performanceTracker is missing', async () => {
-    const { extractAssetsFromComponent } = await import('../../src/utils/assets/assetScanner.js');
+    const { extractAssetsFromComponent } = await import('../../src/systems/assets/assetScanner.js');
     expect(extractAssetsFromComponent({ preloadAssets: [{ src: '/x.png', type: 'image' }] })).toEqual([
       { src: '/x.png', type: 'image' },
     ]);
   });
 
   it('scanSectionComponents does not throw when performanceTracker is missing', async () => {
-    const { scanSectionComponents } = await import('../../src/utils/assets/assetScanner.js');
+    const { scanSectionComponents } = await import('../../src/systems/assets/assetScanner.js');
     const assets = await scanSectionComponents('auth');
     expect(Array.isArray(assets)).toBe(true);
   });

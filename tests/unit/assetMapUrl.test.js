@@ -10,7 +10,7 @@ describe('getAssetMapFetchCandidates (M-10 / L-10)', () => {
     vi.stubEnv('DEV', 'true');
     vi.stubEnv('VITE_ASSET_MAP_URL', '/config/assetMap.staging.json');
 
-    const { getAssetMapFetchCandidates } = await import('../../src/utils/assets/assetLibrary.js');
+    const { getAssetMapFetchCandidates } = await import('../../src/systems/assets/assetLibrary.js');
 
     expect(getAssetMapFetchCandidates()).toEqual([
       '/config/assetMap.staging.json',
@@ -22,7 +22,7 @@ describe('getAssetMapFetchCandidates (M-10 / L-10)', () => {
   it('defaults to public and src paths in development', async () => {
     vi.stubEnv('DEV', 'true');
 
-    const { getAssetMapFetchCandidates } = await import('../../src/utils/assets/assetLibrary.js');
+    const { getAssetMapFetchCandidates } = await import('../../src/systems/assets/assetLibrary.js');
 
     expect(getAssetMapFetchCandidates()).toEqual([
       '/config/assetMap.json',

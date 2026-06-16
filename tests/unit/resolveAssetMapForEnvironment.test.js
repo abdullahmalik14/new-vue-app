@@ -14,7 +14,7 @@ describe('resolveAssetMapForEnvironment (L-07)', () => {
     vi.stubEnv('DEV', '');
 
     const { clearAssetMapConfigCache, getAssetsByCategory } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetMapConfigCache();
@@ -29,7 +29,7 @@ describe('resolveAssetMapForEnvironment (L-07)', () => {
     vi.stubEnv('DEV', '');
 
     const { clearAssetMapConfigCache, getAvailableAssetFlags, getAssetsByCategory } =
-      await import('../../src/utils/assets/assetLibrary.js');
+      await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetMapConfigCache();
     const flags = await getAvailableAssetFlags('staging');
@@ -48,7 +48,7 @@ describe('resolveAssetMapForEnvironment (L-07)', () => {
     vi.stubEnv('DEV', '');
 
     const { clearAssetMapConfigCache, getAssetsByCategory } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetMapConfigCache();

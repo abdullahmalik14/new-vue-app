@@ -16,7 +16,7 @@ describe('validateAssetMap hostname checks (L-08)', () => {
     vi.stubEnv('PROD', 'true');
     vi.stubEnv('DEV', '');
 
-    vi.doMock('../../src/utils/assets/assetMapSource.js', async (importOriginal) => {
+    vi.doMock('../../src/systems/assets/assetMapSource.js', async (importOriginal) => {
       const actual = await importOriginal();
       const bundled = actual.getBundledAssetMap();
       return {
@@ -32,7 +32,7 @@ describe('validateAssetMap hostname checks (L-08)', () => {
     vi.resetModules();
 
     const { clearAssetMapConfigCache, validateAssetMap } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetMapConfigCache();
@@ -44,7 +44,7 @@ describe('validateAssetMap hostname checks (L-08)', () => {
       true,
     );
 
-    vi.doUnmock('../../src/utils/assets/assetMapSource.js');
+    vi.doUnmock('../../src/systems/assets/assetMapSource.js');
   });
 
   it('passes validation when icon.globe uses i.ibb.co', async () => {
@@ -52,7 +52,7 @@ describe('validateAssetMap hostname checks (L-08)', () => {
     vi.stubEnv('DEV', '');
 
     const { clearAssetMapConfigCache, validateAssetMap } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetMapConfigCache();
@@ -61,7 +61,7 @@ describe('validateAssetMap hostname checks (L-08)', () => {
     const globeErrors = result.errors.filter((e) => e.includes('icon.globe'));
     expect(globeErrors).toEqual([]);
 
-    const { getBundledAssetMap } = await import('../../src/utils/assets/assetMapSource.js');
+    const { getBundledAssetMap } = await import('../../src/systems/assets/assetMapSource.js');
     const bundled = getBundledAssetMap();
     expect(bundled.development['icon.globe']).toBe(GOOD_GLOBE_URL);
     expect(bundled.production['icon.globe']).toBe(GOOD_GLOBE_URL);

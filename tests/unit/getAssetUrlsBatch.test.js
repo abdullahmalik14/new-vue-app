@@ -13,7 +13,7 @@ describe('getAssetUrls single-pass batch (P-04)', () => {
     vi.stubEnv('PROD', 'true');
     vi.stubEnv('DEV', '');
 
-    const lib = await import('../../src/utils/assets/assetLibrary.js');
+    const lib = await import('../../src/systems/assets/assetLibrary.js');
     const { clearAssetCaches, getAssetUrls, getAssetUrl } = lib;
 
     clearAssetCaches();
@@ -36,7 +36,7 @@ describe('getAssetUrls single-pass batch (P-04)', () => {
   it('returns {} without throwing when flags is not an array (A-L02)', async () => {
     vi.stubEnv('PROD', 'true');
 
-    const lib = await import('../../src/utils/assets/assetLibrary.js');
+    const lib = await import('../../src/systems/assets/assetLibrary.js');
     const getAssetUrlSpy = vi.spyOn(lib, 'getAssetUrl');
 
     const result = await lib.getAssetUrls(undefined);

@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { validateSharedComponentAssetMappings } from '../../src/utils/assets/validateSharedComponentAssetMappings.js';
+import { validateSharedComponentAssetMappings } from '../../src/systems/assets/validateSharedComponentAssetMappings.js';
 import {
   getSharedComponentAssetMapping,
   groupComponentSlotsByPreloadTier,
-} from '../../src/utils/assets/resolveSharedComponentAssets.js';
+} from '../../src/systems/assets/resolveSharedComponentAssets.js';
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 

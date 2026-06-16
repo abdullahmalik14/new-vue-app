@@ -16,7 +16,7 @@ describe('loadAssetMapConfig (S-06)', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
     const { clearAssetMapConfigCache, loadAssetMapConfig, getAssetMapConfigSource } =
-      await import('../../src/utils/assets/assetLibrary.js');
+      await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetMapConfigCache();
     const map = await loadAssetMapConfig();
@@ -38,7 +38,7 @@ describe('loadAssetMapConfig (S-06)', () => {
       clearAssetMapConfigCache,
       loadAssetMapConfig,
       getAssetMapConfigSource,
-    } = await import('../../src/utils/assets/assetLibrary.js');
+    } = await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetMapConfigCache();
     await loadAssetMapConfig();
@@ -58,7 +58,7 @@ describe('loadAssetMapConfig (S-06)', () => {
     vi.stubEnv('DEV', '');
 
     const { clearAssetMapConfigCache, loadAssetMapConfig, clearAssetCaches } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetMapConfigCache();
@@ -78,7 +78,7 @@ describe('loadAssetMapConfig (S-06)', () => {
     vi.stubEnv('VITE_ASSET_MAP_RUNTIME_OVERRIDE', 'true');
     vi.stubEnv('VITE_ASSET_MAP_URL', '/config/assetMap.json');
 
-    vi.doMock('../../src/utils/assets/assetMapSource.js', async (importOriginal) => {
+    vi.doMock('../../src/systems/assets/assetMapSource.js', async (importOriginal) => {
       const actual = await importOriginal();
       return {
         ...actual,
@@ -107,7 +107,7 @@ describe('loadAssetMapConfig (S-06)', () => {
     );
 
     const { clearAssetMapConfigCache, loadAssetMapConfig } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetMapConfigCache();
@@ -129,7 +129,7 @@ describe('loadAssetMapConfig (S-06)', () => {
     );
 
     fetchSpy.mockRestore();
-    vi.doUnmock('../../src/utils/assets/assetMapSource.js');
+    vi.doUnmock('../../src/systems/assets/assetMapSource.js');
   });
 
   it('rejects tampered runtime fetch and falls back to bundled map (S-03)', async () => {
@@ -148,7 +148,7 @@ describe('loadAssetMapConfig (S-06)', () => {
     });
 
     const { clearAssetMapConfigCache, loadAssetMapConfig, getAssetMapConfigSource } =
-      await import('../../src/utils/assets/assetLibrary.js');
+      await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetMapConfigCache();
     const map = await loadAssetMapConfig();
@@ -166,7 +166,7 @@ describe('loadAssetMapConfig (S-06)', () => {
     vi.stubEnv('DEV', '');
 
     const { clearAssetMapConfigCache, loadAssetMapConfig, getAssetUrl } = await import(
-      '../../src/utils/assets/assetLibrary.js'
+      '../../src/systems/assets/assetLibrary.js'
     );
 
     clearAssetMapConfigCache();

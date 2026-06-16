@@ -15,7 +15,7 @@ describe('getAssetUrl allowlist (S-06 login fix)', () => {
   it('resolves auth.background from legacy i.ibb.co host until S-01', async () => {
     vi.stubEnv('DEV', 'true');
     const { clearAssetMapConfigCache, getAssetUrl } = await import(
-      '../../src/utils/assets/assetLibrary.js'
+      '../../src/systems/assets/assetLibrary.js'
     );
 
     clearAssetMapConfigCache();
@@ -27,7 +27,7 @@ describe('getAssetUrl allowlist (S-06 login fix)', () => {
   it('still blocks javascript: URLs from getAssetUrl', async () => {
     vi.stubEnv('DEV', 'true');
     const { clearAssetMapConfigCache, loadAssetMapConfig, getAssetUrl } = await import(
-      '../../src/utils/assets/assetLibrary.js'
+      '../../src/systems/assets/assetLibrary.js'
     );
 
     clearAssetMapConfigCache();

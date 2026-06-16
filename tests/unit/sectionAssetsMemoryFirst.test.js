@@ -17,7 +17,7 @@ describe('section assets memory-first cache (B-06)', () => {
       getAssetsForSection,
       isSectionAssetMetadataInMemory,
       isSectionAssetMetadataCached,
-    } = await import('../../src/utils/assets/assetLibrary.js');
+    } = await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetCaches();
 
@@ -37,7 +37,7 @@ describe('section assets memory-first cache (B-06)', () => {
       '../../src/utils/common/cacheHandler.js',
     );
     const { clearAssetCaches, loadAssetsForSection } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetCaches();

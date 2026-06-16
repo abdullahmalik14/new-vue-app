@@ -12,9 +12,9 @@ describe('resetAssetLibrary (B-03 / M-06)', () => {
     const { setValueWithExpiration, getValueFromCache } = await import(
       '../../src/utils/common/cacheHandler.js',
     );
-    const { loadAssetsForSection } = await import('../../src/utils/assets/assetLibrary.js');
+    const { loadAssetsForSection } = await import('../../src/systems/assets/assetLibrary.js');
     const { usePreloadStore } = await import('../../src/stores/usePreloadStore.js');
-    const { resetAssetLibrary } = await import('../../src/utils/assets/resetAssetLibrary.js');
+    const { resetAssetLibrary } = await import('../../src/systems/assets/resetAssetLibrary.js');
 
     setValueWithExpiration('b03_probe', { ok: true }, 60_000);
     await loadAssetsForSection('auth');
@@ -38,7 +38,7 @@ describe('resetAssetLibrary (B-03 / M-06)', () => {
 
   it('resetAssetSystem is an alias for resetAssetLibrary', async () => {
     const { resetAssetLibrary, resetAssetSystem } = await import(
-      '../../src/utils/assets/resetAssetLibrary.js',
+      '../../src/systems/assets/resetAssetLibrary.js',
     );
     expect(resetAssetSystem).toBe(resetAssetLibrary);
   });

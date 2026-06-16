@@ -26,7 +26,7 @@ describe('preload normal priority (C-03)', () => {
 
   it('schedules high-priority assets before normal-priority assets', async () => {
     autoResolveLinkPreloads();
-    const { preloadAssets } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadAssets } = await import('../../src/systems/assets/assetPreloader.js');
 
     await preloadAssets([
       { src: '/assets/icon-normal.png', type: 'image', priority: 'normal' },
@@ -43,7 +43,7 @@ describe('preload normal priority (C-03)', () => {
 
   it('maps normal route priority to fetchpriority=auto on image links', async () => {
     autoResolveLinkPreloads();
-    const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadImage } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/assets/icon-normal.png';
 
     await preloadImage(url, { priority: 'normal' });

@@ -11,7 +11,7 @@ describe('withPreloadRetry (M-06)', () => {
   });
 
   it('retries failed operations with exponential backoff', async () => {
-    const { withPreloadRetry } = await import('../../src/utils/assets/assetPreloader.js');
+    const { withPreloadRetry } = await import('../../src/systems/assets/assetPreloader.js');
     let attempts = 0;
 
     const promise = withPreloadRetry(async () => {
@@ -62,7 +62,7 @@ describe('preloadImage retry (M-06)', () => {
       return element;
     });
 
-    const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadImage } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/assets/retry-icon.png';
     const preloadPromise = preloadImage(url, { priority: 'high' });
 

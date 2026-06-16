@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-const VALIDATION_PATH = '../../src/utils/build/bundlePathValidation.js';
+const VALIDATION_PATH = '../../src/systems/build/bundlePathValidation.js';
 
 beforeEach(() => {
   vi.resetModules();

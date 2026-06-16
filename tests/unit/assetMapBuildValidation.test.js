@@ -3,8 +3,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { resolveRouteAssetPreloads } from '../../src/systems/assets/routeAssetPreloadResolver.js';
-import { validateRouteAssetPreloadFlags } from '../../src/utils/assets/validateRouteAssetPreloadFlags.js';
-import { validateSharedComponentAssetMappings } from '../../src/utils/assets/validateSharedComponentAssetMappings.js';
+import { validateRouteAssetPreloadFlags } from '../../src/systems/assets/validateRouteAssetPreloadFlags.js';
+import { validateSharedComponentAssetMappings } from '../../src/systems/assets/validateSharedComponentAssetMappings.js';
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 

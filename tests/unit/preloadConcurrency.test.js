@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { runInConcurrencyChunks, ASSET_PRELOAD_MAX_CONCURRENCY } from '../../src/utils/assets/assetPreloader.js';
+import { runInConcurrencyChunks, ASSET_PRELOAD_MAX_CONCURRENCY } from '../../src/systems/assets/assetPreloader.js';
 
 describe('runInConcurrencyChunks (M-07)', () => {
   it('exports a default max concurrency of 6', () => {

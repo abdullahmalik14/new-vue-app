@@ -24,7 +24,7 @@ describe('getAssetUrl resolution logging (B-04)', () => {
     const logModule = await import('../../src/utils/common/logHandler.js');
     const logSpy = vi.spyOn(logModule, 'log');
 
-    const { clearAssetCaches, getAssetUrl } = await import('../../src/utils/assets/assetLibrary.js');
+    const { clearAssetCaches, getAssetUrl } = await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetCaches();
     logSpy.mockClear();
@@ -52,7 +52,7 @@ describe('getAssetUrl resolution logging (B-04)', () => {
     const logModule = await import('../../src/utils/common/logHandler.js');
     const logSpy = vi.spyOn(logModule, 'log');
 
-    const { clearAssetCaches, getAssetUrl } = await import('../../src/utils/assets/assetLibrary.js');
+    const { clearAssetCaches, getAssetUrl } = await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetCaches();
     logSpy.mockClear();
@@ -78,7 +78,7 @@ describe('getAssetUrl resolution logging (B-04)', () => {
     const logModule = await import('../../src/utils/common/logHandler.js');
     const logSpy = vi.spyOn(logModule, 'log');
 
-    const { clearAssetCaches, getAssetUrl } = await import('../../src/utils/assets/assetLibrary.js');
+    const { clearAssetCaches, getAssetUrl } = await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetCaches();
     await getAssetUrl('logo.main', 'development');
@@ -102,7 +102,7 @@ describe('getAssetUrl resolution logging (B-04)', () => {
     const logModule = await import('../../src/utils/common/logHandler.js');
     const logSpy = vi.spyOn(logModule, 'log');
 
-    const { clearAssetCaches, getAssetUrl } = await import('../../src/utils/assets/assetLibrary.js');
+    const { clearAssetCaches, getAssetUrl } = await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetCaches();
     logSpy.mockClear();

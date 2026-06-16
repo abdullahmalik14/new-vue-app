@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 
 const ASSET_CACHE_KEY_PREFIX = 'asset_metadata_';
-const LIBRARY_PATH = '../../src/utils/assets/assetLibrary.js';
+const LIBRARY_PATH = '../../src/systems/assets/assetLibrary.js';
 
 const loadSectionManifest = vi.fn();
 const getSectionBundlePaths = vi.fn();
 
-vi.mock('../../src/utils/build/manifestLoader.js', () => ({
+vi.mock('../../src/systems/build/manifestLoader.js', () => ({
   loadSectionManifest,
   getSectionBundlePaths,
 }));

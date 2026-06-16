@@ -26,7 +26,7 @@ describe('preloadScript (P-07)', () => {
 
   it('uses rel=preload as=script for classic UMD scripts', async () => {
     autoResolveLinkPreloads();
-    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadScript } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/vendor/amazon-cognito-identity-6.3.15.min.js';
 
     await preloadScript(url);
@@ -38,7 +38,7 @@ describe('preloadScript (P-07)', () => {
 
   it('uses modulepreload when options.module is true', async () => {
     autoResolveLinkPreloads();
-    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadScript } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/assets/chunk.mjs';
 
     await preloadScript(url, { module: true });
@@ -50,7 +50,7 @@ describe('preloadScript (P-07)', () => {
 
   it('blocks javascript: URLs without injecting a link (S-03)', async () => {
     autoResolveLinkPreloads();
-    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadScript } = await import('../../src/systems/assets/assetPreloader.js');
 
     await preloadScript('javascript:alert(1)');
 
@@ -59,7 +59,7 @@ describe('preloadScript (P-07)', () => {
 
   it('sets integrity when provided for allowed scripts (S-03)', async () => {
     autoResolveLinkPreloads();
-    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadScript } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/vendor/amazon-cognito-identity-6.3.15.min.js';
 
     await preloadScript(url, { integrity: 'sha384-test' });
@@ -82,7 +82,7 @@ describe('preloadScript (P-07)', () => {
       return el;
     });
 
-    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadScript } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/scripts/dashboard-metrics.js';
 
     await preloadScript(url, {

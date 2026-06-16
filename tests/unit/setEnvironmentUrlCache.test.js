@@ -16,7 +16,7 @@ describe('setEnvironment URL cache invalidation (L-06)', () => {
       '../../src/utils/common/cacheHandler.js',
     );
     const { clearAssetCaches, setEnvironment, getAssetUrl } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetCaches();

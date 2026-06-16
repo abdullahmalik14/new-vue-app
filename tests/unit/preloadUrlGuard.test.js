@@ -26,7 +26,7 @@ describe('preload URL guard (S-04)', () => {
 
   it('preloadImage does not inject link for data: URIs', async () => {
     autoResolveLinkPreloads();
-    const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadImage } = await import('../../src/systems/assets/assetPreloader.js');
 
     await preloadImage('data:image/png;base64,abc');
 
@@ -35,7 +35,7 @@ describe('preload URL guard (S-04)', () => {
 
   it('preloadFont allows same-origin paths', async () => {
     autoResolveLinkPreloads();
-    const { preloadFont } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadFont } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/assets/fonts/primary.woff2';
 
     await preloadFont(url);

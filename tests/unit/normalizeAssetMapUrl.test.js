@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeAssetMapUrl } from '../../src/utils/assets/assetLibrary.js';
+import { normalizeAssetMapUrl } from '../../src/systems/assets/assetLibrary.js';
 
 describe('normalizeAssetMapUrl (S-05)', () => {
   it('upgrades http to https for non-localhost hosts', () => {

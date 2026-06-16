@@ -26,7 +26,7 @@ describe('preload prefetch hint (M-03)', () => {
 
   it('uses rel=prefetch for low-priority images', async () => {
     autoResolveLinkPreloads();
-    const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadImage } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/assets/bg-low.webp';
 
     await preloadImage(url, { priority: 'low' });
@@ -39,7 +39,7 @@ describe('preload prefetch hint (M-03)', () => {
 
   it('uses rel=prefetch for normal-priority images (C-03)', async () => {
     autoResolveLinkPreloads();
-    const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadImage } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/assets/bg-normal.webp';
 
     await preloadImage(url, { priority: 'normal' });
@@ -52,7 +52,7 @@ describe('preload prefetch hint (M-03)', () => {
 
   it('uses rel=preload for high-priority images', async () => {
     autoResolveLinkPreloads();
-    const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadImage } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/assets/logo-high.png';
 
     await preloadImage(url, { priority: 'high' });
@@ -64,7 +64,7 @@ describe('preload prefetch hint (M-03)', () => {
 
   it('uses rel=prefetch for low-priority classic scripts', async () => {
     autoResolveLinkPreloads();
-    const { preloadScript } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadScript } = await import('../../src/systems/assets/assetPreloader.js');
     const url = '/vendor/amazon-cognito-identity-6.3.15.min.js';
 
     await preloadScript(url, { priority: 'low' });
@@ -82,7 +82,7 @@ describe('preload prefetch hint (M-03)', () => {
     document.head.appendChild(existing);
 
     autoResolveLinkPreloads();
-    const { preloadImage } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadImage } = await import('../../src/systems/assets/assetPreloader.js');
 
     await preloadImage(url, { priority: 'low' });
 

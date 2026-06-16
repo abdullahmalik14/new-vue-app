@@ -5,7 +5,7 @@ import {
   sha256HexFromText,
   verifyManifestBodyIntegrity,
   fetchVerifiedManifest
-} from '../../src/utils/build/manifestIntegrity.js';
+} from '../../src/systems/build/manifestIntegrity.js';
 
 beforeEach(() => {
   document.head.innerHTML = '';

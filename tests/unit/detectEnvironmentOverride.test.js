@@ -13,7 +13,7 @@ describe('detectEnvironment manual override (B-07)', () => {
 
   it('re-reads import.meta.env on each call until setEnvironment', async () => {
     const { getEnvironment, clearAssetCaches } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetCaches();
@@ -23,7 +23,7 @@ describe('detectEnvironment manual override (B-07)', () => {
 
   it('honors setEnvironment override until clearAssetCaches', async () => {
     const { getEnvironment, setEnvironment, clearAssetCaches } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetCaches();

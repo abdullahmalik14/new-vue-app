@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-const LOADER_PATH = '../../src/utils/build/manifestLoader.js';
+const LOADER_PATH = '../../src/systems/build/manifestLoader.js';
 const MANIFEST_SESSION_KEY = 'app-section-manifest';
 
 const manifestPayload = {
@@ -25,7 +25,7 @@ function createSessionStorage() {
 }
 
 async function mockVerifiedManifestFetch(manifest = manifestPayload) {
-  const { MANIFEST_INTEGRITY_META, sha256HexFromText } = await import('../../src/utils/build/manifestIntegrity.js');
+  const { MANIFEST_INTEGRITY_META, sha256HexFromText } = await import('../../src/systems/build/manifestIntegrity.js');
   const body = JSON.stringify(manifest);
   const hash = await sha256HexFromText(body);
 

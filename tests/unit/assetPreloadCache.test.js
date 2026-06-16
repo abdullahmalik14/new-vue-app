@@ -16,7 +16,7 @@ describe('asset preload cache SSOT (P-03)', () => {
     store.addAsset('https://example.com/icon.svg');
     store.buildHash = 'test-hash';
 
-    const { clearPreloadCache } = await import('../../src/utils/assets/assetPreloader.js');
+    const { clearPreloadCache } = await import('../../src/systems/assets/assetPreloader.js');
     clearPreloadCache();
 
     expect(store.preloadedAssetCount).toBe(0);
@@ -34,7 +34,7 @@ describe('asset preload cache SSOT (P-03)', () => {
       json: () => Promise.resolve(payload),
     });
 
-    const { preloadJSON } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadJSON } = await import('../../src/systems/assets/assetPreloader.js');
 
     const first = await preloadJSON(path);
     expect(first).toEqual(payload);
@@ -55,7 +55,7 @@ describe('asset preload cache SSOT (P-03)', () => {
       json: () => Promise.resolve(payload),
     });
 
-    const { preloadJSON, clearPreloadCache } = await import('../../src/utils/assets/assetPreloader.js');
+    const { preloadJSON, clearPreloadCache } = await import('../../src/systems/assets/assetPreloader.js');
 
     await preloadJSON(path);
     fetch.mockClear();

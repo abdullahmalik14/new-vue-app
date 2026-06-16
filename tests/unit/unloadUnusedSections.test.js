@@ -19,7 +19,7 @@ describe('unloadUnusedSections (L-05)', () => {
       getAssetsForSection,
       unloadUnusedSections,
       areAssetsLoadedForSection,
-    } = await import('../../src/utils/assets/assetLibrary.js');
+    } = await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetCaches();
 

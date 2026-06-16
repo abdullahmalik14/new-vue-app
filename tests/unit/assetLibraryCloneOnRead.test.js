@@ -18,7 +18,7 @@ describe('assetLibrary clone-on-read (A-L06)', () => {
       loadAssetMapConfig,
       loadAssetsForSection,
       getAssetsForSection,
-    } = await import('../../src/utils/assets/assetLibrary.js');
+    } = await import('../../src/systems/assets/assetLibrary.js');
 
     clearAssetCaches();
 

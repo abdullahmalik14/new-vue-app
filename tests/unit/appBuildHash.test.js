@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
-import { syncPreloadStoreBuildHash } from '../../src/utils/build/appBuildHash.js';
+import { syncPreloadStoreBuildHash } from '../../src/systems/build/appBuildHash.js';
 import { usePreloadStore } from '../../src/stores/usePreloadStore.js';
 
 describe('appBuildHash / preload invalidation (M-05)', () => {

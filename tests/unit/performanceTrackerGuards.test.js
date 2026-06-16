@@ -20,7 +20,7 @@ describe('performanceTracker guards (S-05)', () => {
   });
 
   it('manifestLoader getSectionBundlePaths works without performanceTracker', async () => {
-    const { getSectionBundlePaths } = await import('../../src/utils/build/manifestLoader.js');
+    const { getSectionBundlePaths } = await import('../../src/systems/build/manifestLoader.js');
 
     const result = await getSectionBundlePaths('auth', {
       auth: {

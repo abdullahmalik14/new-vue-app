@@ -17,7 +17,7 @@ describe('getAssetsByCategory category cache (P-07)', () => {
 
     const { getValueFromCache } = await import('../../src/utils/common/cacheHandler.js');
     const { clearAssetCaches, getAssetsByCategory, isAssetCategoryCached } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetCaches();
@@ -39,7 +39,7 @@ describe('getAssetsByCategory category cache (P-07)', () => {
     vi.stubEnv('DEV', 'true');
 
     const { clearAssetCaches, loadAssetMapConfig, getAssetsByCategory } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetCaches();
@@ -58,7 +58,7 @@ describe('getAssetsByCategory category cache (P-07)', () => {
 
     const { getValueFromCache } = await import('../../src/utils/common/cacheHandler.js');
     const { clearAssetMapConfigCache, getAssetsByCategory, isAssetCategoryCached } = await import(
-      '../../src/utils/assets/assetLibrary.js',
+      '../../src/systems/assets/assetLibrary.js',
     );
 
     clearAssetMapConfigCache();
