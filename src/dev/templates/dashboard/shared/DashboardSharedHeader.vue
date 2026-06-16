@@ -71,7 +71,7 @@
         </div>
       </div>
     </div>
-    <NavDropdown v-model="isNavOpen" title="Menu" logo="your-logo-url" />
+    <NavigationDropdown v-model="isNavOpen" title="Menu" logo="your-logo-url" />
     <DashboardNotificationPopup :config="notificationPopupConfig" v-model="isNotificationOpen" @update:modelValue="
       (val) => {
         isNotificationOpen = val;
@@ -87,7 +87,7 @@
 </template>
 
 <script setup>
-import NavDropdown from '@/components/ui/nav/dashboard/NavDropdown.vue';
+import NavigationDropdown from '@/components/ui/nav/dashboard/NavigationDropdown.vue';
 import { ref, onMounted } from "vue";
 import DashboardNotificationPopup from "@/components/ui/popup/DashboardNotificationPopup.vue";
 import DashboardProfilePopup from "@/components/ui/popup/DashboardProfilePopup.vue";

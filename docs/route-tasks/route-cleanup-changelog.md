@@ -448,4 +448,31 @@ npm run test:unit -- --run tests/unit/hreflangTags.test.js   # pre-existing perf
 
 ---
 
+## Phase 3d — Dev UI component filename renames (2026-06-16)
+
+**Master plan:** Phase 3, batch 4 — dev/nav UI filenames  
+**Audit reference:** [route-naming-audit-batch-3.md](./route-naming-audit-batch-3.md), [route-naming-audit-batch-4.md](./route-naming-audit-batch-4.md)
+
+### What changed
+
+| Old | New |
+|-----|-----|
+| `components/layout/dev/DevNavBar.vue` | `DevNavigationBar.vue` |
+| `components/ui/nav/dashboard/NavDropdown.vue` | `NavigationDropdown.vue` |
+
+Updated import and template usage in `DashboardSharedHeader.vue`. `DevNavigationBar.vue` has no current import sites (orphan scaffold).
+
+### How tested
+
+```bash
+rg "DevNavBar|NavDropdown" src/ tests/ build/   # zero import hits (log string in NavigationDropdown.vue only)
+npm run build   # succeeds
+```
+
+### Phase 3 exit (3a–3d)
+
+All 11 non-auth `type: filename` renames from the naming audit are applied. Auth `*Page.vue` renames deferred to Phase 5.
+
+---
+
 *Add a new section above this line for each completed phase.*
