@@ -21,7 +21,7 @@ describe('asset map build validation (S-06)', () => {
   it('route assetPreload flags resolve in assetMap (M-04)', () => {
     const routes = resolveRouteAssetPreloads(
       readJson('src/router/routeConfig.json'),
-      readJson('src/router/sharedAssetPreloads.json'),
+      readJson('src/config/sharedAssetPreloads.json'),
     );
     const assetMap = readJson('src/config/assetMap.json');
     const result = validateRouteAssetPreloadFlags(routes, assetMap);
@@ -37,7 +37,7 @@ describe('asset map build validation (S-06)', () => {
   });
 
   it('dashboard component slot mappings stay aligned with dashboardMenuIcons (C-06)', () => {
-    const sharedCatalog = readJson('src/router/sharedAssetPreloads.json');
+    const sharedCatalog = readJson('src/config/sharedAssetPreloads.json');
     const errors = validateSharedComponentAssetMappings(sharedCatalog);
 
     expect(errors, errors.join('\n')).toEqual([]);

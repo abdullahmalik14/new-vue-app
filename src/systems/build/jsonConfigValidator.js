@@ -7,7 +7,7 @@
 
 import { log } from '../../infrastructure/logging/logHandler.js';
 import { logError } from '../../infrastructure/errors/errorHandler.js';
-import sharedAssetPreloads from '../../router/sharedAssetPreloads.json';
+import sharedAssetPreloads from '../../config/sharedAssetPreloads.json';
 import assetMapData from '../../config/assetMap.json';
 import {
   validateAssetPreloadEntryShape,

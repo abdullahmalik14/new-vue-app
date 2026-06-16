@@ -1,4 +1,4 @@
-import sharedAssetPreloads from '../../router/sharedAssetPreloads.json';
+import sharedAssetPreloads from '../../config/sharedAssetPreloads.json';
 import { getAssetUrls } from './assetLibrary.js';
 
 const PRELOAD_TIER_ORDER = ['critical', 'high', 'normal'];

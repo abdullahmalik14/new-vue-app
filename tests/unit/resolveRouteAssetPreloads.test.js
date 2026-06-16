@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { resolveRouteAssetPreloads } from '../../src/systems/routing/resolveRouteAssetPreloads.js';
-import sharedAssetPreloads from '../../src/router/sharedAssetPreloads.json';
+import sharedAssetPreloads from '../../src/config/sharedAssetPreloads.json';
 
 describe('resolveRouteAssetPreloads (P4)', () => {
   it('expands assetPreloadRef into assetPreload and removes the ref field', () => {

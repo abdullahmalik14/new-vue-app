@@ -16,7 +16,7 @@ function readJson(relativePath) {
 
 describe('shared component asset mappings (C-06)', () => {
   it('dashboard component slot mappings reference dashboardMenuIcons flags', () => {
-    const sharedCatalog = readJson('src/router/sharedAssetPreloads.json');
+    const sharedCatalog = readJson('src/config/sharedAssetPreloads.json');
     const errors = validateSharedComponentAssetMappings(sharedCatalog);
 
     expect(errors, errors.join('\n')).toEqual([]);

@@ -7,7 +7,7 @@
  */
 
 import routeConfigData from "../../router/routeConfig.json";
-import sharedAssetPreloads from "../../router/sharedAssetPreloads.json";
+import sharedAssetPreloads from "../../config/sharedAssetPreloads.json";
 import assetMapData from "../../config/assetMap.json";
 import {
   loadJsonConfigFromImport,

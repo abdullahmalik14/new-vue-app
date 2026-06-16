@@ -148,4 +148,50 @@ No production `src/` files were modified in Phase 1.
 
 ---
 
+## Phase 2a — Move sharedAssetPreloads.json (2026-06-16)
+
+**Master plan:** Phase 2, step 2a  
+**Audit reference:** [folder-structure-audit-router.md](./folder-structure-audit-router.md) Issue 1, [systems-routing-audit.md](./systems-routing-audit.md) Issue 5, [loose-route-code-scan.md](./loose-route-code-scan.md) Issue 2
+
+### Issue
+
+`sharedAssetPreloads.json` is an asset preload catalog, not route config. It lived under `src/router/` alongside `routeConfig.json`, but `notes.md` limits `router/` to entry + route JSON only.
+
+### What changed
+
+- `git mv` `src/router/sharedAssetPreloads.json` → `src/config/sharedAssetPreloads.json`
+- Updated JSON import paths in production code and tests (path-only; file content unchanged)
+
+### Files touched
+
+| File | Change |
+|------|--------|
+| `src/config/sharedAssetPreloads.json` | Moved from `src/router/` |
+| `src/systems/routing/routeConfigLoader.js` | Import → `../../config/sharedAssetPreloads.json` |
+| `src/systems/assets/resolveSharedComponentAssets.js` | Import → `../../config/sharedAssetPreloads.json` |
+| `src/systems/build/jsonConfigValidator.js` | Import → `../../config/sharedAssetPreloads.json` |
+| `tests/unit/resolveRouteAssetPreloads.test.js` | Import path updated |
+| `tests/unit/sharedComponentAssetMappings.test.js` | `readJson` path updated |
+| `tests/unit/assetMapBuildValidation.test.js` | `readJson` paths updated |
+
+### How tested
+
+```bash
+rg "router/sharedAssetPreloads" src/ tests/
+# zero hits
+
+npm run test:unit -- --run tests/unit/resolveRouteAssetPreloads.test.js
+# import resolves; "throws for unknown assetPreloadRef keys" passes
+```
+
+Some related tests still fail for pre-existing reasons (stale `utils/assets` / `utils/build` test imports, outdated entry-count assertions in `resolveRouteAssetPreloads`) — not caused by this move.
+
+### Step 2a exit
+
+- [x] Asset catalog no longer under `src/router/`
+- [x] Production imports point at `src/config/sharedAssetPreloads.json`
+- [x] No filename rename
+
+---
+
 *Add a new section above this line for each completed phase.*
