@@ -17,7 +17,7 @@ import { log } from "../../infrastructure/logging/logHandler.js";
 import { trackStep } from "../../infrastructure/logging/performanceTrackerAccess.js";
 import { logError } from "../../infrastructure/errors/errorHandler.js";
 import { validateRouteConfig } from "../build/jsonConfigValidator.js";
-import { resolveRouteAssetPreloads } from "./resolveRouteAssetPreloads.js";
+import { resolveRouteAssetPreloads } from "../assets/resolveRouteAssetPreloads.js";
 import { validateRouteComponentPathsWithResolver } from "./routeComponentPathValidator.js";
 import { findComponentLoader } from "./routeComponentLoader.js";
 import { validateRouteAssetPreloadFlags } from "../assets/validateRouteAssetPreloadFlags.js";

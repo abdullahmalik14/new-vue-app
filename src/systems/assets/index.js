@@ -56,6 +56,10 @@ export {
   resetRouteAssetPrefetchCache,
 } from './routeAssetPrefetch.js';
 
+export { resolveRouteAssetPreloads } from './resolveRouteAssetPreloads.js';
+
+export { validateSharedComponentAssetMappings } from './validateSharedComponentAssetMappings.js';
+
 // Export asset scanner functions
 export {
   extractAssetsFromComponent,

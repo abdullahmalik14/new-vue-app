@@ -15,7 +15,7 @@ import {
   validateRouteAssetPreloadFlags,
   validateSharedCatalogAssetPreloadFlags,
 } from '../assets/validateRouteAssetPreloadFlags.js';
-import { resolveRouteAssetPreloads } from '../routing/resolveRouteAssetPreloads.js';
+import { resolveRouteAssetPreloads } from '../assets/resolveRouteAssetPreloads.js';
 import { isValidRouteEnvAccess } from '../routing/routeEnvAccess.js';
 import { findDuplicateRoutePathClaims } from '../routing/routeAliases.js';
 

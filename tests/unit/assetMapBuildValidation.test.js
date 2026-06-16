@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { resolveRouteAssetPreloads } from '../../src/systems/routing/resolveRouteAssetPreloads.js';
+import { resolveRouteAssetPreloads } from '../../src/systems/assets/resolveRouteAssetPreloads.js';
 import { validateRouteAssetPreloadFlags } from '../../src/utils/assets/validateRouteAssetPreloadFlags.js';
 import { validateSharedComponentAssetMappings } from '../../src/utils/assets/validateSharedComponentAssetMappings.js';
 
