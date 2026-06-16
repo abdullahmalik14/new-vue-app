@@ -565,4 +565,47 @@ refactor(routing): rename routing core guard and resolver symbols
 
 ---
 
+## Phase 4.2 — Router orchestration and prefetch symbol renames (2026-06-16)
+
+**Master plan:** Phase 4, batch 2 — createAppRouter, preloader, resource loader, composable  
+**Audit reference:** [route-naming-audit-batch-1.md](./route-naming-audit-batch-1.md)
+
+### What changed
+
+**`createAppRouter.js`**
+- `generateRoutesFromConfig` → `buildVueRouterRecordsFromConfiguration`
+- `loadViaGlob` → `loadRouteComponentViaGlob`
+
+**`routeNavigationResourceLoader.js`**
+- `startCurrentSectionResourceLoads` → `loadCurrentSectionResources`
+- Default log labels updated to match renamed file
+
+**`routeComponentPreloader.js`**
+- Removed duplicate `createRoutePrefetchIntentHandler` export (canonical handler lives in `useRoutePrefetch.js`)
+- Log file labels: `routeComponentPrefetch.js` → `routeComponentPreloader.js`
+
+**`composables/useRoutePrefetch.js`**
+- Composable API: `prefetchRoute` → `prefetchRouteComponent`, `prefetchOnIntent` → `prefetchRouteOnIntent`
+- Component-only intent handler inlined as private `createComponentPrefetchOnIntentHandler`
+
+Updated: `routeGuards.js` comments, `index.js` exports, `routeNavigationData.test.js`, `useRoutePrefetch.test.js`, `routeComponentPrefetch.test.js`.
+
+Hook extraction (`registerRouteBeforeEachGuard`, etc.) deferred — not required for filename/symbol alignment.
+
+### How tested
+
+```bash
+rg "generateRoutesFromConfig|loadViaGlob|startCurrentSectionResourceLoads|prefetchOnIntent" src/ tests/   # zero hits
+npm run test:unit -- --run tests/unit/useRoutePrefetch.test.js tests/unit/routeComponentPrefetch.test.js tests/unit/routeNavigationData.test.js tests/unit/routerExports.test.js   # 22 passed
+npm run build   # succeeds
+```
+
+### Suggested commit
+
+```
+refactor(routing): rename router orchestration and prefetch symbols
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

@@ -35,10 +35,10 @@ describe('useRoutePrefetch (M-08)', () => {
     expect(prefetchSectionAssetsForRoute).toHaveBeenCalledWith('/shop', {});
   });
 
-  it('prefetchOnIntent from composable matches combined handler', async () => {
+  it('prefetchRouteOnIntent from composable matches combined handler', async () => {
     const { useRoutePrefetch } = await import('../../src/composables/useRoutePrefetch.js');
 
-    useRoutePrefetch().prefetchOnIntent('/dashboard')();
+    useRoutePrefetch().prefetchRouteOnIntent('/dashboard')();
 
     expect(prefetchRouteComponent).toHaveBeenCalledWith('/dashboard', {});
     expect(prefetchSectionAssetsForRoute).toHaveBeenCalledWith('/dashboard', {});

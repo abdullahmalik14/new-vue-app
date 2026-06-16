@@ -145,7 +145,7 @@ export function prefetchRouteComponent(targetPath, options = {}) {
   const promise = (async () => {
     const resolved = resolveRouteForPrefetch(menuPath);
     if (!resolved) {
-      log('routeComponentPrefetch.js', 'prefetchRouteComponent', 'skip', 'No exact prefetchable route for path', {
+      log('routeComponentPreloader.js', 'prefetchRouteComponent', 'skip', 'No exact prefetchable route for path', {
         menuPath,
         candidates: buildPrefetchPathCandidates(menuPath)
       });
@@ -156,7 +156,7 @@ export function prefetchRouteComponent(targetPath, options = {}) {
     const effectiveRoute = resolveEffectiveRouteConfig(route);
     const componentPath = resolveComponentPathForRoute(effectiveRoute, userRole);
     if (!componentPath) {
-      log('routeComponentPrefetch.js', 'prefetchRouteComponent', 'skip', 'Route has no component path for prefetch', {
+      log('routeComponentPreloader.js', 'prefetchRouteComponent', 'skip', 'Route has no component path for prefetch', {
         menuPath,
         resolvedSlug,
         userRole
@@ -166,7 +166,7 @@ export function prefetchRouteComponent(targetPath, options = {}) {
 
     const loader = findComponentLoader(componentPath);
     if (!loader) {
-      log('routeComponentPrefetch.js', 'prefetchRouteComponent', 'skip', 'Component loader not found for prefetch', {
+      log('routeComponentPreloader.js', 'prefetchRouteComponent', 'skip', 'Component loader not found for prefetch', {
         menuPath,
         resolvedSlug,
         componentPath
@@ -177,14 +177,14 @@ export function prefetchRouteComponent(targetPath, options = {}) {
     await loader();
     prefetchedPaths.add(menuPath);
 
-    log('routeComponentPrefetch.js', 'prefetchRouteComponent', 'success', 'Route component prefetched on intent', {
+    log('routeComponentPreloader.js', 'prefetchRouteComponent', 'success', 'Route component prefetched on intent', {
       menuPath,
       resolvedSlug,
       componentPath
     });
   })()
     .catch((error) => {
-      log('routeComponentPrefetch.js', 'prefetchRouteComponent', 'warn', 'Route component prefetch failed (non-blocking)', {
+      log('routeComponentPreloader.js', 'prefetchRouteComponent', 'warn', 'Route component prefetch failed (non-blocking)', {
         menuPath,
         error: error?.message
       });
@@ -195,17 +195,6 @@ export function prefetchRouteComponent(targetPath, options = {}) {
 
   prefetchInProgress.set(menuPath, promise);
   return promise;
-}
-
-/**
- * @param {string|object} targetPath
- * @param {{ userRole?: string }} [options]
- * @returns {() => void}
- */
-export function createRoutePrefetchIntentHandler(targetPath, options = {}) {
-  return () => {
-    prefetchRouteComponent(targetPath, options);
-  };
 }
 
 /**

@@ -1,11 +1,21 @@
-import {
-  prefetchRouteComponent,
-  createRoutePrefetchIntentHandler as createComponentPrefetchIntentHandler,
-} from '../systems/routing/routeComponentPreloader.js';
+import { prefetchRouteComponent } from '../systems/routing/routeComponentPreloader.js';
 import {
   prefetchSectionAssetsForRoute,
   createSectionAssetPrefetchIntentHandler,
 } from '../systems/assets/routeAssetPreloader.js';
+
+/**
+ * Component-only hover/focus handler (no section assets).
+ *
+ * @param {string|object} targetPath
+ * @param {{ userRole?: string }} [options]
+ * @returns {() => void}
+ */
+function createComponentPrefetchOnIntentHandler(targetPath, options = {}) {
+  return () => {
+    prefetchRouteComponent(targetPath, options);
+  };
+}
 
 /**
  * Combined hover/focus handler — prefetches route component + section assets (M-08).
@@ -26,11 +36,11 @@ export function createRoutePrefetchIntentHandler(targetPath, options = {}) {
  */
 export function useRoutePrefetch() {
   return {
-    prefetchRoute: prefetchRouteComponent,
+    prefetchRouteComponent,
     prefetchSectionAssets: prefetchSectionAssetsForRoute,
-    prefetchComponentOnIntent: createComponentPrefetchIntentHandler,
+    prefetchComponentOnIntent: createComponentPrefetchOnIntentHandler,
     prefetchAssetsOnIntent: createSectionAssetPrefetchIntentHandler,
-    prefetchOnIntent: createRoutePrefetchIntentHandler,
+    prefetchRouteOnIntent: createRoutePrefetchIntentHandler,
     createRoutePrefetchIntentHandler,
   };
 }

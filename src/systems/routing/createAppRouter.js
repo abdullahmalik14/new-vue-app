@@ -60,7 +60,7 @@ import {
   buildVueRouterAliases,
   createRedirectFromRouteRecords,
 } from './routeAliasResolver.js';
-import { startCurrentSectionResourceLoads, resolveCurrentSectionForNavigation } from './routeNavigationResourceLoader.js';
+import { loadCurrentSectionResources, resolveCurrentSectionForNavigation } from './routeNavigationResourceLoader.js';
 import { syncHreflangTagsForPath, clearHreflangTags } from '../i18n/routeHreflangTags.js';
 
 const DEFAULT_LOCALE = 'en';
@@ -102,12 +102,12 @@ function buildLocaleAwareRedirectPath(targetPath, locale, supportedLocales) {
  * 
  * @returns {Array} - Array of Vue Router route objects
  */
-function generateRoutesFromConfig() {
-  log('createAppRouter.js', 'generateRoutesFromConfig', 'start', 'Generating routes from configuration', {});
+function buildVueRouterRecordsFromConfiguration() {
+  log('createAppRouter.js', 'buildVueRouterRecordsFromConfiguration', 'start', 'Generating routes from configuration', {});
   trackStep({
         step: 'generateRoutes_start',
         file: 'createAppRouter.js',
-        method: 'generateRoutesFromConfig',
+        method: 'buildVueRouterRecordsFromConfiguration',
         flag: 'router-init',
         purpose: 'Generate routes from configuration'
       });
@@ -123,7 +123,7 @@ function generateRoutesFromConfig() {
     // Skip disabled routes — no Vue Router entry; direct URLs hit catch-all → /404 (B3).
     // Guards do not re-check enabled; this is the single enforcement point.
     if (route.enabled === false) {
-      log('createAppRouter.js', 'generateRoutesFromConfig', 'skip-disabled', 'Skipping disabled route', {
+      log('createAppRouter.js', 'buildVueRouterRecordsFromConfiguration', 'skip-disabled', 'Skipping disabled route', {
         path: route.slug,
         section: route.section
       });
@@ -132,7 +132,7 @@ function generateRoutesFromConfig() {
 
     // Skip development-only routes outside local dev (S1)
     if (!isRouteAccessibleInCurrentEnvironment(route)) {
-      log('createAppRouter.js', 'generateRoutesFromConfig', 'skip-env', 'Skipping route unavailable in this environment', {
+      log('createAppRouter.js', 'buildVueRouterRecordsFromConfiguration', 'skip-env', 'Skipping route unavailable in this environment', {
         path: route.slug,
         envAccess: route.envAccess
       });
@@ -150,7 +150,7 @@ function generateRoutesFromConfig() {
           return buildLocaleAwareRedirectPath(route.redirect, locale, SUPPORTED_LOCALES);
         }
       });
-      log('createAppRouter.js', 'generateRoutesFromConfig', 'redirect', 'Added locale-aware redirect route', {
+      log('createAppRouter.js', 'buildVueRouterRecordsFromConfiguration', 'redirect', 'Added locale-aware redirect route', {
         from: localePath,
         to: route.redirect
       });
@@ -190,13 +190,13 @@ function generateRoutesFromConfig() {
 
     for (const redirectRoute of redirectFromRoutes) {
       routes.push(redirectRoute);
-      log('createAppRouter.js', 'generateRoutesFromConfig', 'redirect-from', 'Added legacy redirect route', {
+      log('createAppRouter.js', 'buildVueRouterRecordsFromConfiguration', 'redirect-from', 'Added legacy redirect route', {
         from: redirectRoute.path,
         to: route.slug,
       });
     }
 
-    log('createAppRouter.js', 'generateRoutesFromConfig', 'add-route', 'Added locale-aware route', {
+    log('createAppRouter.js', 'buildVueRouterRecordsFromConfiguration', 'add-route', 'Added locale-aware route', {
       path: localePath,
       section: route.section,
       aliasCount: aliases.length,
@@ -204,13 +204,13 @@ function generateRoutesFromConfig() {
     });
   }
 
-  log('createAppRouter.js', 'generateRoutesFromConfig', 'success', 'Routes generated from config', {
+  log('createAppRouter.js', 'buildVueRouterRecordsFromConfiguration', 'success', 'Routes generated from config', {
     routeCount: routes.length
   });
   trackStep({
         step: 'generateRoutes_complete',
         file: 'createAppRouter.js',
-        method: 'generateRoutesFromConfig',
+        method: 'buildVueRouterRecordsFromConfiguration',
         flag: 'router-ready',
         purpose: `${routes.length} routes generated`
       });
@@ -263,7 +263,7 @@ async function loadRouteComponent(route) {
     // Never await — preloading is non-blocking cache warming, navigation must not wait on image I/O.
     preloadSectionCriticalImages(sectionName).catch(() => {});
 
-    const componentModule = await loadViaGlob(route, userRole);
+    const componentModule = await loadRouteComponentViaGlob(route, userRole);
 
     if (sectionPreloaded) {
       log('createAppRouter.js', 'loadRouteComponent', 'cache-hit', 'Section preloaded, fast load', { sectionName });
@@ -276,7 +276,7 @@ async function loadRouteComponent(route) {
   }
 
   // No section on this route — standard lazy load only
-  return loadViaGlob(route, userRole);
+  return loadRouteComponentViaGlob(route, userRole);
 }
 
 /**
@@ -287,7 +287,7 @@ async function loadRouteComponent(route) {
  * @param {string} userRole - Resolved user role string
  * @returns {Promise} - Component default export
  */
-async function loadViaGlob(route, userRole) {
+async function loadRouteComponentViaGlob(route, userRole) {
   try {
     // Resolve component path (handles role-based customComponentPath)
     const componentPath = resolveComponentPathForRoute(route, userRole);
@@ -296,14 +296,14 @@ async function loadViaGlob(route, userRole) {
       throw new Error(`No component path found for route: ${route.slug}`);
     }
 
-    log('createAppRouter.js', 'loadViaGlob', 'resolve', 'Component path resolved', {
+    log('createAppRouter.js', 'loadRouteComponentViaGlob', 'resolve', 'Component path resolved', {
       slug: route.slug,
       userRole,
       componentPath
     });
 
     if (import.meta.env.DEV) {
-      log('createAppRouter.js', 'loadViaGlob', 'debug', 'Component path lookup failed', {
+      log('createAppRouter.js', 'loadRouteComponentViaGlob', 'debug', 'Component path lookup failed', {
         componentPath
       });
     }
@@ -311,7 +311,7 @@ async function loadViaGlob(route, userRole) {
     const componentLoader = findComponentLoader(componentPath);
 
     if (!componentLoader) {
-      log('createAppRouter.js', 'loadViaGlob', 'error', 'Component not found in pre-loaded modules', {
+      log('createAppRouter.js', 'loadRouteComponentViaGlob', 'error', 'Component not found in pre-loaded modules', {
         componentPath
       });
       throw new Error(`Component not found in pre-loaded modules: ${componentPath}`);
@@ -319,23 +319,23 @@ async function loadViaGlob(route, userRole) {
 
     const componentModule = await componentLoader();
 
-    log('createAppRouter.js', 'loadViaGlob', 'success', 'Component loaded successfully', {
+    log('createAppRouter.js', 'loadRouteComponentViaGlob', 'success', 'Component loaded successfully', {
       slug: route.slug,
       path: componentPath
     });
   trackStep({
           step: 'loadComponent_complete',
           file: 'createAppRouter.js',
-          method: 'loadViaGlob',
+          method: 'loadRouteComponentViaGlob',
           flag: 'component-success',
           purpose: `Component loaded for ${route.slug}`
         });
 
-    log('createAppRouter.js', 'loadViaGlob', 'return', 'Returning loaded component', { slug: route.slug });
+    log('createAppRouter.js', 'loadRouteComponentViaGlob', 'return', 'Returning loaded component', { slug: route.slug });
     return componentModule.default || componentModule;
 
   } catch (error) {
-    log('createAppRouter.js', 'loadViaGlob', 'error', 'Failed to load component, using fallback', {
+    log('createAppRouter.js', 'loadRouteComponentViaGlob', 'error', 'Failed to load component, using fallback', {
       slug: route.slug,
       error: error.message,
       stack: error.stack,
@@ -344,18 +344,18 @@ async function loadViaGlob(route, userRole) {
   trackStep({
           step: 'loadComponent_fallback',
           file: 'createAppRouter.js',
-          method: 'loadViaGlob',
+          method: 'loadRouteComponentViaGlob',
           flag: 'component-error',
           purpose: `Component load failed, using NotFound fallback`
         });
 
-    log('createAppRouter.js', 'loadViaGlob', 'return', 'Returning NotFound fallback component', { slug: route.slug });
+    log('createAppRouter.js', 'loadRouteComponentViaGlob', 'return', 'Returning NotFound fallback component', { slug: route.slug });
     return loadNotFoundComponent();
   }
 }
 
 // Generate routes from configuration
-const routes = generateRoutesFromConfig();
+const routes = buildVueRouterRecordsFromConfiguration();
 
 // Create router instance
 const router = createRouter({
@@ -562,7 +562,7 @@ router.beforeResolve((to, from) => {
   const userRole = authStore.currentUser?.role || 'guest';
   const activeLocale = resolveActiveLocaleForNavigation(to);
 
-  startCurrentSectionResourceLoads({
+  loadCurrentSectionResources({
     to,
     from,
     userRole,

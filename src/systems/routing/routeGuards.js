@@ -12,7 +12,7 @@
  * 5. Role check
  * 6. Dependency check
  *
- * Note (B3): `enabled: false` routes are excluded in `generateRoutesFromConfig`.
+ * Note (B3): `enabled: false` routes are excluded in `buildVueRouterRecordsFromConfiguration`.
  * They never reach the guard chain — direct URLs fall through to the catch-all → /404.
  */
 
@@ -365,7 +365,7 @@ export function guardPreventNavigationLoop(toRoute, fromRoute) {
  * Defense in depth for dev-only routes that were registered (S1).
  *
  * `enabled: false` is NOT checked here — those routes are omitted in
- * `generateRoutesFromConfig` and unreachable URLs hit the catch-all → /404 (B3).
+ * `buildVueRouterRecordsFromConfiguration` and unreachable URLs hit the catch-all → /404 (B3).
  *
  * @param {object} route - Route to check
  * @returns {object} - Guard result

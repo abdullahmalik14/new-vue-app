@@ -137,14 +137,4 @@ describe('routeComponentPrefetch (P10)', () => {
       expect.any(String)
     );
   });
-
-  it('createRoutePrefetchIntentHandler triggers prefetch', async () => {
-    const { createRoutePrefetchIntentHandler } = await import('../../src/systems/routing/routeComponentPreloader.js');
-
-    const onIntent = createRoutePrefetchIntentHandler('/sign-up');
-    onIntent();
-    await Promise.resolve();
-
-    expect(mockLoader).toHaveBeenCalledTimes(1);
-  });
 });

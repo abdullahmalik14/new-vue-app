@@ -41,15 +41,15 @@ export function resolveCurrentSectionForNavigation(to, userRole) {
  * @param {{ file?: string, method?: string }} [options.logContext]
  * @returns {string|null} resolved current section name
  */
-export function startCurrentSectionResourceLoads({
+export function loadCurrentSectionResources({
   to,
   from,
   userRole,
   activeLocale,
   logContext = {},
 }) {
-  const file = logContext.file || 'routeNavigationData.js';
-  const method = logContext.method || 'startCurrentSectionResourceLoads';
+  const file = logContext.file || 'routeNavigationResourceLoader.js';
+  const method = logContext.method || 'loadCurrentSectionResources';
 
   const routeConfig = to.meta?.routeConfig;
   if (!routeConfig) {

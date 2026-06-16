@@ -23,7 +23,7 @@ vi.mock('../../src/systems/sections/sectionResolver.js', () => ({
 
 import {
   resolveCurrentSectionForNavigation,
-  startCurrentSectionResourceLoads,
+  loadCurrentSectionResources,
 } from '../../src/systems/routing/routeNavigationResourceLoader.js';
 
 describe('routeNavigationData (M9)', () => {
@@ -62,10 +62,10 @@ describe('routeNavigationData (M9)', () => {
     expect(resolveCurrentSectionForNavigation({ meta: {} }, 'guest')).toBeNull();
   });
 
-  it('startCurrentSectionResourceLoads skips translation fetch when already loaded (P-02)', () => {
+  it('loadCurrentSectionResources skips translation fetch when already loaded (P-02)', () => {
     areTranslationsLoadedForSection.mockReturnValue(true);
 
-    startCurrentSectionResourceLoads({
+    loadCurrentSectionResources({
       to: { meta: { routeConfig: {}, section: 'auth' } },
       from: { meta: {} },
       userRole: 'guest',
@@ -77,8 +77,8 @@ describe('routeNavigationData (M9)', () => {
     expect(loadTranslationsForSection).not.toHaveBeenCalled();
   });
 
-  it('startCurrentSectionResourceLoads loads translations when not yet loaded', () => {
-    startCurrentSectionResourceLoads({
+  it('loadCurrentSectionResources loads translations when not yet loaded', () => {
+    loadCurrentSectionResources({
       to: { meta: { routeConfig: {}, section: 'auth' } },
       from: { meta: {} },
       userRole: 'guest',

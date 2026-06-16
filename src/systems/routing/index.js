@@ -59,7 +59,6 @@ export {
 
 export {
   prefetchRouteComponent,
-  createRoutePrefetchIntentHandler as createComponentPrefetchIntentHandler,
   normalizeTargetPath,
   resolveRouteForPrefetch,
 } from './routeComponentPreloader.js';
@@ -98,7 +97,7 @@ export {
 
 export {
   resolveCurrentSectionForNavigation,
-  startCurrentSectionResourceLoads,
+  loadCurrentSectionResources,
 } from './routeNavigationResourceLoader.js';
 
 export {
