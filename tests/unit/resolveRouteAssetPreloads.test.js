@@ -13,9 +13,10 @@ describe('resolveRouteAssetPreloads (P4)', () => {
     ];
 
     const resolved = resolveRouteAssetPreloads(routes, sharedAssetPreloads);
+    const refCount = sharedAssetPreloads.dashboardMenuIcons.length;
 
     expect(resolved[0].assetPreloadRef).toBeUndefined();
-    expect(resolved[0].assetPreload).toHaveLength(20);
+    expect(resolved[0].assetPreload).toHaveLength(refCount);
     expect(resolved[0].assetPreload[0]).toEqual({
       flag: 'dashboard.logo',
       type: 'image',
@@ -36,9 +37,10 @@ describe('resolveRouteAssetPreloads (P4)', () => {
     ];
 
     const resolved = resolveRouteAssetPreloads(routes, sharedAssetPreloads);
+    const refCount = sharedAssetPreloads.dashboardMenuIcons.length;
 
-    expect(resolved[0].assetPreload).toHaveLength(21);
-    expect(resolved[0].assetPreload[20]).toEqual({
+    expect(resolved[0].assetPreload).toHaveLength(refCount + 1);
+    expect(resolved[0].assetPreload[refCount]).toEqual({
       src: '/media/extra.png',
       type: 'image',
       priority: 'high'
