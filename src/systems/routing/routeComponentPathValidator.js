@@ -1,6 +1,6 @@
 /**
  * Validate route componentPath / customComponentPath against import.meta.glob (M10).
- * Browser-safe — Node disk checks live in routeComponentPathValidator.node.js.
+ * Browser-safe — Node disk checks live in routeComponentPathDiskValidator.node.js.
  */
 
 const ALLOWED_COMPONENT_PREFIXES = ['src/templates/', 'src/components/', 'src/dev/'];

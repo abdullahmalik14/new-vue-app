@@ -8,7 +8,7 @@ import { useAuthStore } from '../../stores/useAuthStore.js';
 import { resolveCurrentRouteSectionName } from '../sections/sectionPreloadOrchestrator.js';
 import { preloadSectionAssets } from './assetPreloader.js';
 import { log } from '../../infrastructure/logging/logHandler.js';
-import { normalizeTargetPath, resolveRouteForPrefetch } from '../routing/routeComponentPrefetch.js';
+import { normalizeTargetPath, resolveRouteForPrefetch } from '../routing/routeComponentPreloader.js';
 
 const prefetchedSections = new Set();
 const prefetchInProgress = new Map();

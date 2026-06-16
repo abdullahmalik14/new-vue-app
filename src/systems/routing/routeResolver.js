@@ -20,7 +20,7 @@
 import { getRouteConfiguration } from './routeConfigLoader.js';
 import { log } from '../../infrastructure/logging/logHandler.js';
 import { deepMergePreferChild, safelyGetNestedProperty } from '../../utils/common/objectSafety.js';
-import { routeConfigMatchesPath } from './routeAliases.js';
+import { routeConfigMatchesPath } from './routeAliasResolver.js';
 import { trackStep } from '../../infrastructure/logging/performanceTrackerAccess.js';
 
 /**

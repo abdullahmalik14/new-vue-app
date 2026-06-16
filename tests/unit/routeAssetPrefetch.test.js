@@ -7,7 +7,7 @@ vi.mock('../../src/systems/assets/assetPreloader.js', () => ({
   preloadSectionAssets,
 }));
 
-vi.mock('../../src/systems/routing/routeComponentPrefetch.js', () => ({
+vi.mock('../../src/systems/routing/routeComponentPreloader.js', () => ({
   normalizeTargetPath: (target) => {
     if (typeof target === 'string') {
       return target.split('?')[0].split('#')[0];

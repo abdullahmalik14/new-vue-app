@@ -17,7 +17,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useNavigationProgress } from '@/systems/routing/navigationProgress.js';
+import { useNavigationProgress } from '@/systems/routing/navigationProgressTracker.js';
 
 const { isActive, progress } = useNavigationProgress();
 

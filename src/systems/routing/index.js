@@ -63,7 +63,7 @@ export {
   createRoutePrefetchIntentHandler as createComponentPrefetchIntentHandler,
   normalizeTargetPath,
   resolveRouteForPrefetch,
-} from './routeComponentPrefetch.js';
+} from './routeComponentPreloader.js';
 
 export {
   prefetchSectionAssetsForRoute,
@@ -95,12 +95,12 @@ export {
   routeConfigMatchesPath,
   createRedirectFromRouteRecords,
   findDuplicateRoutePathClaims,
-} from './routeAliases.js';
+} from './routeAliasResolver.js';
 
 export {
   resolveCurrentSectionForNavigation,
   startCurrentSectionResourceLoads,
-} from './routeNavigationData.js';
+} from './routeNavigationResourceLoader.js';
 
 export {
   isAdminUser,
@@ -119,5 +119,5 @@ export {
   finishNavigationProgress,
   failNavigationProgress,
   useNavigationProgress,
-} from './navigationProgress.js';
+} from './navigationProgressTracker.js';
 

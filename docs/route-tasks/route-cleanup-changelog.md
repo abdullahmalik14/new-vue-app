@@ -348,4 +348,56 @@ npm run test:unit -- --run tests/unit/routerExports.test.js   # pre-existing per
 
 ---
 
+## Phase 3a — Core routing module filename renames (2026-06-16)
+
+**Master plan:** Phase 3, batch 1 — core routing filenames  
+**Audit reference:** [route-naming-audit-batch-1.md](./route-naming-audit-batch-1.md) (`type: filename` entries)
+
+### Issue
+
+Five core routing modules still used legacy filenames from the pre-refactor layout. Names did not match their responsibilities (alias resolution, component preloading, navigation resource loading, progress tracking, disk path validation).
+
+### What changed
+
+`git mv` renames only — no symbol/method renames (Phase 4):
+
+| Old | New |
+|-----|-----|
+| `routeAliases.js` | `routeAliasResolver.js` |
+| `routeComponentPathValidator.node.js` | `routeComponentPathDiskValidator.node.js` |
+| `routeComponentPrefetch.js` | `routeComponentPreloader.js` |
+| `navigationProgress.js` | `navigationProgressTracker.js` |
+| `routeNavigationData.js` | `routeNavigationResourceLoader.js` |
+
+Updated import paths in:
+
+- `src/systems/routing/index.js`, `createAppRouter.js`, `routeResolver.js`
+- `src/systems/build/jsonConfigValidator.js`
+- `src/composables/useRoutePrefetch.js`
+- `src/systems/assets/routeAssetPrefetch.js`
+- `src/components/layout/NavigationProgressBar.vue`
+- `build/vite/sectionBundler.js`
+- 7 unit test files
+
+### Files touched
+
+5 renamed modules + 14 import-site files (see git status)
+
+### How tested
+
+```bash
+rg "routeAliases\.js|routeComponentPathValidator\.node|routeComponentPrefetch\.js|navigationProgress\.js|routeNavigationData\.js" src/ tests/ build/   # zero import hits
+npm run test:unit -- --run tests/unit/routeAliases.test.js tests/unit/routeComponentPathValidator.test.js tests/unit/routeNavigationData.test.js tests/unit/navigationProgress.test.js tests/unit/useRoutePrefetch.test.js   # 22 passed
+npm run test:unit -- --run tests/unit/routeComponentPrefetch.test.js   # pre-existing performanceTracker UMD failure (unchanged)
+npm run build   # succeeds
+```
+
+### Suggested commit
+
+```
+refactor(routing): rename core routing module filenames
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

@@ -17,7 +17,7 @@ import {
 } from '../assets/validateRouteAssetPreloadFlags.js';
 import { resolveRouteAssetPreloads } from '../assets/resolveRouteAssetPreloads.js';
 import { isValidRouteEnvAccess } from '../routing/routeEnvAccess.js';
-import { findDuplicateRoutePathClaims } from '../routing/routeAliases.js';
+import { findDuplicateRoutePathClaims } from '../routing/routeAliasResolver.js';
 
 const PRELOAD_RESOLVE_ROLE = 'guest';
 const PRELOAD_SECTION_FALLBACK_ROLE = 'default';

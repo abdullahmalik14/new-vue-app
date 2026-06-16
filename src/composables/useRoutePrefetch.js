@@ -1,7 +1,7 @@
 import {
   prefetchRouteComponent,
   createRoutePrefetchIntentHandler as createComponentPrefetchIntentHandler,
-} from '../systems/routing/routeComponentPrefetch.js';
+} from '../systems/routing/routeComponentPreloader.js';
 import {
   prefetchSectionAssetsForRoute,
   createSectionAssetPrefetchIntentHandler,

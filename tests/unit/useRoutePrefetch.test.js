@@ -4,7 +4,7 @@ import { createPinia, setActivePinia } from 'pinia';
 const prefetchRouteComponent = vi.fn(() => Promise.resolve());
 const prefetchSectionAssetsForRoute = vi.fn(() => Promise.resolve());
 
-vi.mock('../../src/systems/routing/routeComponentPrefetch.js', () => ({
+vi.mock('../../src/systems/routing/routeComponentPreloader.js', () => ({
   prefetchRouteComponent,
   createRoutePrefetchIntentHandler: (targetPath, options) => () => {
     prefetchRouteComponent(targetPath, options);

@@ -6,7 +6,7 @@ import {
   findDuplicateRoutePathClaims,
   normalizeRoutePath,
   routeConfigMatchesPath,
-} from '../../src/systems/routing/routeAliases.js';
+} from '../../src/systems/routing/routeAliasResolver.js';
 
 describe('routeAliases (M8)', () => {
   it('normalizeRoutePath adds a leading slash', () => {

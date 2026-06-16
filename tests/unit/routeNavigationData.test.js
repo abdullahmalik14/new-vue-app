@@ -24,7 +24,7 @@ vi.mock('../../src/systems/sections/sectionResolver.js', () => ({
 import {
   resolveCurrentSectionForNavigation,
   startCurrentSectionResourceLoads,
-} from '../../src/systems/routing/routeNavigationData.js';
+} from '../../src/systems/routing/routeNavigationResourceLoader.js';
 
 describe('routeNavigationData (M9)', () => {
   beforeEach(() => {

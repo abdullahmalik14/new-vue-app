@@ -55,12 +55,12 @@ import {
   startNavigationProgress,
   finishNavigationProgress,
   failNavigationProgress,
-} from './navigationProgress.js';
+} from './navigationProgressTracker.js';
 import {
   buildVueRouterAliases,
   createRedirectFromRouteRecords,
-} from './routeAliases.js';
-import { startCurrentSectionResourceLoads, resolveCurrentSectionForNavigation } from './routeNavigationData.js';
+} from './routeAliasResolver.js';
+import { startCurrentSectionResourceLoads, resolveCurrentSectionForNavigation } from './routeNavigationResourceLoader.js';
 import { syncHreflangTagsForPath, clearHreflangTags } from '../i18n/hreflangTags.js';
 
 const DEFAULT_LOCALE = 'en';

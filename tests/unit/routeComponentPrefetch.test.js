@@ -66,12 +66,12 @@ describe('routeComponentPrefetch (P10)', () => {
     vi.resetModules();
     mockLoader.mockClear();
     window.performanceTracker = { step: vi.fn() };
-    const { resetRoutePrefetchCache } = await import('../../src/systems/routing/routeComponentPrefetch.js');
+    const { resetRoutePrefetchCache } = await import('../../src/systems/routing/routeComponentPreloader.js');
     resetRoutePrefetchCache();
   });
 
   it('prefetches the component module for a known route path', async () => {
-    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPrefetch.js');
+    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPreloader.js');
 
     await prefetchRouteComponent('/dashboard');
     await prefetchRouteComponent('/dashboard');
@@ -80,7 +80,7 @@ describe('routeComponentPrefetch (P10)', () => {
   });
 
   it('prefetches /dashboard/analytics on exact prefixed menu path', async () => {
-    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPrefetch.js');
+    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPreloader.js');
     const { resolveComponentPathForRoute } = await import('../../src/systems/routing/routeResolver.js');
 
     await prefetchRouteComponent('/dashboard/analytics');
@@ -93,7 +93,7 @@ describe('routeComponentPrefetch (P10)', () => {
   });
 
   it('resolves legacy /analytics hover to /dashboard/analytics route', async () => {
-    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPrefetch.js');
+    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPreloader.js');
     const { resolveComponentPathForRoute } = await import('../../src/systems/routing/routeResolver.js');
 
     await prefetchRouteComponent('/analytics');
@@ -106,7 +106,7 @@ describe('routeComponentPrefetch (P10)', () => {
   });
 
   it('prefetches /payout shared page without aliasing to /dashboard/payout', async () => {
-    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPrefetch.js');
+    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPreloader.js');
     const { resolveComponentPathForRoute } = await import('../../src/systems/routing/routeResolver.js');
 
     await prefetchRouteComponent('/payout');
@@ -119,7 +119,7 @@ describe('routeComponentPrefetch (P10)', () => {
   });
 
   it('does not match catch-all wildcard routes', async () => {
-    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPrefetch.js');
+    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPreloader.js');
 
     await prefetchRouteComponent('/totally-unknown-path');
 
@@ -127,7 +127,7 @@ describe('routeComponentPrefetch (P10)', () => {
   });
 
   it('strips locale prefix before resolving route', async () => {
-    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPrefetch.js');
+    const { prefetchRouteComponent } = await import('../../src/systems/routing/routeComponentPreloader.js');
     const { resolveComponentPathForRoute } = await import('../../src/systems/routing/routeResolver.js');
 
     await prefetchRouteComponent('/vi/sign-up');
@@ -139,7 +139,7 @@ describe('routeComponentPrefetch (P10)', () => {
   });
 
   it('createRoutePrefetchIntentHandler triggers prefetch', async () => {
-    const { createRoutePrefetchIntentHandler } = await import('../../src/systems/routing/routeComponentPrefetch.js');
+    const { createRoutePrefetchIntentHandler } = await import('../../src/systems/routing/routeComponentPreloader.js');
 
     const onIntent = createRoutePrefetchIntentHandler('/sign-up');
     onIntent();
