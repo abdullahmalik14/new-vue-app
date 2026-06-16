@@ -475,4 +475,54 @@ All 11 non-auth `type: filename` renames from the naming audit are applied. Auth
 
 ---
 
+## Phase 4.0 — Test unblock (2026-06-16)
+
+**Master plan:** Phase 4 prep — restore reliable test signal before symbol renames
+
+### 4.0a — `performanceTracker` ESM/UMD conflict
+
+**Issue:** Vitest loads modules as ESM. `performanceTracker.js` assigned to read-only `module.exports`, throwing `Cannot set property default of [object Module] which has only a getter`. Any test importing routing/prefetch code through `apiWrapper.js` failed before assertions ran.
+
+**Fix:** Skip UMD `module.exports` assignment when `import.meta.url` is present (ESM); keep legacy script-tag / AMD paths unchanged.
+
+**Commit:** `fix(tests): guard performanceTracker UMD export in ESM`
+
+### 4.0b — Stale `utils/assets` and `utils/build` test imports
+
+**Issue:** 47 unit tests still imported deleted `src/utils/assets/` and `src/utils/build/` paths.
+
+**Fix:** Bulk path update to `src/systems/assets/` and `src/systems/build/` in `tests/unit/`.
+
+**Commit:** `fix(tests): align stale asset and build test import paths`
+
+### 4.0c — `resolveRouteAssetPreloads` stale counts
+
+**Issue:** Tests hard-coded 20/21 entry counts; `sharedAssetPreloads.json` catalog grew to 44 entries.
+
+**Fix:** Assert lengths from `sharedAssetPreloads.dashboardMenuIcons.length` instead of magic numbers.
+
+**Commit:** `fix(tests): use catalog-driven asset preload resolver expectations`
+
+### 4.0d — Route chain path drift
+
+**Issue:** Tests used `/dashboard/settings/privacy-security`, which no longer exists in `routeConfig.json` (chain length 1).
+
+**Fix:** Use `/dashboard/analytics` (parent `/dashboard` + child route still in config).
+
+**Commit:** `fix(tests): update route chain assertions for current routeConfig`
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/unit/routeComponentPrefetch.test.js tests/unit/hreflangTags.test.js tests/unit/routerExports.test.js tests/unit/routeAssetPrefetch.test.js   # 24 passed
+npm run test:unit -- --run tests/unit/resolveRouteAssetPreloads.test.js tests/unit/routeChain.test.js tests/unit/routeNavigation.test.js   # 9 passed
+npm run test:unit -- --run tests/unit/assetMapBuildValidation.test.js tests/unit/performanceTrackerGuards.test.js   # pass
+```
+
+### Known remaining failures (not 4.0 scope)
+
+- `jsonConfigValidator.test.js` — 3 production-config tests fail because `/home` route (index 40) lacks `section` and `supportedRoles` in `routeConfig.json` (Phase 6 config fix)
+
+---
+
 *Add a new section above this line for each completed phase.*
