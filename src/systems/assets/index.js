@@ -30,7 +30,7 @@ export {
   dedupeAssetPreloadEntries,
   isRouteEnabledForAssetPreload,
   routeBelongsToSection,
-} from './getAssetPreloadEntriesForSection.js';
+} from './routeSectionAssetPreloadEntries.js';
 
 export {
   collectAssetMapFlags,

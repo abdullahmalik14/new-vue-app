@@ -424,4 +424,28 @@ npm run test:unit -- --run tests/unit/resolveRouteAssetPreloads.test.js   # pre-
 
 ---
 
+## Phase 3c — Cross-system filename renames (2026-06-16)
+
+**Master plan:** Phase 3, batch 3 — cross-system filenames  
+**Audit reference:** [route-naming-audit-batch-2.md](./route-naming-audit-batch-2.md)
+
+### What changed
+
+| Old | New |
+|-----|-----|
+| `systems/i18n/hreflangTags.js` | `routeHreflangTags.js` |
+| `systems/assets/getAssetPreloadEntriesForSection.js` | `routeSectionAssetPreloadEntries.js` |
+
+Updated imports in routing, i18n, assets modules and 6 test files. Fixed stale `utils/assets/getAssetPreloadEntriesForSection` test paths to `systems/assets/routeSectionAssetPreloadEntries`.
+
+### How tested
+
+```bash
+rg "hreflangTags\.js|getAssetPreloadEntriesForSection\.js" src/ tests/ build/   # zero import hits
+npm run test:unit -- --run tests/unit/getAssetPreloadEntriesForSection.test.js   # 7 passed
+npm run test:unit -- --run tests/unit/hreflangTags.test.js   # pre-existing performanceTracker UMD failure
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

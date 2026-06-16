@@ -61,7 +61,7 @@ import {
   createRedirectFromRouteRecords,
 } from './routeAliasResolver.js';
 import { startCurrentSectionResourceLoads, resolveCurrentSectionForNavigation } from './routeNavigationResourceLoader.js';
-import { syncHreflangTagsForPath, clearHreflangTags } from '../i18n/hreflangTags.js';
+import { syncHreflangTagsForPath, clearHreflangTags } from '../i18n/routeHreflangTags.js';
 
 const DEFAULT_LOCALE = 'en';
 

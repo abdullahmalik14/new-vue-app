@@ -10,7 +10,7 @@ describe('C-04 — /shop does not duplicate dashboard icons in shop section buck
     const {
       getAssetPreloadEntriesForSection,
       clearAssetPreloadSectionCache,
-    } = await import('../../src/utils/assets/getAssetPreloadEntriesForSection.js');
+    } = await import('../../src/systems/assets/routeSectionAssetPreloadEntries.js');
 
     const routes = getRouteConfiguration();
     const shopRoute = routes.find((route) => route.slug === '/shop');

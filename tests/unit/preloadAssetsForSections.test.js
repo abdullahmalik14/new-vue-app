@@ -12,7 +12,7 @@ vi.mock('../../src/utils/build/manifestLoader.js', () => ({
   getSectionBundlePaths,
 }));
 
-vi.mock('../../src/utils/assets/getAssetPreloadEntriesForSection.js', () => ({
+vi.mock('../../src/systems/assets/routeSectionAssetPreloadEntries.js', () => ({
   getAssetPreloadEntriesForSection: vi.fn(() => ({ assets: [], routeCount: 0 })),
 }));
 

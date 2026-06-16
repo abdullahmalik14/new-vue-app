@@ -2,7 +2,7 @@
 
 import { log } from "../../infrastructure/logging/logHandler.js";
 import { trackStep } from "../../infrastructure/logging/performanceTrackerAccess.js";
-import { getAssetPreloadEntriesForSection } from "./getAssetPreloadEntriesForSection.js";
+import { getAssetPreloadEntriesForSection } from "./routeSectionAssetPreloadEntries.js";
 
 /**
  * @file assetScanner.js

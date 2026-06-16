@@ -70,5 +70,5 @@ export {
   buildHreflangAlternateUrls,
   syncHreflangTagsForPath,
   clearHreflangTags,
-} from './hreflangTags.js';
+} from './routeHreflangTags.js';
 

@@ -8,7 +8,7 @@ import {
   buildHreflangAlternateUrls,
   syncHreflangTagsForPath,
   clearHreflangTags,
-} from '../../src/systems/i18n/hreflangTags.js';
+} from '../../src/systems/i18n/routeHreflangTags.js';
 
 describe('hreflangTags (B-08)', () => {
   beforeEach(() => {

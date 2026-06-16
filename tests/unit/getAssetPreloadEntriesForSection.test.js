@@ -34,7 +34,7 @@ describe('getAssetPreloadEntriesForSection (P-06)', () => {
     ]);
 
     const { getAssetPreloadEntriesForSection } = await import(
-      '../../src/utils/assets/getAssetPreloadEntriesForSection.js'
+      '../../src/systems/assets/routeSectionAssetPreloadEntries.js'
     );
 
     const result = getAssetPreloadEntriesForSection('dashboard-global');
@@ -53,7 +53,7 @@ describe('getAssetPreloadEntriesForSection (P-06)', () => {
       },
     ]);
 
-    const mod = await import('../../src/utils/assets/getAssetPreloadEntriesForSection.js');
+    const mod = await import('../../src/systems/assets/routeSectionAssetPreloadEntries.js');
 
     mod.getAssetPreloadEntriesForSection('auth');
     mod.getAssetPreloadEntriesForSection('auth');
@@ -82,7 +82,7 @@ describe('getAssetPreloadEntriesForSection (P-06)', () => {
     ]);
 
     const { getAssetPreloadEntriesForSection } = await import(
-      '../../src/utils/assets/getAssetPreloadEntriesForSection.js'
+      '../../src/systems/assets/routeSectionAssetPreloadEntries.js'
     );
 
     const result = getAssetPreloadEntriesForSection('dashboard-global');
@@ -108,7 +108,7 @@ describe('getAssetPreloadEntriesForSection (P-06)', () => {
     ]);
 
     const { getAssetPreloadEntriesForSection } = await import(
-      '../../src/utils/assets/getAssetPreloadEntriesForSection.js'
+      '../../src/systems/assets/routeSectionAssetPreloadEntries.js'
     );
 
     const result = getAssetPreloadEntriesForSection('auth');
@@ -141,7 +141,7 @@ describe('getAssetPreloadEntriesForSection (P-06)', () => {
     ]);
 
     const { getAssetPreloadEntriesForSection } = await import(
-      '../../src/utils/assets/getAssetPreloadEntriesForSection.js'
+      '../../src/systems/assets/routeSectionAssetPreloadEntries.js'
     );
 
     const result = getAssetPreloadEntriesForSection('dashboard-global');
@@ -169,7 +169,7 @@ describe('getAssetPreloadEntriesForSection (P-06)', () => {
     ]);
 
     const { getAssetPreloadEntriesForSection } = await import(
-      '../../src/utils/assets/getAssetPreloadEntriesForSection.js'
+      '../../src/systems/assets/routeSectionAssetPreloadEntries.js'
     );
 
     const result = getAssetPreloadEntriesForSection('dashboard-creator');
@@ -187,7 +187,7 @@ describe('getAssetPreloadEntriesForSection (P-06)', () => {
       },
     ]);
 
-    const mod = await import('../../src/utils/assets/getAssetPreloadEntriesForSection.js');
+    const mod = await import('../../src/systems/assets/routeSectionAssetPreloadEntries.js');
 
     mod.getAssetPreloadEntriesForSection('auth');
     mod.clearAssetPreloadSectionCache();

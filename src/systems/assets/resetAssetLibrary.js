@@ -7,7 +7,7 @@ import { getCacheStatistics } from '../../infrastructure/cache/cacheHandler.js';
 import { usePreloadStore } from '../../stores/usePreloadStore.js';
 import { clearAssetCaches, getAssetStatistics } from './assetLibrary.js';
 import { clearPreloadCache, getPreloadedAssetsCount } from './assetPreloader.js';
-import { clearAssetPreloadSectionCache } from './getAssetPreloadEntriesForSection.js';
+import { clearAssetPreloadSectionCache } from './routeSectionAssetPreloadEntries.js';
 
 /**
  * @typedef {object} ResetAssetLibraryOptions

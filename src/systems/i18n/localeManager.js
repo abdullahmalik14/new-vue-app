@@ -1203,7 +1203,7 @@ async function updateUrlWithLocale(localeCode) {
 
       window.history.pushState({}, "", newUrl);
 
-      import("./hreflangTags.js")
+      import("./routeHreflangTags.js")
         .then(({ syncHreflangTagsForPath }) => {
           syncHreflangTagsForPath(newPath, { enabled: true });
         })

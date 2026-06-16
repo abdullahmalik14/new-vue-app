@@ -4,7 +4,7 @@ import { usePreloadStore } from '../../src/stores/usePreloadStore.js';
 
 const getAssetPreloadEntriesForSection = vi.fn();
 
-vi.mock('../../src/utils/assets/getAssetPreloadEntriesForSection.js', () => ({
+vi.mock('../../src/systems/assets/routeSectionAssetPreloadEntries.js', () => ({
   getAssetPreloadEntriesForSection,
 }));
 
