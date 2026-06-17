@@ -352,6 +352,26 @@
       "flag": "dashboard.analytics.defaultAvatar",
       "type": "image",
       "priority": "high"
+    },
+    {
+      "flag": "dashboard.analytics.chevronDown",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.analytics.closePopup",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.analytics.money",
+      "type": "image",
+      "priority": "high"
+    },
+    {
+      "flag": "dashboard.analytics.subscriptionsIcon",
+      "type": "image",
+      "priority": "high"
     }
   ]
 }

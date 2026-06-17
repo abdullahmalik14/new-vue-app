@@ -4,8 +4,8 @@
     @update:model-value="$emit('update:modelValue', $event)"
     :period="period"
     @update:period="handlePeriodChange"
-    title="Contributors Insight"
-    logo="https://i.ibb.co.com/rGSXLKX4/money.webp"
+    :title="$t('dashboard.analytics.trends.titleContributors', 'Contributors Insight')"
+    :logo="iconPopupLogo || ''"
   >
     <div v-if="hasContributorsData" class="flex flex-col gap-4">
 
@@ -123,6 +123,7 @@
 
 <script setup> 
 import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: iconPopupLogo } = useAssetUrl('dashboard.analytics.money')
 const { url: icon6Url } = useAssetUrl('dashboard.analytics.icon6')
 
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'

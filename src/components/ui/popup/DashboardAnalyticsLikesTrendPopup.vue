@@ -4,8 +4,8 @@
     @update:model-value="$emit('update:modelValue', $event)"
     :period="period"
     @update:period="handlePeriodChange"
-    title="Likes Insight"
-    logo="https://i.ibb.co.com/rGSXLKX4/money.webp"
+    :title="$t('dashboard.analytics.trends.titleLikes', 'Likes Insight')"
+    :logo="iconPopupLogo || ''"
   >
     <div class="flex flex-col gap-6">
       
@@ -39,8 +39,8 @@
         <div v-else class="absolute inset-0 flex flex-col justify-center items-center gap-6 w-full text-center bg-light-bg-container dark:bg-dark-bg-container z-20">
           <img :src="icon6Url || ''" alt="illustration" class="w-24 h-24 object-contain" />
           <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
-            <a href="#" class="text-sm text-primary-600 dark:text-primary-400 underline">Learn ways to earn</a>
+            <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+            <a href="#" class="text-sm text-primary-600 dark:text-primary-400 underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
           </div>
         </div>
       </div>
@@ -51,6 +51,7 @@
 
 <script setup> 
 import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: iconPopupLogo } = useAssetUrl('dashboard.analytics.money')
 const { url: icon6Url } = useAssetUrl('dashboard.analytics.icon6')
 
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'

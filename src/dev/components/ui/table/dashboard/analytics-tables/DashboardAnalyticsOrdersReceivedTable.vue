@@ -18,7 +18,7 @@
       <!-- Table -->
       <div class="self-stretch w-full">
         <div v-if="activeOrderRows && activeOrderRows.length > 0" class="w-full">
-          <FlexTable :columns="currentColumns" :rows="activeOrderRows" :theme="ordersTheme"
+          <FlexTable :columns="dashboardAnalyticsCurrentColumns" :rows="activeOrderRows" :theme="ordersTheme"
             :inner-scroll="true" max-height="60vh" :sticky-header="true">
             <!-- Order Slot -->
             <template #cell.order="{ row }">
@@ -136,9 +136,7 @@
           <img src="/images/shopping-cart.png" alt="Empty Cart" class="w-32 h-32 opacity-80" />
           <div class="flex flex-col items-center gap-1">
             <p class="text-slate-700 text-base font-normal">{{ $t('dashboard.analytics.tables.orders.noOrders') }}</p>
-            <a href="#" class="text-slate-700 text-base font-normal underline decoration-slate-400">Learn how
-              you
-              can earn</a>
+            <RouterLink to="/dashboard" class="text-slate-700 text-base font-normal underline decoration-slate-400">{{ $t('dashboard.analytics.page.learnHowToEarn', 'Learn how you can earn') }}</RouterLink>
           </div>
         </div>
       </div>
@@ -194,24 +192,24 @@ const selectedTab = ref('Subscriptions')
 const isDropdownOpen = ref(false)
 
 // --- Orders Table Data ---
-const ordersColumns = [
+const dashboardAnalyticsOrdersColumns = [
   { key: 'order', label: t('dashboard.analytics.tables.orders.orderLabel'), basis: { default: 'grow md:grow-0 md:basis-[300px]' }, align: 'left' },
-  { key: 'from', label: 'From', basis: 'basis-[220px]', align: 'left', hiddenAt: ['xs', 'sm'] },
-  { key: 'date', label: 'Date', basis: 'basis-[180px]', align: 'left', hiddenAt: ['xs', 'sm'] },
-  { key: 'total', label: 'Total', basis: { default: 'ml-auto basis-[110px]' }, align: 'right' },
+  { key: 'from', label: t('dashboard.analytics.tables.orders.from', 'From'), basis: 'basis-[220px]', align: 'left', hiddenAt: ['xs', 'sm'] },
+  { key: 'date', label: t('dashboard.analytics.tables.orders.date', 'Date'), basis: 'basis-[180px]', align: 'left', hiddenAt: ['xs', 'sm'] },
+  { key: 'total', label: t('dashboard.analytics.tables.orders.total', 'Total'), basis: { default: 'ml-auto basis-[110px]' }, align: 'right' },
   { key: 'details', label: '', basis: { default: 'shrink-0 basis-[80px]' }, align: 'right', hiddenAt: ['xs', 'sm'] }
 ]
 
-const merchOrdersColumns = [
-  { key: 'order', label: 'Order#', basis: { default: 'grow md:grow-0 md:basis-[280px]' }, align: 'left' },
-  { key: 'from', label: 'From', basis: 'basis-[180px]', align: 'left', hiddenAt: ['xs', 'sm'] },
-  { key: 'status', label: 'Status', basis: 'basis-[160px]', align: 'left', hiddenAt: ['xs', 'sm'] },
-  { key: 'date', label: 'Date', basis: 'basis-[150px]', align: 'left', hiddenAt: ['xs', 'sm'] },
-  { key: 'total', label: 'Total', basis: { default: 'ml-auto basis-[110px]' }, align: 'right' },
+const dashboardAnalyticsMerchOrdersColumns = [
+  { key: 'order', label: t('dashboard.analytics.tables.orders.orderLabel', 'Order#'), basis: { default: 'grow md:grow-0 md:basis-[280px]' }, align: 'left' },
+  { key: 'from', label: t('dashboard.analytics.tables.orders.from', 'From'), basis: 'basis-[180px]', align: 'left', hiddenAt: ['xs', 'sm'] },
+  { key: 'status', label: t('dashboard.analytics.tables.orders.status', 'Status'), basis: 'basis-[160px]', align: 'left', hiddenAt: ['xs', 'sm'] },
+  { key: 'date', label: t('dashboard.analytics.tables.orders.date', 'Date'), basis: 'basis-[150px]', align: 'left', hiddenAt: ['xs', 'sm'] },
+  { key: 'total', label: t('dashboard.analytics.tables.orders.total', 'Total'), basis: { default: 'ml-auto basis-[110px]' }, align: 'right' },
   { key: 'details', label: '', basis: { default: 'shrink-0 basis-[80px]' }, align: 'right', hiddenAt: ['xs', 'sm'] }
 ]
 
-const customRequestOrdersColumns = merchOrdersColumns
+const dashboardAnalyticsCustomRequestOrdersColumns = dashboardAnalyticsMerchOrdersColumns
 
 
 
@@ -240,11 +238,11 @@ const totalOrdersCount = computed(() => {
          (recentOrdersData.wishtender?.length || 0)
 })
 
-const currentColumns = computed(() => {
+const dashboardAnalyticsCurrentColumns = computed(() => {
   if (selectedTab.value === 'Merch' || selectedTab.value === 'Custom Request') {
-    return merchOrdersColumns
+    return dashboardAnalyticsMerchOrdersColumns
   }
-  return ordersColumns
+  return dashboardAnalyticsOrdersColumns
 })
 
 const ordersTheme = {

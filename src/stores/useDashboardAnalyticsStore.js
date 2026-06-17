@@ -210,7 +210,7 @@ export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
           salesRaw: c.salesUSD || 0,
           salesUSD: c.salesUSD || 0,
           earningsUSD: c.earningsUSD || c.salesUSD || 0,
-          sales: (c.salesUSD || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          sales: c.salesUSD || 0
         }))
         const summary = state.earnings.summaries?.[key]
         if (summary && summary.totalEarningsUSD != null) {
@@ -235,7 +235,7 @@ export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
       const fansTopCountriesDisplay = (fansInsightForPeriod.topCountries || []).map(c => ({
         ...c,
         country: analyticsCountryCodeToDisplayName[c.country] || c.country,
-        visits: (c.visits || 0).toLocaleString('en-US')
+        visits: c.visits || 0
       }))
       return {
         newFollowers: fansInsightForPeriod.newFollowers,
@@ -248,6 +248,13 @@ export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
     },
     getLikesViewModel: (state) => () => {
       return state.likes || {}
+    },
+
+    getSubscribersViewModel: (state) => (periodKey) => {
+      let key = periodKey.toLowerCase()
+      if (key === 'all-time') key = 'yearly'
+      const insights = buildSubscriberInsights(state.subscriptionsBundle)
+      return insights[key] || { new: null, recurring: null }
     },
     subscriberInsights(state) {
       return buildSubscriberInsights(state.subscriptionsBundle);

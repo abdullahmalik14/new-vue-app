@@ -17,7 +17,7 @@
 
       <!-- table-content -->
       <div v-if="topTagsRows && topTagsRows.length > 0" class="w-full h-full pt-4">
-        <FlexTable :columns="topTagsColumns" :rows="topTagsRows" :theme="topTagsTheme"
+        <FlexTable :columns="dashboardAnalyticsTopTagsColumns" :rows="topTagsRows" :theme="topTagsTheme"
           :inner-scroll="true" max-height="300px" :sticky-header="true">
           <!-- tag column -->
           <template #cell.tag="{ row }">
@@ -39,12 +39,13 @@
       </div>
       <!-- empty-state -->
       <DashboardTrendContent v-else :image="analyticsEmptyStateUrl || ''"
-        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="#" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
+        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="/dashboard" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
     </DashboardTrendCard>
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { onMounted } from 'vue';
 
 onMounted(() => {
@@ -68,14 +69,15 @@ import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.
 
 const { url: analyticsEmptyStateUrl } = useAssetUrl('dashboard.analytics.emptyContributors')
 
+const { t } = useI18n()
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
 const analyticsStore = useDashboardAnalyticsStore()
 
-const topTagsColumns = [
-  { key: 'tag', label: 'Tags', basis: 'basis-1/2', grow: true, align: 'left' },
-  { key: 'views', label: '# of views', basis: 'basis-1/2', grow: true, align: 'right' }
+const dashboardAnalyticsTopTagsColumns = [
+  { key: 'tag', label: t('dashboard.analytics.tables.tags.tags', 'Tags'), basis: 'basis-1/2', grow: true, align: 'left' },
+  { key: 'views', label: t('dashboard.analytics.tables.tags.views', '# of views'), basis: 'basis-1/2', grow: true, align: 'right' }
 ]
 
 const topTagsRows = computed(() => {

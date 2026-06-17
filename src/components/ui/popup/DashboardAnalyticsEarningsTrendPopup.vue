@@ -1,20 +1,17 @@
 <template>
   <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="handlePeriodChange" title="Earnings Insight"
-    logo="https://i.ibb.co.com/rGSXLKX4/money.webp">
+    @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.titleEarnings', 'Earnings Insight')"
+    :logo="iconPopupLogo || ''">
     <div v-if="hasEarningsData" class="flex flex-col gap-4">
 
       <!-- row: stats -->
       <div class="flex w-full items-center py-6 ">
         <div class="flex-1 flex flex-col justify-center items-center gap-4 border-r border-gray-200 dark:border-gray-700">
-          <h3 class="text-light-text-darkgray dark:text-white text-sm md:text-base font-semibold">
-            Total Earnings
-          </h3>
+          <h3 class="text-light-text-darkgray dark:text-white text-sm md:text-base font-semibold">{{ $t('dashboard.analytics.trends.totalEarnings', 'Total Earnings') }}</h3>
           <div class="flex flex-col justify-center items-center gap-2">
             <template v-if="insightData?.total">
               <div>
-                <span class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">{{
-                  insightData.total.toLocaleString() }} </span>
+                <span class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">{{ $n(insightData.total) }} </span>
                 <span class="text-gray-900 text-lg md:text-xl font-bold font-['Poppins']">USD</span>
               </div>
             </template>
@@ -31,13 +28,11 @@
         </div>
 
         <div class="flex-1 flex flex-col justify-center items-center gap-4">
-          <h3 class="text-light-text-darkgray dark:text-white text-sm md:text-base font-semibold">
-            Tokens Received
-          </h3>
+          <h3 class="text-light-text-darkgray dark:text-white text-sm md:text-base font-semibold">{{ $t('dashboard.analytics.trends.tokensReceived', 'Tokens Received') }}</h3>
           <div class="flex flex-col justify-center items-center gap-2">
             <template v-if="insightData?.totalTokens">
               <div class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">
-                {{ insightData.totalTokens.toLocaleString() }}
+                {{ $n(insightData.totalTokens) }}
               </div>
             </template>
             <span v-else
@@ -69,7 +64,7 @@
             </div>
           </div>
           <div class="absolute top-[40px] left-0 right-0 bottom-[30px]">
-             <!-- DAILY = DONUT (Linden: 'Day is a doughnut graph!') -->
+             
              <div data-chart-container data-chart-id="sales-daily-donut" :hidden="!isDaily||undefined" class="absolute inset-0"
                :data-chart-config='JSON.stringify({type:"donut",period:"slot",datasetKey:"sales-donut",fields:{category:"name",total:"value"},categoryKeyMap:{subscription:"subscription",paytoview:"paytoview",merch:"merch",wishtender:"wishtender",customrequest:"customrequest"},seriesStyles:salesChartStyles,legentHint:legendConfig})'>
                <div amchart data-role="chart" style="width:100%;height:100%;"></div>
@@ -99,7 +94,7 @@
             </div>
           </div>
           <div class="absolute top-[40px] left-0 right-0 bottom-[30px]">
-             <!-- DAILY = DONUT (Linden: 'Day is a doughnut graph!') -->
+             
              <div data-chart-container data-chart-id="tokens-daily-donut" :hidden="!isDaily||undefined" class="absolute inset-0"
                :data-chart-config='JSON.stringify({type:"donut",period:"slot",datasetKey:"tokens-donut",fields:{category:"name",total:"value"},categoryKeyMap:{tipTokens:"tipTokens",callTokens:"callTokens",chatTokens:"chatTokens",liveStreamTokens:"liveStreamTokens"},seriesStyles:tokensChartStyles,legentHint:legendConfig})'>
                <div amchart data-role="chart" style="width:100%;height:100%;"></div>
@@ -136,7 +131,7 @@
               </template>
               <template #cell.sales="{ value }">
                 <div class="flex justify-end items-center px-3 w-full">
-                  <span class="text-gray-900 text-sm font-medium">{{ value }}</span>
+                  <span class="text-gray-900 text-sm font-medium">{{ $n(Number(value) || 0, 'currency') }}</span>
                 </div>
               </template>
             </FlexTable>
@@ -164,11 +159,8 @@
             <img src="/images/noTrendImg.png" alt="illustration" class="w-32 h-32 object-contain" />
           </div>
           <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">No trend to show
-              at
-              the moment</span>
-            <a href="#" class="text-sm text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to
-              earn</a>
+            <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+            <a href="#" class="text-sm text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
           </div>
         </div>
       </div>
@@ -187,6 +179,7 @@
 
 <script setup> 
 import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: iconPopupLogo } = useAssetUrl('dashboard.analytics.money')
 const { url: icon4Url } = useAssetUrl('dashboard.analytics.icon4')
 
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
@@ -208,7 +201,7 @@ const hasEarningsData = computed(() => props.insightData && props.insightData.to
 
 const analyticsStore = useDashboardAnalyticsStore()
 
-// Linden: 'on open should be default bar chart for week'
+
 const activePeriod = computed(() => {
   const p = (props.period || 'weekly').toLowerCase().trim()
   if (p === 'all-time' || p === 'alltime') return 'alltime'
@@ -311,7 +304,7 @@ async function renderChart(chartId) {
 async function renderCurrentCharts() {
   await ensureReady()
   if (isDaily.value) {
-    // Daily = DONUT (Linden's rule)
+    
     await renderChart('sales-daily-donut')
     await renderChart('tokens-daily-donut')
   } else {
@@ -377,11 +370,11 @@ const tokensPctChange = computed(() => {
 
 function formatComparisonLabel(period) {
   switch ((period || '').toLowerCase()) {
-    case 'daily': return 'vs last 24 hour'
-    case 'weekly': return 'vs last week'
-    case 'monthly': return 'vs last 30 days'
-    case 'yearly': return 'vs last year'
-    default: return 'vs last year'
+    case 'daily': return t('dashboard.analytics.trends.vsLastDaily', 'vs last 24 hour')
+    case 'weekly': return t('dashboard.analytics.trends.vsLastWeekly', 'vs last week')
+    case 'monthly': return t('dashboard.analytics.trends.vsLastMonthly', 'vs last 30 days')
+    case 'yearly': return t('dashboard.analytics.trends.vsLastYearly', 'vs last year')
+    default: return t('dashboard.analytics.trends.vsLastYearly', 'vs last year')
   }
 }
 </script>

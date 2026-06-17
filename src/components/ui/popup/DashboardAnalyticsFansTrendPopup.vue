@@ -1,7 +1,7 @@
 <template>
   <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="handlePeriodChange" title="Fans Insight"
-    logo="https://i.ibb.co.com/rGSXLKX4/money.webp">
+    @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.titleFans', 'Fans Insight')"
+    :logo="iconPopupLogo || ''">
     <div v-if="hasFansData" class="flex flex-col gap-4">
       <!-- row: stats -->
       <div class="grid grid-cols-2">
@@ -13,7 +13,7 @@
           <div class="flex flex-col justify-center items-center gap-4">
             <span
               class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]">
-              {{ insightData?.newFollowers != null ? insightData.newFollowers.toLocaleString() : '--' }}
+              {{ insightData?.newFollowers != null ? $n(insightData.newFollowers) : '--' }}
             </span>
             <div class="inline-flex items-center gap-2" v-if="followersPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
@@ -33,7 +33,7 @@
           <div class="flex flex-col justify-center items-center gap-4">
             <span
               class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]">
-              {{ insightData?.profileVisit != null ? insightData.profileVisit.toLocaleString() : '--' }}
+              {{ insightData?.profileVisit != null ? $n(insightData.profileVisit) : '--' }}
             </span>
             <div class="inline-flex items-center gap-2" v-if="visitsPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
@@ -138,7 +138,7 @@
               </template>
               <template #cell.visits="{ value }">
                 <div class="flex justify-end items-center px-3 w-full">
-                  <span class="text-gray-900 text-sm font-medium">{{ value }}</span>
+                  <span class="text-gray-900 text-sm font-medium">{{ $n(Number(value) || 0) }}</span>
                 </div>
               </template>
             </FlexTable>
@@ -173,6 +173,7 @@
 
 <script setup> 
 import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: iconPopupLogo } = useAssetUrl('dashboard.analytics.money')
 const { url: icon4Url } = useAssetUrl('dashboard.analytics.icon4')
 
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
@@ -195,7 +196,7 @@ const hasFansData = computed(() => props.insightData && props.insightData.newFol
 const analyticsStore = useDashboardAnalyticsStore()
 
 const activePeriod = computed(() => {
-  // Linden: 'on open should be default bar chart for week'
+  
   const p = (props.period || 'weekly').toLowerCase().trim()
   if (p === 'all-time' || p === 'alltime') return 'alltime'
   return p
@@ -335,11 +336,11 @@ const visitsPct = computed(() => {
 
 function formatComparisonLabel(period) {
   switch ((period || '').toLowerCase()) {
-    case 'daily': return 'vs last 24 hour'
-    case 'weekly': return 'vs last week'
-    case 'monthly': return 'vs last 30 days'
-    case 'yearly': return 'vs last year'
-    default: return 'vs last year'
+    case 'daily': return t('dashboard.analytics.trends.vsLastDaily', 'vs last 24 hour')
+    case 'weekly': return t('dashboard.analytics.trends.vsLastWeekly', 'vs last week')
+    case 'monthly': return t('dashboard.analytics.trends.vsLastMonthly', 'vs last 30 days')
+    case 'yearly': return t('dashboard.analytics.trends.vsLastYearly', 'vs last year')
+    default: return t('dashboard.analytics.trends.vsLastYearly', 'vs last year')
   }
 }
 </script>

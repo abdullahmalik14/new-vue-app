@@ -1,5 +1,5 @@
 <template>
-  <FlexTable :columns="columns" :rows="rows" :theme="theme">
+  <FlexTable :columns="dashboardAnalyticsContributorsPreviewColumns" :rows="rows" :theme="dashboardAnalyticsContributorsTableTheme">
     <!-- Custom Fan Cell (Rank + Avatar + Info) -->
     <template #cell.contributorIdentity="{ row }">
       <div class="flex items-center gap-2.5 px-3 w-full">
@@ -32,7 +32,7 @@
     <template #empty>
       <div class="flex flex-col items-center justify-center w-full gap-4 py-8">
         <img :src="analyticsIcon6Url || ''" alt="No contributors" class="w-24 h-24" />
-        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">No top contributors yet</span>
+        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.tables.noTopContributors', 'No top contributors yet') }}</span>
         <RouterLink to="/dashboard" class="text-sm text-primary-600 underline">{{ $t('dashboard.analytics.page.learnHowToEarn', 'Learn how to earn') }}</RouterLink>
       </div>
     </template>
@@ -40,6 +40,9 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 import { computed } from 'vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { useAssetUrl } from '@/composables/useAssetUrl.js'
@@ -55,12 +58,12 @@ defineProps({
   }
 })
 
-const columns = [
-  { key: 'contributorIdentity', label: 'Fan', grow: true, align: 'left' },
-  { key: 'totalUsd', label: 'Total (USD)', basis: 'basis-32', align: 'right' }
+const dashboardAnalyticsContributorsPreviewColumns = [
+  { key: 'contributorIdentity', label: t('dashboard.analytics.tables.fan', t('dashboard.analytics.tables.contributors.fan', 'Fan')), grow: true, align: 'left' },
+  { key: 'totalUsd', label: t('dashboard.analytics.tables.totalUsd', 'Total (USD)'), basis: 'basis-32', align: 'right' }
 ]
 
-const theme = {
+const dashboardAnalyticsContributorsTableTheme = {
   container: 'relative bg-transparent border-none w-full min-w-72 ',
   header: 'bg-transparent text-gray-500',
   headerRow: 'flex items-center',

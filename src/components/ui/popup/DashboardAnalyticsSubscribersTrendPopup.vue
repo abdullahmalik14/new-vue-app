@@ -1,7 +1,7 @@
 <template>
   <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
     @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.subscriptionsInsight')"
-    logo="https://i.ibb.co.com/MyhfGRNH/svgviewer-png-output-12.webp">
+    :logo="iconPopupLogo || ''">
     <div v-if="hasSubscribersData" :class="isDaily ? 'flex flex-row gap-6' : 'flex flex-col gap-6'">
 
       <!-- STAT CARDS (Hidden to match Figma) -->
@@ -194,16 +194,16 @@
         <img src="/images/noTrendImg.png" alt="illustration" class="w-32 h-32 object-contain" />
       </div>
       <div class="flex flex-col gap-1">
-        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">No trend to show at
-          the moment</span>
-        <a href="#" class="text-xs text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to
-          earn</a>
+        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+        <a href="#" class="text-xs text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
       </div>
     </div>
   </DashboardAnalyticsTrendPopup>
 </template>
 
 <script setup>
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: iconPopupLogo } = useAssetUrl('dashboard.analytics.subscriptionsIcon')
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
@@ -221,7 +221,7 @@ const bundle = computed(() => analyticsStore.subscriptionsBundle || {})
 
 // Active period mapping
 const activePeriod = computed(() => {
-  // Linden: 'on open should be default bar chart for week'
+  
   const p = (props.period || 'weekly').toLowerCase().trim()
   if (p === 'all-time' || p === 'alltime') return 'alltime'
   return p // daily | weekly | monthly | yearly

@@ -17,7 +17,7 @@
 
       <!-- table-content -->
       <div v-if="topMerchRows && topMerchRows.length > 0" class="w-full flex-1 pt-4">
-        <FlexTable :columns="topMerchColumns" :rows="topMerchRows" :theme="topMerchTheme"
+        <FlexTable :columns="dashboardAnalyticsTopMerchColumns" :rows="topMerchRows" :theme="topMerchTheme"
           :inner-scroll="true" max-height="300px" :sticky-header="true">
           <!-- merch column -->
           <template #cell.merch="{ row }">
@@ -57,12 +57,13 @@
       </div>
       <!-- empty-state -->
       <DashboardTrendContent v-else :image="analyticsEmptyStateUrl || ''"
-        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="#" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
+        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="/dashboard" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
     </DashboardTrendCard>
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { onMounted } from 'vue';
 
 onMounted(() => {
@@ -85,15 +86,16 @@ import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.
 
 const { url: analyticsEmptyStateUrl } = useAssetUrl('dashboard.analytics.emptyContributors')
 
+const { t } = useI18n()
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
 const analyticsStore = useDashboardAnalyticsStore()
 
-const topMerchColumns = [
-  { key: 'merch', label: 'Merch', basis: 'basis-1/2', grow: true, align: 'left' },
-  { key: 'views', label: '# of views', basis: 'basis-1/4', grow: true, align: 'right' },
-  { key: 'sales', label: 'Sales (USD)', basis: 'basis-1/4', grow: true, align: 'right' }
+const dashboardAnalyticsTopMerchColumns = [
+  { key: 'merch', label: t('dashboard.analytics.tables.merch.merch', 'Merch'), basis: 'basis-1/2', grow: true, align: 'left' },
+  { key: 'views', label: t('dashboard.analytics.tables.merch.views', '# of views'), basis: 'basis-1/4', grow: true, align: 'right' },
+  { key: 'sales', label: t('dashboard.analytics.tables.salesUsd', 'Sales (USD)'), basis: 'basis-1/4', grow: true, align: 'right' }
 ]
 
 const topMerchRows = computed(() => {

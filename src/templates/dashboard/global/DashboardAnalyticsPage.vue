@@ -1,7 +1,8 @@
 <template>
   <DashboardSharedTwoColLayout>
     <div class="relative flex flex-col mt-6 gap-6 md:p-[40px]">
-      <AnalyticsDashboardDesktopHeaderPart />
+      <DashboardSharedHeader />
+      <DashboardAnalyticsWelcomeBanner />
       <!-- Overview Section -->
       <DashboardAnalyticsOverviewSection
         :is-analytics-refreshing="isAnalyticsRefreshing"
@@ -21,7 +22,7 @@
 
       <!-- Subscribers popup -->
       <DashboardAnalyticsSubscribersTrendPopup v-if="isSubscribersTrendPopupOpen" v-model="isSubscribersTrendPopupOpen" v-model:period="analyticsSubscribersTrendPeriod"
-        :insight-data="dashboardAnalyticsStore.subscriberInsights[analyticsSubscribersTrendPeriod === 'all-time' ? 'yearly' : analyticsSubscribersTrendPeriod.toLowerCase()] || { new: null, recurring: null }" />
+        :insight-data="dashboardAnalyticsStore.getSubscribersViewModel(analyticsSubscribersTrendPeriod)" />
 
       <!-- Earnings popup -->
       <DashboardAnalyticsEarningsTrendPopup v-if="isEarningsTrendPopupOpen" v-model="isEarningsTrendPopupOpen" v-model:period="analyticsEarningsTrendPeriod"
@@ -43,7 +44,7 @@
 
 <script setup>
 import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/DashboardSharedTwoColLayout.vue'
-import AnalyticsDashboardDesktopHeaderPart from '@/components/ui/nav/AnalyticsDashboardDesktopHeaderPart.vue'
+import DashboardSharedHeader from '@/dev/templates/dashboard/shared/DashboardSharedHeader.vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 import { FlowHandler } from '@/services/flow-system/FlowHandler'
 import FlowRefreshManager from '@/services/flow-system/flowRefreshManager'
@@ -57,14 +58,15 @@ import DashboardAnalyticsContributorsTrendPopup from '@/components/ui/popup/Dash
 import DashboardAnalyticsOrdersReceivedTable from '@/dev/components/ui/table/dashboard/analytics-tables/DashboardAnalyticsOrdersReceivedTable.vue'
 import DashboardAnalyticsTrendsSection from '@/dev/components/ui/section/dashboard/DashboardAnalyticsTrendsSection.vue'
 import DashboardAnalyticsOverviewSection from '@/dev/components/ui/section/dashboard/DashboardAnalyticsOverviewSection.vue'
+import DashboardAnalyticsWelcomeBanner from '@/dev/components/ui/section/dashboard/DashboardAnalyticsWelcomeBanner.vue'
 
 const dashboardAnalyticsStore = useDashboardAnalyticsStore()
 
-const analyticsSubscribersTrendPeriod = ref('weekly')
-const analyticsEarningsTrendPeriod = ref('weekly')
-const analyticsFansTrendPeriod = ref('weekly')
-const analyticsLikesTrendPeriod = ref('weekly')
-const analyticsContributorsTrendPeriod = ref('weekly')
+const analyticsSubscribersTrendPeriod = ref('daily')
+const analyticsEarningsTrendPeriod = ref('daily')
+const analyticsFansTrendPeriod = ref('daily')
+const analyticsLikesTrendPeriod = ref('daily')
+const analyticsContributorsTrendPeriod = ref('daily')
 
 const isSubscribersTrendPopupOpen = ref(false)
 function openAnalyticsSubscribersTrendPopup() {

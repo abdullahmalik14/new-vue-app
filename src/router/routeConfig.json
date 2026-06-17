@@ -595,7 +595,7 @@
     "section": "dashboard-global",
     "requiresAuth": true,
     "redirectIfNotAuth": "/log-in",
-    "componentPath": "@/dev/templates/dashboard/analytics/DashboardAnalyticsPage.vue",
+    "componentPath": "@/templates/dashboard/global/DashboardAnalyticsPage.vue",
     "supportedRoles": [
       "all"
     ],

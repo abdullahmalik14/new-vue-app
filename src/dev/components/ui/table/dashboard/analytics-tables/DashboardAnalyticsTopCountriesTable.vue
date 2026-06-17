@@ -17,7 +17,7 @@
 
       <!-- table-content -->
       <div v-if="topCountriesRows && topCountriesRows.length > 0" class="w-full flex-1 pt-4">
-        <FlexTable :columns="topCountriesColumns" :rows="topCountriesRows" :theme="topCountriesTheme"
+        <FlexTable :columns="dashboardAnalyticsTopCountriesColumns" :rows="topCountriesRows" :theme="topCountriesTheme"
           :inner-scroll="true" max-height="300px" :sticky-header="true">
           <!-- tags column -->
           <template #cell.tags="{ row }">
@@ -43,7 +43,7 @@
       </div>
       <!-- empty-state -->
       <DashboardTrendContent v-else :image="analyticsEmptyContributorsUrl || ''"
-        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="#" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
+        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="/dashboard" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
     </DashboardTrendCard>
   </div>
 </template>
@@ -80,9 +80,9 @@ const analyticsStore = useDashboardAnalyticsStore()
 const { t, n } = useI18n()
 const { url: analyticsEmptyContributorsUrl } = useAssetUrl('dashboard.analytics.emptyContributors')
 
-const topCountriesColumns = [
+const dashboardAnalyticsTopCountriesColumns = [
   { key: 'tags', label: t('dashboard.analytics.trends.topCountries'), basis: 'basis-1/2', grow: true, align: 'left' },
-  { key: 'sales', label: 'Sales (USD)', basis: 'basis-1/2', grow: true, align: 'right' }
+  { key: 'sales', label: t('dashboard.analytics.tables.salesUsd', 'Sales (USD)'), basis: 'basis-1/2', grow: true, align: 'right' }
 ]
 
 const topCountriesRows = computed(() => {

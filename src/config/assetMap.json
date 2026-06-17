@@ -21,7 +21,10 @@
     "dashboard.analytics.trendDown": "/dev/cdn/analytics/icons/icon-5.webp",
     "dashboard.analytics.trendsIcon": "/dev/cdn/analytics/icons/icon-7.webp",
     "dashboard.analytics.emptyContributors": "/dev/cdn/analytics/icons/icon-6.webp",
-    "dashboard.analytics.defaultAvatar": "https://i.ibb.co/mXyG1hS/mangoes.png"
+    "dashboard.analytics.defaultAvatar": "/images/avatar_1.png",
+    "dashboard.analytics.chevronDown": "/dev/cdn/analytics/icons/chevron-down.webp",
+    "dashboard.analytics.closePopup": "/dev/cdn/analytics/icons/close.webp",
+    "dashboard.analytics.subscriptionsIcon": "/dev/cdn/analytics/icons/subscriptions.webp"
   },
   "staging": {
     "icon.cart": "/assets/icons/cart-staging.svg",
@@ -41,7 +44,10 @@
     "dashboard.analytics.trendDown": "/dev/cdn/analytics/icons/icon-5.webp",
     "dashboard.analytics.trendsIcon": "/dev/cdn/analytics/icons/icon-7.webp",
     "dashboard.analytics.emptyContributors": "/dev/cdn/analytics/icons/icon-6.webp",
-    "dashboard.analytics.defaultAvatar": "https://i.ibb.co/mXyG1hS/mangoes.png"
+    "dashboard.analytics.defaultAvatar": "/images/avatar_1.png",
+    "dashboard.analytics.chevronDown": "/dev/cdn/analytics/icons/chevron-down.webp",
+    "dashboard.analytics.closePopup": "/dev/cdn/analytics/icons/close.webp",
+    "dashboard.analytics.subscriptionsIcon": "/dev/cdn/analytics/icons/subscriptions.webp"
   },
   "production": {
     "icon.cart": "https://cdn.example.com/assets/icons/cart.svg",
@@ -122,6 +128,9 @@
     "dashboard.analytics.trendDown": "/dev/cdn/analytics/icons/icon-5.webp",
     "dashboard.analytics.trendsIcon": "/dev/cdn/analytics/icons/icon-7.webp",
     "dashboard.analytics.emptyContributors": "/dev/cdn/analytics/icons/icon-6.webp",
-    "dashboard.analytics.defaultAvatar": "https://i.ibb.co/mXyG1hS/mangoes.png"
+    "dashboard.analytics.defaultAvatar": "/images/avatar_1.png",
+    "dashboard.analytics.chevronDown": "/dev/cdn/analytics/icons/chevron-down.webp",
+    "dashboard.analytics.closePopup": "/dev/cdn/analytics/icons/close.webp",
+    "dashboard.analytics.subscriptionsIcon": "/dev/cdn/analytics/icons/subscriptions.webp"
   }
 }

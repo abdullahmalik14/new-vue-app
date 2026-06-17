@@ -5,8 +5,11 @@ const { t } = useI18n();
 import BaseHeading from '@/components/ui/typography/BaseHeading.vue'
 import BasePopup from './BasePopup.vue'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: iconChevronDown } = useAssetUrl('dashboard.analytics.chevronDown')
+const { url: iconClosePopup } = useAssetUrl('dashboard.analytics.closePopup')
 
-// props define karo
+
 const props = defineProps({
   modelValue: Boolean,
   title: String,
@@ -37,17 +40,16 @@ const config = {
 }
 
 // ================= DROPDOWN =================
-const options = ref([
-  { label: 'Yearly', value: 'yearly' },
-  { label: 'Monthly', value: 'monthly' },
-  { label: 'Weekly', value: 'weekly' },
-  { label: 'Daily', value: 'daily' },
-  { label: 'All Time', value: 'all-time' },
-])
+import { DASHBOARD_ANALYTICS_PERIODS, dashboardAnalyticsTrendPeriodTabs } from '@/systems/analytics/analyticsPeriodsConfig.js'
+const options = computed(() => {
+  return [
+    ...dashboardAnalyticsTrendPeriodTabs.map(tab => ({ label: t(tab.labelKey), value: tab.id })),
+    { label: t('dashboard.analytics.periods.allTime', 'All Time'), value: DASHBOARD_ANALYTICS_PERIODS.ALL_TIME }
+  ]
+})
 
 const selected = computed({
-  // Linden: 'on open should be default bar chart for week'
-  get: () => props.period || 'weekly',
+  get: () => props.period || DASHBOARD_ANALYTICS_PERIODS.DAILY.id,
   set: (val) => emit('update:period', val)
 })
 const isOpen = ref(false)
@@ -133,7 +135,7 @@ onBeforeUnmount(() => {
                 <img
                   class="select-arrow h-6 w-6 transition-transform duration-200"
                   :class="{ 'rotate-180': isOpen }"
-                  src="https://i.ibb.co.com/7dq66KXb/svgviewer-png-output-8.webp"
+                  :src="iconChevronDown || ''"
                   alt="arrow-down"
                 />
               </div>
@@ -197,7 +199,7 @@ onBeforeUnmount(() => {
             class="close-button cursor-pointer absolute -top-2 right-0 p-2.5 bg-white shadow-[0px_1px_3px_0px_rgba(16,24,40,0.1),0px_1px_2px_0px_rgba(16,24,40,0.06)] rounded-full flex justify-center items-center dark:bg-[#181a1b] dark:shadow-[0px_1px_3px_0px_rgba(13,19,32,0.1),0px_1px_2px_0px_rgba(13,19,32,0.06)] md:static"
           >
             <img
-              src="https://i.ibb.co.com/dJWn0Btc/svgviewer-png-output-13.webp"
+              :src="iconClosePopup || ''"
               alt="close-button"
               class="w-6 h-6"
             />

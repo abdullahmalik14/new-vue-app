@@ -10,7 +10,7 @@
                 <img :src="analyticsOverviewIconUrl || ''" alt="overview/insight"
                   class="w-6 h-6" />
               </span>
-              <h2 class="m-0 font-medium text-xl font-sans leading-[1.875rem] text-light-text-quaternary dark:text-dark-text-quaternary">{{ $t('dashboard.analytics.page.overviewTitle') }}</h2>
+              <h2 class="m-0 font-medium text-xl font-sans leading-[1.875rem] text-light-text-quaternary dark:text-dark-text-quaternary" data-testid="dashboard-analytics-overview-heading">{{ $t('dashboard.analytics.page.overviewTitle') }}</h2>
             </div>
             <!-- last-date -->
             <div class="flex items-center gap-4 w-full justify-between sm:justify-end sm:w-auto">
@@ -112,8 +112,7 @@
                       class="flex items-center gap-6 w-full flex-grow flex-shrink [flex-basis: auto] min-w-0 min-h-0">
                       <div class="flex flex-col gap-2 w-full flex-shrink items-start">
                         <span
-                          class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">NEW
-                          FOLLOWERS</span>
+                          class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.trends.newFollowers', 'NEW FOLLOWERS').toUpperCase() }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.fans?.daily?.newFollowers"
@@ -128,8 +127,7 @@
 
                       <div class="flex flex-col gap-2 w-full flex-shrink items-start">
                         <span
-                          class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">PROFILE
-                          VISIT</span>
+                          class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.overview.profileVisit', 'PROFILE VISIT').toUpperCase() }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.fans?.daily?.profileVisit"
@@ -220,7 +218,7 @@
                       class="flex items-center gap-6 w-full flex-grow flex-shrink [flex-basis: auto] min-w-0 min-h-0">
                       <div class="flex flex-col gap-2 w-full flex-shrink items-start">
                         <span
-                          class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">MEDIA</span>
+                          class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.overview.media', 'MEDIA') }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.likes?.media"
@@ -254,7 +252,7 @@
 
                       <div class="flex flex-col gap-2 w-full flex-shrink items-start">
                         <span
-                          class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">MERCH</span>
+                          class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.overview.merch', 'MERCH') }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.likes?.merch"
@@ -295,7 +293,7 @@
 
                       <div class="flex flex-col gap-2 w-full flex-shrink items-start">
                         <span
-                          class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">PROFILE</span>
+                          class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.overview.profile', 'PROFILE') }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.likes?.profile"
@@ -328,7 +326,7 @@
 
                       <div class="flex flex-col gap-2 w-full flex-shrink items-start">
                         <span
-                          class="text-xs font-medium leading-[1.125rem] font-sans whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">FEED</span>
+                          class="text-xs font-medium leading-[1.125rem] font-sans whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.overview.feed', 'FEED') }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.likes?.feed"
@@ -377,7 +375,7 @@
                       variant="none"
                       @click="$emit('openContributorsTrendPopup')"
                       customClass="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-transparent [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border-none outline-none hover:bg-light-primary/10 dark:hover:bg-dark-primary/10 transition-colors"
-                      text="Trend"
+                      :text="$t('dashboard.analytics.page.trend', 'Trend')"
                       textClass="text-xs font-sans font-medium leading-[1.125rem] text-light-primary dark:text-dark-primary" :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
                       <template #rightIcon>
                         <span>
@@ -417,7 +415,9 @@ import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.
 import { useAssetUrl } from '@/composables/useAssetUrl.js'
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const dashboardAnalyticsStore = useDashboardAnalyticsStore()
 const { lastUpdated } = storeToRefs(dashboardAnalyticsStore)
 
