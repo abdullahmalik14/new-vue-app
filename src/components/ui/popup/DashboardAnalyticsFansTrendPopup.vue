@@ -17,7 +17,7 @@
             </span>
             <div class="inline-flex items-center gap-2" v-if="followersPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
-                <img v-if="followersPct >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-5 w-5" />
+                <img v-if="followersPct >= 0" :src="icon4Url || ''" alt="trend-up" class="h-5 w-5" />
                 <div :class="followersPct >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ followersPct >= 0 ? '+' : '' }}{{ followersPct }}%</div>
               </div>
               <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ formatComparisonLabel(period) }}</div>
@@ -37,7 +37,7 @@
             </span>
             <div class="inline-flex items-center gap-2" v-if="visitsPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
-                <img v-if="visitsPct >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-5 w-5" />
+                <img v-if="visitsPct >= 0" :src="icon4Url || ''" alt="trend-up" class="h-5 w-5" />
                 <div :class="visitsPct >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ visitsPct >= 0 ? '+' : '' }}{{ visitsPct }}%</div>
               </div>
               <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ formatComparisonLabel(period) }}</div>
@@ -171,7 +171,10 @@
   </DashboardAnalyticsTrendPopup>
 </template>
 
-<script setup>
+<script setup> 
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: icon4Url } = useAssetUrl('dashboard.analytics.icon4')
+
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'

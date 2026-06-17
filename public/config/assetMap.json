@@ -11,7 +11,17 @@
     "dashboard.analytics.icon3": "/dev/cdn/analytics/icons/icon-3.webp",
     "dashboard.analytics.icon4": "/dev/cdn/analytics/icons/icon-4.webp",
     "dashboard.analytics.icon5": "/dev/cdn/analytics/icons/icon-5.webp",
-    "dashboard.analytics.money": "/dev/cdn/analytics/icons/money.webp"
+    "dashboard.analytics.icon6": "/dev/cdn/analytics/icons/icon-6.webp",
+    "dashboard.analytics.icon7": "/dev/cdn/analytics/icons/icon-7.webp",
+    "dashboard.analytics.money": "/dev/cdn/analytics/icons/money.webp",
+    "dashboard.analytics.overviewIcon": "/dev/cdn/analytics/icons/icon-1.webp",
+    "dashboard.analytics.refreshIcon": "/dev/cdn/analytics/icons/icon-2.webp",
+    "dashboard.analytics.trendExpand": "/dev/cdn/analytics/icons/icon-3.webp",
+    "dashboard.analytics.trendUp": "/dev/cdn/analytics/icons/icon-4.webp",
+    "dashboard.analytics.trendDown": "/dev/cdn/analytics/icons/icon-5.webp",
+    "dashboard.analytics.trendsIcon": "/dev/cdn/analytics/icons/icon-7.webp",
+    "dashboard.analytics.emptyContributors": "/dev/cdn/analytics/icons/icon-6.webp",
+    "dashboard.analytics.defaultAvatar": "https://i.ibb.co/mXyG1hS/mangoes.png"
   },
   "staging": {
     "icon.cart": "/assets/icons/cart-staging.svg",
@@ -21,7 +31,17 @@
     "dashboard.analytics.icon3": "/dev/cdn/analytics/icons/icon-3.webp",
     "dashboard.analytics.icon4": "/dev/cdn/analytics/icons/icon-4.webp",
     "dashboard.analytics.icon5": "/dev/cdn/analytics/icons/icon-5.webp",
-    "dashboard.analytics.money": "/dev/cdn/analytics/icons/money.webp"
+    "dashboard.analytics.icon6": "/dev/cdn/analytics/icons/icon-6.webp",
+    "dashboard.analytics.icon7": "/dev/cdn/analytics/icons/icon-7.webp",
+    "dashboard.analytics.money": "/dev/cdn/analytics/icons/money.webp",
+    "dashboard.analytics.overviewIcon": "/dev/cdn/analytics/icons/icon-1.webp",
+    "dashboard.analytics.refreshIcon": "/dev/cdn/analytics/icons/icon-2.webp",
+    "dashboard.analytics.trendExpand": "/dev/cdn/analytics/icons/icon-3.webp",
+    "dashboard.analytics.trendUp": "/dev/cdn/analytics/icons/icon-4.webp",
+    "dashboard.analytics.trendDown": "/dev/cdn/analytics/icons/icon-5.webp",
+    "dashboard.analytics.trendsIcon": "/dev/cdn/analytics/icons/icon-7.webp",
+    "dashboard.analytics.emptyContributors": "/dev/cdn/analytics/icons/icon-6.webp",
+    "dashboard.analytics.defaultAvatar": "https://i.ibb.co/mXyG1hS/mangoes.png"
   },
   "production": {
     "icon.cart": "https://cdn.example.com/assets/icons/cart.svg",
@@ -92,6 +112,16 @@
     "dashboard.analytics.icon3": "/dev/cdn/analytics/icons/icon-3.webp",
     "dashboard.analytics.icon4": "/dev/cdn/analytics/icons/icon-4.webp",
     "dashboard.analytics.icon5": "/dev/cdn/analytics/icons/icon-5.webp",
-    "dashboard.analytics.money": "/dev/cdn/analytics/icons/money.webp"
+    "dashboard.analytics.icon6": "/dev/cdn/analytics/icons/icon-6.webp",
+    "dashboard.analytics.icon7": "/dev/cdn/analytics/icons/icon-7.webp",
+    "dashboard.analytics.money": "/dev/cdn/analytics/icons/money.webp",
+    "dashboard.analytics.overviewIcon": "/dev/cdn/analytics/icons/icon-1.webp",
+    "dashboard.analytics.refreshIcon": "/dev/cdn/analytics/icons/icon-2.webp",
+    "dashboard.analytics.trendExpand": "/dev/cdn/analytics/icons/icon-3.webp",
+    "dashboard.analytics.trendUp": "/dev/cdn/analytics/icons/icon-4.webp",
+    "dashboard.analytics.trendDown": "/dev/cdn/analytics/icons/icon-5.webp",
+    "dashboard.analytics.trendsIcon": "/dev/cdn/analytics/icons/icon-7.webp",
+    "dashboard.analytics.emptyContributors": "/dev/cdn/analytics/icons/icon-6.webp",
+    "dashboard.analytics.defaultAvatar": "https://i.ibb.co/mXyG1hS/mangoes.png"
   }
 }

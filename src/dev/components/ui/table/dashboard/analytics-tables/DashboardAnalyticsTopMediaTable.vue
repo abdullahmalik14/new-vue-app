@@ -9,9 +9,9 @@
         <!-- title -->
         <div class="flex items-center gap-2">
           <h3 
-            data-label="Top Media"
+            data-testid="dashboard-analytics-top-media-heading"
             class="text-slate-700 m-0 leading-6 text-base font-medium font-['Poppins']">
-            Top Media
+            {{ $t('dashboard.analytics.trends.topMedia', 'Top Media') }}
           </h3>
         </div>
 
@@ -73,8 +73,8 @@
           </template>
         </FlexTable>
       </div>
-      <DashboardTrendContent v-else image="https://i.ibb.co.com/vx2RDHM3/svgviewer-png-output-3.webp"
-        alt="list" message="No trend to show at the moment" link="#" linkText="Learn ways to earn" />
+      <DashboardTrendContent v-else :image="analyticsEmptyStateUrl || ''"
+        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="#" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
     </DashboardTrendCard>
   </div>
 </template>
@@ -99,6 +99,9 @@ import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+
+const { url: analyticsEmptyStateUrl } = useAssetUrl('dashboard.analytics.emptyContributors')
 
 const props = defineProps({
   period: { type: String, default: 'daily' }

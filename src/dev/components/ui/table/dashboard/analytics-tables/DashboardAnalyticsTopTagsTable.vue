@@ -8,9 +8,9 @@
         <!-- title -->
         <div class="flex items-center justify-between gap-2 px-[16px]">
           <h3 
-            data-label="Top Tags"
+            data-testid="dashboard-analytics-top-tags-heading"
             class="text-light-text-secondary font-sans dark:text-dark-text-secondary m-0 leading-6 text-base font-medium">
-            Top Tags
+            {{ $t('dashboard.analytics.trends.topTags', 'Top Tags') }}
           </h3>
         </div>
       </div>
@@ -38,8 +38,8 @@
         </FlexTable>
       </div>
       <!-- empty-state -->
-      <DashboardTrendContent v-else image="https://i.ibb.co.com/vx2RDHM3/svgviewer-png-output-3.webp"
-        alt="list" message="No trend to show at the moment" link="#" linkText="Learn ways to earn" />
+      <DashboardTrendContent v-else :image="analyticsEmptyStateUrl || ''"
+        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="#" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
     </DashboardTrendCard>
   </div>
 </template>
@@ -61,9 +61,12 @@ import DashboardTrendCard from '@/components/ui/card/dashboard/DashboardTrendCar
 import DashboardTrendContent from '@/components/ui/card/dashboard/DashboardTrendContent.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import DashboardTableBadge from '@/components/ui/badge/dashboard/DashboardTableBadge.vue'
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
 
 import { computed } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+
+const { url: analyticsEmptyStateUrl } = useAssetUrl('dashboard.analytics.emptyContributors')
 
 const props = defineProps({
   period: { type: String, default: 'daily' }

@@ -34,7 +34,7 @@
           </div>
         </div>
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
+          <img :src="icon6Url || ''" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
             <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
@@ -67,7 +67,7 @@
           </div>
         </div>
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
+          <img :src="icon6Url || ''" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
             <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
@@ -100,7 +100,7 @@
           </div>
         </div>
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
+          <img :src="icon6Url || ''" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
             <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
@@ -121,7 +121,10 @@
   </DashboardAnalyticsTrendPopup>
 </template>
 
-<script setup>
+<script setup> 
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: icon6Url } = useAssetUrl('dashboard.analytics.icon6')
+
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'

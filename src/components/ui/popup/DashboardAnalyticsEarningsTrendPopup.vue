@@ -22,7 +22,7 @@
               class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
             <div class="inline-flex items-center gap-2" v-if="earningsPctChange !== null">
               <div class="flex justify-center items-center gap-1">
-                <img v-if="earningsPctChange >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-4 w-4" />
+                <img v-if="earningsPctChange >= 0" :src="icon4Url || ''" alt="trend-up" class="h-4 w-4" />
                 <div :class="earningsPctChange >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-xs md:text-sm font-medium font-['Poppins']">{{ earningsPctChange >= 0 ? '+' : '' }}{{ earningsPctChange }}%</div>
               </div>
               <div class="text-slate-500 text-xs font-normal font-['Poppins']">{{ formatComparisonLabel(period) }}</div>
@@ -44,7 +44,7 @@
               class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
             <div class="inline-flex items-center gap-2" v-if="tokensPctChange !== null">
               <div class="flex justify-center items-center gap-1">
-                <img v-if="tokensPctChange >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-4 w-4" />
+                <img v-if="tokensPctChange >= 0" :src="icon4Url || ''" alt="trend-up" class="h-4 w-4" />
                 <div :class="tokensPctChange >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-xs md:text-sm font-medium font-['Poppins']">{{ tokensPctChange >= 0 ? '+' : '' }}{{ tokensPctChange }}%</div>
               </div>
               <div class="text-slate-500 text-xs font-normal font-['Poppins']">{{ formatComparisonLabel(period) }}</div>
@@ -185,7 +185,10 @@
   </DashboardAnalyticsTrendPopup>
 </template>
 
-<script setup>
+<script setup> 
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: icon4Url } = useAssetUrl('dashboard.analytics.icon4')
+
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'

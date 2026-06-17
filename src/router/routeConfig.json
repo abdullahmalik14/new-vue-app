@@ -595,52 +595,11 @@
     "section": "dashboard-global",
     "requiresAuth": true,
     "redirectIfNotAuth": "/log-in",
-    "componentPath": "@/dev/templates/analytics/DashboardAnalyticsPage.vue",
+    "componentPath": "@/dev/templates/dashboard/analytics/DashboardAnalyticsPage.vue",
     "supportedRoles": [
       "all"
     ],
-    "assetPreload": [
-      {
-        "src": "/dev/cdn/analytics/icons/icon-1.webp",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "src": "/dev/cdn/analytics/icons/icon-2.webp",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "src": "/dev/cdn/analytics/icons/icon-3.webp",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "src": "/dev/cdn/analytics/icons/icon-4.webp",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "src": "/dev/cdn/analytics/icons/icon-5.webp",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "src": "/dev/cdn/analytics/icons/icon-6.webp",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "src": "/dev/cdn/analytics/icons/icon-7.webp",
-        "type": "image",
-        "priority": "high"
-      },
-      {
-        "src": "/dev/cdn/analytics/icons/icon-8.png",
-        "type": "image",
-        "priority": "high"
-      }
-    ]
+    "assetPreloadRef": "dashboardAnalyticsChrome"
   },
    {
     "slug": "/home",

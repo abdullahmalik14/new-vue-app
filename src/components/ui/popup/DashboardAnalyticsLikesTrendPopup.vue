@@ -37,7 +37,7 @@
         
         <!-- Empty State -->
         <div v-else class="absolute inset-0 flex flex-col justify-center items-center gap-6 w-full text-center bg-light-bg-container dark:bg-dark-bg-container z-20">
-          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="illustration" class="w-24 h-24 object-contain" />
+          <img :src="icon6Url || ''" alt="illustration" class="w-24 h-24 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
             <a href="#" class="text-sm text-primary-600 dark:text-primary-400 underline">Learn ways to earn</a>
@@ -49,7 +49,10 @@
   </DashboardAnalyticsTrendPopup>
 </template>
 
-<script setup>
+<script setup> 
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: icon6Url } = useAssetUrl('dashboard.analytics.icon6')
+
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';

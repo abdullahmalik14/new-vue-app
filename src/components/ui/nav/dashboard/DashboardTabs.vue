@@ -6,15 +6,15 @@
     >
       <div
         v-for="tab in tabs"
-        :key="tab"
+        :key="getTabId(tab)"
         @click="selectTab(tab)"
-        :data-value="tab"
+        :data-value="getTabId(tab)"
         :class="[
           'flex-1 lg:flex-initial whitespace-nowrap cursor-pointer h-full px-4 py-2 flex justify-center items-center gap-2 transition-all font-[\'Poppins\'] text-sm outline-none border-r border-gray-200 last:border-r-0',
-          modelValue === tab ? 'bg-gray-50 text-gray-800 font-bold' : 'bg-transparent text-gray-500 font-medium hover:bg-gray-50'
+          modelValue === getTabId(tab) ? 'bg-gray-50 text-gray-800 font-bold' : 'bg-transparent text-gray-500 font-medium hover:bg-gray-50'
         ]"
       >
-        {{ tab }}
+        {{ getTabLabel(tab) }}
       </div>
     </div>
 
@@ -24,7 +24,7 @@
         @click="isDropdownOpen = !isDropdownOpen"
         class="w-full sm:w-[200px] px-4 py-2 bg-white/70 backdrop-blur-md border border-gray-200 rounded-lg flex justify-center gap-2 items-center outline-none hover:bg-white/90 transition-colors"
       >
-        <span class="text-gray-900 font-semibold text-sm">{{ modelValue }}</span>
+        <span class="text-gray-900 font-semibold text-sm">{{ getTabLabel(selectedTabObject) }}</span>
         <div
           class="w-4 h-4 flex items-center justify-center transition-transform"
           :class="{ 'rotate-180': isDropdownOpen }"
@@ -41,14 +41,14 @@
       >
         <div
           v-for="tab in tabs"
-          :key="tab"
+          :key="getTabId(tab)"
           @click="selectTab(tab)"
           :class="[
             'px-4 py-3 text-sm transition-colors cursor-pointer text-center',
-            modelValue === tab ? 'bg-blue-50/80 text-blue-700 font-bold' : 'text-gray-600 hover:bg-gray-50/80'
+            modelValue === getTabId(tab) ? 'bg-blue-50/80 text-blue-700 font-bold' : 'text-gray-600 hover:bg-gray-50/80'
           ]"
         >
-          {{ tab }}
+          {{ getTabLabel(tab) }}
         </div>
       </div>
     </div>
@@ -56,7 +56,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
   tabs: {
@@ -70,11 +71,27 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+const { t } = useI18n()
 
 const isDropdownOpen = ref(false)
 
+const getTabId = (tab) => {
+  return typeof tab === 'object' ? tab.id : tab
+}
+
+const getTabLabel = (tab) => {
+  if (typeof tab === 'object') {
+    return tab.labelKey ? t(tab.labelKey) : tab.label
+  }
+  return tab
+}
+
+const selectedTabObject = computed(() => {
+  return props.tabs.find(tab => getTabId(tab) === props.modelValue) || props.modelValue
+})
+
 const selectTab = (tab) => {
-  emit('update:modelValue', tab)
+  emit('update:modelValue', getTabId(tab))
   isDropdownOpen.value = false
 }
 </script>

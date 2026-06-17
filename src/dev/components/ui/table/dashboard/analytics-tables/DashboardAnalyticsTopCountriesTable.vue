@@ -8,9 +8,9 @@
         <!-- title -->
         <div class="flex items-center justify-between gap-2 px-[16px]">
           <h3 
-            data-label="Top Countries"
+            data-testid="dashboard-analytics-top-countries-heading"
             class="text-light-text-secondary dark:text-dark-text-secondary m-0 leading-6 text-base font-medium">
-            Top Countries
+            {{ $t('dashboard.analytics.trends.topCountries') }}
           </h3>
         </div>
       </div>
@@ -42,8 +42,8 @@
         </FlexTable>
       </div>
       <!-- empty-state -->
-      <DashboardTrendContent v-else image="https://i.ibb.co.com/vx2RDHM3/svgviewer-png-output-3.webp"
-        alt="list" message="No trend to show at the moment" link="#" linkText="Learn ways to earn" />
+      <DashboardTrendContent v-else :image="analyticsEmptyContributorsUrl || ''"
+        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="#" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
     </DashboardTrendCard>
   </div>
 </template>
@@ -68,46 +68,20 @@ import DashboardTableBadge from '@/components/ui/badge/dashboard/DashboardTableB
 
 import { computed } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+import { useI18n } from 'vue-i18n'
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+import { analyticsCountryCodeToDisplayName } from '@/systems/analytics/analyticsCountryLabels.js'
 
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
 const analyticsStore = useDashboardAnalyticsStore()
 
-const countryNameMap = {
-  'Country 36': 'Australia',
-  'Country 840': 'United States',
-  'Country 826': 'United Kingdom',
-  'Country 276': 'Germany',
-  'Country 392': 'Japan',
-  'Country 344': 'Hong Kong',
-  'Country 702': 'Singapore',
-  'Country 158': 'Taiwan',
-  'Country 124': 'Canada',
-  'Country 250': 'France',
-  'Country 380': 'Italy',
-  'Country 724': 'Spain',
-  'Country 528': 'Netherlands',
-  'Country 752': 'Sweden',
-  'Country 756': 'Switzerland',
-  'Country 56': 'Belgium',
-  'Country 40': 'Austria',
-  'Country 578': 'Norway',
-  'Country 208': 'Denmark',
-  'Country 372': 'Ireland',
-  'Country 76': 'Brazil',
-  'Country 484': 'Mexico',
-  'Country 356': 'India',
-  'Country 156': 'China',
-  'Country 410': 'South Korea',
-  'Country 360': 'Indonesia',
-  'Country 608': 'Philippines',
-  'Country 458': 'Malaysia',
-  'Country 704': 'Vietnam'
-}
+const { t, n } = useI18n()
+const { url: analyticsEmptyContributorsUrl } = useAssetUrl('dashboard.analytics.emptyContributors')
 
 const topCountriesColumns = [
-  { key: 'tags', label: 'Countries', basis: 'basis-1/2', grow: true, align: 'left' },
+  { key: 'tags', label: t('dashboard.analytics.trends.topCountries'), basis: 'basis-1/2', grow: true, align: 'left' },
   { key: 'sales', label: 'Sales (USD)', basis: 'basis-1/2', grow: true, align: 'right' }
 ]
 
@@ -116,8 +90,8 @@ const topCountriesRows = computed(() => {
   return data.map((item, index) => ({
     id: index,
     rank: item.rank || index + 1,
-    country: countryNameMap[item.country] || item.country,
-    sales: `USD$ ${(item.salesUSD || item.earningsUSD || item.sales_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    country: analyticsCountryCodeToDisplayName[item.country] || item.country,
+    sales: `USD$ ${n(item.salesUSD || item.earningsUSD || item.sales_usd || 0)}`
   }));
 });
 

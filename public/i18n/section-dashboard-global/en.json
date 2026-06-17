@@ -67,7 +67,15 @@
         "lastUpdated": "Last updated at",
         "refresh": "Refresh",
         "refreshing": "Refreshing...",
-        "learnHowToEarn": "Learn how you can earn"
+        "learnHowToEarn": "Learn how you can earn",
+        "trends": "Trends",
+        "trend": "Trend"
+      },
+      "periods": {
+        "yearly": "Yearly",
+        "monthly": "Monthly",
+        "weekly": "Weekly",
+        "daily": "Daily"
       },
       "trends": {
         "salesInsights": "Sales Insights",
@@ -84,7 +92,12 @@
         "likesInsight": "Likes Insight",
         "topContributors": "Top Contributors",
         "topFans": "Top Fans",
-        "topOrderSpenders": "Top Order Spenders"
+        "topOrderSpenders": "Top Order Spenders",
+        "subscribers": "Subscribers",
+        "earnings": "Earnings",
+        "fans": "Fans",
+        "likes": "Likes",
+        "vsYesterday": "vs yesterday"
       },
       "likes": {
         "media": "Media Likes",
@@ -128,7 +141,12 @@
         "tier3": "Tier 3",
         "tier4": "Tier 4",
         "tier5": "Tier 5",
-        "paytoview": "Pay to View"
+        "paytoview": "Pay to View",
+        "subscription": "Subscription",
+        "profileVisit": "Profile Visit",
+        "newFollowers": "New Followers",
+        "newSubscriber": "New Subscriber",
+        "recurringSubscriber": "Recurring Subscriber"
       }
     }
   },

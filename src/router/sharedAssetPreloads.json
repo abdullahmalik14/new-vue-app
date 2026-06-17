@@ -297,17 +297,61 @@
       "priority": "normal"
     },
     {
+      "flag": "dashboard.analytics.icon6",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.analytics.icon7",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
       "flag": "dashboard.analytics.money",
       "type": "image",
       "priority": "normal"
     }
   ],
-  "dashboardAnalyticsChrome": {
-    "icon1": "dashboard.analytics.icon1",
-    "icon2": "dashboard.analytics.icon2",
-    "icon3": "dashboard.analytics.icon3",
-    "icon4": "dashboard.analytics.icon4",
-    "icon5": "dashboard.analytics.icon5",
-    "money": "dashboard.analytics.money"
-  }
+  "dashboardAnalyticsChrome": [
+    {
+      "flag": "dashboard.analytics.overviewIcon",
+      "type": "image",
+      "priority": "high"
+    },
+    {
+      "flag": "dashboard.analytics.refreshIcon",
+      "type": "image",
+      "priority": "high"
+    },
+    {
+      "flag": "dashboard.analytics.trendExpand",
+      "type": "image",
+      "priority": "normal"
+    },
+    {
+      "flag": "dashboard.analytics.trendUp",
+      "type": "image",
+      "priority": "high"
+    },
+    {
+      "flag": "dashboard.analytics.trendDown",
+      "type": "image",
+      "priority": "high"
+    },
+    {
+      "flag": "dashboard.analytics.trendsIcon",
+      "type": "image",
+      "priority": "high"
+    },
+    {
+      "flag": "dashboard.analytics.emptyContributors",
+      "type": "image",
+      "priority": "low"
+    },
+    {
+      "flag": "dashboard.analytics.defaultAvatar",
+      "type": "image",
+      "priority": "high"
+    }
+  ]
 }

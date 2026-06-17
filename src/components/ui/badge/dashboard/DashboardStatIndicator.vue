@@ -32,10 +32,15 @@ const formattedPercentage = computed(() => {
   return isNaN(num) ? 0 : Math.abs(num)
 })
 
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+
+const { url: icon4Url } = useAssetUrl('dashboard.analytics.trendUp')
+const { url: icon5Url } = useAssetUrl('dashboard.analytics.trendDown')
+
 const trendIcon = computed(() => 
   isPositive.value 
-    ? '/dev/cdn/analytics/icons/icon-4.webp' 
-    : '/dev/cdn/analytics/icons/icon-5.webp'
+    ? (icon4Url.value || '') 
+    : (icon5Url.value || '')
 )
 
 const trendAlt = computed(() => isPositive.value ? 'trend-up' : 'trend-down')
