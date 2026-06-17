@@ -259,10 +259,10 @@ export function generateContentPathsForSection(sectionName, sectionMetadata, bas
 
     // Add derived base folder fallbacks (both components/ and templates/)
     for (const folder of baseFolders) {
-      const componentsPath = `${baseDir}/components/${folder}/**/*.vue`;
-      const templatesPath = `${baseDir}/templates/${folder}/**/*.vue`;
-      const devComponentsPath = `${baseDir}/dev/components/${folder}/**/*.vue`;
-      const devTemplatesPath = `${baseDir}/dev/templates/${folder}/**/*.vue`;
+      const componentsPath = `${baseDir}/components/**/${folder}/**/*.vue`;
+      const templatesPath = `${baseDir}/templates/**/${folder}/**/*.vue`;
+      const devComponentsPath = `${baseDir}/dev/components/**/${folder}/**/*.vue`;
+      const devTemplatesPath = `${baseDir}/dev/templates/**/${folder}/**/*.vue`;
 
       if (!contentPaths.includes(componentsPath)) {
         contentPaths.push(componentsPath);
