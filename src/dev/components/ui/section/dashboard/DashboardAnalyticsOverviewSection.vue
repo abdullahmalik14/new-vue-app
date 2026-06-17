@@ -20,7 +20,7 @@
                     formatAnalyticsLastUpdatedAt(lastUpdated) }}</span></span>
               <DashboardPrimaryButton 
                 variant="none"
-                @click="refreshDashboardAnalytics" 
+                @click="$emit('refresh')" 
                 data-testid="dashboard-analytics-refresh-button" 
                 :disabled="isAnalyticsRefreshing"
                 customClass="group flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-white border border-gray-200 shadow-sm dark:bg-dark-bg-container dark:border-gray-700 [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none hover:bg-gray-50 dark:hover:bg-dark-primaryHover [outline:none] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
