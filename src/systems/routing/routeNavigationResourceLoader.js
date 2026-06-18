@@ -3,7 +3,7 @@
  * Fire-and-forget only — must not block beforeResolve or navigation.
  */
 
-import { log } from '../../infrastructure/logging/logHandler';
+import { log } from '../../infrastructure/logging/logHandler.js';
 import { preloadSectionAssets } from '../assets/assetPreloader.js';
 import { loadSectionCss, unloadSectionCss } from '../sections/sectionCssLoader.js';
 import { loadTranslationsForSection, areTranslationsLoadedForSection } from '../i18n/translationLoader.js';

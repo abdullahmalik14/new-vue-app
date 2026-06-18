@@ -422,7 +422,14 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   } else {
-    await reapplyTemporaryPageLocaleForRoute(to.path);
+    // F-03 follow-up: reapply temporary locale in the background so navigation never
+    // blocks on translation/section lookup during beforeEach.
+    reapplyTemporaryPageLocaleForRoute(to.path).catch((error) => {
+      log('createAppRouter.js', 'beforeEach', 'locale-reapply-error', 'Temporary locale reapply failed (non-blocking)', {
+        path: to.path,
+        error: error?.message
+      });
+    });
     if (localeInParams && !SUPPORTED_LOCALES.includes(localeInParams)) {
       log('createAppRouter.js', 'beforeEach', 'invalid-locale', 'Invalid locale in path, treating as route path', {
         invalidLocale: localeInParams,

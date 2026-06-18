@@ -6,7 +6,7 @@
     "settings": "Settings",
     "profile": {
       "name": "lindenMay",
-      "handle": "@linden",
+      "handle": "{'@'}linden",
       "status": {
         "away": "Away",
         "offline": "Offline"

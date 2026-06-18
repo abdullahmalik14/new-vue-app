@@ -99,4 +99,9 @@ describe('temporary page locale (F-03)', () => {
 
     expect(resolveLocaleForUrlInjection()).toBe('vi');
   });
+
+  it('reapplyTemporaryPageLocaleForRoute resolves when no temporary locale is active', async () => {
+    const { reapplyTemporaryPageLocaleForRoute } = await import('@/systems/i18n/localeManager.js');
+    await expect(reapplyTemporaryPageLocaleForRoute('/dashboard')).resolves.toBeUndefined();
+  });
 });

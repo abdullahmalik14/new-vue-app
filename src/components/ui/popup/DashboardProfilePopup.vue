@@ -71,7 +71,7 @@
                     </div>
                     <span
                       class="text-xs font-normal leading-[1.125rem] text-user-handle"
-                      >{{ $t('dashboard.profile.handle', '@linden') }}</span
+                      >{{ $t('dashboard.profile.handle', "{'@'}linden") }}</span
                     >
                   </div>
 

@@ -211,9 +211,12 @@ onMounted(() => {
 });
 
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DashboardAnalyticsMainCardWrapper from '@/components/ui/card/dashboard/DashboardAnalyticsMainCardWrapper.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+
+const { t } = useI18n()
 
 // --- Orders Tabs ---
 const orderTabs = ['Subscriptions', 'Pay to View', 'Merch', 'Custom Request', 'Wishtender']
