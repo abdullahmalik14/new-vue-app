@@ -506,3 +506,37 @@ npm run test:unit -- --run tests/sectionTest
 - [x] Slug identifier matrix (`log-in` → `auth`, role dashboard variants) covered
 - [x] Tests use mocked `getRouteConfiguration()` fixtures — not production JSON — for identifier routing
 
+---
+
+## Section test track — Phase C preloader units (2026-06-19)
+
+**Plan:** [section-test-plan.md](./section-test-plan.md) Phase C (§8–14, §61–62, §86–89)  
+**Branch:** `test/section-coverage`  
+**Test folder:** `tests/sectionTest/`
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/helpers/sectionPreloaderTestSetup.js`](../../tests/helpers/sectionPreloaderTestSetup.js) | **New** — shared mocks, default bundle paths, link auto-resolve helper |
+| [`tests/sectionTest/sectionPreloader.test.js`](../../tests/sectionTest/sectionPreloader.test.js) | **New** — `preloadSection`, batch/stats/clear/reset lifecycle (§8–14, §62) |
+| [`tests/sectionTest/sectionPreloader.concurrent.test.js`](../../tests/sectionTest/sectionPreloader.concurrent.test.js) | **New** — shared in-flight promises, parallel batch, cache hits (§8, §86) |
+| [`tests/sectionTest/sectionPreloader.timeout.test.js`](../../tests/sectionTest/sectionPreloader.timeout.test.js) | **New** — `VITE_SECTION_PRELOAD_TIMEOUT_MS` matrix, link lifecycle (§9, §61, §87) |
+
+Legacy copy remains in `tests/unit/sectionPreloader.test.js` until Phase G cleanup.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/sectionTest
+```
+
+**Result:** 10 files, 140 tests passed.
+
+### Exit criteria (Phase C)
+
+- [x] Every export in `sectionPreloader.js` covered in `tests/sectionTest/`
+- [x] Concurrent caller dedup and in-progress store tracking tested
+- [x] Timeout env matrix (500ms, 0, -1, abc, default 10s) tested with fake timers
+- [x] Untrusted JS path, manifest failure, and CSS rejection paths return false without `addSection`
+
