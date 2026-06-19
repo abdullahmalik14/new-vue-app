@@ -564,7 +564,7 @@ Route unit tests import from `@/systems/routing/`, `@/systems/assets/`, and `@/c
 
 **Phase A integrity:** `tests/unit/routeConfig.integrity.test.js` — production `routeConfig.json` validation.
 
-Key suites: `routeGuards.test.js`, `routeConfig.integrity.test.js`, `jsonConfigValidator.test.js`, `routeComponentPathValidator.test.js`, `routeComponentPrefetch.test.js`, `useRoutePrefetch.test.js`, `resolveRouteAssetPreloads.test.js`.
+Key suites: `routeGuards.test.js`, `routeConfig.integrity.test.js`, `jsonConfigValidator.route.test.js`, `routeComponentPathValidator.test.js`, `routeComponentPrefetch.test.js`, `useRoutePrefetch.test.js`, `resolveRouteAssetPreloads.test.js`.
 
 **Run:** `npm run test:unit -- --run tests/unit/route`
 

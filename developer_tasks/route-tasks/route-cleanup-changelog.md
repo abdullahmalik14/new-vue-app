@@ -878,4 +878,43 @@ npm run test:unit -- --run tests/unit/route   # 93 passed, 1 pre-existing timeou
 
 ---
 
+## Phase A — Unblock and integrity (2026-06-19)
+
+**Plan:** [route-test-plan.md](../route-test-plan.md) Phase A (§0, §30, §46)  
+**Master plan:** Phase 8 — Route test coverage
+
+### What was broken
+
+Phase A prep added 25 production integrity checks but did not cover all plan §0 bullets (inheritance parent slugs, alias/redirectFrom collisions, locale-prefixed resolution, route-count baseline, schema warnings). Route validator coverage lived in `jsonConfigValidator.test.js` without the plan’s `jsonConfigValidator.route.test.js` layout or explicit tests for `buildRouteSlugIndex` and `collectPreloadSectionIdentifiers`.
+
+### Why it happened
+
+Work stopped after the initial integrity scaffold; remaining §0 items and §30 helper coverage were deferred to the phased test plan.
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/unit/routeConfig.integrity.test.js`](../../tests/unit/routeConfig.integrity.test.js) | Expanded §0 from 25 → **36** `it()` cases: enabled baseline (B3), role `customComponentPath`, `inheritConfigFromParent` parent slugs, alias/redirectFrom collision checks, `hideLayout`, redirect-chain depth, locale-prefixed resolution, route-count baseline (`42`), schema warnings, assetPreloadRef + asset map via `validateRouteConfig` |
+| [`tests/unit/jsonConfigValidator.route.test.js`](../../tests/unit/jsonConfigValidator.route.test.js) | **New** — route-focused validator suite (26 tests): `collectKnownSectionNames`, `buildRouteSlugIndex`, `resolvePreloadSectionIdentifier`, `collectPreloadSectionIdentifiers`, `validateRouteConfig` error shapes + production snapshot |
+| [`tests/unit/jsonConfigValidator.test.js`](../../tests/unit/jsonConfigValidator.test.js) | **Removed** — route tests moved to `jsonConfigValidator.route.test.js` (no duplicate runs) |
+
+Stale import sweep: `rg "utils/route" tests/` — **zero hits** (Phase 1 fix still holds).
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/unit/routeConfig.integrity.test.js tests/unit/jsonConfigValidator.route.test.js   # 62 passed
+npm run test:unit -- --run tests/unit/route   # 105 passed (17 files)
+```
+
+### Exit criteria (Phase A)
+
+- [x] `validateRouteConfig(productionRoutes)` → `{ valid: true, errors: [] }`
+- [x] All plan §0 integrity cases implemented (36 tests)
+- [x] `jsonConfigValidator.route.test.js` covers each §30 exported route helper at least once
+- [x] No test imports from dead `utils/route` paths
+
+---
+
 *Add a new section above this line for each completed phase.*

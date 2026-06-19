@@ -4,7 +4,13 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { findComponentLoader } from '../../src/systems/routing/routeComponentLoader.js';
-import { findDuplicateRoutePathClaims } from '../../src/systems/routing/routeAliasResolver.js';
+import {
+  findDuplicateRoutePathClaims,
+  normalizeAliasList,
+  normalizeRedirectFromList,
+} from '../../src/systems/routing/routeAliasResolver.js';
+import { normalizeLocalizedPath } from '../../src/systems/i18n/localeManager.js';
+import { resolveRouteFromPath } from '../../src/systems/routing/routeResolver.js';
 import { isValidRouteEnvAccess } from '../../src/systems/routing/routeEnvAccess.js';
 import { validateRouteComponentPathsOnDisk } from '../../src/systems/routing/routeComponentPathDiskValidator.node.js';
 import { resolveRouteAssetPreloads } from '../../src/systems/assets/routeAssetPreloadResolver.js';
@@ -20,6 +26,9 @@ import {
 const VALIDATOR_PATH = '../../src/systems/build/jsonConfigValidator.js';
 
 const KNOWN_ROLES = new Set(['all', 'creator', 'fan', 'agent', 'vendor', 'guest']);
+
+/** Update when routes are intentionally added or removed from production config. */
+const PRODUCTION_ROUTE_COUNT_BASELINE = 42;
 
 beforeEach(() => {
   vi.resetModules();
@@ -254,12 +263,164 @@ describe('routeConfig.json — production integrity (Phase A)', () => {
       }
     }
   });
+
+  it('enabled: false routes are absent from production baseline (B3 skips them at router generation)', () => {
+    const disabledRoutes = routes.filter((route) => route.enabled === false);
+    expect(disabledRoutes).toEqual([]);
+  });
+
+  it('role-based customComponentPath entries have componentPath per role', () => {
+    for (const route of routes) {
+      if (!route.customComponentPath || typeof route.customComponentPath !== 'object') {
+        continue;
+      }
+
+      for (const [role, entry] of Object.entries(route.customComponentPath)) {
+        expect(typeof entry?.componentPath).toBe('string');
+        expect(entry.componentPath.trim().length).toBeGreaterThan(0);
+        expect(role.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('inheritConfigFromParent children have resolvable parent slug in config', () => {
+    const slugSet = new Set(routes.map((route) => route.slug));
+
+    for (const route of routes) {
+      if (!route.inheritConfigFromParent) {
+        continue;
+      }
+
+      const parentSlug = findParentSlugForInheritance(route.slug, slugSet);
+      expect(parentSlug).toBeTruthy();
+      expect(slugSet.has(parentSlug)).toBe(true);
+    }
+  });
+
+  it('redirectFrom paths do not collide with another route primary slug', () => {
+    const slugSet = new Set(routes.map((route) => route.slug));
+
+    for (const route of routes) {
+      for (const legacyPath of normalizeRedirectFromList(route.redirectFrom)) {
+        const owner = routes.find((candidate) => candidate.slug === legacyPath);
+        if (owner) {
+          expect(owner.slug).toBe(route.slug);
+        } else {
+          expect(slugSet.has(legacyPath)).toBe(false);
+        }
+      }
+    }
+  });
+
+  it('alias paths do not collide with another route primary slug', () => {
+    const slugSet = new Set(routes.map((route) => route.slug));
+
+    for (const route of routes) {
+      for (const alias of normalizeAliasList(route.aliases)) {
+        const owner = routes.find((candidate) => candidate.slug === alias);
+        if (owner) {
+          expect(owner.slug).toBe(route.slug);
+        } else {
+          expect(slugSet.has(alias)).toBe(false);
+        }
+      }
+    }
+  });
+
+  it('hideLayout routes are valid slugs present in production config', () => {
+    const slugSet = new Set(routes.map((route) => route.slug));
+
+    for (const route of routes) {
+      if (route.hideLayout) {
+        expect(slugSet.has(route.slug)).toBe(true);
+        expect(typeof route.slug).toBe('string');
+        expect(route.slug.trim().length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('no redirect chain longer than depth 1 (no A redirects to B that also redirects)', () => {
+    const redirectBySlug = new Map(
+      routes.filter((route) => route.redirect).map((route) => [route.slug, route.redirect]),
+    );
+
+    for (const route of routes) {
+      if (!route.redirect) {
+        continue;
+      }
+
+      expect(redirectBySlug.has(route.redirect)).toBe(false);
+    }
+  });
+
+  it('locale-prefixed navigation targets resolve same as locale-free slug', () => {
+    const sampleRoutes = routes.filter(
+      (route) => !route.redirect && !route.slug.includes('pathMatch'),
+    );
+
+    for (const route of sampleRoutes) {
+      for (const locale of ['en', 'vi']) {
+        const localizedPath = `/${locale}${route.slug}`;
+        const normalized = normalizeLocalizedPath(localizedPath);
+        const localizedMatch = resolveRouteFromPath(normalized);
+        const directMatch = resolveRouteFromPath(route.slug);
+
+        expect(localizedMatch?.slug).toBe(directMatch?.slug);
+      }
+    }
+  });
+
+  it('production route count matches documented baseline snapshot', () => {
+    expect(routes.length).toBe(PRODUCTION_ROUTE_COUNT_BASELINE);
+  });
+
+  it('schema warnings for missing recommended fields are documented and acceptable', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+    const result = validateRouteConfig(routes);
+
+    expect(result.valid).toBe(true);
+    expect(result.errors).toEqual([]);
+    expect(result.warnings).toEqual([]);
+  });
+
+  it('every assetPreloadRef resolves in shared catalog and asset map via validateRouteConfig', async () => {
+    const { validateRouteConfig } = await import(VALIDATOR_PATH);
+    const result = validateRouteConfig(routes);
+
+    expect(result.valid).toBe(true);
+    expect(
+      result.errors.filter(
+        (error) =>
+          error.field === 'assetPreloadRef' ||
+          error.type === 'INVALID_ASSET_PRELOAD_FLAG' ||
+          error.type === 'UNKNOWN_ASSET_PRELOAD_REF',
+      ),
+    ).toEqual([]);
+  });
 });
 
 /**
  * @param {Array<string>|Record<string, Array<string>>|undefined} preLoadSections
  * @returns {string[]}
  */
+/**
+ * @param {string} childSlug
+ * @param {Set<string>} slugSet
+ * @returns {string|null}
+ */
+function findParentSlugForInheritance(childSlug, slugSet) {
+  const segments = childSlug.split('/').filter(Boolean);
+
+  for (let index = segments.length - 1; index >= 1; index -= 1) {
+    const candidate = `/${segments.slice(0, index).join('/')}`;
+    if (slugSet.has(candidate)) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 function collectPreloadIdentifiers(preLoadSections) {
   if (!preLoadSections) {
     return [];
