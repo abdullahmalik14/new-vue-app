@@ -119,7 +119,7 @@ function getLikesLineCfg(dk) {
 // ===== INJECT CHART DATA =====
 async function fetchLikesData() {
   try {
-    const { FlowHandler } = await import('@/services/flow-system/flowHandler.js');
+    const { FlowHandler } = await import('@/services/flow-system/FlowHandler.js');
     const { ANALYTICS_FETCH_FLOW } = await import('@/config/dashboardAnalyticsFlows.js');
     const result = await FlowHandler.run(ANALYTICS_FETCH_FLOW, { source: 'full' });
     if (result.ok && result.data) {
