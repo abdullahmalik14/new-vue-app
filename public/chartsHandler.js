@@ -908,6 +908,7 @@ const datasetsPromise = configJson.datasets
         fieldConfig,
         seriesBreakdownKeys,
         datasetRows,
+        chartPeriod,
       });
 
       // Log successful end of render
@@ -1642,6 +1643,14 @@ const datasetsPromise = configJson.datasets
     }
   }
 
+  showLoading(chartHostElement, chartInstanceId) {
+    // No loading blocker
+  }
+
+  hideLoading(chartHostElement, chartInstanceId) {
+    // No loading blocker
+  }
+
   /**
    * Instantiate and render a chart by type.
    *
@@ -1673,6 +1682,8 @@ const datasetsPromise = configJson.datasets
 
     // Begin guarded instantiation block
     try {
+      this.showLoading(chartHostElement, chartInstanceId);
+
       // Destructure chart context inputs
       const {
         styleConfig,
@@ -1680,6 +1691,7 @@ const datasetsPromise = configJson.datasets
         fieldConfig,
         seriesBreakdownKeys,
         datasetRows,
+        chartPeriod,
       } = chartContext;
 
       // Log intent to destroy existing instance
@@ -1758,6 +1770,7 @@ const datasetsPromise = configJson.datasets
             {},
           );
 
+          this.hideLoading(chartHostElement, chartInstanceId);
           // Return after map render
           return;
         }
@@ -1790,6 +1803,7 @@ const datasetsPromise = configJson.datasets
             })}`,
           );
 
+          this.hideLoading(chartHostElement, chartInstanceId);
           // Return after donut render
           return;
         }
@@ -1822,6 +1836,7 @@ const datasetsPromise = configJson.datasets
             })}`,
           );
 
+          this.hideLoading(chartHostElement, chartInstanceId);
           // Return after column-with-icons render
           return;
         }
@@ -1850,6 +1865,7 @@ const datasetsPromise = configJson.datasets
             datasetRows,
             chartType,
             seriesBreakdownKeys,
+            chartPeriod,
           });
 
           // Log successful end for xy
@@ -1860,6 +1876,7 @@ const datasetsPromise = configJson.datasets
             })}`,
           );
 
+          this.hideLoading(chartHostElement, chartInstanceId);
           // Return after xy render
           return;
         }
@@ -1877,6 +1894,7 @@ const datasetsPromise = configJson.datasets
             { critical: true },
           );
 
+          this.hideLoading(chartHostElement, chartInstanceId);
           // Throw error for unknown type
           throw new Error(`Unknown chartType "${chartType}"`);
         }
@@ -1884,6 +1902,7 @@ const datasetsPromise = configJson.datasets
 
       // Catch and log the error
     } catch (error) {
+      this.hideLoading(chartHostElement, chartInstanceId);
       // Log instantiation error details
       DebugLogger.log(
         "ChartsHandler",
@@ -4325,8 +4344,9 @@ const datasetsPromise = configJson.datasets
       // Resolve country/category label
       const country = dataItem.get("categoryX") || "";
 
-      // Resolve numeric visits value
-      const visits = dataItem.get("valueY") || 0;
+      // Resolve numeric visits value directly from dataContext to prevent intermediate 0 values during animation
+      const valueYField = seriesInstance.get("valueYField");
+      const visits = (ctx && valueYField && ctx[valueYField] !== undefined) ? ctx[valueYField] : (dataItem.get("valueY") || 0);
 
       // Resolve column color from context or template
       const col = ctx.fill || seriesInstance.columns.template.get("fill");
@@ -4425,6 +4445,7 @@ const datasetsPromise = configJson.datasets
     datasetRows,
     chartType,
     seriesBreakdownKeys,
+    chartPeriod,
   }) {
     // Create base XY chart instance
     const chartInstance = this._createXYChart(chartRoot, styleConfig);
@@ -4459,7 +4480,10 @@ const datasetsPromise = configJson.datasets
         minVal = 0;
 
       // Handle stacked mode by summing row values
-      if (styleConfig.stacked) {
+      const isLineChart = chartType === "line" || chartType === "line-shadow";
+      const useStacked = styleConfig.stacked && !isLineChart;
+
+      if (useStacked) {
         // Iterate dataset rows to compute stacked totals
         datasetRows.forEach((r) => {
           // Sum values for configured keys
@@ -4494,7 +4518,9 @@ const datasetsPromise = configJson.datasets
       const buffer = styleConfig.yAxis?.autoMaxBuffer ?? 0.12;
 
       // Compute buffered ceiling for max
-      const calculatedMax = Math.ceil(maxVal * (1 + buffer));
+      const calculatedMax = isLineChart
+        ? Math.max(Math.ceil(maxVal * 1.4), Math.ceil(maxVal) + 1)
+        : Math.ceil(maxVal * (1 + buffer));
 
       // Compute buffered floor for min
       const calculatedMin = Math.floor(minVal * (1 + buffer));
@@ -4525,6 +4551,22 @@ const datasetsPromise = configJson.datasets
 
     // Bind dataset rows to X axis
     xAxis.data.setAll(datasetRows);
+
+    // Apply selective date labeling for monthly/30-day view
+    const isMonthly = chartPeriod === "monthly" || 
+                      (chartInstanceId && chartInstanceId.toLowerCase().includes("month"));
+    if (isMonthly) {
+      xAxis.get("renderer").labels.template.adapters.add("text", (text, target) => {
+        const dataItem = target.dataItem;
+        if (dataItem) {
+          const index = xAxis.dataItems.indexOf(dataItem);
+          if (index !== -1 && index % 7 !== 0) {
+            return "";
+          }
+        }
+        return text;
+      });
+    }
 
     // Validate presence of seriesStyles color map
     if (!styleConfig.seriesStyles) {
@@ -4729,8 +4771,10 @@ const datasetsPromise = configJson.datasets
           // Return early when series has no data item
           if (!di) return;
 
-          // Read numeric value for the row
-          const v = Number(di.get("valueY") || 0);
+          // Read numeric value directly from dataContext to prevent intermediate 0 values during animation
+          const valueYField = series.get("valueYField");
+          const ctx = di.dataContext || {};
+          const v = Number((ctx && valueYField && ctx[valueYField] !== undefined) ? ctx[valueYField] : (di.get("valueY") || 0));
 
           // Accumulate total across series
           total += v;
@@ -4741,10 +4785,10 @@ const datasetsPromise = configJson.datasets
             xLabel = di.get("categoryX") || "";
 
             // Resolve year from data context when available
-            const ctx = di.dataContext || {};
+            const yearCtx = di.dataContext || {};
 
             // Convert year to string if present
-            year = ctx.year != null ? String(ctx.year) : "";
+            year = yearCtx.year != null ? String(yearCtx.year) : "";
           }
 
           // Resolve series color from columns or fills
@@ -4757,12 +4801,13 @@ const datasetsPromise = configJson.datasets
           const hex = this.normalizeColorHex(col);
 
           // Push formatted row line into array
+          const formattedValue = window.ChartsUtilities?.formatDecimal ? window.ChartsUtilities.formatDecimal(v) : v;
           lines.push(
             `[${hex} width:8px height:8px]●[/] [fontWeight:normal width:120px]${series.get(
               "name",
             )}:[/] [bold width:0px] ${
               aggregatedTooltipConfig.valuePrefix || ""
-            }${v}${aggregatedTooltipConfig.valueSuffix || ""}[/]`,
+            }${formattedValue}${aggregatedTooltipConfig.valueSuffix || ""}[/]`,
           );
         });
 
@@ -4775,11 +4820,13 @@ const datasetsPromise = configJson.datasets
         const sep = `\n[font color='#D0D5DD']───────────────────────[/font]\n`;
 
         // Build tail line with total value
+        const formattedTotal = window.ChartsUtilities?.formatDecimal ? window.ChartsUtilities.formatDecimal(total) : total;
         const tail = `[fontWeight:normal width:130px][font color='#667085']${
           aggregatedTooltipConfig.totalLabel || "Total Earnings:"
         }[/font][/] [bold width:0px] ${
           aggregatedTooltipConfig.valuePrefix || ""
-        }${total}${aggregatedTooltipConfig.valueSuffix || ""}[/]`;
+        }${formattedTotal}${aggregatedTooltipConfig.valueSuffix || ""}[/]`;
+
 
         // Return the composed tooltip bbcode string
         return `${header}\n\n${lines.join("\n\n")}${sep}${tail}`;

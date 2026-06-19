@@ -178,3 +178,27 @@ export function deepClone(value) {
 
   return value;
 }
+
+/**
+ * Check if a value is present (not null, undefined, or empty string)
+ */
+export function isValuePresent(value) {
+  return value !== null && value !== undefined && value !== '';
+}
+
+/**
+ * Assert that a value is present, throwing an error if it isn't
+ */
+export function assertValuePresent(value, contextDescription = 'Value') {
+  if (!isValuePresent(value)) {
+    throw new Error(`${contextDescription} must be present`);
+  }
+  return true;
+}
+
+/**
+ * Deep clone an object
+ */
+export function deepCloneObject(value) {
+  return deepClone(value);
+}

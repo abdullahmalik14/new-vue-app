@@ -1,36 +1,8 @@
 /**
  * Common Utilities - Central export file
  * 
- * Exports all common utility functions used throughout the application:
- * - Cache management
- * - Logging
- * - Object safety operations
- * - Error handling
- * - JSON configuration loading
+ * Exports all common utility functions used throughout the application.
  */
-
-// Export all cache handler functions
-export {
-  setValueWithExpiration,
-  getValueFromCache,
-  hasValidCacheEntry,
-  removeFromCache,
-  removeCacheKeysByPrefix,
-  clearAllCache,
-  getCacheStatistics,
-  sweepExpiredCacheEntries
-} from './cacheHandler.js';
-
-// Export all log handler functions
-export {
-  logDebugMessage,
-  logInfoMessage,
-  logWarningMessage,
-  logErrorMessage,
-  isLoggerEnabled,
-  log,
-  logger
-} from './logHandler.js';
 
 // Export all object safety functions
 export {
@@ -41,18 +13,6 @@ export {
   deepCloneObject
 } from './objectSafety.js';
 
-// Export all error handler functions
-export {
-  handleErrorSilently,
-  logError,
-  isError
-} from './errorHandler.js';
-
-// Export global performance tracker (if it exists)
-export {
-  getGlobalPerformanceTracker
-} from './performanceTrackerAccess.js';
-
 // Export JSON configuration loader utilities (browser version)
 export {
   loadJsonConfig,
@@ -61,3 +21,11 @@ export {
   getConfigStatistics
 } from './jsonConfigLoader.js';
 
+// Export global formatting utilities
+export {
+  formatDecimal,
+  formatCurrency,
+  formatPrice,
+  formatUsdPrice,
+  formatDate
+} from './formatters.js';

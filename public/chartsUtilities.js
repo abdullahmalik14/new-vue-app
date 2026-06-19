@@ -1082,6 +1082,80 @@ window.ChartsUtilities = (function() {
     }
   }
 
+  const CURRENCY_SYMBOLS = {
+    USD: '$',
+    EUR: '€',
+    GBP: '£',
+  };
+
+  function formatDecimal(val) {
+    if (val === null || val === undefined) return '0.00';
+    const cleanVal = String(val).replace(/[^0-9.-]/g, '');
+    const parsed = parseFloat(cleanVal);
+    if (isNaN(parsed)) return '0.00';
+    const cleaned = Math.round(parsed * 1e9) / 1e9;
+    const parts = cleaned.toFixed(12).split('.');
+    const integerPart = parts[0];
+    const fractionalPart = parts[1].substring(0, 2);
+    return `${integerPart}.${fractionalPart}`;
+  }
+
+  function formatCurrency(val, currency = 'USD') {
+    const formattedDecimal = formatDecimal(val);
+    const symbol = CURRENCY_SYMBOLS[currency.toUpperCase()] || '';
+    return `${symbol}${formattedDecimal}`;
+  }
+
+  function formatPrice(val, currency = 'USD') {
+    const formattedDecimal = formatDecimal(val);
+    const symbol = CURRENCY_SYMBOLS[currency.toUpperCase()] || '$';
+    return `${currency.toUpperCase()} ${symbol}${formattedDecimal}`;
+  }
+
+  function formatUsdPrice(val) {
+    return formatPrice(val, 'USD');
+  }
+
+  function formatDate(dateInput) {
+    if (!dateInput) return '';
+
+    let dateObj;
+    if (dateInput instanceof Date) {
+      dateObj = dateInput;
+    } else {
+      const str = String(dateInput).trim();
+      const match = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/.exec(str);
+      if (match) {
+        const year = parseInt(match[1], 10);
+        const month = parseInt(match[2], 10) - 1;
+        const day = parseInt(match[3], 10);
+        dateObj = new Date(year, month, day);
+      } else {
+        const parsed = new Date(str);
+        if (isNaN(parsed)) return str;
+        dateObj = parsed;
+      }
+    }
+
+    const year = dateObj.getFullYear();
+    const monthIdx = dateObj.getMonth();
+    const day = dateObj.getDate();
+
+    const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const monthStr = MONTHS[monthIdx] || '';
+
+    let suffix = 'th';
+    if (day === 1 || day === 21 || day === 31) {
+      suffix = 'st';
+    } else if (day === 2 || day === 22) {
+      suffix = 'nd';
+    } else if (day === 3 || day === 23) {
+      suffix = 'rd';
+    }
+
+    return `${day}${suffix} ${monthStr} ${year}`;
+  }
+
   // Return public API
   return {
     // DOM Utilities
@@ -1105,5 +1179,13 @@ window.ChartsUtilities = (function() {
 
     // Event Utilities
     emit,
+
+    // Formatting Utilities
+    formatDecimal,
+    formatCurrency,
+    formatPrice,
+    formatUsdPrice,
+    formatDate,
   };
 })();
+

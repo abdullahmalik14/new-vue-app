@@ -98,8 +98,8 @@ export function mapFanInsightsPeriod(arr, countriesArr) {
   }));
 
   return {
-    newFollowers: latest.newFollowers ?? null,
-    profileVisit: latest.profileVisits ?? null,
+    newFollowers: latest.newFollowers ?? 0,
+    profileVisit: latest.profileVisits ?? 0,
     newFollowersPercentage: calculatePeriodChangePercent(latest.newFollowers, prev.newFollowers),
     profileVisitPercentage: calculatePeriodChangePercent(latest.profileVisits, prev.profileVisits),
     topCountries,
@@ -135,7 +135,20 @@ export function mapRawFanInsights(fanInsights) {
 }
 
 export function mapLikesSummary(likes) {
-  const arr = likes.daily || likes.weekly || likes.monthly || [];
+  const arr = (likes && (likes.daily || likes.weekly || likes.monthly)) || [];
+
+  if (!arr || arr.length === 0) {
+    return {
+      media: null,
+      merch: null,
+      profile: null,
+      feed: null,
+      mediaPercentage: null,
+      merchPercentage: null,
+      profilePercentage: null,
+      feedPercentage: null,
+    };
+  }
 
   let latestIdx = arr.length - 1;
   for (let i = arr.length - 1; i >= 0; i--) {
@@ -154,10 +167,10 @@ export function mapLikesSummary(likes) {
   const prev = arr[latestIdx - 1] || {};
 
   return {
-    media: latest.media ?? null,
-    merch: latest.merch ?? null,
-    profile: latest.profile ?? null,
-    feed: latest.feed ?? null,
+    media: latest.media ?? 0,
+    merch: latest.merch ?? 0,
+    profile: latest.profile ?? 0,
+    feed: latest.feed ?? 0,
     mediaPercentage: calculatePeriodChangePercent(latest.media, prev.media),
     merchPercentage: calculatePeriodChangePercent(latest.merch, prev.merch),
     profilePercentage: calculatePeriodChangePercent(latest.profile, prev.profile),
@@ -186,8 +199,8 @@ export function buildSubscriberInsights(subscriptionsBundle) {
     const last = arr[arr.length - 1] || {};
     const secondLast = arr[arr.length - 2] || {};
     return {
-      new: last.sub ?? null,
-      recurring: last.tip ?? null,
+      new: last.sub ?? (arr.length > 0 ? 0 : null),
+      recurring: last.tip ?? (arr.length > 0 ? 0 : null),
       newPercentage: calculatePeriodChangePercent(last.sub, secondLast.sub),
       recurringPercentage: calculatePeriodChangePercent(last.tip, secondLast.tip),
     };
@@ -197,8 +210,8 @@ export function buildSubscriberInsights(subscriptionsBundle) {
 
   return {
     daily: {
-      new: latest.sub ?? null,
-      recurring: latest.tip ?? null,
+      new: latest.sub ?? (daily.length > 0 ? 0 : null),
+      recurring: latest.tip ?? (daily.length > 0 ? 0 : null),
       newPercentage: calculatePeriodChangePercent(latest.sub, prev.sub),
       recurringPercentage: calculatePeriodChangePercent(latest.tip, prev.tip),
       newSparkline: getValidSparkline(daily, 'sub'),
@@ -221,7 +234,7 @@ export function buildEarningsInsights(earnings) {
 
   return {
     daily: {
-      total: latest.total ?? null,
+      total: latest.total ?? (daily.length > 0 ? 0 : null),
       percentage: calculatePeriodChangePercent(latest.total, prev.total),
       sparklineData: daily.slice(-10).map((entry) => entry.total || 0),
     },
