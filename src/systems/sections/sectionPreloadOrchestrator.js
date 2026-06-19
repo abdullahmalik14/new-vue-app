@@ -4,7 +4,7 @@
 
 import { log } from '../../infrastructure/logging/logHandler.js';
 import { loadTranslationsForSection, areTranslationsLoadedForSection } from '../i18n/translationLoader.js';
-import { inheritConfigurationFromParentRoute } from '../routing/routeResolver.js';
+import { resolveEffectiveRouteConfig } from '../routing/routeResolver.js';
 import {
   getPreloadSectionsForRoute,
   resolveSectionIdentifier,
@@ -39,20 +39,6 @@ function buildSectionPreloadStatusSnapshot(sections, skipSection = null) {
         needsPreload: !skipped && !isPreloaded && !inProgress
       };
     });
-}
-
-/**
- * Merge parent route config when inheritConfigFromParent is set (L-11).
- *
- * @param {object|null|undefined} routeConfig
- * @returns {object|null}
- */
-export function resolveEffectiveRouteConfig(routeConfig) {
-  if (!routeConfig) {
-    return null;
-  }
-
-  return inheritConfigurationFromParentRoute(routeConfig);
 }
 
 /**

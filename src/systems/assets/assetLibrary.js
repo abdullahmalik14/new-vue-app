@@ -26,7 +26,7 @@ import {
   removeFromCache,
   removeCacheKeysByPrefix
 } from '../../infrastructure/cache/cacheHandler.js';
-import { loadSectionManifest, getSectionBundlePaths } from '../build/manifestLoader.js';
+import { loadSectionManifest, getSectionBundlePaths } from '../sections/sectionManifestHelpers.js';
 import { getAssetPreloadEntriesForSection } from './routeSectionAssetPreloadEntries.js';
 import { assertAllowedPreloadUrl } from './assertAllowedPreloadUrl.js';
 import {

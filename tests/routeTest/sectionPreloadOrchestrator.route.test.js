@@ -35,7 +35,7 @@ beforeEach(async () => {
 describe('resolveEffectiveRouteConfig (Phase F §33)', () => {
   it('returns null when route config is null', async () => {
     const { resolveEffectiveRouteConfig } = await import(
-      '../../src/systems/sections/sectionPreloadOrchestrator.js'
+      '../../src/systems/routing/routeResolver.js'
     );
 
     expect(resolveEffectiveRouteConfig(null)).toBeNull();

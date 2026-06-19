@@ -8,7 +8,7 @@ import { stripLeadingLocaleFromPath } from '../i18n/localeManager.js';
 import { useAuthStore } from '../../stores/useAuthStore.js';
 import { getRouteConfiguration } from './routeConfigLoader.js';
 import { resolveComponentPathForRoute } from './routeResolver.js';
-import { resolveEffectiveRouteConfig } from '../sections/sectionPreloadOrchestrator.js';
+import { resolveEffectiveRouteConfig } from './routeResolver.js';
 import { findComponentLoader } from './routeComponentLoader.js';
 import { log } from '../../infrastructure/logging/logHandler.js';
 

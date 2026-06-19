@@ -7,7 +7,7 @@ const getSectionBundlePaths = vi.fn();
 const preloadSectionCss = vi.fn();
 const preloadSectionAssets = vi.fn();
 
-vi.mock('../../src/systems/build/manifestLoader.js', () => ({
+vi.mock('../../src/systems/sections/sectionManifestHelpers.js', () => ({
   getSectionBundlePaths
 }));
 

@@ -1,9 +1,9 @@
 /**
  * Resolve per-route Vue Router transition settings from routeConfig (M3).
- * Supports inheritance via resolveEffectiveRouteConfig.
+ * Supports inheritance via resolveEffectiveRouteConfig (from routeResolver).
  */
 
-import { resolveEffectiveRouteConfig } from '../sections/sectionPreloadOrchestrator.js';
+import { resolveEffectiveRouteConfig } from './routeResolver.js';
 
 export const ROUTE_TRANSITION_PRESETS = Object.freeze([
   'route-fade',

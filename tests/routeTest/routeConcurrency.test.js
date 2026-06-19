@@ -27,13 +27,15 @@ vi.mock('../../src/systems/routing/routeConfigLoader.js', () => ({
 }));
 
 vi.mock('../../src/systems/sections/sectionPreloadOrchestrator.js', () => ({
-  resolveEffectiveRouteConfig: vi.fn((route) => route),
   resolveCurrentRouteSectionName: vi.fn((route) => route?.section ?? null),
+  getRoutePreloadPlan: vi.fn(() => ({ preloadSectionIdentifiers: [], resolvedSectionNames: [] })),
+  startBackgroundSectionPreloads: vi.fn(() => Promise.resolve()),
 }));
 
 vi.mock('../../src/systems/routing/routeResolver.js', () => ({
   resolveComponentPathForRoute: vi.fn((route) => route.componentPath),
   getRouteChainForPath: vi.fn(() => []),
+  resolveEffectiveRouteConfig: vi.fn((route) => route),
 }));
 
 vi.mock('../../src/systems/routing/routeComponentLoader.js', () => ({
@@ -48,6 +50,14 @@ vi.mock('../../src/systems/sections/sectionPreloader.js', () => ({
   preloadSection: (...args) => preloadSection(...args),
   resetSectionPreloadState: vi.fn(),
 }));
+
+vi.mock('../../src/systems/sections/sectionNavigationHooks.js', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    loadRouteComponentWithSectionPreload: async (route, loadViaGlob) => loadViaGlob(route, 'guest'),
+  };
+});
 
 vi.mock('../../src/systems/i18n/translationLoader.js', () => ({
   loadTranslationsForSection: vi.fn().mockResolvedValue(undefined),

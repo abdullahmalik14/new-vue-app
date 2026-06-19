@@ -23,8 +23,11 @@ One clear section layer under `src/systems/sections/`, with manifest helpers ext
 | Naming audit | ✅ Batches 1–2; route excluded |
 | Tests import paths | ✅ Fixed (Route Phase 1 + Sections Phase 1 verified) |
 | `sectionPreloader.js` stale import | ✅ Fixed (`./sectionCssLoader.js`) |
-| `sectionManifestHelpers.js` | ❌ Not created |
-| Nav resource loads in routing | ❌ Still in `routeNavigationData.js` |
+| `sectionManifestHelpers.js` | ✅ Created; runtime manifest logic moved from `build/manifestLoader.js` |
+| Nav resource loads | ✅ `sectionNavigationResources.js`; routing re-export kept |
+| Router section hooks | ✅ Extracted to `sectionNavigationResources.js` + `sectionNavigationHooks.js` |
+| `resolveEffectiveRouteConfig` | ✅ Moved to `systems/routing/routeResolver.js` |
+| `systems/sections/index.js` barrel | ✅ Full public API exported |
 
 ## Priority work (developer order)
 

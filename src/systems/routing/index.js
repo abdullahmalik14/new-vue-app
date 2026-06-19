@@ -22,6 +22,7 @@ export {
   resolveExactRouteFromPath,
   resolveComponentPathForRoute,
   inheritConfigurationFromParentRoute,
+  resolveEffectiveRouteConfig,
   resolveEffectiveAssetPreloadForRoute,
   getRouteChainForPath
 } from './routeResolver.js';

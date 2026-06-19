@@ -4,9 +4,13 @@
 
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('../../src/systems/sections/sectionPreloadOrchestrator.js', () => ({
-  resolveEffectiveRouteConfig: (config) => config,
-}));
+vi.mock('../../src/systems/routing/routeResolver.js', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    resolveEffectiveRouteConfig: (config) => config,
+  };
+});
 
 import { resolveRouteTransition } from '../../src/systems/routing/routeTransition.js';
 

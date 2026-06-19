@@ -335,6 +335,20 @@ export function inheritConfigurationFromParentRoute(childRoute) {
 }
 
 /**
+ * Merge parent route config when inheritConfigFromParent is set (L-11).
+ *
+ * @param {object|null|undefined} routeConfig
+ * @returns {object|null}
+ */
+export function resolveEffectiveRouteConfig(routeConfig) {
+  if (!routeConfig) {
+    return null;
+  }
+
+  return inheritConfigurationFromParentRoute(routeConfig);
+}
+
+/**
  * Resolve inherited + inline assetPreload[] for section rollups and preload orchestration (C-02).
  *
  * @param {object} route

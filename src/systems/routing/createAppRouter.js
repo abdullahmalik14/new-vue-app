@@ -7,12 +7,12 @@
  */
 
 import { createRouter, createWebHistory } from 'vue-router';
-import { getActivePinia } from 'pinia';
 import {
   getRouteConfiguration,
   runAllRouteGuards,
   setCurrentActiveRoute,
   resolveComponentPathForRoute,
+  resolveEffectiveRouteConfig,
   clearGuardNavigationHistory,
   markGuardRedirectNavigation,
   consumeGuardRedirectNavigation,
@@ -23,7 +23,6 @@ import { log } from '../../infrastructure/logging/logHandler.js';
 import { trackStep } from '../../infrastructure/logging/performanceTrackerAccess.js';
 import { logError, reportApplicationError } from '../../infrastructure/errors/errorHandler.js';
 import { useAuthStore } from '../../stores/useAuthStore.js';
-import { usePreloadStore } from '../../stores/usePreloadStore.js';
 import {
   SUPPORTED_LOCALES,
   resolveActiveLocale,
@@ -36,14 +35,12 @@ import {
   getLeadingLocaleFromPath,
   stripLeadingLocaleFromPath,
 } from '../i18n/localeManager.js';
-import { resolveRoleSectionVariant } from '../sections/sectionResolver.js';
-import { preloadSection } from '../sections/sectionPreloader.js';
-import { preloadSectionCriticalImages } from '../assets/assetPreloader.js';
 import {
-  getRoutePreloadPlan,
-  resolveEffectiveRouteConfig,
-  startBackgroundSectionPreloads
-} from '../sections/sectionPreloadOrchestrator.js';
+  assignResolvedSectionToRouteMeta,
+  loadRouteComponentWithSectionPreload,
+  startCurrentSectionResourceLoads,
+  startPostNavigationSectionPreloads,
+} from '../sections/sectionNavigationHooks.js';
 import { loadNotFoundComponent } from './notFoundComponentLoader.js';
 import { findComponentLoader } from './routeComponentLoader.js';
 import {
@@ -60,7 +57,6 @@ import {
   buildVueRouterAliases,
   createRedirectFromRouteRecords,
 } from './routeAliasResolver.js';
-import { loadCurrentSectionResources, resolveCurrentSectionForNavigation } from './routeNavigationResourceLoader.js';
 import { syncHreflangTagsForPath, clearHreflangTags } from '../i18n/routeHreflangTags.js';
 
 const DEFAULT_LOCALE = 'en';
@@ -219,21 +215,6 @@ function buildVueRouterRecordsFromConfiguration() {
 }
 
 /**
- * Resolve user role for route component loading (L15).
- * Uses explicit Pinia instance when active; falls back to guest in tests/early boot.
- *
- * @returns {string}
- */
-function resolveUserRoleForComponentLoad() {
-  const pinia = getActivePinia();
-  if (!pinia) {
-    log('createAppRouter.js', 'resolveUserRoleForComponentLoad', 'warn', 'No active Pinia — using guest role for component load', {});
-    return 'guest';
-  }
-  return useAuthStore(pinia).currentUser?.role || 'guest';
-}
-
-/**
  * Load component for a route
  * Uses pre-loaded component map from import.meta.glob
  * 
@@ -241,42 +222,7 @@ function resolveUserRoleForComponentLoad() {
  * @returns {Promise} - Component promise
  */
 async function loadRouteComponent(route) {
-  log('createAppRouter.js', 'loadRouteComponent', 'start', 'Loading component for route', { slug: route.slug });
-  trackStep({
-        step: 'loadComponent_start',
-        file: 'createAppRouter.js',
-        method: 'loadRouteComponent',
-        flag: 'component-load',
-        purpose: `Load component for ${route.slug}`
-      });
-
-  const userRole = resolveUserRoleForComponentLoad();
-  const rawSection = route.section;
-  const sectionName = rawSection ? resolveRoleSectionVariant(rawSection, userRole) : null;
-
-  if (sectionName) {
-    const pinia = getActivePinia();
-    const store = pinia ? usePreloadStore(pinia) : null;
-    const sectionPreloaded = !!store?.hasSection(sectionName);
-
-    // B-03: kick off high/critical section image preloads in the background.
-    // Never await — preloading is non-blocking cache warming, navigation must not wait on image I/O.
-    preloadSectionCriticalImages(sectionName).catch(() => {});
-
-    const componentModule = await loadRouteComponentViaGlob(route, userRole);
-
-    if (sectionPreloaded) {
-      log('createAppRouter.js', 'loadRouteComponent', 'cache-hit', 'Section preloaded, fast load', { sectionName });
-    } else {
-      log('createAppRouter.js', 'loadRouteComponent', 'cache-miss', 'Section not preloaded, lazy load + background preload', { sectionName });
-      preloadSection(sectionName).catch(() => {});
-    }
-
-    return componentModule;
-  }
-
-  // No section on this route — standard lazy load only
-  return loadRouteComponentViaGlob(route, userRole);
+  return loadRouteComponentWithSectionPreload(route, loadRouteComponentViaGlob);
 }
 
 /**
@@ -497,25 +443,7 @@ router.beforeEach(async (to, from, next) => {
 
   log('createAppRouter.js', 'beforeEach', 'auth-context', 'Auth context prepared', guardContext);
 
-  // Resolve section for current user role and store on meta to ensure downstream consumers get a concrete section string
-  try {
-    const resolvedSection = resolveRoleSectionVariant(effectiveRouteConfig.section, guardContext.userRole);
-    if (resolvedSection && typeof resolvedSection === 'string') {
-      to.meta.section = resolvedSection;
-    } else {
-      // fallback to original section if resolution fails
-      to.meta.section = effectiveRouteConfig.section;
-    }
-    log('createAppRouter.js', 'beforeEach', 'section-resolve', 'Resolved meta.section for current role', {
-      role: guardContext.userRole,
-      resolvedSection: to.meta.section
-    });
-  } catch (e) {
-    log('createAppRouter.js', 'beforeEach', 'section-resolve-error', 'Failed to resolve meta.section (non-blocking)', {
-      error: e?.message
-    });
-    to.meta.section = effectiveRouteConfig.section;
-  }
+  assignResolvedSectionToRouteMeta(to, effectiveRouteConfig, guardContext.userRole);
 
   // Run all route guards against inherited/effective route config (L-11)
   const guardResult = await runAllRouteGuards(effectiveRouteConfig, effectiveFromRouteConfig, guardContext);
@@ -569,7 +497,7 @@ router.beforeResolve((to, from) => {
   const userRole = authStore.currentUser?.role || 'guest';
   const activeLocale = resolveActiveLocaleForNavigation(to);
 
-  loadCurrentSectionResources({
+  startCurrentSectionResourceLoads({
     to,
     from,
     userRole,
@@ -639,68 +567,18 @@ router.afterEach(async (to, from) => {
   const routeConfig = to.meta?.routeConfig;
   const effectiveRouteConfig = resolveEffectiveRouteConfig(routeConfig);
 
-  // Check if route should be excluded from preloading
-  const preloadExclude = effectiveRouteConfig?.preloadExclude === true;
-
-  // Note: preloadExclude only skips the background preLoadSections loop below.
-  // Current page CSS, translations, and assets still run regardless.
-
   if (effectiveRouteConfig) {
-    // Get auth store for role-based preload resolution
     const authStore = useAuthStore();
     const userRole = authStore.currentUser?.role || 'guest';
-
-    const {
-      preloadSectionIdentifiers: sectionsToPreload,
-      resolvedSectionNames: resolvedSectionsToPreload,
-    } = getRoutePreloadPlan(routeConfig, userRole);
-
-    // Log what we're about to preload for debugging
-    log('createAppRouter.js', 'afterEach', 'preload-check', 'Checking preload sections', {
-      path: to.path,
-      preLoadSections: effectiveRouteConfig.preLoadSections,
-      sectionsToPreload,
-      resolvedSections: resolvedSectionsToPreload,
-      routeConfigSlug: effectiveRouteConfig.slug
-    });
-
     const activeLocale = resolveActiveLocale();
-    const resolvedCurrentSection = resolveCurrentSectionForNavigation(to, userRole);
 
-    if (resolvedSectionsToPreload.length > 0 && !preloadExclude) {
-      log('createAppRouter.js', 'afterEach', 'preload', 'Preloading sections for route', {
-        path: to.path,
-        originalIdentifiers: sectionsToPreload,
-        resolvedSections: resolvedSectionsToPreload,
-        note: 'ONLY these sections will be preloaded, not all sections'
-      });
-
-      startBackgroundSectionPreloads({
-        sections: resolvedSectionsToPreload,
-        skipSection: resolvedCurrentSection,
-        locale: activeLocale,
-        preloadTranslations: true,
-        logContext: { file: 'createAppRouter.js', method: 'afterEach' },
-        path: to.path
-      })
-        .then(() => {
-          log('createAppRouter.js', 'afterEach', 'success', 'Section preload and translation load initiated', {
-            sections: resolvedSectionsToPreload
-          });
-        })
-        .catch((error) => {
-          log('createAppRouter.js', 'afterEach', 'error', 'Error during post-navigation tasks', {
-            error: error.message,
-            stack: error.stack
-          });
-        });
-    } else {
-      log('createAppRouter.js', 'afterEach', 'no-preload', 'No sections to preload for route', {
-        path: to.path,
-        hasPreLoadSections: !!effectiveRouteConfig.preLoadSections,
-        preLoadSectionsValue: effectiveRouteConfig.preLoadSections
-      });
-    }
+    startPostNavigationSectionPreloads({
+      to,
+      routeConfig,
+      effectiveRouteConfig,
+      userRole,
+      activeLocale,
+    });
   } else {
     log('createAppRouter.js', 'afterEach', 'no-config', 'Route has no configuration, skipping preload', { path: to.path });
   }

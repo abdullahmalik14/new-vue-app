@@ -4,7 +4,7 @@ const LOADER_PATH = '../../src/systems/sections/sectionCssLoader.js';
 
 const getSectionBundlePaths = vi.fn();
 
-vi.mock('../../src/systems/build/manifestLoader.js', () => ({
+vi.mock('../../src/systems/sections/sectionManifestHelpers.js', () => ({
   getSectionBundlePaths
 }));
 

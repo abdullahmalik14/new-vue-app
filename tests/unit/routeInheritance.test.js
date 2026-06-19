@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   inheritConfigurationFromParentRoute,
 } from '../../src/systems/routing/routeResolver.js';
-import { resolveEffectiveRouteConfig } from '../../src/systems/sections/sectionPreloadOrchestrator.js';
+import { resolveEffectiveRouteConfig } from '../../src/systems/routing/routeResolver.js';
 import { guardCheckAuthentication } from '../../src/systems/routing/routeGuards.js';
 
 beforeEach(() => {

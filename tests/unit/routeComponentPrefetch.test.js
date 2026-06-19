@@ -44,17 +44,14 @@ vi.mock('../../src/systems/routing/routeConfigLoader.js', () => ({
   getRouteConfiguration: vi.fn(() => routeCatalog)
 }));
 
-vi.mock('../../src/systems/sections/sectionPreloadOrchestrator.js', () => ({
-  resolveEffectiveRouteConfig: vi.fn((route) => route)
-}));
-
 vi.mock('../../src/systems/routing/routeResolver.js', () => ({
   resolveComponentPathForRoute: vi.fn((route) => {
     if (route.customComponentPath?.creator) {
       return route.customComponentPath.creator.componentPath;
     }
     return route.componentPath;
-  })
+  }),
+  resolveEffectiveRouteConfig: vi.fn((route) => route),
 }));
 
 vi.mock('../../src/systems/routing/routeComponentLoader.js', () => ({

@@ -8,7 +8,7 @@
 
 import { log } from "../../infrastructure/logging/logHandler.js";
 import { logError } from "../../infrastructure/errors/errorHandler.js";
-import { getSectionBundlePaths } from "../build/manifestLoader.js";
+import { getSectionBundlePaths } from "./sectionManifestHelpers.js";
 import {
   isTrustedBundlePath,
   escapeSelectorAttributeValue,
