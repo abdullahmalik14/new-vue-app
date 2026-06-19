@@ -1096,4 +1096,46 @@ npm run test:unit -- --run tests/routeTest   # 35 files, 274 passed
 
 ---
 
+## Phase F — Cross-system route coupling (2026-06-19)
+
+**Plan:** [route-test-plan.md](../route-test-plan.md) Phase F (§32–36, §66–70)  
+**Master plan:** Phase 8 — Route test coverage  
+**Test folder:** `tests/routeTest/`
+
+### What was broken
+
+Locale, hreflang, section resolver/preload orchestrator, and section asset rollup modules had coverage only in scattered `tests/unit/` files, not in the consolidated `tests/routeTest/` layout.
+
+### Why it happened
+
+Phases A–E prioritized routing core, guards, loaders, and router entry first.
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/routeTest/localeManager.route.test.js`](../../tests/routeTest/localeManager.route.test.js) | **New** — path strip/normalize, applyLocaleTemporarily, getDisplayedLocale (§35, §68) |
+| [`tests/routeTest/hreflangTags.route.test.js`](../../tests/routeTest/hreflangTags.route.test.js) | **New** — prefixed paths, alternates, DOM sync (§36, §69; ported from unit) |
+| [`tests/routeTest/sectionResolver.route.test.js`](../../tests/routeTest/sectionResolver.route.test.js) | **New** — preload sections, role variants, section helpers (§32, §67) |
+| [`tests/routeTest/sectionPreloadOrchestrator.route.test.js`](../../tests/routeTest/sectionPreloadOrchestrator.route.test.js) | **New** — preload plan, auth predicate, background/locale refresh (§33, §66) |
+| [`tests/routeTest/getAssetPreloadEntriesForSection.route.test.js`](../../tests/routeTest/getAssetPreloadEntriesForSection.route.test.js) | **New** — section rollups, dedup, cache, role sections (§34, §70) |
+
+Legacy `tests/unit/localePathUtils.test.js`, `hreflangTags.test.js`, `sectionResolver.test.js`, etc. remain for now.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/routeTest   # 40 files, 324 passed
+```
+
+### Exit criteria (Phase F)
+
+- [x] Locale path utilities and route-coupled translation apply covered
+- [x] Hreflang tag build/sync/clear covered
+- [x] Section resolver preload + role variant helpers covered
+- [x] Preload orchestrator plan + background preload + locale refresh covered
+- [x] Section asset preload rollups covered with mocked route config
+
+---
+
 *Add a new section above this line for each completed phase.*
