@@ -960,4 +960,47 @@ npm run test:unit -- --run tests/routeTest   # 9 files, 127 passed
 
 ---
 
+## Phase C — Guards (2026-06-19)
+
+**Plan:** [route-test-plan.md](../route-test-plan.md) Phase C (§3–10, §44, §48)  
+**Master plan:** Phase 8 — Route test coverage  
+**Test folder:** `tests/routeTest/`
+
+### What was broken
+
+Guard coverage lived in a few monolithic `tests/unit/` files (`routeGuards.test.js`, `routeGuardsS6.test.js`, `guardLoopHistoryClear.test.js`) without the plan’s split layout or explicit full-chain ordering tests.
+
+### Why it happened
+
+Phase B focused on resolver/loader units; guard split was deferred to Phase C.
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/helpers/routeFixtures.js`](../../tests/helpers/routeFixtures.js) | Added `KYC_GUARD_ROUTE`, `ONBOARDING_GUARD_ROUTE`, `DASHBOARD_DEPS_GUARD_ROUTE`, `resetGuardModuleState()` |
+| [`tests/routeTest/routeGuards.auth.test.js`](../../tests/routeTest/routeGuards.auth.test.js) | **New** — `guardCheckAuthentication` (§6) |
+| [`tests/routeTest/routeGuards.role.test.js`](../../tests/routeTest/routeGuards.role.test.js) | **New** — `guardCheckRouteUserRole` (§8) |
+| [`tests/routeTest/routeGuards.dependencies.test.js`](../../tests/routeTest/routeGuards.dependencies.test.js) | **New** — onboarding → KYC ordering, L6 (§9) |
+| [`tests/routeTest/routeGuards.loop.test.js`](../../tests/routeTest/routeGuards.loop.test.js) | **New** — loop prevention + redirect markers (§4, §10) |
+| [`tests/routeTest/routeGuards.env.test.js`](../../tests/routeTest/routeGuards.env.test.js) | **New** — `guardCheckRouteEnvironmentAccess` (§5) |
+| [`tests/routeTest/routeGuards.admin.test.js`](../../tests/routeTest/routeGuards.admin.test.js) | **New** — `guardCheckRouteAdminAccess` (§7) |
+| [`tests/routeTest/routeGuards.test.js`](../../tests/routeTest/routeGuards.test.js) | **New** — `runAllRouteGuards` chain order + S6 exception handling (§3) |
+
+Legacy `tests/unit/routeGuards*.test.js` and `guardLoopHistoryClear.test.js` remain for now (duplicate coverage); migrate/remove in a later cleanup PR.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/routeTest   # 16 files, 182 passed
+```
+
+### Exit criteria (Phase C)
+
+- [x] Each guard export: ≥1 allow + ≥1 block test
+- [x] Full chain test proves guard order: loop → env → auth → admin → role → deps
+- [x] Onboarding → KYC dependency ordering covered (creator vs non-creator paths)
+
+---
+
 *Add a new section above this line for each completed phase.*

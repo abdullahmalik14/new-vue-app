@@ -209,6 +209,72 @@ export function getCanonicalRouteFixtures() {
   return cloneRouteFixtures(CANONICAL_ROUTE_FIXTURES);
 }
 
+/** Mirrors production /sign-up/onboarding/kyc dependency pattern (plan §44). */
+export const KYC_GUARD_ROUTE = {
+  slug: '/sign-up/onboarding/kyc',
+  supportedRoles: ['creator'],
+  dependencies: {
+    roles: {
+      creator: {
+        onboardingPassed: { required: true, fallbackSlug: '/sign-up/onboarding' },
+        kycPassed: { redirectIfComplete: true, fallbackSlug: '/dashboard' },
+      },
+      vendor: {
+        onboardingPassed: { redirectIfComplete: true, fallbackSlug: '/dashboard' },
+      },
+    },
+  },
+};
+
+export const ONBOARDING_GUARD_ROUTE = {
+  slug: '/sign-up/onboarding',
+  supportedRoles: ['all'],
+  dependencies: {
+    roles: {
+      creator: {
+        kycPassed: {
+          redirectIfComplete: true,
+          fallbackSlug: '/dashboard',
+        },
+        onboardingPassed: {
+          redirectIfComplete: true,
+          fallbackSlug: '/sign-up/onboarding/kyc',
+        },
+      },
+    },
+  },
+};
+
+export const DASHBOARD_DEPS_GUARD_ROUTE = {
+  slug: '/dashboard',
+  supportedRoles: ['all'],
+  dependencies: {
+    roles: {
+      creator: {
+        onboardingPassed: {
+          required: true,
+          fallbackSlug: '/sign-up/onboarding',
+        },
+        kycPassed: {
+          required: true,
+          fallbackSlug: '/sign-up/onboarding/kyc',
+        },
+      },
+    },
+  },
+};
+
+/**
+ * Clear guard loop history between tests.
+ */
+export async function resetGuardModuleState() {
+  const { clearGuardNavigationHistory, consumeGuardRedirectNavigation } = await import(
+    '../../src/systems/routing/routeGuards.js'
+  );
+  consumeGuardRedirectNavigation();
+  clearGuardNavigationHistory();
+}
+
 /**
  * Build a slug → route map from a route array.
  * @param {Array<object>} routes
