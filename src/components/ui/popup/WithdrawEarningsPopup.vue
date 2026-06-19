@@ -22,6 +22,9 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import BasePopup from "./BasePopup.vue";
 import { createStepStateEngine } from "@/utils/stateEngine";
 import { onMounted } from 'vue';

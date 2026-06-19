@@ -72,6 +72,9 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import { computed } from 'vue';
 import ClockPlusIcon from "/images/clock-plus-1.webp";
 import CalendarIcon from "/images/calendar-date.webp";

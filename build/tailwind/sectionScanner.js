@@ -230,9 +230,11 @@ export function generateContentPathsForSection(sectionName, sectionMetadata, bas
     // (e.g. /dashboard/analytics, /payout in misc) so Tailwind utilities like hidden/md:block survive
     // when unloadSectionCss removes the previous section stylesheet.
     contentPaths.push(`${baseDir}/components/layout/**/*.vue`);
+    contentPaths.push(`${baseDir}/dev/components/layout/**/*.vue`);
     contentPaths.push(`${baseDir}/templates/dashboard/shared/**/*.vue`);
-    contentPaths.push(`${baseDir}/templates/dashboard/shared/DashboardSharedSidebar.vue`);
-    contentPaths.push(`${baseDir}/templates/dashboard/shared/DashboardSharedHeader.vue`);
+    contentPaths.push(`${baseDir}/dev/templates/dashboard/shared/**/*.vue`);
+    contentPaths.push(`${baseDir}/templates/auth/**/*.vue`);
+    contentPaths.push(`${baseDir}/dev/templates/auth/**/*.vue`);
     contentPaths.push(`${baseDir}/App.vue`);
 
     // Add component paths
@@ -249,7 +251,7 @@ export function generateContentPathsForSection(sectionName, sectionMetadata, bas
 
       // Detect base folder (e.g., dashboard) from templates/components path
       const normalized = resolved.replace(/\\/g, '/');
-      const folderMatch = normalized.match(new RegExp(`${baseDir}/(templates|components)/([^/]+)/`));
+      const folderMatch = normalized.match(new RegExp(`${baseDir}/(?:dev/)?(templates|components)/([^/]+)/`));
       if (folderMatch && folderMatch[2]) {
         baseFolders.add(folderMatch[2]);
       }
@@ -257,14 +259,22 @@ export function generateContentPathsForSection(sectionName, sectionMetadata, bas
 
     // Add derived base folder fallbacks (both components/ and templates/)
     for (const folder of baseFolders) {
-      const componentsPath = `${baseDir}/components/${folder}/**/*.vue`;
-      const templatesPath = `${baseDir}/templates/${folder}/**/*.vue`;
+      const componentsPath = `${baseDir}/components/**/${folder}/**/*.vue`;
+      const templatesPath = `${baseDir}/templates/**/${folder}/**/*.vue`;
+      const devComponentsPath = `${baseDir}/dev/components/**/${folder}/**/*.vue`;
+      const devTemplatesPath = `${baseDir}/dev/templates/**/${folder}/**/*.vue`;
 
       if (!contentPaths.includes(componentsPath)) {
         contentPaths.push(componentsPath);
       }
       if (!contentPaths.includes(templatesPath)) {
         contentPaths.push(templatesPath);
+      }
+      if (!contentPaths.includes(devComponentsPath)) {
+        contentPaths.push(devComponentsPath);
+      }
+      if (!contentPaths.includes(devTemplatesPath)) {
+        contentPaths.push(devTemplatesPath);
       }
     }
 

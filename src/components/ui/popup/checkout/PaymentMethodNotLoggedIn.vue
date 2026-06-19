@@ -1,4 +1,7 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 
 // ✅ UPDATE: Props defined for all inputs

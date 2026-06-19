@@ -4,8 +4,8 @@
     @update:model-value="$emit('update:modelValue', $event)"
     :period="period"
     @update:period="handlePeriodChange"
-    title="Contributors Insight"
-    logo="https://i.ibb.co.com/rGSXLKX4/money.webp"
+    :title="$t('dashboard.analytics.trends.titleContributors', 'Contributors Insight')"
+    :logo="iconPopupLogo || ''"
   >
     <div v-if="hasContributorsData" class="flex flex-col gap-4">
 
@@ -34,7 +34,7 @@
           </div>
         </div>
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
+          <img :src="icon6Url || ''" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
             <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
@@ -67,7 +67,7 @@
           </div>
         </div>
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
+          <img :src="icon6Url || ''" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
             <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
@@ -100,7 +100,7 @@
           </div>
         </div>
         <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="list" class="w-32 h-32 object-contain" />
+          <img :src="icon6Url || ''" alt="list" class="w-32 h-32 object-contain" />
           <div class="flex flex-col gap-1">
             <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
             <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
@@ -121,9 +121,14 @@
   </DashboardAnalyticsTrendPopup>
 </template>
 
-<script setup>
+<script setup> 
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: iconPopupLogo } = useAssetUrl('dashboard.analytics.money')
+const { url: icon6Url } = useAssetUrl('dashboard.analytics.icon6')
+
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -132,6 +137,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'update:period'])
+const { t } = useI18n()
 
 const hasContributorsData = computed(() => {
   if (!props.insightData) return false
@@ -148,13 +154,13 @@ const activeSpendersViewMode = ref('bar')
 
 // ===== CHART CONFIG HELPERS =====
 const legendConfig = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
-const contributorsChartStyles = {
-  subscription:  { color:"#4CC9F0", name:"Subscription" },
-  paytoview:     { color:"#4361EE", name:"Pay to View" },
-  merch:         { color:"#7209B7", name:"Merch" },
-  wishtender:    { color:"#F72585", name:"Wishtender" },
-  customrequest: { color:"#3A0CA3", name:"Custom Request" },
-}
+const contributorsChartStyles = computed(() => ({
+  subscription:  { color:"#4CC9F0", name: t('dashboard.analytics.legends.subscription', 'Subscription') },
+  paytoview:     { color:"#4361EE", name: t('dashboard.analytics.legends.paytoview', 'Pay to View') },
+  merch:         { color:"#7209B7", name: t('dashboard.analytics.legends.merch', 'Merch') },
+  wishtender:    { color:"#F72585", name: t('dashboard.analytics.legends.wishtender', 'Wishtender') },
+  customrequest: { color:"#3A0CA3", name: t('dashboard.analytics.legends.customrequest', 'Custom Request') },
+}))
 const contributorsChartLabels = { subscription:"Subscription", paytoview:"Pay to View", merch:"Merch", wishtender:"Wishtender", customrequest:"Custom Request" }
 const BREAKDOWN_KEYS = ["subscription","paytoview","merch","wishtender","customrequest"]
 
@@ -164,7 +170,7 @@ function getContribBarCfg(dk) {
     fields:{ category:"name", total:"tokens" },
     breakdownKeys: BREAKDOWN_KEYS,
     stacked:true,
-    seriesStyles: contributorsChartStyles,
+    seriesStyles: contributorsChartStyles.value,
     seriesLabels: contributorsChartLabels,
     bar:{ widthPercent:50 },
     axisLabelColor:"#475467", axisLabelFontSize:"10px",
@@ -181,7 +187,7 @@ function getContribLineCfg(dk) {
     fields:{ category:"name", total:"tokens" },
     breakdownKeys: BREAKDOWN_KEYS,
     stacked:true,
-    seriesStyles: contributorsChartStyles,
+    seriesStyles: contributorsChartStyles.value,
     seriesLabels: contributorsChartLabels,
     axisLabelColor:"#475467", axisLabelFontSize:"10px",
     xAxis:{ minGridDistance:60 },

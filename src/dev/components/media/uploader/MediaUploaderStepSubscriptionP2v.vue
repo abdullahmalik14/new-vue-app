@@ -12,7 +12,7 @@
         <h4 class="text-[#667085] text-sm font-[700] leading-normal not-italic py-[8px]">
           Subscription Settings
         </h4>
-        <PrimaryButton text="Add Tier" variant="polygonLeft" customClass="gap-[2px] text-sm"
+        <DashboardPrimaryButton text="Add Tier" variant="polygonLeft" customClass="gap-[2px] text-sm"
           :leftIcon="'https://i.ibb.co/N2xH2QVV/svgviewer-png-output-13.webp'" btnBg="#000" btnHoverBg="#07f468"
           btnText="#07f468" btnHoverText="#000" />
       </div>
@@ -79,7 +79,7 @@
     </div>
 
     <div class="flex justify-end md:mt-0 mt-4" @click="uploader.goToStep(3, { intent: 'user' })">
-      <PrimaryButton text="Next" variant="polygonLeft"
+      <DashboardPrimaryButton text="Next" variant="polygonLeft"
         :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'" btnBg="#07f468" btnHoverBg="black"
         btnText="black" btnHoverText="#07f468" />
     </div>
@@ -88,7 +88,7 @@
 
 <script setup>
 import { computed } from "vue";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
 import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import DashboardTextInput from "@/components/forms/inputs/DashboardTextInput.vue";

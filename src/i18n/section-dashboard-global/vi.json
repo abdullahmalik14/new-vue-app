@@ -24,6 +24,124 @@
       "subscribersFollowers": "Người Đăng Ký & Người Theo Dõi",
       "yourPosts": "Bài Đăng Của Bạn",
       "referrals": "Giới Thiệu"
+    },
+    "analytics": {
+      "overview": {
+        "followers": "FOLLOWERS",
+        "profileVisit": "PROFILE VISIT",
+        "media": "MEDIA",
+        "merch": "MERCH",
+        "profile": "PROFILE",
+        "feed": "FEED",
+        "welcomeBack": "Chào mừng trở lại, {name}!"
+      },
+      "trends": {
+        "titleEarnings": "Earnings Insight",
+        "titleFans": "Fans Insight",
+        "titleLikes": "Likes Insight",
+        "titleContributors": "Contributors Insight",
+        "titleSubscribers": "Subscribers Insight",
+        "totalEarnings": "Total Earnings",
+        "tokensReceived": "Tokens Received",
+        "totalFans": "Total Fans",
+        "profileVisits": "Profile Visits",
+        "noTrend": "No trend to show at the moment",
+        "learnToEarn": "Learn ways to earn",
+        "vsLastDaily": "vs last 24 hour",
+        "vsLastWeekly": "vs last week",
+        "vsLastMonthly": "vs last 30 days",
+        "vsLastYearly": "vs last year",
+        "salesInsights": "Sales Insights",
+        "tokenInsights": "Token Insights",
+        "topCountries": "Top Countries",
+        "newSubscribers": "New Subscribers",
+        "recurringSubscribers": "Recurring Subscribers",
+        "subscriptionsInsight": "Subscriptions Insight",
+        "tiersBreakdown": "Tiers Breakdown",
+        "followersAndVisits": "Followers & Visits Trend",
+        "trafficSource": "Traffic Source",
+        "likesInsight": "Likes Insight",
+        "topContributors": "Top Contributors",
+        "topFans": "Top Fans",
+        "topOrderSpenders": "Top Order Spenders",
+        "subscribers": "Subscribers",
+        "earnings": "Earnings",
+        "fans": "Fans",
+        "likes": "Likes",
+        "vsYesterday": "vs yesterday",
+        "topMedia": "Top Media",
+        "topTags": "Top Tags",
+        "topMerch": "Top Merch"
+      },
+      "tables": {
+        "fan": "Fan",
+        "totalUsd": "Total (USD)",
+        "salesUsd": "Sales (USD)",
+        "noTopContributors": "No top contributors yet",
+        "learnHowYouCanEarn": "Learn how you can earn",
+        "orders": {
+          "details": "Details",
+          "noOrders": "You don't have any orders at the moment",
+          "allOrders": "All Orders",
+          "orderLabel": "Order#"
+        },
+        "tabs": {
+          "subscriptions": "Subscriptions",
+          "payToView": "Pay to View",
+          "merch": "Merch",
+          "customRequest": "Custom Request",
+          "wishtender": "Wishtender"
+        }
+      },
+      "page": {
+        "overviewTitle": "Overview/Insight",
+        "lastUpdated": "Last updated at",
+        "refresh": "Refresh",
+        "refreshing": "Refreshing...",
+        "learnHowToEarn": "Learn how you can earn",
+        "trends": "Trends",
+        "trend": "Trend"
+      },
+      "periods": {
+        "yearly": "Yearly",
+        "monthly": "Monthly",
+        "weekly": "Weekly",
+        "daily": "Daily"
+      },
+      "likes": {
+        "media": "Media Likes",
+        "merch": "Merch Likes",
+        "profile": "Profile Likes",
+        "feed": "Feed Likes"
+      },
+      "contributors": {
+        "contributor": "Contributor",
+        "fan": "Fan",
+        "spender": "Spender"
+      },
+      "legends": {
+        "customrequest": "Custom Request",
+        "tipTokens": "Tip Tokens",
+        "p2v": "Pay to View",
+        "merch": "Merch",
+        "sub": "Subscription",
+        "wishtender": "Wishtender",
+        "callTokens": "Call Tokens",
+        "chatTokens": "Chat Tokens",
+        "liveStreamTokens": "Live Stream Tokens",
+        "free": "Free",
+        "tier1": "Tier 1",
+        "tier2": "Tier 2",
+        "tier3": "Tier 3",
+        "tier4": "Tier 4",
+        "tier5": "Tier 5",
+        "paytoview": "Pay to View",
+        "subscription": "Subscription",
+        "profileVisit": "Profile Visit",
+        "newFollowers": "New Followers",
+        "newSubscriber": "New Subscriber",
+        "recurringSubscriber": "Recurring Subscriber"
+      }
     }
   },
   "common": {

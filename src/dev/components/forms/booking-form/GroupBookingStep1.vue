@@ -1,7 +1,7 @@
   <script setup>
   import { onMounted, ref, watch } from "vue";
   import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
-  import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+  import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
   import BookingSectionsWrapper from "./parts/BookingSectionsWrapper.vue";
   import BaseInput from "@/components/forms/inputs/BaseInput.vue";
   import QuillEditor from "@/components/forms/inputs/QuillEditor.vue";
@@ -353,7 +353,7 @@
     <div class="flex items-center pl-6">
       <div class="w-full bg-[#D0D5DD] h-[1px]"></div>
       <div class="flex justify-end">
-        <PrimaryButton @click="goToNext" text="Next" variant="polygonLeft"
+        <DashboardPrimaryButton @click="goToNext" text="Next" variant="polygonLeft"
           :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'" :rightIconClass="`
               w-6 h-6 transition duration-200
               filter brightness-0 invert-0   /* Default: black */

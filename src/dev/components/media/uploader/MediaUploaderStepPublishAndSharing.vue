@@ -174,7 +174,7 @@
     </div>
 
     <div class="flex justify-end md:mt-0 mt-4" @click="uploader.goToStep(5, { intent: 'user' })">
-      <PrimaryButton text="Next" variant="polygonLeft"
+      <DashboardPrimaryButton text="Next" variant="polygonLeft"
         :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'" btnBg="#07f468" btnHoverBg="black"
         btnText="black" btnHoverText="#07f468" />
     </div>
@@ -188,7 +188,7 @@ import NotificationCard from "@/components/ui/card/dashboard/NotificationCard.vu
 import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
 import PublishDatePicker from "./parts/PublishDatePicker.vue";
 import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import BaseInput from "@/components/forms/inputs/BaseInput.vue";
 import RadioGroup from "@/components/forms/radio/dashboard/RadioGroup.vue";
 import PostPreview from "./parts/PostPreview.vue";

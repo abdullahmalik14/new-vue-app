@@ -1,7 +1,7 @@
 <template>
   <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="handlePeriodChange" title="Fans Insight"
-    logo="https://i.ibb.co.com/rGSXLKX4/money.webp">
+    @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.titleFans', 'Fans Insight')"
+    :logo="iconPopupLogo || ''">
     <div v-if="hasFansData" class="flex flex-col gap-4">
       <!-- row: stats -->
       <div class="grid grid-cols-2">
@@ -13,11 +13,11 @@
           <div class="flex flex-col justify-center items-center gap-4">
             <span
               class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]">
-              {{ insightData?.newFollowers != null ? insightData.newFollowers.toLocaleString() : '--' }}
+              {{ insightData?.newFollowers != null ? $n(insightData.newFollowers) : '--' }}
             </span>
             <div class="inline-flex items-center gap-2" v-if="followersPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
-                <img v-if="followersPct >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-5 w-5" />
+                <img v-if="followersPct >= 0" :src="icon4Url || ''" alt="trend-up" class="h-5 w-5" />
                 <div :class="followersPct >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ followersPct >= 0 ? '+' : '' }}{{ followersPct }}%</div>
               </div>
               <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ formatComparisonLabel(period) }}</div>
@@ -33,11 +33,11 @@
           <div class="flex flex-col justify-center items-center gap-4">
             <span
               class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]">
-              {{ insightData?.profileVisit != null ? insightData.profileVisit.toLocaleString() : '--' }}
+              {{ insightData?.profileVisit != null ? $n(insightData.profileVisit) : '--' }}
             </span>
             <div class="inline-flex items-center gap-2" v-if="visitsPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
-                <img v-if="visitsPct >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-5 w-5" />
+                <img v-if="visitsPct >= 0" :src="icon4Url || ''" alt="trend-up" class="h-5 w-5" />
                 <div :class="visitsPct >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ visitsPct >= 0 ? '+' : '' }}{{ visitsPct }}%</div>
               </div>
               <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ formatComparisonLabel(period) }}</div>
@@ -138,7 +138,7 @@
               </template>
               <template #cell.visits="{ value }">
                 <div class="flex justify-end items-center px-3 w-full">
-                  <span class="text-gray-900 text-sm font-medium">{{ value }}</span>
+                  <span class="text-gray-900 text-sm font-medium">{{ $n(Number(value) || 0) }}</span>
                 </div>
               </template>
             </FlexTable>
@@ -171,10 +171,15 @@
   </DashboardAnalyticsTrendPopup>
 </template>
 
-<script setup>
+<script setup> 
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: iconPopupLogo } = useAssetUrl('dashboard.analytics.money')
+const { url: icon4Url } = useAssetUrl('dashboard.analytics.icon4')
+
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
 const props = defineProps({
@@ -184,13 +189,14 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'update:period'])
+const { t } = useI18n()
 
 const hasFansData = computed(() => props.insightData && props.insightData.newFollowers != null)
 
 const analyticsStore = useDashboardAnalyticsStore()
 
 const activePeriod = computed(() => {
-  // Linden: 'on open should be default bar chart for week'
+  
   const p = (props.period || 'weekly').toLowerCase().trim()
   if (p === 'all-time' || p === 'alltime') return 'alltime'
   return p
@@ -200,14 +206,14 @@ const isDaily = computed(() => activePeriod.value === 'daily')
 const activeTrendViewMode = ref('bar')
 
 const legendConfig = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
-const fansChartStyles = { newFollowers:{color:"#4CC9F0",name:"New Followers"}, profileVisits:{color:"#4361EE",name:"Profile Visit"} }
-const fansChartLabels = { newFollowers:"New Followers", profileVisits:"Profile Visit" }
+const fansChartStyles = computed(() => ({ profileVisits: { color: "#4CC9F0", name: t('dashboard.analytics.legends.profileVisit', 'Profile Visit') }, newFollowers: { color: "#4361EE", name: t('dashboard.analytics.legends.newFollowers', 'New Followers') } }))
+const fansChartLabels = { profileVisits: "Profile Visit", newFollowers: "New Followers" }
 
 function getFansBarCfg(dk) {
-  return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:true, seriesStyles:fansChartStyles, seriesLabels:fansChartLabels, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig })
+  return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:true, seriesStyles:fansChartStyles.value, seriesLabels:fansChartLabels, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig })
 }
 function getFansLineCfg(dk) {
-  return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:false, seriesStyles:fansChartStyles, seriesLabels:fansChartLabels, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig })
+  return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:false, seriesStyles:fansChartStyles.value, seriesLabels:fansChartLabels, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig })
 }
 
 function getSourcesDonutCfg(dk) {
@@ -330,11 +336,11 @@ const visitsPct = computed(() => {
 
 function formatComparisonLabel(period) {
   switch ((period || '').toLowerCase()) {
-    case 'daily': return 'vs last 24 hour'
-    case 'weekly': return 'vs last week'
-    case 'monthly': return 'vs last 30 days'
-    case 'yearly': return 'vs last year'
-    default: return 'vs last year'
+    case 'daily': return t('dashboard.analytics.trends.vsLastDaily', 'vs last 24 hour')
+    case 'weekly': return t('dashboard.analytics.trends.vsLastWeekly', 'vs last week')
+    case 'monthly': return t('dashboard.analytics.trends.vsLastMonthly', 'vs last 30 days')
+    case 'yearly': return t('dashboard.analytics.trends.vsLastYearly', 'vs last year')
+    default: return t('dashboard.analytics.trends.vsLastYearly', 'vs last year')
   }
 }
 </script>

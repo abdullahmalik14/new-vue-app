@@ -1,11 +1,14 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
   import { ref } from "vue";
 import BasePopup from "@/components/ui/popup/BasePopup.vue";
 import SectionHeader from "../checkout/SectionHeader.vue";
 import PaymentMethodLoggedIn from "../checkout/PaymentMethodLoggedIn.vue";
 import CheckoutNotes from "../checkout/CheckoutNotes.vue";
 import OrderSummary from "../checkout/OrderSummary.vue";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import CheckoutMediaPreview from "../checkout/CheckoutMediaPreview.vue";
 import TotalAmountRow from "../checkout/TotalAmountRow.vue";
@@ -228,7 +231,7 @@ const cartItems = [
               </CheckboxGroup>
 
               <!-- button -->
-              <PrimaryButton
+              <DashboardPrimaryButton
                 text="Proceed Payment"
                 variant="checkoutProceedpayment"
                 :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'"

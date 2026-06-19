@@ -414,7 +414,7 @@
             </div>
             <!-- buttons -->
             <div class="flex items-center gap-2 w-full justify-end">
-                <PrimaryButton 
+                <DashboardPrimaryButton 
                     @click="saveSettings"
                     v-if="engine.state.currentMode === 'auto-withdraw' || engine.state.currentMode === 'change-card'"
                     class="ml-auto"
@@ -426,7 +426,7 @@
                     <template #leftIcon>
                         <img src="https://i.ibb.co.com/Fb2Xxf9S/tick-circle.webp" alt="tick circle" class="w-6 h-6 [filter:brightness(0)_saturate(100%)_invert(53%)_sepia(97%)_saturate(459%)_hue-rotate(93deg)_brightness(114%)_contrast(94%)] group-hover/button:[filter:brightness(0)_saturate(100%)]">
                     </template>
-                </PrimaryButton>
+                </DashboardPrimaryButton>
 
                 <button @click="goToNextStep" v-if="engine.state.currentMode === 'add-method'" data-next-button="" class="absolute bottom-0 right-0 flex items-center gap-2.5 pl-[1.47625rem] pr-2 h-10 shadow-[0px_0px_16px_0px_#FFFFFF80] [clip-path:polygon(100%_0%,100%_100%,0%_100%,0.97625rem_0%)] bg-[#07F468] group/button hover:bg-black dark:bg-[#06c454] dark:hover:bg-[#181a1b]">
                     <span class="text-lg font-medium text-black group-hover/button:text-[#07F468] dark:text-[#e8e6e3] dark:group-hover/button:text-[#23f97b]">NEXT</span>
@@ -438,10 +438,13 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import { ref, computed } from 'vue';
 import EyeSlashIcon from "@heroicons/vue/24/outline/EyeSlashIcon";
 import BasePlanDropdown from '@/dev/components/plan/parts/BasePlanDropdown.vue';
-import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import DashboardTextInput from '@/components/forms/inputs/DashboardTextInput.vue';
 
 const props = defineProps({

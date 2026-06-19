@@ -55,14 +55,14 @@
         </div>
 
         <!-- Signup button -->
-        <PrimaryButton :text="buttonText" variant="authPink" size="lg" :disabled="isLoading || !isCognitoScriptReady"
+        <DashboardPrimaryButton :text="buttonText" variant="authPink" size="lg" :disabled="isLoading || !isCognitoScriptReady"
           type="submit" />
 
         <!-- Continue with X button -->
-        <PrimaryButton :text="t('auth.login.continueWithX')" variant="authTransparent" size="lg" :leftIcon="xIcon"
+        <DashboardPrimaryButton :text="t('auth.login.continueWithX')" variant="authTransparent" size="lg" :leftIcon="xIcon"
           leftIconClass="w-8 h-8" :disabled="isLoading" @click="handleTwitterLogin" />
 
-        <PrimaryButton :text="t('auth.login.continueWithTelegram')" variant="authTransparent" size="lg"
+        <DashboardPrimaryButton :text="t('auth.login.continueWithTelegram')" variant="authTransparent" size="lg"
           :leftIcon="telegramIcon" leftIconClass="w-8 h-8" :disabled="isLoading" @click="handleTelegramLogin" />
       </form>
 
@@ -107,7 +107,7 @@ import {
 import { ExclamationCircleIcon } from "@heroicons/vue/24/solid";
 import AuthTextInput from "@/components/forms/inputs/AuthTextInput.vue";
 import BaseHeading from "@/components/ui/typography/BaseHeading.vue";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import BaseParagraph from "@/components/ui/typography/BaseParagraph.vue";
 import { initiateTwitterLogin } from "@/dev/utils/auth/socialAuthHandler.js";
 import { initiateTelegramLogin } from "@/dev/utils/auth/telegramAuthHandler.js";

@@ -1,4 +1,7 @@
 import { defineStore } from 'pinia';
+import { analyticsCountryCodeToDisplayName, analyticsCountryCodeToIso3166 } from '@/systems/analytics/analyticsCountryLabels.js'
+import { mapContributorToPreviewRow, getContributorsListForPeriod } from '@/systems/analytics/analyticsDataMappers.js'
+
 import { mapAnalyticsBundleResponse, buildEarningsInsights, buildSubscriberInsights } from '@/services/analytics/mappers/analyticsResponseMapper.js';
 import { validateAnalyticsBundleIntegrity } from '@/services/analytics/validators/analyticsBundleValidator.js';
 import {
@@ -183,6 +186,76 @@ export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
   state: createInitialDashboardAnalyticsState,
 
   getters: {
+    getContributorsViewModel: (state) => (periodKey) => {
+      const storeContributorsByPeriod = state.contributors || {};
+      let key = periodKey.toLowerCase()
+      if (key === 'all-time') key = 'alltime'
+      return {
+        topContributors: mapContributorToPreviewRow(getContributorsListForPeriod(storeContributorsByPeriod.topContributors, key)),
+        topFans: mapContributorToPreviewRow(getContributorsListForPeriod(storeContributorsByPeriod.topFans, key)),
+        topOrderSpenders: mapContributorToPreviewRow(getContributorsListForPeriod(storeContributorsByPeriod.topOrderSpenders, key))
+      };
+    },
+    getEarningsViewModel: (state) => (periodKey) => {
+      let key = periodKey.toLowerCase()
+      if (key === 'all-time') key = 'alltime'
+      const arr = state.earnings[key]
+      const earningsInsightRow = arr && arr.length ? { ...arr[arr.length - 1] } : null
+      if (earningsInsightRow) {
+        const countries = state.countries?.[key] || []
+        earningsInsightRow.topCountries = countries.map((c, i) => ({
+          rank: c.rank || i + 1,
+          country: analyticsCountryCodeToDisplayName[c.country] || c.country,
+          iso: analyticsCountryCodeToIso3166[c.country] || c.iso || null,
+          salesRaw: c.salesUSD || 0,
+          salesUSD: c.salesUSD || 0,
+          earningsUSD: c.earningsUSD || c.salesUSD || 0,
+          sales: c.salesUSD || 0
+        }))
+        const summary = state.earnings.summaries?.[key]
+        if (summary && summary.totalEarningsUSD != null) {
+          earningsInsightRow.total = summary.totalEarningsUSD
+          earningsInsightRow.totalTokens = summary.tokensReceived
+        } else {
+          earningsInsightRow.total = arr?.reduce ? arr.reduce((sum, item) => sum + (item.total || 0), 0) : 0
+          earningsInsightRow.totalTokens = arr?.reduce ? arr.reduce((sum, item) => sum + (item.totalTokens || 0), 0) : 0
+        }
+      }
+      return earningsInsightRow
+    },
+    getFansViewModel: (state) => (periodKey) => {
+      let key = periodKey.toLowerCase()
+      if (key === 'all-time') key = 'alltime'
+      const fansInsightForPeriod = state.fans[key] || state.fans['yearly']
+      if (!fansInsightForPeriod || fansInsightForPeriod.newFollowers == null) {
+        return { newFollowers: null, profileVisit: null, topCountries: [], sources: [] }
+      }
+      const fanTrafficSourcesByPeriod = state.fanInsights?.sources || {}
+      const fanTrafficSourcesForSelectedPeriod = fanTrafficSourcesByPeriod[key] || []
+      const fansTopCountriesDisplay = (fansInsightForPeriod.topCountries || []).map(c => ({
+        ...c,
+        country: analyticsCountryCodeToDisplayName[c.country] || c.country,
+        visits: c.visits || 0
+      }))
+      return {
+        newFollowers: fansInsightForPeriod.newFollowers,
+        profileVisit: fansInsightForPeriod.profileVisit,
+        newFollowersPercentage: fansInsightForPeriod.newFollowersPercentage,
+        profileVisitPercentage: fansInsightForPeriod.profileVisitPercentage,
+        topCountries: fansTopCountriesDisplay,
+        sources: fanTrafficSourcesForSelectedPeriod
+      }
+    },
+    getLikesViewModel: (state) => () => {
+      return state.likes || {}
+    },
+
+    getSubscribersViewModel: (state) => (periodKey) => {
+      let key = periodKey.toLowerCase()
+      if (key === 'all-time') key = 'yearly'
+      const insights = buildSubscriberInsights(state.subscriptionsBundle)
+      return insights[key] || { new: null, recurring: null }
+    },
     subscriberInsights(state) {
       return buildSubscriberInsights(state.subscriptionsBundle);
     },

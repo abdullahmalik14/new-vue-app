@@ -1,7 +1,7 @@
   <script setup>
   import { onBeforeUnmount, onMounted, ref, watch } from "vue";
   import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
-  import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+  import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
   import BookingSectionsWrapper from "@/dev/components/forms/booking-form/parts/BookingSectionsWrapper.vue";
   import BaseInput from "@/components/forms/inputs/BaseInput.vue";
   import ThumbnailUploader from "@/dev/components/media/uploader/parts/ThumbnailUploader.vue";
@@ -774,7 +774,7 @@
 
     </form>
     <div class="flex justify-end">
-      <PrimaryButton @click="goToNext" text="Next" variant="polygonLeft"
+      <DashboardPrimaryButton @click="goToNext" text="Next" variant="polygonLeft"
         :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'" :rightIconClass="`
           w-6 h-6 transition duration-200
           filter brightness-0 invert-0   /* Default: black */

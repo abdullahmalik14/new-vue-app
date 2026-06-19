@@ -178,7 +178,7 @@
     </div>
 
     <div class="flex justify-end md:mt-0 mt-4" @click="uploader.goToStep(2, { intent: 'user' })">
-      <PrimaryButton text="Next" variant="polygonLeft"
+      <DashboardPrimaryButton text="Next" variant="polygonLeft"
         :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'" btnBg="#07f468" btnHoverBg="black"
         btnText="black" btnHoverText="#07f468" />
     </div>
@@ -187,7 +187,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import TrailerSetting from "./parts/TrailerSetting.vue";
 import VideoThumbnailSelector from "./parts/VideoThumbnailSelector.vue";
 import FileUploadPlaceholder from "./parts/FileUploadPlaceholder.vue";

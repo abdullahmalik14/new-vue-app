@@ -24,6 +24,22 @@
       "subscribersFollowers": "Người Đăng Ký & Người Theo Dõi",
       "yourPosts": "Bài Đăng Của Bạn",
       "referrals": "Giới Thiệu"
+    },
+    "analytics": {
+      "page": {
+        "overviewTitle": "Tổng quan/Chi tiết",
+        "lastUpdated": "Cập nhật lần cuối lúc",
+        "refresh": "Làm mới",
+        "refreshing": "Đang làm mới...",
+        "learnHowToEarn": "Tìm hiểu cách kiếm tiền",
+        "trends": "Xu hướng"
+      },
+      "periods": {
+        "yearly": "Hàng năm",
+        "monthly": "Hàng tháng",
+        "weekly": "Hàng tuần",
+        "daily": "Hàng ngày"
+      }
     }
   },
   "common": {

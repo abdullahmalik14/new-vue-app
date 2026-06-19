@@ -62,7 +62,7 @@
       class="flex justify-end md:mt-0 mt-4"
       @click="uploader.goToStep(4, { intent: 'user' })"
     >
-      <PrimaryButton
+      <DashboardPrimaryButton
         text="Next"
         variant="polygonLeft"
         :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'"
@@ -83,7 +83,7 @@
 <script setup>
 import { ref, computed } from "vue"; // 'computed' import karna zaroori hai
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import BaseInput from "@/components/forms/inputs/BaseInput.vue";
 import DashboardTextInput from "@/components/forms/inputs/DashboardTextInput.vue";
 import ReusableSearchInput from "./parts/ReusableSearchInput.vue";

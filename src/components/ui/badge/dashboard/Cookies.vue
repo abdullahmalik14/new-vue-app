@@ -1,5 +1,5 @@
 <script setup>
-import PrimaryButton from '@/components/ui/buttons/PrimaryButton.vue';
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import BaseHeading from '@/components/ui/typography/BaseHeading.vue';
 import BaseParagraph from '@/components/ui/typography/BaseParagraph.vue';
 
@@ -15,7 +15,7 @@ import BaseParagraph from '@/components/ui/typography/BaseParagraph.vue';
               font-color="text-white"
             />
     
-    <PrimaryButton text="Accept" variant="authPink" size="lg" />
+    <DashboardPrimaryButton text="Accept" variant="authPink" size="lg" />
     
     </div>
 </template>

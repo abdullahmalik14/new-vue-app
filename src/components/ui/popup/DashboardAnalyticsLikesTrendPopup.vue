@@ -4,8 +4,8 @@
     @update:model-value="$emit('update:modelValue', $event)"
     :period="period"
     @update:period="handlePeriodChange"
-    title="Likes Insight"
-    logo="https://i.ibb.co.com/rGSXLKX4/money.webp"
+    :title="$t('dashboard.analytics.trends.titleLikes', 'Likes Insight')"
+    :logo="iconPopupLogo || ''"
   >
     <div class="flex flex-col gap-6">
       
@@ -37,10 +37,10 @@
         
         <!-- Empty State -->
         <div v-else class="absolute inset-0 flex flex-col justify-center items-center gap-6 w-full text-center bg-light-bg-container dark:bg-dark-bg-container z-20">
-          <img src="/dev/cdn/analytics/icons/icon-6.webp" alt="illustration" class="w-24 h-24 object-contain" />
+          <img :src="icon6Url || ''" alt="illustration" class="w-24 h-24 object-contain" />
           <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">No trend to show at the moment</span>
-            <a href="#" class="text-sm text-primary-600 dark:text-primary-400 underline">Learn ways to earn</a>
+            <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+            <a href="#" class="text-sm text-primary-600 dark:text-primary-400 underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
           </div>
         </div>
       </div>
@@ -49,7 +49,11 @@
   </DashboardAnalyticsTrendPopup>
 </template>
 
-<script setup>
+<script setup> 
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: iconPopupLogo } = useAssetUrl('dashboard.analytics.money')
+const { url: icon6Url } = useAssetUrl('dashboard.analytics.icon6')
+
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
@@ -85,19 +89,19 @@ const hasLikesData = computed(() => {
 
 // ===== CONFIG HELPERS =====
 const legendConfig = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
-const likesChartStyles = {
+const likesChartStyles = computed(() => ({
   media:   { color:"#4CC9F0", name: t("dashboard.analytics.likes.media") },
   merch:   { color:"#4361EE", name: t("dashboard.analytics.likes.merch") },
   profile: { color:"#7209B7", name: t("dashboard.analytics.likes.profile") },
   feed:    { color:"#F72585", name: t("dashboard.analytics.likes.feed") }
-}
-const likesChartLabels = { media:"Media", merch:"Merch", profile:"Profile", feed:"Feed" }
+}))
+const likesChartLabels = { media: "Media Likes", merch: "Merch Likes", profile: "Profile Likes", feed: "Feed Likes" }
 const BREAKDOWN_KEYS = ["media","merch","profile","feed"]
 
 function getLikesBarCfg(dk) {
   return JSON.stringify({
     type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, 
-    breakdownKeys:BREAKDOWN_KEYS, stacked:true, seriesStyles:likesChartStyles, seriesLabels:likesChartLabels, 
+    breakdownKeys:BREAKDOWN_KEYS, stacked:true, seriesStyles:likesChartStyles.value, seriesLabels:likesChartLabels, 
     bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, 
     tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, 
     yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig 
@@ -107,7 +111,7 @@ function getLikesBarCfg(dk) {
 function getLikesLineCfg(dk) {
   return JSON.stringify({
     type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, 
-    breakdownKeys:BREAKDOWN_KEYS, stacked:true, seriesStyles:likesChartStyles, seriesLabels:likesChartLabels, 
+    breakdownKeys:BREAKDOWN_KEYS, stacked:true, seriesStyles:likesChartStyles.value, seriesLabels:likesChartLabels, 
     axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, 
     tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, 
     yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig 

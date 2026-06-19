@@ -38,7 +38,7 @@
           :placeholder-color="inputPlaceholderColor" :label-color="inputLabelColor" />
 
         <!-- Submit Button -->
-        <PrimaryButton :text="buttonText" variant="authPink" size="lg" :disabled="isLoading || !isFormValid"
+        <DashboardPrimaryButton :text="buttonText" variant="authPink" size="lg" :disabled="isLoading || !isFormValid"
           type="submit" />
       </form>
 
@@ -78,7 +78,7 @@ import { interactionsEngine } from "@/utils/validation/interactionsEngine.js";
 import { changeUserPassword, getUserAttributes, adminSetUserPassword } from "@/dev/utils/auth/awsCognitoHandler.js";
 import AuthTextInput from "@/components/forms/inputs/AuthTextInput.vue";
 import BaseHeading from "@/components/ui/typography/BaseHeading.vue";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import BaseParagraph from "@/components/ui/typography/BaseParagraph.vue";
 import {
   InformationCircleIcon,

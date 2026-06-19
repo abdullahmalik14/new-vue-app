@@ -1,5 +1,10 @@
 <template>
-  <div v-bind="resolvedAttrs.wrapperAttrs.wrapper1">
+  <template v-if="noWrap">
+    <component :is="tag" v-bind="resolvedAttrs.inputAttrs">
+      {{ text }}
+    </component>
+  </template>
+  <div v-else v-bind="resolvedAttrs.wrapperAttrs.wrapper1">
     <div v-bind="resolvedAttrs.wrapperAttrs.wrapper2">
       <component v-if="leftIcon" :is="leftIcon" :class="[iconSize, iconSpacing]" />
 
@@ -11,11 +16,14 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, useAttrs } from "vue";
 import { resolveAllConfigs } from "@/utils/componentRenderingUtils";
+
+const attrs = useAttrs();
 
 const props = defineProps({
   text: { type: String, required: true },
+  noWrap: { type: Boolean, default: false },
 
   tag: {
     type: String,
@@ -99,6 +107,14 @@ const themeClasses = {
   },
   orderHeading: {
     h1: "text-[#475467] text-[30px] font-[500] dark:text-[#ACBACF]"
+  },
+  custom: {
+    h1: "",
+    h2: "",
+    h3: "",
+    h4: "",
+    h5: "",
+    h6: "",
   }
 };
 
@@ -117,8 +133,9 @@ const headingConfig = computed(() => ({
   ],
   elm: {
     addClass: [
-      themeClasses[props.theme]?.[props.tag] || themeClasses.defaultSecondaryHeading.h2,
+      themeClasses[props.theme]?.[props.tag] ?? themeClasses.defaultSecondaryHeading.h2,
       props.class,
+      attrs.class,
     ]
       .filter(Boolean)
       .join(" "),

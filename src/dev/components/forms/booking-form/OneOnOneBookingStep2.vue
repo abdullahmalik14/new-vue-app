@@ -4,7 +4,7 @@ import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
 import DashboardTextInput from "@/components/forms/inputs/DashboardTextInput.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import BookingSectionsWrapper from "@/dev/components/forms/booking-form/parts/BookingSectionsWrapper.vue";
 import BaseInput from "@/components/forms/inputs/BaseInput.vue";
 
@@ -123,7 +123,7 @@ const publishSchedule = async () => {
             different outfits and do different actions in the call.
           </div>
 
-          <PrimaryButton text="add-on service" variant="none"
+          <DashboardPrimaryButton text="add-on service" variant="none"
             customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1
         text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
             :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" :leftIconClass="`
@@ -163,7 +163,7 @@ const publishSchedule = async () => {
               Todo
             </div>
           </div>
-          <PrimaryButton text="add-on service" variant="none"
+          <DashboardPrimaryButton text="add-on service" variant="none"
             customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1
         text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
             :leftIcon="'https://i.ibb.co/bRYvsTVs/Icon.png'" :leftIconClass="`
@@ -250,7 +250,7 @@ const publishSchedule = async () => {
 
   </div>
   <div class="absolute right-0 bottom-0">
-    <PrimaryButton @click="publishSchedule" text="PUBLISH SCHEDULE" variant="polygonLeft"
+    <DashboardPrimaryButton @click="publishSchedule" text="PUBLISH SCHEDULE" variant="polygonLeft"
       :leftIcon="'https://i.ibb.co/S74jfvBw/Icon-1.png'" :leftIconClass="`
         w-6 h-6 transition duration-200
         filter brightness-0

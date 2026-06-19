@@ -9,30 +9,23 @@
         <!-- title -->
         <div class="flex items-center gap-2">
           <h3 
-            data-label="Top Media"
+            data-testid="dashboard-analytics-top-media-heading"
             class="text-slate-700 m-0 leading-6 text-base font-medium font-['Poppins']">
-            Top Media
+            {{ $t('dashboard.analytics.trends.topMedia', 'Top Media') }}
           </h3>
         </div>
 
         <!-- tabs-button-group -->
-        <div
-          class="flex w-full sm:w-auto bg-white/30 rounded-lg justify-start items-start overflow-hidden border border-gray-200 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)]">
-          <div v-for="tab in topMediaTabs" :key="tab" @click="selectedTopMediaTab = tab" 
-            :data-value="tab"
-            :class="[
-            'flex-1 sm:flex-initial whitespace-nowrap cursor-pointer h-full px-4 py-2 flex justify-center items-center gap-2 transition-all font-[\'Poppins\'] text-sm outline-none border-r border-gray-200 last:border-r-0',
-            selectedTopMediaTab === tab ? 'bg-white text-gray-800 font-bold' : 'bg-transparent text-gray-500 font-medium hover:bg-gray-50'
-          ]">
-            {{ tab }}
-          </div>
-        </div>
+        <DashboardTabs 
+          :tabs="topMediaTabs" 
+          v-model="selectedTopMediaTab" 
+        />
       </div>
 
       <!-- tabs-content -->
       <div v-if="(selectedTopMediaTab === 'Views' ? topMediaRows : p2vSalesRows).length > 0"
         class="w-full flex-1 pt-4">
-        <FlexTable :columns="selectedTopMediaTab === 'Views' ? topMediaColumns : p2vSalesColumns"
+        <FlexTable :columns="selectedTopMediaTab === 'Views' ? dashboardAnalyticsTopMediaColumns : dashboardAnalyticsP2VSalesColumns"
           :rows="selectedTopMediaTab === 'Views' ? topMediaRows : p2vSalesRows" :theme="topMediaTheme"
           :inner-scroll="true" max-height="300px" :sticky-header="true">
           <template #cell.media="{ row }">
@@ -80,13 +73,14 @@
           </template>
         </FlexTable>
       </div>
-      <DashboardTrendContent v-else image="https://i.ibb.co.com/vx2RDHM3/svgviewer-png-output-3.webp"
-        alt="list" message="No trend to show at the moment" link="#" linkText="Learn ways to earn" />
+      <DashboardTrendContent v-else :image="analyticsEmptyStateUrl || ''"
+        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="/dashboard" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
     </DashboardTrendCard>
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { onMounted } from 'vue';
 
 onMounted(() => {
@@ -102,10 +96,15 @@ onMounted(() => {
 import { ref, computed } from 'vue'
 import DashboardTrendCard from '@/components/ui/card/dashboard/DashboardTrendCard.vue'
 import DashboardTrendContent from '@/components/ui/card/dashboard/DashboardTrendContent.vue'
+import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
 
+const { url: analyticsEmptyStateUrl } = useAssetUrl('dashboard.analytics.emptyContributors')
+
+const { t } = useI18n()
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
@@ -114,16 +113,16 @@ const analyticsStore = useDashboardAnalyticsStore()
 const topMediaTabs = ['Views', 'P2V Sales']
 const selectedTopMediaTab = ref('Views')
 
-const topMediaColumns = [
-  { key: 'media', label: 'Media', basis: 'basis-1/3', grow: true, align: 'left' },
-  { key: 'clicks', label: '# of Clicks', basis: 'basis-1/3', grow: true, align: 'center' },
-  { key: 'duration', label: 'Watch Duration', basis: 'basis-1/3', grow: true, align: 'right' }
+const dashboardAnalyticsTopMediaColumns = [
+  { key: 'media', label: t('dashboard.analytics.tables.media.media', 'Media'), basis: 'basis-1/3', grow: true, align: 'left' },
+  { key: 'clicks', label: t('dashboard.analytics.tables.media.clicks', '# of Clicks'), basis: 'basis-1/3', grow: true, align: 'center' },
+  { key: 'duration', label: t('dashboard.analytics.tables.media.watchDuration', 'Watch Duration'), basis: 'basis-1/3', grow: true, align: 'right' }
 ]
 
-const p2vSalesColumns = [
-  { key: 'media', label: 'Media', basis: 'basis-1/3', grow: true, align: 'left' },
-  { key: 'sales_count', label: '# of Sales', basis: 'basis-1/3', grow: true, align: 'center' },
-  { key: 'sales_usd', label: 'Sales(USD)', basis: 'basis-1/3', grow: true, align: 'right' }
+const dashboardAnalyticsP2VSalesColumns = [
+  { key: 'media', label: t('dashboard.analytics.tables.media.media', 'Media'), basis: 'basis-1/3', grow: true, align: 'left' },
+  { key: 'sales_count', label: t('dashboard.analytics.tables.media.sales', '# of Sales'), basis: 'basis-1/3', grow: true, align: 'center' },
+  { key: 'sales_usd', label: t('dashboard.analytics.tables.media.salesUsd', 'Sales (USD)'), basis: 'basis-1/3', grow: true, align: 'right' }
 ]
 
 function formatDuration(sec) {

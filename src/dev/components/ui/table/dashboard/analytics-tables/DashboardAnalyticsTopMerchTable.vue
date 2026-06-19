@@ -8,16 +8,16 @@
         <!-- title -->
         <div class="flex items-center justify-between gap-2 px-[16px]">
           <h3 
-            data-label="Top Merch"
+            data-testid="dashboard-analytics-top-merch-heading"
             class="text-light-text-secondary font-sans dark:text-dark-text-secondary m-0 leading-6 text-base font-medium">
-            Top Merch
+            {{ $t('dashboard.analytics.trends.topMerch', 'Top Merch') }}
           </h3>
         </div>
       </div>
 
       <!-- table-content -->
       <div v-if="topMerchRows && topMerchRows.length > 0" class="w-full flex-1 pt-4">
-        <FlexTable :columns="topMerchColumns" :rows="topMerchRows" :theme="topMerchTheme"
+        <FlexTable :columns="dashboardAnalyticsTopMerchColumns" :rows="topMerchRows" :theme="topMerchTheme"
           :inner-scroll="true" max-height="300px" :sticky-header="true">
           <!-- merch column -->
           <template #cell.merch="{ row }">
@@ -56,13 +56,14 @@
         </FlexTable>
       </div>
       <!-- empty-state -->
-      <DashboardTrendContent v-else image="https://i.ibb.co.com/vx2RDHM3/svgviewer-png-output-3.webp"
-        alt="list" message="No trend to show at the moment" link="#" linkText="Learn ways to earn" />
+      <DashboardTrendContent v-else :image="analyticsEmptyStateUrl || ''"
+        alt="list" :message="$t('dashboard.analytics.trends.noTrend')" link="/dashboard" :linkText="$t('dashboard.analytics.trends.learnToEarn')" />
     </DashboardTrendCard>
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { onMounted } from 'vue';
 
 onMounted(() => {
@@ -78,19 +79,23 @@ onMounted(() => {
 import DashboardTrendCard from '@/components/ui/card/dashboard/DashboardTrendCard.vue'
 import DashboardTrendContent from '@/components/ui/card/dashboard/DashboardTrendContent.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
 
 import { computed } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
+const { url: analyticsEmptyStateUrl } = useAssetUrl('dashboard.analytics.emptyContributors')
+
+const { t } = useI18n()
 const props = defineProps({
   period: { type: String, default: 'daily' }
 })
 const analyticsStore = useDashboardAnalyticsStore()
 
-const topMerchColumns = [
-  { key: 'merch', label: 'Merch', basis: 'basis-1/2', grow: true, align: 'left' },
-  { key: 'views', label: '# of views', basis: 'basis-1/4', grow: true, align: 'right' },
-  { key: 'sales', label: 'Sales (USD)', basis: 'basis-1/4', grow: true, align: 'right' }
+const dashboardAnalyticsTopMerchColumns = [
+  { key: 'merch', label: t('dashboard.analytics.tables.merch.merch', 'Merch'), basis: 'basis-1/2', grow: true, align: 'left' },
+  { key: 'views', label: t('dashboard.analytics.tables.merch.views', '# of views'), basis: 'basis-1/4', grow: true, align: 'right' },
+  { key: 'sales', label: t('dashboard.analytics.tables.salesUsd', 'Sales (USD)'), basis: 'basis-1/4', grow: true, align: 'right' }
 ]
 
 const topMerchRows = computed(() => {

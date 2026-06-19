@@ -33,6 +33,9 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 import { computed } from 'vue';
 import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vue';
 

@@ -1,5 +1,5 @@
 <template>
-  <DashboardAnalyticsMainCardWrapper>
+  <DashboardSectionWrapper>
     <div class="flex flex-col justify-start items-start gap-6 ">
       <!-- Header & Tabs -->
       <div
@@ -8,55 +8,17 @@
           <div class="w-6 h-6 flex items-center justify-center">
             <img src="/images/cartIcon.png" alt="Cart" class="w-5 h-5 opacity-70" />
           </div>
-          <div 
-            data-label="Order Received"
-            class="text-gray-500 text-xl font-medium font-['Poppins'] leading-8">Order Received</div>
+          <h2 class="text-gray-500 text-xl font-medium font-['Poppins'] leading-8 m-0">{{ $t('dashboard.menu.ordersReceived') }}</h2>
         </div>
 
-        <!-- Tabs (Desktop) -->
-        <div
-          class="hidden md:flex w-full lg:w-auto bg-white/30 rounded-lg justify-start items-start overflow-hidden border border-gray-200">
-          <div v-for="tab in orderTabs" :key="tab" @click="selectedTab = tab" 
-            :data-value="tab"
-            :class="[
-            'flex-1 lg:flex-initial whitespace-nowrap cursor-pointer h-full px-4 py-2 flex justify-center items-center gap-2 transition-all font-[\'Poppins\'] text-sm outline-none border-r border-gray-200 last:border-r-0',
-            selectedTab === tab ? 'bg-white text-gray-800 font-bold' : 'bg-transparent text-gray-500 font-medium hover:bg-gray-50'
-          ]">
-            {{ tab }}
-          </div>
-        </div>
-
-        <!-- Tabs Dropdown (Mobile) -->
-        <div class="md:hidden relative w-full sm:w-auto">
-          <button @click="isDropdownOpen = !isDropdownOpen"
-            class="w-full sm:w-[200px] px-4 py-2 bg-white/70 backdrop-blur-md border border-gray-200 rounded-lg flex justify-center gap-2 items-center outline-none hover:bg-white/90 transition-colors">
-            <span class="text-gray-900 font-semibold text-sm">{{ selectedTab }}</span>
-            <div class="w-4 h-4 flex items-center justify-center transition-transform"
-              :class="{ 'rotate-180': isDropdownOpen }">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="#667085" stroke-width="1.5" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-            </div>
-          </button>
-          <div v-if="isDropdownOpen"
-            class="absolute right-0 z-20 w-full sm:w-[200px] mt-1.5 bg-white/90 backdrop-blur-md border border-gray-200 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div v-for="tab in orderTabs" :key="tab" @click="selectedTab = tab; isDropdownOpen = false" 
-              :data-value="tab"
-              :class="[
-              'px-4 py-3 text-sm transition-colors cursor-pointer text-center',
-              selectedTab === tab ? 'bg-blue-50/80 text-blue-700 font-bold' : 'text-gray-600 hover:bg-gray-50/80'
-            ]">
-              {{ tab }}
-            </div>
-          </div>
-        </div>
+        <!-- Tabs (Desktop & Mobile) -->
+        <DashboardTabs v-model="selectedTab" :tabs="orderTabs" />
       </div>
 
       <!-- Table -->
       <div class="self-stretch w-full">
         <div v-if="activeOrderRows && activeOrderRows.length > 0" class="w-full">
-          <FlexTable :columns="currentColumns" :rows="activeOrderRows" :theme="ordersTheme"
+          <FlexTable :columns="dashboardAnalyticsCurrentColumns" :rows="activeOrderRows" :theme="ordersTheme"
             :inner-scroll="true" max-height="60vh" :sticky-header="true">
             <!-- Order Slot -->
             <template #cell.order="{ row }">
@@ -174,30 +136,34 @@
           <img src="/images/shopping-cart.png" alt="Empty Cart" class="w-32 h-32 opacity-80" />
           <div class="flex flex-col items-center gap-1">
             <p class="text-slate-700 text-base font-normal">{{ $t('dashboard.analytics.tables.orders.noOrders') }}</p>
-            <a href="#" class="text-slate-700 text-base font-normal underline decoration-slate-400">Learn how
-              you
-              can earn</a>
+            <RouterLink to="/dashboard" class="text-slate-700 text-base font-normal underline decoration-slate-400">{{ $t('dashboard.analytics.page.learnHowToEarn', 'Learn how you can earn') }}</RouterLink>
           </div>
         </div>
       </div>
 
       <!-- Footer -->
       <div class="w-full flex justify-end">
-        <button
-          class="inline-flex items-center gap-2.5 pr-2 pl-6 py-1 bg-white border border-gray-200 rounded-none [clip-path:polygon(0_100%,100%_100%,100%_0,16%_0)] shadow-sm hover:bg-gray-50 transition-colors">
-          <span class="text-blue-700 text-base font-medium">{{ $t('dashboard.analytics.tables.orders.allOrders') }}</span>
-          <span class="text-blue-700 text-[10px] font-bold -translate-y-2 -ml-1">{{ totalOrdersCount }}</span>
-          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M1 5H13M13 5L9 1M13 5L9 9" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
-        </button>
+        <DashboardPrimaryButton
+          variant="none"
+          :text="$t('dashboard.analytics.tables.orders.allOrders')"
+          customClass="inline-flex items-center gap-2.5 pr-2 pl-6 py-1 bg-white border border-gray-200 rounded-none [clip-path:polygon(0_100%,100%_100%,100%_0,16%_0)] shadow-sm hover:bg-gray-50 transition-colors"
+          textClass="text-blue-700 text-base font-medium"
+          :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
+          <template #rightIcon>
+            <span class="text-blue-700 text-[10px] font-bold -translate-y-2 -ml-1">{{ totalOrdersCount }}</span>
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 5H13M13 5L9 1M13 5L9 9" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </template>
+        </DashboardPrimaryButton>
       </div>
     </div>
-  </DashboardAnalyticsMainCardWrapper>
+  </DashboardSectionWrapper>
 </template>
 
 <script setup>
+import BaseHeading from '@/components/ui/typography/BaseHeading.vue'
 import { onMounted } from 'vue';
 
 onMounted(() => {
@@ -211,10 +177,15 @@ onMounted(() => {
 });
 
 import { ref, computed } from 'vue'
-import DashboardAnalyticsMainCardWrapper from '@/components/ui/card/dashboard/DashboardAnalyticsMainCardWrapper.vue'
+import { useI18n } from 'vue-i18n'
+import DashboardSectionWrapper from '@/components/ui/card/dashboard/DashboardSectionWrapper.vue'
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue'
+import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 import { formatUsdPrice, formatDate } from '@/utils/common/index.js'
+
+const { t } = useI18n()
 
 // --- Orders Tabs ---
 const orderTabs = ['Subscriptions', 'Pay to View', 'Merch', 'Custom Request', 'Wishtender']
@@ -222,24 +193,24 @@ const selectedTab = ref('Subscriptions')
 const isDropdownOpen = ref(false)
 
 // --- Orders Table Data ---
-const ordersColumns = [
+const dashboardAnalyticsOrdersColumns = [
   { key: 'order', label: t('dashboard.analytics.tables.orders.orderLabel'), basis: { default: 'grow md:grow-0 md:basis-[300px]' }, align: 'left' },
-  { key: 'from', label: 'From', basis: 'basis-[220px]', align: 'left', hiddenAt: ['xs', 'sm'] },
-  { key: 'date', label: 'Date', basis: 'basis-[180px]', align: 'left', hiddenAt: ['xs', 'sm'] },
-  { key: 'total', label: 'Total', basis: { default: 'ml-auto basis-[110px]' }, align: 'right' },
+  { key: 'from', label: t('dashboard.analytics.tables.orders.from', 'From'), basis: 'basis-[220px]', align: 'left', hiddenAt: ['xs', 'sm'] },
+  { key: 'date', label: t('dashboard.analytics.tables.orders.date', 'Date'), basis: 'basis-[180px]', align: 'left', hiddenAt: ['xs', 'sm'] },
+  { key: 'total', label: t('dashboard.analytics.tables.orders.total', 'Total'), basis: { default: 'ml-auto basis-[110px]' }, align: 'right' },
   { key: 'details', label: '', basis: { default: 'shrink-0 basis-[80px]' }, align: 'right', hiddenAt: ['xs', 'sm'] }
 ]
 
-const merchOrdersColumns = [
-  { key: 'order', label: 'Order#', basis: { default: 'grow md:grow-0 md:basis-[280px]' }, align: 'left' },
-  { key: 'from', label: 'From', basis: 'basis-[180px]', align: 'left', hiddenAt: ['xs', 'sm'] },
-  { key: 'status', label: 'Status', basis: 'basis-[160px]', align: 'left', hiddenAt: ['xs', 'sm'] },
-  { key: 'date', label: 'Date', basis: 'basis-[150px]', align: 'left', hiddenAt: ['xs', 'sm'] },
-  { key: 'total', label: 'Total', basis: { default: 'ml-auto basis-[110px]' }, align: 'right' },
+const dashboardAnalyticsMerchOrdersColumns = [
+  { key: 'order', label: t('dashboard.analytics.tables.orders.orderLabel', 'Order#'), basis: { default: 'grow md:grow-0 md:basis-[280px]' }, align: 'left' },
+  { key: 'from', label: t('dashboard.analytics.tables.orders.from', 'From'), basis: 'basis-[180px]', align: 'left', hiddenAt: ['xs', 'sm'] },
+  { key: 'status', label: t('dashboard.analytics.tables.orders.status', 'Status'), basis: 'basis-[160px]', align: 'left', hiddenAt: ['xs', 'sm'] },
+  { key: 'date', label: t('dashboard.analytics.tables.orders.date', 'Date'), basis: 'basis-[150px]', align: 'left', hiddenAt: ['xs', 'sm'] },
+  { key: 'total', label: t('dashboard.analytics.tables.orders.total', 'Total'), basis: { default: 'ml-auto basis-[110px]' }, align: 'right' },
   { key: 'details', label: '', basis: { default: 'shrink-0 basis-[80px]' }, align: 'right', hiddenAt: ['xs', 'sm'] }
 ]
 
-const customRequestOrdersColumns = merchOrdersColumns
+const dashboardAnalyticsCustomRequestOrdersColumns = dashboardAnalyticsMerchOrdersColumns
 
 
 
@@ -268,11 +239,11 @@ const totalOrdersCount = computed(() => {
          (recentOrdersData.wishtender?.length || 0)
 })
 
-const currentColumns = computed(() => {
+const dashboardAnalyticsCurrentColumns = computed(() => {
   if (selectedTab.value === 'Merch' || selectedTab.value === 'Custom Request') {
-    return merchOrdersColumns
+    return dashboardAnalyticsMerchOrdersColumns
   }
-  return ordersColumns
+  return dashboardAnalyticsOrdersColumns
 })
 
 const ordersTheme = {

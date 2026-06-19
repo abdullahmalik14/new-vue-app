@@ -326,7 +326,7 @@
               </div>
             </div>
 
-            <PrimaryButton
+            <DashboardPrimaryButton
               text="ChECK OUT"
               variant="bgGreen"
               :rightIcon="'https://i.ibb.co.com/v28S0Zt/arrow-up-right.webp'"
@@ -353,7 +353,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useCartStore } from "@/stores/useCartStore.js";
 import { FlowHandler } from "@/services/flow-system/FlowHandler";
 import flowRefreshManager from "@/services/flow-system/flowRefreshManager";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import { preloadIcons } from "@/utils/preload";
 
 const cartStore = useCartStore();

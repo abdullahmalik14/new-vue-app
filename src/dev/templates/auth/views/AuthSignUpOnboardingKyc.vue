@@ -9,11 +9,11 @@
 
       <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
         <!-- confirm button -->
-        <PrimaryButton :text="isLoading ? t('common.loading') : t('auth.register.KYC.button')" variant="authPink"
+        <DashboardPrimaryButton :text="isLoading ? t('common.loading') : t('auth.register.KYC.button')" variant="authPink"
           size="lg" :disabled="isLoading" @click="completeKyc" />
 
         <!-- logout -->
-        <PrimaryButton :text="t('auth.register.KYC.logout')" variant="authTransparent" size="lg" type="button"
+        <DashboardPrimaryButton :text="t('auth.register.KYC.logout')" variant="authTransparent" size="lg" type="button"
           @click="handleLogout" />
       </div>
 
@@ -34,7 +34,7 @@ import { useI18n } from "vue-i18n"
 import { getActiveLocale } from "@/systems/i18n/localeManager.js"
 import BaseHeading from "@/components/ui/typography/BaseHeading.vue"
 import BaseParagraph from "@/components/ui/typography/BaseParagraph.vue"
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue"
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue"
 import apiWrapper from "@/lib/mock-api-demo/apiWrapper.js"
 import { userIdUtility } from "@/lib/mock-api-demo/utilities/userId.js"
 
