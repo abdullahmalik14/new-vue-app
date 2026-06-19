@@ -1047,4 +1047,53 @@ npm run test:unit -- --run tests/routeTest   # 25 files, 232 passed
 
 ---
 
+## Phase E — Router entry, integration, and navigation UX (2026-06-19)
+
+**Plan:** [route-test-plan.md](../route-test-plan.md) Phase E (§23–29, §37–39, §41, §72–75, §87–89)  
+**Master plan:** Phase 8 — Route test coverage  
+**Test folder:** `tests/routeTest/`
+
+### What was broken
+
+Router entry, integration journeys, startup locale resolution, navigation UX modules (`routeTransition`, progress, errors, scroll, error boundary, not-found loader), and barrel export completeness had no consolidated coverage in `tests/routeTest/`.
+
+### Why it happened
+
+Phases A–D prioritized config integrity, core units, guards, and loaders first.
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/routeTest/router.index.test.js`](../../tests/routeTest/router.index.test.js) | **New** — default router export, prefetch re-exports, production routes, scrollBehavior (§37) |
+| [`tests/routeTest/router.integration.test.js`](../../tests/routeTest/router.integration.test.js) | **New** — memory-history guard journeys: guest redirect, auth access, login redirect (§38, §87) |
+| [`tests/routeTest/startupRouteResolution.test.js`](../../tests/routeTest/startupRouteResolution.test.js) | **New** — locale strip before `resolveRouteFromPath` (§39; ported from unit) |
+| [`tests/routeTest/routerExports.test.js`](../../tests/routeTest/routerExports.test.js) | **New** — barrel symbol completeness + router entry guard export boundary (§41, §90) |
+| [`tests/routeTest/routeTransition.test.js`](../../tests/routeTest/routeTransition.test.js) | **New** — presets, disable, object config (§24) |
+| [`tests/routeTest/navigationProgress.test.js`](../../tests/routeTest/navigationProgress.test.js) | **New** — start/finish/fail/trickle (§26) |
+| [`tests/routeTest/navigationErrorHandler.test.js`](../../tests/routeTest/navigationErrorHandler.test.js) | **New** — chunk error detection + error route check (§27) |
+| [`tests/routeTest/scrollBehavior.test.js`](../../tests/routeTest/scrollBehavior.test.js) | **New** — saved position, hash, top (§28) |
+| [`tests/routeTest/routeErrorBoundary.test.js`](../../tests/routeTest/routeErrorBoundary.test.js) | **New** — error normalization + clear-on-nav (§25) |
+| [`tests/routeTest/notFoundComponentLoader.test.js`](../../tests/routeTest/notFoundComponentLoader.test.js) | **New** — path constant + dynamic import (§29) |
+
+Legacy `tests/unit/routerExports.test.js`, `startupRouteResolution.test.js`, `routeTransition.test.js`, etc. remain for now.
+
+**Note:** §90 lists `isChunkLoadNavigationError`, `resolveRouterScrollPosition`, `findComponentLoader`, etc. as barrel imports — those remain submodule-only exports today; tests document that gap via `routerExports.test.js`.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/routeTest   # 35 files, 274 passed
+```
+
+### Exit criteria (Phase E)
+
+- [x] Router default export and prefetch re-exports verified
+- [x] Integration guard journeys (guest/auth/login redirect) covered with memory history
+- [x] Startup locale normalization before route resolution covered
+- [x] Navigation UX modules ported to `tests/routeTest/`
+- [x] Barrel export completeness tested for current `systems/routing/index.js`
+
+---
+
 *Add a new section above this line for each completed phase.*
