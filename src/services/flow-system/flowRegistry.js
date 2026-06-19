@@ -1836,7 +1836,7 @@ export const flowRegistry = {
       readFrom: {
         enabled: false,
         priority: ["pinia"],
-        sources: [{ type: "pinia", storeId: "dashboard" }],
+        sources: [{ type: "pinia", storeId: "dashboardAnalytics" }],
       },
       destinations: [
         {

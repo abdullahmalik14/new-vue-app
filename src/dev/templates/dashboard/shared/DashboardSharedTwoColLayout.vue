@@ -1,10 +1,10 @@
 <template>
   <!--Mobile Header -->
-  <DashboardSharedHeader class="block md:hidden" />
+  <DashboardSharedHeader v-if="!hideLayout" class="block md:hidden" />
 
   <div class="dashboard-two-col-container min-h-screen flex">
     <!--Desktop Sidebar -->
-    <DashboardSharedSidebar class="hidden md:block" />
+    <DashboardSharedSidebar v-if="!hideLayout" class="hidden md:block" />
 
     <!-- Body / Main Content -->
     <div class="flex-1 bg-[#F9FAFBE5] min-h-screen md:bg-transparent md:h-auto dark:bg-background-dark-app relative isolate">
@@ -17,8 +17,12 @@
 <script setup>
 import DashboardSharedHeader  from "@/dev/templates/dashboard/shared/DashboardSharedHeader.vue";
 import DashboardSharedSidebar from "./DashboardSharedSidebar.vue";
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { getAssetUrl } from '@/systems/assets/assetLibrary.js';
+
+const route = useRoute();
+const hideLayout = computed(() => route.meta?.routeConfig?.hideLayout || route.meta?.hideLayout || false);
 
 const bgUrl = ref('');
 

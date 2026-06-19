@@ -601,6 +601,16 @@
     ],
     "assetPreloadRef": "dashboardAnalyticsChrome"
   },
+  {
+    "slug": "/iframe/analytics",
+    "section": "dashboard-global",
+    "requiresAuth": false,
+    "componentPath": "@/templates/dashboard/global/DashboardAnalyticsPage.vue",
+    "supportedRoles": [
+      "all"
+    ],
+    "hideLayout": true
+  },
    {
     "slug": "/home",
   "componentPath": "@/dev/templates/home/Home.vue"

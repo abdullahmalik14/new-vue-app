@@ -169,6 +169,7 @@ FlowHandler.configure({
     chat: useChatStore(pinia),
     cart: useCartStore(pinia),
     dashboard: useDashboardAnalyticsStore(pinia),
+    dashboardAnalytics: useDashboardAnalyticsStore(pinia),
   },
   getUserId: () => {
     const auth = useAuthStore();
