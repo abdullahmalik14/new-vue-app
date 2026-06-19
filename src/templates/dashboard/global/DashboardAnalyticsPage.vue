@@ -1,7 +1,7 @@
 <template>
   <DashboardSharedTwoColLayout>
     <div class="relative flex flex-col mt-6 gap-6 md:p-[40px]">
-      <DashboardSharedHeader />
+      <DashboardSharedHeader v-if="!hideLayout" />
       <DashboardAnalyticsWelcomeBanner />
       <!-- Overview Section -->
       <DashboardAnalyticsOverviewSection
@@ -49,7 +49,8 @@ import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.
 import { FlowHandler } from '@/services/flow-system/FlowHandler'
 import FlowRefreshManager from '@/services/flow-system/flowRefreshManager'
 import { ANALYTICS_FETCH_FLOW } from '@/config/dashboardAnalyticsFlows.js'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import DashboardAnalyticsEarningsTrendPopup from '@/components/ui/popup/DashboardAnalyticsEarningsTrendPopup.vue'
 import DashboardAnalyticsSubscribersTrendPopup from '@/components/ui/popup/DashboardAnalyticsSubscribersTrendPopup.vue'
 import DashboardAnalyticsFansTrendPopup from '@/components/ui/popup/DashboardAnalyticsFansTrendPopup.vue'
@@ -59,6 +60,9 @@ import DashboardAnalyticsOrdersReceivedTable from '@/dev/components/ui/table/das
 import DashboardAnalyticsTrendsSection from '@/dev/components/ui/section/dashboard/DashboardAnalyticsTrendsSection.vue'
 import DashboardAnalyticsOverviewSection from '@/dev/components/ui/section/dashboard/DashboardAnalyticsOverviewSection.vue'
 import DashboardAnalyticsWelcomeBanner from '@/dev/components/ui/section/dashboard/DashboardAnalyticsWelcomeBanner.vue'
+
+const route = useRoute()
+const hideLayout = computed(() => route.meta?.routeConfig?.hideLayout || route.meta?.hideLayout || false)
 
 const dashboardAnalyticsStore = useDashboardAnalyticsStore()
 
