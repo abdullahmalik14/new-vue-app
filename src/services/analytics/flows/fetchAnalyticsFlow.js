@@ -11,7 +11,7 @@ import { fail, ok } from "@/services/flow-system/flowTypes.js";
 export async function fetchAnalyticsFlow({ payload, context }) {
   const source = payload?.source || "full";
   const bundleFile =
-    source === "empty" ? "/chartsData.empty.json" : "/api/charts/456?nocache=1";
+    source === "empty" ? "/api/charts/456?nocache=1" : "/api/charts/456?nocache=1";
 
   console.log(`[Polling] ⏰ Fetching latest analytics data from ${bundleFile}...`);
 

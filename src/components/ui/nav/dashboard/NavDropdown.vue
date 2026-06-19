@@ -3,7 +3,8 @@ import BasePopup from '@/components/ui/popup/BasePopup.vue';
 import DashboardMenuCounter from '@/components/ui/nav/dashboard/DashboardMenuCounter.vue';
 import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { dashboardSidebarMenuItems as menuItems, resolveDashboardSidebarMenuItems as resolveMenuItemsWithAssets } from "@/config/dashboardSidebarMenuItems.js";
+import { dashboardSidebarMenuItems as menuItems } from "@/config/dashboardSidebarMenuItems.js";
+import { resolveDashboardSidebarMenuItems as resolveMenuItemsWithAssets } from "@/systems/dashboard/resolveDashboardSidebarMenuItems.js";
 import { getI18nInstance } from "@/systems/i18n/i18nInstance.js";
 import { useAuthStore } from "@/stores/useAuthStore";
 
