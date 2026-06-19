@@ -27,6 +27,7 @@
 | Components/templates (Vue Router consumers) | 27 | — |
 | Build scripts | 6 | ~12 |
 | Unit tests (route-related) | 30+ | — |
+| `tests/routeTest/` | 10+ | Phase A–B route coverage (integrity + core units) |
 | Docs | 15+ | — |
 
 ---
@@ -564,7 +565,7 @@ Route unit tests import from `@/systems/routing/`, `@/systems/assets/`, and `@/c
 
 **Phase A integrity:** `tests/unit/routeConfig.integrity.test.js` — production `routeConfig.json` validation.
 
-Key suites: `routeGuards.test.js`, `routeConfig.integrity.test.js`, `jsonConfigValidator.route.test.js`, `routeComponentPathValidator.test.js`, `routeComponentPrefetch.test.js`, `useRoutePrefetch.test.js`, `resolveRouteAssetPreloads.test.js`.
+Key suites: `tests/routeTest/*` (integrity, validator, loader, resolver, inheritance, aliases, defaults, env, admin), legacy `tests/unit/routeGuards.test.js`, `routeComponentPathValidator.test.js`, `useRoutePrefetch.test.js`.
 
 **Run:** `npm run test:unit -- --run tests/unit/route`
 

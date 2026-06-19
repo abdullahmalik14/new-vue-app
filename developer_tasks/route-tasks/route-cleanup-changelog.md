@@ -917,4 +917,47 @@ npm run test:unit -- --run tests/unit/route   # 105 passed (17 files)
 
 ---
 
+## Phase B — Core units (2026-06-19)
+
+**Plan:** [route-test-plan.md](../route-test-plan.md) Phase B (§1–2, §12, §20–22, §43)  
+**Master plan:** Phase 8 — Route test coverage  
+**Test folder:** `tests/routeTest/` (new route tests live here, not `tests/unit/`)
+
+### What was broken
+
+Core routing modules (`routeConfigLoader`, `routeResolver`, `routeDefaults`, alias resolver, env/admin access, inheritance) had partial coverage scattered in `tests/unit/` with no mocked fixture set for isolated resolver/inheritance tests.
+
+### Why it happened
+
+Phase A focused on production integrity only; core unit tests were deferred to Phase B per the test plan.
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/helpers/routeFixtures.js`](../../tests/helpers/routeFixtures.js) | Added `CANONICAL_ROUTE_FIXTURES`, `cloneRouteFixtures()`, `getCanonicalRouteFixtures()` for mocked unit tests |
+| [`tests/routeTest/routeConfigLoader.test.js`](../../tests/routeTest/routeConfigLoader.test.js) | **New** — loader cache, load, asset preload merge (§1) |
+| [`tests/routeTest/routeResolver.test.js`](../../tests/routeTest/routeResolver.test.js) | **New** — path resolve, exact resolve, component path, chain, asset preload (§2) |
+| [`tests/routeTest/routeDefaults.test.js`](../../tests/routeTest/routeDefaults.test.js) | **New** — all default slug getters + `ROUTE_DEFAULTS` (§20) |
+| [`tests/routeTest/routeInheritance.test.js`](../../tests/routeTest/routeInheritance.test.js) | **New** — inheritance matrix with mocked config (§43) |
+| [`tests/routeTest/routeAliases.test.js`](../../tests/routeTest/routeAliases.test.js) | **New** — alias/redirectFrom helpers including `collectRoutePathClaims` (§12) |
+| [`tests/routeTest/routeEnvAccess.test.js`](../../tests/routeTest/routeEnvAccess.test.js) | **New** — env access validation + MODE stub (§21) |
+| [`tests/routeTest/routeAdminAccess.test.js`](../../tests/routeTest/routeAdminAccess.test.js) | **New** — admin context shapes (§22) |
+
+Phase A files remain in `tests/routeTest/`: `routeConfig.integrity.test.js`, `jsonConfigValidator.route.test.js`.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/routeTest   # 9 files, 127 passed
+```
+
+### Exit criteria (Phase B)
+
+- [x] Every export in `routeConfigLoader`, `routeResolver`, `routeDefaults`, `routeAliasResolver`, `routeEnvAccess`, `routeAdminAccess` has ≥1 happy + ≥1 edge test
+- [x] Inheritance matrix covers auth merge, child override, assetPreload concat, nested chain
+- [x] Tests use `getRouteConfiguration()` mock via canonical fixtures (not production JSON) for resolver/inheritance
+
+---
+
 *Add a new section above this line for each completed phase.*

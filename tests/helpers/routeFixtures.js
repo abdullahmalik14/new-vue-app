@@ -108,6 +108,108 @@ export const MINIMAL_ROUTE_FIXTURES = [
 ];
 
 /**
+ * Canonical route set for mocked resolver / inheritance tests (plan §100).
+ * Use with `mockRouteConfiguration()` — not production routeConfig.json.
+ */
+export const CANONICAL_ROUTE_FIXTURES = [
+  {
+    slug: '/log-in',
+    section: 'auth',
+    componentPath: '@/dev/templates/auth/page/role/LoginPage.vue',
+    supportedRoles: ['all'],
+  },
+  {
+    slug: '/dashboard',
+    section: 'dashboard-global',
+    componentPath: '@/dev/templates/dashboard/DashboardPage.vue',
+    requiresAuth: true,
+    redirectIfNotAuth: '/log-in',
+    supportedRoles: ['creator', 'fan', 'agent', 'vendor'],
+    assetPreload: [{ flag: 'dashboard.logo', type: 'image' }],
+  },
+  {
+    slug: '/dashboard/settings',
+    section: 'profile',
+    componentPath: '@/dev/templates/dashboard/settings/SettingsPage.vue',
+    inheritConfigFromParent: true,
+    supportedRoles: ['creator'],
+  },
+  {
+    slug: '/dashboard/settings/privacy',
+    section: 'profile-security',
+    componentPath: '@/dev/templates/dashboard/settings/PrivacyPage.vue',
+    inheritConfigFromParent: true,
+    supportedRoles: ['creator'],
+  },
+  {
+    slug: '/dashboard/payout',
+    inheritConfigFromParent: true,
+    supportedRoles: ['creator'],
+    customComponentPath: {
+      creator: {
+        componentPath: '@/dev/templates/dashboard/creator/PayoutPage.vue',
+      },
+    },
+  },
+  {
+    slug: '/internal/tools',
+    section: 'dev',
+    componentPath: '@/dev/templates/dev/ToolsPage.vue',
+    adminOnly: true,
+    requiresAuth: true,
+    supportedRoles: ['admin'],
+  },
+  {
+    slug: '/dev/demo',
+    section: 'dev',
+    componentPath: '@/dev/templates/dev/DemoPage.vue',
+    envAccess: 'development',
+    supportedRoles: ['all'],
+  },
+  {
+    slug: '/shop',
+    section: 'shop',
+    componentPath: '@/dev/templates/shop/page/ShopPage.vue',
+    aliases: ['/store'],
+    supportedRoles: ['all'],
+  },
+  {
+    slug: '/disabled-page',
+    section: 'misc',
+    componentPath: '@/dev/templates/misc/DisabledPage.vue',
+    enabled: false,
+    supportedRoles: ['all'],
+  },
+  {
+    slug: '/404',
+    section: 'misc',
+    componentPath: '@/dev/templates/misc/NotFoundPage.vue',
+    supportedRoles: ['all'],
+  },
+  {
+    slug: '/:pathMatch(.*)*',
+    redirect: '/404',
+  },
+];
+
+/**
+ * Deep-clone a route or route array to avoid cross-test mutation.
+ * @param {object|Array<object>} value
+ * @returns {object|Array<object>}
+ */
+export function cloneRouteFixtures(value) {
+  return structuredClone(value);
+}
+
+/**
+ * Return a deep-cloned copy of the canonical fixture set.
+ * @returns {Array<object>}
+ */
+export function getCanonicalRouteFixtures() {
+  return cloneRouteFixtures(CANONICAL_ROUTE_FIXTURES);
+}
+
+/**
  * Build a slug → route map from a route array.
  * @param {Array<object>} routes
  * @returns {Map<string, object>}
