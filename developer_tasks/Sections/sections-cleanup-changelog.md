@@ -438,3 +438,37 @@ Sections cleanup Phases 0–4 complete. Audits/indexes (`section-code-index.md`,
 ---
 
 *Add a new section above this line for each completed phase.*
+
+---
+
+## Section test track — Phase A prep + integrity (2026-06-19)
+
+**Plan:** [section-test-plan.md](./section-test-plan.md) Phase A (§0, §55, §71)  
+**Branch:** `test/section-coverage`  
+**Test folder:** `tests/sectionTest/`
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/helpers/sectionFixtures.js`](../../tests/helpers/sectionFixtures.js) | **New** — production/manifest loaders, inheritance fixtures, intentional gap lists |
+| [`tests/sectionTest/routeConfig.section.integrity.test.js`](../../tests/sectionTest/routeConfig.section.integrity.test.js) | **New** — production `routeConfig.json` section field integrity + inheritance matrix (§0) |
+| [`tests/sectionTest/sectionManifest.integrity.test.js`](../../tests/sectionTest/sectionManifest.integrity.test.js) | **New** — `section-manifest.dev.json` alignment with route sections |
+| [`tests/sectionTest/validateI18n.section.test.js`](../../tests/sectionTest/validateI18n.section.test.js) | **New** — `collectKnownSectionNames` + i18n folder gap checks (§71) |
+| [`tests/sectionTest/sectionImportRegression.test.js`](../../tests/sectionTest/sectionImportRegression.test.js) | **New** — no stale `utils/section` imports (§55) |
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/sectionTest
+```
+
+**Result:** 4 files, 39 tests passed.
+
+### Exit criteria (Phase A)
+
+- [x] §0 production section integrity cases covered in `tests/sectionTest/`
+- [x] Dev manifest alignment with documented intentional gaps
+- [x] `collectKnownSectionNames` + i18n folder gaps documented
+- [x] No stale `utils/section` import paths in `tests/` or `src/`
+
