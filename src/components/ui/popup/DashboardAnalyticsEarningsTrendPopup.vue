@@ -1,20 +1,17 @@
 <template>
   <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="handlePeriodChange" title="Earnings Insight"
-    logo="https://i.ibb.co.com/rGSXLKX4/money.webp">
+    @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.titleEarnings', 'Earnings Insight')"
+    :logo="iconPopupLogo || ''">
     <div v-if="hasEarningsData" class="flex flex-col gap-4">
 
       <!-- row: stats -->
       <div class="flex w-full items-center py-6 ">
         <div class="flex-1 flex flex-col justify-center items-center gap-4 border-r border-gray-200 dark:border-gray-700">
-          <h3 class="text-light-text-darkgray dark:text-white text-sm md:text-base font-semibold">
-            Total Earnings
-          </h3>
+          <h3 class="text-light-text-darkgray dark:text-white text-sm md:text-base font-semibold">{{ $t('dashboard.analytics.trends.totalEarnings', 'Total Earnings') }}</h3>
           <div class="flex flex-col justify-center items-center gap-2">
             <template v-if="insightData?.total">
               <div>
-                <span class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">{{
-                  formatDecimal(insightData.total) }} </span>
+                <span class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">{{ $n(insightData.total) }} </span>
                 <span class="text-gray-900 text-lg md:text-xl font-bold font-['Poppins']">USD</span>
               </div>
             </template>
@@ -22,7 +19,7 @@
               class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
             <div class="inline-flex items-center gap-2" v-if="earningsPctChange !== null">
               <div class="flex justify-center items-center gap-1">
-                <img v-if="earningsPctChange >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-4 w-4" />
+                <img v-if="earningsPctChange >= 0" :src="icon4Url || ''" alt="trend-up" class="h-4 w-4" />
                 <div :class="earningsPctChange >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-xs md:text-sm font-medium font-['Poppins']">{{ earningsPctChange >= 0 ? '+' : '' }}{{ earningsPctChange }}%</div>
               </div>
               <div class="text-slate-500 text-xs font-normal font-['Poppins']">{{ formatComparisonLabel(period) }}</div>
@@ -31,20 +28,18 @@
         </div>
 
         <div class="flex-1 flex flex-col justify-center items-center gap-4">
-          <h3 class="text-light-text-darkgray dark:text-white text-sm md:text-base font-semibold">
-            Tokens Received
-          </h3>
+          <h3 class="text-light-text-darkgray dark:text-white text-sm md:text-base font-semibold">{{ $t('dashboard.analytics.trends.tokensReceived', 'Tokens Received') }}</h3>
           <div class="flex flex-col justify-center items-center gap-2">
             <template v-if="insightData?.totalTokens">
               <div class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">
-                {{ insightData.totalTokens.toLocaleString() }}
+                {{ $n(insightData.totalTokens) }}
               </div>
             </template>
             <span v-else
               class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
             <div class="inline-flex items-center gap-2" v-if="tokensPctChange !== null">
               <div class="flex justify-center items-center gap-1">
-                <img v-if="tokensPctChange >= 0" src="/dev/cdn/analytics/icons/icon-4.webp" alt="trend-up" class="h-4 w-4" />
+                <img v-if="tokensPctChange >= 0" :src="icon4Url || ''" alt="trend-up" class="h-4 w-4" />
                 <div :class="tokensPctChange >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-xs md:text-sm font-medium font-['Poppins']">{{ tokensPctChange >= 0 ? '+' : '' }}{{ tokensPctChange }}%</div>
               </div>
               <div class="text-slate-500 text-xs font-normal font-['Poppins']">{{ formatComparisonLabel(period) }}</div>
@@ -69,7 +64,7 @@
             </div>
           </div>
           <div class="absolute top-[40px] left-0 right-0 bottom-[30px]">
-             <!-- DAILY = DONUT (Linden: 'Day is a doughnut graph!') -->
+             
              <div data-chart-container data-chart-id="sales-daily-donut" :hidden="!isDaily||undefined" class="absolute inset-0"
                :data-chart-config='JSON.stringify({type:"donut",period:"slot",datasetKey:"sales-donut",fields:{category:"name",total:"value"},categoryKeyMap:{subscription:"subscription",paytoview:"paytoview",merch:"merch",wishtender:"wishtender",customrequest:"customrequest"},seriesStyles:salesChartStyles,legentHint:legendConfig})'>
                <div amchart data-role="chart" style="width:100%;height:100%;"></div>
@@ -99,7 +94,7 @@
             </div>
           </div>
           <div class="absolute top-[40px] left-0 right-0 bottom-[30px]">
-             <!-- DAILY = DONUT (Linden: 'Day is a doughnut graph!') -->
+             
              <div data-chart-container data-chart-id="tokens-daily-donut" :hidden="!isDaily||undefined" class="absolute inset-0"
                :data-chart-config='JSON.stringify({type:"donut",period:"slot",datasetKey:"tokens-donut",fields:{category:"name",total:"value"},categoryKeyMap:{tipTokens:"tipTokens",callTokens:"callTokens",chatTokens:"chatTokens",liveStreamTokens:"liveStreamTokens"},seriesStyles:tokensChartStyles,legentHint:legendConfig})'>
                <div amchart data-role="chart" style="width:100%;height:100%;"></div>
@@ -136,7 +131,7 @@
               </template>
               <template #cell.sales="{ value }">
                 <div class="flex justify-end items-center px-3 w-full">
-                  <span class="text-gray-900 text-sm font-medium">{{ value }}</span>
+                  <span class="text-gray-900 text-sm font-medium">{{ $n(Number(value) || 0, 'currency') }}</span>
                 </div>
               </template>
             </FlexTable>
@@ -164,11 +159,8 @@
             <img src="/images/noTrendImg.png" alt="illustration" class="w-32 h-32 object-contain" />
           </div>
           <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">No trend to show
-              at
-              the moment</span>
-            <a href="#" class="text-sm text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways to
-              earn</a>
+            <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+            <a href="#" class="text-sm text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
           </div>
         </div>
       </div>
@@ -185,12 +177,16 @@
   </DashboardAnalyticsTrendPopup>
 </template>
 
-<script setup>
+<script setup> 
+import { useAssetUrl } from '@/composables/useAssetUrl.js'
+const { url: iconPopupLogo } = useAssetUrl('dashboard.analytics.money')
+const { url: icon4Url } = useAssetUrl('dashboard.analytics.icon4')
+
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
-import { formatDecimal } from '@/utils/common/index.js'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -199,12 +195,13 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'update:period'])
+const { t } = useI18n()
 
 const hasEarningsData = computed(() => props.insightData && props.insightData.total != null)
 
 const analyticsStore = useDashboardAnalyticsStore()
 
-// Linden: 'on open should be default bar chart for week'
+
 const activePeriod = computed(() => {
   const p = (props.period || 'weekly').toLowerCase().trim()
   if (p === 'all-time' || p === 'alltime') return 'alltime'
@@ -219,16 +216,16 @@ const topCountriesWithRank = computed(() => {
 })
 
 const legendConfig = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
-const salesChartStyles = { subscription:{color:"#4CC9F0",name:"Subscription"}, paytoview:{color:"#4361EE",name:"Pay to view"}, merch:{color:"#7209B7",name:"Merch"}, wishtender:{color:"#F72585",name:"Wishtender"}, customrequest:{color:"#94A3B8",name:"Custom request"} }
-const salesChartLabels = { subscription:"Subscription", paytoview:"Pay to view", merch:"Merch", wishtender:"Wishtender", customrequest:"Custom request" }
-const tokensChartStyles = { tipTokens:{color:"#4CC9F0",name:"Tip"}, callTokens:{color:"#4361EE",name:"Call"}, chatTokens:{color:"#7209B7",name:"Chat"}, liveStreamTokens:{color:"#F72585",name:"Live streaming"} }
-const tokensChartLabels = { tipTokens:"Tip", callTokens:"Call", chatTokens:"Chat", liveStreamTokens:"Live streaming" }
+const salesChartStyles = computed(() => ({ subscription:{color:"#4CC9F0",name:t('dashboard.analytics.legends.subscription', 'Subscription')}, paytoview:{color:"#4361EE",name:t('dashboard.analytics.legends.paytoview', 'Pay to View')}, merch:{color:"#7209B7",name:t('dashboard.analytics.legends.merch', 'Merch')}, wishtender:{color:"#F72585",name:t('dashboard.analytics.legends.wishtender', 'Wishtender')}, customrequest:{color:"#94A3B8",name:t('dashboard.analytics.legends.customrequest', 'Custom Request')} }))
+const salesChartLabels = { subscription:"Subscription", paytoview:"Pay to View", merch:"Merch", wishtender:"Wishtender", customrequest:"Custom Request" }
+const tokensChartStyles = computed(() => ({ tipTokens:{color:"#4CC9F0",name:t('dashboard.analytics.legends.tipTokens', 'Tip Tokens')}, callTokens:{color:"#4361EE",name:t('dashboard.analytics.legends.callTokens', 'Call Tokens')}, chatTokens:{color:"#7209B7",name:t('dashboard.analytics.legends.chatTokens', 'Chat Tokens')}, liveStreamTokens:{color:"#F72585",name:t('dashboard.analytics.legends.liveStreamTokens', 'Live Stream Tokens')} }))
+const tokensChartLabels = { tipTokens:"Tip Tokens", callTokens:"Call Tokens", chatTokens:"Chat Tokens", liveStreamTokens:"Live Stream Tokens" }
 
-function getSalesBarCfg(dk) { return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["subscription","paytoview","merch","wishtender","customrequest"], stacked:true, seriesStyles:salesChartStyles, seriesLabels:salesChartLabels, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"$",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig }) }
-function getSalesLineCfg(dk) { return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["subscription","paytoview","merch","wishtender","customrequest"], stacked:true, seriesStyles:salesChartStyles, seriesLabels:salesChartLabels, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"$",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig }) }
+function getSalesBarCfg(dk) { return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["subscription","paytoview","merch","wishtender","customrequest"], stacked:true, seriesStyles:salesChartStyles.value, seriesLabels:salesChartLabels, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"$",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig }) }
+function getSalesLineCfg(dk) { return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["subscription","paytoview","merch","wishtender","customrequest"], stacked:true, seriesStyles:salesChartStyles.value, seriesLabels:salesChartLabels, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"$",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig }) }
 
-function getTokensBarCfg(dk) { return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"totalTokens"}, breakdownKeys:["tipTokens","callTokens","chatTokens","liveStreamTokens"], stacked:true, seriesStyles:tokensChartStyles, seriesLabels:tokensChartLabels, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:" tokens"}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig }) }
-function getTokensLineCfg(dk) { return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"totalTokens"}, breakdownKeys:["tipTokens","callTokens","chatTokens","liveStreamTokens"], stacked:true, seriesStyles:tokensChartStyles, seriesLabels:tokensChartLabels, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:" tokens"}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig }) }
+function getTokensBarCfg(dk) { return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"totalTokens"}, breakdownKeys:["tipTokens","callTokens","chatTokens","liveStreamTokens"], stacked:true, seriesStyles:tokensChartStyles.value, seriesLabels:tokensChartLabels, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:" tokens"}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig }) }
+function getTokensLineCfg(dk) { return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"totalTokens"}, breakdownKeys:["tipTokens","callTokens","chatTokens","liveStreamTokens"], stacked:true, seriesStyles:tokensChartStyles.value, seriesLabels:tokensChartLabels, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:30}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:" tokens"}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig }) }
 
 function getCountriesMapCfg(dk) { return JSON.stringify({ type:"map", period:"slot", datasetKey:dk, groupColors: { "base": "#e8e8e8", "g1": "#3A0CA3", "g2": "#7209B7", "g3": "#F72585", "g4": "#4CC9F0", "g5": "#00f2fe" }, tooltip: { color: "#344054", valuePrefix: "USD$ " } }) }
 
@@ -307,7 +304,7 @@ async function renderChart(chartId) {
 async function renderCurrentCharts() {
   await ensureReady()
   if (isDaily.value) {
-    // Daily = DONUT (Linden's rule)
+    
     await renderChart('sales-daily-donut')
     await renderChart('tokens-daily-donut')
   } else {
@@ -373,11 +370,11 @@ const tokensPctChange = computed(() => {
 
 function formatComparisonLabel(period) {
   switch ((period || '').toLowerCase()) {
-    case 'daily': return 'vs last 24 hour'
-    case 'weekly': return 'vs last week'
-    case 'monthly': return 'vs last 30 days'
-    case 'yearly': return 'vs last year'
-    default: return 'vs last year'
+    case 'daily': return t('dashboard.analytics.trends.vsLastDaily', 'vs last 24 hour')
+    case 'weekly': return t('dashboard.analytics.trends.vsLastWeekly', 'vs last week')
+    case 'monthly': return t('dashboard.analytics.trends.vsLastMonthly', 'vs last 30 days')
+    case 'yearly': return t('dashboard.analytics.trends.vsLastYearly', 'vs last year')
+    default: return t('dashboard.analytics.trends.vsLastYearly', 'vs last year')
   }
 }
 </script>
