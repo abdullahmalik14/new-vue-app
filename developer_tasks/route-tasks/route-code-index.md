@@ -27,7 +27,7 @@
 | Components/templates (Vue Router consumers) | 27 | — |
 | Build scripts | 6 | ~12 |
 | Unit tests (route-related) | 30+ | — |
-| `tests/routeTest/` | 16+ | Phase A–C route coverage (integrity, core units, guards) |
+| `tests/routeTest/` | 25+ | Phase A–D route coverage |
 | Docs | 15+ | — |
 
 ---

@@ -1003,4 +1003,48 @@ npm run test:unit -- --run tests/routeTest   # 16 files, 182 passed
 
 ---
 
+## Phase D — Navigation and loaders (2026-06-19)
+
+**Plan:** [route-test-plan.md](../route-test-plan.md) Phase D (§11, §13–19, §23, §31)  
+**Master plan:** Phase 8 — Route test coverage  
+**Test folder:** `tests/routeTest/`
+
+### What was broken
+
+Navigation, component loader/validator, prefetch, and asset preload modules had partial coverage only in `tests/unit/` without the plan’s consolidated `tests/routeTest/` layout.
+
+### Why it happened
+
+Phases A–C prioritized integrity, core units, and guards first.
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/routeTest/routeNavigation.test.js`](../../tests/routeTest/routeNavigation.test.js) | **New** — history, chain, stats, path helpers (§11) |
+| [`tests/routeTest/routeNavigationData.test.js`](../../tests/routeTest/routeNavigationData.test.js) | **New** — section resolve + translation skip/load (§23) |
+| [`tests/routeTest/routeComponentLoader.test.js`](../../tests/routeTest/routeComponentLoader.test.js) | **New** — `findComponentLoader`, `loadComponentModule` errors (§13) |
+| [`tests/routeTest/routeComponentPathValidator.test.js`](../../tests/routeTest/routeComponentPathValidator.test.js) | **New** — path collection, disk + resolver validation (§14) |
+| [`tests/routeTest/routeComponentPrefetch.test.js`](../../tests/routeTest/routeComponentPrefetch.test.js) | **New** — dedup, locale strip, cache reset (§16) |
+| [`tests/routeTest/routeAssetPrefetch.test.js`](../../tests/routeTest/routeAssetPrefetch.test.js) | **New** — section asset dedup + intent handler (§17) |
+| [`tests/routeTest/resolveRouteAssetPreloads.test.js`](../../tests/routeTest/resolveRouteAssetPreloads.test.js) | **New** — ref expansion + inline merge (§18) |
+| [`tests/routeTest/useRoutePrefetch.test.js`](../../tests/routeTest/useRoutePrefetch.test.js) | **New** — composable intent handlers (§19) |
+| [`tests/routeTest/validateRouteAssetPreloadFlags.test.js`](../../tests/routeTest/validateRouteAssetPreloadFlags.test.js) | **New** — flag/catalog validation (§31) |
+
+Legacy `tests/unit/routeNavigation*.test.js`, `routeComponentPrefetch.test.js`, etc. remain for now.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/routeTest   # 25 files, 232 passed
+```
+
+### Exit criteria (Phase D)
+
+- [x] Loader/prefetch exports have happy + edge coverage
+- [x] Component path validation tested with fixtures (not production JSON)
+- [x] Prefetch tests mock network/asset layers (non-blocking background preload)
+
+---
+
 *Add a new section above this line for each completed phase.*
