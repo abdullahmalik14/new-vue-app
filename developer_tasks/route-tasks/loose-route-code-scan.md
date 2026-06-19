@@ -18,8 +18,8 @@ src/systems/routing/  → guards, resolvers, navigation, loaders, hooks logic
 |------|--------|
 | `utils/route/` in `src/` | ✅ Gone — logic lives in `systems/routing/` |
 | `systems/routing/` | ✅ Main home for route logic (24 files) |
-| `router/index.js` | ❌ Still holds ~749 lines of orchestration (loose) |
-| `router/sharedAssetPreloads.json` | ❌ Asset config, not route config |
+| `router/index.js` | ✅ Thin re-export → `createAppRouter.js` |
+| `router/sharedAssetPreloads.json` | ✅ Moved to `config/sharedAssetPreloads.json` |
 | Tests + docs | ✅ Active tests/docs fixed (Phase 1 + Phase 7); archived docs may still mention `utils/route/` |
 | UI/templates using `useRouter()` | ✅ Normal — consumers, not route system code |
 

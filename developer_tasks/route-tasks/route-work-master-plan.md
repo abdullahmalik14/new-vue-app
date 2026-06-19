@@ -17,7 +17,8 @@ This plan ties together every route-related report in `Developer Tasks/` and giv
 | Systems routing audit        | `systems/routing/` + bleed into i18n/sections/assets | [systems-routing-audit.md](./systems-routing-audit.md)                 |
 | Loose route code scan        | Code in wrong layer; test/doc debt                   | [loose-route-code-scan.md](./loose-route-code-scan.md)                 |
 | Naming audit (merged)        | 194 suggested renames — filename / method / name     | [route-naming-audit.md](./route-naming-audit.md)                       |
-| **Routing docs (canonical)** | Developer + AI guide — single source for routing     | [RoutingExplained.md](./RoutingExplained.md)                           |
+| **Test plan** | Vitest coverage ideas + phases A→G | [route-test-plan.md](../route-test-plan.md) |
+| **Change log** | Done work during master plan + tests | [route-cleanup-changelog.md](./route-cleanup-changelog.md) |
 
 
 **Naming audit batches (archived — use merged file):**  
@@ -230,6 +231,18 @@ Fix every hit: point to `Developer Tasks/RoutingExplained.md` or update stale pa
 3. Optional one-line banner at top of `docs/archived/`* routing mentions: “Historical — see `Developer Tasks/RoutingExplained.md`.”
 
 **Exit:** One canonical routing doc; zero routing READMEs in `src/`; grep for `utils/route` clean in active docs/tests.
+
+---
+
+### Phase 8 — Route test coverage (ongoing)
+
+**Plan:** [route-test-plan.md](../route-test-plan.md)  
+**Execution log:** [route-cleanup-changelog.md](./route-cleanup-changelog.md) (Phase A prep+)  
+**Helpers:** `tests/helpers/routeFixtures.js`
+
+Start only after Phases 0–7. Implement in order **A → G** (integrity → core → guards → loaders → router → cross-system → hardening). One PR per sub-phase on branch `test/route-coverage`.
+
+**Exit:** All route unit tests pass; production `routeConfig.json` integrity suite green; every `systems/routing/` export has happy + edge coverage per test plan.
 
 ---
 

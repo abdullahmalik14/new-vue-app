@@ -856,4 +856,26 @@ docs(routing): align RoutingExplained with post-refactor architecture
 
 ---
 
+## Phase A prep — Route test infrastructure (2026-06-18)
+
+**Plan:** [route-test-plan.md](../route-test-plan.md) Phase A  
+**Master plan:** Phase 8 — Route test coverage (prep)
+
+### What changed
+
+- Added `tests/helpers/routeFixtures.js` — shared `makeRoute()`, `makeGuardContext()`, production config loaders
+- Added `tests/unit/routeConfig.integrity.test.js` — 25 production `routeConfig.json` integrity checks (plan §0)
+- Updated `route-test-plan.md` header — Phases A→G, run commands, sync instructions, post-refactor module names
+- Updated `route-code-index.md` and `loose-route-code-scan.md` summary — reflect post-refactor paths/symbols
+- Added Phase 8 section to `route-work-master-plan.md`
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/unit/routeConfig.integrity.test.js   # 25 passed
+npm run test:unit -- --run tests/unit/route   # 93 passed, 1 pre-existing timeout (routerLocaleInject)
+```
+
+---
+
 *Add a new section above this line for each completed phase.*

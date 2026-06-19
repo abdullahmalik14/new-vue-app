@@ -72,10 +72,9 @@ Imports: `router/routeConfig.json`, `config/sharedAssetPreloads.json`, `validate
 | `runAllRouteGuards` | export |
 | `guardPreventNavigationLoop` | export |
 | `guardCheckRouteEnvironmentAccess` | export |
-| `guardCheckRouteEnabled` | export |
 | `guardCheckRouteAdminAccess` | export |
 | `guardCheckAuthentication` | export |
-| `guardCheckUserRole` | export |
+| `guardCheckRouteUserRole` | export |
 | `guardCheckDependencies` | export |
 | `markGuardRedirectNavigation` | export |
 | `consumeGuardRedirectNavigation` | export |
@@ -105,7 +104,7 @@ Imports: `router/routeConfig.json`, `config/sharedAssetPreloads.json`, `validate
 
 ---
 
-### `routeAliases.js`
+### `routeAliasResolver.js`
 
 | Symbol | Kind |
 |--------|------|
@@ -114,7 +113,7 @@ Imports: `router/routeConfig.json`, `config/sharedAssetPreloads.json`, `validate
 | `normalizeRedirectFromList` | export |
 | `normalizeAliasList` | export |
 | `buildVueRouterAliases` | export |
-| `routeConfigMatchesPath` | export |
+| `doesRouteConfigMatchPath` | export |
 | `createRedirectFromRouteRecords` | export |
 | `collectRoutePathClaims` | export |
 | `findDuplicateRoutePathClaims` | export |
@@ -130,7 +129,7 @@ Imports: `router/routeConfig.json`, `config/sharedAssetPreloads.json`, `validate
 
 ---
 
-### `routeComponentPrefetch.js`
+### `routeComponentPreloader.js`
 
 | Symbol | Kind |
 |--------|------|
@@ -142,7 +141,7 @@ Imports: `router/routeConfig.json`, `config/sharedAssetPreloads.json`, `validate
 
 ---
 
-### `routeAssetPrefetch.js` *(misplaced — notes say `systems/assets/`)*
+### `systems/assets/routeAssetPreloader.js`
 
 | Symbol | Kind |
 |--------|------|
@@ -152,7 +151,7 @@ Imports: `router/routeConfig.json`, `config/sharedAssetPreloads.json`, `validate
 
 ---
 
-### `resolveRouteAssetPreloads.js` *(misplaced — notes say `systems/assets/`)*
+### `systems/assets/routeAssetPreloadResolver.js`
 
 | Symbol | Kind |
 |--------|------|
@@ -160,7 +159,7 @@ Imports: `router/routeConfig.json`, `config/sharedAssetPreloads.json`, `validate
 
 ---
 
-### `useRoutePrefetch.js` *(misplaced — notes say `composables/`)*
+### `composables/useRoutePrefetch.js`
 
 | Symbol | Kind |
 |--------|------|
@@ -222,16 +221,16 @@ Imports: `router/routeDefaults.json`.
 
 ---
 
-### `routeNavigationData.js`
+### `routeNavigationResourceLoader.js`
 
 | Symbol | Kind |
 |--------|------|
 | `resolveCurrentSectionForNavigation` | export |
-| `startCurrentSectionResourceLoads` | export |
+| `loadCurrentSectionResources` | export |
 
 ---
 
-### `navigationProgress.js`
+### `navigationProgressTracker.js`
 
 | Symbol | Kind |
 |--------|------|
@@ -281,7 +280,7 @@ Imports: `router/routeDefaults.json`.
 
 ---
 
-### `routeComponentPathValidator.node.js`
+### `routeComponentPathDiskValidator.node.js`
 
 | Symbol | Kind |
 |--------|------|
@@ -290,42 +289,28 @@ Imports: `router/routeDefaults.json`.
 
 ---
 
+### `createAppRouter.js`
+
+| Symbol | Role |
+|--------|------|
+| `default` export | Factory — `createRouter` + hook registration |
+
+**Vue Router hooks registered here:** `beforeEach` (locale inject, guards), `beforeResolve` (section resource loads), `afterEach` (navigation state, hreflang, preload), `onError` (chunk recovery).
+
+**Local helpers (not exported):** `generateRoutesFromConfig`, `loadRouteComponent`, locale-aware redirect builders, etc.
+
+---
+
 ## 2. `router/` — entry + config
 
-### `index.js` (749 lines) — **Entry, still holds orchestration**
-
-**Local functions (not exported)**
-
-| Symbol | Role |
-|--------|------|
-| `resolveLocaleFromRouteLocation` | Locale from route params/path |
-| `buildLocaleAwareRedirectPath` | Locale-prefixed redirect targets |
-| `generateRoutesFromConfig` | Builds Vue Router records from JSON |
-| `resolveUserRoleForComponentLoad` | Role for dynamic import |
-| `loadRouteComponent` | Async component loader per route |
-| `loadViaGlob` | Glob-based component resolution |
-
-**Vue Router instance**
-
-| Symbol | Role |
-|--------|------|
-| `createRouter` / `createWebHistory` | Router construction |
-| `scrollBehavior` callback | Delegates to `resolveRouterScrollPosition` |
-| `router.beforeEach` | Locale inject, guards, section meta |
-| `router.beforeResolve` | `startCurrentSectionResourceLoads` |
-| `router.afterEach` | Navigation state, hreflang, section preload |
-| `router.onError` | Chunk-load recovery |
-
-**Re-exports (default export + named)**
+### `index.js` — thin re-export
 
 | Symbol | Source |
 |--------|--------|
-| `default` | router instance |
+| `default` | `createAppRouter.js` |
 | `prefetchRouteComponent` | `systems/routing/index.js` |
 | `createRoutePrefetchIntentHandler` | `systems/routing/index.js` |
 | `prefetchSectionAssetsForRoute` | `systems/routing/index.js` |
-
-**Calls into (non-exhaustive):** `getRouteConfiguration`, `runAllRouteGuards`, `setCurrentActiveRoute`, `resolveComponentPathForRoute`, guard loop helpers, `isRouteAccessibleInCurrentEnvironment`, locale manager (`applyLocaleTemporarily`, `reapplyTemporaryPageLocaleForRoute`, `syncTemporaryPageLocaleFromUrl`, `resolveLocaleForUrlInjection`, `getLeadingLocaleFromPath`, `stripLeadingLocaleFromPath`, `resolveActiveLocale`, `resolveActiveLocaleForNavigation`), `resolveRoleSectionVariant`, `getRoutePreloadPlan`, `resolveEffectiveRouteConfig`, `startBackgroundSectionPreloads`, `loadNotFoundComponent`, `findComponentLoader`, navigation error/progress/scroll/alias/navigationData modules, `syncHreflangTagsForPath`, `clearHreflangTags`.
 
 ---
 
@@ -409,7 +394,7 @@ Imports: `inheritConfigurationFromParentRoute`, `getPreloadSectionsForRoute`.
 
 ---
 
-### `systems/assets/getAssetPreloadEntriesForSection.js`
+### `systems/assets/routeSectionAssetPreloadEntries.js`
 
 | Symbol | Route role |
 |--------|------------|
@@ -435,7 +420,7 @@ Imports: `inheritConfigurationFromParentRoute`, `getPreloadSectionsForRoute`.
 
 ### `systems/assets/resolveSharedComponentAssets.js`
 
-Imports `router/sharedAssetPreloads.json`. No route-specific function names; shared catalog resolution for route asset preload.
+Imports `config/sharedAssetPreloads.json`. No route-specific function names; shared catalog resolution for route asset preload.
 
 ---
 
@@ -449,7 +434,7 @@ Imports `router/sharedAssetPreloads.json`. No route-specific function names; sha
 | `collectPreloadSectionIdentifiers` | Parse `preLoadSections` |
 | `validateRouteConfig` | Main route JSON validator |
 
-Imports: `router/sharedAssetPreloads.json`, `isValidRouteEnvAccess`, `validateRouteAssetPreloadFlags`.
+Imports: `config/sharedAssetPreloads.json`, `isValidRouteEnvAccess`, `validateRouteAssetPreloadFlags`.
 
 ---
 
@@ -575,7 +560,15 @@ Normal navigation UI (no `systems/routing` imports unless noted).
 
 Route unit tests import from `@/systems/routing/`, `@/systems/assets/`, and `@/composables/` (Phase 1 fixed legacy `utils/route/` paths).
 
-Key suites: `routeGuards.test.js`, `jsonConfigValidator.test.js`, `routeComponentPathValidator.test.js`, `routeComponentPrefetch.test.js`, `useRoutePrefetch.test.js`, `resolveRouteAssetPreloads.test.js`.
+**Shared helpers:** `tests/helpers/routeFixtures.js` — `makeRoute()`, `makeGuardContext()`, `loadProductionRouteConfig()`, `MINIMAL_ROUTE_FIXTURES`.
+
+**Phase A integrity:** `tests/unit/routeConfig.integrity.test.js` — production `routeConfig.json` validation.
+
+Key suites: `routeGuards.test.js`, `routeConfig.integrity.test.js`, `jsonConfigValidator.test.js`, `routeComponentPathValidator.test.js`, `routeComponentPrefetch.test.js`, `useRoutePrefetch.test.js`, `resolveRouteAssetPreloads.test.js`.
+
+**Run:** `npm run test:unit -- --run tests/unit/route`
+
+**Plan:** [route-test-plan.md](../route-test-plan.md)
 
 ---
 
