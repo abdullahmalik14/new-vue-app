@@ -8,7 +8,8 @@
 ## For developers
 
 - [DEVELOPER_GUIDE.md](./docs/DEVELOPER_GUIDE.md) — how the system works
-- Priority work: **P0** test imports → **P1** structure → **P2** naming → **P3** docs
+- **Cleanup Phases 0–4:** complete (see [sections-cleanup-changelog.md](./sections-cleanup-changelog.md))
+- **Next:** [section-test-plan.md](./section-test-plan.md) phases A→G on branch `test/section-coverage`
 
 ## For AI
 

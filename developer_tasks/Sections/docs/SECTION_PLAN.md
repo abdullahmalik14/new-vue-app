@@ -1,7 +1,7 @@
 # Section system — master plan
 
-**Last updated:** 2026-06-10  
-**Status:** Audits complete (structure + code + naming batches 1–2). Migration in progress.
+**Last updated:** 2026-06-19  
+**Status:** Phases 0–4 complete (imports, structure, naming, docs). Section test expansion is a separate track per [section-test-plan.md](../section-test-plan.md).
 
 ---
 
@@ -28,32 +28,43 @@ One clear section layer under `src/systems/sections/`, with manifest helpers ext
 | Router section hooks | ✅ Extracted to `sectionNavigationResources.js` + `sectionNavigationHooks.js` |
 | `resolveEffectiveRouteConfig` | ✅ Moved to `systems/routing/routeResolver.js` |
 | `systems/sections/index.js` barrel | ✅ Full public API exported |
+| Developer docs (`Sections/docs/`) | ✅ Synced with code (Phase 4) |
+| `src/systems/sections/README.md` | ✅ Deprecation banner only |
+| Legacy `docs/SECTION_LOADING_AND_PRELOADING_GUIDE.md` | ✅ Stale-path banner added |
 
 ## Priority work (developer order)
 
-### P0 — breaks clarity / imports
+Phases 0–4 are **complete**. Next work (separate branch/PRs):
+
+### P4 — section test coverage (after cleanup)
+
+Follow [section-test-plan.md](../section-test-plan.md) phases A→G on branch `test/section-coverage`.
+
+### Historical priorities (done)
+
+#### P0 — breaks clarity / imports ✅
 
 1. Update test imports: `src/utils/section/*` → `src/systems/sections/*`
-2. Fix `sectionPreloader.js` stale import `../sections/sectionCssLoader.js` → `./sectionCssLoader.js`
+2. Fix `sectionPreloader.js` stale import `../sections/sectionCssLoader.js` → `./sectionCssLoader.js` ✅
 
-### P1 — structure cleanup
+### P1 — structure cleanup ✅
 
 3. Create `sectionManifestHelpers.js`; slim `manifestLoader.js`
 4. Complete `systems/sections/index.js` barrel
 5. Move `startCurrentSectionResourceLoads` from `routeNavigationData.js` into sections
-6. Extract router section blocks to a sections hook module
+6. Extract router section blocks to a sections hook module ✅
 
-### P2 — naming alignment
+### P2 — naming alignment ✅
 
 7. Batch 1: filenames/methods in `systems/sections/` per naming audit
 8. Batch 2: interconnected files (manifest, assets, nav resources)
-9. `resolveRolePreLoadSections` → `resolveRolePreloadSections`; store/helper disambiguation
+9. `resolveRolePreLoadSections` → `resolveRolePreloadSections`; store/helper disambiguation ✅
 
-### P3 — documentation
+### P3 — documentation ✅
 
-10. Keep `Developer Tasks/Sections/docs/` current after each phase
-11. Deprecation banner on `src/systems/sections/README.md`
-12. Flag or update `docs/SECTION_LOADING_AND_PRELOADING_GUIDE.md` stale paths
+10. Keep `Developer Tasks/Sections/docs/` current after each phase ✅
+11. Deprecation banner on `src/systems/sections/README.md` ✅
+12. Flag or update `docs/SECTION_LOADING_AND_PRELOADING_GUIDE.md` stale paths ✅
 
 ## Rename before or after other fixes?
 

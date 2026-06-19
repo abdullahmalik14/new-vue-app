@@ -11,8 +11,8 @@ Read this before editing any section-related file.
 ## Hard rules
 
 1. **Do not recreate `src/utils/section/`** — use `src/systems/sections/`.
-2. **Do not put section preload orchestration in `router/index.js` long term** — extend `sectionPreloadOrchestrator.js` or add `sectionNavigationHooks.js`; router should call one entry point.
-3. **Do not import `section-manifest.json` paths from random folders** — use `getSectionBundlePaths` (moving to `sectionManifestHelpers.js`).
+2. **Do not put section preload orchestration in `createAppRouter.js` long term** — use `sectionNavigationHooks.js`; router should call one entry point.
+3. **Do not import `section-manifest.json` paths from random folders** — use `getSectionBundlePaths` from `sectionManifestHelpers.js`.
 4. **Section state** lives in `usePreloadStore` (`hasSection`, `markSectionInProgress`) — do not duplicate caches in components.
 5. **Route-only renames/moves** belong in [RoutingExplained.md](../../Route/RoutingExplained.md) — not in section PRs unless deeply coupled.
 6. **Section docs live in `Developer Tasks/Sections/docs/`** — update [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md) and this file when behaviour changes; do not expand stale `src/systems/sections/README.md`.
@@ -62,8 +62,10 @@ systems/sections/
 | Role → section string | `sectionResolver.js` |
 | Preload behaviour | `sectionPreloader.js`, `sectionPreloadOrchestrator.js` |
 | CSS inject/swap | `sectionCssLoader.js` |
-| Nav-side resource load | `routeNavigationData.js` (planned move into sections) |
-| Manifest paths | `sectionManifestHelpers.js` (to create) + build `manifestLoader.js` |
+| Nav-side resource load | `sectionNavigationResources.js` (routing re-export: `routeNavigationResourceLoader.js`) |
+| Manifest paths | `sectionManifestHelpers.js` (`build/manifestLoader.js` re-exports for compat) |
+| Router section hooks | `sectionNavigationHooks.js` via `createAppRouter.js` |
+| Route config inheritance | `routeResolver.js` → `resolveEffectiveRouteConfig` |
 | Section assets | `systems/assets/assetPreloader.js` → `preloadSectionAssets` |
 
 ---

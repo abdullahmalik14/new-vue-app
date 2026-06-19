@@ -1,5 +1,8 @@
 # Section Loading and Preloading System Guide
 
+> **Stale paths (2026-06):** This guide predates the `systems/sections/` cleanup (Phases 0–4). File paths, module names, and some flows are outdated (e.g. `utils/section/`, `routeNavigationData.js`, `getRoutePreloadPlan`).  
+> **Use instead:** [developer_tasks/Sections/docs/DEVELOPER_GUIDE.md](../developer_tasks/Sections/docs/DEVELOPER_GUIDE.md)
+
 This document describes how section loading, preloading, and asset preloading work in the application. Use this guide to ensure all features are properly implemented.
 
 ---

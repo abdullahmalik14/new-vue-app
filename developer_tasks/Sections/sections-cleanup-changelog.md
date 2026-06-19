@@ -387,4 +387,54 @@ Public section API uses consistent naming; docs/import map updated in `AI_GUIDE.
 
 ---
 
+## Phase 4 — Documentation refresh (2026-06-19)
+
+**Master plan:** Phase 4 — Doc audit  
+**Scope:** Documentation only. No production code changes.
+
+### Issue 1 — `DEVELOPER_GUIDE.md` described pre-cleanup architecture
+
+**What was broken:** Guide still listed `routeNavigationData.js`, `router/index.js` inline hooks, partial barrel, missing `sectionManifestHelpers.js`, and `getRoutePreloadPlan` (pre-rename). Test section still said to fix `utils/section` imports.
+
+**How it was fixed:** Rewrote [DEVELOPER_GUIDE.md](./docs/DEVELOPER_GUIDE.md) with current folder layout, module table, flows (`createAppRouter.js`, `sectionNavigationHooks.js`, `sectionNavigationResources.js`), renamed APIs, and test commands.
+
+### Issue 2 — `src/systems/sections/README.md` was stale and long
+
+**What was broken:** In-repo README referenced removed APIs (`preloadSectionBundle`), old paths, and duplicated docs that drift from code.
+
+**How it was fixed:** Replaced with a **short deprecation banner** pointing to `developer_tasks/Sections/docs/` (per plan: do not expand).
+
+### Issue 3 — Legacy app guide had outdated paths
+
+**What was broken:** [docs/SECTION_LOADING_AND_PRELOADING_GUIDE.md](../../docs/SECTION_LOADING_AND_PRELOADING_GUIDE.md) still described pre-migration file layout.
+
+**How it was fixed:** Added stale-path banner at top linking to `DEVELOPER_GUIDE.md`.
+
+### Issue 4 — Hub docs and plan status out of date
+
+**What was broken:** `docs/README.md`, `SECTION_PLAN.md`, and `AI_GUIDE.md` file-ownership table still referenced planned moves and old module names.
+
+**How it was fixed:**
+
+| File | Update |
+|------|--------|
+| [docs/README.md](./docs/README.md) | Current orientation, changelog link, audit snapshot note |
+| [SECTION_PLAN.md](./docs/SECTION_PLAN.md) | Phases 0–4 marked complete; next step = test plan |
+| [AI_GUIDE.md](./docs/AI_GUIDE.md) | File ownership + hard rules aligned with post-Phase 2/3 code |
+
+### Files touched (Phase 4)
+
+- `developer_tasks/Sections/docs/DEVELOPER_GUIDE.md`
+- `developer_tasks/Sections/docs/README.md`
+- `developer_tasks/Sections/docs/SECTION_PLAN.md`
+- `developer_tasks/Sections/docs/AI_GUIDE.md`
+- `src/systems/sections/README.md`
+- `docs/SECTION_LOADING_AND_PRELOADING_GUIDE.md`
+
+### Phase 4 exit
+
+Sections cleanup Phases 0–4 complete. Audits/indexes (`section-code-index.md`, `loose-section-code-scan.md`) remain historical snapshots — update when starting test coverage or if discrepancies block onboarding. Next: [section-test-plan.md](./section-test-plan.md) on `test/section-coverage`.
+
+---
+
 *Add a new section above this line for each completed phase.*
