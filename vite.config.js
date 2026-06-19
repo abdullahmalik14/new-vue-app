@@ -122,7 +122,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         // Analytics API → backend server (mirrors vercel.json rewrite)
         '/api/charts': {
-          target: 'http://168.144.35.180:3000',
+          target: 'https://unified-api-handler-six.vercel.app',
           changeOrigin: true,
           secure: false
         },
