@@ -1841,7 +1841,7 @@ export const flowRegistry = {
       destinations: [
         {
           type: "piniaAction",
-          storeId: "dashboard",
+          storeId: "dashboardAnalytics",
           action: "syncAnalyticsBundle",
         },
       ],

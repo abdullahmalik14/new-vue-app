@@ -14,7 +14,7 @@
             <template v-if="insightData?.total">
               <div>
                 <span class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">{{
-                  insightData.total.toLocaleString() }} </span>
+                  formatDecimal(insightData.total) }} </span>
                 <span class="text-gray-900 text-lg md:text-xl font-bold font-['Poppins']">USD</span>
               </div>
             </template>
@@ -190,6 +190,7 @@ import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+import { formatDecimal } from '@/utils/common/index.js'
 
 const props = defineProps({
   modelValue: Boolean,

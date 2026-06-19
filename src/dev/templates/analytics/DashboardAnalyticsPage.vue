@@ -302,7 +302,7 @@
                         :data-value="analyticsStore.earningsInsights?.daily?.total"
                         class="text-[2.25rem] font-semibold leading-[2.75rem] font-sans tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
                           analyticsStore.earningsInsights?.daily?.total != null ?
-                            Number(analyticsStore.earningsInsights.daily.total).toLocaleString('en-US') :
+                            formatDecimal(analyticsStore.earningsInsights.daily.total) :
                             '--'
                         }}</span>
                       <span v-if="analyticsStore.earningsInsights?.daily?.total != null"
@@ -740,6 +740,7 @@ import DashboardAnalyticsTopTagsTable from '@/dev/components/ui/table/dashboard/
 import DashboardAnalyticsTopMerchTable from '@/dev/components/ui/table/dashboard/analytics-tables/DashboardAnalyticsTopMerchTable.vue'
 import DashboardAnalyticsTopCountriesTable from '@/dev/components/ui/table/dashboard/analytics-tables/DashboardAnalyticsTopCountriesTable.vue'
 import SparkLine from '@/components/ui/charts/SparkLine.vue'
+import { formatDecimal, formatUsdPrice, formatDate } from '@/utils/common/index.js'
 
 const analyticsStore = useDashboardAnalyticsStore()
 const { lastUpdated } = storeToRefs(analyticsStore)
@@ -772,7 +773,7 @@ const currentContributorsInsightData = computed(() => {
         name: c.name || 'Unknown',
         handle: c.handle || `@${(c.name || '').replace(/\s+/g, '').toLowerCase()}`,
         avatar: c.avatar || '/dev/cdn/analytics/icons/icon-8.png',
-        total: `USD$ ${Number(c.usdSpent || c.totalSpent || c.totalUSD || c.tokens || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        total: formatUsdPrice(c.usdSpent || c.totalSpent || c.totalUSD || c.tokens || 0),
         rawTotal: c.usdSpent || c.totalSpent || c.totalUSD || c.tokens || 0
       };
     }).filter(Boolean);
@@ -883,7 +884,7 @@ const currentEarningsInsightData = computed(() => {
       salesRaw: c.salesUSD || 0,
       salesUSD: c.salesUSD || 0,
       earningsUSD: c.earningsUSD || c.salesUSD || 0,
-      sales: (c.salesUSD || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      sales: formatDecimal(c.salesUSD || 0)
     }))
     // FIX: Use the summary object if available, otherwise calculate the sum
     const summary = analyticsStore.earnings.summaries?.[tab]

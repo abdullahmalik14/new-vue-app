@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/charts/:path*",
-      "destination": "http://168.144.35.180:3000/api/charts/:path*"
+      "destination": "https://unified-api-handler-six.vercel.app/api/charts/:path*"
     },
     {
       "source": "/(.*)",

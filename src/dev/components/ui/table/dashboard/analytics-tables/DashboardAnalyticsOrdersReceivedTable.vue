@@ -100,7 +100,7 @@
                 <div class="flex flex-col justify-center items-start gap-1 overflow-hidden">
                   <div class="flex items-center gap-1.5 text-slate-400 text-[11px] font-normal">
                     <span>{{ row.orderId }}</span>
-                    <span>{{ row.date }}</span>
+                    <span>{{ formatDate(row.date) }}</span>
                   </div>
                   <div class="flex items-center gap-1.5">
                     <img src="/images/mangoes.png" class="w-4 h-4 rounded-full border border-black/5" />
@@ -141,7 +141,7 @@
             <template #cell.date="{ row }">
               <div 
                 :data-value="row.date"
-                class="px-4 text-slate-600 text-[13px] font-normal h-full flex items-center">{{ row.date }}</div>
+                class="px-4 text-slate-600 text-[13px] font-normal h-full flex items-center">{{ formatDate(row.date) }}</div>
             </template>
 
             <!-- Total Slot -->
@@ -149,7 +149,7 @@
               <div
                 :data-value="row.total"
                 class="pr-4 text-gray-900 text-[13px] font-bold h-full flex items-center justify-end w-full whitespace-nowrap">
-                {{ row.total }}
+                {{ formatUsdPrice(row.total) }}
               </div>
             </template>
 
@@ -214,6 +214,7 @@ import { ref, computed } from 'vue'
 import DashboardAnalyticsMainCardWrapper from '@/components/ui/card/dashboard/DashboardAnalyticsMainCardWrapper.vue'
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+import { formatUsdPrice, formatDate } from '@/utils/common/index.js'
 
 // --- Orders Tabs ---
 const orderTabs = ['Subscriptions', 'Pay to View', 'Merch', 'Custom Request', 'Wishtender']

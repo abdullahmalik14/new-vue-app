@@ -69,6 +69,7 @@ import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 
 import { computed } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+import { formatUsdPrice } from '@/utils/common/index.js'
 
 const props = defineProps({
   period: { type: String, default: 'daily' }
@@ -118,7 +119,7 @@ const topCountriesRows = computed(() => {
     id: index,
     rank: item.rank || index + 1,
     country: countryNameMap[item.country] || item.country,
-    sales: `USD$ ${(item.salesUSD || item.earningsUSD || item.sales_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    sales: formatUsdPrice(item.salesUSD || item.earningsUSD || item.sales_usd || 0)
   }));
 });
 
