@@ -1138,4 +1138,44 @@ npm run test:unit -- --run tests/routeTest   # 40 files, 324 passed
 
 ---
 
+## Phase G — Hardening: concurrency, fuzz, contracts (2026-06-19)
+
+**Plan:** [route-test-plan.md](../route-test-plan.md) Phase G (§47, §91–93)  
+**Master plan:** Phase 8 — Route test coverage  
+**Test folder:** `tests/routeTest/`
+
+### What was broken
+
+Concurrency edge cases, property-style fuzz guards, and contract snapshot stability had no dedicated coverage in `tests/routeTest/`.
+
+### Why it happened
+
+Phases A–F prioritized functional coverage first; hardening was deferred to the final phase.
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/routeTest/routeConcurrency.test.js`](../../tests/routeTest/routeConcurrency.test.js) | **New** — concurrent prefetch dedup, mid-flight cache reset, rapid navigation, progress edge cases (§47) |
+| [`tests/routeTest/routeFuzz.test.js`](../../tests/routeTest/routeFuzz.test.js) | **New** — random-input guards for path/scroll/guard helpers + §91 regression one-offs |
+| [`tests/routeTest/routeContracts.test.js`](../../tests/routeTest/routeContracts.test.js) | **New** — guard block shape contracts, ROUTE_DEFAULTS/PRESETS, validator/preload/hreflang snapshots (§93) |
+
+Uses lightweight in-test random generators (no `fast-check` dependency).
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/routeTest   # 43 files, 357 passed
+```
+
+### Exit criteria (Phase G)
+
+- [x] Concurrent component/asset prefetch dedup covered
+- [x] Mid-flight prefetch cache reset covered
+- [x] Fuzz loops verify no throw + type invariants on core routing helpers
+- [x] Contract snapshots guard guard-result shape and stable config presets
+- [x] Full route test plan phases A→G complete in `tests/routeTest/`
+
+---
+
 *Add a new section above this line for each completed phase.*
