@@ -23,7 +23,7 @@
           </div>
         </div>
 
-        <div v-if="hasLikesData" class="absolute top-[40px] left-0 right-0 bottom-[30px]">
+        <div v-show="hasLikesData" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200">
           <!-- Bar/Line Container -->
           <div data-chart-container data-chart-id="likes-chart-bar" :hidden="activeLikesViewMode!=='bar'||undefined" class="absolute inset-0"
             :data-chart-config='getLikesBarCfg("likes-chart")'>
@@ -36,11 +36,11 @@
         </div>
         
         <!-- Empty State -->
-        <div v-else class="absolute inset-0 flex flex-col justify-center items-center gap-6 w-full text-center bg-light-bg-container dark:bg-dark-bg-container z-20">
+        <div v-if="!hasLikesData || isChartRendering" class="absolute inset-0 flex flex-col justify-center items-center gap-6 w-full text-center z-20">
           <img :src="icon6Url || ''" alt="illustration" class="w-24 h-24 object-contain" />
           <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
-            <a href="#" class="text-sm text-primary-600 dark:text-primary-400 underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
+            <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+            <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
           </div>
         </div>
       </div>
@@ -81,9 +81,7 @@ const activeLikesViewMode = ref('bar')
 const isLikesDataAvailable = ref(false)
 
 const hasLikesData = computed(() => {
-  // First check: store has any likes data at all
-  if (analyticsStore.likes?.media != null) return true
-  // Second check: data was loaded from bundle
+  if (!analyticsStore.bundleLoaded) return false
   return isLikesDataAvailable.value
 })
 
@@ -121,13 +119,13 @@ function getLikesLineCfg(dk) {
 // ===== INJECT CHART DATA =====
 async function fetchLikesData() {
   try {
-    // We fetch the bundle directly to get the history since store only holds latest daily
-    const urlParams = new URLSearchParams(window.location.search)
-    const source = urlParams.get('data') || 'full'
-    const bundleFile = source === 'empty' ? '/chartsData.empty.json' : '/api/charts/456?nocache=1'
-    const res = await fetch(bundleFile)
-    const bundle = await res.json()
-    return bundle.likes || {}
+    const { FlowHandler } = await import('@/services/flow-system/flowHandler.js');
+    const { ANALYTICS_FETCH_FLOW } = await import('@/config/dashboardAnalyticsFlows.js');
+    const result = await FlowHandler.run(ANALYTICS_FETCH_FLOW, { source: 'full' });
+    if (result.ok && result.data) {
+      return result.data.likes || {};
+    }
+    return {};
   } catch(e) {
     return {}
   }
@@ -177,9 +175,13 @@ async function renderChart(chartId) {
   await window.chartsHandler.renderChartInstance(container)
 }
 
+const isChartRendering = ref(true)
+
 async function renderCurrentCharts() {
+  isChartRendering.value = true
   await ensureReady()
   await renderChart(`likes-chart-${activeLikesViewMode.value}`)
+  isChartRendering.value = false
 }
 
 async function setLikesView(v) {

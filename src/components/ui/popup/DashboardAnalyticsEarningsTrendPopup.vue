@@ -2,21 +2,22 @@
   <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
     @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.titleEarnings', 'Earnings Insight')"
     :logo="iconPopupLogo || ''">
-    <div v-if="hasEarningsData" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4">
 
       <!-- row: stats -->
       <div class="flex w-full items-center py-6 ">
         <div class="flex-1 flex flex-col justify-center items-center gap-4 border-r border-gray-200 dark:border-gray-700">
           <h3 class="text-light-text-darkgray dark:text-white text-sm md:text-base font-semibold">{{ $t('dashboard.analytics.trends.totalEarnings', 'Total Earnings') }}</h3>
           <div class="flex flex-col justify-center items-center gap-2">
-            <template v-if="insightData?.total">
+            <template v-if="!analyticsStore.bundleLoaded">
+              <span class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
+            </template>
+            <template v-else>
               <div>
-                <span class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">{{ $n(insightData.total) }} </span>
+                <span class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">{{ $n(insightData?.total || 0) }} </span>
                 <span class="text-gray-900 text-lg md:text-xl font-bold font-['Poppins']">USD</span>
               </div>
             </template>
-            <span v-else
-              class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
             <div class="inline-flex items-center gap-2" v-if="earningsPctChange !== null">
               <div class="flex justify-center items-center gap-1">
                 <img v-if="earningsPctChange >= 0" :src="icon4Url || ''" alt="trend-up" class="h-4 w-4" />
@@ -30,13 +31,14 @@
         <div class="flex-1 flex flex-col justify-center items-center gap-4">
           <h3 class="text-light-text-darkgray dark:text-white text-sm md:text-base font-semibold">{{ $t('dashboard.analytics.trends.tokensReceived', 'Tokens Received') }}</h3>
           <div class="flex flex-col justify-center items-center gap-2">
-            <template v-if="insightData?.totalTokens">
+            <template v-if="!analyticsStore.bundleLoaded">
+              <span class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
+            </template>
+            <template v-else>
               <div class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">
-                {{ $n(insightData.totalTokens) }}
+                {{ $n(insightData?.totalTokens || 0) }}
               </div>
             </template>
-            <span v-else
-              class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
             <div class="inline-flex items-center gap-2" v-if="tokensPctChange !== null">
               <div class="flex justify-center items-center gap-1">
                 <img v-if="tokensPctChange >= 0" :src="icon4Url || ''" alt="trend-up" class="h-4 w-4" />
@@ -63,7 +65,7 @@
               </button>
             </div>
           </div>
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px]">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && insightData?.total > 0">
              
              <div data-chart-container data-chart-id="sales-daily-donut" :hidden="!isDaily||undefined" class="absolute inset-0"
                :data-chart-config='JSON.stringify({type:"donut",period:"slot",datasetKey:"sales-donut",fields:{category:"name",total:"value"},categoryKeyMap:{subscription:"subscription",paytoview:"paytoview",merch:"merch",wishtender:"wishtender",customrequest:"customrequest"},seriesStyles:salesChartStyles,legentHint:legendConfig})'>
@@ -77,6 +79,12 @@
              <div data-chart-container data-chart-id="sales-yearly-line" :hidden="isDaily||!(activePeriod==='yearly'&&activeSalesViewMode==='line')||undefined" class="absolute inset-0" :data-chart-config='getSalesLineCfg("sales-yearly")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
              <div data-chart-container data-chart-id="sales-alltime-bar" :hidden="isDaily||!(activePeriod==='alltime'&&activeSalesViewMode==='bar')||undefined" class="absolute inset-0" :data-chart-config='getSalesBarCfg("sales-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
              <div data-chart-container data-chart-id="sales-alltime-line" :hidden="isDaily||!(activePeriod==='alltime'&&activeSalesViewMode==='line')||undefined" class="absolute inset-0" :data-chart-config='getSalesLineCfg("sales-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
+          </div>
+          
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20" v-if="!analyticsStore.bundleLoaded || !insightData?.total || isChartRendering">
+            <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50 mb-2" />
+            <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+            <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
           </div>
         </div>
 
@@ -93,7 +101,7 @@
               </button>
             </div>
           </div>
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px]">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && insightData?.totalTokens > 0">
              
              <div data-chart-container data-chart-id="tokens-daily-donut" :hidden="!isDaily||undefined" class="absolute inset-0"
                :data-chart-config='JSON.stringify({type:"donut",period:"slot",datasetKey:"tokens-donut",fields:{category:"name",total:"value"},categoryKeyMap:{tipTokens:"tipTokens",callTokens:"callTokens",chatTokens:"chatTokens",liveStreamTokens:"liveStreamTokens"},seriesStyles:tokensChartStyles,legentHint:legendConfig})'>
@@ -108,6 +116,12 @@
              <div data-chart-container data-chart-id="tokens-alltime-bar" :hidden="isDaily||!(activePeriod==='alltime'&&activeTokensViewMode==='bar')||undefined" class="absolute inset-0" :data-chart-config='getTokensBarCfg("tokens-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
              <div data-chart-container data-chart-id="tokens-alltime-line" :hidden="isDaily||!(activePeriod==='alltime'&&activeTokensViewMode==='line')||undefined" class="absolute inset-0" :data-chart-config='getTokensLineCfg("tokens-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
           </div>
+
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20" v-if="!analyticsStore.bundleLoaded || !insightData?.totalTokens || isChartRendering">
+            <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50 mb-2" />
+            <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+            <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
+          </div>
         </div>
       </div>
 
@@ -116,7 +130,7 @@
         class="flex flex-col gap-4 p-4 rounded-sm ">
         <h3 class="text-light-text-darkgray dark:text-white text-lg font-semibold">{{ $t('dashboard.analytics.trends.topCountries') }}</h3>
 
-        <div v-if="insightData?.topCountries?.length > 0" class="flex flex-col md:flex-row gap-8 w-full mt-2">
+        <div v-if="analyticsStore.bundleLoaded && insightData?.topCountries?.length > 0" class="flex flex-col md:flex-row gap-8 w-full mt-2">
           <!-- Left: Table -->
           <div class="flex-1 min-w-0">
             <FlexTable :columns="earningsTopCountriesColumns" :rows="topCountriesWithRank"
@@ -154,24 +168,15 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
+        <div v-else-if="!analyticsStore.bundleLoaded || insightData?.topCountries?.length === 0 || isChartRendering" class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center h-[300px] bg-white dark:bg-dark-bg-container z-20">
           <div class="relative flex justify-center items-center">
-            <img src="/images/noTrendImg.png" alt="illustration" class="w-32 h-32 object-contain" />
+            <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50" />
           </div>
           <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
-            <a href="#" class="text-sm text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
+            <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+            <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
           </div>
         </div>
-      </div>
-    </div>
-    <div v-else class="flex flex-col justify-center items-center gap-6 h-[400px] text-center w-full">
-      <div class="relative flex justify-center items-center">
-        <img src="/images/noTrendImg.png" alt="illustration" class="w-32 h-32 object-contain" />
-      </div>
-      <div class="flex flex-col gap-1">
-        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
-        <a href="#" class="text-xs text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
       </div>
     </div>
   </DashboardAnalyticsTrendPopup>
@@ -283,6 +288,8 @@ function injectChartData() {
   }
 }
 
+const isChartRendering = ref(true)
+
 async function ensureReady() {
   if (!window.chartsHandler) return
   const hasEarningsData = window.chartsHandler._configs?.data && Object.keys(window.chartsHandler._configs.data).length > 0
@@ -302,6 +309,7 @@ async function renderChart(chartId) {
 }
 
 async function renderCurrentCharts() {
+  isChartRendering.value = true
   await ensureReady()
   if (isDaily.value) {
     
@@ -315,6 +323,7 @@ async function renderCurrentCharts() {
   if (props.insightData?.topCountries?.length > 0) {
     await renderChart('countries-map')
   }
+  isChartRendering.value = false
 }
 
 async function setSalesView(v) { activeSalesViewMode.value = v; await nextTick(); if (!isDaily.value) await renderChart(`sales-${activePeriod.value}-${v}`) }

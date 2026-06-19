@@ -250,7 +250,12 @@ function onRowContext(e, row) { e?.preventDefault?.(); emit('row-context', row) 
             </template>
           </div>
 
-          <template v-for="(row, rIdx) in rows" :key="row[rowKey] ?? rIdx">
+          <div v-if="!rows || !rows.length" class="w-full">
+            <slot name="empty">
+              <div class="p-8 text-center text-sm text-zinc-500">No data available</div>
+            </slot>
+          </div>
+          <template v-else v-for="(row, rIdx) in rows" :key="row[rowKey] ?? rIdx">
             <div :class="[theme.row, 'w-full']" v-bind="rowAttrs ? rowAttrs(row, rIdx) : {}"
                  @click="onRowClick(row)" @contextmenu="onRowContext($event, row)">
               <template v-for="(col, cIdx) in columns" :key="(row[rowKey] ?? rIdx)+'-'+col.key">

@@ -584,6 +584,7 @@ router.beforeResolve((to, from) => {
  * Update active route, preload future sections, track completion
  */
 router.afterEach(async (to, from) => {
+  console.log('Version 1.1')
   finishNavigationProgress();
 
   log('router/index.js', 'afterEach', 'start', 'Navigation completed', {

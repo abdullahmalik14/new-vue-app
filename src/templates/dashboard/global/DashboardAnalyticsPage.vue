@@ -38,6 +38,16 @@
       <DashboardAnalyticsContributorsTrendPopup v-if="isContributorsTrendPopupOpen" v-model="isContributorsTrendPopupOpen" v-model:period="analyticsContributorsTrendPeriod"
         :insight-data="dashboardAnalyticsStore.getContributorsViewModel(analyticsContributorsTrendPeriod)" />
 
+      <!-- Toast Notification -->
+      <transition enter-active-class="transition duration-300 ease-out" enter-from-class="transform translate-y-2 opacity-0" enter-to-class="transform translate-y-0 opacity-100" leave-active-class="transition duration-200 ease-in" leave-from-class="transform translate-y-0 opacity-100" leave-to-class="transform translate-y-2 opacity-0">
+        <div v-if="isAnalyticsRefreshing" class="fixed bottom-6 right-6 z-[9999] flex items-center gap-3 bg-[#1D1D20] text-white px-5 py-3 rounded-xl shadow-lg border border-[#333]">
+          <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="text-sm font-medium">Fetching Analytics Data...</span>
+        </div>
+      </transition>
     </div>
   </DashboardSharedTwoColLayout>
 </template>
@@ -109,13 +119,20 @@ async function refreshDashboardAnalytics() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (window.performanceTracker) {
     window.performanceTracker.step({
       flowName: 'AnalyticsRender',
       stepName: 'DashboardAnalyticsPage Mounted',
       status: 'success'
     });
+  }
+
+  isAnalyticsRefreshing.value = true
+  try {
+    await FlowHandler.run(ANALYTICS_FETCH_FLOW, { source: 'full' })
+  } finally {
+    isAnalyticsRefreshing.value = false
   }
 
   FlowRefreshManager.startFromRegistry(ANALYTICS_FETCH_FLOW, { source: 'full' })

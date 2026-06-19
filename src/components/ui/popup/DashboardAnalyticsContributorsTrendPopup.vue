@@ -7,7 +7,7 @@
     :title="$t('dashboard.analytics.trends.titleContributors', 'Contributors Insight')"
     :logo="iconPopupLogo || ''"
   >
-    <div v-if="hasContributorsData" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4">
 
       <!-- {{ $t('dashboard.analytics.trends.topContributors') }} -->
       <div class="flex flex-col gap-3 p-4 rounded-sm w-full h-[22rem] relative">
@@ -23,7 +23,7 @@
           </div>
         </div>
 
-        <div v-if="insightData?.topContributors?.length > 0" class="absolute top-[40px] left-0 right-0 bottom-[10px]">
+        <div class="absolute top-[40px] left-0 right-0 bottom-[10px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && insightData?.topContributors?.length > 0">
           <div data-chart-container data-chart-id="contrib-top-bar" :hidden="activeContribViewMode!=='bar'||undefined" class="absolute inset-0"
             :data-chart-config='getContribBarCfg("contrib-top")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
@@ -33,11 +33,11 @@
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
-        <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img :src="icon6Url || ''" alt="list" class="w-32 h-32 object-contain" />
+        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 bg-white dark:bg-dark-bg-container z-20" v-if="!analyticsStore.bundleLoaded || !insightData?.topContributors?.length || isChartRendering">
+          <img src="/images/noTrendImg.png" alt="list" class="w-16 h-16 object-contain opacity-50" />
           <div class="flex flex-col gap-1">
-            <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
-            <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
+            <span class="text-xs leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
+            <a href="#" class="text-[10px] leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
           </div>
         </div>
       </div>
@@ -56,7 +56,7 @@
           </div>
         </div>
 
-        <div v-if="insightData?.topFans?.length > 0" class="absolute top-[40px] left-0 right-0 bottom-[10px]">
+        <div class="absolute top-[40px] left-0 right-0 bottom-[10px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && insightData?.topFans?.length > 0">
           <div data-chart-container data-chart-id="contrib-fans-bar" :hidden="activeFansViewMode!=='bar'||undefined" class="absolute inset-0"
             :data-chart-config='getContribBarCfg("contrib-fans")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
@@ -66,11 +66,11 @@
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
-        <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img :src="icon6Url || ''" alt="list" class="w-32 h-32 object-contain" />
+        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 bg-white dark:bg-dark-bg-container z-20" v-if="!analyticsStore.bundleLoaded || !insightData?.topFans?.length || isChartRendering">
+          <img src="/images/noTrendImg.png" alt="list" class="w-16 h-16 object-contain opacity-50" />
           <div class="flex flex-col gap-1">
-            <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
-            <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
+            <span class="text-xs leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
+            <a href="#" class="text-[10px] leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@
           </div>
         </div>
 
-        <div v-if="insightData?.topOrderSpenders?.length > 0" class="absolute top-[40px] left-0 right-0 bottom-[10px]">
+        <div class="absolute top-[40px] left-0 right-0 bottom-[10px]" v-show="analyticsStore.bundleLoaded && insightData?.topOrderSpenders?.length > 0">
           <div data-chart-container data-chart-id="contrib-spenders-bar" :hidden="activeSpendersViewMode!=='bar'||undefined" class="absolute inset-0"
             :data-chart-config='getContribBarCfg("contrib-spenders")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
@@ -99,24 +99,15 @@
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
-        <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center">
-          <img :src="icon6Url || ''" alt="list" class="w-32 h-32 object-contain" />
+        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 bg-white dark:bg-dark-bg-container z-20" v-if="!analyticsStore.bundleLoaded || !insightData?.topOrderSpenders?.length || isChartRendering">
+          <img src="/images/noTrendImg.png" alt="list" class="w-16 h-16 object-contain opacity-50" />
           <div class="flex flex-col gap-1">
-            <span class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
-            <a href="#" class="text-base leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
+            <span class="text-xs leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
+            <a href="#" class="text-[10px] leading-6 text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
           </div>
         </div>
       </div>
 
-    </div>
-    <div v-else class="flex flex-col justify-center items-center gap-6 h-[400px] text-center w-full">
-      <div class="relative flex justify-center items-center">
-        <img src="/images/noTrendImg.png" alt="illustration" class="w-32 h-32 object-contain" />
-      </div>
-      <div class="flex flex-col gap-1">
-        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend') }}</span>
-        <a href="#" class="text-xs text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn') }}</a>
-      </div>
     </div>
   </DashboardAnalyticsTrendPopup>
 </template>
@@ -129,6 +120,7 @@ const { url: icon6Url } = useAssetUrl('dashboard.analytics.icon6')
 import DashboardAnalyticsTrendPopup from './DashboardAnalyticsTrendPopup.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -138,6 +130,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'update:period'])
 const { t } = useI18n()
+const analyticsStore = useDashboardAnalyticsStore()
 
 const hasContributorsData = computed(() => {
   if (!props.insightData) return false
@@ -242,11 +235,15 @@ async function renderChart(chartId) {
   await window.chartsHandler.renderChartInstance(container)
 }
 
+const isChartRendering = ref(true)
+
 async function renderAllCharts() {
+  isChartRendering.value = true
   await ensureReady()
   await renderChart(`contrib-top-${activeContribViewMode.value}`)
   await renderChart(`contrib-fans-${activeFansViewMode.value}`)
   await renderChart(`contrib-spenders-${activeSpendersViewMode.value}`)
+  isChartRendering.value = false
 }
 
 async function setContribView(v) {

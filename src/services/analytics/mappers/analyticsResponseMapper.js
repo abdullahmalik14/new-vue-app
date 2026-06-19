@@ -64,7 +64,7 @@ export function mapEarningsBundle(earnings) {
 
 const getValidSparkline = (arr, key) => {
   const extracted = (arr || []).slice(-10).map(entry => entry[key] || 0);
-  return extracted.every(v => v === 0) ? [3, 4, 3, 5, 4, 6, 5, 7, 6, 8] : extracted;
+  return extracted.every(v => v === 0) ? [] : extracted;
 };
 
 export function mapFanInsightsPeriod(arr, countriesArr) {

@@ -2,7 +2,7 @@
   <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
     @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.subscriptionsInsight')"
     :logo="iconPopupLogo || ''">
-    <div v-if="hasSubscribersData" :class="isDaily ? 'flex flex-row gap-6' : 'flex flex-col gap-6'">
+    <div :class="isDaily ? 'flex flex-row gap-6' : 'flex flex-col gap-6'">
 
       <!-- STAT CARDS (Hidden to match Figma) -->
       <!--
@@ -48,7 +48,7 @@
           </div>
         </div>
 
-        <div class="absolute top-[40px] left-0 right-0 bottom-[30px]">
+        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && (insightData?.new > 0 || insightData?.recurring > 0)">
           <!-- Daily Donut -->
           <div data-chart-container data-chart-id="subs-daily-donut" :hidden="!isDaily || undefined"
             class="absolute inset-0"
@@ -104,6 +104,12 @@
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
+
+        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20" v-if="!analyticsStore.bundleLoaded || (!insightData?.new && !insightData?.recurring) || isChartRendering">
+          <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50 mb-2" />
+          <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+          <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
+        </div>
       </div>
 
       <!-- TIERS BREAKDOWN -->
@@ -130,7 +136,7 @@
           </div>
         </div>
 
-        <div class="absolute top-[40px] left-0 right-0 bottom-[30px]">
+        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && (insightData?.new > 0 || insightData?.recurring > 0)">
           <!-- Daily Donut -->
           <div data-chart-container data-chart-id="tiers-daily-donut" :hidden="!isDaily || undefined"
             class="absolute inset-0"
@@ -186,17 +192,14 @@
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
+
+        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20" v-if="!analyticsStore.bundleLoaded || (!insightData?.new && !insightData?.recurring) || isChartRendering">
+          <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50 mb-2" />
+          <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+          <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
+        </div>
       </div>
 
-    </div>
-    <div v-else class="flex flex-col justify-center items-center gap-6 h-[400px] text-center w-full">
-      <div class="relative flex justify-center items-center">
-        <img src="/images/noTrendImg.png" alt="illustration" class="w-32 h-32 object-contain" />
-      </div>
-      <div class="flex flex-col gap-1">
-        <span class="text-base font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
-        <a href="#" class="text-xs text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
-      </div>
     </div>
   </DashboardAnalyticsTrendPopup>
 </template>
@@ -322,6 +325,8 @@ function injectChartData() {
   }
 }
 
+const isChartRendering = ref(true)
+
 // ===== CHART RENDERING =====
 async function ensureReady() {
   if (!window.chartsHandler) return
@@ -343,6 +348,7 @@ async function renderChart(chartId) {
 }
 
 async function renderCurrentCharts() {
+  isChartRendering.value = true
   await ensureReady()
   if (isDaily.value) {
     await renderChart('subs-daily-donut')
@@ -352,6 +358,7 @@ async function renderCurrentCharts() {
     await renderChart(`subs-${p}-${activeSubsViewMode.value}`)
     await renderChart(`tiers-${p}-${activeTiersViewMode.value}`)
   }
+  isChartRendering.value = false
 }
 
 async function setSubsView(v) {

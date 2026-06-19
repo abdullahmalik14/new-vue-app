@@ -605,6 +605,7 @@ function startStartupPreloadForCurrentRoute() {
 }
 
 async function mountApplication() {
+  console.log("Version 1.1");
   if (window.performanceTracker) {
     window.performanceTracker.step({
       step: "initAssetLibrary_start",

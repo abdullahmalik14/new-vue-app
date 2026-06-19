@@ -59,16 +59,16 @@
                         <div class="flex justify-between items-end">
                           <span>
                             <span :data-value="dashboardAnalyticsStore.subscriberInsights?.daily?.new"
-                              class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                                dashboardAnalyticsStore.subscriberInsights?.daily?.new ?? '--' }}</span>
+                              class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{ displayValue(dashboardAnalyticsStore.subscriberInsights?.daily?.new) }}</span>
                           </span>
 
                           <!-- right part only show when data are here -->
                           <DashboardStatIndicator v-if="dashboardAnalyticsStore.subscriberInsights?.daily?.newPercentage !== undefined && dashboardAnalyticsStore.subscriberInsights?.daily?.newPercentage !== null" :percentage="dashboardAnalyticsStore.subscriberInsights?.daily?.newPercentage" :period-label="$t('dashboard.analytics.trends.vsYesterday')" />
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.subscriberInsights?.daily?.newSparkline?.length > 0">
-                            <SparkLine :data="dashboardAnalyticsStore.subscriberInsights.daily.newSparkline" color="#22c55e" :height="28" />
-                          </div>
+<SparkLine :data="dashboardAnalyticsStore.subscriberInsights.daily.newSparkline" color="#22c55e" :height="28" />
+</div>
+
                       </div>
                     </div>
                   </div>
@@ -86,15 +86,15 @@
                         <div class="flex justify-between items-end">
                           <span>
                             <span :data-value="dashboardAnalyticsStore.subscriberInsights?.daily?.recurring"
-                              class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                                dashboardAnalyticsStore.subscriberInsights?.daily?.recurring ?? '--' }}</span>
+                              class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{ displayValue(dashboardAnalyticsStore.subscriberInsights?.daily?.recurring) }}</span>
                           </span>
                           <!-- right part only show when data are here -->
                           <DashboardStatIndicator v-if="dashboardAnalyticsStore.subscriberInsights?.daily?.recurringPercentage !== undefined && dashboardAnalyticsStore.subscriberInsights?.daily?.recurringPercentage !== null" :percentage="dashboardAnalyticsStore.subscriberInsights?.daily?.recurringPercentage" :period-label="$t('dashboard.analytics.trends.vsYesterday')" />
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.subscriberInsights?.daily?.recurringSparkline?.length > 0">
-                            <SparkLine :data="dashboardAnalyticsStore.subscriberInsights.daily.recurringSparkline" color="#22c55e" :width="70" :height="28" />
-                          </div>
+<SparkLine :data="dashboardAnalyticsStore.subscriberInsights.daily.recurringSparkline" color="#22c55e" :width="70" :height="28" />
+</div>
+
                       </div>
                     </div>
                   </div>
@@ -117,12 +117,13 @@
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.fans?.daily?.newFollowers"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
-                            {{ dashboardAnalyticsStore.fans?.daily?.newFollowers ?? '--' }}</span>
+                            {{ displayValue(dashboardAnalyticsStore.fans?.daily?.newFollowers) }}</span>
                           <DashboardStatIndicator v-if="dashboardAnalyticsStore.fans?.daily?.newFollowersPercentage !== undefined && dashboardAnalyticsStore.fans?.daily?.newFollowersPercentage !== null" :percentage="dashboardAnalyticsStore.fans?.daily?.newFollowersPercentage" :period-label="$t('dashboard.analytics.trends.vsYesterday')" />
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.fans?.daily?.newFollowersSparkline?.length > 0">
-                            <SparkLine :data="dashboardAnalyticsStore.fans.daily.newFollowersSparkline" color="#ef4444" :width="60" :height="24" />
-                          </div>
+<SparkLine :data="dashboardAnalyticsStore.fans.daily.newFollowersSparkline" color="#ef4444" :width="60" :height="24" />
+</div>
+
                       </div>
 
                       <div class="flex flex-col gap-2 w-full flex-shrink items-start">
@@ -132,7 +133,7 @@
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.fans?.daily?.profileVisit"
                             class="text-[1.875rem] font-semibold font-sans leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
-                            {{ dashboardAnalyticsStore.fans?.daily?.profileVisit ?? '--' }}</span>
+                            {{ displayValue(dashboardAnalyticsStore.fans?.daily?.profileVisit) }}</span>
                           <div v-if="
                             dashboardAnalyticsStore.fans?.daily?.profileVisitPercentage !== undefined &&
                             dashboardAnalyticsStore.fans?.daily?.profileVisitPercentage !== null
@@ -155,8 +156,9 @@
                           </div>
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.fans?.daily?.profileVisitSparkline?.length > 0">
-                            <SparkLine :data="dashboardAnalyticsStore.fans.daily.profileVisitSparkline" color="#ef4444" :width="60" :height="24" />
-                          </div>
+<SparkLine :data="dashboardAnalyticsStore.fans.daily.profileVisitSparkline" color="#ef4444" :width="60" :height="24" />
+</div>
+
                       </div>
                     </div>
                   </div>
@@ -174,11 +176,7 @@
                     <span>
                       <span
                         :data-value="dashboardAnalyticsStore.earningsInsights?.daily?.total"
-                        class="text-[2.25rem] font-semibold leading-[2.75rem] font-sans tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{
-                          dashboardAnalyticsStore.earningsInsights?.daily?.total != null ?
-                            $n(Number(dashboardAnalyticsStore.earningsInsights.daily.total)) :
-                            '--'
-                        }}</span>
+                        class="text-[2.25rem] font-semibold leading-[2.75rem] font-sans tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{ displayCurrency(dashboardAnalyticsStore.earningsInsights?.daily?.total) }}</span>
                       <span v-if="dashboardAnalyticsStore.earningsInsights?.daily?.total != null"
                         class="text-base font-medium leading-6 font-sans text-light-text-secondary dark:text-dark-text-secondary ml-1">USD</span>
                     </span>
@@ -223,8 +221,7 @@
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.likes?.media"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
-                            {{ dashboardAnalyticsStore.likes?.media != null ? $n(Number(dashboardAnalyticsStore.likes.media)) : '--'
-                            }}</span>
+                            {{ displayCurrency(dashboardAnalyticsStore.likes?.media) }}</span>
                           <div v-if="
                             dashboardAnalyticsStore.likes?.mediaPercentage !== undefined &&
                             dashboardAnalyticsStore.likes?.mediaPercentage !== null
@@ -246,8 +243,9 @@
 
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.likes?.mediaSparkline?.length > 0">
-                            <SparkLine :data="dashboardAnalyticsStore.likes.mediaSparkline" color="#ef4444" :width="55" :height="22" />
-                          </div>
+<SparkLine :data="dashboardAnalyticsStore.likes.mediaSparkline" color="#ef4444" :width="55" :height="22" />
+</div>
+
                       </div>
 
                       <div class="flex flex-col gap-2 w-full flex-shrink items-start">
@@ -256,8 +254,7 @@
 
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.likes?.merch"
-                            class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">{{
-                              dashboardAnalyticsStore.likes?.merch ?? '--' }}</span>
+                            class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">{{ displayValue(dashboardAnalyticsStore.likes?.merch) }}</span>
                           <div v-if="
                             dashboardAnalyticsStore.likes?.merchPercentage !== undefined &&
                             dashboardAnalyticsStore.likes?.merchPercentage !== null
@@ -279,8 +276,9 @@
                           </div>
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.likes?.merchSparkline?.length > 0">
-                            <SparkLine :data="dashboardAnalyticsStore.likes.merchSparkline" color="#ef4444" :width="55" :height="22" />
-                          </div>
+<SparkLine :data="dashboardAnalyticsStore.likes.merchSparkline" color="#ef4444" :width="55" :height="22" />
+</div>
+
                       </div>
                     </div>
                   </div>
@@ -297,9 +295,7 @@
 
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.likes?.profile"
-                            class="text-[1.875rem] font-semibold font-sans leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">{{
-                              dashboardAnalyticsStore.likes?.profile != null ? $n(Number(dashboardAnalyticsStore.likes.profile)) : '--'
-                            }}</span>
+                            class="text-[1.875rem] font-semibold font-sans leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">{{ displayCurrency(dashboardAnalyticsStore.likes?.profile) }}</span>
                           <div v-if="
                             dashboardAnalyticsStore.likes?.profilePercentage !== undefined &&
                             dashboardAnalyticsStore.likes?.profilePercentage !== null
@@ -320,8 +316,9 @@
                           </div>
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.likes?.profileSparkline?.length > 0">
-                            <SparkLine :data="dashboardAnalyticsStore.likes.profileSparkline" color="#22c55e" :width="55" :height="22" />
-                          </div>
+<SparkLine :data="dashboardAnalyticsStore.likes.profileSparkline" color="#22c55e" :width="55" :height="22" />
+</div>
+
                       </div>
 
                       <div class="flex flex-col gap-2 w-full flex-shrink items-start">
@@ -330,9 +327,7 @@
 
                         <div class="flex items-end justify-between w-full gap-1">
                           <span :data-value="dashboardAnalyticsStore.likes?.feed"
-                            class="text-[1.875rem] font-semibold leading-[2.375rem] font-sans text-light-text-primary dark:text-dark-text-primary">{{
-                              dashboardAnalyticsStore.likes?.feed != null ? $n(Number(dashboardAnalyticsStore.likes.feed)) : '--'
-                            }}</span>
+                            class="text-[1.875rem] font-semibold leading-[2.375rem] font-sans text-light-text-primary dark:text-dark-text-primary">{{ displayCurrency(dashboardAnalyticsStore.likes?.feed) }}</span>
                           <div v-if="
                             dashboardAnalyticsStore.likes?.feedPercentage !== undefined &&
                             dashboardAnalyticsStore.likes?.feedPercentage !== null
@@ -352,8 +347,9 @@
                           </div>
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.likes?.feedSparkline?.length > 0">
-                            <SparkLine :data="dashboardAnalyticsStore.likes.feedSparkline" color="#22c55e" :width="55" :height="22" />
-                          </div>
+<SparkLine :data="dashboardAnalyticsStore.likes.feedSparkline" color="#22c55e" :width="55" :height="22" />
+</div>
+
                       </div>
 
 
@@ -417,7 +413,18 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n()
+const { t, n } = useI18n()
+
+const displayValue = (val) => {
+  if (!dashboardAnalyticsStore.bundleLoaded) return '--'
+  return val == null ? 0 : val
+}
+
+const displayCurrency = (val) => {
+  if (!dashboardAnalyticsStore.bundleLoaded) return '--'
+  return val == null ? 0 : n(Number(val))
+}
+
 const dashboardAnalyticsStore = useDashboardAnalyticsStore()
 const { lastUpdated } = storeToRefs(dashboardAnalyticsStore)
 
