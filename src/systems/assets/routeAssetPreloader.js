@@ -5,7 +5,7 @@
 
 import { getActivePinia } from 'pinia';
 import { useAuthStore } from '../../stores/useAuthStore.js';
-import { resolveCurrentRouteSectionName } from '../sections/sectionPreloadOrchestrator.js';
+import { resolveCurrentSectionNameFromRouteConfig } from '../sections/sectionPreloadOrchestrator.js';
 import { preloadSectionAssets } from './assetPreloader.js';
 import { log } from '../../infrastructure/logging/logHandler.js';
 import { normalizeTargetPath, resolveRouteForPrefetch } from '../routing/routeComponentPreloader.js';
@@ -48,7 +48,7 @@ export function prefetchSectionAssetsForRoute(targetPath, options = {}) {
     return Promise.resolve();
   }
 
-  const sectionName = resolveCurrentRouteSectionName(resolved.route, userRole);
+  const sectionName = resolveCurrentSectionNameFromRouteConfig(resolved.route, userRole);
 
   if (!sectionName) {
     log('routeAssetPrefetch.js', 'prefetchSectionAssetsForRoute', 'skip', 'Route has no section for asset prefetch', {

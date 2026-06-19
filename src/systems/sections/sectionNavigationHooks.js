@@ -12,7 +12,7 @@ import { preloadSectionCriticalImages } from '../assets/assetPreloader.js';
 import { resolveRoleSectionVariant } from './sectionResolver.js';
 import { preloadSection } from './sectionPreloader.js';
 import {
-  getRoutePreloadPlan,
+  getSectionPreloadPlan,
   startBackgroundSectionPreloads,
 } from './sectionPreloadOrchestrator.js';
 import {
@@ -165,7 +165,7 @@ export function startPostNavigationSectionPreloads({
   const {
     preloadSectionIdentifiers: sectionsToPreload,
     resolvedSectionNames: resolvedSectionsToPreload,
-  } = getRoutePreloadPlan(routeConfig, userRole);
+  } = getSectionPreloadPlan(routeConfig, userRole);
 
   log('sectionNavigationHooks.js', 'startPostNavigationSectionPreloads', 'preload-check', 'Checking preload sections', {
     path: to.path,

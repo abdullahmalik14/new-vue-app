@@ -158,12 +158,12 @@ describe('routeContracts — config stability (Phase G §93)', () => {
     `);
   });
 
-  it('getRoutePreloadPlan snapshot for role-based preload fixture', async () => {
-    const { getRoutePreloadPlan } = await import(
+  it('getSectionPreloadPlan snapshot for role-based preload fixture', async () => {
+    const { getSectionPreloadPlan } = await import(
       '../../src/systems/sections/sectionPreloadOrchestrator.js'
     );
 
-    const plan = getRoutePreloadPlan(
+    const plan = getSectionPreloadPlan(
       {
         slug: '/dashboard',
         section: { creator: 'dashboard-creator', fan: 'dashboard-fan' },

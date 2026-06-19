@@ -28,11 +28,11 @@ export function clearSectionCssPreloadHint(sectionName) {
 }
 
 function removeSectionCssPreloadHint(sectionName) {
-  const hintLink = preloadHintLinks.get(sectionName);
+  const cssPreloadHintLink = preloadHintLinks.get(sectionName);
   preloadHintPromises.delete(sectionName);
 
-  if (hintLink && hintLink.parentNode) {
-    hintLink.parentNode.removeChild(hintLink);
+  if (cssPreloadHintLink && cssPreloadHintLink.parentNode) {
+    cssPreloadHintLink.parentNode.removeChild(cssPreloadHintLink);
     preloadHintLinks.delete(sectionName);
     return true;
   }
@@ -63,10 +63,10 @@ function normalizeCssBundlePath(rawPath) {
  * @param {string} sectionName - Section name
  * @returns {Promise<{ cssPath: string, integrity: string|null }|null>}
  */
-async function getSectionCssBundle(sectionName) {
+async function resolveSectionCssBundlePaths(sectionName) {
   log(
     "sectionCssLoader.js",
-    "getSectionCssBundle",
+    "resolveSectionCssBundlePaths",
     "start",
     "Getting CSS bundle for section",
     { sectionName },
@@ -74,16 +74,16 @@ async function getSectionCssBundle(sectionName) {
 
   try {
     const bundlePaths = await getSectionBundlePaths(sectionName);
-    const rawPath = bundlePaths?.css;
+    const rawCssBundlePath = bundlePaths?.css;
 
-    if (rawPath) {
-      const normalized = normalizeCssBundlePath(rawPath);
+    if (rawCssBundlePath) {
+      const normalized = normalizeCssBundlePath(rawCssBundlePath);
       const integrity = bundlePaths.integrity?.css || null;
 
       if (!isTrustedBundlePath(normalized)) {
         logError(
           "sectionCssLoader.js",
-          "getSectionCssBundle",
+          "resolveSectionCssBundlePaths",
           "Untrusted CSS bundle path rejected",
           new Error("Untrusted path"),
           {
@@ -96,7 +96,7 @@ async function getSectionCssBundle(sectionName) {
 
       log(
         "sectionCssLoader.js",
-        "getSectionCssBundle",
+        "resolveSectionCssBundlePaths",
         "success",
         "CSS bundle found",
         {
@@ -111,7 +111,7 @@ async function getSectionCssBundle(sectionName) {
 
     log(
       "sectionCssLoader.js",
-      "getSectionCssBundle",
+      "resolveSectionCssBundlePaths",
       "not-found",
       "No CSS bundle for section",
       {
@@ -123,7 +123,7 @@ async function getSectionCssBundle(sectionName) {
   } catch (error) {
     logError(
       "sectionCssLoader.js",
-      "getSectionCssBundle",
+      "resolveSectionCssBundlePaths",
       "Error getting CSS bundle",
       error,
       {
@@ -141,7 +141,7 @@ async function getSectionCssBundle(sectionName) {
  * @returns {Promise<string|null>} CSS file path or null
  */
 async function getSectionCssPath(sectionName) {
-  const bundle = await getSectionCssBundle(sectionName);
+  const bundle = await resolveSectionCssBundlePaths(sectionName);
   return bundle?.cssPath ?? null;
 }
 
@@ -152,8 +152,8 @@ async function getSectionCssPath(sectionName) {
  * @param {string} sectionName - Section name
  * @returns {Promise<HTMLLinkElement>} Link element
  */
-async function injectCssLink(cssPath, sectionName, integrity = null) {
-  log("sectionCssLoader.js", "injectCssLink", "start", "Injecting CSS link", {
+async function injectSectionCssLinkElement(cssPath, sectionName, integrity = null) {
+  log("sectionCssLoader.js", "injectSectionCssLinkElement", "start", "Injecting CSS link", {
     cssPath,
     sectionName,
   });
@@ -172,7 +172,7 @@ async function injectCssLink(cssPath, sectionName, integrity = null) {
     if (existingLink) {
       log(
         "sectionCssLoader.js",
-        "injectCssLink",
+        "injectSectionCssLinkElement",
         "exists",
         "CSS already loaded",
         { sectionName },
@@ -191,7 +191,7 @@ async function injectCssLink(cssPath, sectionName, integrity = null) {
 
     // Handle load success
     linkElement.onload = () => {
-      log("sectionCssLoader.js", "injectCssLink", "success", "CSS loaded", {
+      log("sectionCssLoader.js", "injectSectionCssLinkElement", "success", "CSS loaded", {
         cssPath,
         sectionName,
       });
@@ -200,7 +200,7 @@ async function injectCssLink(cssPath, sectionName, integrity = null) {
         window.performanceTracker.step({
           step: "sectionCss_loaded",
           file: "sectionCssLoader.js",
-          method: "injectCssLink",
+          method: "injectSectionCssLinkElement",
           flag: "success",
           purpose: `Section CSS loaded: ${sectionName}`,
         });
@@ -213,7 +213,7 @@ async function injectCssLink(cssPath, sectionName, integrity = null) {
     linkElement.onerror = (error) => {
       logError(
         "sectionCssLoader.js",
-        "injectCssLink",
+        "injectSectionCssLinkElement",
         "CSS load failed",
         error,
         {
@@ -226,7 +226,7 @@ async function injectCssLink(cssPath, sectionName, integrity = null) {
         window.performanceTracker.step({
           step: "sectionCss_error",
           file: "sectionCssLoader.js",
-          method: "injectCssLink",
+          method: "injectSectionCssLinkElement",
           flag: "error",
           purpose: `Section CSS failed: ${sectionName}`,
         });
@@ -240,7 +240,7 @@ async function injectCssLink(cssPath, sectionName, integrity = null) {
 
     log(
       "sectionCssLoader.js",
-      "injectCssLink",
+      "injectSectionCssLinkElement",
       "appended",
       "CSS link appended to head",
       {
@@ -291,7 +291,7 @@ export async function loadSectionCss(sectionName) {
     }
 
     // Get CSS bundle info
-    const cssBundle = await getSectionCssBundle(sectionName);
+    const cssBundle = await resolveSectionCssBundlePaths(sectionName);
 
     if (!cssBundle) {
       log(
@@ -305,7 +305,7 @@ export async function loadSectionCss(sectionName) {
     }
 
     // Inject CSS
-    const linkElement = await injectCssLink(
+    const linkElement = await injectSectionCssLinkElement(
       cssBundle.cssPath,
       sectionName,
       cssBundle.integrity,
@@ -365,7 +365,7 @@ export async function loadSectionCss(sectionName) {
  *
  * IMPORTANT: this Promise only resolves to `true` after `link.onload` fires, i.e. once
  * the CSS file has actually been downloaded into the HTTP cache. Callers that need to
- * mark a section as "fully preloaded" must await this — see sectionPreloader._doPreload.
+ * mark a section as "fully preloaded" must await this — see sectionPreloader.performSectionPreload.
  *
  * @param {string} sectionName - Section name
  * @returns {Promise<boolean>} Resolves true after onload, false on validation failure (no bundle / untrusted path).
@@ -391,7 +391,7 @@ export async function preloadSectionCss(sectionName) {
 
   let cssBundle;
   try {
-    cssBundle = await getSectionCssBundle(sectionName);
+    cssBundle = await resolveSectionCssBundlePaths(sectionName);
   } catch (error) {
     logError(
       "sectionCssLoader.js",

@@ -22,12 +22,12 @@ export function resolveCurrentSectionForNavigation(to, userRole) {
     return null;
   }
 
-  const resolved =
+  const resolvedSectionName =
     typeof currentSection === 'object'
       ? resolveRoleSectionVariant(currentSection, userRole)
       : currentSection;
 
-  return typeof resolved === 'string' && resolved ? resolved : null;
+  return typeof resolvedSectionName === 'string' && resolvedSectionName ? resolvedSectionName : null;
 }
 
 /**
@@ -69,20 +69,20 @@ export function loadCurrentSectionResources({
   const resolvedCurrentSection = resolveCurrentSectionForNavigation(to, userRole);
 
   if (resolvedCurrentSection) {
-    loadSectionCss(resolvedCurrentSection).catch((err) => {
+    loadSectionCss(resolvedCurrentSection).catch((resourceLoadError) => {
       log(file, method, 'css-error', 'Section CSS load failed (non-blocking)', {
         section: resolvedCurrentSection,
-        error: err.message,
+        error: resourceLoadError.message,
       });
     });
 
     if (!areTranslationsLoadedForSection(resolvedCurrentSection, activeLocale)) {
-      loadTranslationsForSection(resolvedCurrentSection, activeLocale).catch((err) => {
+      loadTranslationsForSection(resolvedCurrentSection, activeLocale).catch((resourceLoadError) => {
         log(file, method, 'translation-error', 'Translation load failed (non-blocking)', {
           originalSection: currentSection,
           resolvedSection: resolvedCurrentSection,
           locale: activeLocale,
-          error: err.message,
+          error: resourceLoadError.message,
         });
       });
     } else {
@@ -92,10 +92,10 @@ export function loadCurrentSectionResources({
       });
     }
 
-    preloadSectionAssets(resolvedCurrentSection).catch((err) => {
+    preloadSectionAssets(resolvedCurrentSection).catch((resourceLoadError) => {
       log(file, method, 'asset-preload-error', 'Current section asset preload failed (non-blocking)', {
         section: resolvedCurrentSection,
-        error: err.message,
+        error: resourceLoadError.message,
       });
     });
   } else if (currentSection) {

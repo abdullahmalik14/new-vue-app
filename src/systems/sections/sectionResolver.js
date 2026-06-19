@@ -19,7 +19,7 @@ const PRELOAD_SECTIONS_FALLBACK_ROLE = 'default';
  * @param {string} userRole
  * @returns {Array<string>}
  */
-function resolveRolePreLoadSections(preLoadSections, userRole) {
+function resolveRolePreloadSections(preLoadSections, userRole) {
   if (!preLoadSections) {
     return [];
   }
@@ -38,7 +38,7 @@ function resolveRolePreLoadSections(preLoadSections, userRole) {
       return roleSections;
     }
 
-    log('sectionResolver.js', 'resolveRolePreLoadSections', 'warn', 'Role-keyed preLoadSections could not be resolved', {
+    log('sectionResolver.js', 'resolveRolePreloadSections', 'warn', 'Role-keyed preLoadSections could not be resolved', {
       userRole,
       availableRoles: Object.keys(preLoadSections)
     });
@@ -73,7 +73,7 @@ export function getPreloadSectionsForRoute(route, userRole) {
   }
 
   try {
-    const sections = resolveRolePreLoadSections(route.preLoadSections, userRole);
+    const sections = resolveRolePreloadSections(route.preLoadSections, userRole);
 
     // Remove duplicates
     const uniqueSections = [...new Set(sections)];
@@ -123,17 +123,17 @@ export function resolveSectionIdentifier(identifier, userRole = 'guest') {
     return null;
   }
 
-  const trimmed = identifier.trim();
+  const trimmedIdentifier = identifier.trim();
 
   // Treat identifier as possible slug variants
-  const maybeSlugs = [];
-  if (trimmed.startsWith('/')) {
-    maybeSlugs.push(trimmed);
+  const candidateSlugPaths = [];
+  if (trimmedIdentifier.startsWith('/')) {
+    candidateSlugPaths.push(trimmedIdentifier);
   } else {
-    maybeSlugs.push(`/${trimmed}`);
+    candidateSlugPaths.push(`/${trimmedIdentifier}`);
   }
 
-  for (const potentialSlug of maybeSlugs) {
+  for (const potentialSlug of candidateSlugPaths) {
     const matchedRoute = resolveRouteFromPath(potentialSlug);
     if (matchedRoute) {
       const resolvedSection = resolveRoleSectionVariant(matchedRoute.section, userRole);
@@ -151,7 +151,7 @@ export function resolveSectionIdentifier(identifier, userRole = 'guest') {
   log('sectionResolver.js', 'resolveSectionIdentifier', 'info', 'Identifier treated as direct section name', {
     identifier
   });
-  return trimmed;
+  return trimmedIdentifier;
 }
 
 /**

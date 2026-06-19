@@ -29,7 +29,7 @@ export {
   clearAssetPreloadSectionCache,
   dedupeAssetPreloadEntries,
   isRouteEnabledForAssetPreload,
-  routeBelongsToSection,
+  doesRouteBelongToSection,
 } from './routeSectionAssetPreloadEntries.js';
 
 export {

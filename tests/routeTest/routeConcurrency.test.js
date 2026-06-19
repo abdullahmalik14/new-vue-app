@@ -27,8 +27,8 @@ vi.mock('../../src/systems/routing/routeConfigLoader.js', () => ({
 }));
 
 vi.mock('../../src/systems/sections/sectionPreloadOrchestrator.js', () => ({
-  resolveCurrentRouteSectionName: vi.fn((route) => route?.section ?? null),
-  getRoutePreloadPlan: vi.fn(() => ({ preloadSectionIdentifiers: [], resolvedSectionNames: [] })),
+  resolveCurrentSectionNameFromRouteConfig: vi.fn((route) => route?.section ?? null),
+  getSectionPreloadPlan: vi.fn(() => ({ preloadSectionIdentifiers: [], resolvedSectionNames: [] })),
   startBackgroundSectionPreloads: vi.fn(() => Promise.resolve()),
 }));
 

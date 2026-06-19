@@ -221,9 +221,9 @@ export const usePreloadStore = defineStore('preload', {
         return;
       }
       ensurePreloadSets(this);
-      const next = addToStringSet(this.sectionsInProgress, sectionName);
-      if (next !== this.sectionsInProgress) {
-        this.sectionsInProgress = next;
+      const nextSectionSet = addToStringSet(this.sectionsInProgress, sectionName);
+      if (nextSectionSet !== this.sectionsInProgress) {
+        this.sectionsInProgress = nextSectionSet;
         log('usePreloadStore.js', 'markSectionInProgress', 'start', 'Section preload in progress', { sectionName });
       }
     },
@@ -237,9 +237,9 @@ export const usePreloadStore = defineStore('preload', {
         return;
       }
       ensurePreloadSets(this);
-      const next = removeFromStringSet(this.sectionsInProgress, sectionName);
-      if (next !== this.sectionsInProgress) {
-        this.sectionsInProgress = next;
+      const nextSectionSet = removeFromStringSet(this.sectionsInProgress, sectionName);
+      if (nextSectionSet !== this.sectionsInProgress) {
+        this.sectionsInProgress = nextSectionSet;
         log('usePreloadStore.js', 'unmarkSectionInProgress', 'complete', 'Section preload no longer in progress', { sectionName });
       }
     },

@@ -294,4 +294,97 @@ Section structure matches target layout; routing/router delegate to sections; re
 
 ---
 
+## Phase 3 — Naming alignment (2026-06-19)
+
+**Master plan:** Phase 3 — Naming batches 1–2 per [sections-naming-audit.md](./sections-naming-audit.md)  
+**Scope:** Symbol renames only. No behaviour changes. No `routeConfig.json` edits.
+
+### Big picture
+
+Audits listed ~45 rename suggestions across `systems/sections/` and tightly coupled files. Phase 3 applied **approved public API renames** and **internal clarity renames** inside section modules. Items already done in Phase 2 or Route track were skipped.
+
+### Issue 1 — Public API names mixed “route” and “preload” semantics
+
+**What was broken:** Exported names like `getRoutePreloadPlan` and `resolveCurrentRouteSectionName` lived in the section orchestrator but read as routing APIs. `clearPreloadState` was ambiguous (preload store vs section-only).
+
+**How it was fixed:**
+
+| Old name | New name | Module |
+|----------|----------|--------|
+| `getRoutePreloadPlan` | `getSectionPreloadPlan` | `sectionPreloadOrchestrator.js` |
+| `resolveCurrentRouteSectionName` | `resolveCurrentSectionNameFromRouteConfig` | `sectionPreloadOrchestrator.js` |
+| `clearPreloadState` | `clearSectionPreloadState` | `sectionPreloader.js` |
+
+**Consumers updated:** `main.js`, `localeManager.js`, `sectionNavigationHooks.js`, `routeAssetPreloader.js`, `index.js`, and all matching tests/mocks.
+
+### Issue 2 — Internal section module names (batch 1)
+
+**What was broken:** Legacy names from migration (`resolveRolePreLoadSections`, `_doPreload`, `getSectionCssBundle`, `injectCssLink`) and vague locals (`maybeSlugs`, `hintLink`).
+
+**How it was fixed (internal unless noted):**
+
+| Old | New | File |
+|-----|-----|------|
+| `resolveRolePreLoadSections` | `resolveRolePreloadSections` | `sectionResolver.js` |
+| `_doPreload` | `performSectionPreload` | `sectionPreloader.js` |
+| `getSectionCssBundle` | `resolveSectionCssBundlePaths` | `sectionCssLoader.js` |
+| `injectCssLink` | `injectSectionCssLinkElement` | `sectionCssLoader.js` |
+| `maybeSlugs` | `candidateSlugPaths` | `sectionResolver.js` |
+| `trimmed` | `trimmedIdentifier` | `sectionResolver.js` |
+| `file` / `method` (log context) | `logSourceFile` / `logSourceMethod` | `sectionPreloadOrchestrator.js` |
+| `hintLink` | `cssPreloadHintLink` | `sectionCssLoader.js` |
+| `rawPath` (CSS bundle) | `rawCssBundlePath` | `sectionCssLoader.js` |
+| `link` (JS preload DOM) | `javascriptPreloadLink` | `sectionPreloader.js` |
+| `resolved` (nav helper) | `resolvedSectionName` | `sectionNavigationResources.js` |
+| `err` (nav catches) | `resourceLoadError` | `sectionNavigationResources.js` |
+| `next` (store section set) | `nextSectionSet` | `usePreloadStore.js` (section in-progress actions) |
+
+### Issue 3 — Interconnected symbols (batch 2)
+
+**What was broken:** `routeBelongsToSection` read as a routing helper but lives in section asset rollup code. `localeManager` used `resolveSectionFromRoutePath` while other section helpers use `resolveActive…` pattern.
+
+**How it was fixed:**
+
+| Old | New | File |
+|-----|-----|------|
+| `routeBelongsToSection` | `doesRouteBelongToSection` | `routeSectionAssetPreloadEntries.js`, `assets/index.js` |
+| `resolveSectionFromRoutePath` | `resolveActiveSectionFromRoutePath` | `localeManager.js` (internal) |
+
+### Skipped (already done or out of scope)
+
+| Audit item | Reason |
+|------------|--------|
+| Create `sectionManifestHelpers.js` | Phase 2 |
+| Move `resolveEffectiveRouteConfig` to routing | Phase 2 |
+| `routeNavigationData.js` → nav loader filename | Phase 2 (`sectionNavigationResources.js` + routing re-export) |
+| `loadCurrentSectionResources` rename | Already applied in Route track |
+| `getAssetPreloadEntriesForSection.js` → `sectionAssetPreloadEntries.js` | File already `routeSectionAssetPreloadEntries.js` in Route track; function name unchanged |
+| `entriesByDedupeKey` etc. in asset rollup | Already renamed in Route track Phase 4 |
+
+### Issue 4 — Circular import exposed by full barrel load
+
+**What was broken:** `sectionPreloadOrchestrator.js` imported `translationLoader.js` at top level; `translationLoader` imports `localeManager`, which imports the orchestrator. Loading `systems/sections/index.js` in tests could hang.
+
+**How it was fixed:** Dynamic `import()` of `translationLoader` inside `startBackgroundSectionPreloads` when translation preload is requested. Barrel test mocks heavy cross-system deps and uses 15s timeout for first full barrel import.
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/section*.test.js \
+  tests/unit/routeInheritance.test.js \
+  tests/unit/getAssetPreloadEntriesForSection.test.js \
+  tests/unit/updateUrlWithLocale.test.js \
+  tests/routeTest/sectionPreloadOrchestrator.route.test.js \
+  tests/routeTest/getAssetPreloadEntriesForSection.route.test.js
+```
+
+**Result:** 6+ section-focused files passed (45+ tests in core subset).
+
+### Phase 3 exit
+
+Public section API uses consistent naming; docs/import map updated in `AI_GUIDE.md` and `DEVELOPER_GUIDE.md`. Ready for Phase 4 doc audit.
+
+---
+
 *Add a new section above this line for each completed phase.*

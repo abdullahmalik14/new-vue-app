@@ -130,19 +130,19 @@ describe('getAssetPreloadEntriesForSection.route (Phase F §34)', () => {
     expect(result.assets.some((entry) => entry.flag === 'dashboard.disabled-only')).toBe(false);
   });
 
-  it('routeBelongsToSection matches role-variant section names', async () => {
-    const { routeBelongsToSection } = await import(
+  it('doesRouteBelongToSection matches role-variant section names', async () => {
+    const { doesRouteBelongToSection } = await import(
       '../../src/systems/assets/routeSectionAssetPreloadEntries.js'
     );
 
     expect(
-      routeBelongsToSection(
+      doesRouteBelongToSection(
         { section: { creator: 'dashboard-creator', fan: 'dashboard-fan' } },
         'dashboard-creator',
       ),
     ).toBe(true);
     expect(
-      routeBelongsToSection(
+      doesRouteBelongToSection(
         { section: { creator: 'dashboard-creator', fan: 'dashboard-fan' } },
         'shop',
       ),

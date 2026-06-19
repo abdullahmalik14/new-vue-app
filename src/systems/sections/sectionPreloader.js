@@ -93,7 +93,7 @@ export function preloadSection(sectionName) {
     return inProgressPromises.get(sectionName);
   }
 
-  const promise = _doPreload(sectionName).finally(() => {
+  const promise = performSectionPreload(sectionName).finally(() => {
     inProgressPromises.delete(sectionName);
     preloadStore.unmarkSectionInProgress(sectionName);
   });
@@ -110,7 +110,7 @@ export function preloadSection(sectionName) {
  * @param {string} sectionName
  * @returns {Promise<boolean>}
  */
-async function _doPreload(sectionName) {
+async function performSectionPreload(sectionName) {
   const preloadStore = usePreloadStore();
 
   try {
@@ -118,12 +118,12 @@ async function _doPreload(sectionName) {
     const bundlePaths = await getSectionBundlePaths(sectionName);
 
     if (!bundlePaths) {
-      log('sectionPreloader.js', '_doPreload', 'no-paths', 'No bundle paths found in manifest', { sectionName });
-      log('sectionPreloader.js', '_doPreload', 'return', 'Returning no-paths status', { sectionName, preloaded: false });
+      log('sectionPreloader.js', 'performSectionPreload', 'no-paths', 'No bundle paths found in manifest', { sectionName });
+      log('sectionPreloader.js', 'performSectionPreload', 'return', 'Returning no-paths status', { sectionName, preloaded: false });
       return false;
     }
 
-    log('sectionPreloader.js', '_doPreload', 'paths-resolved', 'Bundle paths resolved from manifest', {
+    log('sectionPreloader.js', 'performSectionPreload', 'paths-resolved', 'Bundle paths resolved from manifest', {
       sectionName,
       hasCss: !!bundlePaths.css,
       hasJs: !!bundlePaths.js
@@ -142,41 +142,41 @@ async function _doPreload(sectionName) {
 
     // Preload section assets (non-blocking)
     preloadSectionAssets(sectionName).catch(err => {
-      log('sectionPreloader.js', '_doPreload', 'asset-preload-error', 'Asset preload failed (non-blocking)', {
+      log('sectionPreloader.js', 'performSectionPreload', 'asset-preload-error', 'Asset preload failed (non-blocking)', {
         sectionName,
         error: err.message
       });
     });
 
-    log('sectionPreloader.js', '_doPreload', 'success', 'Section preload completed successfully', { sectionName });
+    log('sectionPreloader.js', 'performSectionPreload', 'success', 'Section preload completed successfully', { sectionName });
 
     if (window.performanceTracker) {
       window.performanceTracker.step({
         step: 'preloadSection_complete',
         file: 'sectionPreloader.js',
-        method: '_doPreload',
+        method: 'performSectionPreload',
         flag: 'preload-complete',
         purpose: `Section ${sectionName} preloaded successfully`
       });
     }
 
-    log('sectionPreloader.js', '_doPreload', 'return', 'Returning successful preload status', { sectionName, preloaded: true });
+    log('sectionPreloader.js', 'performSectionPreload', 'return', 'Returning successful preload status', { sectionName, preloaded: true });
     return true;
 
   } catch (error) {
-    logError('sectionPreloader.js', '_doPreload', 'Section preload failed', error, { sectionName });
+    logError('sectionPreloader.js', 'performSectionPreload', 'Section preload failed', error, { sectionName });
 
     if (window.performanceTracker) {
       window.performanceTracker.step({
         step: 'preloadSection_error',
         file: 'sectionPreloader.js',
-        method: '_doPreload',
+        method: 'performSectionPreload',
         flag: 'preload-error',
         purpose: `Section ${sectionName} preload failed`
       });
     }
 
-    log('sectionPreloader.js', '_doPreload', 'return', 'Returning failed preload status', { sectionName, preloaded: false, error: error.message });
+    log('sectionPreloader.js', 'performSectionPreload', 'return', 'Returning failed preload status', { sectionName, preloaded: false, error: error.message });
     return false;
   }
 }
@@ -393,17 +393,17 @@ export function isSectionPreloaded(sectionName) {
 function clearSectionJsPreloadLink(sectionName) {
   document.querySelectorAll(
     `link[data-section-js-preload="${escapeSelectorAttributeValue(sectionName)}"]`
-  ).forEach((link) => {
-    if (link.parentNode) {
-      link.parentNode.removeChild(link);
+  ).forEach((javascriptPreloadLink) => {
+    if (javascriptPreloadLink.parentNode) {
+      javascriptPreloadLink.parentNode.removeChild(javascriptPreloadLink);
     }
   });
 }
 
 function clearSectionJsPreloadLinks() {
-  document.querySelectorAll('link[data-section-js-preload]').forEach(link => {
-    if (link.parentNode) {
-      link.parentNode.removeChild(link);
+  document.querySelectorAll('link[data-section-js-preload]').forEach((javascriptPreloadLink) => {
+    if (javascriptPreloadLink.parentNode) {
+      javascriptPreloadLink.parentNode.removeChild(javascriptPreloadLink);
     }
   });
 }
@@ -426,8 +426,8 @@ export function resetSectionPreloadState(sectionName) {
   log('sectionPreloader.js', 'resetSectionPreloadState', 'reset', 'Section preload state reset', { sectionName });
 }
 
-export function clearPreloadState() {
-  log('sectionPreloader.js', 'clearPreloadState', 'start', 'Clearing preload state', {});
+export function clearSectionPreloadState() {
+  log('sectionPreloader.js', 'clearSectionPreloadState', 'start', 'Clearing preload state', {});
 
   const preloadStore = usePreloadStore();
   const preloadedCount = preloadStore.preloadedSections.size;
@@ -438,8 +438,8 @@ export function clearPreloadState() {
   preloadStore.clearState();
   inProgressPromises.clear();
 
-  log('sectionPreloader.js', 'clearPreloadState', 'success', 'Preload state cleared', { clearedCount: preloadedCount });
-  log('sectionPreloader.js', 'clearPreloadState', 'return', 'Clear complete', {});
+  log('sectionPreloader.js', 'clearSectionPreloadState', 'success', 'Preload state cleared', { clearedCount: preloadedCount });
+  log('sectionPreloader.js', 'clearSectionPreloadState', 'return', 'Clear complete', {});
 }
 
 /**

@@ -41,9 +41,9 @@ import { loadTranslationsForSection, loadBaseTranslations } from '@/systems/i18n
 import { useAuthStore } from '@/stores/useAuthStore.js';
 import { useLocaleStore } from '@/stores/useLocaleStore.js';
 import {
-  getRoutePreloadPlan,
+  getSectionPreloadPlan,
   preloadDefaultAuthSection,
-  resolveCurrentRouteSectionName,
+  resolveCurrentSectionNameFromRouteConfig,
   shouldPreloadDefaultAuthSection,
   startBackgroundSectionPreloads,
 } from '@/systems/sections/sectionPreloadOrchestrator.js';
@@ -444,9 +444,9 @@ function startStartupPreloadForCurrentRoute() {
   const userRoleForPreload = authStore.currentUser?.role || "guest";
 
   const currentSectionName = currentRoute
-    ? resolveCurrentRouteSectionName(currentRoute, userRoleForPreload)
+    ? resolveCurrentSectionNameFromRouteConfig(currentRoute, userRoleForPreload)
     : null;
-  const { resolvedSectionNames: baseSectionsToPreload } = getRoutePreloadPlan(
+  const { resolvedSectionNames: baseSectionsToPreload } = getSectionPreloadPlan(
     currentRoute,
     userRoleForPreload,
   );

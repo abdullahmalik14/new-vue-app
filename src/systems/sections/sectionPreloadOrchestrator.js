@@ -3,7 +3,6 @@
  */
 
 import { log } from '../../infrastructure/logging/logHandler.js';
-import { loadTranslationsForSection, areTranslationsLoadedForSection } from '../i18n/translationLoader.js';
 import { resolveEffectiveRouteConfig } from '../routing/routeResolver.js';
 import {
   getPreloadSectionsForRoute,
@@ -49,7 +48,7 @@ function buildSectionPreloadStatusSnapshot(sections, skipSection = null) {
  * @param {{ additionalSections?: Array<string> }} [options]
  * @returns {{ preloadSectionIdentifiers: Array<string>, resolvedSectionNames: Array<string> }}
  */
-export function getRoutePreloadPlan(routeConfig, userRole, { additionalSections = [] } = {}) {
+export function getSectionPreloadPlan(routeConfig, userRole, { additionalSections = [] } = {}) {
   const effectiveRouteConfig = resolveEffectiveRouteConfig(routeConfig);
 
   if (!effectiveRouteConfig) {
@@ -69,7 +68,7 @@ export function getRoutePreloadPlan(routeConfig, userRole, { additionalSections 
     }
   }
 
-  log('sectionPreloadOrchestrator.js', 'getRoutePreloadPlan', 'config', 'Sections configured for preload from routeConfig', {
+  log('sectionPreloadOrchestrator.js', 'getSectionPreloadPlan', 'config', 'Sections configured for preload from routeConfig', {
     routeSlug: effectiveRouteConfig.slug ?? null,
     userRole,
     preLoadSections: effectiveRouteConfig.preLoadSections ?? null,
@@ -88,7 +87,7 @@ export function getRoutePreloadPlan(routeConfig, userRole, { additionalSections 
  * @param {string} userRole
  * @returns {string|null}
  */
-export function resolveCurrentRouteSectionName(routeConfig, userRole) {
+export function resolveCurrentSectionNameFromRouteConfig(routeConfig, userRole) {
   const effectiveRouteConfig = resolveEffectiveRouteConfig(routeConfig);
 
   if (!effectiveRouteConfig?.section) {
@@ -116,22 +115,22 @@ export function shouldPreloadDefaultAuthSection(authPreloadCheckParams) {
  * @returns {Promise<void>}
  */
 export function preloadDefaultAuthSection(logContext) {
-  const { file, method } = logContext;
+  const { file: logSourceFile, method: logSourceMethod } = logContext;
   const preloadStore = usePreloadStore();
   const isPreloaded = preloadStore.hasSection('auth');
   const inProgress = preloadStore.isSectionInProgress('auth');
 
-  log(file, method, 'preload-status', 'Auth section preload status before default auth preload', {
+  log(logSourceFile, logSourceMethod, 'preload-status', 'Auth section preload status before default auth preload', {
     section: 'auth',
     isPreloaded,
     inProgress,
     needsPreload: !isPreloaded && !inProgress
   });
 
-  log(file, method, 'preload-default', 'Preloading default auth section', { section: 'auth' });
+  log(logSourceFile, logSourceMethod, 'preload-default', 'Preloading default auth section', { section: 'auth' });
 
   return preloadSection('auth').catch((preloadError) => {
-    log(file, method, 'preload-error', 'Default auth section preload failed (non-blocking)', {
+    log(logSourceFile, logSourceMethod, 'preload-error', 'Default auth section preload failed (non-blocking)', {
       section: 'auth',
       error: preloadError.message
     });
@@ -159,10 +158,10 @@ export function startBackgroundSectionPreloads({
   logContext,
   path = null
 }) {
-  const { file, method } = logContext;
+  const { file: logSourceFile, method: logSourceMethod } = logContext;
   const sectionStatus = buildSectionPreloadStatusSnapshot(sections, skipSection);
 
-  log(file, method, 'preload-status', 'Section preload status before background preloads start', {
+  log(logSourceFile, logSourceMethod, 'preload-status', 'Section preload status before background preloads start', {
     path,
     configuredSections: sections,
     skipSection: skipSection ?? null,
@@ -186,21 +185,21 @@ export function startBackgroundSectionPreloads({
     }
 
     if (!section || typeof section !== 'string') {
-      log(file, method, 'preload-skip', 'Skipping invalid section name', {
+      log(logSourceFile, logSourceMethod, 'preload-skip', 'Skipping invalid section name', {
         section,
         type: typeof section
       });
       continue;
     }
 
-    log(file, method, 'preload-section', 'Preloading specific section', {
+    log(logSourceFile, logSourceMethod, 'preload-section', 'Preloading specific section', {
       section,
       path
     });
 
     preloadPromises.push(
       preloadSection(section).catch((preloadError) => {
-        log(file, method, 'preload-error', 'Section preload failed (non-blocking)', {
+        log(logSourceFile, logSourceMethod, 'preload-error', 'Section preload failed (non-blocking)', {
           section,
           error: preloadError.message
         });
@@ -208,23 +207,26 @@ export function startBackgroundSectionPreloads({
     );
 
     if (preloadTranslations && locale) {
-      if (areTranslationsLoadedForSection(section, locale)) {
-        log(file, method, 'translation-skip', 'Translations already loaded for background section', {
-          section,
-          locale,
-          path
-        });
-      } else {
-        preloadPromises.push(
-          loadTranslationsForSection(section, locale).catch((preloadError) => {
-            log(file, method, 'translation-error', 'Translation load failed (non-blocking)', {
+      preloadPromises.push(
+        (async () => {
+          const { areTranslationsLoadedForSection, loadTranslationsForSection } = await import('../i18n/translationLoader.js');
+          if (areTranslationsLoadedForSection(section, locale)) {
+            log(logSourceFile, logSourceMethod, 'translation-skip', 'Translations already loaded for background section', {
               section,
               locale,
-              error: preloadError.message
+              path
             });
-          })
-        );
-      }
+            return;
+          }
+          await loadTranslationsForSection(section, locale);
+        })().catch((preloadError) => {
+          log(logSourceFile, logSourceMethod, 'translation-error', 'Translation load failed (non-blocking)', {
+            section,
+            locale,
+            error: preloadError.message
+          });
+        })
+      );
     }
   }
 
@@ -249,7 +251,7 @@ export async function refreshSectionPreloadsOnLocaleChange({
   skipSection = null,
   logContext
 }) {
-  const { file, method } = logContext;
+  const { file: logSourceFile, method: logSourceMethod } = logContext;
 
   const sectionsToRefresh = sections.filter(
     (section) => typeof section === 'string'
@@ -261,7 +263,7 @@ export async function refreshSectionPreloadsOnLocaleChange({
     return;
   }
 
-  log(file, method, 'locale-refresh', 'Refreshing section preloads for locale change', {
+  log(logSourceFile, logSourceMethod, 'locale-refresh', 'Refreshing section preloads for locale change', {
     locale,
     sections: sectionsToRefresh,
     skipSection

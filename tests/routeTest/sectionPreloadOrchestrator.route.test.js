@@ -42,24 +42,24 @@ describe('resolveEffectiveRouteConfig (Phase F §33)', () => {
   });
 });
 
-describe('getRoutePreloadPlan (Phase F §33)', () => {
+describe('getSectionPreloadPlan (Phase F §33)', () => {
   it('returns empty plan for null route config', async () => {
-    const { getRoutePreloadPlan } = await import(
+    const { getSectionPreloadPlan } = await import(
       '../../src/systems/sections/sectionPreloadOrchestrator.js'
     );
 
-    expect(getRoutePreloadPlan(null, 'guest')).toEqual({
+    expect(getSectionPreloadPlan(null, 'guest')).toEqual({
       preloadSectionIdentifiers: [],
       resolvedSectionNames: [],
     });
   });
 
   it('returns empty plan for route with empty preLoadSections array', async () => {
-    const { getRoutePreloadPlan } = await import(
+    const { getSectionPreloadPlan } = await import(
       '../../src/systems/sections/sectionPreloadOrchestrator.js'
     );
 
-    const plan = getRoutePreloadPlan(
+    const plan = getSectionPreloadPlan(
       { slug: '/dashboard', section: 'dashboard-global', preLoadSections: [] },
       'creator',
     );
@@ -69,11 +69,11 @@ describe('getRoutePreloadPlan (Phase F §33)', () => {
   });
 
   it('deduplicates resolved section names', async () => {
-    const { getRoutePreloadPlan } = await import(
+    const { getSectionPreloadPlan } = await import(
       '../../src/systems/sections/sectionPreloadOrchestrator.js'
     );
 
-    const plan = getRoutePreloadPlan(
+    const plan = getSectionPreloadPlan(
       {
         slug: '/log-in',
         section: 'auth',
@@ -87,11 +87,11 @@ describe('getRoutePreloadPlan (Phase F §33)', () => {
   });
 
   it('merges additionalSections without duplicates', async () => {
-    const { getRoutePreloadPlan } = await import(
+    const { getSectionPreloadPlan } = await import(
       '../../src/systems/sections/sectionPreloadOrchestrator.js'
     );
 
-    const plan = getRoutePreloadPlan(
+    const plan = getSectionPreloadPlan(
       {
         slug: '/log-in',
         section: 'auth',
@@ -105,13 +105,13 @@ describe('getRoutePreloadPlan (Phase F §33)', () => {
   });
 });
 
-describe('resolveCurrentRouteSectionName (Phase F §33)', () => {
+describe('resolveCurrentSectionNameFromRouteConfig (Phase F §33)', () => {
   it('resolves role-based section for user role', async () => {
-    const { resolveCurrentRouteSectionName } = await import(
+    const { resolveCurrentSectionNameFromRouteConfig } = await import(
       '../../src/systems/sections/sectionPreloadOrchestrator.js'
     );
 
-    const sectionName = resolveCurrentRouteSectionName(
+    const sectionName = resolveCurrentSectionNameFromRouteConfig(
       {
         slug: '/dashboard',
         section: { creator: 'dashboard-creator', fan: 'dashboard-fan' },
@@ -123,11 +123,11 @@ describe('resolveCurrentRouteSectionName (Phase F §33)', () => {
   });
 
   it('returns null when route has no section', async () => {
-    const { resolveCurrentRouteSectionName } = await import(
+    const { resolveCurrentSectionNameFromRouteConfig } = await import(
       '../../src/systems/sections/sectionPreloadOrchestrator.js'
     );
 
-    expect(resolveCurrentRouteSectionName({ slug: '/callback' }, 'guest')).toBeNull();
+    expect(resolveCurrentSectionNameFromRouteConfig({ slug: '/callback' }, 'guest')).toBeNull();
   });
 });
 

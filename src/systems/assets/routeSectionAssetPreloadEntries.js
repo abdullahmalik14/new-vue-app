@@ -66,7 +66,7 @@ export function dedupeAssetPreloadEntries(entries) {
  * @param {string} sectionName
  * @returns {boolean}
  */
-export function routeBelongsToSection(route, sectionName) {
+export function doesRouteBelongToSection(route, sectionName) {
   if (typeof route.section === 'string') {
     return route.section === sectionName;
   }
@@ -115,7 +115,7 @@ export function getAssetPreloadEntriesForSection(sectionName) {
 
   const routes = getRouteConfiguration();
   const sectionRoutes = routes.filter(
-    (route) => isRouteEnabledForAssetPreload(route) && routeBelongsToSection(route, sectionName),
+    (route) => isRouteEnabledForAssetPreload(route) && doesRouteBelongToSection(route, sectionName),
   );
 
   const rawAssets = [];

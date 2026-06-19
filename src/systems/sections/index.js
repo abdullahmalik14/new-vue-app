@@ -16,7 +16,7 @@ export {
   preloadSection,
   preloadMultipleSections,
   isSectionPreloaded,
-  clearPreloadState,
+  clearSectionPreloadState,
   getPreloadStatistics,
   resetSectionPreloadState,
 } from './sectionPreloader.js';
@@ -31,8 +31,8 @@ export {
 } from './sectionCssLoader.js';
 
 export {
-  getRoutePreloadPlan,
-  resolveCurrentRouteSectionName,
+  getSectionPreloadPlan,
+  resolveCurrentSectionNameFromRouteConfig,
   shouldPreloadDefaultAuthSection,
   preloadDefaultAuthSection,
   startBackgroundSectionPreloads,

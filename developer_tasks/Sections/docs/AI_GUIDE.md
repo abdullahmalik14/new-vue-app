@@ -1,7 +1,7 @@
 # Section system — AI guide
 
 **Audience:** Cursor agents, codegen, audit bots.  
-**Last updated:** 2026-06-10  
+**Last updated:** 2026-06-19  
 **Primary naming reference:** `docs/tasks/Expanded Vue App Naming Convention.txt`
 
 Read this before editing any section-related file.
@@ -28,7 +28,9 @@ systems/sections/
   sectionPreloader.js
   sectionCssLoader.js
   sectionPreloadOrchestrator.js
-  sectionManifestHelpers.js   ← missing; extract from build/manifestLoader.js
+  sectionManifestHelpers.js   ← runtime manifest helpers (Phase 2)
+  sectionNavigationResources.js
+  sectionNavigationHooks.js
 ```
 
 ---
@@ -40,10 +42,15 @@ systems/sections/
 | Resolve section for role | `@/systems/sections/sectionResolver.js` → `resolveRoleSectionVariant` |
 | Preload list for route | `getPreloadSectionsForRoute` |
 | Preload one section | `@/systems/sections/sectionPreloader.js` → `preloadSection` |
-| Preload plan + background | `@/systems/sections/sectionPreloadOrchestrator.js` |
+| Preload plan + background | `@/systems/sections/sectionPreloadOrchestrator.js` → `getSectionPreloadPlan`, `startBackgroundSectionPreloads` |
+| Current section from route config | `resolveCurrentSectionNameFromRouteConfig` |
+| Clear all section preload state (tests) | `clearSectionPreloadState` |
 | Load CSS on navigate | `@/systems/sections/sectionCssLoader.js` → `loadSectionCss` |
+| Nav resource loads | `@/systems/sections/sectionNavigationResources.js` |
+| Router section hooks | `@/systems/sections/sectionNavigationHooks.js` |
 | Preload store | `@/stores/usePreloadStore.js` |
-| Bundle paths | `@/systems/build/manifestLoader.js` → `getSectionBundlePaths` (temporary) |
+| Bundle paths | `@/systems/sections/sectionManifestHelpers.js` → `getSectionBundlePaths` |
+| Route config inheritance | `@/systems/routing/routeResolver.js` → `resolveEffectiveRouteConfig` |
 
 ---
 

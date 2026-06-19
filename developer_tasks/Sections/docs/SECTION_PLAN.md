@@ -20,7 +20,7 @@ One clear section layer under `src/systems/sections/`, with manifest helpers ext
 | Structure audit | ✅ 5 issues documented |
 | Code audit | ✅ 12 issues documented |
 | Loose code scan | ✅ Wrong-layer code mapped |
-| Naming audit | ✅ Batches 1–2; route excluded |
+| Naming audit (45 items) | ✅ Phase 3 applied (batch 1 + interconnected batch 2 symbols) |
 | Tests import paths | ✅ Fixed (Route Phase 1 + Sections Phase 1 verified) |
 | `sectionPreloader.js` stale import | ✅ Fixed (`./sectionCssLoader.js`) |
 | `sectionManifestHelpers.js` | ✅ Created; runtime manifest logic moved from `build/manifestLoader.js` |

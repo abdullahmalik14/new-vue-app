@@ -162,13 +162,13 @@ describe('sectionPreloader (Task 5 lifecycle)', () => {
     expect(stats.inProgressSections).toEqual([]);
   });
 
-  it('clearPreloadState resets store, in-progress map, and section preload DOM hints', async () => {
+  it('clearSectionPreloadState resets store, in-progress map, and section preload DOM hints', async () => {
     let resolveCss;
     preloadSectionCss.mockImplementation(
       () => new Promise((resolve) => { resolveCss = resolve; })
     );
 
-    const { preloadSection, clearPreloadState, getPreloadStatistics } = await importPreloader();
+    const { preloadSection, clearSectionPreloadState, getPreloadStatistics } = await importPreloader();
     const { usePreloadStore } = await import('../../src/stores/usePreloadStore.js');
 
     const inFlight = preloadSection('auth');
@@ -177,7 +177,7 @@ describe('sectionPreloader (Task 5 lifecycle)', () => {
     expect(getPreloadStatistics().inProgressCount).toBe(1);
     expect(usePreloadStore().sectionsInProgress.has('auth')).toBe(true);
 
-    clearPreloadState();
+    clearSectionPreloadState();
 
     expect(usePreloadStore().preloadedSections.size).toBe(0);
     expect(getPreloadStatistics().inProgressCount).toBe(0);
@@ -188,8 +188,8 @@ describe('sectionPreloader (Task 5 lifecycle)', () => {
     await inFlight;
   });
 
-  it('clearPreloadState removes section JS modulepreload links after preload completes', async () => {
-    const { preloadSection, clearPreloadState } = await importPreloader();
+  it('clearSectionPreloadState removes section JS modulepreload links after preload completes', async () => {
+    const { preloadSection, clearSectionPreloadState } = await importPreloader();
     const { usePreloadStore } = await import('../../src/stores/usePreloadStore.js');
 
     await preloadSection('auth');
@@ -198,7 +198,7 @@ describe('sectionPreloader (Task 5 lifecycle)', () => {
       .toBe('sha384-test-js-integrity');
     expect(usePreloadStore().hasSection('auth')).toBe(true);
 
-    clearPreloadState();
+    clearSectionPreloadState();
 
     expect(document.querySelector('link[data-section-js-preload]')).toBeNull();
     expect(usePreloadStore().hasSection('auth')).toBe(false);
@@ -240,20 +240,20 @@ describe('sectionPreloader (Task 5 lifecycle)', () => {
     expect(usePreloadStore().hasSection('auth')).toBe(false);
   });
 
-  it('clearPreloadState clears reactive sectionsInProgress in store (M-06)', async () => {
+  it('clearSectionPreloadState clears reactive sectionsInProgress in store (M-06)', async () => {
     let resolveCss;
     preloadSectionCss.mockImplementation(
       () => new Promise((resolve) => { resolveCss = resolve; })
     );
 
-    const { preloadSection, clearPreloadState } = await importPreloader();
+    const { preloadSection, clearSectionPreloadState } = await importPreloader();
     const { usePreloadStore } = await import('../../src/stores/usePreloadStore.js');
 
     const inFlight = preloadSection('auth');
 
     await vi.waitUntil(() => usePreloadStore().sectionsInProgress.has('auth'));
 
-    clearPreloadState();
+    clearSectionPreloadState();
 
     expect(usePreloadStore().sectionsInProgress.size).toBe(0);
 

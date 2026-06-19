@@ -48,7 +48,7 @@ src/router/index.js            # afterEach preload, loadRouteComponent section c
 | `sectionResolver.js` | `resolveRoleSectionVariant`, `getPreloadSectionsForRoute`, `resolveSectionIdentifier` |
 | `sectionPreloader.js` | `preloadSection`, `preloadMultipleSections`, `resetSectionPreloadState` |
 | `sectionCssLoader.js` | `loadSectionCss`, `preloadSectionCss`, `unloadSectionCss` |
-| `sectionPreloadOrchestrator.js` | `getRoutePreloadPlan`, `startBackgroundSectionPreloads`, locale refresh |
+| `sectionPreloadOrchestrator.js` | `getSectionPreloadPlan`, `startBackgroundSectionPreloads`, locale refresh |
 
 ---
 
@@ -79,13 +79,13 @@ Role-keyed `preLoadSections` objects are also supported (see `sectionResolver.js
 ### App startup (`main.js`)
 
 1. Resolve current route's section (if any).
-2. `getRoutePreloadPlan` → list of sections to warm.
+2. `getSectionPreloadPlan` → list of sections to warm.
 3. Optionally `preloadDefaultAuthSection('auth')`.
 4. `startBackgroundSectionPreloads` (non-blocking).
 
 ### After navigation (`router/index.js` → `afterEach`)
 
-1. `getRoutePreloadPlan(routeConfig, userRole)`.
+1. `getSectionPreloadPlan(routeConfig, userRole)`.
 2. `startBackgroundSectionPreloads` for resolved section names.
 3. Optional translation preload per section.
 

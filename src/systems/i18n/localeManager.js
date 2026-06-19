@@ -22,7 +22,7 @@ import {
   resolveRoleSectionVariant,
 } from "../sections/sectionResolver.js";
 import {
-  getRoutePreloadPlan,
+  getSectionPreloadPlan,
   refreshSectionPreloadsOnLocaleChange,
 } from "../sections/sectionPreloadOrchestrator.js";
 import { getI18nInstance } from "./i18nInstance.js";
@@ -920,7 +920,7 @@ export async function setActiveLocale(localeCode, options = {}) {
           }
 
           // Refresh bundle/CSS preload and translations for background preLoadSections
-          const { resolvedSectionNames: preloadedSectionsToRefresh } = getRoutePreloadPlan(
+          const { resolvedSectionNames: preloadedSectionsToRefresh } = getSectionPreloadPlan(
             currentRoute,
             userRole
           );
@@ -1254,7 +1254,7 @@ async function updateUrlWithLocale(localeCode) {
  * @param {string} [routePath] - Full path (e.g. /vi/dashboard); falls back to window.location.pathname
  * @returns {Promise<string|null>}
  */
-async function resolveSectionFromRoutePath(routePath) {
+async function resolveActiveSectionFromRoutePath(routePath) {
   const rawPath =
     routePath ||
     (typeof window !== "undefined" ? window.location.pathname : null);
@@ -1291,7 +1291,7 @@ async function resolveSectionFromRoutePath(routePath) {
   } catch (error) {
     log(
       "localeManager.js",
-      "resolveSectionFromRoutePath",
+      "resolveActiveSectionFromRoutePath",
       "info",
       "Could not resolve section from route path",
       { routePath: rawPath, error: error?.message }
@@ -1321,7 +1321,7 @@ async function loadTranslationsForTemporaryLocale(
     const basePromise = loadBaseTranslations(localeCode);
 
     const resolvedSection =
-      sectionName || (await resolveSectionFromRoutePath(routePath));
+      sectionName || (await resolveActiveSectionFromRoutePath(routePath));
 
     if (!resolvedSection) {
       if (awaitTranslations) {
