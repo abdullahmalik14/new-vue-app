@@ -540,3 +540,47 @@ npm run test:unit -- --run tests/sectionTest
 - [x] Timeout env matrix (500ms, 0, -1, abc, default 10s) tested with fake timers
 - [x] Untrusted JS path, manifest failure, and CSS rejection paths return false without `addSection`
 
+---
+
+## Section test track — Phase D CSS, manifest, store, barrel (2026-06-19)
+
+**Plan:** [section-test-plan.md](./section-test-plan.md) Phase D (§15–21, §30–34, §80, §90–91, §95, §102–108)  
+**Branch:** `test/section-coverage`  
+**Test folder:** `tests/sectionTest/`
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/helpers/sectionCssLoaderTestSetup.js`](../../tests/helpers/sectionCssLoaderTestSetup.js) | **New** — CSS loader mocks, auto-resolve link helper, env stubs |
+| [`tests/sectionTest/sectionCssLoader.test.js`](../../tests/sectionTest/sectionCssLoader.test.js) | **New** — `loadSectionCss`, unload/clear, integrity (§15–21, §80, §90, §95) |
+| [`tests/sectionTest/sectionCssLoader.preload.test.js`](../../tests/sectionTest/sectionCssLoader.preload.test.js) | **New** — `preloadSectionCss` hint lifecycle, in-flight dedupe, onerror (§16, §91, §63) |
+| [`tests/sectionTest/sectionManifestHelpers.test.js`](../../tests/sectionTest/sectionManifestHelpers.test.js) | **New** — `loadSectionManifest`, `getSectionBundlePaths`, failure recovery (§32–33, §105–106) |
+| [`tests/sectionTest/bundlePathValidation.section.test.js`](../../tests/sectionTest/bundlePathValidation.section.test.js) | **New** — `isTrustedBundlePath`, `escapeSelectorAttributeValue` (§34, §107–108) |
+| [`tests/sectionTest/usePreloadStore.section.test.js`](../../tests/sectionTest/usePreloadStore.section.test.js) | **New** — section getters/actions, `normalizeStringSet` (§31, §102–104) |
+| [`tests/sectionTest/sectionBarrel.test.js`](../../tests/sectionTest/sectionBarrel.test.js) | **New** — `systems/sections/index.js` export surface (§30) |
+
+Legacy copies remain in `tests/unit/` until Phase G cleanup.
+
+### Test notes
+
+- `preloadSectionCss` registers in-flight dedupe **after** bundle paths resolve; tests assert dedupe on subsequent callers, not during path resolution.
+- Error-path CSS tests use `disableAutoCssLinkResolve()` so setup auto-`onload` does not race `onerror`.
+- `getSectionBundlePaths(name, manifest)` skips fetch when manifest is supplied; explicit `loadSectionManifest()` still fetches when cache is cold.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/sectionTest
+```
+
+**Result:** 16 files, 190 tests passed.
+
+### Exit criteria (Phase D)
+
+- [x] `sectionCssLoader.js` load/preload/unload/clear paths covered in `tests/sectionTest/`
+- [x] `sectionManifestHelpers.js` cache, bundle paths, and retry behaviour covered
+- [x] `bundlePathValidation.js` trust + selector escaping covered for section consumers
+- [x] `usePreloadStore` section getters/actions and `normalizeStringSet` covered
+- [x] `systems/sections/index.js` barrel exports verified (`clearSectionPreloadState`, not legacy names)
+
