@@ -636,3 +636,57 @@ load paths with mocked route fixtures (21 files, 230 tests).
 - [x] `refreshSectionPreloadsOnLocaleChange` resets state then re-warms bundles + translations
 - [x] `sectionNavigationResources.js` fire-and-forget CSS/i18n/asset loads covered
 
+---
+
+## Section test track — Phase F cross-system hooks and assets (2026-06-19)
+
+**Plan:** [section-test-plan.md](./section-test-plan.md) Phase F (§35–36, §40–51, §66–70, §114–124)  
+**Branch:** `test/section-coverage`  
+**Test folder:** `tests/sectionTest/`
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/sectionTest/sectionNavigationHooks.test.js`](../../tests/sectionTest/sectionNavigationHooks.test.js) | **New** — meta.section assign, component preload, post-nav background preloads (§35–36, §66) |
+| [`tests/sectionTest/translationLoader.section.test.js`](../../tests/sectionTest/translationLoader.section.test.js) | **New** — section translation load/preload/batch APIs (§40–41, §114) |
+| [`tests/sectionTest/localeManager.section.test.js`](../../tests/sectionTest/localeManager.section.test.js) | **New** — `setActiveLocale` section translation reload + background refresh (§42, §117) |
+| [`tests/sectionTest/assetPreloader.section.test.js`](../../tests/sectionTest/assetPreloader.section.test.js) | **New** — `preloadSectionAssets`, `preloadSectionCriticalImages` (§43–44, §118) |
+| [`tests/sectionTest/routeSectionAssetPreloadEntries.section.test.js`](../../tests/sectionTest/routeSectionAssetPreloadEntries.section.test.js) | **New** — section asset rollup + inheritance (§45, §119) |
+| [`tests/sectionTest/main.startup.section.test.js`](../../tests/sectionTest/main.startup.section.test.js) | **New** — startup preload list + auth predicate contract (§48, §124) |
+| [`tests/sectionTest/routeTransition.section.test.js`](../../tests/sectionTest/routeTransition.section.test.js) | **New** — inherited section visible via effective route config (§46) |
+| [`tests/sectionTest/routeComponentPrefetch.section.test.js`](../../tests/sectionTest/routeComponentPrefetch.section.test.js) | **New** — section route component prefetch (§47) |
+| [`tests/sectionTest/routeAssetPrefetch.section.test.js`](../../tests/sectionTest/routeAssetPrefetch.section.test.js) | **New** — `prefetchSectionAssetsForRoute` (§51, §120) |
+| [`src/systems/i18n/localeManager.js`](../../src/systems/i18n/localeManager.js) | **Fix** — hoist `resolvedSection` so locale refresh can call `refreshSectionPreloadsOnLocaleChange` |
+
+Legacy copies remain in `tests/unit/` and `tests/routeTest/` until Phase G cleanup.
+
+### Production fix (Phase F)
+
+- `setActiveLocale` declared `resolvedSection` inside an inner `try` block but referenced it when refreshing background preloads — a `ReferenceError` prevented locale-driven section refresh whenever `preLoadSections` was non-empty.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/sectionTest
+```
+
+**Result:** 30 files, 266 tests passed.
+
+### Suggested commit message
+
+```
+test: add section Phase F cross-system hook and asset tests in sectionTest
+
+Cover navigation hooks, translation/locale section refresh, asset preloader
+rollup, startup preload contract, and route prefetch helpers; fix localeManager
+resolvedSection scope for background preload refresh (30 files, 266 tests).
+```
+
+### Exit criteria (Phase F)
+
+- [x] `sectionNavigationHooks.js` non-blocking guard flows covered
+- [x] Translation/locale section refresh paths tested with orchestrator mocks
+- [x] Section asset rollup + preloader + route prefetch helpers covered
+- [x] Startup preload contract documented via orchestrator integration tests
+

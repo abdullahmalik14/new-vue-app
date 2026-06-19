@@ -872,9 +872,10 @@ export async function setActiveLocale(localeCode, options = {}) {
 
         const currentRoute = resolveRouteFromPath(routePath);
         if (currentRoute?.section) {
+          let resolvedSection = null;
           try {
             // Resolve section to string (handles both string and object sections)
-            const resolvedSection = resolveRoleSectionVariant(
+            resolvedSection = resolveRoleSectionVariant(
               currentRoute.section,
               userRole
             );
