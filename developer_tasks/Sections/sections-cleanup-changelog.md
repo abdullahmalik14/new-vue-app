@@ -472,3 +472,37 @@ npm run test:unit -- --run tests/sectionTest
 - [x] `collectKnownSectionNames` + i18n folder gaps documented
 - [x] No stale `utils/section` import paths in `tests/` or `src/`
 
+---
+
+## Section test track — Phase B resolver units (2026-06-19)
+
+**Plan:** [section-test-plan.md](./section-test-plan.md) Phase B (§1–7, §59–60, §83–85)  
+**Branch:** `test/section-coverage`  
+**Test folder:** `tests/sectionTest/`
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/helpers/sectionFixtures.js`](../../tests/helpers/sectionFixtures.js) | Added `RESOLVER_ROUTE_FIXTURES` for slug/role identifier tests |
+| [`tests/sectionTest/sectionResolver.rolePreload.test.js`](../../tests/sectionTest/sectionResolver.rolePreload.test.js) | **New** — `getPreloadSectionsForRoute` happy/edge + role matrix (§1, §59) |
+| [`tests/sectionTest/sectionResolver.identifier.test.js`](../../tests/sectionTest/sectionResolver.identifier.test.js) | **New** — `resolveSectionIdentifier` slug routing with mocked routes (§2, §60) |
+| [`tests/sectionTest/sectionResolver.test.js`](../../tests/sectionTest/sectionResolver.test.js) | **New** — `normalizeSectionConfiguration`, `resolveRoleSectionVariant`, `isSectionRoleBased`, `getAllSectionVariants`, `getAllRouteSectionsForRoute` (§3–7, §84–85) |
+
+Legacy copies remain in `tests/unit/sectionResolver.test.js` and `tests/routeTest/sectionResolver.route.test.js` until Phase G cleanup.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/sectionTest
+```
+
+**Result:** 7 files, 102 tests passed.
+
+### Exit criteria (Phase B)
+
+- [x] Every export in `sectionResolver.js` has ≥1 happy + ≥1 edge test in `tests/sectionTest/`
+- [x] Role preload fallback matrix (default → guest) covered
+- [x] Slug identifier matrix (`log-in` → `auth`, role dashboard variants) covered
+- [x] Tests use mocked `getRouteConfiguration()` fixtures — not production JSON — for identifier routing
+

@@ -179,6 +179,40 @@ export const ROLE_KEYED_PRELOAD_FIXTURES = [
   },
 ];
 
+/** Route fixtures for resolveSectionIdentifier slug routing tests. */
+export const RESOLVER_ROUTE_FIXTURES = [
+  {
+    slug: '/log-in',
+    section: 'auth',
+    componentPath: '@/dev/templates/auth/page/role/LoginPage.vue',
+    supportedRoles: ['all'],
+  },
+  {
+    slug: '/dashboard',
+    section: {
+      creator: 'dashboard-creator',
+      fan: 'dashboard-fan',
+      default: 'dashboard-global',
+    },
+    componentPath: '@/dev/templates/dashboard/DashboardPage.vue',
+    supportedRoles: ['creator', 'fan'],
+  },
+  {
+    slug: '/shop',
+    section: 'shop',
+    componentPath: '@/dev/templates/shop/page/ShopPage.vue',
+    supportedRoles: ['all'],
+  },
+  {
+    slug: '/unresolved-role',
+    section: {
+      creator: 'dashboard-creator',
+    },
+    componentPath: '@/dev/templates/dashboard/creator/CreatorDashboardOverviewPage.vue',
+    supportedRoles: ['creator'],
+  },
+];
+
 /**
  * @param {Array<object>} fixtures
  * @returns {Array<object>}
