@@ -584,3 +584,55 @@ npm run test:unit -- --run tests/sectionTest
 - [x] `usePreloadStore` section getters/actions and `normalizeStringSet` covered
 - [x] `systems/sections/index.js` barrel exports verified (`clearSectionPreloadState`, not legacy names)
 
+---
+
+## Section test track — Phase E orchestrator, inheritance, nav resources (2026-06-19)
+
+**Plan:** [section-test-plan.md](./section-test-plan.md) Phase E (§22–29, §37, §53, §64, §73, §78–79, §96–101)  
+**Branch:** `test/section-coverage`  
+**Test folder:** `tests/sectionTest/`
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/helpers/sectionOrchestratorTestSetup.js`](../../tests/helpers/sectionOrchestratorTestSetup.js) | **New** — shared preloader mocks, Pinia setup, translation loader reset helper |
+| [`tests/sectionTest/sectionPreloadOrchestrator.test.js`](../../tests/sectionTest/sectionPreloadOrchestrator.test.js) | **New** — `getSectionPreloadPlan`, auth predicate/preload, background preloads (§22–27, §64) |
+| [`tests/sectionTest/sectionPreloadOrchestrator.inheritance.test.js`](../../tests/sectionTest/sectionPreloadOrchestrator.inheritance.test.js) | **New** — inherited `section` / `preLoadSections` via orchestrator (§53, §79) |
+| [`tests/sectionTest/sectionPreloadOrchestrator.locale.test.js`](../../tests/sectionTest/sectionPreloadOrchestrator.locale.test.js) | **New** — `refreshSectionPreloadsOnLocaleChange` reset + re-warm (§28, §73) |
+| [`tests/sectionTest/routeResolver.sectionInheritance.test.js`](../../tests/sectionTest/routeResolver.sectionInheritance.test.js) | **New** — `inheritConfigurationFromParentRoute` section fields (§37, §53) |
+| [`tests/sectionTest/sectionNavigationResources.test.js`](../../tests/sectionTest/sectionNavigationResources.test.js) | **New** — `resolveCurrentSectionForNavigation`, `loadCurrentSectionResources` (§29, §78) |
+
+Legacy copies remain in `tests/unit/sectionPreloadOrchestrator.test.js`, `tests/routeTest/sectionPreloadOrchestrator.route.test.js`, and `tests/unit/routeNavigationData.test.js` until Phase G cleanup.
+
+### Test notes
+
+- Orchestrator mocks must be created inline in `vi.hoisted()` — importing helper functions inside hoisted callbacks causes initialization errors.
+- Inheritance tests mock `getRouteConfiguration()` with `SECTION_INHERITANCE_FIXTURES` from `sectionFixtures.js`.
+- `sectionNavigationResources.test.js` imports the canonical module directly (not the routing re-export).
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/sectionTest
+```
+
+**Result:** 21 files, 230 tests passed.
+
+### Suggested commit message
+
+```
+test: add section Phase E orchestrator and inheritance tests in sectionTest
+
+Cover getSectionPreloadPlan, background preloads, locale refresh,
+routeResolver section/preLoadSections inheritance, and sectionNavigationResources
+load paths with mocked route fixtures (21 files, 230 tests).
+```
+
+### Exit criteria (Phase E)
+
+- [x] Every export in `sectionPreloadOrchestrator.js` covered in `tests/sectionTest/`
+- [x] Inheritance matrix (§53) asserted via orchestrator and routeResolver suites
+- [x] `refreshSectionPreloadsOnLocaleChange` resets state then re-warms bundles + translations
+- [x] `sectionNavigationResources.js` fire-and-forget CSS/i18n/asset loads covered
+
