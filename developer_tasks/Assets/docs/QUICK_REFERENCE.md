@@ -1,6 +1,6 @@
 # Asset system — quick reference
 
-**Last updated:** 2026-06-10  
+**Last updated:** 2026-06-20  
 **Imports:** use `@/systems/assets/` (not `@/utils/assets`)
 
 ---
@@ -43,12 +43,28 @@ await validateAssetMap();
 
 ---
 
+## Policy / URL guards
+
+```javascript
+import { assertAllowedAssetUrl } from '@/systems/assets/assetPolicy.js';
+
+const check = assertAllowedAssetUrl(url, { assetType: 'script' });
+```
+
+---
+
 ## Intent prefetch (nav hover)
 
 ```javascript
-import { createRoutePrefetchIntentHandler } from '@/systems/routing/useRoutePrefetch.js';
+import { createCombinedRoutePrefetchIntentHandler } from '@/composables/useRoutePrefetch.js';
 
-const prefetchShop = createRoutePrefetchIntentHandler('/shop');
+const prefetchShop = createCombinedRoutePrefetchIntentHandler('/shop');
+```
+
+```javascript
+import { useAssetPrefetch } from '@/composables/useAssetPrefetch.js';
+
+useAssetPrefetch().prefetchAssetsOnIntent('/dashboard')();
 ```
 
 ---
@@ -57,9 +73,10 @@ const prefetchShop = createRoutePrefetchIntentHandler('/shop');
 
 ```javascript
 import { createAssetHandler } from '@/systems/assets/assetHandlerFactory.js';
+import { getAuthAssetConfig, getAuthAssetNames } from '@/systems/assets/authAssetConfig.js';
 
-const handler = await createAssetHandler(assetsConfig, { name: 'AuthLogIn', section: 'auth' });
-await handler.ensureAssetDependencies(['cognito'], { strict: true });
+const handler = await createAssetHandler(getAuthAssetConfig(), { name: 'AuthLogIn', section: 'auth' });
+await handler.ensureAssetDependencies(getAuthAssetNames(getAuthAssetConfig()), { strict: true });
 handler.dispose();
 ```
 
@@ -82,9 +99,11 @@ Build-time: `systems/build/jsonConfigValidator.js` validates route `assetPreload
 |------|---------|
 | `src/config/assetMap.json` | Global flags |
 | `src/config/assetMap.auth.json` | Section overrides |
-| `router/sharedAssetPreloads.json` | Shared preload catalog (move to config planned) |
+| `src/config/sharedAssetPreloads.json` | Shared preload catalog |
+| `src/config/settingConfig.js` | Settings nav + flag resolver |
+| `src/config/dashboardSidebarMenuItems.js` | Sidebar menu flags |
 
-Operator detail: [src/config/assetMap.README.md](../../src/config/assetMap.README.md)
+Operator detail: [src/config/assetMap.README.md](../../../src/config/assetMap.README.md)
 
 ---
 
@@ -94,9 +113,13 @@ Operator detail: [src/config/assetMap.README.md](../../src/config/assetMap.READM
 import { usePreloadStore } from '@/stores/usePreloadStore.js';
 
 const store = usePreloadStore();
+store.addPreloadedAsset(resolvedUrl);
 store.hasAsset(resolvedUrl);
 store.hasSection('shop');
+store.clearPreloadState();
 ```
+
+Deprecated aliases: `addAsset`, `clearState`.
 
 ---
 
@@ -106,14 +129,16 @@ store.hasSection('shop');
 |--------|------|
 | Library | `src/systems/assets/assetLibrary.js` |
 | Preloader | `src/systems/assets/assetPreloader.js` |
-| Scanner | `src/systems/assets/assetScanner.js` |
+| Policy | `src/systems/assets/assetPolicy.js` |
+| Handler | `src/systems/assets/assetHandler.js` |
+| Auth config | `src/systems/assets/authAssetConfig.js` |
 | Barrel | `src/systems/assets/index.js` |
-| Tests | `tests/unit/assetMap*.test.js`, `tests/assetLibrary.test.js` |
 
 ---
 
 ## Links
 
 - [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md)
+- [assets-cleanup-changelog.md](../assets-cleanup-changelog.md)
 - [ASSET_PLAN.md](./ASSET_PLAN.md)
 - [AI_GUIDE.md](./AI_GUIDE.md)

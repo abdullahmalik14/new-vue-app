@@ -4,11 +4,29 @@
 **Reference:** `notes.md`, [folder-structure-audit-assets.md](./folder-structure-audit-assets.md)  
 **Generated:** 2026-06-10
 
-Legend: ✅ correct layer per `notes.md` · ⚠️ loose / wrong layer · 🧪 test (stale `utils/assets` imports)
+**Generated:** 2026-06-10 · **Synced:** 2026-06-20 (Phases 0–7)  
+**Changelog:** [assets-cleanup-changelog.md](./assets-cleanup-changelog.md)
+
+Legend: ✅ correct layer · ⚠️ open audit item · 🧪 test note
 
 ---
 
-## 1. `systems/assets/` — core asset system (14 files)
+## 1. `systems/assets/` — core asset system
+
+### New / renamed modules (2026-06-20)
+
+| File | Role |
+|------|------|
+| `assetPolicy.js` ✅ | URL policy + validation re-exports |
+| `assetHandler.js` ✅ | `AssetHandler` class (was `assetsHandlerNew.js`) |
+| `routeAssetPrefetch.js` ✅ | Section asset intent prefetch |
+| `resolveRouteAssetPreloads.js` ✅ | Route `assetPreloadRef` expansion |
+| `routeSectionAssetPreloadEntries.js` ✅ | Section preload rollup (replaces standalone `getAssetPreloadEntriesForSection.js` path in older docs) |
+| `authAssetConfig.js` ✅ | Shared auth/onboarding handler config |
+
+### `assertAllowedPreloadUrl.js` ✅
+
+Deprecated shim — import from `assetPolicy.js` (`assertAllowedAssetUrl`).
 
 ### `assetLibrary.js` ✅
 
@@ -77,7 +95,7 @@ Legend: ✅ correct layer per `notes.md` · ⚠️ loose / wrong layer · 🧪 t
 | `clearPreloadCache` | function |
 | `getPreloadedAssetsCount` | function |
 
-Uses `usePreloadStore.addAsset`, `hasAsset` internally.
+Uses `usePreloadStore.addPreloadedAsset`, `hasAsset` internally.
 
 ### `assetScanner.js` ✅
 
@@ -172,7 +190,7 @@ Uses `usePreloadStore.addAsset`, `hasAsset` internally.
 |--------|------|
 | `createAssetHandler` | function |
 
-### `assetsHandlerNew.js` ✅ (rename → `assetHandler.js`)
+### `assetsHandlerNew.js` — **removed** (renamed → `assetHandler.js`)
 
 **Default export:** `AssetHandler` class
 
@@ -208,54 +226,31 @@ Uses `usePreloadStore.addAsset`, `hasAsset` internally.
 
 Re-exports from: `assetPreloader`, `getAssetPreloadEntriesForSection`, `validateRouteAssetPreloadFlags`, `resolveSharedComponentAssets`, `validateSharedComponentAssetMappings`, `assetScanner`, `assetLibrary`, `resetAssetLibrary`.
 
-**Not in barrel:** `assetMapSource`, `sectionAssetMapSource`, `assertAllowedPreloadUrl`, `assetHandlerFactory`, `assetsHandlerNew`.
+Re-exports from: `assetPreloader`, `routeSectionAssetPreloadEntries`, `assetPolicy`, `resolveSharedComponentAssets`, `routeAssetPrefetch`, `resolveRouteAssetPreloads`, `validateSharedComponentAssetMappings`, `assetScanner`, `assetLibrary`, `resetAssetLibrary`.
+
+**Direct import only (not in barrel):** `assetMapSource`, `sectionAssetMapSource`, `assetHandlerFactory`, `assetHandler`, `authAssetConfig`, `assertAllowedPreloadUrl` shim.
 
 ---
 
-## 2. Loose asset code — wrong system folder
+## 2. Loose asset code — remaining open items
 
-### `systems/routing/routeAssetPrefetch.js` ⚠️ → should be `systems/assets/`
+### `systems/interactions/scriptAvailabilityChecker.js` ⚠️
 
-| Export | Calls |
-|--------|-------|
-| `prefetchSectionAssetsForRoute` | `preloadSectionAssets` |
-| `createSectionAssetPrefetchIntentHandler` | `prefetchSectionAssetsForRoute` |
-| `resetRouteAssetPrefetchCache` | — |
+Still embeds `AssetHandler` singleton and Cognito default config — optional extraction to `systems/assets/` (post-P3).
 
-### `systems/routing/resolveRouteAssetPreloads.js` ⚠️ → should be `systems/assets/`
+### `utils/preload.js` — **removed** (Phase 4)
 
-| Export | |
-|--------|--|
-| `resolveRouteAssetPreloads` | |
+Use `preloadImage` from `assetPreloader.js`.
 
-### `systems/routing/useRoutePrefetch.js` ⚠️ → should be `composables/`
+### Moved to correct layer ✅
 
-| Export | Calls |
-|--------|-------|
-| `createRoutePrefetchIntentHandler` | `prefetchRouteComponent`, `prefetchSectionAssetsForRoute` |
-| `useRoutePrefetch` | returns `{ prefetchRoute, prefetchSectionAssets, createRoutePrefetchIntentHandler, createSectionAssetPrefetchIntentHandler }` |
-
-### `systems/interactions/scriptAvailabilityChecker.js` ⚠️ — embeds asset loading
-
-| Export | Asset role |
-|--------|------------|
-| `isScriptInDOM` | uses `AssetHandler` |
-| `isScriptReady` | uses `AssetHandler` |
-| `loadScript` | uses `AssetHandler` |
-| `waitForScriptAvailability` | uses `AssetHandler` |
-| `waitForCognitoScript` | uses `AssetHandler` |
-| `getScriptLoadingState` | uses `AssetHandler` |
-| `addAssetToHandler` | mutates `AssetHandler` singleton |
-| `updateAssetUrlFromAssetMap` | `getAssetUrl` + `AssetHandler` |
-| default export | object of above |
-
-Internal (not exported): `getAssetHandler` — singleton `AssetHandler` + `DEFAULT_ASSET_CONFIG`.
-
-### `utils/preload.js` ⚠️ — legacy duplicate
-
-| Export | |
-|--------|--|
-| `preloadIcons` | raw `Image()` preload |
+| Was | Now |
+|-----|-----|
+| `systems/routing/routeAssetPrefetch.js` | `systems/assets/routeAssetPrefetch.js` |
+| `systems/routing/resolveRouteAssetPreloads.js` | `systems/assets/resolveRouteAssetPreloads.js` |
+| `systems/routing/useRoutePrefetch.js` | `composables/useRoutePrefetch.js` |
+| `router/sharedAssetPreloads.json` | `config/sharedAssetPreloads.json` |
+| `assets/data/settingConfig.js` | `config/settingConfig.js` |
 
 ---
 
@@ -278,7 +273,7 @@ Calls `preloadSectionAssets` on navigation (line ~95).
 
 | Export | Asset calls |
 |--------|-------------|
-| `loadRouteConfigurationFromFile` | `resolveRouteAssetPreloads`, `validateRouteAssetPreloadFlags`, `sharedAssetPreloads.json` |
+| `loadRouteConfigurationFromFile` | `resolveRouteAssetPreloads`, `validateRouteAssetPreloadFlags` via `assetPolicy`, `sharedAssetPreloads.json` |
 | `getCachedRouteConfiguration` | — |
 | `resetRouteConfigurationCache` | — |
 | `getRouteConfiguration` | — |
@@ -299,7 +294,7 @@ Uses: `validateRouteAssetPreloadRefs`, `validateRouteAssetPreloadFlags`, `valida
 |------|-----------|
 | `preloadSectionCriticalImages` | `assetPreloader` |
 | `preloadSection` | sections (which calls assets) |
-| `createRoutePrefetchIntentHandler` | re-export from routing |
+| `createCombinedRoutePrefetchIntentHandler` | re-export from composables (alias: `createRoutePrefetchIntentHandler`) |
 | `usePreloadStore` | preload state |
 
 ### `app/main.js` ✅
@@ -319,12 +314,19 @@ Uses: `validateRouteAssetPreloadRefs`, `validateRouteAssetPreloadFlags`, `valida
 |--------|-------|
 | `useAssetUrl(flag, sectionName)` | `getAssetUrl` — returns `{ url, loading, error }` |
 
-### Missing per `notes.md`
+### `composables/useRoutePrefetch.js` ✅
 
-| File | Status |
-|------|--------|
-| `composables/useAssetPrefetch.js` | ❌ not created |
-| `composables/useRoutePrefetch.js` | ❌ lives in `systems/routing/` |
+| Export | Notes |
+|--------|-------|
+| `createCombinedRoutePrefetchIntentHandler` | component + section assets |
+| `createRoutePrefetchIntentHandler` | deprecated alias |
+| `useRoutePrefetch` | composable API |
+
+### `composables/useAssetPrefetch.js` ✅
+
+| Export | Notes |
+|--------|-------|
+| `useAssetPrefetch` | section asset prefetch only |
 
 ---
 
@@ -339,7 +341,7 @@ Uses: `validateRouteAssetPreloadRefs`, `validateRouteAssetPreloadFlags`, `valida
 
 **Getters:** `preloadedAssetCount`, `hasSection`, `hasAsset`, `isSectionInProgress`
 
-**Actions:** `addSection`, `removeSection`, `addAsset`, `removeAsset`, `clearAssets`, `markSectionInProgress`, `unmarkSectionInProgress`, `setManifestLoadFailed`, `clearState`
+**Actions:** `addSection`, `removeSection`, `addPreloadedAsset`, `addAsset` (alias), `removeAsset`, `clearAssets`, `markSectionInProgress`, `unmarkSectionInProgress`, `setManifestLoadFailed`, `clearPreloadState`, `clearState` (alias)
 
 ---
 
@@ -352,24 +354,20 @@ Uses: `validateRouteAssetPreloadRefs`, `validateRouteAssetPreloadFlags`, `valida
 | `config/assetMap.json` | Global flag → URL map |
 | `config/assetMap.auth.json` | Section-scoped auth map |
 | `config/assetMap.README.md` | Docs |
-| `router/sharedAssetPreloads.json` ⚠️ | Shared preload catalog (wrong folder) |
+| `config/sharedAssetPreloads.json` ✅ | Shared preload catalog |
+| `config/settingConfig.js` ✅ | Settings nav + `resolveSettingConfigWithAssets` |
+| `config/dashboardSidebarMenuItems.js` ✅ | Sidebar menu flags + resolver |
 
-### `src/assets/` — static files
+### `src/assets/` — static files only
 
 | File | Role |
 |------|------|
 | `assets/main.css` | Global CSS |
 | `assets/route-transitions.css` | Route transition CSS |
 | `assets/styles/rtl-foundation.css` | RTL CSS |
-| `assets/data/menuItems.js` ⚠️ | Menu data + `resolveMenuItemsWithAssets` |
-| `assets/data/settingConfig.js` ⚠️ | Settings nav data (hardcoded ImgBB URLs) |
 
-**`menuItems.js` exports:**
-
-| Export | Calls |
-|--------|-------|
-| `menuItems` | const array (asset flags in `image` field) |
-| `resolveMenuItemsWithAssets` | `getAssetUrls`, i18n |
+~~`assets/data/menuItems.js`~~ → `config/dashboardSidebarMenuItems.js`  
+~~`assets/data/settingConfig.js`~~ → `config/settingConfig.js`
 
 ---
 
@@ -379,15 +377,9 @@ Uses: `validateRouteAssetPreloadRefs`, `validateRouteAssetPreloadFlags`, `valida
 |------|-----------------|
 | `templates/auth/AuthHeader.vue` | `getAssetUrl` — `loadAssets()` |
 | `templates/auth/AuthLayout.vue` | `getAssetUrlForCss` — `onMounted` |
-| `templates/auth/views/AuthLogIn.vue` | `getAssetUrl`, `createAssetHandler`, `createRoutePrefetchIntentHandler`; local `assetsConfig`, `ensureAssetDependencies`, `dispose` |
-| `templates/auth/views/AuthSignUp.vue` | same pattern |
-| `templates/auth/views/AuthResetPassword.vue` | same pattern |
-| `templates/auth/views/AuthLostPassword.vue` | `createAssetHandler`, `ensureAssetDependencies`, `dispose` |
-| `templates/auth/views/AuthConfirmEmail.vue` | same |
-| `templates/auth/views/AuthSignUpOnboarding.vue` | same |
-| `templates/dashboard/shared/DashboardSharedHeader.vue` | `getAssetUrl`, `groupComponentSlotsByPreloadTier`, `resolveSharedComponentAssets`; local `loadHeaderAssets()` |
-| `templates/dashboard/shared/DashboardSharedSidebar.vue` | `menuItems`, `resolveMenuItemsWithAssets`, `getAssetUrl`, `resolveSharedComponentAssets`, `createRoutePrefetchIntentHandler`; local `resolveMenuItems()`, `loadSidebarChromeAssets()` |
-| `templates/dashboard/creator/CreatorDashboardOverviewPage.vue` | `AssetHandler`, `loadAssetsForSection`; local `loadDashboardMetrics()` |
+| `dev/templates/auth/views/*.vue` | `createAssetHandler`, `getAuthAssetConfig`, `getAuthAssetNames` |
+| `dev/templates/dashboard/creator/CreatorDashboardOverviewPage.vue` | `createAssetHandler`, `loadAssetsForSection` |
+| `dev/templates/dashboard/shared/DashboardSharedSidebar.vue` | `createCombinedRoutePrefetchIntentHandler`, menu resolvers |
 | `templates/dashboard/demo/SocialLinkingDemoPage.vue` | `getAssetUrl` |
 | `templates/dev/demo-audit/AuthComponentDemo.vue` | `getAssetUrl` |
 
@@ -398,13 +390,13 @@ Uses: `validateRouteAssetPreloadRefs`, `validateRouteAssetPreloadFlags`, `valida
 | File | Imports / calls |
 |------|-----------------|
 | `components/forms/select/CountryStateSelect.vue` | `preloadJSON('/src/config/countries.json')` |
-| `components/ui/cart/Cart.vue` | `preloadIcons` from `utils/preload` |
-| `components/media/uploader/parts/UploadThumbnailPreview.vue` | `preloadIcons` from `utils/preload` |
+| `components/ui/cart/Cart.vue` | `preloadImage` from `assetPreloader` |
+| `components/media/uploader/parts/UploadThumbnailPreview.vue` | `preloadImage` |
 | `components/media/uploader/parts/VideoThumbnailSelector.vue` | local `preloadImages()` (raw `Image()`) |
 | `components/media/uploader/MediaUploaderStepPreviewSettings.vue` | prop `preloadImages` (URLs passed down) |
-| `components/layout/AppFooter.vue` | `createRoutePrefetchIntentHandler` |
-| `components/ui/nav/dashboard/NavDropdown.vue` | `menuItems`, `resolveMenuItemsWithAssets` |
-| `components/ui/nav/dashboard/DashProfileSettings.vue` | `settingConfig` from `assets/data` |
+| `components/layout/AppFooter.vue` | `createCombinedRoutePrefetchIntentHandler` |
+| `components/ui/nav/dashboard/NavDropdown.vue` | `dashboardSidebarMenuItems`, resolver |
+| `components/ui/nav/dashboard/DashProfileSettings.vue` | `resolveSettingConfigWithAssets` |
 
 ---
 
@@ -412,100 +404,31 @@ Uses: `validateRouteAssetPreloadRefs`, `validateRouteAssetPreloadFlags`, `valida
 
 ### `systems/routing/index.js`
 
-Re-exports from `routeAssetPrefetch.js`: `prefetchSectionAssetsForRoute`, `createSectionAssetPrefetchIntentHandler`, `resetRouteAssetPrefetchCache`.
-
-Re-exports from `useRoutePrefetch.js`: `useRoutePrefetch`, `createRoutePrefetchIntentHandler`.
+Re-exports from `../assets/routeAssetPrefetch.js` and `../../composables/useRoutePrefetch.js` (`createCombinedRoutePrefetchIntentHandler` + deprecated alias).
 
 ---
 
-## 10. Tests — asset-related (47 files, stale paths)
+## 10. Tests — asset-related
 
-All listed tests import `src/utils/assets/*` or `src/utils/route/routeAssetPrefetch.js` instead of `src/systems/assets/*`.
+**Import path:** `src/systems/assets/*` (Phase 0 — no `utils/assets` in tests).
 
-### Unit tests by module under test
+Representative suites: `tests/handler/`, `tests/unit/assetMap*.test.js`, `tests/unit/useRoutePrefetch.test.js`, `tests/unit/usePreloadStore.test.js`, `tests/routeTest/routerExports.test.js`.
 
-| Test file | Methods / modules exercised |
-|-----------|----------------------------|
-| `assetLibrary.test.js` | `assetLibrary` |
-| `assetMapper.test.js` | `getAssetUrl`, library |
-| `unit/areAssetsLoadedForSection.test.js` | `areAssetsLoadedForSection` |
-| `unit/assetLibraryCloneOnRead.test.js` | `getAssetsByCategory`, caches |
-| `unit/assetMapBuildValidation.test.js` | `validateRouteAssetPreloadFlags`, `validateSharedComponentAssetMappings` |
-| `unit/assetMapConfig.test.js` | `loadAssetMapConfig`, `assetMapSource` |
-| `unit/assetMapReadme.test.js` | config docs |
-| `unit/assetMapSource.test.js` | `parseAssetMapJsonText`, `getBundledAssetMap` |
-| `unit/assetMapSourceImport.test.js` | `getBundledAssetMap` |
-| `unit/assetMapUrl.test.js` | `getAssetMapFetchCandidates` |
-| `unit/assetPerformanceTrackerGuards.test.js` | `preloadImage`, `preloadScript`, `preloadSectionAssets`, scanner |
-| `unit/assetPreloadCache.test.js` | `clearPreloadCache`, `preloadJSON` |
-| `unit/assetScanner.test.js` | scanner + `getPreloadedAssetsCount` |
-| `unit/assetsIndexExports.test.js` | `index.js` barrel |
-| `unit/assertAllowedPreloadUrl.test.js` | `assertAllowedPreloadUrl` |
-| `unit/detectEnvironmentOverride.test.js` | `setEnvironment`, `getEnvironment` |
-| `unit/getAssetPreloadEntriesForSection.test.js` | section preload rollup |
-| `unit/getAssetsByCategoryCache.test.js` | `getAssetsByCategory` |
-| `unit/getAssetUrlAllowlist.test.js` | `getAssetUrl` allowlist |
-| `unit/getAssetUrlResolutionLogging.test.js` | `getAssetUrl` logging |
-| `unit/getAssetUrlsBatch.test.js` | `getAssetUrls` |
-| `unit/initAssetLibrary.test.js` | `initAssetLibrary` |
-| `unit/loadAssetsForSectionDedup.test.js` | `loadAssetsForSection` |
-| `unit/normalizeAssetMapUrl.test.js` | `normalizeAssetMapUrl` |
-| `unit/preloadAssetsForSections.test.js` | `preloadAssetsForSections` |
-| `unit/preloadConcurrency.test.js` | `runInConcurrencyChunks`, `ASSET_PRELOAD_MAX_CONCURRENCY` |
-| `unit/preloadFetchPriority.test.js` | `preloadImage`, `preloadScript`, `resolveFetchPriority` |
-| `unit/preloadNormalPriority.test.js` | `preloadAssets`, `preloadImage` |
-| `unit/preloadPrefetch.test.js` | `preloadImage`, `preloadScript` |
-| `unit/preloadRetry.test.js` | `withPreloadRetry`, `preloadImage` |
-| `unit/preloadScript.test.js` | `preloadScript` |
-| `unit/preloadSectionAssets.test.js` | `preloadSectionAssets` |
-| `unit/preloadUrlGuard.test.js` | `preloadImage`, `preloadFont` |
-| `unit/resetAssetLibrary.test.js` | `resetAssetLibrary` |
-| `unit/resolveAssetMapForEnvironment.test.js` | env resolution |
-| `unit/resolveRouteAssetPreloads.test.js` | `resolveRouteAssetPreloads` |
-| `unit/routeAssetPrefetch.test.js` | `prefetchSectionAssetsForRoute` |
-| `unit/sectionAssetMapMerge.test.js` | `loadSectionAssetMap` |
-| `unit/sectionAssetsMemoryFirst.test.js` | section metadata |
-| `unit/setEnvironmentUrlCache.test.js` | env + URL cache |
-| `unit/sharedComponentAssetMappings.test.js` | `resolveSharedComponentAssets`, validators |
-| `unit/shopAssetPreloadConfig.test.js` | `getAssetPreloadEntriesForSection` |
-| `unit/syncAssetMapToPublic.test.js` | build sync |
-| `unit/unloadUnusedSections.test.js` | `unloadUnusedSections` |
-| `unit/useRoutePrefetch.test.js` | `useRoutePrefetch`, `createRoutePrefetchIntentHandler` |
-| `unit/validateAssetMapHostname.test.js` | `validateAssetMap` |
-| `unit/validateAssetMapHttpProduction.test.js` | `validateAssetMap` |
-| `unit/validateRouteAssetPreloadFlags.test.js` | validators |
-| `handler/AssetHandler.validation.test.js` | `AssetHandler` class |
-| `handler/AssetHandler.critical.test.js` | `AssetHandler` class |
-| `handler/AssetHandler testing code.js` | `AssetHandler` |
-| `AssetHandler.browser-test.html` | `AssetHandler` |
-| `handler/AssetHandler.browser-test (1).html` | `AssetHandler` |
-
-### Cross-module tests (asset-adjacent)
-
-| Test file | Asset touchpoint |
-|-----------|------------------|
-| `unit/routeNavigationData.test.js` | mocks `assetPreloader` |
-| `unit/sectionPreloader.test.js` | mocks `preloadSectionAssets` |
-| `unit/appBuildHash.test.js` | `syncPreloadStoreBuildHash` |
+Full phase test commands: [assets-cleanup-changelog.md](./assets-cleanup-changelog.md).
 
 ---
 
 ## 11. Summary counts
 
-| Layer | Files | Status |
-|-------|-------|--------|
-| `systems/assets/` | 14 | ✅ core (2 naming/placement issues) |
-| Loose in routing | 3 | ⚠️ |
-| Loose in interactions | 1 | ⚠️ |
-| Loose in utils | 1 | ⚠️ |
-| Composables | 1 (+2 missing) | partial |
-| Stores | 1 | ✅ |
-| Config JSON | 4 | 1 wrong folder |
-| `src/assets/` data | 2 | ⚠️ wrong folder / hardcoded URLs |
-| Template consumers | 13 | ✅ consumers (some duplicated logic) |
-| Component consumers | 8 | 3 use legacy/local preload |
-| Tests | 47 | 🧪 stale import paths |
-| **Total touchpoints** | **~95** | |
+| Layer | Status |
+|-------|--------|
+| `systems/assets/` | ✅ ~20 modules |
+| Composables | ✅ `useAssetUrl`, `useRoutePrefetch`, `useAssetPrefetch` |
+| Config | ✅ `assetMap`, `sharedAssetPreloads`, `settingConfig`, sidebar menu |
+| Tests | ✅ import `systems/assets` |
+| Open | ⚠️ `scriptAvailabilityChecker` handler extraction (optional) |
+
+**Changelog:** [assets-cleanup-changelog.md](./assets-cleanup-changelog.md)
 
 ---
 

@@ -8,6 +8,10 @@
 **Docs hub:** [docs/README.md](./docs/README.md)  
 **Audit type:** File location and structure only
 
+**Implementation status (2026-06-20):** Phases 0–8 complete — see [assets-cleanup-changelog.md](./assets-cleanup-changelog.md). Issues **1–8, 14–17, 22–23** resolved in code. Still open: **13** (optional handler extraction), **19** (empty static asset subfolders), naming batches **3–4**.
+
+The issue entries below remain as historical audit detail unless marked resolved.
+
 ---
 
 ## Issue 1

@@ -1,7 +1,7 @@
 # Asset system — master plan
 
-**Last updated:** 2026-06-10  
-**Status:** Audits complete (structure + code index + naming batches 1–2). Migration in progress.
+**Last updated:** 2026-06-20  
+**Status:** Phases 0–8 complete — see [assets-cleanup-changelog.md](../assets-cleanup-changelog.md). Naming batches 3–4 and optional handler extraction remain.
 
 ---
 
@@ -15,14 +15,21 @@ One clear asset layer under `src/systems/assets/`, config in `src/config/`, stat
 
 | Area | Status |
 |------|--------|
-| Core modules in `systems/assets/` | ✅ Migrated from `utils/assets/` |
-| Docs hub `Developer Tasks/Assets/docs/` | ✅ This folder |
-| Structure audit | ✅ 24 issues documented |
-| Code index | ✅ ~95 touchpoints |
-| Naming audit | ✅ Batch 1–2; Batch 3–4 pending |
-| Tests import paths | ❌ ~47 files still use `utils/assets` |
-| `assetPolicy.js` | ❌ Not created |
-| Loose files in routing/interactions | ❌ Not moved |
+| Core modules in `systems/assets/` | ✅ |
+| Docs hub `developer_tasks/Assets/docs/` | ✅ |
+| Test imports (`systems/assets`) | ✅ Phase 0 |
+| Prefetch/resolver filenames | ✅ Phase 1 |
+| `assetPolicy.js` | ✅ Phase 2 |
+| `assetHandler.js` rename | ✅ Phase 3 |
+| `utils/preload.js` removed | ✅ Phase 4 |
+| `authAssetConfig.js` | ✅ Phase 5 |
+| Store / composable renames | ✅ Phase 6 |
+| `settingConfig` in `config/` + flags | ✅ Phase 7 |
+| `useRoutePrefetch` in `composables/` | ✅ (pre-Phase 0) |
+| `sharedAssetPreloads.json` in `config/` | ✅ (pre-Phase 0) |
+| Docs synced to repo | ✅ Phase 8 |
+| Naming audit batches 3–4 | ⏳ Pending |
+| `scriptAvailabilityChecker` handler extraction | ⏳ Optional post-P3 |
 
 ## Priority work (developer order)
 

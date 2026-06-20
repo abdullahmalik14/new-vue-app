@@ -1,7 +1,7 @@
 # Asset system — AI guide
 
 **Audience:** Cursor agents, codegen, audit bots.  
-**Last updated:** 2026-06-10  
+**Last updated:** 2026-06-20  
 **Primary naming reference:** `docs/tasks/Expanded Vue App Naming Convention.txt`
 
 Read this before editing any asset-related file.
@@ -29,9 +29,19 @@ systems/assets/
   assetLibrary.js
   assetPreloader.js
   assetScanner.js
-  assetPolicy.js          ← missing; consolidate from assertAllowedPreloadUrl.js
+  assetPolicy.js
   assetMapSource.js
-  routeAssetPrefetch.js   ← currently in systems/routing/
+  routeAssetPrefetch.js
+  resolveRouteAssetPreloads.js
+  authAssetConfig.js
+  assetHandler.js
+composables/
+  useRoutePrefetch.js
+  useAssetPrefetch.js
+config/
+  assetMap.json
+  sharedAssetPreloads.json
+  settingConfig.js
 ```
 
 ---
@@ -41,9 +51,9 @@ systems/assets/
 | Task | File(s) |
 |------|---------|
 | New flag / URL resolution | `assetLibrary.js`, `config/assetMap.json` |
-| New preload type / URL guard | `assetPolicy.js` (future), `assetPreloader.js` |
-| Route preload ref expansion | `resolveRouteAssetPreloads.js` → `systems/assets/` |
-| Hover prefetch | `routeAssetPrefetch.js` → `systems/assets/` |
+| New preload type / URL guard | `assetPolicy.js`, `assetPreloader.js` |
+| Route preload ref expansion | `resolveRouteAssetPreloads.js` |
+| Hover prefetch | `routeAssetPrefetch.js` |
 | Component flag scan | `assetScanner.js` |
 | Shared dashboard chrome assets | `resolveSharedComponentAssets.js` |
 | Auth script injection | `assetHandler.js` + `assetHandlerFactory.js` |
@@ -67,12 +77,12 @@ systems/assets/
 
 | Issue | Detail |
 |-------|--------|
-| Name collision | `createRoutePrefetchIntentHandler` in both `routeComponentPrefetch.js` (component only) and `useRoutePrefetch.js` (combined) |
-| Missing file | `assetPolicy.js`, `composables/useAssetPrefetch.js` |
-| Wrong location | `routeAssetPrefetch.js`, `resolveRouteAssetPreloads.js`, `useRoutePrefetch.js`, `sharedAssetPreloads.json` |
-| Legacy utils | `src/utils/preload.js` (`preloadIcons`) — use `assetPreloader.preloadImage` |
-| Stale tests | `tests/**` imports `src/utils/assets/*` |
-| Duplicate auth config | Six auth views each define `assetsConfig` inline |
+| Name collision | `createRoutePrefetchIntentHandler` in `routeComponentPrefetch.js` (component only) vs `useRoutePrefetch.js` (combined). Prefer **`createCombinedRoutePrefetchIntentHandler`** for combined handler. |
+| Optional refactor | Issue 13: extract handler singleton from `scriptAvailabilityChecker.js` into assets layer (needs permission). |
+| Inline URLs | `DashProfileSettings.vue` profile header still uses inline ImgBB (separate flags). |
+| Naming batches 3–4 | Template consumers + tests — pending in naming audit. |
+
+**Resolved (Phases 0–8):** `assetPolicy.js`, `useAssetPrefetch.js`, route prefetch/resolver locations, `utils/preload.js`, stale test imports, duplicate auth `assetsConfig`, `assetsHandlerNew.js`, `assets/data/settingConfig.js`.
 
 ---
 

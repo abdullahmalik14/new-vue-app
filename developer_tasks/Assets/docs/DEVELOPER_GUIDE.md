@@ -1,7 +1,8 @@
 # Asset system — developer guide
 
 **Audience:** Developers working on flags, preloads, templates, or config.  
-**Last updated:** 2026-06-10
+**Last updated:** 2026-06-20  
+**Done work log:** [assets-cleanup-changelog.md](../assets-cleanup-changelog.md)
 
 ---
 
@@ -9,7 +10,7 @@
 
 1. **Flag → URL resolution** — Components use stable flags (`icon.cart`, `auth.background`) resolved via `assetMap.json`.
 2. **Section asset preloading** — Route/section config drives background warming of images, fonts, scripts.
-3. **Intent prefetch** — Hover/focus on nav links can prefetch a route’s section assets before navigation.
+3. **Intent prefetch** — Hover/focus on nav links can prefetch route components and section assets before navigation.
 4. **DOM script loading** — `AssetHandler` + factory load critical scripts (e.g. Cognito) in auth flows.
 5. **Validation** — Build and runtime checks on `assetMap.json` and route `assetPreload` entries.
 
@@ -21,20 +22,27 @@
 |------|----------------|
 | `systems/assets/assetLibrary.js` | `getAssetUrl`, section metadata, `initAssetLibrary`, `validateAssetMap` |
 | `systems/assets/assetPreloader.js` | `preloadImage`, `preloadSectionAssets`, `preloadJSON`, cache |
+| `systems/assets/assetPolicy.js` | URL allow-list (`assertAllowedAssetUrl`) + preload validation re-exports |
 | `systems/assets/assetScanner.js` | Scan components for asset references |
 | `systems/assets/assetMapSource.js` | Bundled global map, runtime fetch policy |
 | `systems/assets/sectionAssetMapSource.js` | Per-section `assetMap.<section>.json` |
-| `systems/assets/getAssetPreloadEntriesForSection.js` | Roll up route `assetPreload` per section |
-| `systems/assets/routeAssetPrefetch.js` | *Should live here* — currently in `systems/routing/` |
-| `systems/assets/assertAllowedPreloadUrl.js` | URL allow-list (*→ future `assetPolicy.js`*) |
-| `systems/assets/assetHandlerFactory.js` | `createAssetHandler()` for auth templates |
-| `systems/assets/assetsHandlerNew.js` | `AssetHandler` class (*rename → `assetHandler.js` planned*) |
-| `stores/usePreloadStore.js` | Tracks preloaded section names and asset URLs |
+| `systems/assets/routeSectionAssetPreloadEntries.js` | Roll up route `assetPreload` per section |
+| `systems/assets/routeAssetPrefetch.js` | Intent prefetch for section assets on nav hover |
+| `systems/assets/resolveRouteAssetPreloads.js` | Expand `assetPreloadRef` in route config |
+| `systems/assets/assetHandler.js` | `AssetHandler` class (DOM script/CSS loading) |
+| `systems/assets/assetHandlerFactory.js` | `createAssetHandler()` for templates |
+| `systems/assets/authAssetConfig.js` | Shared auth/onboarding asset config for templates |
+| `systems/assets/assertAllowedPreloadUrl.js` | Deprecated shim → import from `assetPolicy.js` |
+| `stores/usePreloadStore.js` | Preload state (`addPreloadedAsset`, `clearPreloadState`, …) |
 | `composables/useAssetUrl.js` | Reactive `getAssetUrl` in components |
+| `composables/useRoutePrefetch.js` | Combined component + section asset intent prefetch |
+| `composables/useAssetPrefetch.js` | Section asset intent prefetch only |
 | `config/assetMap.json` | Global flag → URL map |
-| `router/sharedAssetPreloads.json` | Shared dashboard preload catalog (*→ move to `config/` planned*) |
+| `config/sharedAssetPreloads.json` | Shared dashboard preload catalog |
+| `config/settingConfig.js` | Settings nav data + `resolveSettingConfigWithAssets()` |
+| `config/dashboardSidebarMenuItems.js` | Sidebar menu flags + resolver |
 
-Static files only: `src/assets/` (CSS, images) — not the asset **system**.
+Static files only: `src/assets/` (CSS, images) — not JS config modules.
 
 ---
 
@@ -46,7 +54,6 @@ Static files only: `src/assets/` (CSS, images) — not the asset **system**.
 import { getAssetUrl } from '@/systems/assets/assetLibrary.js';
 
 const url = await getAssetUrl('icon.cart');
-// Section-scoped:
 const authUrl = await getAssetUrl('auth.background', { section: 'auth' });
 ```
 
@@ -58,12 +65,14 @@ import { useAssetUrl } from '@/composables/useAssetUrl.js';
 const { url, loading, error } = useAssetUrl('icon.cart');
 ```
 
-### Preload JSON config
+### Preload images / JSON / section assets
 
 ```javascript
-import { preloadJSON } from '@/systems/assets/assetPreloader.js';
+import { preloadImage, preloadJSON, preloadSectionAssets } from '@/systems/assets/assetPreloader.js';
 
-const data = await preloadJSON('/src/config/countries.json');
+preloadImage('/images/logo.svg', { priority: 'high' });
+const countries = await preloadJSON('/src/config/countries.json');
+await preloadSectionAssets('shop');
 ```
 
 ### Add a new flag
@@ -71,9 +80,9 @@ const data = await preloadJSON('/src/config/countries.json');
 1. Add **`production`** URL first in `src/config/assetMap.json`.
 2. Override in `development` / `staging` only if needed.
 3. Run `npm run sync:asset-map` (or restart dev).
-4. Call `validateAssetMap()` in console or run `tests/unit/assetMap*.test.js`.
+4. Run `tests/unit/assetMap*.test.js` or `validateAssetMap()` in console.
 
-See [src/config/assetMap.README.md](../../src/config/assetMap.README.md) for environment rules.
+See [src/config/assetMap.README.md](../../../src/config/assetMap.README.md) for environment rules.
 
 ### Declare route asset preloads
 
@@ -91,20 +100,47 @@ Or reference shared catalog:
 "assetPreloadRef": "dashboardMenuIcons"
 ```
 
-### Section preload (automatic)
+Catalog lives in `src/config/sharedAssetPreloads.json`.
 
-`sectionPreloader.js` calls `preloadSectionAssets(sectionName)` after section CSS/JS. You rarely call this directly from templates.
+### Auth script loading
+
+```javascript
+import { createAssetHandler } from '@/systems/assets/assetHandlerFactory.js';
+import { getAuthAssetConfig, getAuthAssetNames } from '@/systems/assets/authAssetConfig.js';
+
+const assetsConfig = getAuthAssetConfig();
+const handler = await createAssetHandler(assetsConfig, { name: 'AuthLogIn', debug: true });
+await handler.ensureAssetDependencies(getAuthAssetNames(assetsConfig), { strict: true });
+handler.dispose();
+```
 
 ### Intent prefetch on nav links
 
 ```javascript
-import { createRoutePrefetchIntentHandler } from '@/systems/routing/useRoutePrefetch.js';
+import { createCombinedRoutePrefetchIntentHandler } from '@/composables/useRoutePrefetch.js';
 
-const onHover = createRoutePrefetchIntentHandler('/shop');
+const onHover = createCombinedRoutePrefetchIntentHandler('/shop');
 // @mouseenter="onHover"
 ```
 
-*Planned:* move `useRoutePrefetch` to `composables/`.
+Asset-only prefetch (no route component):
+
+```javascript
+import { useAssetPrefetch } from '@/composables/useAssetPrefetch.js';
+
+const { prefetchAssetsOnIntent } = useAssetPrefetch();
+```
+
+`createRoutePrefetchIntentHandler` remains as a deprecated alias for the combined handler.
+
+### Settings nav with flags
+
+```javascript
+import { resolveSettingConfigWithAssets } from '@/config/settingConfig.js';
+
+const groups = await resolveSettingConfigWithAssets(undefined, userRole);
+// each item has resolved `icon` URL from `iconFlag`
+```
 
 ---
 
@@ -113,18 +149,21 @@ const onHover = createRoutePrefetchIntentHandler('/shop');
 | ✅ Current | ❌ Retired |
 |-----------|-----------|
 | `@/systems/assets/assetLibrary.js` | `@/utils/assets` |
-| `@/systems/assets/assetPreloader.js` | `@/utils/assets/assetPreloader.js` |
-| `@/systems/assets/index.js` | `src/utils/assets/*` |
+| `@/systems/assets/assetPolicy.js` | `src/utils/preload.js` |
+| `@/systems/assets/assetHandler.js` | `assetsHandlerNew.js` |
+| `@/config/settingConfig.js` | `@/assets/data/settingConfig.js` |
+
+Tests: import `@/systems/assets/...` or `../../src/systems/assets/...`.
 
 ---
 
 ## Testing
 
 ```bash
-# Asset-focused unit tests (note: many still import old utils paths — fix in progress)
-npx vitest run tests/unit/assetMap
-npx vitest run tests/unit/assetPreload
-npx vitest run tests/assetLibrary.test.js
+npm run test:unit -- --run tests/unit/assetMapBuildValidation.test.js
+npm run test:unit -- --run tests/handler/
+npm run test:unit -- --run tests/unit/useRoutePrefetch.test.js
+npm run test:unit -- --run tests/unit/usePreloadStore.test.js
 ```
 
 Browser smoke:
@@ -139,21 +178,11 @@ await import('/src/systems/assets/assetLibrary.js').then(m => m.validateAssetMap
 
 | Symptom | Check |
 |---------|--------|
-| Flag not found | `production` entry in `assetMap.json`; `initAssetLibrary()` ran |
-| Preload blocked | `assertAllowedPreloadUrl` / allow-list; no `javascript:` URLs |
-| Stale URLs after deploy | `usePreloadStore` build hash invalidation via `syncPreloadStoreBuildHash` |
+| Flag not found | `production` entry in `assetMap.json`; `initAssetLibrary()` ran in `main.js` |
+| Preload blocked | `assertAllowedAssetUrl` in `assetPolicy.js`; allow-list / same-origin |
+| Stale URLs after deploy | `usePreloadStore` build hash via `syncPreloadStoreBuildHash` |
 | Section assets not warming | Route `section` + `assetPreload` in `routeConfig.json` |
-| Wrong import error | Update path from `utils/assets` → `systems/assets` |
-
----
-
-## Work in progress (see [ASSET_PLAN.md](./ASSET_PLAN.md))
-
-- Move `routeAssetPrefetch.js` and `resolveRouteAssetPreloads.js` into `systems/assets/`
-- Create `assetPolicy.js`; rename `assetsHandlerNew.js` → `assetHandler.js`
-- Fix ~47 test files still pointing at `utils/assets`
-- Store action renames (`addAsset` → `addPreloadedAsset`, etc.)
-- Resolve duplicate `createRoutePrefetchIntentHandler` name
+| Wrong import error | Use `systems/assets/` paths — see [assets-cleanup-changelog.md](../assets-cleanup-changelog.md) |
 
 ---
 
@@ -161,4 +190,5 @@ await import('/src/systems/assets/assetLibrary.js').then(m => m.validateAssetMap
 
 - [QUICK_REFERENCE.md](./QUICK_REFERENCE.md)
 - [ASSET_PLAN.md](./ASSET_PLAN.md)
+- [assets-cleanup-changelog.md](../assets-cleanup-changelog.md)
 - [../README.md](../README.md)

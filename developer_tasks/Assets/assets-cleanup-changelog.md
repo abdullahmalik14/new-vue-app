@@ -461,12 +461,57 @@ refactor(assets): move settingConfig to config and use asset flags
 
 ---
 
-## Upcoming (not started)
+## Phase 8 — Docs sync (P3)
 
-| Phase | ASSET_PLAN | Summary |
-|-------|------------|---------|
-| 8 | P3 | Docs sync (`DEVELOPER_GUIDE.md`, `asset-code-index.md`) |
+**Scope:** Align developer docs, code index, and audit status with Phases 0–7 outcomes. No runtime code changes.
+
+### What was stale
+
+| Doc | Problem |
+|-----|---------|
+| `docs/DEVELOPER_GUIDE.md` | Old paths, missing `assetPolicy`, `authAssetConfig`, store/composable renames |
+| `docs/QUICK_REFERENCE.md` | Stale imports and prefetch handler names |
+| `asset-code-index.md` | Listed removed modules; sections 8–10 showed pre-cleanup consumers and “47 stale test files” |
+| `AssetsExplained.md` | Pointer-only stub |
+| `docs/AI_GUIDE.md` | “Missing file / wrong location” known issues already fixed in code |
+| `systems-assets-audit.md` | No implementation status banner |
+| `docs/ASSET_PLAN.md` | Phase 8 not marked complete |
+
+### How it was fixed
+
+| File | Change |
+|------|--------|
+| [`docs/DEVELOPER_GUIDE.md`](./docs/DEVELOPER_GUIDE.md) | Full refresh: folder map, imports, examples, migration table, changelog link |
+| [`docs/QUICK_REFERENCE.md`](./docs/QUICK_REFERENCE.md) | Current paths, policy entry, store actions, composables |
+| [`asset-code-index.md`](./asset-code-index.md) | Post-cleanup module list; consumers §8–10; summary counts |
+| [`AssetsExplained.md`](./AssetsExplained.md) | Hub table + module map + retired paths |
+| [`docs/AI_GUIDE.md`](./docs/AI_GUIDE.md) | Target structure + resolved vs open known issues |
+| [`systems-assets-audit.md`](./systems-assets-audit.md) | Phase 0–8 status banner (issues remain as historical detail) |
+| [`docs/ASSET_PLAN.md`](./docs/ASSET_PLAN.md) | Current-state table; Phases 0–8 complete |
+
+Legacy folder `docs/legacy/` left unchanged (historical paths noted in `legacy/README.md`).
+
+### How it was tested
+
+```bash
+rg "utils/assets|assetsHandlerNew|utils/preload|preloadIcons|assets/data/settingConfig" developer_tasks/Assets/ --glob "!**/legacy/**"
+rg "utils/assets" tests/
+```
+
+**Result:** No stale active-doc hits outside `docs/legacy/`; tests still import `systems/assets` only.
+
+Manual smoke (recommended, unchanged from plan): auth flows, dashboard nav/settings, cart icons.
+
+### Phase 8 exit
+
+Asset cleanup plan Phases 0–8 complete. Remaining optional work: naming audit batches 3–4, Issue 13 handler extraction, inline ImgBB in `DashProfileSettings.vue` header.
+
+**Suggested commit:**
+
+```
+docs(assets): sync guides and code index after cleanup phases 0–7
+```
 
 ---
 
-*End of log through Phase 7.*
+*End of log through Phase 8.*
