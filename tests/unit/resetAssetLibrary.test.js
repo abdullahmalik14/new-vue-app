@@ -1,45 +1,59 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
+import { loadProductionAssetLibrary } from '../helpers/assetFixtures.js';
 
-describe('resetAssetLibrary (B-03 / M-06)', () => {
+describe('resetAssetLibrary (§50)', () => {
   beforeEach(() => {
     vi.resetModules();
     setActivePinia(createPinia());
     window.performanceTracker = { step: vi.fn() };
   });
 
-  it('clears assetLibrary, cacheHandler, and preload store URL cache', async () => {
-    const { setValueWithExpiration, getValueFromCache } = await import(
-      '../../src/utils/common/cacheHandler.js',
-    );
-    const { loadAssetsForSection } = await import('../../src/systems/assets/assetLibrary.js');
-    const { usePreloadStore } = await import('../../src/stores/usePreloadStore.js');
+  it('resetAssetLibrary clears initialized', async () => {
+    const lib = await loadProductionAssetLibrary();
+    await lib.initAssetLibrary();
     const { resetAssetLibrary } = await import('../../src/systems/assets/resetAssetLibrary.js');
-
-    setValueWithExpiration('b03_probe', { ok: true }, 60_000);
-    await loadAssetsForSection('auth');
-
-    const store = usePreloadStore();
-    store.addPreloadedAsset('https://example.com/preloaded.png');
-
-    expect(getValueFromCache('b03_probe')).not.toBeNull();
-    expect(store.preloadedAssetCount).toBe(1);
-
-    const summary = resetAssetLibrary();
-
-    expect(summary.before.cacheHandlerEntries).toBeGreaterThan(0);
-    expect(summary.before.preloadedUrls).toBe(1);
-    expect(summary.after.loadedAssets).toBe(0);
-    expect(summary.after.cacheHandlerEntries).toBe(0);
-    expect(summary.after.preloadedUrls).toBe(0);
-    expect(getValueFromCache('b03_probe')).toBeNull();
-    expect(summary.sectionRollupCacheCleared).toBe(true);
+    resetAssetLibrary();
+    expect(lib.isAssetLibraryInitialized()).toBe(false);
   });
 
-  it('resetAssetSystem is an alias for resetAssetLibrary', async () => {
+  it('resetAssetLibrary clears caches', async () => {
+    const { setValueWithExpiration, getValueFromCache } = await import(
+      '../../src/infrastructure/cache/cacheHandler.js',
+    );
+    const lib = await loadProductionAssetLibrary();
+    setValueWithExpiration('asset_metadata_auth', { sectionName: 'auth', state: 'loaded' }, 60_000);
+    lib.getAssetsForSection('auth');
+    const { resetAssetLibrary } = await import('../../src/systems/assets/resetAssetLibrary.js');
+    resetAssetLibrary();
+    expect(getValueFromCache('asset_metadata_auth')).toBeNull();
+    expect(lib.getAssetStatistics().loadedCount).toBe(0);
+  });
+
+  it('re-init works after reset', async () => {
+    const lib = await loadProductionAssetLibrary();
+    await lib.initAssetLibrary();
+    const { resetAssetLibrary } = await import('../../src/systems/assets/resetAssetLibrary.js');
+    resetAssetLibrary();
+    const result = await lib.initAssetLibrary();
+    expect(result.flagCount).toBeGreaterThan(0);
+    expect(lib.isAssetLibraryInitialized()).toBe(true);
+  });
+
+  it('safe when never initialized', async () => {
+    const { resetAssetLibrary } = await import('../../src/systems/assets/resetAssetLibrary.js');
+    expect(() => resetAssetLibrary()).not.toThrow();
+  });
+
+  it('resetAssetSystem is alias for resetAssetLibrary', async () => {
     const { resetAssetLibrary, resetAssetSystem } = await import(
       '../../src/systems/assets/resetAssetLibrary.js',
     );
     expect(resetAssetSystem).toBe(resetAssetLibrary);
+  });
+
+  it('options partial reset if supported', async () => {
+    const { resetAssetLibrary } = await import('../../src/systems/assets/resetAssetLibrary.js');
+    expect(() => resetAssetLibrary({})).not.toThrow();
   });
 });

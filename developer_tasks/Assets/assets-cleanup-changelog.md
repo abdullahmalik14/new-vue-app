@@ -579,4 +579,50 @@ test(assets): add Phase A integrity suite and shared fixtures
 
 ---
 
-*End of log through Phase A tests.*
+## Core library unit tests — assetMapSource, sectionAssetMapSource, assetLibrary
+
+**Reference:** [asset-test-plan.md](./asset-test-plan.md) §1–13, §50  
+**Scope:** Plan-named core library Vitest files; one `it()` per bullet. No production code changes.
+
+### What was added
+
+| File | Cases |
+|------|-------|
+| [`tests/unit/assetMapSource.test.js`](../../tests/unit/assetMapSource.test.js) | 19 — runtime fetch policy, bundled map, SHA256 verify |
+| [`tests/unit/sectionAssetMapSource.test.js`](../../tests/unit/sectionAssetMapSource.test.js) | 23 — path parsing, validation, bundled/network |
+| [`tests/unit/assetLibrary.normalize.test.js`](../../tests/unit/assetLibrary.normalize.test.js) | 19 — `normalizeGetAssetUrlArgs`, `normalizeAssetMapUrl` |
+| [`tests/unit/assetLibrary.environment.test.js`](../../tests/unit/assetLibrary.environment.test.js) | 11 — `setEnvironment`, fetch candidates, config cache |
+| [`tests/unit/assetLibrary.config.test.js`](../../tests/unit/assetLibrary.config.test.js) | 8 — `loadAssetMapConfig`, `loadSectionAssetMap` |
+| [`tests/unit/assetLibrary.getAssetUrl.test.js`](../../tests/unit/assetLibrary.getAssetUrl.test.js) | 70 — inheritance matrix + sync/async resolution |
+| [`tests/unit/assetLibrary.getAssetUrl.variants.test.js`](../../tests/unit/assetLibrary.getAssetUrl.variants.test.js) | 8 — CSS/attr wrappers |
+| [`tests/unit/assetLibrary.getAssetUrls.test.js`](../../tests/unit/assetLibrary.getAssetUrls.test.js) | 11 — batch URL + preload |
+| [`tests/unit/assetLibrary.flags.test.js`](../../tests/unit/assetLibrary.flags.test.js) | 8 — flag helpers |
+| [`tests/unit/assetLibrary.section.test.js`](../../tests/unit/assetLibrary.section.test.js) | 14 — section load metadata |
+| [`tests/unit/assetLibrary.cache.test.js`](../../tests/unit/assetLibrary.cache.test.js) | 14 — unload, statistics, category cache |
+| [`tests/unit/assetLibrary.init.test.js`](../../tests/unit/assetLibrary.init.test.js) | 14 — init, prime index, validate |
+| [`tests/unit/assetLibrary.category.test.js`](../../tests/unit/assetLibrary.category.test.js) | 2 — `getAssetsByCategory` |
+| [`tests/unit/resetAssetLibrary.test.js`](../../tests/unit/resetAssetLibrary.test.js) | 6 — full reset coordination |
+
+Also extended [`tests/helpers/assetFixtures.js`](../../tests/helpers/assetFixtures.js) with `stubProductionEnv`, `loadProductionAssetLibrary`.
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/assetMapSource.test.js \
+  tests/unit/sectionAssetMapSource.test.js \
+  tests/unit/assetLibrary.*.test.js \
+  tests/unit/resetAssetLibrary.test.js
+```
+
+**Result:** 228 tests passed (14 files).
+
+**Suggested commit:**
+
+```
+test(assets): add core assetLibrary unit coverage
+```
+
+---
+
+*End of log through core library tests.*

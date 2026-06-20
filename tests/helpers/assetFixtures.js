@@ -12,6 +12,40 @@ import { getProjectRoot, loadSharedAssetPreloads, makeRoute } from './routeFixtu
 
 export { getProjectRoot, loadSharedAssetPreloads, makeRoute } from './routeFixtures.js';
 
+/** @see developer_tasks/Assets/asset-test-plan.md */
+export function stubProductionEnv() {
+  vi.stubEnv('PROD', 'true');
+  vi.stubEnv('DEV', '');
+  vi.stubEnv('MODE', 'production');
+}
+
+/** @see developer_tasks/Assets/asset-test-plan.md */
+export function stubDevelopmentEnv() {
+  vi.stubEnv('PROD', '');
+  vi.stubEnv('DEV', 'true');
+  vi.stubEnv('MODE', 'development');
+}
+
+/**
+ * @returns {Promise<typeof import('../../src/systems/assets/assetLibrary.js')>}
+ */
+export async function importFreshAssetLibrary() {
+  return import('../../src/systems/assets/assetLibrary.js');
+}
+
+/**
+ * Load bundled map in production mode with caches cleared.
+ * @returns {Promise<typeof import('../../src/systems/assets/assetLibrary.js')>}
+ */
+export async function loadProductionAssetLibrary() {
+  stubProductionEnv();
+  const lib = await importFreshAssetLibrary();
+  lib.clearAssetMapConfigCache();
+  lib.clearAssetCaches();
+  await lib.loadAssetMapConfig();
+  return lib;
+}
+
 /** Minimal asset map for unit tests (sparse staging/dev overrides). */
 export const MOCK_ASSET_MAP = {
   production: {
