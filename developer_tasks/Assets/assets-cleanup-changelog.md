@@ -713,4 +713,86 @@ test(assets): add policy and route preload resolution coverage
 
 ---
 
-*End of log through policy and rollup tests.*
+## AssetHandler, script checker, and composable unit tests
+
+**Reference:** [asset-test-plan.md](./asset-test-plan.md) §51–84  
+**Scope:** `assetHandlerFactory`, split `assetHandler.*` Vitest files, `scriptAvailabilityChecker`, `usePreloadStore`, `useAssetUrl`. No production code changes.
+
+### What was added
+
+| File | Cases |
+|------|-------|
+| [`tests/unit/assetHandlerFactory.test.js`](../../tests/unit/assetHandlerFactory.test.js) | 4 — `createAssetHandler` |
+| [`tests/unit/assetHandler.config.test.js`](../../tests/unit/assetHandler.config.test.js) | 17 — constructor, config load/validate, versioning |
+| [`tests/unit/assetHandler.lifecycle.test.js`](../../tests/unit/assetHandler.lifecycle.test.js) | 11 — readiness, dispose, statistics |
+| [`tests/unit/assetHandler.dom.test.js`](../../tests/unit/assetHandler.dom.test.js) | 11 — DOM presence, element creation/insert |
+| [`tests/unit/assetHandler.load.test.js`](../../tests/unit/assetHandler.load.test.js) | 17 — load, throttle, preload hints |
+| [`tests/unit/assetHandler.deps.test.js`](../../tests/unit/assetHandler.deps.test.js) | 9 — dependency ensure/ready |
+| [`tests/unit/assetHandler.mount.test.js`](../../tests/unit/assetHandler.mount.test.js) | 12 — mount blockers, events |
+| [`tests/unit/assetHandler.lazy.test.js`](../../tests/unit/assetHandler.lazy.test.js) | 6 — lazy observer, selector load |
+| [`tests/unit/scriptAvailabilityChecker.test.js`](../../tests/unit/scriptAvailabilityChecker.test.js) | 12 — singleton script checker |
+| [`tests/unit/useAssetUrl.test.js`](../../tests/unit/useAssetUrl.test.js) | 6 — reactive URL composable |
+| [`tests/unit/usePreloadStore.test.js`](../../tests/unit/usePreloadStore.test.js) | +1 — initial empty state |
+| [`tests/unit/appBuildHash.test.js`](../../tests/unit/appBuildHash.test.js) | 2 — build-hash preload invalidation |
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/assetHandlerFactory.test.js \
+  tests/unit/assetHandler.config.test.js \
+  tests/unit/assetHandler.lifecycle.test.js \
+  tests/unit/assetHandler.dom.test.js \
+  tests/unit/assetHandler.load.test.js \
+  tests/unit/assetHandler.deps.test.js \
+  tests/unit/assetHandler.mount.test.js \
+  tests/unit/assetHandler.lazy.test.js \
+  tests/unit/scriptAvailabilityChecker.test.js \
+  tests/unit/useAssetUrl.test.js \
+  tests/unit/usePreloadStore.test.js \
+  tests/unit/appBuildHash.test.js
+```
+
+**Result:** 118 tests passed (12 files).
+
+**Suggested commit:**
+
+```
+test(assets): add AssetHandler and composable unit coverage
+```
+
+---
+
+## Route prefetch and asset preload inheritance tests
+
+**Reference:** [asset-test-plan.md](./asset-test-plan.md) §47–49  
+**Scope:** Intent-based section asset prefetch, `useRoutePrefetch`, `resolveEffectiveAssetPreloadForRoute`. No production code changes.
+
+### What was added
+
+| File | Cases |
+|------|-------|
+| [`tests/unit/routeAssetPrefetch.test.js`](../../tests/unit/routeAssetPrefetch.test.js) | 8 — section prefetch on hover intent |
+| [`tests/unit/useRoutePrefetch.test.js`](../../tests/unit/useRoutePrefetch.test.js) | 6 — combined component + asset prefetch |
+| [`tests/unit/routeResolver.assetPreload.test.js`](../../tests/unit/routeResolver.assetPreload.test.js) | 12 — C-02 assetPreload inheritance |
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/routeAssetPrefetch.test.js \
+  tests/unit/useRoutePrefetch.test.js \
+  tests/unit/routeResolver.assetPreload.test.js
+```
+
+**Result:** 26 tests passed (3 files).
+
+**Suggested commit:**
+
+```
+test(assets): add route prefetch and preload inheritance coverage
+```
+
+---
+
+*End of log through route prefetch tests.*

@@ -9,6 +9,14 @@ describe('appBuildHash / preload invalidation (M-05)', () => {
     vi.unstubAllEnvs();
   });
 
+  it('starts with an empty preload store', () => {
+    const store = usePreloadStore();
+
+    expect(store.preloadedSections.size).toBe(0);
+    expect(store.preloadedAssets.size).toBe(0);
+    expect(store.buildHash).toBe(null);
+  });
+
   it('clears preload state when VITE_BUILD_HASH changes', () => {
     vi.stubEnv('VITE_BUILD_HASH', 'build-v2');
     const store = usePreloadStore();

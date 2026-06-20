@@ -46,6 +46,14 @@ describe('usePreloadStore — preloadedAssets Set', () => {
     setActivePinia(createPinia());
   });
 
+  it('initial empty state', () => {
+    const store = usePreloadStore();
+
+    expect(store.preloadedAssetCount).toBe(0);
+    expect(store.preloadedSections.size).toBe(0);
+    expect(store.sectionsInProgress.size).toBe(0);
+  });
+
   it('tracks asset URLs with O(1) Set membership', () => {
     const store = usePreloadStore();
     const url = 'https://example.com/icon.svg';
