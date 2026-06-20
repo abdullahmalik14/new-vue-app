@@ -625,4 +625,52 @@ test(assets): add core assetLibrary unit coverage
 
 ---
 
-*End of log through core library tests.*
+## Asset preloader unit tests — retry, dispatch, section rollup
+
+**Reference:** [asset-test-plan.md](./asset-test-plan.md) §14–23  
+**Scope:** Plan-named `assetPreloader.*` Vitest files; one `it()` per bullet. No production code changes.
+
+### What was added
+
+| File | Cases |
+|------|-------|
+| [`tests/unit/assetPreloader.retry.test.js`](../../tests/unit/assetPreloader.retry.test.js) | 9 — `withPreloadRetry`, `runInConcurrencyChunks` |
+| [`tests/unit/assetPreloader.priority.test.js`](../../tests/unit/assetPreloader.priority.test.js) | 4 — `resolveFetchPriority`, `shouldInjectExecutableScript` |
+| [`tests/unit/assetPreloader.image.test.js`](../../tests/unit/assetPreloader.image.test.js) | 6 — `preloadImage` |
+| [`tests/unit/assetPreloader.font.test.js`](../../tests/unit/assetPreloader.font.test.js) | 3 — `preloadFont` |
+| [`tests/unit/assetPreloader.media.test.js`](../../tests/unit/assetPreloader.media.test.js) | 3 — `preloadMedia` |
+| [`tests/unit/assetPreloader.script.test.js`](../../tests/unit/assetPreloader.script.test.js) | 8 — `preloadScript`, `injectExecutableScript` |
+| [`tests/unit/assetPreloader.json.test.js`](../../tests/unit/assetPreloader.json.test.js) | 3 — `preloadJSON` |
+| [`tests/unit/assetPreloader.asset.test.js`](../../tests/unit/assetPreloader.asset.test.js) | 9 — `preloadAsset`, `preloadAssets` |
+| [`tests/unit/assetPreloader.section.test.js`](../../tests/unit/assetPreloader.section.test.js) | 12 — section URL resolve, rollup preload |
+| [`tests/unit/assetPreloader.cache.test.js`](../../tests/unit/assetPreloader.cache.test.js) | 6 — preload cache helpers |
+
+Also extended [`tests/helpers/assetFixtures.js`](../../tests/helpers/assetFixtures.js) with `mockLinkPreloads`, `autoResolveLinkPreloads`, `autoResolveScriptLoads`, and `vi.restoreAllMocks()` in `setupAssetTestEnv` to prevent DOM mock leakage between tests.
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/assetPreloader.retry.test.js \
+  tests/unit/assetPreloader.priority.test.js \
+  tests/unit/assetPreloader.image.test.js \
+  tests/unit/assetPreloader.font.test.js \
+  tests/unit/assetPreloader.media.test.js \
+  tests/unit/assetPreloader.script.test.js \
+  tests/unit/assetPreloader.json.test.js \
+  tests/unit/assetPreloader.asset.test.js \
+  tests/unit/assetPreloader.section.test.js \
+  tests/unit/assetPreloader.cache.test.js
+```
+
+**Result:** 63 tests passed (10 files).
+
+**Suggested commit:**
+
+```
+test(assets): add assetPreloader unit coverage
+```
+
+---
+
+*End of log through asset preloader tests.*

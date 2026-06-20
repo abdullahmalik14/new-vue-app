@@ -133,10 +133,107 @@ export function makeRouteWithAssets(overrides = {}) {
   });
 }
 
+function applyLinkPreloadMock(element, mode = 'load') {
+  let loadHandler;
+  let errorHandler;
+
+  Object.defineProperty(element, 'onload', {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return loadHandler;
+    },
+    set(fn) {
+      loadHandler = fn;
+      if (mode === 'load' && typeof fn === 'function') {
+        queueMicrotask(() => fn(new Event('load')));
+      }
+    },
+  });
+
+  Object.defineProperty(element, 'onerror', {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return errorHandler;
+    },
+    set(fn) {
+      errorHandler = fn;
+      if (mode === 'error' && typeof fn === 'function') {
+        queueMicrotask(() => fn(new Event('error')));
+      }
+    },
+  });
+}
+
+function applyScriptLoadMock(element) {
+  let loadHandler;
+
+  Object.defineProperty(element, 'onload', {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return loadHandler;
+    },
+    set(fn) {
+      loadHandler = fn;
+      if (typeof fn === 'function') {
+        queueMicrotask(() => fn(new Event('load')));
+      }
+    },
+  });
+}
+
+/**
+ * Mock link preloads by firing load/error when handlers are assigned.
+ * @param {'load' | 'error'} mode
+ */
+export function mockLinkPreloads(mode = 'load') {
+  const originalCreateElement = document.createElement.bind(document);
+  return vi.spyOn(document, 'createElement').mockImplementation((tag, options) => {
+    const element = originalCreateElement(tag, options);
+
+    if (tag === 'link') {
+      applyLinkPreloadMock(element, mode);
+    }
+
+    return element;
+  });
+}
+
+/** @returns {import('vitest').MockInstance} */
+export function autoResolveLinkPreloads() {
+  return mockLinkPreloads('load');
+}
+
+/** @returns {import('vitest').MockInstance} */
+export function autoRejectLinkPreloads() {
+  return mockLinkPreloads('error');
+}
+
+/** Mock executable script and link preloads. */
+export function autoResolveScriptLoads() {
+  const originalCreateElement = document.createElement.bind(document);
+  return vi.spyOn(document, 'createElement').mockImplementation((tag, options) => {
+    const element = originalCreateElement(tag, options);
+
+    if (tag === 'script') {
+      applyScriptLoadMock(element);
+    }
+
+    if (tag === 'link') {
+      applyLinkPreloadMock(element, 'load');
+    }
+
+    return element;
+  });
+}
+
 /**
  * Standard Vitest setup for asset module tests.
  */
 export function setupAssetTestEnv() {
+  vi.restoreAllMocks();
   vi.resetModules();
   vi.unstubAllEnvs();
   setActivePinia(createPinia());
