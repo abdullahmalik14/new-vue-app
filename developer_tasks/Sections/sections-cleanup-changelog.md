@@ -6,7 +6,7 @@
 
 ---
 
-## Phase 0 — Prep (2026-06-19)
+## Phase 0 — Prep (2026-06-18)
 
 **Master plan:** Phase 0 — Read docs + baseline vitest  
 **Scope:** Orientation and baseline only. No production or test code changes.
@@ -58,7 +58,7 @@ Branch ready; baseline recorded; audit file-name drift documented.
 
 ---
 
-## Phase 1 — Fix test imports and stale production import (2026-06-19)
+## Phase 1 — Fix test imports and stale production import (2026-06-18)
 
 **Master plan:** Phase 1 — Unblock tests and CI  
 **Audit reference:** [loose-section-code-scan.md](./loose-section-code-scan.md) Issue 1, [sections-code-audit.md](./sections-code-audit.md) Issue 2 & 12  
@@ -109,7 +109,7 @@ Section unit/route tests import correct paths; production same-folder import fix
 
 ---
 
-## Phase 2 — Structure cleanup (2026-06-19)
+## Phase 2 — Structure cleanup (2026-06-18)
 
 **Master plan:** Phase 2 — Manifest helper, barrel, nav moves, router hooks  
 **Audit reference:** [sections-code-audit.md](./sections-code-audit.md) Issues 1–6, [loose-section-code-scan.md](./loose-section-code-scan.md) Issues 2–6  
@@ -294,7 +294,7 @@ Section structure matches target layout; routing/router delegate to sections; re
 
 ---
 
-## Phase 3 — Naming alignment (2026-06-19)
+## Phase 3 — Naming alignment (2026-06-18)
 
 **Master plan:** Phase 3 — Naming batches 1–2 per [sections-naming-audit.md](./sections-naming-audit.md)  
 **Scope:** Symbol renames only. No behaviour changes. No `routeConfig.json` edits.
@@ -387,7 +387,7 @@ Public section API uses consistent naming; docs/import map updated in `AI_GUIDE.
 
 ---
 
-## Phase 4 — Documentation refresh (2026-06-19)
+## Phase 4 — Documentation refresh (2026-06-18)
 
 **Master plan:** Phase 4 — Doc audit  
 **Scope:** Documentation only. No production code changes.
@@ -441,7 +441,7 @@ Sections cleanup Phases 0–4 complete. Audits/indexes (`section-code-index.md`,
 
 ---
 
-## Section test track — Phase A prep + integrity (2026-06-19)
+## Section test track — Phase A prep + integrity (2026-06-18)
 
 **Plan:** [section-test-plan.md](./section-test-plan.md) Phase A (§0, §55, §71)  
 **Branch:** `test/section-coverage`  
@@ -474,7 +474,7 @@ npm run test:unit -- --run tests/sectionTest
 
 ---
 
-## Section test track — Phase B resolver units (2026-06-19)
+## Section test track — Phase B resolver units (2026-06-18)
 
 **Plan:** [section-test-plan.md](./section-test-plan.md) Phase B (§1–7, §59–60, §83–85)  
 **Branch:** `test/section-coverage`  
@@ -508,7 +508,7 @@ npm run test:unit -- --run tests/sectionTest
 
 ---
 
-## Section test track — Phase C preloader units (2026-06-19)
+## Section test track — Phase C preloader units (2026-06-18)
 
 **Plan:** [section-test-plan.md](./section-test-plan.md) Phase C (§8–14, §61–62, §86–89)  
 **Branch:** `test/section-coverage`  
@@ -542,7 +542,7 @@ npm run test:unit -- --run tests/sectionTest
 
 ---
 
-## Section test track — Phase D CSS, manifest, store, barrel (2026-06-19)
+## Section test track — Phase D CSS, manifest, store, barrel (2026-06-18)
 
 **Plan:** [section-test-plan.md](./section-test-plan.md) Phase D (§15–21, §30–34, §80, §90–91, §95, §102–108)  
 **Branch:** `test/section-coverage`  
@@ -586,7 +586,7 @@ npm run test:unit -- --run tests/sectionTest
 
 ---
 
-## Section test track — Phase E orchestrator, inheritance, nav resources (2026-06-19)
+## Section test track — Phase E orchestrator, inheritance, nav resources (2026-06-18)
 
 **Plan:** [section-test-plan.md](./section-test-plan.md) Phase E (§22–29, §37, §53, §64, §73, §78–79, §96–101)  
 **Branch:** `test/section-coverage`  
@@ -638,7 +638,7 @@ load paths with mocked route fixtures (21 files, 230 tests).
 
 ---
 
-## Section test track — Phase F cross-system hooks and assets (2026-06-19)
+## Section test track — Phase F cross-system hooks and assets (2026-06-18)
 
 **Plan:** [section-test-plan.md](./section-test-plan.md) Phase F (§35–36, §40–51, §66–70, §114–124)  
 **Branch:** `test/section-coverage`  
@@ -692,7 +692,7 @@ resolvedSection scope for background preload refresh (30 files, 266 tests).
 
 ---
 
-## Phase G — integration, concurrency, contracts; legacy cleanup (2026-06-19)
+## Phase G — integration, concurrency, contracts; legacy cleanup (2026-06-18)
 
 ### What changed
 
@@ -749,4 +749,38 @@ once parity is confirmed (33 files, 284 tests).
 - [x] `npm run test:unit -- --run tests/sectionTest` is the single section coverage command
 - [x] Legacy duplicate section tests removed
 - [x] Changelog entry + suggested commit message
+
+---
+
+## Phase H — locale refresh hardening follow-up (2026-06-18)
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`src/systems/i18n/localeManager.js`](../../src/systems/i18n/localeManager.js) | **Fix** — decoupled background section refresh from `currentRoute.section` guard; refresh plan now resolves whenever route config exists, and `refreshSectionPreloadsOnLocaleChange` runs non-blocking (`.then/.catch`) so locale switching is not delayed by cache-warming I/O |
+| [`tests/sectionTest/localeManager.section.test.js`](../../tests/sectionTest/localeManager.section.test.js) | **Expanded** — added regression coverage for: route with `preLoadSections` but no `section`, resolver throw path (no crash + refresh still called), and non-blocking locale switch while refresh promise remains pending |
+
+### Production issue addressed
+
+- Locale-change section refresh was still structurally fragile:
+  - refresh execution depended on `currentRoute.section` existing, so malformed or partial route shapes with valid `preLoadSections` could skip refresh silently.
+  - locale switching awaited background preload refresh, making a cache-warming path part of the user-facing locale-switch critical path.
+
+### Why it happened
+
+- The refresh planning logic was nested under the same branch as current-section translation reload.
+- The refresh call used `await` even though section preload architecture defines this as background/non-blocking work.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/sectionTest/localeManager.section.test.js
+```
+
+### Exit criteria (Phase H)
+
+- [x] Refresh plan executes independently from current-section translation branch
+- [x] Locale switch no longer blocks on background section refresh promise
+- [x] Regression tests cover no-section + resolver-failure + pending-refresh scenarios
 

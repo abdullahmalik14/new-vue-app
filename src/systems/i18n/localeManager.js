@@ -871,8 +871,9 @@ export async function setActiveLocale(localeCode, options = {}) {
         const routePath = stripLeadingLocaleFromPath(rawPath);
 
         const currentRoute = resolveRouteFromPath(routePath);
+        let resolvedSection = null;
+
         if (currentRoute?.section) {
-          let resolvedSection = null;
           try {
             // Resolve section to string (handles both string and object sections)
             resolvedSection = resolveRoleSectionVariant(
@@ -919,36 +920,38 @@ export async function setActiveLocale(localeCode, options = {}) {
               }
             );
           }
+        }
 
-          // Refresh bundle/CSS preload and translations for background preLoadSections
-          const { resolvedSectionNames: preloadedSectionsToRefresh } = getSectionPreloadPlan(
-            currentRoute,
-            userRole
+        // Refresh bundle/CSS preload and translations for background preLoadSections.
+        // This is intentionally non-blocking and should not delay locale switching.
+        const { resolvedSectionNames: preloadedSectionsToRefresh } = getSectionPreloadPlan(
+          currentRoute,
+          userRole
+        );
+
+        if (preloadedSectionsToRefresh.length > 0) {
+          log(
+            "localeManager.js",
+            "setActiveLocale",
+            "info",
+            "Refreshing section preloads for locale change",
+            {
+              localeCode,
+              resolvedSections: preloadedSectionsToRefresh,
+              skipSection: resolvedSection,
+            }
           );
 
-          if (preloadedSectionsToRefresh.length > 0) {
-            log(
-              "localeManager.js",
-              "setActiveLocale",
-              "info",
-              "Refreshing section preloads for locale change",
-              {
-                localeCode,
-                resolvedSections: preloadedSectionsToRefresh,
-                skipSection: resolvedSection,
-              }
-            );
-
-            try {
-              await refreshSectionPreloadsOnLocaleChange({
-                sections: preloadedSectionsToRefresh,
-                locale: localeCode,
-                skipSection: resolvedSection,
-                logContext: {
-                  file: "localeManager.js",
-                  method: "setActiveLocale",
-                },
-              });
+          refreshSectionPreloadsOnLocaleChange({
+            sections: preloadedSectionsToRefresh,
+            locale: localeCode,
+            skipSection: resolvedSection,
+            logContext: {
+              file: "localeManager.js",
+              method: "setActiveLocale",
+            },
+          })
+            .then(() => {
               log(
                 "localeManager.js",
                 "setActiveLocale",
@@ -959,7 +962,8 @@ export async function setActiveLocale(localeCode, options = {}) {
                   resolvedSections: preloadedSectionsToRefresh,
                 }
               );
-            } catch (error) {
+            })
+            .catch((error) => {
               log(
                 "localeManager.js",
                 "setActiveLocale",
@@ -971,8 +975,7 @@ export async function setActiveLocale(localeCode, options = {}) {
                   error: error?.message,
                 }
               );
-            }
-          }
+            });
         }
       } catch (error) {
         // Route resolution failed, not critical
