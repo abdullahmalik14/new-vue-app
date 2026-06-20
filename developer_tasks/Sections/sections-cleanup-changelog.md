@@ -690,3 +690,63 @@ resolvedSection scope for background preload refresh (30 files, 266 tests).
 - [x] Section asset rollup + preloader + route prefetch helpers covered
 - [x] Startup preload contract documented via orchestrator integration tests
 
+---
+
+## Phase G — integration, concurrency, contracts; legacy cleanup (2026-06-19)
+
+### What changed
+
+| File | Change |
+|------|--------|
+| [`tests/sectionTest/section.integration.test.js`](../../tests/sectionTest/section.integration.test.js) | **New** — memory-router journeys: login/dashboard role sections, CSS swap, inherited preloads, 404 without section errors (§52, §126) |
+| [`tests/sectionTest/sectionConcurrency.test.js`](../../tests/sectionTest/sectionConcurrency.test.js) | **New** — mid-flight reset, overlapping background preloads, store consistency under batch clear (§142) |
+| [`tests/sectionTest/sectionContracts.test.js`](../../tests/sectionTest/sectionContracts.test.js) | **New** — barrel export snapshot, `getSectionPreloadPlan` shape, non-blocking hook contracts (§144) |
+
+**Removed legacy duplicates** (parity confirmed in `tests/sectionTest/`):
+
+- `tests/unit/sectionResolver.test.js`
+- `tests/unit/sectionPreloader.test.js`
+- `tests/unit/sectionCssLoader.test.js`
+- `tests/unit/sectionPreloadOrchestrator.test.js`
+- `tests/unit/sectionBarrel.test.js`
+- `tests/unit/routeNavigationData.test.js`
+- `tests/unit/getAssetPreloadEntriesForSection.test.js`
+- `tests/routeTest/sectionResolver.route.test.js`
+- `tests/routeTest/sectionPreloadOrchestrator.route.test.js`
+- `tests/routeTest/getAssetPreloadEntriesForSection.route.test.js`
+- `tests/routeTest/routeNavigationData.test.js`
+
+**Kept:** `tests/unit/sectionScanner.test.js` and unrelated asset/build tests.
+
+### How tested
+
+```bash
+npm run test:unit -- --run tests/sectionTest
+```
+
+**Result:** 33 files, 284 tests passed.
+
+Full regression (section + route + unit):
+
+```bash
+npm run test:unit -- --run tests/sectionTest tests/routeTest tests/unit
+```
+
+### Suggested commit message
+
+```
+test: add section Phase G integration tests and retire legacy section suites
+
+Add memory-router integration, concurrency, and contract snapshots under
+tests/sectionTest; remove duplicated tests/unit and routeTest section files
+once parity is confirmed (33 files, 284 tests).
+```
+
+### Exit criteria (Phase G)
+
+- [x] Integration journeys green
+- [x] Concurrency tests stable
+- [x] `npm run test:unit -- --run tests/sectionTest` is the single section coverage command
+- [x] Legacy duplicate section tests removed
+- [x] Changelog entry + suggested commit message
+
