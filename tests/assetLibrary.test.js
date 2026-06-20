@@ -17,7 +17,7 @@ import {
   clearAssetCaches,
   getAssetStatistics,
   unloadUnusedSections
-} from '../src/utils/assets/assetLibrary.js';
+} from '../src/systems/assets/assetLibrary.js';
 
 // Test 1: Load assets for a single section
 async function testLoadAssetsForSection() {
@@ -192,7 +192,7 @@ To run these tests in a browser:
 4. Run the test functions manually
 
 Example:
-  import { loadAssetsForSection } from './src/utils/assets/assetLibrary.js';
+  import { loadAssetsForSection } from './src/systems/assets/assetLibrary.js';
   const assets = await loadAssetsForSection('auth');
   console.log(assets);
 `;

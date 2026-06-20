@@ -16,7 +16,7 @@ import {
   setEnvironment,
   getEnvironment,
   clearAssetCaches
-} from '../src/utils/assets/assetLibrary.js';
+} from '../src/systems/assets/assetLibrary.js';
 
 /**
  * Test 1: Get asset URL for production environment
@@ -374,7 +374,7 @@ To run these tests in a browser:
 3. Run: window.runAssetLibraryFlagTests()
 
 Example usage:
-  import { getAssetUrl } from './src/utils/assets/assetLibrary.js';
+  import { getAssetUrl } from './src/systems/assets/assetLibrary.js';
   const url = await getAssetUrl('icon.cart');
   console.log(url); // https://cdn.example.com/assets/icons/cart.svg
 `;

@@ -12,7 +12,7 @@
 
 import { JSDOM } from 'jsdom';
 import { vi } from 'vitest';
-import AssetHandler from '../../src/utils/assets/assetsHandlerNew.js';
+import AssetHandler from '../../src/systems/assets/assetsHandlerNew.js';
 
 // Test environment setup
 const dom = new JSDOM('<!DOCTYPE html><html><head></head><body><div id="test-container"></div></body></html>', {
