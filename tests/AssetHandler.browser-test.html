@@ -96,9 +96,9 @@
         // Import the real AssetHandler with error handling using async IIFE
         (async () => {
             const importPaths = [
-                '../src/systems/assets/assetsHandlerNew.js',
-                './src/systems/assets/assetsHandlerNew.js',
-                '/src/systems/assets/assetsHandlerNew.js'
+                '../src/systems/assets/assetHandler.js',
+                './src/systems/assets/assetHandler.js',
+                '/src/systems/assets/assetHandler.js'
             ];
 
             let loaded = false;
@@ -141,7 +141,7 @@
                     console.error('');
                 } else {
                     console.warn('⚠️  Tests will fail without AssetHandler, but buttons should still work');
-                    console.warn('💡 Check that the file exists at: src/systems/assets/assetsHandlerNew.js');
+                    console.warn('💡 Check that the file exists at: src/systems/assets/assetHandler.js');
                 }
                 // Store error for later use
                 window.AssetHandlerError = lastError;

@@ -1,4 +1,4 @@
-import AssetHandler from './assetsHandlerNew.js';
+import AssetHandler from './assetHandler.js';
 import { getAssetUrl } from './assetLibrary.js';
 import { log } from '../../infrastructure/logging/logHandler.js';
 

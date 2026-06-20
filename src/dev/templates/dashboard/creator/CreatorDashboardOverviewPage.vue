@@ -19,7 +19,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/DashboardSharedTwoColLayout.vue';
-import AssetHandler from '@/systems/assets/assetsHandlerNew.js';
+import AssetHandler from '@/systems/assets/assetHandler.js';
 import { loadAssetsForSection } from '@/systems/assets/assetLibrary.js';
 
 const ASSET_DEPENDENCIES = ['dashboard-metrics-lib'];

@@ -160,7 +160,7 @@ npm run test:unit -- --run \
 
 ### Phase 2 exit
 
-`assetPolicy.js` exists as the policy entry point; preloader, library, routing loader, and build validator import policy from one module; barrel exports updated. Ready for Phase 3 (`assetsHandlerNew.js` → `assetHandler.js`).
+`assetPolicy.js` exists as the policy entry point; preloader, library, routing loader, and build validator import policy from one module; barrel exports updated. Ready for Phase 3 handler rename.
 
 **Suggested commit:**
 
@@ -170,11 +170,65 @@ refactor(assets): add assetPolicy.js as unified preload policy entry
 
 ---
 
+## Phase 3 — Rename `assetsHandlerNew.js` → `assetHandler.js` (P1)
+
+**Master plan:** ASSET_PLAN P1 item 5  
+**Audit reference:** [folder-structure-audit-assets.md](./folder-structure-audit-assets.md) Issue 5 · [asset-naming-audit-batch-1.md](./asset-naming-audit-batch-1.md)  
+**Scope:** `git mv` rename + import updates only. `AssetHandler` class logic unchanged.
+
+### Issue 5 — Handler filename used legacy `New` suffix and plural `assets`
+
+**What was broken:** The DOM script-loading class lived in `assetsHandlerNew.js` — inconsistent with sibling modules (`assetLibrary.js`, `assetPreloader.js`, `assetHandlerFactory.js`) and the naming convention (`AssetHandler` in `assetHandler.js`).
+
+**Why it happened:** The file kept a transitional `New` suffix from an older handler implementation during the assets system migration.
+
+**How it was fixed:**
+
+| Before | After |
+|--------|-------|
+| `src/systems/assets/assetsHandlerNew.js` | `src/systems/assets/assetHandler.js` |
+
+**Consumers updated:**
+
+| File | Change |
+|------|--------|
+| [`src/systems/assets/assetHandlerFactory.js`](../../src/systems/assets/assetHandlerFactory.js) | Default import path |
+| [`src/systems/interactions/scriptAvailabilityChecker.js`](../../src/systems/interactions/scriptAvailabilityChecker.js) | Default import path |
+| [`src/dev/templates/dashboard/creator/CreatorDashboardOverviewPage.vue`](../../src/dev/templates/dashboard/creator/CreatorDashboardOverviewPage.vue) | Default import path |
+| [`tests/handler/AssetHandler.critical.test.js`](../../tests/handler/AssetHandler.critical.test.js) | Test import |
+| [`tests/handler/AssetHandler.validation.test.js`](../../tests/handler/AssetHandler.validation.test.js) | Test import |
+| [`tests/handler/AssetHandler testing code.js`](../../tests/handler/AssetHandler%20testing%20code.js) | Test import |
+| [`tests/AssetHandler.browser-test.html`](../../tests/AssetHandler.browser-test.html) | Dynamic import paths + error hint |
+| [`tests/handler/AssetHandler.browser-test (1).html`](../../tests/handler/AssetHandler.browser-test%20(1).html) | Static import |
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/handler/AssetHandler.critical.test.js \
+  tests/handler/AssetHandler.validation.test.js
+
+rg "assetsHandlerNew" src/ tests/
+```
+
+**Result:** 74 tests passed; zero stale `assetsHandlerNew` references in `src/` or `tests/`.
+
+### Phase 3 exit
+
+Handler class file uses approved `assetHandler.js` name; factory, script checker, dashboard template, and handler tests import the new path. Ready for Phase 4 (`utils/preload.js` removal).
+
+**Suggested commit:**
+
+```
+refactor(assets): rename assetsHandlerNew.js to assetHandler.js
+```
+
+---
+
 ## Upcoming (not started)
 
 | Phase | ASSET_PLAN | Summary |
 |-------|------------|---------|
-| 3 | P1 | Rename `assetsHandlerNew.js` → `assetHandler.js` |
 | 4 | P1 | Remove `utils/preload.js`; use `preloadImage` |
 | 5 | P1 | Extract `authAssetConfig.js` from six auth views |
 | 6 | P2 | Store/composable symbol renames |
@@ -183,4 +237,4 @@ refactor(assets): add assetPolicy.js as unified preload policy entry
 
 ---
 
-*End of log through Phase 2.*
+*End of log through Phase 3.*

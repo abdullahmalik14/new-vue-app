@@ -13,7 +13,7 @@
 
 // Node.js environment setup
 import { JSDOM } from 'jsdom';
-import AssetHandler from '../../src/systems/assets/assetsHandlerNew.js';
+import AssetHandler from '../../src/systems/assets/assetHandler.js';
 
 const dom = new JSDOM('<!DOCTYPE html><html><head></head><body><div id="test-container"></div></body></html>', {
   url: 'http://localhost'

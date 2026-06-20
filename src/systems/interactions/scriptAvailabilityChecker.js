@@ -6,7 +6,7 @@
  * @purpose Ensures scripts are loaded and available before dependent operations
  */
 
-import AssetHandler from '@/systems/assets/assetsHandlerNew.js';
+import AssetHandler from '@/systems/assets/assetHandler.js';
 import { log } from '@/infrastructure/logging/logHandler.js';
 import { getAssetUrl } from '@/systems/assets/assetLibrary.js';
 
