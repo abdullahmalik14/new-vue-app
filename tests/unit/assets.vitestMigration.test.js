@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { getProjectRoot } from '../helpers/assetFixtures.js';
 
+const STALE_PRELOAD_IMPORT_PATTERN = /(?:from|import)\s*\(?['"][^'"]*utils\/preload/;
 const STALE_IMPORT_PATTERN = /(?:from|import)\s*\(?['"][^'"]*utils\/assets/;
 const SELF_TEST_FILE = 'tests/unit/assets.vitestMigration.test.js';
 const SCANNED_ROOTS = ['src', 'tests'];
@@ -45,7 +46,7 @@ function listSourceFiles(directory, files = []) {
   return files;
 }
 
-function findStaleImports(rootDir) {
+function findStaleImports(rootDir, pattern = STALE_IMPORT_PATTERN) {
   const projectRoot = getProjectRoot();
   const hits = [];
 
@@ -58,14 +59,14 @@ function findStaleImports(rootDir) {
 
     const content = readFileSync(absolutePath, 'utf8');
 
-    if (!STALE_IMPORT_PATTERN.test(content)) {
+    if (!pattern.test(content)) {
       continue;
     }
 
     const lines = content.split('\n');
 
     for (let index = 0; index < lines.length; index += 1) {
-      if (STALE_IMPORT_PATTERN.test(lines[index])) {
+      if (pattern.test(lines[index])) {
         hits.push({
           file: relativePath,
           line: index + 1,
@@ -78,14 +79,32 @@ function findStaleImports(rootDir) {
   return hits;
 }
 
+function findStaleAssetImports(rootDir) {
+  return findStaleImports(rootDir, STALE_IMPORT_PATTERN);
+}
+
+function findStalePreloadImports(rootDir) {
+  return findStaleImports(rootDir, STALE_PRELOAD_IMPORT_PATTERN);
+}
+
 describe('assets.vitestMigration — stale utils/assets import guard', () => {
   it('src/ contains no utils/assets import paths', () => {
-    const hits = findStaleImports('src');
+    const hits = findStaleAssetImports('src');
     expect(hits, formatHits(hits)).toEqual([]);
   });
 
   it('tests/ contains no utils/assets import paths', () => {
-    const hits = findStaleImports('tests');
+    const hits = findStaleAssetImports('tests');
+    expect(hits, formatHits(hits)).toEqual([]);
+  });
+
+  it('src/ contains no utils/preload import paths', () => {
+    const hits = findStalePreloadImports('src');
+    expect(hits, formatHits(hits)).toEqual([]);
+  });
+
+  it('tests/ contains no utils/preload import paths', () => {
+    const hits = findStalePreloadImports('tests');
     expect(hits, formatHits(hits)).toEqual([]);
   });
 

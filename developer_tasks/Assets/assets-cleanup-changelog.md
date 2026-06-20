@@ -796,3 +796,95 @@ test(assets): add route prefetch and preload inheritance coverage
 ---
 
 *End of log through route prefetch tests.*
+
+---
+
+## Asset scanner, consumer, and integration tests (Phase G)
+
+**Reference:** [asset-test-plan.md](./asset-test-plan.md) §24–32, §85–94  
+**Scope:** Scanner split files, menu/section/route consumer coverage, barrel exports, navigation hooks, bootstrap smoke, integration. No production code changes.
+
+### What was added
+
+| File | Cases |
+|------|-------|
+| [`tests/unit/assetScanner.extract.test.js`](../../tests/unit/assetScanner.extract.test.js) | 14 — `extractAssetsFromComponent`, literal/expression extractors |
+| [`tests/unit/assetScanner.scan.test.js`](../../tests/unit/assetScanner.scan.test.js) | 16 — script/template scan, `scanSectionComponents` |
+| [`tests/unit/assetScanner.util.test.js`](../../tests/unit/assetScanner.util.test.js) | 7 — `shouldIgnoreComponent`, `normalizeAssetDefinition` |
+| [`tests/unit/menuItems.assets.test.js`](../../tests/unit/menuItems.assets.test.js) | 13 — `resolveDashboardSidebarMenuItems` |
+| [`tests/unit/sectionPreloader.assets.test.js`](../../tests/unit/sectionPreloader.assets.test.js) | 7 — section → asset preload integration |
+| [`tests/unit/routeNavigationData.assets.test.js`](../../tests/unit/routeNavigationData.assets.test.js) | 3 — `loadCurrentSectionResources` |
+| [`tests/unit/routeConfigLoader.assets.test.js`](../../tests/unit/routeConfigLoader.assets.test.js) | 5 — loader ref expansion + validation |
+| [`tests/unit/jsonConfigValidator.assets.test.js`](../../tests/unit/jsonConfigValidator.assets.test.js) | 5 — build-time asset validators |
+| [`tests/unit/assetsIndexExports.test.js`](../../tests/unit/assetsIndexExports.test.js) | 8 — barrel export contract |
+| [`tests/unit/router.index.assets.test.js`](../../tests/unit/router.index.assets.test.js) | 4 — `sectionNavigationHooks` + router barrel |
+| [`tests/unit/main.assets.bootstrap.test.js`](../../tests/unit/main.assets.bootstrap.test.js) | 4 — `main.js` asset bootstrap order |
+| [`tests/unit/assets.integration.test.js`](../../tests/unit/assets.integration.test.js) | 13 — mocked section/route/asset smoke |
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/assetScanner.extract.test.js \
+  tests/unit/assetScanner.scan.test.js \
+  tests/unit/assetScanner.util.test.js \
+  tests/unit/menuItems.assets.test.js \
+  tests/unit/sectionPreloader.assets.test.js \
+  tests/unit/routeNavigationData.assets.test.js \
+  tests/unit/routeConfigLoader.assets.test.js \
+  tests/unit/jsonConfigValidator.assets.test.js \
+  tests/unit/assetsIndexExports.test.js \
+  tests/unit/router.index.assets.test.js \
+  tests/unit/main.assets.bootstrap.test.js \
+  tests/unit/assets.integration.test.js
+```
+
+**Result:** 99 tests passed (12 files).
+
+**Notes:** Tests align to actual implementation (e.g. `extractAssetsFromComponent` reads `preloadAssets` arrays; `scanSectionComponents` delegates to route rollup; `shouldIgnoreComponent` checks `IGNORE_ASSET_PRELOAD` only).
+
+**Suggested commit:**
+
+```
+test(assets): add scanner, consumer, and integration coverage
+```
+
+---
+
+## Concurrency, network failure, and legacy consumer tests (Phase H)
+
+**Reference:** [asset-test-plan.md](./asset-test-plan.md) §95–96  
+**Scope:** `assetPolicy.js` hardening, concurrency dedupe, network failure paths, `utils/preload` migration guards. No production code changes.
+
+### What was added
+
+| File | Cases |
+|------|-------|
+| [`tests/unit/assets.concurrency.test.js`](../../tests/unit/assets.concurrency.test.js) | 5 — `runInConcurrencyChunks`, init/load dedupe |
+| [`tests/unit/assets.networkFailure.test.js`](../../tests/unit/assets.networkFailure.test.js) | 5 — retry, blocked URL, fetch/map/prefetch failures |
+| [`tests/unit/assetPolicy.test.js`](../../tests/unit/assetPolicy.test.js) | 5 — `assertAllowedAssetUrl`, policy re-exports |
+| [`tests/unit/assets.consumers.test.js`](../../tests/unit/assets.consumers.test.js) | 5 — `preloadImage` replaces legacy `utils/preload`, Cart migration |
+| [`tests/unit/assets.vitestMigration.test.js`](../../tests/unit/assets.vitestMigration.test.js) | +2 — `utils/preload` import guard |
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/assets.concurrency.test.js \
+  tests/unit/assets.networkFailure.test.js \
+  tests/unit/assetPolicy.test.js \
+  tests/unit/assets.consumers.test.js \
+  tests/unit/assets.vitestMigration.test.js
+```
+
+**Result:** 27 tests passed (5 files).
+
+**Suggested commit:**
+
+```
+test(assets): add concurrency, network failure, and policy coverage
+```
+
+---
+
+*End of log through Phase H asset test coverage.*
