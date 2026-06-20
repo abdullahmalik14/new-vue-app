@@ -673,4 +673,44 @@ test(assets): add assetPreloader unit coverage
 
 ---
 
-*End of log through asset preloader tests.*
+## Policy, rollup, and route preload resolution tests
+
+**Reference:** [asset-test-plan.md](./asset-test-plan.md) §33–46  
+**Scope:** URL allowlisting, section rollup helpers, validators, shared chrome resolution, route ref expansion. No production code changes.
+
+### What was added
+
+| File | Cases |
+|------|-------|
+| [`tests/unit/assertAllowedPreloadUrl.test.js`](../../tests/unit/assertAllowedPreloadUrl.test.js) | 12 — URL policy allowlist |
+| [`tests/unit/getAssetPreloadEntriesForSection.helpers.test.js`](../../tests/unit/getAssetPreloadEntriesForSection.helpers.test.js) | 19 — dedupe, section match, enabled filter |
+| [`tests/unit/getAssetPreloadEntriesForSection.rollup.test.js`](../../tests/unit/getAssetPreloadEntriesForSection.rollup.test.js) | 13 — section rollup, cache, inheritance |
+| [`tests/unit/validateRouteAssetPreloadFlags.test.js`](../../tests/unit/validateRouteAssetPreloadFlags.test.js) | 17 — validators + catalog constants |
+| [`tests/unit/validateSharedComponentAssetMappings.test.js`](../../tests/unit/validateSharedComponentAssetMappings.test.js) | 5 — dashboard slot mapping validation |
+| [`tests/unit/resolveSharedComponentAssets.test.js`](../../tests/unit/resolveSharedComponentAssets.test.js) | 11 — shared chrome URL resolution |
+| [`tests/unit/resolveRouteAssetPreloads.test.js`](../../tests/unit/resolveRouteAssetPreloads.test.js) | 9 — assetPreloadRef expansion |
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/assertAllowedPreloadUrl.test.js \
+  tests/unit/getAssetPreloadEntriesForSection.helpers.test.js \
+  tests/unit/getAssetPreloadEntriesForSection.rollup.test.js \
+  tests/unit/validateRouteAssetPreloadFlags.test.js \
+  tests/unit/validateSharedComponentAssetMappings.test.js \
+  tests/unit/resolveSharedComponentAssets.test.js \
+  tests/unit/resolveRouteAssetPreloads.test.js
+```
+
+**Result:** 78 tests passed (7 files).
+
+**Suggested commit:**
+
+```
+test(assets): add policy and route preload resolution coverage
+```
+
+---
+
+*End of log through policy and rollup tests.*

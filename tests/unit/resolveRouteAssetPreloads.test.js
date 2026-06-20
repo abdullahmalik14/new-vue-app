@@ -1,58 +1,74 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { resolveRouteAssetPreloads } from '../../src/systems/assets/resolveRouteAssetPreloads.js';
-import sharedAssetPreloads from '../../src/config/sharedAssetPreloads.json';
 
 describe('resolveRouteAssetPreloads (P4)', () => {
-  it('expands assetPreloadRef into assetPreload and removes the ref field', () => {
+  it('leaves an empty route unchanged', () => {
+    const route = { slug: '/dashboard', section: 'dashboard-global' };
+
+    const resolved = resolveRouteAssetPreloads([route], {});
+
+    expect(resolved[0]).toBe(route);
+  });
+
+  it('keeps multiple assetPreloadRef entries in order', () => {
     const routes = [
       {
         slug: '/dashboard',
         section: 'dashboard-global',
-        assetPreloadRef: 'dashboardMenuIcons'
-      }
+        assetPreloadRef: ['menuIcons', 'headerIcons'],
+      },
     ];
+    const sharedCatalog = {
+      menuIcons: [{ flag: 'dashboard.logo', type: 'image', priority: 'high' }],
+      headerIcons: [{ flag: 'dashboard.avatar', type: 'image', priority: 'normal' }],
+    };
 
-    const resolved = resolveRouteAssetPreloads(routes, sharedAssetPreloads);
-    const refCount = sharedAssetPreloads.dashboardMenuIcons.length;
+    const resolved = resolveRouteAssetPreloads(routes, sharedCatalog);
 
-    expect(resolved[0].assetPreloadRef).toBeUndefined();
-    expect(resolved[0].assetPreload).toHaveLength(refCount);
-    expect(resolved[0].assetPreload[0]).toEqual({
-      flag: 'dashboard.logo',
-      type: 'image',
-      priority: 'high'
-    });
+    expect(resolved[0].assetPreload).toEqual([
+      { flag: 'dashboard.logo', type: 'image', priority: 'high' },
+      { flag: 'dashboard.avatar', type: 'image', priority: 'normal' },
+    ]);
   });
 
-  it('appends inline assetPreload entries after shared ref entries', () => {
+  it('ignores a null assetPreloadRef', () => {
+    const route = {
+      slug: '/shop',
+      section: 'shop',
+      assetPreloadRef: null,
+      assetPreload: [{ src: '/media/extra.png', type: 'image', priority: 'high' }],
+    };
+
+    const resolved = resolveRouteAssetPreloads([route], {});
+
+    expect(resolved[0]).toBe(route);
+    expect(resolved[0].assetPreload).toEqual([
+      { src: '/media/extra.png', type: 'image', priority: 'high' },
+    ]);
+  });
+
+  it('preserves type and priority on every resolved entry', () => {
     const routes = [
       {
-        slug: '/shop',
-        section: 'shop',
-        assetPreloadRef: 'dashboardMenuIcons',
-        assetPreload: [
-          { src: '/media/extra.png', type: 'image', priority: 'high' }
-        ]
-      }
+        slug: '/dashboard',
+        section: 'dashboard-global',
+        assetPreloadRef: 'menuIcons',
+        assetPreload: [{ src: '/media/extra.png', type: 'image', priority: 'critical' }],
+      },
     ];
+    const sharedCatalog = {
+      menuIcons: [
+        { flag: 'dashboard.logo', type: 'font', priority: 'high' },
+        { flag: 'dashboard.avatar', type: 'image', priority: 'normal' },
+      ],
+    };
 
-    const resolved = resolveRouteAssetPreloads(routes, sharedAssetPreloads);
-    const refCount = sharedAssetPreloads.dashboardMenuIcons.length;
+    const resolved = resolveRouteAssetPreloads(routes, sharedCatalog);
 
-    expect(resolved[0].assetPreload).toHaveLength(refCount + 1);
-    expect(resolved[0].assetPreload[refCount]).toEqual({
-      src: '/media/extra.png',
-      type: 'image',
-      priority: 'high'
-    });
-  });
-
-  it('throws for unknown assetPreloadRef keys', () => {
-    expect(() =>
-      resolveRouteAssetPreloads(
-        [{ slug: '/bad', assetPreloadRef: 'missing' }],
-        sharedAssetPreloads
-      )
-    ).toThrow(/Unknown assetPreloadRef "missing"/);
+    expect(resolved[0].assetPreload).toEqual([
+      { flag: 'dashboard.logo', type: 'font', priority: 'high' },
+      { flag: 'dashboard.avatar', type: 'image', priority: 'normal' },
+      { src: '/media/extra.png', type: 'image', priority: 'critical' },
+    ]);
   });
 });
