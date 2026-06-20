@@ -19,7 +19,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/DashboardSharedTwoColLayout.vue';
-import AssetHandler from '@/systems/assets/assetHandler.js';
+import { createAssetHandler } from '@/systems/assets/assetHandlerFactory.js';
 import { loadAssetsForSection } from '@/systems/assets/assetLibrary.js';
 
 const ASSET_DEPENDENCIES = ['dashboard-metrics-lib'];
@@ -56,7 +56,7 @@ async function loadDashboardMetrics() {
             return;
         }
 
-        handlerInstance = new AssetHandler(assetConfigs, { maxConcurrent: 2 });
+        handlerInstance = await createAssetHandler(assetConfigs, { maxConcurrent: 2 });
         const result = await handlerInstance.ensureAssetDependencies(ASSET_DEPENDENCIES, { strict: true });
 
         if (result.failed.length > 0) {

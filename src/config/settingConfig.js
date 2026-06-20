@@ -6,21 +6,21 @@ export const settingConfig = {
       items: [
         { 
           label: "Account Information", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/account-info", 
           isActive: true, 
           isDisabled: false 
         },
         { 
           label: "Change Password", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/change-password", 
           isActive: false, 
           isDisabled: false 
         },
         { 
           label: "Privacy & Security", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/privacy", 
           isActive: false, 
           isDisabled: true, 
@@ -33,7 +33,7 @@ export const settingConfig = {
       items: [
         { 
           label: "Live Stream Settings", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/live-settings", 
           isActive: false, 
           isDisabled: true, 
@@ -41,7 +41,7 @@ export const settingConfig = {
         },
         { 
           label: "Call Settings", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/call-settings", 
           isActive: false, 
           isDisabled: true, 
@@ -54,14 +54,14 @@ export const settingConfig = {
       items: [
         { 
           label: "Shipping Address", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/shipping", 
           isActive: false, 
           isDisabled: false 
         },
         { 
           label: "Payout Details", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/payout", 
           isActive: false, 
           isDisabled: false 
@@ -73,7 +73,7 @@ export const settingConfig = {
       items: [
         { 
           label: "Newsletter & Email Settings", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/newsletter", 
           isActive: false, 
           isDisabled: true, 
@@ -81,7 +81,7 @@ export const settingConfig = {
         },
         { 
           label: "X Repost Automation", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/x-repost", 
           isActive: false, 
           isDisabled: true, 
@@ -98,14 +98,14 @@ export const settingConfig = {
       items: [
         { 
           label: "Shop Profile", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/shop-profile", 
           isActive: true, 
           isDisabled: false 
         },
         { 
           label: "Inventory Management", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/inventory", 
           isActive: false, 
           isDisabled: false 
@@ -117,14 +117,14 @@ export const settingConfig = {
       items: [
         { 
           label: "Order History", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/orders", 
           isActive: false, 
           isDisabled: false 
         },
         { 
           label: "Payout Settings", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/vendor-payout", 
           isActive: false, 
           isDisabled: false 
@@ -140,14 +140,14 @@ export const settingConfig = {
       items: [
         { 
           label: "Profile Settings", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/fan-profile", 
           isActive: true, 
           isDisabled: false 
         },
         { 
           label: "My Subscriptions", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/subscriptions", 
           isActive: false, 
           isDisabled: false 
@@ -159,14 +159,14 @@ export const settingConfig = {
       items: [
         { 
           label: "Payment Methods", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/payment-methods", 
           isActive: false, 
           isDisabled: false 
         },
         { 
           label: "Purchase History", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/purchases", 
           isActive: false, 
           isDisabled: true,
@@ -183,14 +183,14 @@ export const settingConfig = {
       items: [
         { 
           label: "Agency Dashboard", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/agency-dash", 
           isActive: true, 
           isDisabled: false 
         },
         { 
           label: "Manage Creators", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/manage-creators", 
           isActive: false, 
           isDisabled: false 
@@ -202,7 +202,7 @@ export const settingConfig = {
       items: [
         { 
           label: "Commission Reports", 
-          icon: "https://i.ibb.co.com/YTFLKydW/svgviewer-png-output-6.webp", 
+          iconFlag: "settings.menu.item", 
           route: "/commissions", 
           isActive: false, 
           isDisabled: false 
@@ -211,3 +211,45 @@ export const settingConfig = {
     }
   ]
 };
+
+/**
+ * Resolve settings nav groups with icon URLs from assetMap flags.
+ * @param {Record<string, Array>} [configByRole]
+ * @param {string} [userRole]
+ * @returns {Promise<Array>}
+ */
+export async function resolveSettingConfigWithAssets(
+  configByRole = settingConfig,
+  userRole = 'creator',
+) {
+  const { getAssetUrls } = await import('@/systems/assets/assetLibrary.js');
+  const groups = configByRole[userRole] || configByRole.creator || [];
+  const iconFlags = new Set();
+
+  groups.forEach((group) => {
+    group.items.forEach((item) => {
+      if (typeof item.iconFlag === 'string' && item.iconFlag.trim()) {
+        iconFlags.add(item.iconFlag.trim());
+      }
+    });
+  });
+
+  const iconUrlsByFlag = await getAssetUrls([...iconFlags]);
+
+  return groups.map((group) => ({
+    ...group,
+    items: group.items.map((item) => {
+      const flag = typeof item.iconFlag === 'string' ? item.iconFlag.trim() : '';
+      const icon = flag ? iconUrlsByFlag[flag] || '' : '';
+
+      if (flag && !icon) {
+        console.warn(`[settingConfig] Missing asset for flag: ${flag}`);
+      }
+
+      return {
+        ...item,
+        icon,
+      };
+    }),
+  }));
+}

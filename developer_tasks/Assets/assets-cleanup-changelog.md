@@ -399,13 +399,74 @@ refactor(assets): rename preload store actions and prefetch handlers
 
 ---
 
+## Phase 7 — Config and consumer cleanup (P3)
+
+**Master plan:** ASSET_PLAN P3 items 13–14, Issue 21  
+**Audit reference:** [folder-structure-audit-assets.md](./folder-structure-audit-assets.md) Issues 18 & 21  
+**Scope:** Move settings config to `config/`; replace hardcoded menu icon URLs with asset flags; use `createAssetHandler` factory on creator dashboard overview.
+
+### Issue 18 — `settingConfig.js` in wrong layer with hardcoded ImgBB URLs
+
+**What was broken:** Settings navigation data lived in `src/assets/data/settingConfig.js` (JS module under static assets folder). Every menu item duplicated the same ImgBB icon URL inline (~20 copies).
+
+**Why it happened:** Predates asset flag convention used by `dashboardSidebarMenuItems.js`.
+
+**How it was fixed:**
+
+| File | Change |
+|------|--------|
+| [`src/config/settingConfig.js`](../../src/config/settingConfig.js) | Moved from `assets/data/`; items use `iconFlag: "settings.menu.item"` |
+| [`src/config/settingConfig.js`](../../src/config/settingConfig.js) | Added `resolveSettingConfigWithAssets()` — batch-resolves flags via `getAssetUrls` |
+| [`src/config/assetMap.json`](../../src/config/assetMap.json) | Added `settings.menu.item` production URL (preserves prior ImgBB icon) |
+| [`DashProfileSettings.vue`](../../src/components/ui/nav/dashboard/DashProfileSettings.vue) | Import from `@/config/settingConfig.js`; resolve icons on mount / role change |
+
+**Out of scope this phase:** Profile header / edit-profile images in `DashProfileSettings.vue` template still use inline ImgBB URLs (separate flags can be added later).
+
+### Issue 21 — Creator dashboard overview bypassed factory
+
+**What was broken:** `CreatorDashboardOverviewPage.vue` instantiated `AssetHandler` directly with `new AssetHandler(...)` instead of the shared `createAssetHandler()` factory.
+
+**Why it happened:** Page was added as a dev prototype before factory pattern was standardised.
+
+**How it was fixed:**
+
+| File | Change |
+|------|--------|
+| [`CreatorDashboardOverviewPage.vue`](../../src/dev/templates/dashboard/creator/CreatorDashboardOverviewPage.vue) | `createAssetHandler(assetConfigs, { maxConcurrent: 2 })` replaces direct constructor |
+
+Section metadata → handler config mapping unchanged; factory still accepts pre-resolved `url` entries.
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/assetMapBuildValidation.test.js \
+  tests/unit/getAssetUrlsBatch.test.js \
+  tests/unit/initAssetLibrary.test.js
+
+rg "assets/data/settingConfig" src/
+```
+
+**Result:** 8 tests passed; zero imports from old `assets/data/settingConfig` path under `src/`. Manual smoke: dashboard settings panel + creator overview (recommended).
+
+### Phase 7 exit
+
+Settings config in `config/` layer with flag-based icons; creator overview uses asset handler factory. Ready for Phase 8 (docs sync).
+
+**Suggested commit:**
+
+```
+refactor(assets): move settingConfig to config and use asset flags
+```
+
+---
+
 ## Upcoming (not started)
 
 | Phase | ASSET_PLAN | Summary |
 |-------|------------|---------|
-| 7 | P3 | Config/consumer cleanup (`settingConfig.js`, ImgBB flags) |
 | 8 | P3 | Docs sync (`DEVELOPER_GUIDE.md`, `asset-code-index.md`) |
 
 ---
 
-*End of log through Phase 6.*
+*End of log through Phase 7.*

@@ -1,18 +1,33 @@
 <script setup>
-import { computed } from 'vue';
-import { settingConfig } from '@/assets/data/settingConfig.js';
+import { onMounted, ref, watch } from 'vue';
+import {
+  settingConfig,
+  resolveSettingConfigWithAssets,
+} from '@/config/settingConfig.js';
 
 const props = defineProps({
   userRole: {
     type: String,
     default: 'creator', // 'creator', 'vendor', 'fan', 'agent'
-  }
+  },
 });
 
-// Config pick based on role
-const menuGroups = computed(() => {
-  return settingConfig[props.userRole] || settingConfig['creator'];
+const menuGroups = ref(settingConfig[props.userRole] || settingConfig.creator);
+
+async function loadMenuGroups() {
+  menuGroups.value = await resolveSettingConfigWithAssets(settingConfig, props.userRole);
+}
+
+onMounted(() => {
+  loadMenuGroups();
 });
+
+watch(
+  () => props.userRole,
+  () => {
+    loadMenuGroups();
+  },
+);
 </script>
 
 <template>
