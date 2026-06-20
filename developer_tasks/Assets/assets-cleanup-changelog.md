@@ -453,6 +453,31 @@ rg "assets/data/settingConfig" src/
 
 Settings config in `config/` layer with flag-based icons; creator overview uses asset handler factory. Ready for Phase 8 (docs sync).
 
+### Phase 7 follow-up — post-review fixes (Issue 18 hardening)
+
+**What was broken:** `settings.menu.item` in asset maps used malformed host `i.ibb.co.com` and `DashProfileSettings.vue` could apply stale async icon results if `userRole` changed quickly during resolution.
+
+**Why it happened:** Initial Phase 7 move copied an ImgBB URL with a typo and used fire-and-forget async loading without request ordering guards.
+
+**What changed:**
+
+| File | Change |
+|------|--------|
+| [`src/config/assetMap.json`](../../src/config/assetMap.json) | Fixed `settings.menu.item` host to `https://i.ibb.co/...` |
+| [`public/config/assetMap.json`](../../public/config/assetMap.json) | Synced same host fix for runtime/public map |
+| [`DashProfileSettings.vue`](../../src/components/ui/nav/dashboard/DashProfileSettings.vue) | Added request-id stale-response guard, error fallback to role defaults, and unmount cancellation |
+| [`tests/unit/settingConfig.test.js`](../../tests/unit/settingConfig.test.js) | **New** focused tests for role resolution + creator fallback |
+
+**How it was tested:**
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/settingConfig.test.js \
+  tests/unit/settingsMenuItemHost.test.js
+```
+
+**Result:** 3 tests passed; settings icon host is `i.ibb.co` in both source and public maps; settings config resolution tests pass with mocked asset resolver.
+
 **Suggested commit:**
 
 ```

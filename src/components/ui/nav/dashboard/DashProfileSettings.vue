@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import {
   settingConfig,
   resolveSettingConfigWithAssets,
@@ -13,9 +13,29 @@ const props = defineProps({
 });
 
 const menuGroups = ref(settingConfig[props.userRole] || settingConfig.creator);
+let loadRequestId = 0;
+let isDisposed = false;
 
 async function loadMenuGroups() {
-  menuGroups.value = await resolveSettingConfigWithAssets(settingConfig, props.userRole);
+  const currentRequestId = ++loadRequestId;
+
+  try {
+    const resolvedGroups = await resolveSettingConfigWithAssets(settingConfig, props.userRole);
+
+    if (isDisposed || currentRequestId !== loadRequestId) {
+      return;
+    }
+
+    menuGroups.value = resolvedGroups;
+  } catch (error) {
+    if (isDisposed || currentRequestId !== loadRequestId) {
+      return;
+    }
+
+    const fallbackGroups = settingConfig[props.userRole] || settingConfig.creator;
+    menuGroups.value = fallbackGroups;
+    console.error('[DashProfileSettings] Failed to resolve menu icons', error);
+  }
 }
 
 onMounted(() => {
@@ -28,6 +48,11 @@ watch(
     loadMenuGroups();
   },
 );
+
+onBeforeUnmount(() => {
+  isDisposed = true;
+  loadRequestId += 1;
+});
 </script>
 
 <template>
