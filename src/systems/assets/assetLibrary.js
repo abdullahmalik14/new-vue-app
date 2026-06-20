@@ -28,7 +28,7 @@ import {
 } from '../../infrastructure/cache/cacheHandler.js';
 import { loadSectionManifest, getSectionBundlePaths } from '../sections/sectionManifestHelpers.js';
 import { getAssetPreloadEntriesForSection } from './routeSectionAssetPreloadEntries.js';
-import { assertAllowedPreloadUrl } from './assertAllowedPreloadUrl.js';
+import { assertAllowedPreloadUrl } from './assetPolicy.js';
 import {
   getBundledAssetMap,
   parseAssetMapJsonText,

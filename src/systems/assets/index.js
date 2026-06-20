@@ -33,14 +33,17 @@ export {
 } from './routeSectionAssetPreloadEntries.js';
 
 export {
+  assertAllowedAssetUrl,
+  assertAllowedPreloadUrl,
   collectAssetMapFlags,
   validateRouteAssetPreloadFlags,
+  validateAssetPreloadEntry,
   validateAssetPreloadEntryShape,
   validateRouteAssetPreloadRefs,
   validateSharedCatalogAssetPreloadFlags,
   ALLOWED_ASSET_PRELOAD_TYPES,
   ALLOWED_ASSET_PRELOAD_PRIORITIES,
-} from './validateRouteAssetPreloadFlags.js';
+} from './assetPolicy.js';
 
 export {
   getSharedCatalogEntriesByFlag,

@@ -20,7 +20,7 @@ import { validateRouteConfig } from "../build/jsonConfigValidator.js";
 import { resolveRouteAssetPreloads } from "../assets/resolveRouteAssetPreloads.js";
 import { validateRouteComponentPathsWithResolver } from "./routeComponentPathValidator.js";
 import { findComponentLoader } from "./routeComponentLoader.js";
-import { validateRouteAssetPreloadFlags } from "../assets/validateRouteAssetPreloadFlags.js";
+import { validateRouteAssetPreloadFlags } from "../assets/assetPolicy.js";
 
 // Performance tracking via trackStep() from performanceTrackerAccess.js
 

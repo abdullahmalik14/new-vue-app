@@ -23,6 +23,7 @@
 | Naming batch 1 | [asset-naming-audit-batch-1.md](./asset-naming-audit-batch-1.md) |
 | Naming batch 2 | [asset-naming-audit-batch-2.md](./asset-naming-audit-batch-2.md) |
 | Vitest test plan (planning) | [asset-test-plan.md](./asset-test-plan.md) |
+| Done work log | [assets-cleanup-changelog.md](./assets-cleanup-changelog.md) |
 | Legacy / historical | [docs/legacy/](./docs/legacy/) |
 
 **Related:** [Sections/docs/](../Sections/docs/README.md) · [RoutingExplained.md](../Route/RoutingExplained.md)

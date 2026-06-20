@@ -4,7 +4,7 @@ import { log } from '@/infrastructure/logging/logHandler';
 import { logError } from '@/infrastructure/errors/errorHandler.js';
 import { trackStep } from '@/infrastructure/logging/performanceTrackerAccess.js';
 import { getAssetUrl, getAssetUrls } from './assetLibrary';
-import { assertAllowedPreloadUrl } from './assertAllowedPreloadUrl.js';
+import { assertAllowedPreloadUrl } from './assetPolicy.js';
 import { getAssetPreloadEntriesForSection } from './routeSectionAssetPreloadEntries.js';
 import { usePreloadStore } from '../../stores/usePreloadStore.js';
 
