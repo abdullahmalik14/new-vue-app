@@ -539,4 +539,44 @@ docs(assets): sync guides and code index after cleanup phases 0–7
 
 ---
 
-*End of log through Phase 8.*
+## Phase A — Asset test integrity suite (test plan Phase A)
+
+**Reference:** [asset-test-plan.md](./asset-test-plan.md) §0, §0b, auth map table row  
+**Scope:** Shared test fixtures + production JSON integrity tests + stale import guard. No production code changes.
+
+### What was added
+
+| File | Cases | Covers |
+|------|-------|--------|
+| [`tests/helpers/assetFixtures.js`](../../tests/helpers/assetFixtures.js) | — | Mock asset maps, route preload factories, `setupAssetTestEnv`, `resetAssetSystemState` |
+| [`tests/unit/assetMap.integrity.test.js`](../../tests/unit/assetMap.integrity.test.js) | 16 | `assetMap.json` shape, sparse env overrides, catalog cross-refs, SHA256 snapshot |
+| [`tests/unit/sharedAssetPreloads.integrity.test.js`](../../tests/unit/sharedAssetPreloads.integrity.test.js) | 10 | Catalog entry shape, mapping flags, `assetPreloadRef` resolution |
+| [`tests/unit/assetMap.auth.integrity.test.js`](../../tests/unit/assetMap.auth.integrity.test.js) | 7 | `assetMap.auth.json` sparse overrides, src/public sync |
+| [`tests/unit/assets.vitestMigration.test.js`](../../tests/unit/assets.vitestMigration.test.js) | 3 | Guard against `utils/assets` imports in `src/` and `tests/` |
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/assetMap.integrity.test.js \
+  tests/unit/sharedAssetPreloads.integrity.test.js \
+  tests/unit/assetMap.auth.integrity.test.js \
+  tests/unit/assets.vitestMigration.test.js \
+  tests/unit/syncAssetMapToPublic.test.js
+```
+
+**Result:** 37 tests passed (5 files).
+
+### Phase A exit
+
+Production asset config contracts locked by Vitest; shared `assetFixtures.js` ready for Phase B core-library tests.
+
+**Suggested commit:**
+
+```
+test(assets): add Phase A integrity suite and shared fixtures
+```
+
+---
+
+*End of log through Phase A tests.*
