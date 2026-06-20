@@ -64,22 +64,22 @@ describe('usePreloadStore section actions (Phase D §31)', () => {
     expect(store.hasSection('auth')).toBe(false);
   });
 
-  it('clearState empties preloadedSections and sectionsInProgress', () => {
+  it('clearPreloadState empties preloadedSections and sectionsInProgress', () => {
     const store = usePreloadStore();
 
     store.addSection('auth');
     store.markSectionInProgress('shop');
-    store.clearState();
+    store.clearPreloadState();
 
     expect(store.preloadedSections.size).toBe(0);
     expect(store.sectionsInProgress.size).toBe(0);
   });
 
-  it('clearState with resetBuildHash nulls buildHash', () => {
+  it('clearPreloadState with resetBuildHash nulls buildHash', () => {
     const store = usePreloadStore();
     store.buildHash = 'build-v1';
 
-    store.clearState({ resetBuildHash: true });
+    store.clearPreloadState({ resetBuildHash: true });
 
     expect(store.buildHash).toBeNull();
   });

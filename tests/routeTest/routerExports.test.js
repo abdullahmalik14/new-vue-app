@@ -46,6 +46,7 @@ const BARREL_EXPORTS = [
   'createSectionAssetPrefetchIntentHandler',
   'resetRouteAssetPrefetchCache',
   'useRoutePrefetch',
+  'createCombinedRoutePrefetchIntentHandler',
   'createRoutePrefetchIntentHandler',
   'resolveRouteTransition',
   'ROUTE_TRANSITION_PRESETS',

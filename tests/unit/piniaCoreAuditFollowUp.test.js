@@ -195,7 +195,7 @@ describe('PINIA_CORE_AUDIT follow-up review scenarios', () => {
       preloadedSections: new Set(['auth']),
       buildHash: 'build-v1',
     });
-    preloadStore.addAsset('/assets/stale.png');
+    preloadStore.addPreloadedAsset('/assets/stale.png');
 
     const sync = syncPreloadStoreBuildHash(preloadStore);
 

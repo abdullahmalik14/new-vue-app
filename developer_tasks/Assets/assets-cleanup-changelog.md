@@ -326,14 +326,86 @@ refactor(assets): extract shared authAssetConfig for auth views
 
 ---
 
+## Phase 6 — Store and composable symbol renames (P2)
+
+**Master plan:** ASSET_PLAN P2 items 9–12  
+**Audit reference:** [asset-naming-audit-batch-2.md](./asset-naming-audit-batch-2.md) · [folder-structure-audit-assets.md](./folder-structure-audit-assets.md) Issue 15  
+**Scope:** Rename preload store actions and disambiguate combined route prefetch handler; add `useAssetPrefetch` composable. Deprecated aliases retained for one release.
+
+### Issue — Store action names were ambiguous
+
+**What was broken:** `usePreloadStore` used generic names (`addAsset`, `clearState`) that did not signal preload-specific intent. `clearState` in particular was easy to confuse with unrelated store resets.
+
+**Why it happened:** Early preload store predated the expanded naming convention.
+
+**How it was fixed:**
+
+| File | Change |
+|------|--------|
+| [`src/stores/usePreloadStore.js`](../../src/stores/usePreloadStore.js) | `addAsset` → `addPreloadedAsset`; `clearState` → `clearPreloadState`; deprecated aliases kept |
+| [`src/systems/assets/assetPreloader.js`](../../src/systems/assets/assetPreloader.js) | Calls `addPreloadedAsset` |
+| [`src/systems/sections/sectionPreloader.js`](../../src/systems/sections/sectionPreloader.js) | Calls `clearPreloadState` |
+| [`src/systems/build/appBuildHash.js`](../../src/systems/build/appBuildHash.js) | Calls `clearPreloadState` |
+| 8 test files | Updated to canonical store action names |
+
+### Issue — `createRoutePrefetchIntentHandler` name collision
+
+**What was broken:** The same symbol name was used for component-only prefetch (routing) and combined component+asset prefetch (composable). Nav UI imports the combined handler but the name did not reflect that.
+
+**Why it happened:** Handler evolved from component-only to combined without renaming.
+
+**How it was fixed:**
+
+| File | Change |
+|------|--------|
+| [`src/composables/useRoutePrefetch.js`](../../src/composables/useRoutePrefetch.js) | Canonical export `createCombinedRoutePrefetchIntentHandler`; `createRoutePrefetchIntentHandler` deprecated alias |
+| [`AuthLogIn.vue`](../../src/dev/templates/auth/views/AuthLogIn.vue), [`AppFooter.vue`](../../src/components/layout/AppFooter.vue), [`DashboardSharedSidebar.vue`](../../src/dev/templates/dashboard/shared/DashboardSharedSidebar.vue) | Import combined handler |
+| [`src/systems/routing/index.js`](../../src/systems/routing/index.js), [`src/router/index.js`](../../src/router/index.js) | Export both names (canonical + alias) |
+
+### Issue 15 — Missing `useAssetPrefetch` composable
+
+**What was broken:** Asset-only intent prefetch was only reachable through `useRoutePrefetch` (combined API). Naming docs list a dedicated `useAssetPrefetch.js`.
+
+**How it was fixed:**
+
+| File | Change |
+|------|--------|
+| [`src/composables/useAssetPrefetch.js`](../../src/composables/useAssetPrefetch.js) | **New** — wraps `prefetchSectionAssetsForRoute`, `createSectionAssetPrefetchIntentHandler`, `resetRouteAssetPrefetchCache` |
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/unit/usePreloadStore.test.js \
+  tests/sectionTest/usePreloadStore.section.test.js \
+  tests/unit/useRoutePrefetch.test.js \
+  tests/routeTest/useRoutePrefetch.test.js \
+  tests/routeTest/routerExports.test.js \
+  tests/unit/appBuildHash.test.js \
+  tests/unit/preloadUrlGuard.test.js
+```
+
+**Result:** 7 test files, 37 tests passed.
+
+### Phase 6 exit
+
+Preload store and route prefetch APIs use approved names; asset-only prefetch composable exists; deprecated aliases preserve backward compatibility. Ready for Phase 7 (config/consumer cleanup).
+
+**Suggested commit:**
+
+```
+refactor(assets): rename preload store actions and prefetch handlers
+```
+
+---
+
 ## Upcoming (not started)
 
 | Phase | ASSET_PLAN | Summary |
 |-------|------------|---------|
-| 6 | P2 | Store/composable symbol renames |
 | 7 | P3 | Config/consumer cleanup (`settingConfig.js`, ImgBB flags) |
 | 8 | P3 | Docs sync (`DEVELOPER_GUIDE.md`, `asset-code-index.md`) |
 
 ---
 
-*End of log through Phase 5.*
+*End of log through Phase 6.*

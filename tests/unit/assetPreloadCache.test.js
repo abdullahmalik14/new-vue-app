@@ -13,7 +13,7 @@ describe('asset preload cache SSOT (P-03)', () => {
   it('clearPreloadCache clears asset URLs but preserves section preload state', async () => {
     const store = usePreloadStore();
     store.addSection('dashboard-global');
-    store.addAsset('https://example.com/icon.svg');
+    store.addPreloadedAsset('https://example.com/icon.svg');
     store.buildHash = 'test-hash';
 
     const { clearPreloadCache } = await import('../../src/systems/assets/assetPreloader.js');

@@ -12,7 +12,7 @@ export function getAppBuildHash() {
 /**
  * Clear persisted preload state when the deploy/build hash changes.
  *
- * @param {{ clearState: () => void, buildHash: string | null }} store
+ * @param {{ clearPreloadState: () => void, buildHash: string | null }} store
  * @returns {{ invalidated: boolean, previousHash: string | null, currentBuildHash: string | null }}
  */
 export function syncPreloadStoreBuildHash(store) {
@@ -24,7 +24,7 @@ export function syncPreloadStoreBuildHash(store) {
 
   if (store.buildHash !== currentBuildHash) {
     const previousHash = store.buildHash;
-    store.clearState();
+    store.clearPreloadState();
     store.buildHash = currentBuildHash;
     if (typeof store.$persist === 'function') {
       store.$persist();

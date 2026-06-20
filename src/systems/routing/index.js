@@ -72,6 +72,7 @@ export {
 
 export {
   useRoutePrefetch,
+  createCombinedRoutePrefetchIntentHandler,
   createRoutePrefetchIntentHandler,
 } from '../../composables/useRoutePrefetch.js';
 

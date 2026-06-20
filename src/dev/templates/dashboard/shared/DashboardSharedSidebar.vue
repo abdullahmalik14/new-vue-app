@@ -226,7 +226,7 @@ import BasePopup from "@/components/ui/popup/BasePopup.vue";
 import DashboardProfilePopup from "@/components/ui/popup/DashboardProfilePopup.vue";
 import DashboardNotificationPopup from "@/components/ui/popup/DashboardNotificationPopup.vue";
 import DashboardMenuCounter from "@/components/ui/nav/dashboard/DashboardMenuCounter.vue";
-import { createRoutePrefetchIntentHandler } from "@/composables/useRoutePrefetch.js";
+import { createCombinedRoutePrefetchIntentHandler } from "@/composables/useRoutePrefetch.js";
 
 import { useAuthStore } from "@/stores/useAuthStore";
 export default {
@@ -540,7 +540,7 @@ export default {
     },
     prefetchMenuItemRoute(item) {
       if (item?.enabled && item?.route) {
-        createRoutePrefetchIntentHandler(item.route)();
+        createCombinedRoutePrefetchIntentHandler(item.route)();
       }
     },
     handleSubmenuItemClick(submenuItem) {

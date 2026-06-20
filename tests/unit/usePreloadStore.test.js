@@ -51,20 +51,20 @@ describe('usePreloadStore — preloadedAssets Set', () => {
     const url = 'https://example.com/icon.svg';
 
     expect(store.hasAsset(url)).toBe(false);
-    store.addAsset(url);
+    store.addPreloadedAsset(url);
     expect(store.hasAsset(url)).toBe(true);
     expect(store.preloadedAssetCount).toBe(1);
     expect(store.preloadedAssets instanceof Set).toBe(true);
 
-    store.addAsset(url);
+    store.addPreloadedAsset(url);
     expect(store.preloadedAssetCount).toBe(1);
   });
 
   it('removeAsset and clearAssets reset URL cache only', () => {
     const store = usePreloadStore();
     store.addSection('auth');
-    store.addAsset('/a.png');
-    store.addAsset('/b.png');
+    store.addPreloadedAsset('/a.png');
+    store.addPreloadedAsset('/b.png');
 
     store.removeAsset('/a.png');
     expect(store.hasAsset('/a.png')).toBe(false);
@@ -95,7 +95,7 @@ describe('usePreloadStore — preloadedAssets Set', () => {
     const store = usePreloadStore();
 
     store.addSection('');
-    store.addAsset('');
+    store.addPreloadedAsset('');
     store.markSectionInProgress('');
 
     expect(store.preloadedSections.size).toBe(0);
@@ -176,7 +176,7 @@ describe('usePreloadStore — pinia persist plugin', () => {
 
     const writer = usePreloadStore();
     writer.addSection('dashboard-global');
-    writer.addAsset('/cached.png');
+    writer.addPreloadedAsset('/cached.png');
 
     expect(memoryStorage.getItem(key)).not.toBeNull();
 

@@ -123,12 +123,12 @@ import {
   isTrustedOAuthOrigin,
   postOAuthAck,
 } from "@/dev/utils/auth/oauthPostMessage.js";
-import { createRoutePrefetchIntentHandler } from "@/composables/useRoutePrefetch.js";
+import { createCombinedRoutePrefetchIntentHandler } from "@/composables/useRoutePrefetch.js";
 
 const { t, locale: i18nLocale } = useI18n();
 const route = useRoute();
-const prefetchSignUp = createRoutePrefetchIntentHandler('/sign-up');
-const prefetchLostPassword = createRoutePrefetchIntentHandler('/lost-password');
+const prefetchSignUp = createCombinedRoutePrefetchIntentHandler('/sign-up');
+const prefetchLostPassword = createCombinedRoutePrefetchIntentHandler('/lost-password');
 const rememberMe = ref(false);
 const email = ref("");
 const password = ref("");

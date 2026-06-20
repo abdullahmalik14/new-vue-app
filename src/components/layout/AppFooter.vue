@@ -54,7 +54,7 @@ import { useAuthStore } from '../../stores/useAuthStore.js';
 import { log } from '../../infrastructure/logging/logHandler.js';
 import { logError } from '../../infrastructure/errors/errorHandler.js';
 import { getRouteConfiguration } from '../../systems/routing/routeConfigLoader.js';
-import { createRoutePrefetchIntentHandler } from '../../composables/useRoutePrefetch.js';
+import { createCombinedRoutePrefetchIntentHandler } from '../../composables/useRoutePrefetch.js';
 
 // Component name for logging
 const componentName = 'AppFooter';
@@ -185,7 +185,7 @@ function isCurrentRoute(routeSlug) {
 }
 
 function prefetchFooterRoute(routeSlug) {
-  createRoutePrefetchIntentHandler(routeSlug)();
+  createCombinedRoutePrefetchIntentHandler(routeSlug)();
 }
 
 /**

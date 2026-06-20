@@ -54,7 +54,7 @@ describe('preloadSectionAssets (Phase F §43)', () => {
     const preloadAssetsSpy = vi.spyOn(mod, 'preloadAssets');
     const store = usePreloadStore();
 
-    store.addAsset('/assets/logo.png');
+    store.addPreloadedAsset('/assets/logo.png');
 
     await mod.preloadSectionAssets('dashboard-global');
 

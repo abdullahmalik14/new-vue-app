@@ -26,7 +26,16 @@ describe('useRoutePrefetch (M-08)', () => {
     prefetchSectionAssetsForRoute.mockClear();
   });
 
-  it('createRoutePrefetchIntentHandler prefetches component and section assets', async () => {
+  it('createCombinedRoutePrefetchIntentHandler prefetches component and section assets', async () => {
+    const { createCombinedRoutePrefetchIntentHandler } = await import('../../src/composables/useRoutePrefetch.js');
+
+    createCombinedRoutePrefetchIntentHandler('/shop')();
+
+    expect(prefetchRouteComponent).toHaveBeenCalledWith('/shop', {});
+    expect(prefetchSectionAssetsForRoute).toHaveBeenCalledWith('/shop', {});
+  });
+
+  it('deprecated createRoutePrefetchIntentHandler alias matches combined handler', async () => {
     const { createRoutePrefetchIntentHandler } = await import('../../src/composables/useRoutePrefetch.js');
 
     createRoutePrefetchIntentHandler('/shop')();

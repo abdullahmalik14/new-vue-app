@@ -176,7 +176,7 @@ export const usePreloadStore = defineStore('preload', {
      * Mark an asset as preloaded
      * @param {string} assetUrl 
      */
-    addAsset(assetUrl) {
+    addPreloadedAsset(assetUrl) {
       if (!isValidSectionKey(assetUrl)) {
         return;
       }
@@ -186,6 +186,11 @@ export const usePreloadStore = defineStore('preload', {
         this.preloadedAssets = nextAssets;
         commitPersistedPreloadState(this);
       }
+    },
+
+    /** @deprecated Use {@link addPreloadedAsset} */
+    addAsset(assetUrl) {
+      return this.addPreloadedAsset(assetUrl);
     },
 
     /**
@@ -259,7 +264,7 @@ export const usePreloadStore = defineStore('preload', {
      * Clear all preload state
      * @param {{ resetBuildHash?: boolean }} [options]
      */
-    clearState({ resetBuildHash = false } = {}) {
+    clearPreloadState({ resetBuildHash = false } = {}) {
       this.preloadedSections = new Set();
       this.preloadedAssets = new Set();
       if (resetBuildHash) {
@@ -267,8 +272,13 @@ export const usePreloadStore = defineStore('preload', {
       }
       this.manifestLoadFailed = false;
       this.sectionsInProgress = new Set();
-      log('usePreloadStore.js', 'clearState', 'clear', 'Preload state cleared', {});
+      log('usePreloadStore.js', 'clearPreloadState', 'clear', 'Preload state cleared', {});
       commitPersistedPreloadState(this);
+    },
+
+    /** @deprecated Use {@link clearPreloadState} */
+    clearState(options) {
+      return this.clearPreloadState(options);
     }
   },
 

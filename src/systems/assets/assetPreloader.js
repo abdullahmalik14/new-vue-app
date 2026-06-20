@@ -328,7 +328,7 @@ export function injectExecutableScript(src, options = {}) {
 
   const existingScript = findExistingExecutableScript(src);
   if (existingScript) {
-    preloadStore.addAsset(src);
+    preloadStore.addPreloadedAsset(src);
     return Promise.resolve();
   }
 
@@ -381,7 +381,7 @@ export function injectExecutableScript(src, options = {}) {
     await waitForScriptElementLoad(script);
   })
     .then(() => {
-      preloadStore.addAsset(src);
+      preloadStore.addPreloadedAsset(src);
       preloadInProgress.delete(src);
       resolveScript();
     })
@@ -500,7 +500,7 @@ export function preloadImage(src, options = {}) {
   const existingLink = findExistingResourceHintLink(src);
   if (existingLink) {
     log('assetPreloader.js', 'preloadImage', 'already-exists', 'Image preload link already exists in DOM', { src });
-    preloadStore.addAsset(src);
+    preloadStore.addPreloadedAsset(src);
     preloadInProgress.delete(src);
     trackStep({
       step: 'preloadImage_dom_exists',
@@ -532,7 +532,7 @@ export function preloadImage(src, options = {}) {
     await waitForLinkLoad(link);
   })
     .then(() => {
-      preloadStore.addAsset(src);
+      preloadStore.addPreloadedAsset(src);
       preloadInProgress.delete(src);
       log('assetPreloader.js', 'preloadImage', 'success', 'Image preloaded successfully', { src });
       trackStep({
@@ -611,7 +611,7 @@ export function preloadFont(src, options = {}) {
   const existingFontLink = findExistingResourceHintLink(src);
   if (existingFontLink) {
     log('assetPreloader.js', 'preloadFont', 'already-exists', 'Font preload link already exists in DOM', { src });
-    preloadStore.addAsset(src);
+    preloadStore.addPreloadedAsset(src);
     preloadInProgress.delete(src);
     trackStep({
       step: 'preloadFont_dom_exists',
@@ -644,7 +644,7 @@ export function preloadFont(src, options = {}) {
     await waitForLinkLoad(link);
   })
     .then(() => {
-      preloadStore.addAsset(src);
+      preloadStore.addPreloadedAsset(src);
       preloadInProgress.delete(src);
       log('assetPreloader.js', 'preloadFont', 'success', 'Font preloaded successfully', { src });
       trackStep({
@@ -724,7 +724,7 @@ export function preloadMedia(src, type = 'video', options = {}) {
   const existingMediaLink = findExistingResourceHintLink(src);
   if (existingMediaLink) {
     log('assetPreloader.js', 'preloadMedia', 'already-exists', 'Media preload link already exists in DOM', { src });
-    preloadStore.addAsset(src);
+    preloadStore.addPreloadedAsset(src);
     preloadInProgress.delete(src);
     trackStep({
       step: 'preloadMedia_dom_exists',
@@ -756,7 +756,7 @@ export function preloadMedia(src, type = 'video', options = {}) {
     await waitForLinkLoad(link);
   })
     .then(() => {
-      preloadStore.addAsset(src);
+      preloadStore.addPreloadedAsset(src);
       preloadInProgress.delete(src);
       log('assetPreloader.js', 'preloadMedia', 'success', 'Media preloaded successfully', { src, type });
       trackStep({
@@ -847,7 +847,7 @@ export function preloadScript(src, options = {}) {
   const existingScriptLink = findExistingScriptPreloadLink(src);
   if (existingScriptLink) {
     log('assetPreloader.js', 'preloadScript', 'already-exists', 'Script preload link already exists in DOM', { src });
-    preloadStore.addAsset(src);
+    preloadStore.addPreloadedAsset(src);
     preloadInProgress.delete(src);
     trackStep({
       step: 'preloadScript_dom_exists',
@@ -871,7 +871,7 @@ export function preloadScript(src, options = {}) {
     await waitForLinkLoad(scriptLink);
   })
     .then(() => {
-      preloadStore.addAsset(src);
+      preloadStore.addPreloadedAsset(src);
       preloadInProgress.delete(src);
       log('assetPreloader.js', 'preloadScript', 'success', 'Script preloaded successfully', { src });
       trackStep({
@@ -971,7 +971,7 @@ export async function preloadJSON(src, options = {}) {
       });
 
       jsonDataCache.set(src, data);
-      preloadStore.addAsset(src);
+      preloadStore.addPreloadedAsset(src);
 
       log('assetPreloader.js', 'preloadJSON', 'success', 'JSON loaded and cached successfully', { src });
       trackStep({

@@ -24,12 +24,15 @@ function createComponentPrefetchOnIntentHandler(targetPath, options = {}) {
  * @param {{ userRole?: string }} [options]
  * @returns {() => void}
  */
-export function createRoutePrefetchIntentHandler(targetPath, options = {}) {
+export function createCombinedRoutePrefetchIntentHandler(targetPath, options = {}) {
   return () => {
     prefetchRouteComponent(targetPath, options);
     prefetchSectionAssetsForRoute(targetPath, options);
   };
 }
+
+/** @deprecated Use {@link createCombinedRoutePrefetchIntentHandler} */
+export const createRoutePrefetchIntentHandler = createCombinedRoutePrefetchIntentHandler;
 
 /**
  * Composable for intent-based route component + section asset prefetch on nav links.
@@ -40,7 +43,8 @@ export function useRoutePrefetch() {
     prefetchSectionAssets: prefetchSectionAssetsForRoute,
     prefetchComponentOnIntent: createComponentPrefetchOnIntentHandler,
     prefetchAssetsOnIntent: createSectionAssetPrefetchIntentHandler,
-    prefetchRouteOnIntent: createRoutePrefetchIntentHandler,
+    prefetchRouteOnIntent: createCombinedRoutePrefetchIntentHandler,
+    createCombinedRoutePrefetchIntentHandler,
     createRoutePrefetchIntentHandler,
   };
 }

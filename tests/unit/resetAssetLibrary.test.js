@@ -20,7 +20,7 @@ describe('resetAssetLibrary (B-03 / M-06)', () => {
     await loadAssetsForSection('auth');
 
     const store = usePreloadStore();
-    store.addAsset('https://example.com/preloaded.png');
+    store.addPreloadedAsset('https://example.com/preloaded.png');
 
     expect(getValueFromCache('b03_probe')).not.toBeNull();
     expect(store.preloadedAssetCount).toBe(1);

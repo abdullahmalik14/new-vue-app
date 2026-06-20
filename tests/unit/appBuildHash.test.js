@@ -17,7 +17,7 @@ describe('appBuildHash / preload invalidation (M-05)', () => {
       preloadedSections: ['dashboard-global'],
       buildHash: 'build-v1',
     });
-    store.addAsset('/assets/old-icon.png');
+    store.addPreloadedAsset('/assets/old-icon.png');
 
     const result = syncPreloadStoreBuildHash(store);
 
@@ -35,7 +35,7 @@ describe('appBuildHash / preload invalidation (M-05)', () => {
 
     store.$patch({ buildHash: 'build-v1' });
     store.addSection('auth');
-    store.addAsset('/assets/icon.png');
+    store.addPreloadedAsset('/assets/icon.png');
 
     const result = syncPreloadStoreBuildHash(store);
 

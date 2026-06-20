@@ -47,7 +47,7 @@ describe('preloadSectionAssets URL short-circuit (C-07)', () => {
     const preloadAssetsSpy = vi.spyOn(mod, 'preloadAssets');
     const store = usePreloadStore();
 
-    store.addAsset('/assets/logo.png');
+    store.addPreloadedAsset('/assets/logo.png');
 
     await mod.preloadSectionAssets('dashboard-global');
 

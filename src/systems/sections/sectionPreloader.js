@@ -435,7 +435,7 @@ export function clearSectionPreloadState() {
   clearAllSectionCss();
   clearSectionJsPreloadLinks();
 
-  preloadStore.clearState();
+  preloadStore.clearPreloadState();
   inProgressPromises.clear();
 
   log('sectionPreloader.js', 'clearSectionPreloadState', 'success', 'Preload state cleared', { clearedCount: preloadedCount });
