@@ -1,5 +1,5 @@
 /**
- * routeAssetPreloader.js — Phase D (route test plan §17).
+ * routeAssetPrefetch.js — Phase D (route test plan §17).
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -36,14 +36,14 @@ describe('routeAssetPrefetch (Phase D §17)', () => {
     preloadSectionAssets.mockClear();
 
     const { resetRouteAssetPrefetchCache } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
     resetRouteAssetPrefetchCache();
   });
 
   it('prefetches section assets for a hover target path', async () => {
     const { prefetchSectionAssetsForRoute } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
 
     await prefetchSectionAssetsForRoute('/shop');
@@ -54,7 +54,7 @@ describe('routeAssetPrefetch (Phase D §17)', () => {
 
   it('dedupes section asset prefetch for the same section', async () => {
     const { prefetchSectionAssetsForRoute } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
 
     await prefetchSectionAssetsForRoute('/shop');
@@ -65,7 +65,7 @@ describe('routeAssetPrefetch (Phase D §17)', () => {
 
   it('createSectionAssetPrefetchIntentHandler invokes prefetch on call', async () => {
     const { createSectionAssetPrefetchIntentHandler } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
 
     createSectionAssetPrefetchIntentHandler('/shop')();
@@ -75,7 +75,7 @@ describe('routeAssetPrefetch (Phase D §17)', () => {
 
   it('resetRouteAssetPrefetchCache allows prefetch to run again', async () => {
     const { prefetchSectionAssetsForRoute, resetRouteAssetPrefetchCache } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
 
     await prefetchSectionAssetsForRoute('/shop');

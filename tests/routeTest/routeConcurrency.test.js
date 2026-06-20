@@ -77,7 +77,7 @@ describe('routeConcurrency (Phase G §47)', () => {
       '../../src/systems/routing/routeComponentPreloader.js'
     );
     const { resetRouteAssetPrefetchCache } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
     resetRoutePrefetchCache();
     resetRouteAssetPrefetchCache();
@@ -115,7 +115,7 @@ describe('routeConcurrency (Phase G §47)', () => {
     );
 
     const { prefetchSectionAssetsForRoute } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
 
     const first = prefetchSectionAssetsForRoute('/shop');

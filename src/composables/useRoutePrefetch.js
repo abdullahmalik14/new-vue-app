@@ -2,7 +2,7 @@ import { prefetchRouteComponent } from '../systems/routing/routeComponentPreload
 import {
   prefetchSectionAssetsForRoute,
   createSectionAssetPrefetchIntentHandler,
-} from '../systems/assets/routeAssetPreloader.js';
+} from '../systems/assets/routeAssetPrefetch.js';
 
 /**
  * Component-only hover/focus handler (no section assets).

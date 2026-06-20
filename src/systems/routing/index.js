@@ -68,7 +68,7 @@ export {
   prefetchSectionAssetsForRoute,
   createSectionAssetPrefetchIntentHandler,
   resetRouteAssetPrefetchCache,
-} from '../assets/routeAssetPreloader.js';
+} from '../assets/routeAssetPrefetch.js';
 
 export {
   useRoutePrefetch,

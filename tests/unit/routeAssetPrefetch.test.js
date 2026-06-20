@@ -31,12 +31,12 @@ describe('routeAssetPrefetch (M-08)', () => {
     setActivePinia(createPinia());
     preloadSectionAssets.mockClear();
 
-    const { resetRouteAssetPrefetchCache } = await import('../../src/systems/assets/routeAssetPreloader.js');
+    const { resetRouteAssetPrefetchCache } = await import('../../src/systems/assets/routeAssetPrefetch.js');
     resetRouteAssetPrefetchCache();
   });
 
   it('prefetches section assets for a hover target path', async () => {
-    const { prefetchSectionAssetsForRoute } = await import('../../src/systems/assets/routeAssetPreloader.js');
+    const { prefetchSectionAssetsForRoute } = await import('../../src/systems/assets/routeAssetPrefetch.js');
 
     await prefetchSectionAssetsForRoute('/shop');
 
@@ -45,7 +45,7 @@ describe('routeAssetPrefetch (M-08)', () => {
   });
 
   it('dedupes section asset prefetch for the same section', async () => {
-    const { prefetchSectionAssetsForRoute } = await import('../../src/systems/assets/routeAssetPreloader.js');
+    const { prefetchSectionAssetsForRoute } = await import('../../src/systems/assets/routeAssetPrefetch.js');
 
     await prefetchSectionAssetsForRoute('/shop');
     await prefetchSectionAssetsForRoute('/shop');

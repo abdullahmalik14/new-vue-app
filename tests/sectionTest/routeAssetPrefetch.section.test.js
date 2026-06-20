@@ -1,5 +1,5 @@
 /**
- * routeAssetPreloader.js — prefetchSectionAssetsForRoute (section test plan §51, §120).
+ * routeAssetPrefetch.js — prefetchSectionAssetsForRoute (section test plan §51, §120).
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -36,14 +36,14 @@ describe('prefetchSectionAssetsForRoute (Phase F §51, §120)', () => {
     preloadSectionAssets.mockClear();
 
     const { resetRouteAssetPrefetchCache } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
     resetRouteAssetPrefetchCache();
   });
 
   it('prefetches section assets for a hover target path', async () => {
     const { prefetchSectionAssetsForRoute } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
 
     await prefetchSectionAssetsForRoute('/shop');
@@ -54,7 +54,7 @@ describe('prefetchSectionAssetsForRoute (Phase F §51, §120)', () => {
 
   it('dedupes section asset prefetch for the same section', async () => {
     const { prefetchSectionAssetsForRoute } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
 
     await prefetchSectionAssetsForRoute('/shop');
@@ -65,7 +65,7 @@ describe('prefetchSectionAssetsForRoute (Phase F §51, §120)', () => {
 
   it('createSectionAssetPrefetchIntentHandler invokes prefetch on call', async () => {
     const { createSectionAssetPrefetchIntentHandler } = await import(
-      '../../src/systems/assets/routeAssetPreloader.js'
+      '../../src/systems/assets/routeAssetPrefetch.js'
     );
 
     createSectionAssetPrefetchIntentHandler('/shop')();

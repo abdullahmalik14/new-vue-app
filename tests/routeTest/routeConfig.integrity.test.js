@@ -13,7 +13,7 @@ import { normalizeLocalizedPath } from '../../src/systems/i18n/localeManager.js'
 import { resolveRouteFromPath } from '../../src/systems/routing/routeResolver.js';
 import { isValidRouteEnvAccess } from '../../src/systems/routing/routeEnvAccess.js';
 import { validateRouteComponentPathsOnDisk } from '../../src/systems/routing/routeComponentPathDiskValidator.node.js';
-import { resolveRouteAssetPreloads } from '../../src/systems/assets/routeAssetPreloadResolver.js';
+import { resolveRouteAssetPreloads } from '../../src/systems/assets/resolveRouteAssetPreloads.js';
 import {
   getProjectRoot,
   loadProductionRouteConfig,

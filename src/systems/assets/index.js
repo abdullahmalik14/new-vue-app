@@ -54,9 +54,9 @@ export {
   prefetchSectionAssetsForRoute,
   createSectionAssetPrefetchIntentHandler,
   resetRouteAssetPrefetchCache,
-} from './routeAssetPreloader.js';
+} from './routeAssetPrefetch.js';
 
-export { resolveRouteAssetPreloads } from './routeAssetPreloadResolver.js';
+export { resolveRouteAssetPreloads } from './resolveRouteAssetPreloads.js';
 
 export { validateSharedComponentAssetMappings } from './validateSharedComponentAssetMappings.js';
 
