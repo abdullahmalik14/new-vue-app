@@ -225,11 +225,54 @@ refactor(assets): rename assetsHandlerNew.js to assetHandler.js
 
 ---
 
+## Phase 4 — Remove `utils/preload.js` (P1)
+
+**Master plan:** ASSET_PLAN P1 item 7  
+**Audit reference:** [folder-structure-audit-assets.md](./folder-structure-audit-assets.md) Issue 17  
+**Scope:** Delete legacy util; switch two Vue consumers to `preloadImage` from the assets system. Fire-and-forget preload behaviour preserved.
+
+### Issue 17 — Duplicate icon preloading in `utils/preload.js`
+
+**What was broken:** `src/utils/preload.js` exposed `preloadIcons()` using raw `new Image()` with no URL policy, no preload-store tracking, and console-only logging. The same concern is handled by `systems/assets/assetPreloader.js` (`preloadImage`) with allow-list checks via `assetPolicy.js`.
+
+**Why it happened:** Pre-dates the assets system migration; two components (`Cart.vue`, `UploadThumbnailPreview.vue`) were never updated when `assetPreloader.js` became canonical.
+
+**How it was fixed:**
+
+| File | Change |
+|------|--------|
+| [`src/components/ui/cart/Cart.vue`](../../src/components/ui/cart/Cart.vue) | `preloadIcons([...])` → `urls.forEach((url) => preloadImage(url))`; import from `@/systems/assets/assetPreloader.js` |
+| [`src/dev/components/media/uploader/parts/UploadThumbnailPreview.vue`](../../src/dev/components/media/uploader/parts/UploadThumbnailPreview.vue) | Same pattern for `props.preloadImages` |
+| [`src/utils/preload.js`](../../src/utils/preload.js) | **Deleted** |
+
+**Behaviour note:** Cart/thumbnail icon URLs (ImgBB hosts) remain allowed via legacy host entry in `assetPolicy.js` (`i.ibb.co`). Preloads now go through URL policy and `usePreloadStore` deduplication instead of silent `Image()` construction.
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run tests/unit/preloadUrlGuard.test.js
+
+rg "utils/preload|preloadIcons" src/
+```
+
+**Result:** 2 tests passed; zero stale imports under `src/`. Manual smoke: cart qty icons and upload thumbnail chrome in dev (recommended).
+
+### Phase 4 exit
+
+No legacy `utils/preload.js`; all component icon warmups use the assets preloader. Ready for Phase 5 (`authAssetConfig.js` extraction).
+
+**Suggested commit:**
+
+```
+refactor(assets): remove utils/preload.js in favor of preloadImage
+```
+
+---
+
 ## Upcoming (not started)
 
 | Phase | ASSET_PLAN | Summary |
 |-------|------------|---------|
-| 4 | P1 | Remove `utils/preload.js`; use `preloadImage` |
 | 5 | P1 | Extract `authAssetConfig.js` from six auth views |
 | 6 | P2 | Store/composable symbol renames |
 | 7 | P3 | Config/consumer cleanup (`settingConfig.js`, ImgBB flags) |
@@ -237,4 +280,4 @@ refactor(assets): rename assetsHandlerNew.js to assetHandler.js
 
 ---
 
-*End of log through Phase 3.*
+*End of log through Phase 4.*

@@ -354,7 +354,7 @@ import { useCartStore } from "@/stores/useCartStore.js";
 import { FlowHandler } from "@/services/flow-system/FlowHandler";
 import flowRefreshManager from "@/services/flow-system/flowRefreshManager";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton.vue";
-import { preloadIcons } from "@/utils/preload";
+import { preloadImage } from "@/systems/assets/assetPreloader.js";
 
 const cartStore = useCartStore();
 const newLabel = ref("");
@@ -430,11 +430,11 @@ const handleCheckout = () => {
 
 // Lifecycle hooks
 onMounted(() => {
-  preloadIcons([
+  [
     "https://i.ibb.co.com/LXwdW794/minus-circle.webp",
     "https://i.ibb.co.com/3YVrnBJz/trash-bin.webp",
     "https://i.ibb.co.com/VYqPvctj/plus-circle.webp",
-  ]);
+  ].forEach((url) => preloadImage(url));
 
   // Start background sync from registry (includes initial fetch)
   flowRefreshManager.startFromRegistry("cart.fetch", {

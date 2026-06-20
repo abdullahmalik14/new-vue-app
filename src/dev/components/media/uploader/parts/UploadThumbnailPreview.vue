@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted } from "vue";
 import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
-import { preloadIcons } from "@/utils/preload.js";
+import { preloadImage } from "@/systems/assets/assetPreloader.js";
 
 // Props
 const props = defineProps({
@@ -16,7 +16,7 @@ const props = defineProps({
 
 onMounted(() => {
   if (props.preloadImages.length > 0) {
-    preloadIcons(props.preloadImages);
+    props.preloadImages.forEach((url) => preloadImage(url));
   }
 });
 </script>
