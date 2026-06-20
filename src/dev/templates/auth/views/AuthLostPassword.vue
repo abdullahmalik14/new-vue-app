@@ -50,6 +50,7 @@ import { useI18n } from "vue-i18n"
 import { getActiveLocale } from "@/systems/i18n/localeManager.js"
 import { authHandler } from "@/dev/utils/auth/authHandler"
 import { createAssetHandler } from "@/systems/assets/assetHandlerFactory.js"
+import { getAuthAssetConfig, getAuthAssetNames } from "@/systems/assets/authAssetConfig.js"
 import { interactionsEngine } from "@/utils/validation/interactionsEngine.js"
 import { InformationCircleIcon } from "@heroicons/vue/24/outline"
 import BaseHeading from "@/components/ui/typography/BaseHeading.vue"
@@ -162,30 +163,7 @@ const buttonText = computed(() => {
 onMounted(async () => {
   console.log(`[LOST PASSWORD] Component mounted, current locale: ${locale.value}`)
 
-  // Define assets configuration
-  const assetsConfig = [
-    {
-      name: 'cognito-sdk',
-      flag: 'script.cognito',
-      type: 'script',
-      critical: true,
-      priority: 'critical',
-      retry: 2
-    },
-    {
-      name: 'auth-styles',
-      url: '/css/auth.css',
-      type: 'css',
-      critical: true,
-      priority: 'high'
-    },
-    {
-      name: 'auth-bg',
-      flag: 'auth.background',
-      type: 'image',
-      priority: 'normal'
-    }
-  ]
+  const assetsConfig = getAuthAssetConfig()
 
   // Initialize AssetHandler using factory
   assetHandler.value = await createAssetHandler(assetsConfig, {
@@ -197,7 +175,7 @@ onMounted(async () => {
   try {
     console.log('[LOST PASSWORD] Loading assets via AssetHandler...')
     const result = await assetHandler.value.ensureAssetDependencies(
-      assetsConfig.map(a => a.name),
+      getAuthAssetNames(assetsConfig),
       { strict: true }
     )
 

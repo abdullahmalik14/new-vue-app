@@ -98,6 +98,7 @@ import { useRouter } from "vue-router"
 import { useAuthStore } from "@/stores/useAuthStore"
 import { authHandler } from "@/dev/utils/auth/authHandler"
 import { createAssetHandler } from "@/systems/assets/assetHandlerFactory.js"
+import { getAuthOnboardingAssetConfig, getAuthAssetNames } from "@/systems/assets/authAssetConfig.js"
 import { interactionsEngine } from "@/utils/validation/interactionsEngine.js"
 import { InformationCircleIcon } from "@heroicons/vue/24/outline"
 import { useI18n } from "vue-i18n"
@@ -325,30 +326,7 @@ watch(i18nLocale, async (newLocale, oldLocale) => {
 onMounted(async () => {
   console.log(`[ONBOARDING] Component mounted, current locale: ${locale.value}`)
 
-  // Define assets configuration
-  const assetsConfig = [
-    {
-      name: 'cognito-sdk',
-      flag: 'script.cognito',
-      type: 'script',
-      critical: true,
-      priority: 'critical',
-      retry: 2
-    },
-    {
-      name: 'onboarding-styles',
-      url: '/css/onboarding.css',
-      type: 'css',
-      critical: true,
-      priority: 'high'
-    },
-    {
-      name: 'kyc-bg',
-      url: '/images/kyc-status-bg.jpg',
-      type: 'image',
-      priority: 'normal'
-    }
-  ]
+  const assetsConfig = getAuthOnboardingAssetConfig()
 
   // Initialize AssetHandler using factory
   assetHandler.value = await createAssetHandler(assetsConfig, {
@@ -360,7 +338,7 @@ onMounted(async () => {
   try {
     console.log('[ONBOARDING] Loading assets via AssetHandler...')
     const result = await assetHandler.value.ensureAssetDependencies(
-      assetsConfig.map(a => a.name),
+      getAuthAssetNames(assetsConfig),
       { strict: true }
     )
 

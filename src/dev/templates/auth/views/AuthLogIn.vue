@@ -98,6 +98,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { authHandler } from "@/dev/utils/auth/authHandler";
 import { getAssetUrl } from "@/systems/assets/assetLibrary";
 import { createAssetHandler } from "@/systems/assets/assetHandlerFactory.js";
+import { getAuthAssetConfig, getAuthAssetNames } from "@/systems/assets/authAssetConfig.js";
 import { interactionsEngine } from "@/utils/validation/interactionsEngine.js";
 import {
   InformationCircleIcon,
@@ -282,30 +283,7 @@ watch(i18nLocale, async (newLocale, oldLocale) => {
 onMounted(async () => {
   console.log(`[LOGIN] Component mounted, current locale: ${locale.value}`);
 
-  // Define assets configuration
-  const assetsConfig = [
-    {
-      name: "cognito-sdk",
-      flag: "script.cognito",
-      type: "script",
-      critical: true,
-      priority: "critical",
-      retry: 2,
-    },
-    {
-      name: "auth-styles",
-      url: "/css/auth.css",
-      type: "css",
-      critical: true,
-      priority: "high",
-    },
-    {
-      name: "auth-bg",
-      flag: "auth.background",
-      type: "image",
-      priority: "normal",
-    },
-  ];
+  const assetsConfig = getAuthAssetConfig();
 
   // Initialize AssetHandler using factory
   assetHandler.value = await createAssetHandler(assetsConfig, {
@@ -321,7 +299,7 @@ onMounted(async () => {
   try {
     console.log("[LOGIN] Loading assets via AssetHandler...");
     const result = await assetHandler.value.ensureAssetDependencies(
-      assetsConfig.map((a) => a.name),
+      getAuthAssetNames(assetsConfig),
       { strict: true }
     );
 

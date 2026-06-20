@@ -269,15 +269,71 @@ refactor(assets): remove utils/preload.js in favor of preloadImage
 
 ---
 
+## Phase 5 — Extract shared auth asset config (P1)
+
+**Master plan:** ASSET_PLAN P1 item 8  
+**Audit reference:** [folder-structure-audit-assets.md](./folder-structure-audit-assets.md) Issue 22  
+**Scope:** DRY duplicated `assetsConfig` arrays across auth templates. Same asset entries and load order; per-view `createAssetHandler` options unchanged.
+
+### Issue 22 — Six auth views each defined inline `assetsConfig`
+
+**What was broken:** Every auth template duplicated the same Cognito script + auth CSS + background image configuration (~25 lines each). Onboarding used a third variant (onboarding CSS + KYC background). Any flag or priority change required editing six files in sync.
+
+**Why it happened:** Auth views were built independently before a shared assets config module existed under `systems/assets/`.
+
+**How it was fixed:**
+
+| File | Change |
+|------|--------|
+| [`src/systems/assets/authAssetConfig.js`](../../src/systems/assets/authAssetConfig.js) | **New** — `getAuthAssetConfig()`, `getAuthOnboardingAssetConfig()`, `getAuthAssetNames()` |
+| [`AuthLogIn.vue`](../../src/dev/templates/auth/views/AuthLogIn.vue) | Import shared config |
+| [`AuthSignUp.vue`](../../src/dev/templates/auth/views/AuthSignUp.vue) | Import shared config |
+| [`AuthLostPassword.vue`](../../src/dev/templates/auth/views/AuthLostPassword.vue) | Import shared config |
+| [`AuthConfirmEmail.vue`](../../src/dev/templates/auth/views/AuthConfirmEmail.vue) | Import shared config |
+| [`AuthResetPassword.vue`](../../src/dev/templates/auth/views/AuthResetPassword.vue) | Import shared config |
+| [`AuthSignUpOnboarding.vue`](../../src/dev/templates/auth/views/AuthSignUpOnboarding.vue) | Uses `getAuthOnboardingAssetConfig()` |
+
+**Config variants preserved:**
+
+| Function | Assets |
+|----------|--------|
+| `getAuthAssetConfig()` | `cognito-sdk`, `auth-styles`, `auth-bg` |
+| `getAuthOnboardingAssetConfig()` | `cognito-sdk`, `onboarding-styles`, `kyc-bg` |
+
+Each view still passes its own handler name to `createAssetHandler(..., { name: 'AuthLogin', debug: true })`.
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run \
+  tests/handler/AssetHandler.critical.test.js \
+  tests/handler/AssetHandler.validation.test.js
+
+rg "Define assets configuration|cognito-sdk" src/dev/templates/auth/views/
+```
+
+**Result:** 74 handler tests passed; zero inline `assetsConfig` arrays remain in auth views. Manual smoke: login, signup, lost/reset password, confirm email, onboarding (recommended).
+
+### Phase 5 exit
+
+Auth asset loading config centralized in `systems/assets/`; templates import one source. Ready for Phase 6 (store/composable symbol renames).
+
+**Suggested commit:**
+
+```
+refactor(assets): extract shared authAssetConfig for auth views
+```
+
+---
+
 ## Upcoming (not started)
 
 | Phase | ASSET_PLAN | Summary |
 |-------|------------|---------|
-| 5 | P1 | Extract `authAssetConfig.js` from six auth views |
 | 6 | P2 | Store/composable symbol renames |
 | 7 | P3 | Config/consumer cleanup (`settingConfig.js`, ImgBB flags) |
 | 8 | P3 | Docs sync (`DEVELOPER_GUIDE.md`, `asset-code-index.md`) |
 
 ---
 
-*End of log through Phase 4.*
+*End of log through Phase 5.*
