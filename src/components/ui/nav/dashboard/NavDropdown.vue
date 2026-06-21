@@ -3,10 +3,11 @@ import BasePopup from '@/components/ui/popup/BasePopup.vue';
 import DashboardMenuCounter from '@/components/ui/nav/dashboard/DashboardMenuCounter.vue';
 import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { dashboardSidebarMenuItems as menuItems } from "@/config/dashboardSidebarMenuItems.js";
-import { resolveDashboardSidebarMenuItems as resolveMenuItemsWithAssets } from "@/systems/dashboard/resolveDashboardSidebarMenuItems.js";
+import { dashboardSidebarMenuItems as menuItems } from "@/assets/data/dashboard-sidebar-menu-items.js";
+import { resolveDashboardSidebarMenuItems as resolveMenuItemsWithAssets } from "@/systems/dashboard/resolve-dashboard-sidebar-menu-items.js";
 import { getI18nInstance } from "@/systems/i18n/i18nInstance.js";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { getAssetUrlSync } from "@/systems/assets/assetLibrary.js";
 
 const props = defineProps({
   modelValue: Boolean,
@@ -123,7 +124,7 @@ const handleSubmenuClick = (e, childItem) => {
                 class="sidebar-item group" :class="{ 'disabled opacity-50 pointer-events-none': !item.isEnabled }">
                 <a @click="(e) => handleMenuClick(e, item)" :href="item.route || '#'" :title="$t(item.translationKey, item.fallbackLabel)"
                    class="main-menu-item flex flex-col outline-none items-center justify-center self-stretch gap-0.5 p-2 rounded min-w-[4.5rem] min-h-[4.5rem] group-hover:bg-sidebar-active transition-all duration-200 cursor-pointer">
-                  <img :src="item.iconUrl" :alt="$t(item.translationKey, item.fallbackLabel)"
+                  <img :src="getAssetUrlSync(item.iconAssetFlag, { section: 'dashboard-global' })" :alt="$t(item.translationKey, item.fallbackLabel)"
                        class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
                   <span class="text-sidebar-text text-[0.625rem] leading-[1.125rem] text-center font-medium pointer-events-none group-hover:text-sidebar-active-text">
                     {{ $t(item.translationKey, item.fallbackLabel) }}
@@ -168,7 +169,7 @@ const handleSubmenuClick = (e, childItem) => {
       <div class="flex flex-col gap-4 w-full">
         <!-- title -->
         <div class="flex items-center justify-center gap-2 w-full">
-          <img v-if="selectedMenuItem?.iconUrl" :src="selectedMenuItem.iconUrl" :alt="$t(selectedMenuItem?.translationKey, selectedMenuItem?.fallbackLabel)"
+          <img v-if="selectedMenuItem?.iconAssetFlag" :src="getAssetUrlSync(selectedMenuItem.iconAssetFlag, { section: 'dashboard-global' })" :alt="$t(selectedMenuItem?.translationKey, selectedMenuItem?.fallbackLabel)"
             class="w-5 h-5" />
           <span class="text-sm font-semibold text-submenu-title-text">
             {{ selectedMenuItem ? $t(selectedMenuItem.translationKey, selectedMenuItem.fallbackLabel) : '' }}
@@ -212,7 +213,7 @@ const handleSubmenuClick = (e, childItem) => {
               <span class="truncate">{{ $t(child.translationKey, child.fallbackLabel) }}</span>
 
               <!-- DS-01: Global Counter Badge -->
-              <DashboardMenuCounter v-if="child.badgeId || child.count" :badgeId="child.badgeId || child.translationKey" :staticCount="child.count" />
+              <DashboardMenuCounter v-if="child.badgeId" :badgeId="child.badgeId"  />
             </span>
 
             <!-- Left hover effect -->

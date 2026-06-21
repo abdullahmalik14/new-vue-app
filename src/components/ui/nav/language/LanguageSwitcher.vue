@@ -5,7 +5,7 @@
     <select
       :id="selectId"
       ref="selectRef"
-      class="border rounded px-2 py-1 text-sm"
+      :class="variant === 'invisible' ? 'absolute inset-0 w-full h-full opacity-0 cursor-pointer' : 'border rounded px-2 py-1 text-sm'"
       :disabled="isBusy"
       :value="currentLocale"
       :aria-busy="isBusy"
@@ -41,6 +41,13 @@ import {
   extractLocaleSelection,
   SUPPORTED_LOCALES,
 } from '@/systems/i18n';
+
+const props = defineProps({
+  variant: {
+    type: String,
+    default: 'default' // 'default' or 'invisible'
+  }
+});
 
 const emit = defineEmits(['locale-changed', 'locale-change-error']);
 

@@ -139,7 +139,11 @@
       "awayMessage": "Away Message...",
       "mock": {
         "defaultStatus": "I am all dressed up ready to eat some chicken 💋"
-      }
+      },
+      "signIn": "Sign In",
+      "logOut": "Log Out",
+      "changesStatuses": "Changes Statuses",
+      "repostCondition": "Repost your status and custom message automatically when you:"
     },
     "logout": "Logout",
     "more": "More",
@@ -177,6 +181,10 @@
         "mediaRequired": "Media Content Required: Your profile currently has no media. Enhance your profile's visibility by adding at least 5 media items.",
         "mediaApproved": "Congratulations: Your media 'Audio with placeholder and no preview' has been approved.",
         "bankRequired": "Bank Details Required: To ensure seamless transactions, please complete your bank information."
+      },
+      "time": {
+        "1w": "1w",
+        "3m": "3m"
       }
     }
   },

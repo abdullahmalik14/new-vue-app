@@ -28,13 +28,13 @@ export const dashboardSidebarMenuItems = [
     fallbackLabel: "Orders", // Fallback text
     translationKey: "dashboard.menu.orders", // Translation key
     iconAssetFlag: "dashboard.menu.orders", // Asset flag instead of hardcoded URL
-    route: "/dashboard/orders",
+    route: "/dashboard/demo-page",
     submenuItems: [
       {
         menuItemId: 301,
         fallbackLabel: "Orders Received", // Fallback text
         translationKey: "dashboard.menu.ordersReceived", // Translation key
-        route: "/dashboard/orders/order-received",
+        route: "/dashboard/demo-page",
         iconAssetFlag: "",
         isEnabled: true
       },
@@ -50,7 +50,7 @@ export const dashboardSidebarMenuItems = [
         menuItemId: 303,
         fallbackLabel: "Item Purchased", // Fallback text
         translationKey: "dashboard.menu.itemPurchased", // Translation key
-        route: "/dashboard/orders/item-purchased",
+        route: "/dashboard/demo-page",
         iconAssetFlag: "",
         isEnabled: true
       }
@@ -62,7 +62,7 @@ export const dashboardSidebarMenuItems = [
     fallbackLabel: "Media", // Fallback text
     translationKey: "dashboard.menu.media", // Translation key
     iconAssetFlag: "dashboard.menu.media", // Asset flag instead of hardcoded URL
-    route: "/dashboard/my-media",
+    route: "/dashboard/demo-page",
     submenuItems: [],
     isEnabled: true
   },
@@ -73,14 +73,14 @@ export const dashboardSidebarMenuItems = [
     iconAssetFlag: "dashboard.menu.chats", // Asset flag instead of hardcoded URL
     route: "/dashboard/chats",
     submenuItems: [],
-    isEnabled: true // Disabled as in original
+    isEnabled: false // Disabled as in original
   },
   {
     menuItemId: 6,
     fallbackLabel: "Subscriptions", // Fallback text
     translationKey: "dashboard.menu.subscriptions", // Translation key
     iconAssetFlag: "dashboard.menu.subscriptions", // Asset flag instead of hardcoded URL
-    route: "/dashboard/subscriptions",
+    route: "/dashboard/demo-page",
     submenuItems: [],
     isEnabled: true
   },
@@ -92,61 +92,20 @@ export const dashboardSidebarMenuItems = [
     iconAssetFlag: "dashboard.menu.shops", // Asset flag instead of hardcoded URL
     route: "/shop",
     submenuItems: [],
-    isEnabled: true // Disabled as in original
+    isEnabled: false // Disabled as in original
   },
   {
     menuItemId: 8,
     fallbackLabel: "Profile", // Fallback text
     translationKey: "dashboard.menu.profile", // Translation key (using existing profile key)
     iconAssetFlag: "dashboard.menu.profile", // Asset flag instead of hardcoded URL
-    route: "/profile",
+    route: "/dashboard/demo-page",
     submenuItems: [
       {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
         menuItemId: 801,
         fallbackLabel: "Edit Profile", // Fallback text
         translationKey: "dashboard.menu.editProfile", // Translation key
-        route: "/dashboard/edit-profile",
+        route: "/dashboard/demo-page",
         iconAssetFlag: "",
         isEnabled: true
       },
@@ -171,7 +130,7 @@ export const dashboardSidebarMenuItems = [
         menuItemId: 804,
         fallbackLabel: "Referrals", // Fallback text
         translationKey: "dashboard.menu.referrals", // Translation key
-        route: "/dashboard/referrals",
+        route: "/dashboard/demo-page",
         iconAssetFlag: "",
         badgeId: "dashboard.menu.referrals",
         isEnabled: true
@@ -184,7 +143,7 @@ export const dashboardSidebarMenuItems = [
     fallbackLabel: "Settings", // Fallback text
     translationKey: "dashboard.menu.settings", // Translation key (using existing settings key)
     iconAssetFlag: "dashboard.menu.settings", // Asset flag instead of hardcoded URL
-    route: "/dashboard/settings",
+    route: "/dashboard/demo-page",
     submenuItems: [],
     isEnabled: true
   },

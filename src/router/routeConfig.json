@@ -611,9 +611,9 @@
     ],
     "hideLayout": true
   },
-   {
+  {
     "slug": "/home",
-  "componentPath": "@/dev/templates/home/Home.vue"
+    "componentPath": "@/dev/templates/home/Home.vue"
   },
   {
     "slug": "/:pathMatch(.*)*",

@@ -1,20 +1,29 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 import { useRouter, useRoute } from 'vue-router';
-import { dashboardSidebarMenuItems } from "@/config/dashboardSidebarMenuItems.js";
-import { resolveDashboardSidebarMenuItems } from "@/systems/dashboard/resolveDashboardSidebarMenuItems.js";
+import { dashboardSidebarMenuItems } from "@/assets/data/dashboard-sidebar-menu-items.js";
+import { resolveDashboardSidebarMenuItems } from "@/systems/dashboard/resolve-dashboard-sidebar-menu-items.js";
 import { useAuthStore } from "@/stores/useAuthStore";
-
+import { useDashboardNavStore } from "@/stores/useDashboardNavStore";
+import { isDashboardMenuItemActive } from "@/systems/routing/isDashboardMenuItemActive.js";
+import { createRoutePrefetchIntentHandler } from "@/systems/routing/useRoutePrefetch.js";
 export function useDashboardMenuNavigation(closeAllSidebarPanels) {
   const router = useRouter();
   const route = useRoute();
   
   const dashboardMenuItems = ref([]);
-  const isSubmenuOpen = ref(false);
+  const dashboardNavStore = useDashboardNavStore();
+  const { isSubmenuOpen, activeSubmenuTitle: currentSubmenuTitle } = storeToRefs(dashboardNavStore);
   const currentSubmenuItems = ref([]);
-  const currentSubmenuTitle = ref("");
   const currentSubmenuTranslationKey = ref("");
-  const currentSubmenuIconUrl = ref("");
+  const currentSubmenuIconAssetFlag = ref("");
   const submenuHistory = ref([]);
+
+  watch(isSubmenuOpen, (isOpen) => {
+    if (!isOpen) {
+      submenuHistory.value = [];
+    }
+  });
 
   const loadDashboardMenuItems = async () => {
     try {
@@ -27,11 +36,7 @@ export function useDashboardMenuNavigation(closeAllSidebarPanels) {
   };
 
   const isMenuItemRouteActive = (item) => {
-    if (!item.route || !route) return false;
-    if (item.route === '/dashboard' || item.route === '/dashboard/') {
-      return route.path === '/dashboard' || route.path === '/dashboard/';
-    }
-    return route.path.startsWith(item.route);
+    return isDashboardMenuItemActive(item, route);
   };
 
   const handleMenuClick = (item) => {
@@ -41,7 +46,7 @@ export function useDashboardMenuNavigation(closeAllSidebarPanels) {
       currentSubmenuItems.value = item.submenuItems;
       currentSubmenuTitle.value = item.fallbackLabel;
       currentSubmenuTranslationKey.value = item.translationKey;
-      currentSubmenuIconUrl.value = item.iconUrl;
+      currentSubmenuIconAssetFlag.value = item.iconAssetFlag;
       isSubmenuOpen.value = true;
     } else if (item.isEnabled && item.route) {
       router.push(item.route);
@@ -54,12 +59,12 @@ export function useDashboardMenuNavigation(closeAllSidebarPanels) {
         submenuItems: currentSubmenuItems.value,
         submenuTitle: currentSubmenuTitle.value,
         submenuTranslationKey: currentSubmenuTranslationKey.value,
-        submenuIconUrl: currentSubmenuIconUrl.value
+        submenuIconAssetFlag: currentSubmenuIconAssetFlag.value
       });
       currentSubmenuItems.value = submenuItem.submenuItems;
       currentSubmenuTitle.value = submenuItem.fallbackLabel;
       currentSubmenuTranslationKey.value = submenuItem.translationKey;
-      currentSubmenuIconUrl.value = submenuItem.iconUrl || currentSubmenuIconUrl.value;
+      currentSubmenuIconAssetFlag.value = submenuItem.iconAssetFlag || currentSubmenuIconAssetFlag.value;
     } else if (submenuItem.isEnabled && submenuItem.route) {
       isSubmenuOpen.value = false;
       router.push(submenuItem.route);
@@ -72,9 +77,16 @@ export function useDashboardMenuNavigation(closeAllSidebarPanels) {
       currentSubmenuItems.value = previousSubmenuState.submenuItems;
       currentSubmenuTitle.value = previousSubmenuState.submenuTitle;
       currentSubmenuTranslationKey.value = previousSubmenuState.submenuTranslationKey;
-      currentSubmenuIconUrl.value = previousSubmenuState.submenuIconUrl;
+      currentSubmenuIconAssetFlag.value = previousSubmenuState.submenuIconAssetFlag;
     } else {
       isSubmenuOpen.value = false;
+    }
+  };
+
+  
+  const prefetchMenuItemRoute = (item) => {
+    if (item?.isEnabled && item?.route) {
+      createRoutePrefetchIntentHandler(item.route)();
     }
   };
 
@@ -84,7 +96,7 @@ export function useDashboardMenuNavigation(closeAllSidebarPanels) {
     currentSubmenuItems,
     currentSubmenuTitle,
     currentSubmenuTranslationKey,
-    currentSubmenuIconUrl,
+    currentSubmenuIconAssetFlag,
     submenuHistory,
     loadDashboardMenuItems,
     isMenuItemRouteActive,

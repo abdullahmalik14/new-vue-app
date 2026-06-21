@@ -58,7 +58,7 @@
                   class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active"
                   :class="{ 'bg-sidebar-active': isMenuItemRouteActive(item) }"
                   :style="!item.isEnabled ? { pointerEvents: 'none', opacity: '0.5' } : {}">
-                  <img :src="item.iconUrl" :alt="$t(item.translationKey, item.fallbackLabel)"
+                  <img :src="getAssetUrlSync(item.iconAssetFlag, { section: 'dashboard-global' })" :alt="$t(item.translationKey, item.fallbackLabel)"
                     class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]"
                     :class="{ '[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]': isMenuItemRouteActive(item) }" />
                   <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text"
@@ -94,9 +94,10 @@
         <div class="flex items-center justify-center self-stretch gap-2 pl-1 pr-1">
           <!-- language -->
           <div
-            class="language-icon-container flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out hover:bg-notification-hover group cursor-pointer">
+            class="language-icon-container relative flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out hover:bg-notification-hover group">
             <img v-if="sidebarChromeAssetUrls.language" :src="sidebarChromeAssetUrls.language" alt="language"
               class="w-5 h-5 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+            <LanguageSwitcher variant="invisible" class="!m-0 !p-0 border-none" />
           </div>
 
           <!-- help -->
@@ -123,7 +124,7 @@
             @click.prevent="handleMenuClick(item)">
             <div class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group-hover:bg-sidebar-active"
                  :class="{ 'bg-sidebar-active': isMenuItemRouteActive(item) }">
-              <img :src="item.iconUrl" :alt="$t(item.translationKey, item.fallbackLabel)"
+              <img :src="getAssetUrlSync(item.iconAssetFlag, { section: 'dashboard-global' })" :alt="$t(item.translationKey, item.fallbackLabel)"
                 class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]"
                 :class="{ '[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]': isMenuItemRouteActive(item) }" />
             </div>
@@ -151,7 +152,7 @@
       :isSubmenuOpen="isSubmenuOpen"
       @update:isSubmenuOpen="isSubmenuOpen = $event"
       :submenuPopupConfig="submenuPopupConfig"
-      :currentSubmenuIconUrl="currentSubmenuIconUrl"
+      :currentSubmenuIconAssetFlag="currentSubmenuIconAssetFlag"
       :currentSubmenuTitle="currentSubmenuTitle"
       :currentSubmenuTranslationKey="currentSubmenuTranslationKey"
       :sidebarChromeAssetUrls="sidebarChromeAssetUrls"
@@ -164,32 +165,30 @@
     <DashboardNotificationPopup v-if="isNotificationOpen" :config="notificationPopupConfig" v-model="isNotificationOpen" @update:modelValue="handleNotificationPopupVisibilityChange" />
   </div>
 </template>
+
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { useI18n } from 'vue-i18n';
+
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useDashboardNavStore } from "@/stores/useDashboardNavStore";
 import { createRoutePrefetchIntentHandler } from "@/systems/routing/useRoutePrefetch.js";
 import { createDashboardSidebarSlideInConfig } from "@/systems/dashboard/createDashboardSidebarSlideInConfig.js";
+import { getAssetUrlSync } from "@/systems/assets/assetLibrary.js";
 
 import DashboardSubmenuPanel from "@/dev/templates/dashboard/shared/DashboardSubmenuPanel.vue";
 import DashboardProfilePopup from "@/components/ui/popup/DashboardProfilePopup.vue";
 import DashboardNotificationPopup from "@/components/ui/popup/DashboardNotificationPopup.vue";
 import DashboardMenuCounter from "@/components/ui/nav/dashboard/DashboardMenuCounter.vue";
+import LanguageSwitcher from "@/components/ui/nav/language/LanguageSwitcher.vue";
 
-import { useDashboardSidebarAssets } from "@/composables/dashboard/useDashboardSidebarAssets.js";
-import { useDashboardMenuNavigation } from "@/composables/dashboard/useDashboardMenuNavigation.js";
-import { useSidebarOverflow } from "@/composables/dashboard/useSidebarOverflow.js";
+import { useDashboardSidebarAssets } from "@/systems/dashboard/useDashboardSidebarAssets.js";
+import { useDashboardMenuNavigation } from "@/systems/dashboard/useDashboardMenuNavigation.js";
+import { useSidebarOverflow } from "@/systems/dashboard/useSidebarOverflow.js";
 
 const router = useRouter();
 const route = useRoute();
-let localeRef;
-try {
-  const i18n = useI18n();
-  localeRef = i18n.locale;
-} catch(e) {
-  // Ignore
-}
+
 
 const isProfileOpen = ref(false);
 const isNotificationOpen = ref(false);
@@ -250,7 +249,7 @@ const {
   currentSubmenuItems,
   currentSubmenuTitle,
   currentSubmenuTranslationKey,
-  currentSubmenuIconUrl,
+  currentSubmenuIconAssetFlag,
   submenuHistory,
   loadDashboardMenuItems,
   isMenuItemRouteActive,
@@ -275,20 +274,18 @@ const {
 let resizeObserver = null;
 
 onMounted(async () => {
+  const navStore = useDashboardNavStore();
+  await navStore.hydrateFromDashboardNavApi();
+  
   await loadSidebarChromeAssets();
   await loadDashboardMenuItems();
-  
-  nextTick(() => {
-    updateVisibleMenuItems(sidebarHeaderContainer, sidebarFooterContainer, sidebarLogoContainer);
-  });
 
-  if (sidebarMenuContainer.value) {
+  if (sidebarMenuContainer.value && sidebarEl.value) {
+    updateVisibleMenuItems(sidebarHeaderContainer, sidebarFooterContainer, sidebarLogoContainer);
     resizeObserver = new ResizeObserver(() => {
       updateVisibleMenuItems(sidebarHeaderContainer, sidebarFooterContainer, sidebarLogoContainer);
     });
-    if (sidebarEl.value) {
-      resizeObserver.observe(sidebarEl.value);
-    }
+    resizeObserver.observe(sidebarEl.value);
   }
 });
 
@@ -296,25 +293,5 @@ onBeforeUnmount(() => {
   if (resizeObserver) {
     resizeObserver.disconnect();
   }
-});
-
-if (localeRef) {
-  watch(localeRef, async () => {
-    await loadDashboardMenuItems();
-    updateVisibleMenuItems(sidebarHeaderContainer, sidebarFooterContainer, sidebarLogoContainer);
-  });
-}
-
-watch(isSubmenuOpen, (isOpen) => {
-  if (!isOpen) {
-    submenuHistory.value = [];
-  }
-  const event = new CustomEvent('dashboard-menu-state', {
-    detail: {
-      isOpen: isOpen,
-      activePage: currentSubmenuTitle.value || null
-    }
-  });
-  window.dispatchEvent(event);
 });
 </script>

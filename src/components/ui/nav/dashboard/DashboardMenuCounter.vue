@@ -12,19 +12,13 @@ const props = defineProps({
   badgeId: {
     type: String,
     required: true
-  },
-  // Optional fallback static count if store is not populated
-  staticCount: {
-    type: [Number, String],
-    default: null
   }
 });
  
 const navStore = useDashboardNavStore();
 
 const displayCount = computed(() => {
-  const storeCount = navStore.getMenuBadgeCount(props.badgeId);
-  return storeCount > 0 ? storeCount : props.staticCount;
+  return navStore.getMenuBadgeCount(props.badgeId);
 });
 
 const isVisible = computed(() => {

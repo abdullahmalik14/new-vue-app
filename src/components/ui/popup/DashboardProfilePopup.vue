@@ -558,7 +558,7 @@
               <p
                 class="text-xs leading-[1.125rem] text-text-darker-light dark:text-text-darker-dark self-stretch"
               >
-                Repost your status and custom message automatically when you:
+                {{ $t('dashboard.profile.repostStatusPrompt', 'Repost your status and custom message automatically when you:') }}
               </p>
 
               <!-- toggle -->
@@ -581,7 +581,7 @@
                   <span
                     class="text-xs leading-[1.125rem] text-text-secondary-light dark:text-text-secondary-dark"
                   >
-                    Sign In
+                    {{ $t('dashboard.profile.signIn', 'Sign In') }}
                   </span>
                 </div>
               </div>
@@ -606,7 +606,7 @@
                   <span
                     class="text-xs leading-[1.125rem] text-text-secondary-light dark:text-text-secondary-dark"
                   >
-                    Log Out
+                    {{ $t('dashboard.profile.logOut', 'Log Out') }}
                   </span>
                 </div>
               </div>
@@ -631,7 +631,7 @@
                   <span
                     class="text-xs leading-[1.125rem] text-text-secondary-light dark:text-text-secondary-dark"
                   >
-                    Changes Statuses
+                    {{ $t('dashboard.profile.changeStatuses', 'Changes Statuses') }}
                   </span>
                 </div>
               </div>

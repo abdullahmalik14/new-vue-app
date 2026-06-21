@@ -1,4 +1,4 @@
-import { dashboardSidebarMenuItems } from "@/config/dashboardSidebarMenuItems.js";
+import { dashboardSidebarMenuItems } from "@/assets/data/dashboard-sidebar-menu-items.js";
 
 /**
  * Resolve menu items with asset URLs from assetLibrary and translated titles
@@ -24,15 +24,21 @@ export async function resolveDashboardSidebarMenuItems(items = dashboardSidebarM
 
   // Collect all unique asset flags from menu items
   const assetFlags = new Set();
-  items.forEach(item => {
+  
+  const collectFlags = (item) => {
     if (isValidAssetLibraryFlagCandidate(item.iconAssetFlag)) {
       assetFlags.add(item.iconAssetFlag.trim());
     }
-  });
+    if (item.submenuItems && item.submenuItems.length > 0) {
+      item.submenuItems.forEach(collectFlags);
+    }
+  };
+  
+  items.forEach(collectFlags);
 
   // Load all asset URLs in parallel
   const assetFlagsArray = Array.from(assetFlags);
-  const iconAssetUrlsByFlag = await getAssetUrls(assetFlagsArray);
+  const iconAssetUrlsByFlag = await getAssetUrls(assetFlagsArray, { section: 'dashboard-global' }); // Use the section name used in useDashboardSidebarAssets
 
   // Resolve menu items with asset URLs and translations
   const resolveMenuItem = (item) => {
@@ -51,7 +57,6 @@ export async function resolveDashboardSidebarMenuItems(items = dashboardSidebarM
       if (!resolvedIconUrl) {
         console.warn(`[dashboardSidebarMenuItems] Missing asset for flag: ${item.iconAssetFlag}`);
       }
-      resolved.iconUrl = resolvedIconUrl;
     }
 
     // Recursively resolve children

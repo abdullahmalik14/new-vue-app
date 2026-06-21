@@ -25,7 +25,7 @@
         </div>
 
         <div class="flex">
-          <a @click="emit('update:modelValue', false)"
+          <button type="button" @click="emit('update:modelValue', false)"
             class="flex items-center justify-center w-6 h-6 md:w-auto md:h-auto p-0 md:p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-panel-light-buttonHover dark:hover:bg-panel-dark-buttonHover cursor-pointer">
             <img
               class="w-6 h-6 pointer-events-none hidden md:block [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)]"
@@ -33,7 +33,7 @@
             <img
               class="block w-6 h-6 pointer-events-none md:hidden [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)]"
               v-if="notificationAssets.closeMobile" :src="notificationAssets.closeMobile" alt="close" />
-          </a>
+          </button>
         </div>
       </div>
 
@@ -48,7 +48,7 @@
             <ul
               class="flex flex-row justify-between items-center self-stretch overflow-x-auto whitespace-nowrap scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <li class="flex-1 flex" v-for="tab in tabs" :key="tab.tabId">
-                <a href="#" @click.prevent="activeTab = tab.tabId" :class="[
+                <button type="button" @click.prevent="activeTab = tab.tabId" :class="[
                   'w-full flex flex-col items-center gap-2.5 whitespace-nowrap px-4 py-2 transition-all duration-200 ease-in-out',
                   activeTab === tab.tabId
                     ? 'opacity-100 shadow-[0_-1.5px_0_0_inset] shadow-border-tab-active-light dark:shadow-border-tab-active-dark'
@@ -62,12 +62,12 @@
                         : 'font-medium text-text-tab-light dark:text-text-tab-dark'
                     ]">{{ $t(tab.translationKey, tab.fallback) }}</span>
                     <span class="flex flex-col items-center self-stretch gap-2.5">
-                      <small
+                      <small v-if="tab.badgeCount && tab.badgeCount !== '0' && tab.badgeCount !== 0"
                         class="text-[0.625rem] font-medium leading-none tracking-[0.016rem] text-text-badge-light dark:text-text-badge-dark">{{
                           tab.badgeCount }}</small>
                     </span>
                   </span>
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -114,13 +114,13 @@
                               <!-- time -->
                               <div class="flex justify-start items-end">
                                 <span
-                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">1w</span>
+                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">{{ $t('dashboard.notifications.time.oneWeek', '1w') }}</span>
                               </div>
 
                               <!-- actions -->
                               <div class="flex items-end gap-2">
                                 <!-- cta-dismiss -->
-                                <a 
+                                <button type="button" 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out md:flex hidden">
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
@@ -128,10 +128,10 @@
                                     <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
-                                </a>
+                                </button>
 
                                 <!-- cta-->
-                                <a 
+                                <button type="button" 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out">
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-warning-light dark:text-cta-warning-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
@@ -139,7 +139,7 @@
                                     <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(24%)_sepia(100%)_saturate(1622%)_hue-rotate(10deg)_brightness(98%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
-                                </a>
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -155,11 +155,11 @@
                       class="flex-1 gap-4 pt-3 pb-3 pl-2 pr-2 z-[2] relative self-stretch flex flex-col items-start transition-all duration-150 ease-in-out [background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(46,211,183,0.15)_0,rgba(46,211,183,0.15)_100%),rgba(255,255,255,0.9)] dark:[background:linear-gradient(90deg,rgba(24,26,27,0)_0px,rgba(24,26,27,0.9)_100%),linear-gradient(0deg,rgba(35,168,151,0.15)_0px,rgba(35,168,151,0.15)_100%)] dark:bg-background-notification-panel-dark">
                       <div class="relative flex justify-start items-start self-stretch gap-5">
                         <!-- notification-close -->
-                        <a 
+                        <button type="button" 
                           class="absolute right-0 top-0 flex justify-center items-center w-6 h-6 hidden md:block">
                           <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="close"
                             class="w-4 h-4 pointer-events-none" />
-                        </a>
+                        </button>
 
                         <!-- Success Notification Icon -->
                         <div
@@ -190,7 +190,7 @@
                               <!-- time -->
                               <div class="flex justify-start items-end">
                                 <span
-                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">1m</span>
+                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">{{ $t('dashboard.notifications.time.oneMinute', '1m') }}</span>
                               </div>
                             </div>
                           </div>
@@ -206,11 +206,11 @@
                       class="flex-1 gap-4 pt-3 pb-3 pl-2 pr-2 z-[2] relative self-stretch flex flex-col items-start transition-all duration-150 ease-in-out [background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(34,204,238,0.15)_0,rgba(34,204,238,0.15)_100%),rgba(255,255,255,0.9)] dark:[background:linear-gradient(90deg,rgba(24,26,27,0)_0px,rgba(24,26,27,0.9)_100%),linear-gradient(0deg,rgba(14,152,180,0.15)_0px,rgba(14,152,180,0.15)_100%)] dark:bg-background-notification-panel-dark">
                       <div class="relative flex justify-start items-start self-stretch gap-5">
                         <!-- notification-close -->
-                        <a 
+                        <button type="button" 
                           class="absolute right-0 top-0 flex justify-center items-center w-6 h-6 hidden md:block">
                           <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="close"
                             class="w-4 h-4 pointer-events-none" />
-                        </a>
+                        </button>
 
                         <!-- Info Notification Icon -->
                         <div
@@ -241,7 +241,7 @@
                               <!-- time -->
                               <div class="flex justify-start items-end">
                                 <span
-                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">3m</span>
+                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">{{ $t('dashboard.notifications.time.threeMinutes', '3m') }}</span>
                               </div>
                             </div>
                           </div>
@@ -257,11 +257,11 @@
                       class="flex-1 gap-4 pt-3 pb-3 pl-2 pr-2 z-[2] relative self-stretch flex flex-col items-start transition-all duration-150 ease-in-out [background:linear-gradient(90deg,rgba(255,255,255,0)_0,rgba(255,255,255,0.9)_100%),linear-gradient(0deg,rgba(255,68,5,0.1)_0,rgba(255,68,5,0.1)_100%),rgba(255,255,255,0.9)] dark:[background:linear-gradient(90deg,rgba(24,26,27,0)_0px,rgba(24,26,27,0.9)_100%),linear-gradient(0deg,rgba(201,51,0,0.1)_0px,rgba(201,51,0,0.1)_100%)] dark:bg-background-notification-panel-dark">
                       <div class="relative flex justify-start items-start self-stretch gap-5">
                         <!-- notification-close -->
-                        <a 
+                        <button type="button" 
                           class="absolute right-0 top-0 flex justify-center items-center w-6 h-6 hidden md:block">
                           <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="close"
                             class="w-4 h-4 pointer-events-none" />
-                        </a>
+                        </button>
 
                         <!-- Destructive Notification Icon -->
                         <div
@@ -292,7 +292,7 @@
                               <!-- time -->
                               <div class="flex justify-start items-end">
                                 <span
-                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">3m</span>
+                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">{{ $t('dashboard.notifications.time.threeMinutes', '3m') }}</span>
                               </div>
                             </div>
                           </div>
@@ -336,13 +336,13 @@
                               <!-- time -->
                               <div class="flex justify-start items-end">
                                 <span
-                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">1w</span>
+                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">{{ $t('dashboard.notifications.time.oneWeek', '1w') }}</span>
                               </div>
 
                               <!-- actions -->
                               <div class="flex items-end gap-2">
                                 <!-- cta-dismiss -->
-                                <a 
+                                <button type="button" 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out md:flex hidden">
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
@@ -350,10 +350,10 @@
                                     <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
-                                </a>
+                                </button>
 
                                 <!-- cta-->
-                                <a 
+                                <button type="button" 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out">
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-warning-light dark:text-cta-warning-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
@@ -361,7 +361,7 @@
                                     <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(24%)_sepia(100%)_saturate(1622%)_hue-rotate(10deg)_brightness(98%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
-                                </a>
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -405,13 +405,13 @@
                               <!-- time -->
                               <div class="flex justify-start items-end">
                                 <span
-                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">1m</span>
+                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">{{ $t('dashboard.notifications.time.oneMinute', '1m') }}</span>
                               </div>
 
                               <!-- actions -->
                               <div class="flex items-end gap-2">
                                 <!-- cta-dismiss -->
-                                <a 
+                                <button type="button" 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out md:flex hidden">
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
@@ -419,10 +419,10 @@
                                     <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
-                                </a>
+                                </button>
 
                                 <!-- cta-->
-                                <a 
+                                <button type="button" 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out">
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-success-light dark:text-cta-success-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
@@ -430,7 +430,7 @@
                                     <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(34%)_sepia(63%)_saturate(508%)_hue-rotate(123deg)_brightness(94%)_contrast(97%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
-                                </a>
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -474,13 +474,13 @@
                               <!-- time -->
                               <div class="flex justify-start items-end">
                                 <span
-                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">3m</span>
+                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">{{ $t('dashboard.notifications.time.threeMinutes', '3m') }}</span>
                               </div>
 
                               <!-- actions -->
                               <div class="flex items-end gap-2">
                                 <!-- cta-dismiss -->
-                                <a 
+                                <button type="button" 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out md:flex hidden">
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
@@ -488,10 +488,10 @@
                                     <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
-                                </a>
+                                </button>
 
                                 <!-- cta-->
-                                <a 
+                                <button type="button" 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out">
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-info-light dark:text-cta-info-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
@@ -499,7 +499,7 @@
                                     <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(39%)_sepia(96%)_saturate(762%)_hue-rotate(157deg)_brightness(88%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
-                                </a>
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -543,13 +543,13 @@
                               <!-- time -->
                               <div class="flex justify-start items-end">
                                 <span
-                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">3m</span>
+                                  class="text-xs leading-[1.125rem] text-text-time-light dark:text-text-time-dark">{{ $t('dashboard.notifications.time.threeMinutes', '3m') }}</span>
                               </div>
 
                               <!-- actions -->
                               <div class="flex items-end gap-2">
                                 <!-- cta-dismiss -->
-                                <a 
+                                <button type="button" 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out md:flex hidden">
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
@@ -557,10 +557,10 @@
                                     <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
-                                </a>
+                                </button>
 
                                 <!-- cta-->
-                                <a 
+                                <button type="button" 
                                   class="group flex items-center gap-0.5 transition-all duration-200 ease-in-out">
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-destructive-light dark:text-cta-destructive-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
@@ -568,7 +568,7 @@
                                     <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(12%)_sepia(50%)_saturate(4284%)_hue-rotate(351deg)_brightness(115%)_contrast(102%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
-                                </a>
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -591,7 +591,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 defineOptions({ name: 'DashboardNotificationPopup' });
-import { ref, onBeforeMount } from "vue";
+import { ref, computed, onBeforeMount } from "vue";
 import BasePopup from "./BasePopup.vue";
 import { resolveSharedComponentAssets } from '@/systems/assets/resolveSharedComponentAssets.js';
 
@@ -630,17 +630,21 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
+import { useDashboardNavStore } from '@/stores/useDashboardNavStore';
+
+const navStore = useDashboardNavStore();
+
 const NOTIFICATION_TAB_ID_ALL = 'all';
 const NOTIFICATION_TAB_ID_UNREAD = 'unread';
 const NOTIFICATION_TAB_ID_CUSTOM_REQUESTS = 'custom-requests';
 const NOTIFICATION_TAB_ID_ACCOUNT = 'account';
 
-const tabs = [
-  { tabId: NOTIFICATION_TAB_ID_ALL, translationKey: 'dashboard.notifications.tabs.all', fallback: 'All', badgeCount: '400+' },
-  { tabId: NOTIFICATION_TAB_ID_UNREAD, translationKey: 'dashboard.notifications.tabs.unread', fallback: 'Unread', badgeCount: '400+' },
-  { tabId: NOTIFICATION_TAB_ID_CUSTOM_REQUESTS, translationKey: 'dashboard.notifications.tabs.customRequests', fallback: 'Custom Requests', badgeCount: '1' },
-  { tabId: NOTIFICATION_TAB_ID_ACCOUNT, translationKey: 'dashboard.notifications.tabs.account', fallback: 'Account', badgeCount: '6' }
-];
+const tabs = computed(() => [
+  { tabId: NOTIFICATION_TAB_ID_ALL, translationKey: 'dashboard.notifications.tabs.all', fallback: 'All', badgeCount: navStore.getTabBadgeCount(NOTIFICATION_TAB_ID_ALL) },
+  { tabId: NOTIFICATION_TAB_ID_UNREAD, translationKey: 'dashboard.notifications.tabs.unread', fallback: 'Unread', badgeCount: navStore.getTabBadgeCount(NOTIFICATION_TAB_ID_UNREAD) },
+  { tabId: NOTIFICATION_TAB_ID_CUSTOM_REQUESTS, translationKey: 'dashboard.notifications.tabs.customRequests', fallback: 'Custom Requests', badgeCount: navStore.getTabBadgeCount(NOTIFICATION_TAB_ID_CUSTOM_REQUESTS) },
+  { tabId: NOTIFICATION_TAB_ID_ACCOUNT, translationKey: 'dashboard.notifications.tabs.account', fallback: 'Account', badgeCount: navStore.getTabBadgeCount(NOTIFICATION_TAB_ID_ACCOUNT) }
+]);
 
 const activeTab = ref('all');
 </script>
