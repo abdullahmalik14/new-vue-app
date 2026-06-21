@@ -1,18 +1,18 @@
 <template>
-  <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.titleFans', 'Fans Insight')"
-    :logo="iconPopupLogo || ''">
+  <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)"
+    :period="period" @update:period="handlePeriodChange"
+    :title="$t('dashboard.analytics.trends.titleFans', 'Fans Insight')" :logo="iconPopupLogo || ''">
     <div class="flex flex-col gap-4">
       <!-- row: stats -->
       <div class="grid grid-cols-2">
         <!-- New Followers -->
-        <div
-          class="flex w-full flex-col gap-4 rounded-[0.125rem] p-4 text-center ">
+        <div class="flex w-full flex-col gap-4 rounded-[0.125rem] p-4 text-center ">
           <h3 class="text-light-text-darkgray dark:text-white text-base leading-7 md:text-lg font-semibold">New
             Followers</h3>
           <div class="flex flex-col justify-center items-center gap-4">
             <template v-if="!analyticsStore.bundleLoaded">
-              <span class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]">--</span>
+              <span
+                class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]">--</span>
             </template>
             <template v-else>
               <span
@@ -23,21 +23,25 @@
             <div class="inline-flex items-center gap-2" v-if="followersPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
                 <img v-if="followersPct >= 0" :src="icon4Url || ''" alt="trend-up" class="h-5 w-5" />
-                <div :class="followersPct >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ followersPct >= 0 ? '+' : '' }}{{ followersPct }}%</div>
+                <div :class="followersPct >= 0 ? 'text-emerald-700' : 'text-red-500'"
+                  class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ followersPct >= 0 ? '+' : ''
+                  }}{{
+                  followersPct }}%</div>
               </div>
-              <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ formatComparisonLabel(period) }}</div>
+              <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{
+                formatComparisonLabel(period) }}</div>
             </div>
           </div>
         </div>
 
         <!-- Total Profile Visit -->
-        <div
-          class="flex w-full flex-col gap-4 rounded-[0.125rem] p-4 text-center ">
+        <div class="flex w-full flex-col gap-4 rounded-[0.125rem] p-4 text-center ">
           <h3 class="text-light-text-darkgray dark:text-white text-base leading-7 md:text-lg font-semibold">Total
             Profile Visit</h3>
           <div class="flex flex-col justify-center items-center gap-4">
             <template v-if="!analyticsStore.bundleLoaded">
-              <span class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]">--</span>
+              <span
+                class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]">--</span>
             </template>
             <template v-else>
               <span
@@ -48,75 +52,105 @@
             <div class="inline-flex items-center gap-2" v-if="visitsPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
                 <img v-if="visitsPct >= 0" :src="icon4Url || ''" alt="trend-up" class="h-5 w-5" />
-                <div :class="visitsPct >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ visitsPct >= 0 ? '+' : '' }}{{ visitsPct }}%</div>
+                <div :class="visitsPct >= 0 ? 'text-emerald-700' : 'text-red-500'"
+                  class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ visitsPct >= 0 ? '+' : '' }}{{
+                  visitsPct
+                  }}%</div>
               </div>
-              <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{ formatComparisonLabel(period) }}</div>
+              <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{
+                formatComparisonLabel(period) }}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- row: Followers/Visit Trend Chart (hidden for Daily) -->
-      <div v-if="!isDaily" class="flex flex-col gap-3 p-4 bg-light-bg-container dark:bg-dark-bg-container rounded w-full h-[25rem] relative">
+      <div v-if="!isDaily" class="flex flex-col gap-3 p-4  rounded w-full h-[25rem] relative">
         <div class="flex justify-between items-center z-10 relative">
-          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{ $t('dashboard.analytics.trends.followersAndVisits') }}</h3>
+          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{
+            $t('dashboard.analytics.trends.followersAndVisits') }}</h3>
           <div class="flex gap-1 bg-[#F9FAFB] p-1 rounded-lg border border-[#EAECF0]">
-            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="activeTrendViewMode==='bar'?'bg-white shadow-sm':'bg-transparent'" @click="setTrendView('bar')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="activeTrendViewMode==='bar'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
+              :class="activeTrendViewMode === 'bar' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setTrendView('bar')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                :stroke="activeTrendViewMode === 'bar' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
             </button>
-            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent" :class="activeTrendViewMode==='line'?'bg-white shadow-sm':'bg-transparent'" @click="setTrendView('line')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="activeTrendViewMode==='line'?'#344054':'#98A2B3'" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
+              :class="activeTrendViewMode === 'line' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setTrendView('line')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                :stroke="activeTrendViewMode === 'line' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
             </button>
           </div>
         </div>
 
-        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && (insightData?.newFollowers > 0 || insightData?.profileVisit > 0)">
+        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200"
+          :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }"
+          v-show="analyticsStore.bundleLoaded && (insightData?.newFollowers > 0 || insightData?.profileVisit > 0)">
           <!-- Weekly bar/line -->
-          <div data-chart-container data-chart-id="fans-weekly-bar" :hidden="!(activePeriod==='weekly'&&activeTrendViewMode==='bar')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-weekly-bar"
+            :hidden="!(activePeriod === 'weekly' && activeTrendViewMode === 'bar') || undefined" class="absolute inset-0"
             :data-chart-config='getFansBarCfg("fans-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="fans-weekly-line" :hidden="!(activePeriod==='weekly'&&activeTrendViewMode==='line')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-weekly-line"
+            :hidden="!(activePeriod === 'weekly' && activeTrendViewMode === 'line') || undefined" class="absolute inset-0"
             :data-chart-config='getFansLineCfg("fans-weekly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Monthly bar/line -->
-          <div data-chart-container data-chart-id="fans-monthly-bar" :hidden="!(activePeriod==='monthly'&&activeTrendViewMode==='bar')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-monthly-bar"
+            :hidden="!(activePeriod === 'monthly' && activeTrendViewMode === 'bar') || undefined" class="absolute inset-0"
             :data-chart-config='getFansBarCfg("fans-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="fans-monthly-line" :hidden="!(activePeriod==='monthly'&&activeTrendViewMode==='line')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-monthly-line"
+            :hidden="!(activePeriod === 'monthly' && activeTrendViewMode === 'line') || undefined" class="absolute inset-0"
             :data-chart-config='getFansLineCfg("fans-monthly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Yearly bar/line -->
-          <div data-chart-container data-chart-id="fans-yearly-bar" :hidden="!(activePeriod==='yearly'&&activeTrendViewMode==='bar')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-yearly-bar"
+            :hidden="!(activePeriod === 'yearly' && activeTrendViewMode === 'bar') || undefined" class="absolute inset-0"
             :data-chart-config='getFansBarCfg("fans-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="fans-yearly-line" :hidden="!(activePeriod==='yearly'&&activeTrendViewMode==='line')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-yearly-line"
+            :hidden="!(activePeriod === 'yearly' && activeTrendViewMode === 'line') || undefined" class="absolute inset-0"
             :data-chart-config='getFansLineCfg("fans-yearly")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
 
           <!-- Alltime bar/line -->
-          <div data-chart-container data-chart-id="fans-alltime-bar" :hidden="!(activePeriod==='alltime'&&activeTrendViewMode==='bar')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-alltime-bar"
+            :hidden="!(activePeriod === 'alltime' && activeTrendViewMode === 'bar') || undefined" class="absolute inset-0"
             :data-chart-config='getFansBarCfg("fans-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
-          <div data-chart-container data-chart-id="fans-alltime-line" :hidden="!(activePeriod==='alltime'&&activeTrendViewMode==='line')||undefined" class="absolute inset-0"
+          <div data-chart-container data-chart-id="fans-alltime-line"
+            :hidden="!(activePeriod === 'alltime' && activeTrendViewMode === 'line') || undefined" class="absolute inset-0"
             :data-chart-config='getFansLineCfg("fans-alltime")'>
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
-        
+
         <!-- Empty State -->
-        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center  z-20" v-if="!analyticsStore.bundleLoaded || (!insightData?.newFollowers && !insightData?.profileVisit) || isChartRendering">
-          <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50 mb-2" />
-          <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
-          <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
+        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center  z-20"
+          v-if="!analyticsStore.bundleLoaded || (!insightData?.newFollowers && !insightData?.profileVisit) || isChartRendering">
+          <img src="/images/empty-bar.svg" alt="illustration" class="w-24 h-24 object-contain mb-2"
+            style="transform: scale(2.5);" />
+          <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{
+            $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+          <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{
+            $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
         </div>
       </div>
 
@@ -125,31 +159,38 @@
         <!-- {{ $t('dashboard.analytics.trends.trafficSource') }} -->
         <div class="flex flex-col gap-4 p-4 w-full h-[25.875rem]  relative">
           <div class="flex justify-between items-center gap-2 relative z-10">
-            <h3 class="text-light-text-darkgray dark:text-white text-lg font-semibold">{{ $t('dashboard.analytics.trends.trafficSource') }}</h3>
+            <h3 class="text-light-text-darkgray dark:text-white text-lg font-semibold">{{
+              $t('dashboard.analytics.trends.trafficSource') }}</h3>
           </div>
-          <div class="absolute top-[60px] left-0 right-0 bottom-4 p-2 transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && insightData?.sources?.length > 0">
+          <div class="absolute top-[60px] left-0 right-0 bottom-4 p-2 transition-opacity duration-200"
+            :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }"
+            v-show="analyticsStore.bundleLoaded && insightData?.sources?.length > 0">
             <div data-chart-container data-chart-id="traffic-sources-donut" class="w-full h-full"
               :data-chart-config='getSourcesDonutCfg("traffic-sources-donut")'>
               <div amchart data-role="chart" style="width:100%;height:100%;"></div>
             </div>
           </div>
-          <div class="absolute top-[60px] left-0 right-0 bottom-4 flex flex-col justify-center items-center bg-white dark:bg-dark-bg-container z-20" v-if="!analyticsStore.bundleLoaded || !insightData?.sources?.length || isChartRendering">
-            <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50 mb-2" />
-            <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
-            <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
+          <div class="absolute top-[60px] left-0 right-0 bottom-4 flex flex-col justify-center items-center z-20"
+            v-if="!analyticsStore.bundleLoaded || !insightData?.sources?.length || isChartRendering">
+            <img src="/images/empty-donut.svg" alt="illustration" class="w-24 h-24 object-contain mb-2"
+              style="transform: scale(2.5);" />
+            <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{
+              $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+            <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{
+              $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
           </div>
         </div>
 
         <!-- {{ $t('dashboard.analytics.trends.topCountries') }} -->
-        <div
-          class="flex flex-col gap-4 p-4 w-full h-[25.875rem] overflow-hidden">
+        <div class="flex flex-col gap-4 p-4 w-full h-[25.875rem] overflow-hidden">
           <div class="flex justify-between items-center gap-2">
-            <h3 class="text-light-text-darkgray dark:text-white text-lg font-semibold">{{ $t('dashboard.analytics.trends.topCountries') }}</h3>
+            <h3 class="text-light-text-darkgray dark:text-white text-lg font-semibold">{{
+              $t('dashboard.analytics.trends.topCountries') }}</h3>
           </div>
 
-          <div v-if="analyticsStore.bundleLoaded && insightData?.topCountries?.length > 0" class="w-full h-full overflow-hidden">
-            <FlexTable :columns="fansTopCountriesColumns" :rows="insightData.topCountries"
-              :theme="fansTopCountriesTheme">
+          <div v-if="analyticsStore.bundleLoaded && insightData?.topCountries?.length > 0"
+            class="w-full h-full overflow-hidden">
+            <FlexTable :columns="fansTopCountriesColumns" :rows="topCountriesWithRank" :theme="fansTopCountriesTheme">
               <template #cell.media="{ row }">
                 <div class="flex items-center gap-3 w-full px-3">
                   <div class="w-8 h-8 rounded-sm bg-black flex justify-center items-center shrink-0">
@@ -168,13 +209,15 @@
 
           <div v-else class="flex flex-col justify-center items-center gap-6 h-full text-center py-6">
             <div class="relative flex justify-center items-center">
-              <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50" />
+              <img src="/images/empty-list.svg" alt="illustration" class="w-24 h-24 object-contain"
+                style="transform: scale(2.5);" />
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">No trend to
                 show at the
                 moment</span>
-              <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">Learn ways
+              <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">Learn
+                ways
                 to earn</a>
             </div>
           </div>
@@ -184,7 +227,7 @@
   </DashboardAnalyticsTrendPopup>
 </template>
 
-<script setup> 
+<script setup>
 import { useAssetUrl } from '@/composables/useAssetUrl.js'
 const { url: iconPopupLogo } = useAssetUrl('dashboard.analytics.money')
 const { url: icon4Url } = useAssetUrl('dashboard.analytics.icon4')
@@ -206,10 +249,17 @@ const { t } = useI18n()
 
 const hasFansData = computed(() => props.insightData && props.insightData.newFollowers != null)
 
+const topCountriesWithRank = computed(() => {
+  return (props.insightData?.topCountries || []).map((c, index) => ({
+    ...c,
+    rank: index + 1
+  }))
+})
+
 const analyticsStore = useDashboardAnalyticsStore()
 
 const activePeriod = computed(() => {
-  
+
   const p = (props.period || 'weekly').toLowerCase().trim()
   if (p === 'all-time' || p === 'alltime') return 'alltime'
   return p
@@ -218,31 +268,31 @@ const isDaily = computed(() => activePeriod.value === 'daily')
 
 const activeTrendViewMode = ref('bar')
 
-const legendConfig = { enabled:true, class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass:"inline-flex items-center gap-1.5 px-2 py-1", markerClass:"w-2.5 h-2.5 rounded-full", labelClass:"text-slate-500 text-xs font-medium font-sans" }
+const legendConfig = { enabled: true, class: "absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass: "inline-flex items-center gap-1.5 px-2 py-1", markerClass: "w-2.5 h-2.5 rounded-full", labelClass: "text-slate-500 text-xs font-medium font-sans" }
 const fansChartStyles = computed(() => ({ profileVisits: { color: "#4CC9F0", name: t('dashboard.analytics.legends.profileVisit', 'Profile Visit') }, newFollowers: { color: "#4361EE", name: t('dashboard.analytics.legends.newFollowers', 'New Followers') } }))
 const fansChartLabels = { profileVisits: "Profile Visit", newFollowers: "New Followers" }
 
 function getFansBarCfg(dk) {
-  return JSON.stringify({ type:"bar", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:true, seriesStyles:fansChartStyles.value, seriesLabels:fansChartLabels, bar:{widthPercent:35}, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, legentHint:legendConfig })
+  return JSON.stringify({ type: "bar", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["newFollowers", "profileVisits"], stacked: true, seriesStyles: fansChartStyles.value, seriesLabels: fansChartLabels, bar: { widthPercent: 35 }, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, legentHint: legendConfig })
 }
 function getFansLineCfg(dk) {
-  return JSON.stringify({ type:"line", period:"slot", datasetKey:dk, fields:{category:"period",total:"total"}, breakdownKeys:["newFollowers","profileVisits"], stacked:false, seriesStyles:fansChartStyles.value, seriesLabels:fansChartLabels, axisLabelColor:"#475467", axisLabelFontSize:"10px", xAxis:{minGridDistance:80}, tooltip:{aggregated:{enabled:true,mode:"codepen",valuePrefix:"",valueSuffix:""}}, yAxis:{autoMax:true,autoMaxBuffer:0.12,strict:true}, line:{strokeWidth:4}, legentHint:legendConfig })
+  return JSON.stringify({ type: "line", period: "slot", datasetKey: dk, fields: { category: "period", total: "total" }, breakdownKeys: ["newFollowers", "profileVisits"], stacked: false, seriesStyles: fansChartStyles.value, seriesLabels: fansChartLabels, axisLabelColor: "#475467", axisLabelFontSize: "10px", xAxis: { minGridDistance: 80 }, tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "", valueSuffix: "" } }, yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true }, line: { strokeWidth: 4 }, legentHint: legendConfig })
 }
 
 function getSourcesDonutCfg(dk) {
   const styles = {
-    Instagram: { color:"#E1306C", name:"Instagram" },
-    TikTok: { color:"#000000", name:"TikTok" },
-    Twitter: { color:"#1DA1F2", name:"Twitter" },
-    Reddit: { color:"#FF4500", name:"Reddit" },
-    Direct: { color:"#4CC9F0", name:"Direct" },
-    Other: { color:"#98A2B3", name:"Other" }
+    Instagram: { color: "#E1306C", name: "Instagram" },
+    TikTok: { color: "#000000", name: "TikTok" },
+    Twitter: { color: "#1DA1F2", name: "Twitter" },
+    Reddit: { color: "#FF4500", name: "Reddit" },
+    Direct: { color: "#4CC9F0", name: "Direct" },
+    Other: { color: "#98A2B3", name: "Other" }
   }
-  const keyMap = { Instagram:"Instagram", TikTok:"TikTok", Twitter:"Twitter", Reddit:"Reddit", Direct:"Direct", Other:"Other" }
+  const keyMap = { Instagram: "Instagram", TikTok: "TikTok", Twitter: "Twitter", Reddit: "Reddit", Direct: "Direct", Other: "Other" }
   return JSON.stringify({
-    type:"donut", period:"slot", datasetKey:dk, fields:{category:"source",total:"value"},
+    type: "donut", period: "slot", datasetKey: dk, fields: { category: "source", total: "value" },
     categoryKeyMap: keyMap, seriesStyles: styles,
-    legentHint:{enabled:true,class:"absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4",itemClass:"inline-flex items-center gap-1.5 px-2 py-1",markerClass:"w-2.5 h-2.5 rounded-full",labelClass:"text-slate-500 text-xs font-medium font-sans"}
+    legentHint: { enabled: true, class: "absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass: "inline-flex items-center gap-1.5 px-2 py-1", markerClass: "w-2.5 h-2.5 rounded-full", labelClass: "text-slate-500 text-xs font-medium font-sans" }
   })
 }
 
@@ -259,9 +309,9 @@ function injectChartData() {
     profileVisits: item.profileVisits || 0,
     total: (item.newFollowers || 0) + (item.profileVisits || 0)
   }))
-  window.chartsHandler._configs.data['fans-weekly']  = { slot: mapFansData(fi.weekly) }
+  window.chartsHandler._configs.data['fans-weekly'] = { slot: mapFansData(fi.weekly) }
   window.chartsHandler._configs.data['fans-monthly'] = { slot: mapFansData(fi.monthly) }
-  window.chartsHandler._configs.data['fans-yearly']  = { slot: mapFansData(fi.yearly) }
+  window.chartsHandler._configs.data['fans-yearly'] = { slot: mapFansData(fi.yearly) }
   window.chartsHandler._configs.data['fans-alltime'] = { slot: mapFansData(fi.alltime) }
 }
 
@@ -278,7 +328,7 @@ async function renderChart(chartId) {
   if (!window.chartsHandler) return
   const container = document.querySelector(`[data-chart-id="${chartId}"]`)
   if (!container) return
-  try { window.chartsHandler.destroyChartInstance(chartId) } catch(e) {}
+  try { window.chartsHandler.destroyChartInstance(chartId) } catch (e) { }
   container.removeAttribute('hidden')
   const host = container.querySelector('[amchart]')
   if (host) host.innerHTML = ''

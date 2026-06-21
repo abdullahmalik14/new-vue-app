@@ -3,22 +3,26 @@
     <div class="relative flex flex-col mt-6 gap-6 md:p-[40px]">
       <DashboardSharedHeader v-if="!hideLayout" />
       <DashboardAnalyticsWelcomeBanner />
-      <!-- Overview Section -->
-      <DashboardAnalyticsOverviewSection
-        :is-analytics-refreshing="isAnalyticsRefreshing"
-        @openSubscribersTrendPopup="openAnalyticsSubscribersTrendPopup"
-        @openEarningsTrendPopup="openAnalyticsEarningsTrendPopup"
-        @openFansTrendPopup="openAnalyticsFansTrendPopup"
-        @openLikesTrendPopup="openAnalyticsLikesTrendPopup"
-        @openContributorsTrendPopup="openAnalyticsContributorsTrendPopup"
-        @refresh="refreshDashboardAnalytics"
-      />
+      
+      <!-- Analytics Content Wrapper -->
+      <div class="flex flex-col gap-6 transition-opacity duration-200" :class="{ 'opacity-50 pointer-events-none': isAnalyticsRefreshing, 'opacity-100': !isAnalyticsRefreshing }">
+        <!-- Overview Section -->
+        <DashboardAnalyticsOverviewSection
+          :is-analytics-refreshing="isAnalyticsRefreshing"
+          @openSubscribersTrendPopup="openAnalyticsSubscribersTrendPopup"
+          @openEarningsTrendPopup="openAnalyticsEarningsTrendPopup"
+          @openFansTrendPopup="openAnalyticsFansTrendPopup"
+          @openLikesTrendPopup="openAnalyticsLikesTrendPopup"
+          @openContributorsTrendPopup="openAnalyticsContributorsTrendPopup"
+          @refresh="refreshDashboardAnalytics"
+        />
 
-      <!-- Orders Received section -->
-      <DashboardAnalyticsOrdersReceivedTable />
+        <!-- Orders Received section -->
+        <DashboardAnalyticsOrdersReceivedTable />
 
-      <!-- Trends Section -->
-      <DashboardAnalyticsTrendsSection />
+        <!-- Trends Section -->
+        <DashboardAnalyticsTrendsSection />
+      </div>
 
       <!-- Subscribers popup -->
       <DashboardAnalyticsSubscribersTrendPopup v-if="isSubscribersTrendPopupOpen" v-model="isSubscribersTrendPopupOpen" v-model:period="analyticsSubscribersTrendPeriod"

@@ -82,7 +82,7 @@
           </div>
           
           <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20" v-if="!analyticsStore.bundleLoaded || !insightData?.total || isChartRendering">
-            <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50 mb-2" />
+            <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
             <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
           </div>
@@ -118,7 +118,7 @@
           </div>
 
           <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20" v-if="!analyticsStore.bundleLoaded || !insightData?.totalTokens || isChartRendering">
-            <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50 mb-2" />
+            <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
             <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
           </div>
@@ -168,9 +168,9 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else-if="!analyticsStore.bundleLoaded || insightData?.topCountries?.length === 0 || isChartRendering" class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center h-[300px] bg-white dark:bg-dark-bg-container z-20">
+        <div v-else class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center h-[300px] z-20">
           <div class="relative flex justify-center items-center">
-            <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50" />
+            <img src="/images/empty-list.svg" alt="illustration" class="w-24 h-24 object-contain" style="transform: scale(2.5);" />
           </div>
           <div class="flex flex-col gap-1">
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>

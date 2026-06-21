@@ -1,6 +1,6 @@
 <template>
-  <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :period="period"
-    @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.subscriptionsInsight')"
+  <DashboardAnalyticsTrendPopup :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)"
+    :period="period" @update:period="handlePeriodChange" :title="$t('dashboard.analytics.trends.subscriptionsInsight')"
     :logo="iconPopupLogo || ''">
     <div :class="isDaily ? 'flex flex-row gap-6' : 'flex flex-col gap-6'">
 
@@ -27,10 +27,12 @@
       <!-- SUBSCRIPTIONS INSIGHT -->
       <div :class="isDaily ? 'flex-1' : 'w-full'" class="flex flex-col gap-3 p-4   h-[25rem] relative">
         <div class="flex justify-between items-center z-10 relative">
-          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{ $t('dashboard.analytics.trends.subscriptionsInsight') }}</h3>
+          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{
+            $t('dashboard.analytics.trends.subscriptionsInsight') }}</h3>
           <div v-if="!isDaily" class="flex gap-1 bg-[#F9FAFB] p-1 rounded-lg border border-[#EAECF0]">
             <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
-              :class="activeSubsViewMode === 'bar' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setSubsView('bar')">
+              :class="activeSubsViewMode === 'bar' ? 'bg-white shadow-sm' : 'bg-transparent'"
+              @click="setSubsView('bar')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                 :stroke="activeSubsViewMode === 'bar' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
                 <line x1="18" y1="20" x2="18" y2="10" />
@@ -39,7 +41,8 @@
               </svg>
             </button>
             <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
-              :class="activeSubsViewMode === 'line' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setSubsView('line')">
+              :class="activeSubsViewMode === 'line' ? 'bg-white shadow-sm' : 'bg-transparent'"
+              @click="setSubsView('line')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                 :stroke="activeSubsViewMode === 'line' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -48,7 +51,9 @@
           </div>
         </div>
 
-        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && (insightData?.new > 0 || insightData?.recurring > 0)">
+        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200"
+          :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }"
+          v-show="analyticsStore.bundleLoaded && (insightData?.new > 0 || insightData?.recurring > 0)">
           <!-- Daily Donut -->
           <div data-chart-container data-chart-id="subs-daily-donut" :hidden="!isDaily || undefined"
             class="absolute inset-0"
@@ -105,20 +110,26 @@
           </div>
         </div>
 
-        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20" v-if="!analyticsStore.bundleLoaded || (!insightData?.new && !insightData?.recurring) || isChartRendering">
-          <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50 mb-2" />
-          <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
-          <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
+        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20"
+          v-if="!analyticsStore.bundleLoaded || (!insightData?.new && !insightData?.recurring) || isChartRendering">
+          <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration"
+            class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
+          <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{
+            $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+          <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{
+            $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
         </div>
       </div>
 
       <!-- TIERS BREAKDOWN -->
       <div :class="isDaily ? 'flex-1' : 'w-full'" class="flex flex-col gap-3 p-4 h-[25rem] relative">
         <div class="flex justify-between items-center z-10 relative">
-          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{ $t('dashboard.analytics.trends.tiersBreakdown') }}</h3>
+          <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">{{
+            $t('dashboard.analytics.trends.tiersBreakdown') }}</h3>
           <div v-if="!isDaily" class="flex gap-1 bg-[#F9FAFB] p-1 rounded-lg border border-[#EAECF0]">
             <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
-              :class="activeTiersViewMode === 'bar' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setTiersView('bar')">
+              :class="activeTiersViewMode === 'bar' ? 'bg-white shadow-sm' : 'bg-transparent'"
+              @click="setTiersView('bar')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                 :stroke="activeTiersViewMode === 'bar' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
                 <line x1="18" y1="20" x2="18" y2="10" />
@@ -127,16 +138,20 @@
               </svg>
             </button>
             <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
-              :class="activeTiersViewMode === 'line' ? 'bg-white shadow-sm' : 'bg-transparent'" @click="setTiersView('line')">
+              :class="activeTiersViewMode === 'line' ? 'bg-white shadow-sm' : 'bg-transparent'"
+              @click="setTiersView('line')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                :stroke="activeTiersViewMode === 'line' ? '#344054' : '#98A2B3'" stroke-width="2" stroke-linecap="round">
+                :stroke="activeTiersViewMode === 'line' ? '#344054' : '#98A2B3'" stroke-width="2"
+                stroke-linecap="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
               </svg>
             </button>
           </div>
         </div>
 
-        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && (insightData?.new > 0 || insightData?.recurring > 0)">
+        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200"
+          :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }"
+          v-show="analyticsStore.bundleLoaded && (insightData?.new > 0 || insightData?.recurring > 0)">
           <!-- Daily Donut -->
           <div data-chart-container data-chart-id="tiers-daily-donut" :hidden="!isDaily || undefined"
             class="absolute inset-0"
@@ -193,10 +208,14 @@
           </div>
         </div>
 
-        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20" v-if="!analyticsStore.bundleLoaded || (!insightData?.new && !insightData?.recurring) || isChartRendering">
-          <img src="/images/noTrendImg.png" alt="illustration" class="w-16 h-16 object-contain opacity-50 mb-2" />
-          <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
-          <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
+        <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20"
+          v-if="!analyticsStore.bundleLoaded || (!insightData?.new && !insightData?.recurring) || isChartRendering">
+          <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration"
+            class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
+          <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{
+            $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
+          <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{
+            $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
         </div>
       </div>
 
@@ -224,7 +243,7 @@ const bundle = computed(() => analyticsStore.subscriptionsBundle || {})
 
 // Active period mapping
 const activePeriod = computed(() => {
-  
+
   const p = (props.period || 'weekly').toLowerCase().trim()
   if (p === 'all-time' || p === 'alltime') return 'alltime'
   return p // daily | weekly | monthly | yearly
