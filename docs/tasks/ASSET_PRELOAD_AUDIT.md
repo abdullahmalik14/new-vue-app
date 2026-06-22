@@ -1701,56 +1701,27 @@ Apply **defense in depth**: lock down *where config comes from*, then *what URLs
 
 #### Resolution ✅
 
-**Status:** Resolved (fixed in this audit pass).
+**Status:** Resolved (fixed in this audit pass; **2026-06-22 follow-up** completed dashboard nav wiring).
 
-**What was broken:** Section `assetPreload[]` warmed only after navigation (`preloadSectionAssets` from router `afterEach`). Hovering a nav link prefetched the Vue component chunk (AUDIT **P10**) but not static assets for the destination section.
+**What was broken:** Section `assetPreload[]` warmed only after navigation (`preloadSectionAssets` from router `afterEach`). Hovering a nav link prefetched the Vue component chunk (AUDIT **P10**) but not static assets for the destination section. After the initial pass, `DashboardSharedSidebar.vue` wired combined prefetch only on submenu popup items; main sidebar and overflow flyout links had no `@mouseenter`/`@focus` handlers. Submenu prefetch also checked `item.enabled` instead of `item.isEnabled`, so intent prefetch never ran.
 
-**Why it happened:** Intent prefetch existed only for route components (`routeComponentPrefetch.js`), not section asset rollup.
+**Why it happened:** Intent prefetch existed only for route components (`routeComponentPrefetch.js`), not section asset rollup. Nav UI follow-up was partial when sidebar was renamed to `DashboardSharedSidebar.vue`.
 
 **What changed:**
 - `routeAssetPrefetch.js` — `prefetchSectionAssetsForRoute()` resolves the target route + role section, then calls `preloadSectionAssets()` non-blocking; dedupes by section name.
 - `useRoutePrefetch.js` — `createRoutePrefetchIntentHandler()` and `prefetchOnIntent()` trigger **both** component prefetch and section asset prefetch; split handlers `prefetchComponentOnIntent` / `prefetchAssetsOnIntent` also exported.
-- **Nav UI follow-up:** `DashboardSidebar.vue`, `AppFooter.vue`, and `AuthLogIn.vue` now use the combined `createRoutePrefetchIntentHandler()` from `useRoutePrefetch.js` instead of component-only prefetch. `src/utils/route/index.js` and `src/router/index.js` re-export the combined handler as the default.
-- Re-exported from `src/utils/route/index.js`.
+- **Nav UI follow-up:** `DashboardSharedSidebar.vue`, `AppFooter.vue`, and `AuthLogIn.vue` use the combined `createCombinedRoutePrefetchIntentHandler()` from `useRoutePrefetch.js`. **2026-06-22:** main sidebar visible items, overflow flyout items, and submenu items all call `prefetchMenuItemRoute()` on hover/focus; guard uses `isEnabled`.
+- Re-exported from `src/systems/routing/index.js` and `src/router/index.js`.
 
 **Conflict check:** Complements **AUDIT.md P10** (component intent prefetch) without changing post-navigation preload. Does not add viewport observers (hover/focus only, matching existing component pattern).
 
-**How it was tested:** `npm run test:unit -- --run tests/unit/routeAssetPrefetch.test.js tests/unit/useRoutePrefetch.test.js`
+**How it was tested:** `npm run test:unit -- --run tests/unit/routeAssetPrefetch.test.js tests/unit/useRoutePrefetch.test.js tests/assetsTest/useRoutePrefetch.test.js`
 
 **How to test in the browser:**
 1. Run `npm run dev`, open DevTools → **Network** → filter `Img` or `webp`.
-2. From `/log-in`, hover **Dashboard** or **Shop** nav link (uses `useRoutePrefetch` / `@mouseenter`).
-3. **Expected:** Static icon/asset requests for that route's section begin **before** click (same timing window as component chunk prefetch).
-4. DevTools → **Console** — paste:
-   ```js
-   (async () => {
-     const { prefetchSectionAssetsForRoute, resetRouteAssetPrefetchCache } = await import('/src/utils/route/routeAssetPrefetch.js');
-     const { resetRoutePrefetchCache } = await import('/src/utils/route/routeComponentPrefetch.js');
-
-     const linksBefore = document.querySelectorAll('link[rel="preload"], link[rel="prefetch"]').length;
-
-     resetRouteAssetPrefetchCache();
-     resetRoutePrefetchCache();
-
-     await prefetchSectionAssetsForRoute('/shop');
-     await prefetchSectionAssetsForRoute('/shop');
-
-     const linksAfter = document.querySelectorAll('link[rel="preload"], link[rel="prefetch"]').length;
-
-     console.log({
-       sectionResolved: 'shop',
-       dedupedSecondCall: true,
-       linksBefore,
-       linksAfter,
-       note: 'If you already visited /shop or /dashboard, most images log already-preloaded — Pinia store hit, not a failure'
-     });
-   })();
-   ```
-5. **Expected (console test):**
-   - **One** `preloadSectionAssets [start]` log (second `/shop` call is deduped — no second start).
-   - **One** `Section assets prefetched on intent` success log.
-   - `linksAfter` may stay low (e.g. 3) if assets were already in `usePreloadStore` from an earlier visit — you will see many `preloadImage [already-preloaded]` lines instead of new `<link>` tags. That is correct.
-6. **Expected (hover on nav):** From `/log-in`, hover a link to a **different section** (e.g. `/shop` or `/dashboard`) — Network tab shows icon/webp requests **before** click. Hover **Sign up** on the login form prefetches both the **Vue component** and auth section assets (same `auth` section as `/log-in`, so asset requests may be store cache hits).
+2. From `/log-in`, hover **Sign up** — expect auth component chunk + section asset warmup before click.
+3. From `/dashboard`, hover a **main sidebar** item (e.g. Analytics) or an item in the **More** overflow flyout — expect `.vue` chunk **and** section icon/webp requests before click (store cache hits are OK on repeat hovers).
+4. Open a route with a **submenu** (e.g. Orders), hover a submenu row — same combined prefetch (previously broken due to `enabled` vs `isEnabled`).
 
 ---
 

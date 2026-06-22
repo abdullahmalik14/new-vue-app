@@ -86,11 +86,11 @@ fix(tests): point asset tests at systems/assets after migration
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/routeAssetPrefetch.test.js \
+  tests/assetsTest/routeAssetPrefetch.test.js \
   tests/routeTest/routeAssetPrefetch.test.js \
-  tests/unit/resolveRouteAssetPreloads.test.js \
+  tests/assetsTest/resolveRouteAssetPreloads.test.js \
   tests/routeTest/resolveRouteAssetPreloads.test.js \
-  tests/unit/useRoutePrefetch.test.js \
+  tests/assetsTest/useRoutePrefetch.test.js \
   tests/routeTest/useRoutePrefetch.test.js \
   tests/sectionTest/routeAssetPrefetch.section.test.js
 
@@ -148,12 +148,12 @@ refactor(assets): align prefetch module filenames with naming audit
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/assertAllowedPreloadUrl.test.js \
+  tests/assetsTest/assertAllowedPreloadUrl.test.js \
   tests/unit/preloadUrlGuard.test.js \
-  tests/unit/validateRouteAssetPreloadFlags.test.js \
+  tests/assetsTest/validateRouteAssetPreloadFlags.test.js \
   tests/routeTest/validateRouteAssetPreloadFlags.test.js \
   tests/unit/assetMapBuildValidation.test.js \
-  tests/unit/assetsIndexExports.test.js
+  tests/assetsTest/assetsIndexExports.test.js
 ```
 
 **Result:** 6 test files, 23 tests passed. Deprecated `assertAllowedPreloadUrl.js` shim still satisfies existing test dynamic imports.
@@ -362,6 +362,20 @@ refactor(assets): extract shared authAssetConfig for auth views
 | [`AuthLogIn.vue`](../../src/dev/templates/auth/views/AuthLogIn.vue), [`AppFooter.vue`](../../src/components/layout/AppFooter.vue), [`DashboardSharedSidebar.vue`](../../src/dev/templates/dashboard/shared/DashboardSharedSidebar.vue) | Import combined handler |
 | [`src/systems/routing/index.js`](../../src/systems/routing/index.js), [`src/router/index.js`](../../src/router/index.js) | Export both names (canonical + alias) |
 
+### Issue — M-08 dashboard sidebar intent prefetch incomplete (2026-06-22)
+
+**What was broken:** `DashboardSharedSidebar.vue` wired combined component+asset prefetch only on submenu popup rows. Main sidebar visible items and overflow flyout links had no `@mouseenter`/`@focus` handlers. `prefetchMenuItemRoute()` checked `item.enabled` instead of `item.isEnabled`, so submenu prefetch never ran.
+
+**Why it happened:** Nav UI follow-up from M-08 was partial when sidebar was renamed; submenu guard copied wrong property name.
+
+**How it was fixed:**
+
+| File | Change |
+|------|--------|
+| [`DashboardSharedSidebar.vue`](../../src/dev/templates/dashboard/shared/DashboardSharedSidebar.vue) | `@mouseenter` / `@focus` → `prefetchMenuItemRoute(item)` on main menu + overflow links; guard uses `isEnabled` |
+
+**How it was tested:** `npm run test:unit -- --run tests/assetsTest/useRoutePrefetch.test.js tests/assetsTest/routeAssetPrefetch.test.js`
+
 ### Issue 15 — Missing `useAssetPrefetch` composable
 
 **What was broken:** Asset-only intent prefetch was only reachable through `useRoutePrefetch` (combined API). Naming docs list a dedicated `useAssetPrefetch.js`.
@@ -376,12 +390,12 @@ refactor(assets): extract shared authAssetConfig for auth views
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/usePreloadStore.test.js \
+  tests/assetsTest/usePreloadStore.test.js \
   tests/sectionTest/usePreloadStore.section.test.js \
-  tests/unit/useRoutePrefetch.test.js \
+  tests/assetsTest/useRoutePrefetch.test.js \
   tests/routeTest/useRoutePrefetch.test.js \
   tests/routeTest/routerExports.test.js \
-  tests/unit/appBuildHash.test.js \
+  tests/assetsTest/appBuildHash.test.js \
   tests/unit/preloadUrlGuard.test.js
 ```
 
@@ -549,20 +563,20 @@ docs(assets): sync guides and code index after cleanup phases 0–7
 | File | Cases | Covers |
 |------|-------|--------|
 | [`tests/helpers/assetFixtures.js`](../../tests/helpers/assetFixtures.js) | — | Mock asset maps, route preload factories, `setupAssetTestEnv`, `resetAssetSystemState` |
-| [`tests/unit/assetMap.integrity.test.js`](../../tests/unit/assetMap.integrity.test.js) | 16 | `assetMap.json` shape, sparse env overrides, catalog cross-refs, SHA256 snapshot |
-| [`tests/unit/sharedAssetPreloads.integrity.test.js`](../../tests/unit/sharedAssetPreloads.integrity.test.js) | 10 | Catalog entry shape, mapping flags, `assetPreloadRef` resolution |
-| [`tests/unit/assetMap.auth.integrity.test.js`](../../tests/unit/assetMap.auth.integrity.test.js) | 7 | `assetMap.auth.json` sparse overrides, src/public sync |
-| [`tests/unit/assets.vitestMigration.test.js`](../../tests/unit/assets.vitestMigration.test.js) | 3 | Guard against `utils/assets` imports in `src/` and `tests/` |
+| [`tests/assetsTest/assetMap.integrity.test.js`](../../tests/assetsTest/assetMap.integrity.test.js) | 16 | `assetMap.json` shape, sparse env overrides, catalog cross-refs, SHA256 snapshot |
+| [`tests/assetsTest/sharedAssetPreloads.integrity.test.js`](../../tests/assetsTest/sharedAssetPreloads.integrity.test.js) | 10 | Catalog entry shape, mapping flags, `assetPreloadRef` resolution |
+| [`tests/assetsTest/assetMap.auth.integrity.test.js`](../../tests/assetsTest/assetMap.auth.integrity.test.js) | 7 | `assetMap.auth.json` sparse overrides, src/public sync |
+| [`tests/assetsTest/assets.vitestMigration.test.js`](../../tests/assetsTest/assets.vitestMigration.test.js) | 3 | Guard against `utils/assets` imports in `src/` and `tests/` |
 
 ### How it was tested
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/assetMap.integrity.test.js \
-  tests/unit/sharedAssetPreloads.integrity.test.js \
-  tests/unit/assetMap.auth.integrity.test.js \
-  tests/unit/assets.vitestMigration.test.js \
-  tests/unit/syncAssetMapToPublic.test.js
+  tests/assetsTest/assetMap.integrity.test.js \
+  tests/assetsTest/sharedAssetPreloads.integrity.test.js \
+  tests/assetsTest/assetMap.auth.integrity.test.js \
+  tests/assetsTest/assets.vitestMigration.test.js \
+  tests/assetsTest/syncAssetMapToPublic.test.js
 ```
 
 **Result:** 37 tests passed (5 files).
@@ -588,20 +602,20 @@ test(assets): add Phase A integrity suite and shared fixtures
 
 | File | Cases |
 |------|-------|
-| [`tests/unit/assetMapSource.test.js`](../../tests/unit/assetMapSource.test.js) | 19 — runtime fetch policy, bundled map, SHA256 verify |
-| [`tests/unit/sectionAssetMapSource.test.js`](../../tests/unit/sectionAssetMapSource.test.js) | 23 — path parsing, validation, bundled/network |
-| [`tests/unit/assetLibrary.normalize.test.js`](../../tests/unit/assetLibrary.normalize.test.js) | 19 — `normalizeGetAssetUrlArgs`, `normalizeAssetMapUrl` |
-| [`tests/unit/assetLibrary.environment.test.js`](../../tests/unit/assetLibrary.environment.test.js) | 11 — `setEnvironment`, fetch candidates, config cache |
-| [`tests/unit/assetLibrary.config.test.js`](../../tests/unit/assetLibrary.config.test.js) | 8 — `loadAssetMapConfig`, `loadSectionAssetMap` |
-| [`tests/unit/assetLibrary.getAssetUrl.test.js`](../../tests/unit/assetLibrary.getAssetUrl.test.js) | 70 — inheritance matrix + sync/async resolution |
-| [`tests/unit/assetLibrary.getAssetUrl.variants.test.js`](../../tests/unit/assetLibrary.getAssetUrl.variants.test.js) | 8 — CSS/attr wrappers |
-| [`tests/unit/assetLibrary.getAssetUrls.test.js`](../../tests/unit/assetLibrary.getAssetUrls.test.js) | 11 — batch URL + preload |
-| [`tests/unit/assetLibrary.flags.test.js`](../../tests/unit/assetLibrary.flags.test.js) | 8 — flag helpers |
-| [`tests/unit/assetLibrary.section.test.js`](../../tests/unit/assetLibrary.section.test.js) | 14 — section load metadata |
-| [`tests/unit/assetLibrary.cache.test.js`](../../tests/unit/assetLibrary.cache.test.js) | 14 — unload, statistics, category cache |
-| [`tests/unit/assetLibrary.init.test.js`](../../tests/unit/assetLibrary.init.test.js) | 14 — init, prime index, validate |
-| [`tests/unit/assetLibrary.category.test.js`](../../tests/unit/assetLibrary.category.test.js) | 2 — `getAssetsByCategory` |
-| [`tests/unit/resetAssetLibrary.test.js`](../../tests/unit/resetAssetLibrary.test.js) | 6 — full reset coordination |
+| [`tests/assetsTest/assetMapSource.test.js`](../../tests/assetsTest/assetMapSource.test.js) | 19 — runtime fetch policy, bundled map, SHA256 verify |
+| [`tests/assetsTest/sectionAssetMapSource.test.js`](../../tests/assetsTest/sectionAssetMapSource.test.js) | 23 — path parsing, validation, bundled/network |
+| [`tests/assetsTest/assetLibrary.normalize.test.js`](../../tests/assetsTest/assetLibrary.normalize.test.js) | 19 — `normalizeGetAssetUrlArgs`, `normalizeAssetMapUrl` |
+| [`tests/assetsTest/assetLibrary.environment.test.js`](../../tests/assetsTest/assetLibrary.environment.test.js) | 11 — `setEnvironment`, fetch candidates, config cache |
+| [`tests/assetsTest/assetLibrary.config.test.js`](../../tests/assetsTest/assetLibrary.config.test.js) | 8 — `loadAssetMapConfig`, `loadSectionAssetMap` |
+| [`tests/assetsTest/assetLibrary.getAssetUrl.test.js`](../../tests/assetsTest/assetLibrary.getAssetUrl.test.js) | 70 — inheritance matrix + sync/async resolution |
+| [`tests/assetsTest/assetLibrary.getAssetUrl.variants.test.js`](../../tests/assetsTest/assetLibrary.getAssetUrl.variants.test.js) | 8 — CSS/attr wrappers |
+| [`tests/assetsTest/assetLibrary.getAssetUrls.test.js`](../../tests/assetsTest/assetLibrary.getAssetUrls.test.js) | 11 — batch URL + preload |
+| [`tests/assetsTest/assetLibrary.flags.test.js`](../../tests/assetsTest/assetLibrary.flags.test.js) | 8 — flag helpers |
+| [`tests/assetsTest/assetLibrary.section.test.js`](../../tests/assetsTest/assetLibrary.section.test.js) | 14 — section load metadata |
+| [`tests/assetsTest/assetLibrary.cache.test.js`](../../tests/assetsTest/assetLibrary.cache.test.js) | 14 — unload, statistics, category cache |
+| [`tests/assetsTest/assetLibrary.init.test.js`](../../tests/assetsTest/assetLibrary.init.test.js) | 14 — init, prime index, validate |
+| [`tests/assetsTest/assetLibrary.category.test.js`](../../tests/assetsTest/assetLibrary.category.test.js) | 2 — `getAssetsByCategory` |
+| [`tests/assetsTest/resetAssetLibrary.test.js`](../../tests/assetsTest/resetAssetLibrary.test.js) | 6 — full reset coordination |
 
 Also extended [`tests/helpers/assetFixtures.js`](../../tests/helpers/assetFixtures.js) with `stubProductionEnv`, `loadProductionAssetLibrary`.
 
@@ -609,10 +623,10 @@ Also extended [`tests/helpers/assetFixtures.js`](../../tests/helpers/assetFixtur
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/assetMapSource.test.js \
-  tests/unit/sectionAssetMapSource.test.js \
-  tests/unit/assetLibrary.*.test.js \
-  tests/unit/resetAssetLibrary.test.js
+  tests/assetsTest/assetMapSource.test.js \
+  tests/assetsTest/sectionAssetMapSource.test.js \
+  tests/assetsTest/assetLibrary.*.test.js \
+  tests/assetsTest/resetAssetLibrary.test.js
 ```
 
 **Result:** 228 tests passed (14 files).
@@ -634,16 +648,16 @@ test(assets): add core assetLibrary unit coverage
 
 | File | Cases |
 |------|-------|
-| [`tests/unit/assetPreloader.retry.test.js`](../../tests/unit/assetPreloader.retry.test.js) | 9 — `withPreloadRetry`, `runInConcurrencyChunks` |
-| [`tests/unit/assetPreloader.priority.test.js`](../../tests/unit/assetPreloader.priority.test.js) | 4 — `resolveFetchPriority`, `shouldInjectExecutableScript` |
-| [`tests/unit/assetPreloader.image.test.js`](../../tests/unit/assetPreloader.image.test.js) | 6 — `preloadImage` |
-| [`tests/unit/assetPreloader.font.test.js`](../../tests/unit/assetPreloader.font.test.js) | 3 — `preloadFont` |
-| [`tests/unit/assetPreloader.media.test.js`](../../tests/unit/assetPreloader.media.test.js) | 3 — `preloadMedia` |
-| [`tests/unit/assetPreloader.script.test.js`](../../tests/unit/assetPreloader.script.test.js) | 8 — `preloadScript`, `injectExecutableScript` |
-| [`tests/unit/assetPreloader.json.test.js`](../../tests/unit/assetPreloader.json.test.js) | 3 — `preloadJSON` |
-| [`tests/unit/assetPreloader.asset.test.js`](../../tests/unit/assetPreloader.asset.test.js) | 9 — `preloadAsset`, `preloadAssets` |
-| [`tests/unit/assetPreloader.section.test.js`](../../tests/unit/assetPreloader.section.test.js) | 12 — section URL resolve, rollup preload |
-| [`tests/unit/assetPreloader.cache.test.js`](../../tests/unit/assetPreloader.cache.test.js) | 6 — preload cache helpers |
+| [`tests/assetsTest/assetPreloader.retry.test.js`](../../tests/assetsTest/assetPreloader.retry.test.js) | 9 — `withPreloadRetry`, `runInConcurrencyChunks` |
+| [`tests/assetsTest/assetPreloader.priority.test.js`](../../tests/assetsTest/assetPreloader.priority.test.js) | 4 — `resolveFetchPriority`, `shouldInjectExecutableScript` |
+| [`tests/assetsTest/assetPreloader.image.test.js`](../../tests/assetsTest/assetPreloader.image.test.js) | 6 — `preloadImage` |
+| [`tests/assetsTest/assetPreloader.font.test.js`](../../tests/assetsTest/assetPreloader.font.test.js) | 3 — `preloadFont` |
+| [`tests/assetsTest/assetPreloader.media.test.js`](../../tests/assetsTest/assetPreloader.media.test.js) | 3 — `preloadMedia` |
+| [`tests/assetsTest/assetPreloader.script.test.js`](../../tests/assetsTest/assetPreloader.script.test.js) | 8 — `preloadScript`, `injectExecutableScript` |
+| [`tests/assetsTest/assetPreloader.json.test.js`](../../tests/assetsTest/assetPreloader.json.test.js) | 3 — `preloadJSON` |
+| [`tests/assetsTest/assetPreloader.asset.test.js`](../../tests/assetsTest/assetPreloader.asset.test.js) | 9 — `preloadAsset`, `preloadAssets` |
+| [`tests/assetsTest/assetPreloader.section.test.js`](../../tests/assetsTest/assetPreloader.section.test.js) | 12 — section URL resolve, rollup preload |
+| [`tests/assetsTest/assetPreloader.cache.test.js`](../../tests/assetsTest/assetPreloader.cache.test.js) | 6 — preload cache helpers |
 
 Also extended [`tests/helpers/assetFixtures.js`](../../tests/helpers/assetFixtures.js) with `mockLinkPreloads`, `autoResolveLinkPreloads`, `autoResolveScriptLoads`, and `vi.restoreAllMocks()` in `setupAssetTestEnv` to prevent DOM mock leakage between tests.
 
@@ -651,16 +665,16 @@ Also extended [`tests/helpers/assetFixtures.js`](../../tests/helpers/assetFixtur
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/assetPreloader.retry.test.js \
-  tests/unit/assetPreloader.priority.test.js \
-  tests/unit/assetPreloader.image.test.js \
-  tests/unit/assetPreloader.font.test.js \
-  tests/unit/assetPreloader.media.test.js \
-  tests/unit/assetPreloader.script.test.js \
-  tests/unit/assetPreloader.json.test.js \
-  tests/unit/assetPreloader.asset.test.js \
-  tests/unit/assetPreloader.section.test.js \
-  tests/unit/assetPreloader.cache.test.js
+  tests/assetsTest/assetPreloader.retry.test.js \
+  tests/assetsTest/assetPreloader.priority.test.js \
+  tests/assetsTest/assetPreloader.image.test.js \
+  tests/assetsTest/assetPreloader.font.test.js \
+  tests/assetsTest/assetPreloader.media.test.js \
+  tests/assetsTest/assetPreloader.script.test.js \
+  tests/assetsTest/assetPreloader.json.test.js \
+  tests/assetsTest/assetPreloader.asset.test.js \
+  tests/assetsTest/assetPreloader.section.test.js \
+  tests/assetsTest/assetPreloader.cache.test.js
 ```
 
 **Result:** 63 tests passed (10 files).
@@ -682,25 +696,25 @@ test(assets): add assetPreloader unit coverage
 
 | File | Cases |
 |------|-------|
-| [`tests/unit/assertAllowedPreloadUrl.test.js`](../../tests/unit/assertAllowedPreloadUrl.test.js) | 12 — URL policy allowlist |
-| [`tests/unit/getAssetPreloadEntriesForSection.helpers.test.js`](../../tests/unit/getAssetPreloadEntriesForSection.helpers.test.js) | 19 — dedupe, section match, enabled filter |
-| [`tests/unit/getAssetPreloadEntriesForSection.rollup.test.js`](../../tests/unit/getAssetPreloadEntriesForSection.rollup.test.js) | 13 — section rollup, cache, inheritance |
-| [`tests/unit/validateRouteAssetPreloadFlags.test.js`](../../tests/unit/validateRouteAssetPreloadFlags.test.js) | 17 — validators + catalog constants |
-| [`tests/unit/validateSharedComponentAssetMappings.test.js`](../../tests/unit/validateSharedComponentAssetMappings.test.js) | 5 — dashboard slot mapping validation |
-| [`tests/unit/resolveSharedComponentAssets.test.js`](../../tests/unit/resolveSharedComponentAssets.test.js) | 11 — shared chrome URL resolution |
-| [`tests/unit/resolveRouteAssetPreloads.test.js`](../../tests/unit/resolveRouteAssetPreloads.test.js) | 9 — assetPreloadRef expansion |
+| [`tests/assetsTest/assertAllowedPreloadUrl.test.js`](../../tests/assetsTest/assertAllowedPreloadUrl.test.js) | 12 — URL policy allowlist |
+| [`tests/assetsTest/getAssetPreloadEntriesForSection.helpers.test.js`](../../tests/assetsTest/getAssetPreloadEntriesForSection.helpers.test.js) | 19 — dedupe, section match, enabled filter |
+| [`tests/assetsTest/getAssetPreloadEntriesForSection.rollup.test.js`](../../tests/assetsTest/getAssetPreloadEntriesForSection.rollup.test.js) | 13 — section rollup, cache, inheritance |
+| [`tests/assetsTest/validateRouteAssetPreloadFlags.test.js`](../../tests/assetsTest/validateRouteAssetPreloadFlags.test.js) | 17 — validators + catalog constants |
+| [`tests/assetsTest/validateSharedComponentAssetMappings.test.js`](../../tests/assetsTest/validateSharedComponentAssetMappings.test.js) | 5 — dashboard slot mapping validation |
+| [`tests/assetsTest/resolveSharedComponentAssets.test.js`](../../tests/assetsTest/resolveSharedComponentAssets.test.js) | 11 — shared chrome URL resolution |
+| [`tests/assetsTest/resolveRouteAssetPreloads.test.js`](../../tests/assetsTest/resolveRouteAssetPreloads.test.js) | 9 — assetPreloadRef expansion |
 
 ### How it was tested
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/assertAllowedPreloadUrl.test.js \
-  tests/unit/getAssetPreloadEntriesForSection.helpers.test.js \
-  tests/unit/getAssetPreloadEntriesForSection.rollup.test.js \
-  tests/unit/validateRouteAssetPreloadFlags.test.js \
-  tests/unit/validateSharedComponentAssetMappings.test.js \
-  tests/unit/resolveSharedComponentAssets.test.js \
-  tests/unit/resolveRouteAssetPreloads.test.js
+  tests/assetsTest/assertAllowedPreloadUrl.test.js \
+  tests/assetsTest/getAssetPreloadEntriesForSection.helpers.test.js \
+  tests/assetsTest/getAssetPreloadEntriesForSection.rollup.test.js \
+  tests/assetsTest/validateRouteAssetPreloadFlags.test.js \
+  tests/assetsTest/validateSharedComponentAssetMappings.test.js \
+  tests/assetsTest/resolveSharedComponentAssets.test.js \
+  tests/assetsTest/resolveRouteAssetPreloads.test.js
 ```
 
 **Result:** 78 tests passed (7 files).
@@ -722,35 +736,35 @@ test(assets): add policy and route preload resolution coverage
 
 | File | Cases |
 |------|-------|
-| [`tests/unit/assetHandlerFactory.test.js`](../../tests/unit/assetHandlerFactory.test.js) | 4 — `createAssetHandler` |
-| [`tests/unit/assetHandler.config.test.js`](../../tests/unit/assetHandler.config.test.js) | 17 — constructor, config load/validate, versioning |
-| [`tests/unit/assetHandler.lifecycle.test.js`](../../tests/unit/assetHandler.lifecycle.test.js) | 11 — readiness, dispose, statistics |
-| [`tests/unit/assetHandler.dom.test.js`](../../tests/unit/assetHandler.dom.test.js) | 11 — DOM presence, element creation/insert |
-| [`tests/unit/assetHandler.load.test.js`](../../tests/unit/assetHandler.load.test.js) | 17 — load, throttle, preload hints |
-| [`tests/unit/assetHandler.deps.test.js`](../../tests/unit/assetHandler.deps.test.js) | 9 — dependency ensure/ready |
-| [`tests/unit/assetHandler.mount.test.js`](../../tests/unit/assetHandler.mount.test.js) | 12 — mount blockers, events |
-| [`tests/unit/assetHandler.lazy.test.js`](../../tests/unit/assetHandler.lazy.test.js) | 6 — lazy observer, selector load |
-| [`tests/unit/scriptAvailabilityChecker.test.js`](../../tests/unit/scriptAvailabilityChecker.test.js) | 12 — singleton script checker |
-| [`tests/unit/useAssetUrl.test.js`](../../tests/unit/useAssetUrl.test.js) | 6 — reactive URL composable |
-| [`tests/unit/usePreloadStore.test.js`](../../tests/unit/usePreloadStore.test.js) | +1 — initial empty state |
-| [`tests/unit/appBuildHash.test.js`](../../tests/unit/appBuildHash.test.js) | 2 — build-hash preload invalidation |
+| [`tests/assetsTest/assetHandlerFactory.test.js`](../../tests/assetsTest/assetHandlerFactory.test.js) | 4 — `createAssetHandler` |
+| [`tests/assetsTest/assetHandler.config.test.js`](../../tests/assetsTest/assetHandler.config.test.js) | 17 — constructor, config load/validate, versioning |
+| [`tests/assetsTest/assetHandler.lifecycle.test.js`](../../tests/assetsTest/assetHandler.lifecycle.test.js) | 11 — readiness, dispose, statistics |
+| [`tests/assetsTest/assetHandler.dom.test.js`](../../tests/assetsTest/assetHandler.dom.test.js) | 11 — DOM presence, element creation/insert |
+| [`tests/assetsTest/assetHandler.load.test.js`](../../tests/assetsTest/assetHandler.load.test.js) | 17 — load, throttle, preload hints |
+| [`tests/assetsTest/assetHandler.deps.test.js`](../../tests/assetsTest/assetHandler.deps.test.js) | 9 — dependency ensure/ready |
+| [`tests/assetsTest/assetHandler.mount.test.js`](../../tests/assetsTest/assetHandler.mount.test.js) | 12 — mount blockers, events |
+| [`tests/assetsTest/assetHandler.lazy.test.js`](../../tests/assetsTest/assetHandler.lazy.test.js) | 6 — lazy observer, selector load |
+| [`tests/assetsTest/scriptAvailabilityChecker.test.js`](../../tests/assetsTest/scriptAvailabilityChecker.test.js) | 12 — singleton script checker |
+| [`tests/assetsTest/useAssetUrl.test.js`](../../tests/assetsTest/useAssetUrl.test.js) | 6 — reactive URL composable |
+| [`tests/assetsTest/usePreloadStore.test.js`](../../tests/assetsTest/usePreloadStore.test.js) | +1 — initial empty state |
+| [`tests/assetsTest/appBuildHash.test.js`](../../tests/assetsTest/appBuildHash.test.js) | 2 — build-hash preload invalidation |
 
 ### How it was tested
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/assetHandlerFactory.test.js \
-  tests/unit/assetHandler.config.test.js \
-  tests/unit/assetHandler.lifecycle.test.js \
-  tests/unit/assetHandler.dom.test.js \
-  tests/unit/assetHandler.load.test.js \
-  tests/unit/assetHandler.deps.test.js \
-  tests/unit/assetHandler.mount.test.js \
-  tests/unit/assetHandler.lazy.test.js \
-  tests/unit/scriptAvailabilityChecker.test.js \
-  tests/unit/useAssetUrl.test.js \
-  tests/unit/usePreloadStore.test.js \
-  tests/unit/appBuildHash.test.js
+  tests/assetsTest/assetHandlerFactory.test.js \
+  tests/assetsTest/assetHandler.config.test.js \
+  tests/assetsTest/assetHandler.lifecycle.test.js \
+  tests/assetsTest/assetHandler.dom.test.js \
+  tests/assetsTest/assetHandler.load.test.js \
+  tests/assetsTest/assetHandler.deps.test.js \
+  tests/assetsTest/assetHandler.mount.test.js \
+  tests/assetsTest/assetHandler.lazy.test.js \
+  tests/assetsTest/scriptAvailabilityChecker.test.js \
+  tests/assetsTest/useAssetUrl.test.js \
+  tests/assetsTest/usePreloadStore.test.js \
+  tests/assetsTest/appBuildHash.test.js
 ```
 
 **Result:** 118 tests passed (12 files).
@@ -772,17 +786,17 @@ test(assets): add AssetHandler and composable unit coverage
 
 | File | Cases |
 |------|-------|
-| [`tests/unit/routeAssetPrefetch.test.js`](../../tests/unit/routeAssetPrefetch.test.js) | 8 — section prefetch on hover intent |
-| [`tests/unit/useRoutePrefetch.test.js`](../../tests/unit/useRoutePrefetch.test.js) | 6 — combined component + asset prefetch |
-| [`tests/unit/routeResolver.assetPreload.test.js`](../../tests/unit/routeResolver.assetPreload.test.js) | 12 — C-02 assetPreload inheritance |
+| [`tests/assetsTest/routeAssetPrefetch.test.js`](../../tests/assetsTest/routeAssetPrefetch.test.js) | 8 — section prefetch on hover intent |
+| [`tests/assetsTest/useRoutePrefetch.test.js`](../../tests/assetsTest/useRoutePrefetch.test.js) | 6 — combined component + asset prefetch |
+| [`tests/assetsTest/routeResolver.assetPreload.test.js`](../../tests/assetsTest/routeResolver.assetPreload.test.js) | 12 — C-02 assetPreload inheritance |
 
 ### How it was tested
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/routeAssetPrefetch.test.js \
-  tests/unit/useRoutePrefetch.test.js \
-  tests/unit/routeResolver.assetPreload.test.js
+  tests/assetsTest/routeAssetPrefetch.test.js \
+  tests/assetsTest/useRoutePrefetch.test.js \
+  tests/assetsTest/routeResolver.assetPreload.test.js
 ```
 
 **Result:** 26 tests passed (3 files).
@@ -808,35 +822,35 @@ test(assets): add route prefetch and preload inheritance coverage
 
 | File | Cases |
 |------|-------|
-| [`tests/unit/assetScanner.extract.test.js`](../../tests/unit/assetScanner.extract.test.js) | 14 — `extractAssetsFromComponent`, literal/expression extractors |
-| [`tests/unit/assetScanner.scan.test.js`](../../tests/unit/assetScanner.scan.test.js) | 16 — script/template scan, `scanSectionComponents` |
-| [`tests/unit/assetScanner.util.test.js`](../../tests/unit/assetScanner.util.test.js) | 7 — `shouldIgnoreComponent`, `normalizeAssetDefinition` |
-| [`tests/unit/menuItems.assets.test.js`](../../tests/unit/menuItems.assets.test.js) | 13 — `resolveDashboardSidebarMenuItems` |
-| [`tests/unit/sectionPreloader.assets.test.js`](../../tests/unit/sectionPreloader.assets.test.js) | 7 — section → asset preload integration |
-| [`tests/unit/routeNavigationData.assets.test.js`](../../tests/unit/routeNavigationData.assets.test.js) | 3 — `loadCurrentSectionResources` |
-| [`tests/unit/routeConfigLoader.assets.test.js`](../../tests/unit/routeConfigLoader.assets.test.js) | 5 — loader ref expansion + validation |
-| [`tests/unit/jsonConfigValidator.assets.test.js`](../../tests/unit/jsonConfigValidator.assets.test.js) | 5 — build-time asset validators |
-| [`tests/unit/assetsIndexExports.test.js`](../../tests/unit/assetsIndexExports.test.js) | 8 — barrel export contract |
-| [`tests/unit/router.index.assets.test.js`](../../tests/unit/router.index.assets.test.js) | 4 — `sectionNavigationHooks` + router barrel |
-| [`tests/unit/main.assets.bootstrap.test.js`](../../tests/unit/main.assets.bootstrap.test.js) | 4 — `main.js` asset bootstrap order |
-| [`tests/unit/assets.integration.test.js`](../../tests/unit/assets.integration.test.js) | 13 — mocked section/route/asset smoke |
+| [`tests/assetsTest/assetScanner.extract.test.js`](../../tests/assetsTest/assetScanner.extract.test.js) | 14 — `extractAssetsFromComponent`, literal/expression extractors |
+| [`tests/assetsTest/assetScanner.scan.test.js`](../../tests/assetsTest/assetScanner.scan.test.js) | 16 — script/template scan, `scanSectionComponents` |
+| [`tests/assetsTest/assetScanner.util.test.js`](../../tests/assetsTest/assetScanner.util.test.js) | 7 — `shouldIgnoreComponent`, `normalizeAssetDefinition` |
+| [`tests/assetsTest/menuItems.assets.test.js`](../../tests/assetsTest/menuItems.assets.test.js) | 13 — `resolveDashboardSidebarMenuItems` |
+| [`tests/assetsTest/sectionPreloader.assets.test.js`](../../tests/assetsTest/sectionPreloader.assets.test.js) | 7 — section → asset preload integration |
+| [`tests/assetsTest/routeNavigationData.assets.test.js`](../../tests/assetsTest/routeNavigationData.assets.test.js) | 3 — `loadCurrentSectionResources` |
+| [`tests/assetsTest/routeConfigLoader.assets.test.js`](../../tests/assetsTest/routeConfigLoader.assets.test.js) | 5 — loader ref expansion + validation |
+| [`tests/assetsTest/jsonConfigValidator.assets.test.js`](../../tests/assetsTest/jsonConfigValidator.assets.test.js) | 5 — build-time asset validators |
+| [`tests/assetsTest/assetsIndexExports.test.js`](../../tests/assetsTest/assetsIndexExports.test.js) | 8 — barrel export contract |
+| [`tests/assetsTest/router.index.assets.test.js`](../../tests/assetsTest/router.index.assets.test.js) | 4 — `sectionNavigationHooks` + router barrel |
+| [`tests/assetsTest/main.assets.bootstrap.test.js`](../../tests/assetsTest/main.assets.bootstrap.test.js) | 4 — `main.js` asset bootstrap order |
+| [`tests/assetsTest/assets.integration.test.js`](../../tests/assetsTest/assets.integration.test.js) | 13 — mocked section/route/asset smoke |
 
 ### How it was tested
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/assetScanner.extract.test.js \
-  tests/unit/assetScanner.scan.test.js \
-  tests/unit/assetScanner.util.test.js \
-  tests/unit/menuItems.assets.test.js \
-  tests/unit/sectionPreloader.assets.test.js \
-  tests/unit/routeNavigationData.assets.test.js \
-  tests/unit/routeConfigLoader.assets.test.js \
-  tests/unit/jsonConfigValidator.assets.test.js \
-  tests/unit/assetsIndexExports.test.js \
-  tests/unit/router.index.assets.test.js \
-  tests/unit/main.assets.bootstrap.test.js \
-  tests/unit/assets.integration.test.js
+  tests/assetsTest/assetScanner.extract.test.js \
+  tests/assetsTest/assetScanner.scan.test.js \
+  tests/assetsTest/assetScanner.util.test.js \
+  tests/assetsTest/menuItems.assets.test.js \
+  tests/assetsTest/sectionPreloader.assets.test.js \
+  tests/assetsTest/routeNavigationData.assets.test.js \
+  tests/assetsTest/routeConfigLoader.assets.test.js \
+  tests/assetsTest/jsonConfigValidator.assets.test.js \
+  tests/assetsTest/assetsIndexExports.test.js \
+  tests/assetsTest/router.index.assets.test.js \
+  tests/assetsTest/main.assets.bootstrap.test.js \
+  tests/assetsTest/assets.integration.test.js
 ```
 
 **Result:** 99 tests passed (12 files).
@@ -860,21 +874,21 @@ test(assets): add scanner, consumer, and integration coverage
 
 | File | Cases |
 |------|-------|
-| [`tests/unit/assets.concurrency.test.js`](../../tests/unit/assets.concurrency.test.js) | 5 — `runInConcurrencyChunks`, init/load dedupe |
-| [`tests/unit/assets.networkFailure.test.js`](../../tests/unit/assets.networkFailure.test.js) | 5 — retry, blocked URL, fetch/map/prefetch failures |
-| [`tests/unit/assetPolicy.test.js`](../../tests/unit/assetPolicy.test.js) | 5 — `assertAllowedAssetUrl`, policy re-exports |
-| [`tests/unit/assets.consumers.test.js`](../../tests/unit/assets.consumers.test.js) | 5 — `preloadImage` replaces legacy `utils/preload`, Cart migration |
-| [`tests/unit/assets.vitestMigration.test.js`](../../tests/unit/assets.vitestMigration.test.js) | +2 — `utils/preload` import guard |
+| [`tests/assetsTest/assets.concurrency.test.js`](../../tests/assetsTest/assets.concurrency.test.js) | 5 — `runInConcurrencyChunks`, init/load dedupe |
+| [`tests/assetsTest/assets.networkFailure.test.js`](../../tests/assetsTest/assets.networkFailure.test.js) | 5 — retry, blocked URL, fetch/map/prefetch failures |
+| [`tests/assetsTest/assetPolicy.test.js`](../../tests/assetsTest/assetPolicy.test.js) | 5 — `assertAllowedAssetUrl`, policy re-exports |
+| [`tests/assetsTest/assets.consumers.test.js`](../../tests/assetsTest/assets.consumers.test.js) | 5 — `preloadImage` replaces legacy `utils/preload`, Cart migration |
+| [`tests/assetsTest/assets.vitestMigration.test.js`](../../tests/assetsTest/assets.vitestMigration.test.js) | +2 — `utils/preload` import guard |
 
 ### How it was tested
 
 ```bash
 npm run test:unit -- --run \
-  tests/unit/assets.concurrency.test.js \
-  tests/unit/assets.networkFailure.test.js \
-  tests/unit/assetPolicy.test.js \
-  tests/unit/assets.consumers.test.js \
-  tests/unit/assets.vitestMigration.test.js
+  tests/assetsTest/assets.concurrency.test.js \
+  tests/assetsTest/assets.networkFailure.test.js \
+  tests/assetsTest/assetPolicy.test.js \
+  tests/assetsTest/assets.consumers.test.js \
+  tests/assetsTest/assets.vitestMigration.test.js
 ```
 
 **Result:** 27 tests passed (5 files).
@@ -888,3 +902,34 @@ test(assets): add concurrency, network failure, and policy coverage
 ---
 
 *End of log through Phase H asset test coverage.*
+
+---
+
+## Asset test suite relocation — `tests/assetsTest/`
+
+**Reference:** [asset-test-plan.md](./asset-test-plan.md) suggested layout  
+**Scope:** Move master-plan asset Vitest files out of `tests/unit/` into dedicated `tests/assetsTest/`. Legacy pre-plan asset tests remain in `tests/unit/`.
+
+### What changed
+
+| Before | After |
+|--------|-------|
+| 67 plan-track files under `tests/unit/` | Same files under [`tests/assetsTest/`](../../tests/assetsTest/) |
+| `assets.vitestMigration` scanned `tests/unit/` for `asset*` filenames | Scans all `tests/assetsTest/*.test.js`; exclusions updated for integrity JSON, sync script, `appBuildHash`, `usePreloadStore` |
+
+**Left in `tests/unit/` (pre-plan / not in master plan):** e.g. `assetScanner.test.js`, `initAssetLibrary.test.js`, `assetMapBuildValidation.test.js`, `preloadUrlGuard.test.js`, `getAssetPreloadEntriesForSection.test.js`, and other legacy asset-related unit tests.
+
+### How it was tested
+
+```bash
+npm run test:unit -- --run tests/assetsTest
+```
+
+**Result:** 673 tests passed (67 files).
+
+**Suggested commit:**
+
+```
+test(assets): relocate master-plan suites to tests/assetsTest
+```
+

@@ -55,6 +55,8 @@
                 :class="{ 'opacity-50 pointer-events-none grayscale': !item.isEnabled }"
                 :title="$t(item.translationKey, item.fallbackLabel)">
                 <a :href="item.route || '#'" @click.prevent="handleMenuClick(item)"
+                  @mouseenter="item.isEnabled && prefetchMenuItemRoute(item)"
+                  @focus="item.isEnabled && prefetchMenuItemRoute(item)"
                   class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active"
                   :class="{ 'bg-sidebar-active': isMenuItemRouteActive(item) }"
                   :style="!item.isEnabled ? { pointerEvents: 'none', opacity: '0.5' } : {}">
@@ -120,7 +122,9 @@
             :href="item.route || '#'"
             class="flex flex-col items-center justify-center cursor-pointer group"
             :style="!item.isEnabled ? { pointerEvents: 'none', opacity: '0.5' } : {}"
-            @click.prevent="handleMenuClick(item)">
+            @click.prevent="handleMenuClick(item)"
+            @mouseenter="item.isEnabled && prefetchMenuItemRoute(item)"
+            @focus="item.isEnabled && prefetchMenuItemRoute(item)">
             <div class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group-hover:bg-sidebar-active"
                  :class="{ 'bg-sidebar-active': isMenuItemRouteActive(item) }">
               <img :src="item.iconUrl" :alt="$t(item.translationKey, item.fallbackLabel)"
@@ -539,7 +543,7 @@ export default {
       }
     },
     prefetchMenuItemRoute(item) {
-      if (item?.enabled && item?.route) {
+      if (item?.isEnabled && item?.route) {
         createCombinedRoutePrefetchIntentHandler(item.route)();
       }
     },

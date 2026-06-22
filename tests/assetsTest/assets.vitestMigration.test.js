@@ -5,16 +5,18 @@ import { getProjectRoot } from '../helpers/assetFixtures.js';
 
 const STALE_PRELOAD_IMPORT_PATTERN = /(?:from|import)\s*\(?['"][^'"]*utils\/preload/;
 const STALE_IMPORT_PATTERN = /(?:from|import)\s*\(?['"][^'"]*utils\/assets/;
-const SELF_TEST_FILE = 'tests/unit/assets.vitestMigration.test.js';
+const SELF_TEST_FILE = 'tests/assetsTest/assets.vitestMigration.test.js';
 const SCANNED_ROOTS = ['src', 'tests'];
 const SCANNED_EXTENSIONS = new Set(['.js', '.vue', '.ts', '.mjs', '.cjs']);
 const ASSET_TEST_IMPORT_EXCLUSIONS = new Set([
   'tests/unit/assetMapReadme.test.js',
-  'tests/unit/assets.vitestMigration.test.js',
-  'tests/unit/syncAssetMapToPublic.test.js',
-  'tests/unit/assetMap.integrity.test.js',
-  'tests/unit/sharedAssetPreloads.integrity.test.js',
-  'tests/unit/assetMap.auth.integrity.test.js',
+  'tests/assetsTest/assets.vitestMigration.test.js',
+  'tests/assetsTest/syncAssetMapToPublic.test.js',
+  'tests/assetsTest/assetMap.integrity.test.js',
+  'tests/assetsTest/sharedAssetPreloads.integrity.test.js',
+  'tests/assetsTest/assetMap.auth.integrity.test.js',
+  'tests/assetsTest/appBuildHash.test.js',
+  'tests/assetsTest/usePreloadStore.test.js',
   'tests/unit/settingsMenuItemHost.test.js',
   'tests/unit/settingConfig.test.js',
   'tests/unit/iconGlobeUrl.test.js',
@@ -110,8 +112,8 @@ describe('assets.vitestMigration — stale utils/assets import guard', () => {
 
   it('asset module unit tests import from systems/assets paths', () => {
     const projectRoot = getProjectRoot();
-    const assetTests = listSourceFiles(join(projectRoot, 'tests/unit')).filter((filePath) =>
-      filePath.includes('asset') && filePath.endsWith('.test.js'),
+    const assetTests = listSourceFiles(join(projectRoot, 'tests/assetsTest')).filter((filePath) =>
+      filePath.endsWith('.test.js'),
     );
 
     expect(assetTests.length).toBeGreaterThan(0);
