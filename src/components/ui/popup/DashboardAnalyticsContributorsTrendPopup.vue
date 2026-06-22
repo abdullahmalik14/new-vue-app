@@ -43,9 +43,15 @@
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
+        <!-- Loading State -->
+        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container" v-if="!analyticsStore.bundleLoaded || isChartRendering">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#101828] dark:border-white"></div>
+          <span class="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">Loading Chart...</span>
+        </div>
+        <!-- Empty State -->
         <div
-          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10  z-20"
-          v-if="!analyticsStore.bundleLoaded || !insightData?.topContributors?.length || isChartRendering">
+          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container"
+          v-else-if="!insightData?.topContributors?.length">
           <img src="/images/empty-bar.svg" alt="list" class="w-24 h-24 object-contain" style="transform: scale(2.5);" />
           <div class="flex flex-col gap-1">
             <span class="text-xs leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{
@@ -94,9 +100,15 @@
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
+        <!-- Loading State -->
+        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container" v-if="!analyticsStore.bundleLoaded || isChartRendering">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#101828] dark:border-white"></div>
+          <span class="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">Loading Chart...</span>
+        </div>
+        <!-- Empty State -->
         <div
-          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20"
-          v-if="!analyticsStore.bundleLoaded || !insightData?.topFans?.length || isChartRendering">
+          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container"
+          v-else-if="!insightData?.topFans?.length">
           <img src="/images/empty-bar.svg" alt="list" class="w-24 h-24 object-contain" style="transform: scale(2.5);" />
           <div class="flex flex-col gap-1">
             <span class="text-xs leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{
@@ -149,9 +161,15 @@
             <div amchart data-role="chart" style="width:100%;height:100%;"></div>
           </div>
         </div>
+        <!-- Loading State -->
+        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container" v-if="!analyticsStore.bundleLoaded || isChartRendering">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#101828] dark:border-white"></div>
+          <span class="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">Loading Chart...</span>
+        </div>
+        <!-- Empty State -->
         <div
-          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20"
-          v-if="!analyticsStore.bundleLoaded || !insightData?.topOrderSpenders?.length || isChartRendering">
+          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container"
+          v-else-if="!insightData?.topOrderSpenders?.length">
           <img src="/images/empty-bar.svg" alt="list" class="w-24 h-24 object-contain" style="transform: scale(2.5);" />
           <div class="flex flex-col gap-1">
             <span class="text-xs leading-6 text-light-text-secondary dark:text-dark-text-secondary">{{
