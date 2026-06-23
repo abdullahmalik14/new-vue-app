@@ -146,15 +146,39 @@ const topMediaRows = computed(() => {
 
 const p2vSalesRows = computed(() => {
   const data = analyticsStore.trendingMedia?.[props.period] || [];
-  return data.map((item, index) => ({
+  const aggregated = {};
+  data.forEach(item => {
+    const key = item.media || item.title || `Media #${item.rank || 'unknown'}`;
+    if (!key) return;
+    const salesUSD = item.ppvSalesUSD || item.salesUSD || item.sales_usd || 0;
+    const salesCount = item.ppvSalesCount || item.salesCount || item.sales_count || 0;
+    if (!aggregated[key]) {
+      aggregated[key] = {
+        title: key,
+        salesUSD: 0,
+        salesCount: 0,
+        thumbnailUrl: item.thumbnailUrl
+      };
+    }
+    aggregated[key].salesUSD += salesUSD;
+    aggregated[key].salesCount += salesCount;
+  });
+
+  const sorted = Object.values(aggregated)
+    .filter(item => item.salesCount > 0)
+    .sort((a, b) => b.salesUSD - a.salesUSD)
+    .slice(0, 10);
+
+  return sorted.map((item, index) => ({
     id: index,
-    rank: item.rank || index + 1,
-    title: item.media || item.title || `Media #${index + 1}`,
-    sales_count: item.ppvSalesCount || item.salesCount || item.sales_count || 0,
-    sales_usd: `USD$ ${(item.ppvSalesUSD || item.salesUSD || item.sales_usd || 0).toFixed(2)}`,
+    rank: index + 1,
+    title: item.title,
+    sales_count: item.salesCount,
+    sales_usd: `USD$ ${item.salesUSD.toFixed(2)}`,
     image: item.thumbnailUrl || '/images/profile-thumbnail.png'
   }));
 });
+
 
 const topMediaTheme = {
   container: 'relative bg-transparent border-none w-full ',
