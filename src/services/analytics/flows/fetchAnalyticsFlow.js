@@ -57,7 +57,7 @@ export async function fetchAnalyticsFlow({ payload, context }) {
     //   trendingCountries: [],
     //   contributors: [],
     // };
-    data.dataSource = source;
+    data.dataSource = payload?.source || "full";
 
     console.log(`[Polling] ✅ Successfully fetched new analytics data.`);
 
