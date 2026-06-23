@@ -81,7 +81,13 @@
              <div data-chart-container data-chart-id="sales-alltime-line" :hidden="isDaily||!(activePeriod==='alltime'&&activeSalesViewMode==='line')||undefined" class="absolute inset-0" :data-chart-config='getSalesLineCfg("sales-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
           </div>
           
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20" v-if="!analyticsStore.bundleLoaded || !insightData?.total || isChartRendering">
+          <!-- Loading State -->
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-if="!analyticsStore.bundleLoaded || isChartRendering">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#101828] dark:border-white"></div>
+            <span class="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">Loading Chart...</span>
+          </div>
+          <!-- Empty State -->
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-else-if="!insightData?.total">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
             <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
@@ -117,7 +123,13 @@
              <div data-chart-container data-chart-id="tokens-alltime-line" :hidden="isDaily||!(activePeriod==='alltime'&&activeTokensViewMode==='line')||undefined" class="absolute inset-0" :data-chart-config='getTokensLineCfg("tokens-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
           </div>
 
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20" v-if="!analyticsStore.bundleLoaded || !insightData?.totalTokens || isChartRendering">
+          <!-- Loading State -->
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-if="!analyticsStore.bundleLoaded || isChartRendering">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#101828] dark:border-white"></div>
+            <span class="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">Loading Chart...</span>
+          </div>
+          <!-- Empty State -->
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-else-if="!insightData?.totalTokens">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
             <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>

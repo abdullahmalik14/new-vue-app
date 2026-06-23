@@ -10,11 +10,12 @@ import { useDashboardAnalyticsStore } from "@/stores/useDashboardAnalyticsStore.
  * @param {Object} params.context - Pipeline context
  */
 export async function fetchAnalyticsFlow({ payload, context }) {
-  const source = payload?.source || "full";
-  const bundleFile =
-    source === "empty"
-      ? "/api/charts/456?nocache=1"
-      : "/api/charts/456?nocache=1";
+  let creatorId = "456";
+  if (typeof window !== "undefined") {
+    const urlParams = new URLSearchParams(window.location.search);
+    creatorId = urlParams.get("creator_id") || urlParams.get("creatorId") || "456";
+  }
+  const bundleFile = `/api/charts/${creatorId}?nocache=1`;
 
   console.log(
     `[Polling] ⏰ Fetching latest analytics data from ${bundleFile}...`,
