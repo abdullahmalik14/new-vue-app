@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BookingAdjustmentPopup from '@/components/ui/popup/booking/BookingAdjustmentPopup.vue';
+import BookingAdjustmentPopup from '@/components/ui/popups/booking/BookingAdjustmentPopup.vue';
 import BookingMoreOptionsDropdown from '@/components/ui/dropdowns/booking/BookingMoreOptionsDropdown.vue';
 import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/DashboardSharedTwoColLayout.vue';
 
@@ -237,25 +237,25 @@ import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButt
 import Cookies from "@/components/ui/badge/dashboard/Cookies.vue";
 import Cart from "@/components/ui/cart/Cart.vue";
 import OrderReceived from "@/dev/components/ui/table/dashboard/OrderReceived.vue";
-import ProfileViewAllPopup from "@/components/ui/popup/ProfileViewAllPopup.vue";
-import ProfileMediaDetailsPopup from "@/components/ui/popup/ProfileMediaDetailsPopup.vue";
-import AvatarUploadPopup from "@/components/ui/popup/AvatarUploadPopup.vue";
+import ProfileViewAllPopup from "@/components/ui/popups/ProfileViewAllPopup.vue";
+import ProfileMediaDetailsPopup from "@/components/ui/popups/ProfileMediaDetailsPopup.vue";
+import AvatarUploadPopup from "@/components/ui/popups/AvatarUploadPopup.vue";
 import { onMounted, ref } from "vue";
-import ImageCropperModal from "@/components/ui/popup/ImageCropperModal.vue";
-import CancelUploadPopup from "@/components/ui/popup/CancelUploadPopup.vue";
+import ImageCropperModal from "@/components/ui/popups/ImageCropperModal.vue";
+import CancelUploadPopup from "@/components/ui/popups/CancelUploadPopup.vue";
 import UploadingProgressBar from "@/components/ui/progress/UploadingProgressBar.vue";
-import BuyNowLoginPopup from "@/components/ui/popup/buy-now/BuyNowLoginPopup.vue";
-import BuyNowNotLoginPopup from "@/components/ui/popup/buy-now/BuyNowNotLoginPopup.vue";
-import CartCheckoutLoginPopup from "@/components/ui/popup/cart-checkout/CartCheckoutLoginPopup.vue";
-import CartCheckoutNotLoginPopup from "@/components/ui/popup/cart-checkout/CartCheckoutNotLoginPopup.vue";
-import SubscribeLoginPopup from "@/components/ui/popup/subscribe/SubscribeLoginPopup.vue";
-import SubscribeNotLoginPopup from "@/components/ui/popup/subscribe/SubscribeNotLoginPopup.vue";
-import SubscribeUpdateLoginPopup from "@/components/ui/popup/subscribe/SubscribeUpdateLoginPopup.vue";
+import BuyNowLoginPopup from "@/components/ui/popups/buy-now/BuyNowLoginPopup.vue";
+import BuyNowNotLoginPopup from "@/components/ui/popups/buy-now/BuyNowNotLoginPopup.vue";
+import CartCheckoutLoginPopup from "@/components/ui/popups/cart-checkout/CartCheckoutLoginPopup.vue";
+import CartCheckoutNotLoginPopup from "@/components/ui/popups/cart-checkout/CartCheckoutNotLoginPopup.vue";
+import SubscribeLoginPopup from "@/components/ui/popups/subscribe/SubscribeLoginPopup.vue";
+import SubscribeNotLoginPopup from "@/components/ui/popups/subscribe/SubscribeNotLoginPopup.vue";
+import SubscribeUpdateLoginPopup from "@/components/ui/popups/subscribe/SubscribeUpdateLoginPopup.vue";
 import DashProfileSettings from "@/components/ui/nav/dashboard/DashProfileSettings.vue";
-import PurchaseTipFlowPopup from "@/components/ui/popup/purchase/PurchaseTipFlowPopup.vue";
-import PurchaseFlowSubscriptionOrderPopup from "@/components/ui/popup/purchase/PurchaseFlowSubscriptionOrderPopup.vue";
-import GuestPurchaseFlowPopup from "@/components/ui/popup/purchase/GuestPurchaseFlowPopup.vue";
-import UpgradeTierPopup from "@/components/ui/popup/purchase/UpgradeTierPopup.vue";
+import PurchaseTipFlowPopup from "@/components/ui/popups/purchase/PurchaseTipFlowPopup.vue";
+import PurchaseFlowSubscriptionOrderPopup from "@/components/ui/popups/purchase/PurchaseFlowSubscriptionOrderPopup.vue";
+import GuestPurchaseFlowPopup from "@/components/ui/popups/purchase/GuestPurchaseFlowPopup.vue";
+import UpgradeTierPopup from "@/components/ui/popups/purchase/UpgradeTierPopup.vue";
 import TierCard from "@/components/ui/card/dashboard/TierCard.vue";
 import { tierData } from "/public/data/TierData.js";
 import LatestEventCard from "@/components/ui/card/dashboard/LatestEventCard.vue";

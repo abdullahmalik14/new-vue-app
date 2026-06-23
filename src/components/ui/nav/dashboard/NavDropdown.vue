@@ -1,9 +1,9 @@
 <script setup>
-import BasePopup from '@/components/ui/popup/BasePopup.vue';
+import BasePopup from '@/components/ui/popups/BasePopup.vue';
 import DashboardMenuCounter from '@/components/ui/nav/dashboard/DashboardMenuCounter.vue';
 import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { dashboardSidebarMenuItems as menuItems } from "@/assets/data/dashboard-sidebar-menu-items.js";
+import { dashboardSidebarMenuItems as menuItems } from "@/config/dashboard-sidebar-menu-items.js";
 import { resolveDashboardSidebarMenuItems as resolveMenuItemsWithAssets } from "@/systems/dashboard/resolve-dashboard-sidebar-menu-items.js";
 import { getI18nInstance } from "@/systems/i18n/i18nInstance.js";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -102,7 +102,7 @@ const handleSubmenuClick = (e, childItem) => {
 
 <template>
   <BasePopup :modelValue="props.modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="config">
+    :popup-config="config">
     <div
       class="sidebar-main-wrapper flex flex-col items-center justify-start bg-sidebar-bg w-full pt-2 pb-2 gap-4 left-0 backdrop-blur-lg px-4 fixed top-0 z-[5] h-auto sm:h-auto sm-md:h-auto h-screen shadow-sidebar opacity-100 visible pointer-events-auto scale-100 origin-[100%_0]">
       <!-- nav-close-button -->
@@ -162,7 +162,7 @@ const handleSubmenuClick = (e, childItem) => {
   </BasePopup>
 
   <!-- Submenu Popup -->
-  <BasePopup v-model="showSubmenuPopup" :config="submenuPopupConfig" :is-loading="false">
+  <BasePopup v-model="showSubmenuPopup" :popup-config="submenuPopupConfig" :is-loading="false">
     <div
       class="w-full h-[100vh] flex flex-col items-start gap-4 overflow-hidden bg-submenu-bg px-4 py-2 shadow-md backdrop-blur-lg">
       <!-- submenu-header -->

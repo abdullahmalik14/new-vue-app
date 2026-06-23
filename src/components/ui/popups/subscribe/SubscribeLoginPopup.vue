@@ -2,15 +2,15 @@
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
-import BasePopup from '@/components/ui/popup/BasePopup.vue';
-import CheckoutMediaPreview from '../checkout/CheckoutMediaPreview.vue';
-import SectionHeader from '../checkout/SectionHeader.vue';
-import SubscriptionPlanCard from '../checkout/SubscriptionPlanCard.vue';
-import PaymentMethodLoggedIn from '../checkout/PaymentMethodLoggedIn.vue';
-import CheckoutNotes from '../checkout/CheckoutNotes.vue';
-import CheckboxGroup from '@/components/forms/checkboxes/CheckboxGroup.vue';
-import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
-import TotalAmountRow from '../checkout/TotalAmountRow.vue';
+import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
+import CheckoutMediaPreview from "../checkout/CheckoutMediaPreview.vue";
+import CheckoutNotes from "../checkout/CheckoutNotes.vue";
+import PaymentMethodLoggedIn from "../checkout/PaymentMethodLoggedIn.vue";
+import SectionHeader from "../checkout/SectionHeader.vue";
+import SubscriptionPlanCard from "../checkout/SubscriptionPlanCard.vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
+import BasePopup from "@/components/ui/popups/BasePopup.vue";
+import TotalAmountRow from "../checkout/TotalAmountRow.vue";
 
 
 const props = defineProps({
@@ -19,7 +19,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
-const subscribeUpdateLoginConfig = {
+const subscribeLoginConfig = {
   actionType: "slidein",
   from: "right",
   offset: "0px",
@@ -35,24 +35,24 @@ const subscribeUpdateLoginConfig = {
   closeSpeed: "250ms",
   closeEffect: "cubic-bezier(0.4, 0, 0.2, 1)",
 };
+
 </script>
 
 <template>
     <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="subscribeUpdateLoginConfig"
+    :popup-config="subscribeLoginConfig"
   >
-    <div
-    class="bg-[#272727] font-sans p-0 m-0 box-border overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] [&.dark]:bg-[#202324]"
+  <div
+    class="bg-[#272727] font-sans p-0 m-0 box-border overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none]"
   >
     <!-- popup-wrapper -->
     <div
       class="flex flex-col h-screen bg-white/10 backdrop-blur-[100px] drop-shadow-[0_4px_6px_-2px_#10182808,0_12px_16px_-4px_#10182814] md:flex-row overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:overflow-y-[unset]"
     >
-
       <!-- image-container -->
-      <checkout-media-preview
+      <CheckoutMediaPreview
         @update:modelValue="emit('update:modelValue', false)"
         image="https://i.ibb.co.com/70sHrpv/featured-media-bg.webp"
         creatorName="Princess Carrot Pop"
@@ -64,15 +64,15 @@ const subscribeUpdateLoginConfig = {
       <!-- form-container -->
       <div
         class="flex flex-col gap-6 px-2 pt-4 pb-6 md:overflow-y-auto [scrollbar-width:none] 
-        [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:px-4 sm:py-6 md:w-1/2
-         md:h-screen md:bg-black/50 dark:bg-background-dark-app"
+        [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:px-4 sm:py-6 md:w-1/2 md:h-screen
+         md:bg-black/50 dark:bg-background-dark-app"
       >
         <!-- form-section -->
         <div class="flex flex-col gap-6">
           <!-- email-account-section -->
           <div class="flex flex-col gap-2">
             <!-- title-container -->
-            <section-header
+            <SectionHeader
               title="ACCOUNT EMAIL"
               icon="https://i.ibb.co.com/LX2mCL2d/Communication.webp"
               :showClose="true"
@@ -120,8 +120,9 @@ const subscribeUpdateLoginConfig = {
           </div>
 
           <div class="flex flex-col gap-6">
-            <!-- subscription-section -->
-            <div class="flex flex-col gap-4 md:order-2">
+
+            <!-- subscription-section  mobile-->
+            <div class="flex flex-col gap-4 md:hidden">
               <!-- title-container -->
               <div
                 class="flex justify-between items-center border-b border-transparent"
@@ -145,24 +146,6 @@ const subscribeUpdateLoginConfig = {
 
               <!-- new-subscription-wrapper -->
               <div class="flex flex-col gap-4">
-                <p class="text-base font-medium text-[#F9FAFB]">
-                  You are about to change your membership tier as follow:
-                </p>
-
-                <div class="flex flex-col gap-2">
-                  <h4 class="text-xs leading-normal font-medium text-[#98A2B3]">
-                    Current subscription
-                  </h4>
-
-                  <!-- subscription-container -->
-                  <SubscriptionPlanCard
-                    title="FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
-                    price="USD$499.99/mo"
-                    backgroundImage="https://i.ibb.co.com/70sHrpv/featured-media-bg.webp"
-                    accentColor="#667085"
-                  />
-                </div>
-
                 <div class="flex flex-col gap-2">
                   <h4 class="text-xs leading-normal font-medium text-[#98A2B3]">
                     New Subscribtion
@@ -173,16 +156,15 @@ const subscribeUpdateLoginConfig = {
                     title="FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
                     price="USD$499.99/mo"
                     backgroundImage="https://i.ibb.co.com/70sHrpv/featured-media-bg.webp"
-                    accentColor="#FF0066"
+                    accentColor="#FFCC01"
                     footerText="Your membership will update in your next billing cycle (xx-xx-xxxx)"
-                    footerColor="#ffffff"
-                    
                   />
                 </div>
               </div>
             </div>
+            
             <!-- payment-method-section -->
-            <div class="flex flex-col gap-4 md:order-1">
+            <div class="flex flex-col gap-4">
               <!-- title-container -->
               <div
                 class="flex justify-between items-center border-b border-transparent"
@@ -220,10 +202,51 @@ const subscribeUpdateLoginConfig = {
               <!-- form-container -->
               <PaymentMethodLoggedIn />
             </div>
-            <!-- notes-section -->
-            <div class="flex flex-col gap-6 md:order-3">
-            <CheckoutNotes :showAvatars="false" />
+
+            <!-- subscription-section  desktop-->
+            <div class="md:flex flex-col gap-4 hidden">
+              <!-- title-container -->
+              <div
+                class="flex justify-between items-center border-b border-transparent"
+              >
+                <!-- section-title -->
+                <div class="flex items-center gap-2">
+                  <div class="flex justify-center items-center w-5 h-5">
+                    <img
+                      src="https://i.ibb.co.com/gZsWNR4Q/our-website-full-white-logo.webp"
+                      alt="logo"
+                      class="w-5 h-5 [filter:brightness(0)_saturate(100%)_invert(98%)_sepia(1%)_saturate(934%)_hue-rotate(29deg)_brightness(120%)_contrast(100%)]"
+                    />
+                  </div>
+                  <h3
+                    class="text-base font-semibold text-[#F9FAFB] align-middle"
+                  >
+                    SUBSCRIPTION
+                  </h3>
+                </div>
+              </div>
+
+              <!-- new-subscription-wrapper -->
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                  <h4 class="text-xs leading-normal font-medium text-[#98A2B3]">
+                    New Subscribtion
+                  </h4>
+
+                  <!-- subscription-container -->
+                  <SubscriptionPlanCard
+                    title="FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
+                    price="USD$499.99/mo"
+                    backgroundImage="https://i.ibb.co.com/70sHrpv/featured-media-bg.webp"
+                    accentColor="#FFCC01"
+                    footerText="Your membership will update in your next billing cycle (xx-xx-xxxx)"
+                  />
+                </div>
+              </div>
             </div>
+
+            <!-- notes-section -->
+            <CheckoutNotes :showAvatars="false" />
           </div>
         </div>
 
@@ -248,6 +271,7 @@ const subscribeUpdateLoginConfig = {
             </p>
 
             <TotalAmountRow amount="USD$6.99" />
+           
             <!-- checkbox-container -->
             <CheckboxGroup
               checkboxClass="appearance-none border border-[#D0D5DD] rounded-[4px] w-4 min-w-4 h-4 checked:accent-[#07f468] checked:bg-[#07f468] checked:border-[#07f468] checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:border-[black] checked:after:border-b-[2px] checked:after:border-r-[2px] checked:after:rotate-45 checked:after:box-border cursor-pointer"
@@ -267,6 +291,7 @@ const subscribeUpdateLoginConfig = {
                 >Privacy Policy</a
               >.
             </CheckboxGroup>
+
             <!-- button -->
             <DashboardPrimaryButton
               text="Proceed Payment"
@@ -280,5 +305,4 @@ const subscribeUpdateLoginConfig = {
     </div>
   </div>
   </BasePopup>
-
 </template>

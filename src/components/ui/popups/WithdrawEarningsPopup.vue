@@ -2,7 +2,7 @@
   <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="popupConfig"
+    :popup-config="popupConfig"
   >
     <!-- popup-inner-wrapper -->
     <div class="w-full min-h-screen relative overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] shadow-[0px_0px_10px_0px_#00000040] bg-[#F9FAFB]/90 md:w-[29.1875rem] dark:bg-[#1b1d1e]/90">

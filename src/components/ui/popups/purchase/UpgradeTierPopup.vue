@@ -3,8 +3,8 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import BasePopup from "@/components/ui/popup/BasePopup.vue";
-import PurchaseFlowSubscriptionOrderPopup from "@/components/ui/popup/purchase/PurchaseFlowSubscriptionOrderPopup.vue";
+import BasePopup from "@/components/ui/popups/BasePopup.vue";
+import PurchaseFlowSubscriptionOrderPopup from "@/components/ui/popups/purchase/PurchaseFlowSubscriptionOrderPopup.vue";
 
 const purchaseFlowOpen = ref(false);
 
@@ -71,7 +71,7 @@ const guestPurchaseFlowPopupConfig = computed(() => {
 
 <template>
   <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="guestPurchaseFlowPopupConfig">
+    :popup-config="guestPurchaseFlowPopupConfig">
     <div
       class="bg-white/90 backdrop-blur-[50px] shadow-[0px_4px_6px_-2px_#10182808,0px_12px_16px_-4px_#10182814] /* Mobile Styling */ w-full rounded-t-[0.625rem] /* Desktop Styling */ md:max-w-[31.25rem] md:rounded-[0.625rem] md:bg-white/10 dark:bg-[#181a1b]/90 md:dark:bg-[#181a1b]/10 md:backdrop-blur-[35px]">
       <div class="flex flex-col py-1">

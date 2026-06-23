@@ -1,5 +1,5 @@
 <template>
-  <BasePopup :modelValue="isSubmenuOpen" @update:modelValue="$emit('update:isSubmenuOpen', $event)" :config="submenuPopupConfig" :is-loading="false">
+  <BasePopup :modelValue="isSubmenuOpen" @update:modelValue="$emit('update:isSubmenuOpen', $event)" :popup-config="submenuPopupConfig" :is-loading="false">
     <div v-if="isSubmenuOpen" class="w-full h-[100vh] flex flex-col items-start gap-4 overflow-hidden bg-submenu-bg px-4 py-2 shadow-md backdrop-blur-lg">
       <!-- submenu-header -->
       <div class="flex justify-between gap-4 w-full mt-8">
@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import BasePopup from "@/components/ui/popup/BasePopup.vue";
+import BasePopup from "@/components/ui/popups/BasePopup.vue";
 import DashboardMenuCounter from "@/components/ui/nav/dashboard/DashboardMenuCounter.vue";
 import { createRoutePrefetchIntentHandler } from "@/systems/routing/useRoutePrefetch.js";
 import { isDashboardMenuItemActive } from "@/systems/routing/isDashboardMenuItemActive.js";

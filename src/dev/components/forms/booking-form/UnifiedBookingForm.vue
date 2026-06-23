@@ -161,7 +161,7 @@ import GroupBookingStep1 from "./GroupBookingStep1.vue";
 import GroupBookingStep2 from "./GroupBookingStep2.vue";
 import MainCalendar from "@/dev/components/calendar/MainCalendar.vue";
 import NotificationCard from "@/components/ui/card/dashboard/NotificationCard.vue";
-// import OneOnOneBookingFlowPopup from "@/components/ui/popup/FanBookingFlow/OneOnOneBookingFlow/OneOnOneBookingFlowPopup.vue";
+// import OneOnOneBookingFlowPopup from "@/components/ui/popups/FanBookingFlow/OneOnOneBookingFlow/OneOnOneBookingFlowPopup.vue";
 
 const props = defineProps({
     type: {

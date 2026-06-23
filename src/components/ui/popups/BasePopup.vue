@@ -13,10 +13,10 @@ A single, reusable Vue 3 SFC that handles BOTH centered popups and slide-ins.
 - NEW: Optional scrollable content with hidden scrollbar
 ================================================================= -->
 <template>
-  <Teleport :to="props.teleportTo || 'body'" :disabled="cfg.isAbsolute">
+  <Teleport :to="props.teleportTo || 'body'" :disabled="mergedPopupConfig.isAbsolute">
     <!-- Local overlay for absolute popups to avoid dimming whole screen -->
     <div 
-      v-if="isPanelVisible && cfg.isAbsolute && cfg.shouldShowOverlay"
+      v-if="isPanelVisible && mergedPopupConfig.isAbsolute && mergedPopupConfig.shouldShowOverlay"
       class="absolute inset-0 bg-black/5 backdrop-blur-[7.5px] z-[1999] cursor-pointer"
       @click="handleEscapeKey"
     ></div>
@@ -109,7 +109,7 @@ const props = defineProps({
    *   scrollable: true | false (NEW: makes content scrollable with hidden scrollbar)
    * }
    */
-  config: {
+  popupConfig: {
     type: Object,
     required: true
   },
@@ -138,12 +138,12 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:modelValue',
-  'opened',
-  'closed'
+  'popup-opened',
+  'popup-closed'
 ]);
 
 // -------------------- Defaults (per your spec) --------------------
-const defaults = {
+const DEFAULT_POPUP_CONFIG = {
   actionType: 'popup',
   speed: '200ms',
   effect: 'ease',
@@ -174,7 +174,7 @@ const defaults = {
 const popupPanelRef = ref(null);
 const popupContentRef = ref(null);
 const isPanelVisible = ref(false);
-const currentZIndex = ref(defaults.zIndex);
+const currentZIndex = ref(DEFAULT_POPUP_CONFIG.zIndex);
 
 const {
   registerPanel,
@@ -188,7 +188,7 @@ const {
 } = usePopupStack();
 
 // -------------------- Helpers --------------------
-const cfg = computed(() => ({ ...defaults, ...(props.config || {}) }));
+const mergedPopupConfig = computed(() => ({ ...DEFAULT_POPUP_CONFIG, ...(props.popupConfig || {}) }));
 
 function assertPopupShellInvariant(msg) {
   console.error(`[BasePopup] ${msg}`);
@@ -200,7 +200,7 @@ function resolveResponsive(value) {
   if (typeof value !== 'object') {
     return (typeof value === 'string') ? value.trim().toLowerCase() : value;
   }
-  const w = window.innerWidth;
+  const viewportWidth = window.innerWidth;
   const fallback = value.default ?? Object.values(value)[0];
   let matchedBreakpointValue = null;
 
@@ -208,13 +208,13 @@ function resolveResponsive(value) {
     if (key === 'default') continue;
     if (key.startsWith('<')) {
       const breakpointWidthLimit = parseInt(key.slice(1), 10);
-      if (w < breakpointWidthLimit) matchedBreakpointValue = value[key];
+      if (viewportWidth < breakpointWidthLimit) matchedBreakpointValue = value[key];
     } else if (key.startsWith('>')) {
       const breakpointWidthLimit = parseInt(key.slice(1), 10);
-      if (w > breakpointWidthLimit) matchedBreakpointValue = value[key];
+      if (viewportWidth > breakpointWidthLimit) matchedBreakpointValue = value[key];
     } else if (key.includes('-')) {
       const [min, max] = key.split('-').map(n => parseInt(n, 10));
-      if (w >= min && w <= max) matchedBreakpointValue = value[key];
+      if (viewportWidth >= min && viewportWidth <= max) matchedBreakpointValue = value[key];
     }
   }
   const resolved = (matchedBreakpointValue ?? fallback);
@@ -223,11 +223,11 @@ function resolveResponsive(value) {
 
 function isInstantOpen() {
   // open animation considered instant if speed === "0ms" OR customEffect === "instant"
-  return cfg.value.speed === '0ms' || cfg.value.customEffect === 'instant';
+  return mergedPopupConfig.value.speed === '0ms' || mergedPopupConfig.value.customEffect === 'instant';
 }
 function isInstantClose() {
   // close animation considered instant if closeSpeed === "0ms" OR closeEffect === "instant"
-  return (cfg.value.closeSpeed ?? cfg.value.speed) === '0ms' || (cfg.value.closeEffect ?? cfg.value.effect) === 'instant';
+  return (mergedPopupConfig.value.closeSpeed ?? mergedPopupConfig.value.speed) === '0ms' || (mergedPopupConfig.value.closeEffect ?? mergedPopupConfig.value.effect) === 'instant';
 }
 
 function dispatchDomEvent(name, detail) {
@@ -240,15 +240,15 @@ function dispatchDomEvent(name, detail) {
 }
 
 // -------------------- Derived styles & classes --------------------
-const isPopup = computed(() => (cfg.value.actionType || 'popup') === 'popup');
+const isPopup = computed(() => (mergedPopupConfig.value.actionType || 'popup') === 'popup');
 const isSlideIn = computed(() => !isPopup.value);
 
 const ariaRole = computed(() => {
   // Use dialog semantics for modal popups; slide-ins default to complementary unless overlay makes them modal
   if (isPopup.value) return 'dialog';
-  return cfg.value.shouldShowOverlay ? 'dialog' : 'complementary';
+  return mergedPopupConfig.value.shouldShowOverlay ? 'dialog' : 'complementary';
 });
-const isModal = computed(() => !!cfg.value.shouldShowOverlay);
+const isModal = computed(() => !!mergedPopupConfig.value.shouldShowOverlay);
 
 // container class: minimal Tailwind; visual decisions mostly from config / inline transforms
 const containerClassList = computed(() => {
@@ -260,14 +260,14 @@ const containerClassList = computed(() => {
     'outline-none'
   ];
   // Hide scrollbar via CSS (for Chrome/Safari — inline styles can't target ::webkit-scrollbar)
-  if (cfg.value.scrollable !== false) {
+  if (mergedPopupConfig.value.scrollable !== false) {
     base.push('scrollbar-hide');
   }
-  if (cfg.value.containerClass) {
-    if (Array.isArray(cfg.value.containerClass)) base.push(...cfg.value.containerClass);
-    else base.push(cfg.value.containerClass);
+  if (mergedPopupConfig.value.containerClass) {
+    if (Array.isArray(mergedPopupConfig.value.containerClass)) base.push(...mergedPopupConfig.value.containerClass);
+    else base.push(mergedPopupConfig.value.containerClass);
   }
-  if (cfg.value.customClass) base.push(cfg.value.customClass);
+  if (mergedPopupConfig.value.customClass) base.push(mergedPopupConfig.value.customClass);
   return base;
 });
 
@@ -279,14 +279,14 @@ const contentClassList = computed(() => {
 
 const containerBindAttrs = computed(() => {
   // Add any data-* or aria-* attributes the caller wants
-  const attrs = cfg.value.containerAttrs || {};
+  const attrs = mergedPopupConfig.value.containerAttrs || {};
   return attrs;
 });
 
 // Loader component from config
-const loaderComponent = computed(() => (cfg.value.loader && cfg.value.loader.component) ? cfg.value.loader.component : null);
-const loaderProps = computed(() => (cfg.value.loader && cfg.value.loader.props) ? cfg.value.loader.props : {});
-const loaderPosition = computed(() => (cfg.value.loader && cfg.value.loader.position) ? cfg.value.loader.position : 'center');
+const loaderComponent = computed(() => (mergedPopupConfig.value.loader && mergedPopupConfig.value.loader.component) ? mergedPopupConfig.value.loader.component : null);
+const loaderProps = computed(() => (mergedPopupConfig.value.loader && mergedPopupConfig.value.loader.props) ? mergedPopupConfig.value.loader.props : {});
+const loaderPosition = computed(() => (mergedPopupConfig.value.loader && mergedPopupConfig.value.loader.position) ? mergedPopupConfig.value.loader.position : 'center');
 
 // -------------------- Open/Close mechanics --------------------
 async function openPanel() {
@@ -299,7 +299,7 @@ async function openPanel() {
   if (!panel) return;
 
   // z-index calc & overlay
-  const baseZIndex = (cfg.value.forceZIndex != null) ? cfg.value.forceZIndex : (cfg.value.zIndex ?? defaults.zIndex);
+  const baseZIndex = (mergedPopupConfig.value.forceZIndex != null) ? mergedPopupConfig.value.forceZIndex : (mergedPopupConfig.value.zIndex ?? DEFAULT_POPUP_CONFIG.zIndex);
   
   // Register with stack after nextTick ensures popupPanelRef.value is not null
   registerPanel(popupPanelRef, {
@@ -314,19 +314,19 @@ async function openPanel() {
   });
 
   currentZIndex.value = bringToFront(panel, baseZIndex);
-  if (cfg.value.shouldShowOverlay && !cfg.value.isAbsolute) {
+  if (mergedPopupConfig.value.shouldShowOverlay && !mergedPopupConfig.value.isAbsolute) {
     setOverlayZ(currentZIndex.value - 1);
     setOverlayActive(true);
     setOverlayVisible(true);
     registerOverlayClickHandler();
-  } else if (cfg.value.shouldCloseOnOutsideClick) {
+  } else if (mergedPopupConfig.value.shouldCloseOnOutsideClick) {
     // Even without global overlay, set up outside click detection
     registerOverlayClickHandler();
   }
 
 
   // Body scroll lock
-  if (cfg.value.shouldLockBodyScroll) bodyScrollLock(true);
+  if (mergedPopupConfig.value.shouldLockBodyScroll) bodyScrollLock(true);
 
   // Initial inline styles (positioning + transform off-screen if needed)
   applyPanelInitialStyles(panel);
@@ -342,7 +342,7 @@ async function openPanel() {
     applyPanelEnterStyles(panel);
     const completePanelOpen = () => {
       // Add document click listener for outside click detection (only if no overlay)
-      if (!cfg.value.shouldShowOverlay && cfg.value.shouldCloseOnOutsideClick) {
+      if (!mergedPopupConfig.value.shouldShowOverlay && mergedPopupConfig.value.shouldCloseOnOutsideClick) {
         // Use setTimeout to ensure the popup is fully rendered before adding the listener
         setTimeout(() => {
           document.addEventListener('click', handleDocumentClick);
@@ -351,9 +351,9 @@ async function openPanel() {
       
       // Dispatch events with flags
       const detail = buildEventDetail(PANEL_EVENT_PHASE_OPEN);
-      const domName = isPopup.value ? (cfg.value.openDomEventName || 'popup:open') : (cfg.value.openDomEventName || 'slideIn:open');
+      const domName = isPopup.value ? (mergedPopupConfig.value.openDomEventName || 'popup-open') : (mergedPopupConfig.value.openDomEventName || 'slidein-open');
       dispatchDomEvent(domName, detail);
-      emit('opened', detail);
+      emit('popup-opened', detail);
     };
     if (isInstantOpen()) completePanelOpen();
     else panel.addEventListener('transitionend', completePanelOpen, { once: true });
@@ -368,19 +368,19 @@ function closePanel() {
 
   const completePanelClose = () => {
     // Reset styles if requested
-    if (cfg.value.resetOnClose) {
+    if (mergedPopupConfig.value.resetOnClose) {
       panel.removeAttribute('style');
-      if (cfg.value.customClass) {
+      if (mergedPopupConfig.value.customClass) {
         // nothing else to remove; customClass is kept as class (per spec)
       }
     }
     isPanelVisible.value = false;
 
     // Unlock scroll if this panel was locking it
-    if (cfg.value.shouldLockBodyScroll) bodyScrollLock(false);
+    if (mergedPopupConfig.value.shouldLockBodyScroll) bodyScrollLock(false);
 
     // Remove document click listener if it was added
-    if (!cfg.value.shouldShowOverlay && cfg.value.shouldCloseOnOutsideClick) {
+    if (!mergedPopupConfig.value.shouldShowOverlay && mergedPopupConfig.value.shouldCloseOnOutsideClick) {
       document.removeEventListener('click', handleDocumentClick);
     }
 
@@ -392,9 +392,9 @@ function closePanel() {
 
     // Events
     const detail = buildEventDetail(PANEL_EVENT_PHASE_CLOSE);
-    const domName = isPopup.value ? (cfg.value.closeDomEventName || 'popup:close') : (cfg.value.closeDomEventName || 'slideIn:close');
+    const domName = isPopup.value ? (mergedPopupConfig.value.closeDomEventName || 'popup-close') : (mergedPopupConfig.value.closeDomEventName || 'slidein-close');
     dispatchDomEvent(domName, detail);
-    emit('closed', detail);
+    emit('popup-closed', detail);
   };
 
   if (isInstantClose()) completePanelClose();
@@ -430,26 +430,26 @@ function validateBeforeOpen() {
   if (!popupContentRef.value) assertPopupShellInvariant('Content element not found.');
 
   // Validate actionType
-  const at = cfg.value.actionType || 'popup';
-  if (at !== 'popup' && at !== 'slideIn') assertPopupShellInvariant(`Invalid actionType "${at}". Use "popup" or "slideIn".`);
+  const actionType = mergedPopupConfig.value.actionType || 'popup';
+  if (actionType !== 'popup' && actionType !== 'slideIn') assertPopupShellInvariant(`Invalid actionType "${actionType}". Use "popup" or "slideIn".`);
 
   // Validate effects if provided
-  const ce = (cfg.value.customEffect || (isPopup.value ? 'scale' : null));
+  const customEffect = (mergedPopupConfig.value.customEffect || (isPopup.value ? 'scale' : null));
   if (isPopup.value) {
-    const allowed = ['instant', 'fade', 'scale', 'slideTopFade'];
-    if (ce && !allowed.includes(ce)) assertPopupShellInvariant(`Unsupported popup customEffect "${ce}". Allowed: ${allowed.join(', ')}`);
+    const allowedCustomEffects = ['instant', 'fade', 'scale', 'slideTopFade'];
+    if (customEffect && !allowedCustomEffects.includes(customEffect)) assertPopupShellInvariant(`Unsupported popup customEffect "${customEffect}". Allowed: ${allowedCustomEffects.join(', ')}`);
   }
 
   // slide-in direction
   if (isSlideIn.value) {
-    const dir = cfg.value.from || 'left';
-    const allowedDir = ['left', 'right', 'top', 'bottom'];
-    if (!allowedDir.includes(dir)) assertPopupShellInvariant(`Invalid slide-in "from"="${dir}". Allowed: ${allowedDir.join(', ')}`);
+    const slideInDirection = mergedPopupConfig.value.from || 'left';
+    const allowedSlideInDirections = ['left', 'right', 'top', 'bottom'];
+    if (!allowedSlideInDirections.includes(slideInDirection)) assertPopupShellInvariant(`Invalid slide-in "from"="${slideInDirection}". Allowed: ${allowedSlideInDirections.join(', ')}`);
   }
 
   // Validate width/height types
-  validateSizeValue(cfg.value.width, 'width');
-  validateSizeValue(cfg.value.height, 'height');
+  validateSizeValue(mergedPopupConfig.value.width, 'width');
+  validateSizeValue(mergedPopupConfig.value.height, 'height');
 }
 
 function validateSizeValue(value, name) {
@@ -496,15 +496,15 @@ function validateSizeValue(value, name) {
 
 // -------------------- Style application --------------------
 function applyPanelInitialStyles(panel) {
-  const w = resolveResponsive(cfg.value.width);
-  const h = resolveResponsive(cfg.value.height);
-  const normalizedW = (typeof w === 'string') ? w.trim().toLowerCase() : w;
-  const normalizedH = (typeof h === 'string') ? h.trim().toLowerCase() : h;
+  const resolvedWidth = resolveResponsive(mergedPopupConfig.value.width);
+  const resolvedHeight = resolveResponsive(mergedPopupConfig.value.height);
+  const normalizedW = (typeof resolvedWidth === 'string') ? resolvedWidth.trim().toLowerCase() : resolvedWidth;
+  const normalizedH = (typeof resolvedHeight === 'string') ? resolvedHeight.trim().toLowerCase() : resolvedHeight;
   const isFullWidth = ['100%', '100vw'].includes(normalizedW);
   const isFullHeight = ['100%', '100vh'].includes(normalizedH);
 
   // Base styles
-  panel.style.position = cfg.value.isAbsolute ? 'absolute' : 'fixed';
+  panel.style.position = mergedPopupConfig.value.isAbsolute ? 'absolute' : 'fixed';
   panel.style.zIndex = String(currentZIndex.value);
   panel.style.visibility = 'visible';
   panel.style.width = (normalizedW ?? 'auto');
@@ -515,7 +515,7 @@ function applyPanelInitialStyles(panel) {
   // - Arrow keys work because popupPanelRef is focused (tabindex=-1) and overflow-y: auto ✓
   // - Touch scroll works naturally ✓
   // - overscroll-behavior: contain prevents scroll chain leaking to the locked body ✓
-  if (cfg.value.scrollable !== false) {
+  if (mergedPopupConfig.value.scrollable !== false) {
     panel.style.overflowY = 'auto';
     panel.style.overflowX = 'hidden';
     panel.style.overscrollBehavior = 'contain';
@@ -530,7 +530,7 @@ function applyPanelInitialStyles(panel) {
     // ... (Popup logic same as before) ...
     panel.style.height = (normalizedH ?? '500px'); // Restore popup height logic
     
-    const pos = resolveResponsive(cfg.value.position) || 'center';
+    const pos = resolveResponsive(mergedPopupConfig.value.position) || 'center';
     if (isFullWidth) { panel.style.left = '0'; panel.style.right = '0'; } else { panel.style.left = '50%'; }
     if (isFullHeight) { panel.style.top = '0'; panel.style.bottom = '0'; } 
     else {
@@ -538,7 +538,7 @@ function applyPanelInitialStyles(panel) {
       else panel.style.top = '50%';
     }
 
-    const effect = cfg.value.customEffect || 'scale';
+    const effect = mergedPopupConfig.value.customEffect || 'scale';
     if (isInstantOpen()) {
       panel.style.transition = 'none';
       if (!isFullWidth || !isFullHeight) {
@@ -549,29 +549,29 @@ function applyPanelInitialStyles(panel) {
     } else {
       if (effect === 'fade') {
         panel.style.opacity = '0';
-        panel.style.transition = `opacity ${cfg.value.speed} ${cfg.value.effect}`;
+        panel.style.transition = `opacity ${mergedPopupConfig.value.speed} ${mergedPopupConfig.value.effect}`;
       } else if (effect === 'slideTopFade') {
         panel.style.opacity = '0';
         panel.style.transform = isFullWidth || isFullHeight ? 'none' : 'translate(-50%, -150%)';
-        panel.style.transition = `transform ${cfg.value.speed} ${cfg.value.effect}, opacity ${cfg.value.speed} ${cfg.value.effect}`;
+        panel.style.transition = `transform ${mergedPopupConfig.value.speed} ${mergedPopupConfig.value.effect}, opacity ${mergedPopupConfig.value.speed} ${mergedPopupConfig.value.effect}`;
       } else {
         panel.style.transform = (isFullWidth || isFullHeight) ? 'none' : (pos === 'top-center' ? 'translate(-50%, 0) scale(0)' : 'translate(-50%, -50%) scale(0)');
-        panel.style.transition = `transform ${cfg.value.speed} ${cfg.value.effect}`;
+        panel.style.transition = `transform ${mergedPopupConfig.value.speed} ${mergedPopupConfig.value.effect}`;
       }
     }
     
-    if (!isFullWidth && !isFullHeight && cfg.value.position !== 'top-center') {
+    if (!isFullWidth && !isFullHeight && mergedPopupConfig.value.position !== 'top-center') {
       panel.style.transform = panel.style.transform || 'translate(-50%, -50%)';
     }
 
   } else {
     // --- SLIDE-IN LOGIC (UPDATED FOR BOTTOM ALIGNMENT) ---
-    const dir = cfg.value.from || 'left';
-    const offset = (typeof cfg.value.offset === 'number') ? `${cfg.value.offset}px` : (cfg.value.offset || '0px');
-    const verticalAlign = cfg.value.verticalAlign || 'stretch'; // Get vertical align config
+    const slideInDirection = mergedPopupConfig.value.from || 'left';
+    const offset = (typeof mergedPopupConfig.value.offset === 'number') ? `${mergedPopupConfig.value.offset}px` : (mergedPopupConfig.value.offset || '0px');
+    const verticalAlign = mergedPopupConfig.value.verticalAlign || 'stretch'; // Get vertical align config
 
     // LEFT / RIGHT SLIDE-INS
-    if (dir === 'left' || dir === 'right') {
+    if (slideInDirection === 'left' || slideInDirection === 'right') {
       
       // Vertical Alignment Logic
       if (verticalAlign === 'stretch') {
@@ -595,7 +595,7 @@ function applyPanelInitialStyles(panel) {
       }
 
       // Horizontal Logic
-      if (dir === 'left') {
+      if (slideInDirection === 'left') {
         panel.style.left = offset || '0';
         panel.style.right = 'auto';
         panel.style.transform = (verticalAlign === 'center') ? 'translate(-100%, -50%)' : 'translateX(-100%)';
@@ -609,7 +609,7 @@ function applyPanelInitialStyles(panel) {
       // TOP / BOTTOM SLIDE-INS (Standard logic)
       panel.style.left = '0';
       panel.style.right = '0';
-      if (dir === 'top') {
+      if (slideInDirection === 'top') {
         panel.style.top = offset || '0';
         panel.style.bottom = 'auto';
         panel.style.transform = 'translateY(-100%)';
@@ -626,7 +626,7 @@ function applyPanelInitialStyles(panel) {
       panel.style.transition = 'none';
     } else {
       // Transition apply
-      panel.style.transition = `transform ${cfg.value.speed} ${cfg.value.effect}`;
+      panel.style.transition = `transform ${mergedPopupConfig.value.speed} ${mergedPopupConfig.value.effect}`;
     }
   }
 }
@@ -635,12 +635,12 @@ function applyPanelEnterStyles(panel) {
   if (isPopup.value) {
      // ... (Popup logic same as before, no change needed) ...
      // Copy paste old popup enter logic here
-     const w = resolveResponsive(cfg.value.width);
-     const h = resolveResponsive(cfg.value.height);
-     const isFullWidth = ['100%', '100vw'].includes((w || '').toString());
-     const isFullHeight = ['100%', '100vh'].includes((h || '').toString());
-     const pos = cfg.value.position || 'center';
-     const effect = cfg.value.customEffect || 'scale';
+     const resolvedWidth = resolveResponsive(mergedPopupConfig.value.width);
+     const resolvedHeight = resolveResponsive(mergedPopupConfig.value.height);
+     const isFullWidth = ['100%', '100vw'].includes((resolvedWidth || '').toString());
+     const isFullHeight = ['100%', '100vh'].includes((resolvedHeight || '').toString());
+     const pos = mergedPopupConfig.value.position || 'center';
+     const effect = mergedPopupConfig.value.customEffect || 'scale';
 
      if (effect === 'fade') { panel.style.opacity = '1'; }
      else if (effect === 'slideTopFade') {
@@ -651,10 +651,10 @@ function applyPanelEnterStyles(panel) {
      }
   } else {
     // --- SLIDE IN ENTER ---
-    const verticalAlign = cfg.value.verticalAlign || 'stretch';
-    const dir = cfg.value.from || 'left';
+    const verticalAlign = mergedPopupConfig.value.verticalAlign || 'stretch';
+    const slideInDirection = mergedPopupConfig.value.from || 'left';
 
-    if ((dir === 'left' || dir === 'right') && verticalAlign === 'center') {
+    if ((slideInDirection === 'left' || slideInDirection === 'right') && verticalAlign === 'center') {
        panel.style.transform = 'translate(0, -50%)'; // Keep vertical centering
     } else {
        panel.style.transform = 'translate(0, 0)';
@@ -667,7 +667,7 @@ function applyPanelLeaveStyles(panel) {
     panel.style.transition = 'none';
   }
   if (isPopup.value) {
-    const effect = cfg.value.customEffect || 'scale';
+    const effect = mergedPopupConfig.value.customEffect || 'scale';
     if (effect === 'fade') {
       panel.style.opacity = '0';
     } else if (effect === 'slideTopFade') {
@@ -677,10 +677,10 @@ function applyPanelLeaveStyles(panel) {
       panel.style.transform = 'translate(-50%, -50%) scale(0)';
     }
   } else {
-    const dir = cfg.value.from || 'left';
-    if (dir === 'left') panel.style.transform = 'translateX(-100%)';
-    else if (dir === 'right') panel.style.transform = 'translateX(100%)';
-    else if (dir === 'top') panel.style.transform = 'translateY(-100%)';
+    const slideInDirection = mergedPopupConfig.value.from || 'left';
+    if (slideInDirection === 'left') panel.style.transform = 'translateX(-100%)';
+    else if (slideInDirection === 'right') panel.style.transform = 'translateX(100%)';
+    else if (slideInDirection === 'top') panel.style.transform = 'translateY(-100%)';
     else panel.style.transform = 'translateY(100%)';
   }
 }
@@ -706,7 +706,7 @@ function restoreFocus() {
 }
 
 function handleEscapeKey() {
-  if (!cfg.value.shouldCloseOnEscape) return;
+  if (!mergedPopupConfig.value.shouldCloseOnEscape) return;
   closeTopMostPanel();
 }
 
@@ -727,7 +727,7 @@ function handleCloseClick() {
 function buildEventDetail(panelEventPhase) {
   return {
     panelEventPhase: panelEventPhase, // "open" | "close"
-    type: cfg.value.actionType || 'popup',
+    type: mergedPopupConfig.value.actionType || 'popup',
     isPopup: isPopup.value,
     isSlideIn: isSlideIn.value,
     zIndex: currentZIndex.value,
@@ -735,19 +735,19 @@ function buildEventDetail(panelEventPhase) {
     flags: {
       isInstantOpen: isInstantOpen(),
       isInstantClose: isInstantClose(),
-      hasOverlay: !!cfg.value.shouldShowOverlay,
-      shouldLockScroll: !!cfg.value.shouldLockBodyScroll,
-      scrollable: cfg.value.scrollable !== false
+      hasOverlay: !!mergedPopupConfig.value.shouldShowOverlay,
+      shouldLockScroll: !!mergedPopupConfig.value.shouldLockBodyScroll,
+      scrollable: mergedPopupConfig.value.scrollable !== false
     },
-    config: { ...cfg.value }
+    config: { ...mergedPopupConfig.value }
   };
 }
 
 // Helper to register the overlay click handler for THIS panel
 function registerOverlayClickHandler() {
-  if (cfg.value.shouldCloseOnOutsideClick) {
+  if (mergedPopupConfig.value.shouldCloseOnOutsideClick) {
     overlayClick.setHandler(() => closeTopMostPanel());
-  } else if (cfg.value.shouldShowOverlay) {
+  } else if (mergedPopupConfig.value.shouldShowOverlay) {
     // If showing overlay but NOT closing on outside, swallow clicks
     overlayClick.setHandler(() => {});
   }
@@ -762,17 +762,17 @@ watch(() => props.modelValue, (isModelValueOpen) => {
   }
 }, { immediate: false });
 
-watch(() => cfg.value.width, () => {
+watch(() => mergedPopupConfig.value.width, () => {
   if (!isPanelVisible.value) return;
   const panel = popupPanelRef.value;
   if (!panel) return;
-  panel.style.width = resolveResponsive(cfg.value.width);
+  panel.style.width = resolveResponsive(mergedPopupConfig.value.width);
 });
-watch(() => cfg.value.height, () => {
+watch(() => mergedPopupConfig.value.height, () => {
   if (!isPanelVisible.value) return;
   const panel = popupPanelRef.value;
   if (!panel) return;
-  panel.style.height = resolveResponsive(cfg.value.height);
+  panel.style.height = resolveResponsive(mergedPopupConfig.value.height);
   panel.style.maxHeight = window.innerHeight + 'px';
 });
 
@@ -781,8 +781,8 @@ function handleWindowResize() {
   const panel = popupPanelRef.value;
   if (!panel) return;
   // Re-apply width/height responsively
-  if (cfg.value.width) panel.style.width = resolveResponsive(cfg.value.width);
-  if (cfg.value.height) panel.style.height = resolveResponsive(cfg.value.height);
+  if (mergedPopupConfig.value.width) panel.style.width = resolveResponsive(mergedPopupConfig.value.width);
+  if (mergedPopupConfig.value.height) panel.style.height = resolveResponsive(mergedPopupConfig.value.height);
   panel.style.maxHeight = window.innerHeight + 'px';
 }
 
@@ -796,7 +796,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleWindowResize);
   // Remove document click listener if it was added
-  if (!cfg.value.shouldShowOverlay && cfg.value.shouldCloseOnOutsideClick) {
+  if (!mergedPopupConfig.value.shouldShowOverlay && mergedPopupConfig.value.shouldCloseOnOutsideClick) {
     document.removeEventListener('click', handleDocumentClick);
   }
   // Ensure scroll unlocked if this panel was locking it
@@ -807,9 +807,9 @@ onBeforeUnmount(() => {
 
 // -------------------- v-model methods exposed --------------------
 defineExpose({
-  open: () => { emit('update:modelValue', true); },
-  close: () => { emit('update:modelValue', false); },
-  toggle: () => { emit('update:modelValue', !props.modelValue); }
+  openPopup: () => { emit('update:modelValue', true); },
+  closePopup: () => { emit('update:modelValue', false); },
+  togglePopup: () => { emit('update:modelValue', !props.modelValue); }
 });
 </script>
 

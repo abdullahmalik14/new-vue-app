@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
   import { ref } from "vue";
-import BasePopup from "@/components/ui/popup/BasePopup.vue";
+import BasePopup from "@/components/ui/popups/BasePopup.vue";
 import SectionHeader from "../checkout/SectionHeader.vue";
 import PaymentMethodLoggedIn from "../checkout/PaymentMethodLoggedIn.vue";
 import CheckoutNotes from "../checkout/CheckoutNotes.vue";
@@ -56,7 +56,7 @@ const cartItems = [
   <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="buyNowLoginConfig"
+    :popup-config="buyNowLoginConfig"
   >
     <!-- popup-wrapper -->
     <div

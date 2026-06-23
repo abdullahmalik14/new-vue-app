@@ -1,4 +1,4 @@
-import { dashboardSidebarMenuItems } from "@/assets/data/dashboard-sidebar-menu-items.js";
+import { dashboardSidebarMenuItems } from "@/config/dashboard-sidebar-menu-items.js";
 
 /**
  * Resolve menu items with asset URLs from assetLibrary and translated titles
@@ -44,9 +44,11 @@ export async function resolveDashboardSidebarMenuItems(items = dashboardSidebarM
   const resolveMenuItem = (item) => {
     const resolved = { ...item };
 
-    // Role-based filtering: hide completely if role doesn't match
-    if (resolved.roles && Array.isArray(resolved.roles) && userRole) {
-      if (!resolved.roles.includes(userRole)) {
+    // Role-based filtering: role-gated items are hidden unless the current role
+    // is known AND explicitly allowed. Treat a missing role as "not allowed"
+    // so restricted items never leak during auth bootstrap.
+    if (resolved.roles && Array.isArray(resolved.roles) && resolved.roles.length > 0) {
+      if (!userRole || !resolved.roles.includes(userRole)) {
         return null;
       }
     }

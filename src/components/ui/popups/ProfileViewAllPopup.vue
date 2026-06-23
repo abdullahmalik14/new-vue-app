@@ -1,6 +1,6 @@
 <template>
   <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="viewAllPopupConfig">
+    :popup-config="viewAllPopupConfig">
     <!-- popup-wrapper -->
     <div
       class="h-full bg-black/90 font-sans p-0 m-0 box-border overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none]">

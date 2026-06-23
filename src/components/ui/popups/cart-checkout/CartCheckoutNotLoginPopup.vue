@@ -2,7 +2,7 @@
   <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="cartcheckoutNotLoginConfig"
+    :popup-config="cartcheckoutNotLoginConfig"
   >
     <div
       class="bg-[#272727] font-sans p-0 m-0 box-border overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] [&.dark]:bg-[#202324]"
@@ -272,7 +272,7 @@ import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import PaymentMethodNotLoggedIn from "../checkout/PaymentMethodNotLoggedIn.vue";
 import CheckoutNotes from "../checkout/CheckoutNotes.vue";
 import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
-import BasePopup from "@/components/ui/popup/BasePopup.vue";
+import BasePopup from "@/components/ui/popups/BasePopup.vue";
 import BaseSelect from "../checkout/BaseSelect.vue";
 import { ref } from "vue";
 import TotalAmountRow from "../checkout/TotalAmountRow.vue";

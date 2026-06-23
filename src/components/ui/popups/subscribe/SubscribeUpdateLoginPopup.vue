@@ -2,16 +2,16 @@
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
-import BasePopup from '@/components/ui/popup/BasePopup.vue';
+import BasePopup from '@/components/ui/popups/BasePopup.vue';
 import CheckoutMediaPreview from '../checkout/CheckoutMediaPreview.vue';
-import PaymentMethodNotLoggedIn from '../checkout/PaymentMethodNotLoggedIn.vue';
 import SectionHeader from '../checkout/SectionHeader.vue';
 import SubscriptionPlanCard from '../checkout/SubscriptionPlanCard.vue';
-import BaseInput from '@/components/forms/inputs/BaseInput.vue';
+import PaymentMethodLoggedIn from '../checkout/PaymentMethodLoggedIn.vue';
+import CheckoutNotes from '../checkout/CheckoutNotes.vue';
 import CheckboxGroup from '@/components/forms/checkboxes/CheckboxGroup.vue';
 import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
-import CheckoutNotes from '../checkout/CheckoutNotes.vue';
 import TotalAmountRow from '../checkout/TotalAmountRow.vue';
+
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -19,7 +19,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
-const subscribeNotLoginConfig = {
+const subscribeUpdateLoginConfig = {
   actionType: "slidein",
   from: "right",
   offset: "0px",
@@ -38,21 +38,21 @@ const subscribeNotLoginConfig = {
 </script>
 
 <template>
-<BasePopup
+    <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="subscribeNotLoginConfig"
+    :popup-config="subscribeUpdateLoginConfig"
   >
     <div
-    class="bg-[#272727] font-sans p-0 m-0 box-border overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none]"
+    class="bg-[#272727] font-sans p-0 m-0 box-border overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] [&.dark]:bg-[#202324]"
   >
     <!-- popup-wrapper -->
     <div
-      class="flex flex-col h-screen bg-white/10 backdrop-blur-[100px] drop-shadow-[0_4px_6px_-2px_#10182808,0_12px_16px_-4px_#10182814] relative md:flex-row overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:overflow-y-[unset]"
+      class="flex flex-col h-screen bg-white/10 backdrop-blur-[100px] drop-shadow-[0_4px_6px_-2px_#10182808,0_12px_16px_-4px_#10182814] md:flex-row overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:overflow-y-[unset]"
     >
 
       <!-- image-container -->
-      <CheckoutMediaPreview
+      <checkout-media-preview
         @update:modelValue="emit('update:modelValue', false)"
         image="https://i.ibb.co.com/70sHrpv/featured-media-bg.webp"
         creatorName="Princess Carrot Pop"
@@ -72,7 +72,7 @@ const subscribeNotLoginConfig = {
           <!-- email-account-section -->
           <div class="flex flex-col gap-2">
             <!-- title-container -->
-            <SectionHeader
+            <section-header
               title="ACCOUNT EMAIL"
               icon="https://i.ibb.co.com/LX2mCL2d/Communication.webp"
               :showClose="true"
@@ -80,27 +80,48 @@ const subscribeNotLoginConfig = {
             />
 
             <!-- email-container -->
-            <div class="flex flex-col gap-4">
-              <p class="text-sm font-medium text-white">
-                Already have an account?
-                <span class="text-sm font-medium text-[#07F468] cursor-pointer"
-                  >Log in</span
-                >
-              </p>
-
-              <!-- input-wrapper -->
-              <BaseInput
-                  type="text"
-                  v-model="titleModel"
-                  placeholder="Email"
-                  inputClass="bg-white/10 text-base text-[#F9FAFB] placeholder:text-base placeholder:text-[#F9FAFB]/50 w-full px-3 py-2 rounded-tl-sm rounded-tr-sm outline-none border-b border-gray-300"
+            <div class="flex justify-between items-end">
+              <!-- model-info -->
+              <div class="flex items-center gap-2 py-1">
+                <!-- avatar -->
+                <div class="flex justify-center items-center w-10 h-9">
+                  <img
+                    src="https://i.ibb.co.com/67B4Cz6d/Frame-1410098582.webp"
+                    alt="avatar"
+                    class="h-full object-cover"
+                  />
+                </div>
+                <!-- info -->
+                <div class="flex flex-col">
+                  <h3 class="text-xs leading-normal font-semibold text-white">
+                    Man goes 4eva
+                  </h3>
+                  <span
+                    class="text-xs leading-normal font-medium text-[#98A2B3]"
+                  >
+                    existingmember@gmail.com
+                  </span>
+                </div>
+              </div>
+              <!-- log-out-button -->
+              <button
+                class="flex items-center gap-0.5 bg-transparent border-none outline-none cursor-pointer"
+              >
+                <img
+                  src="https://i.ibb.co.com/Gfb88yFY/log-out.webp"
+                  alt="log-out"
+                  class="w-4 h-4 [filter:brightness(0)_saturate(100%)_invert(67%)_sepia(4%)_saturate(1168%)_hue-rotate(179deg)_brightness(98%)_contrast(82%)]"
                 />
+                <span class="text-xs leading-normal font-medium text-[#98A2B3]">
+                  Log out
+                </span>
+              </button>
             </div>
           </div>
 
           <div class="flex flex-col gap-6">
-             <!-- subscription-section  mobile-->
-            <div class="flex flex-col gap-4 md:hidden">
+            <!-- subscription-section -->
+            <div class="flex flex-col gap-4 md:order-2">
               <!-- title-container -->
               <div
                 class="flex justify-between items-center border-b border-transparent"
@@ -124,6 +145,24 @@ const subscribeNotLoginConfig = {
 
               <!-- new-subscription-wrapper -->
               <div class="flex flex-col gap-4">
+                <p class="text-base font-medium text-[#F9FAFB]">
+                  You are about to change your membership tier as follow:
+                </p>
+
+                <div class="flex flex-col gap-2">
+                  <h4 class="text-xs leading-normal font-medium text-[#98A2B3]">
+                    Current subscription
+                  </h4>
+
+                  <!-- subscription-container -->
+                  <SubscriptionPlanCard
+                    title="FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
+                    price="USD$499.99/mo"
+                    backgroundImage="https://i.ibb.co.com/70sHrpv/featured-media-bg.webp"
+                    accentColor="#667085"
+                  />
+                </div>
+
                 <div class="flex flex-col gap-2">
                   <h4 class="text-xs leading-normal font-medium text-[#98A2B3]">
                     New Subscribtion
@@ -134,15 +173,16 @@ const subscribeNotLoginConfig = {
                     title="FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
                     price="USD$499.99/mo"
                     backgroundImage="https://i.ibb.co.com/70sHrpv/featured-media-bg.webp"
-                    accentColor="#FFCC01"
+                    accentColor="#FF0066"
                     footerText="Your membership will update in your next billing cycle (xx-xx-xxxx)"
+                    footerColor="#ffffff"
+                    
                   />
                 </div>
               </div>
             </div>
-
             <!-- payment-method-section -->
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-4 md:order-1">
               <!-- title-container -->
               <div
                 class="flex justify-between items-center border-b border-transparent"
@@ -162,61 +202,33 @@ const subscribeNotLoginConfig = {
                     PAYMENT METHOD
                   </h3>
                 </div>
-              </div>
-
-              <!-- card-wrapper -->
-              <PaymentMethodNotLoggedIn />
-            </div>
-
-            <!-- subscription-section  desktop-->
-            <div class="md:flex flex-col gap-4 hidden">
-              <!-- title-container -->
-              <div
-                class="flex justify-between items-center border-b border-transparent"
-              >
-                <!-- section-title -->
-                <div class="flex items-center gap-2">
-                  <div class="flex justify-center items-center w-5 h-5">
+                <!-- arrow-container -->
+                <div class="flex items-center gap-2.5">
+                  <span class="text-sm font-medium text-[#EAECF0]">
+                    Change Card
+                  </span>
+                  <div
+                    class="flex justify-center items-center w-6 h-6 cursor-pointer"
+                  >
                     <img
-                      src="https://i.ibb.co.com/gZsWNR4Q/our-website-full-white-logo.webp"
-                      alt="logo"
-                      class="w-5 h-5 [filter:brightness(0)_saturate(100%)_invert(98%)_sepia(1%)_saturate(934%)_hue-rotate(29deg)_brightness(120%)_contrast(100%)]"
+                      src="https://i.ibb.co.com/qLW7tf3T/Arrows.webp"
+                      alt="chevron-down"
                     />
                   </div>
-                  <h3
-                    class="text-base font-semibold text-[#F9FAFB] align-middle"
-                  >
-                    SUBSCRIPTION
-                  </h3>
                 </div>
               </div>
-
-              <!-- new-subscription-wrapper -->
-              <div class="flex flex-col gap-4">
-                <div class="flex flex-col gap-2">
-                  <h4 class="text-xs leading-normal font-medium text-[#98A2B3]">
-                    New Subscribtion
-                  </h4>
-
-                  <!-- subscription-container -->
-                  <SubscriptionPlanCard
-                    title="FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
-                    price="USD$499.99/mo"
-                    backgroundImage="https://i.ibb.co.com/70sHrpv/featured-media-bg.webp"
-                    accentColor="#FFCC01"
-                    footerText="Your membership will update in your next billing cycle (xx-xx-xxxx)"
-                  />
-                </div>
-              </div>
+              <!-- form-container -->
+              <PaymentMethodLoggedIn />
             </div>
-
             <!-- notes-section -->
+            <div class="flex flex-col gap-6 md:order-3">
             <CheckoutNotes :showAvatars="false" />
+            </div>
           </div>
         </div>
 
-        <!-- total-section -->
-        <div class="flex gap-6">
+        <!-- total-section (mobile) -->
+        <div class="flex gap-6 mt-auto">
           <div class="flex flex-col gap-4 w-full">
             <p
               class="text-sm leading-normal tracking-[0.0175rem] text-[#98A2B3] hidden md:inline"
@@ -236,7 +248,6 @@ const subscribeNotLoginConfig = {
             </p>
 
             <TotalAmountRow amount="USD$6.99" />
-
             <!-- checkbox-container -->
             <CheckboxGroup
               checkboxClass="appearance-none border border-[#D0D5DD] rounded-[4px] w-4 min-w-4 h-4 checked:accent-[#07f468] checked:bg-[#07f468] checked:border-[#07f468] checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:border-[black] checked:after:border-b-[2px] checked:after:border-r-[2px] checked:after:rotate-45 checked:after:box-border cursor-pointer"
@@ -256,18 +267,18 @@ const subscribeNotLoginConfig = {
                 >Privacy Policy</a
               >.
             </CheckboxGroup>
-
             <!-- button -->
             <DashboardPrimaryButton
-                text="Next"
-                variant="disableBtn"
-                :rightIcon="'https://i.ibb.co.com/8LKPbgm1/arrow-right.webp'"
-                :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)_invert(100%)_sepia(6%)_saturate(678%)_hue-rotate(146deg)_brightness(115%)_contrast(100%)]`"
-              />
+              text="Proceed Payment"
+              variant="checkoutProceedpayment"
+              :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'"
+              :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]`"
+            />
           </div>
         </div>
       </div>
     </div>
   </div>
   </BasePopup>
+
 </template>

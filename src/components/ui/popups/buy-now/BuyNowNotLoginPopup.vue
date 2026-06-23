@@ -2,7 +2,7 @@
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
-import BasePopup from "@/components/ui/popup/BasePopup.vue";
+import BasePopup from "@/components/ui/popups/BasePopup.vue";
 import SectionHeader from "../checkout/SectionHeader.vue";
 import PaymentMethodNotLoggedIn from "../checkout/PaymentMethodNotLoggedIn.vue";
 import CheckoutNotes from "../checkout/CheckoutNotes.vue";
@@ -41,7 +41,7 @@ const buyNowNotLoginConfig = {
   <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="buyNowNotLoginConfig"
+    :popup-config="buyNowNotLoginConfig"
   >
     <div
       class="bg-[#272727] font-sans p-0 m-0 box-border overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none]"

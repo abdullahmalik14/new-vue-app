@@ -1,7 +1,7 @@
 import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter, useRoute } from 'vue-router';
-import { dashboardSidebarMenuItems } from "@/assets/data/dashboard-sidebar-menu-items.js";
+import { dashboardSidebarMenuItems } from "@/config/dashboard-sidebar-menu-items.js";
 import { resolveDashboardSidebarMenuItems } from "@/systems/dashboard/resolve-dashboard-sidebar-menu-items.js";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useDashboardNavStore } from "@/stores/useDashboardNavStore";
@@ -25,15 +25,22 @@ export function useDashboardMenuNavigation(closeAllSidebarPanels) {
     }
   });
 
+  const authStore = useAuthStore();
+
   const loadDashboardMenuItems = async () => {
     try {
-      const authStore = useAuthStore();
       const userRole = authStore.userRole;
       dashboardMenuItems.value = await resolveDashboardSidebarMenuItems(dashboardSidebarMenuItems, userRole);
     } catch (error) {
       dashboardMenuItems.value = dashboardSidebarMenuItems;
     }
   };
+
+  // Re-resolve role-aware menu whenever the authenticated role changes
+  // (e.g. role becomes known after auth bootstrap).
+  watch(() => authStore.userRole, () => {
+    loadDashboardMenuItems();
+  });
 
   const isMenuItemRouteActive = (item) => {
     return isDashboardMenuItemActive(item, route);

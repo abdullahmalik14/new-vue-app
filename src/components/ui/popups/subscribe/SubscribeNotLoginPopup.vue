@@ -2,16 +2,16 @@
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
-import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
-import CheckoutMediaPreview from "../checkout/CheckoutMediaPreview.vue";
-import CheckoutNotes from "../checkout/CheckoutNotes.vue";
-import PaymentMethodLoggedIn from "../checkout/PaymentMethodLoggedIn.vue";
-import SectionHeader from "../checkout/SectionHeader.vue";
-import SubscriptionPlanCard from "../checkout/SubscriptionPlanCard.vue";
-import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
-import BasePopup from "@/components/ui/popup/BasePopup.vue";
-import TotalAmountRow from "../checkout/TotalAmountRow.vue";
-
+import BasePopup from '@/components/ui/popups/BasePopup.vue';
+import CheckoutMediaPreview from '../checkout/CheckoutMediaPreview.vue';
+import PaymentMethodNotLoggedIn from '../checkout/PaymentMethodNotLoggedIn.vue';
+import SectionHeader from '../checkout/SectionHeader.vue';
+import SubscriptionPlanCard from '../checkout/SubscriptionPlanCard.vue';
+import BaseInput from '@/components/forms/inputs/BaseInput.vue';
+import CheckboxGroup from '@/components/forms/checkboxes/CheckboxGroup.vue';
+import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
+import CheckoutNotes from '../checkout/CheckoutNotes.vue';
+import TotalAmountRow from '../checkout/TotalAmountRow.vue';
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -19,7 +19,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
-const subscribeLoginConfig = {
+const subscribeNotLoginConfig = {
   actionType: "slidein",
   from: "right",
   offset: "0px",
@@ -35,22 +35,22 @@ const subscribeLoginConfig = {
   closeSpeed: "250ms",
   closeEffect: "cubic-bezier(0.4, 0, 0.2, 1)",
 };
-
 </script>
 
 <template>
-    <BasePopup
+<BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="subscribeLoginConfig"
+    :popup-config="subscribeNotLoginConfig"
   >
-  <div
+    <div
     class="bg-[#272727] font-sans p-0 m-0 box-border overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none]"
   >
     <!-- popup-wrapper -->
     <div
-      class="flex flex-col h-screen bg-white/10 backdrop-blur-[100px] drop-shadow-[0_4px_6px_-2px_#10182808,0_12px_16px_-4px_#10182814] md:flex-row overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:overflow-y-[unset]"
+      class="flex flex-col h-screen bg-white/10 backdrop-blur-[100px] drop-shadow-[0_4px_6px_-2px_#10182808,0_12px_16px_-4px_#10182814] relative md:flex-row overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:overflow-y-[unset]"
     >
+
       <!-- image-container -->
       <CheckoutMediaPreview
         @update:modelValue="emit('update:modelValue', false)"
@@ -64,8 +64,8 @@ const subscribeLoginConfig = {
       <!-- form-container -->
       <div
         class="flex flex-col gap-6 px-2 pt-4 pb-6 md:overflow-y-auto [scrollbar-width:none] 
-        [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:px-4 sm:py-6 md:w-1/2 md:h-screen
-         md:bg-black/50 dark:bg-background-dark-app"
+        [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:px-4 sm:py-6 md:w-1/2
+         md:h-screen md:bg-black/50 dark:bg-background-dark-app"
       >
         <!-- form-section -->
         <div class="flex flex-col gap-6">
@@ -80,48 +80,26 @@ const subscribeLoginConfig = {
             />
 
             <!-- email-container -->
-            <div class="flex justify-between items-end">
-              <!-- model-info -->
-              <div class="flex items-center gap-2 py-1">
-                <!-- avatar -->
-                <div class="flex justify-center items-center w-10 h-9">
-                  <img
-                    src="https://i.ibb.co.com/67B4Cz6d/Frame-1410098582.webp"
-                    alt="avatar"
-                    class="h-full object-cover"
-                  />
-                </div>
-                <!-- info -->
-                <div class="flex flex-col">
-                  <h3 class="text-xs leading-normal font-semibold text-white">
-                    Man goes 4eva
-                  </h3>
-                  <span
-                    class="text-xs leading-normal font-medium text-[#98A2B3]"
-                  >
-                    existingmember@gmail.com
-                  </span>
-                </div>
-              </div>
-              <!-- log-out-button -->
-              <button
-                class="flex items-center gap-0.5 bg-transparent border-none outline-none cursor-pointer"
-              >
-                <img
-                  src="https://i.ibb.co.com/Gfb88yFY/log-out.webp"
-                  alt="log-out"
-                  class="w-4 h-4 [filter:brightness(0)_saturate(100%)_invert(67%)_sepia(4%)_saturate(1168%)_hue-rotate(179deg)_brightness(98%)_contrast(82%)]"
+            <div class="flex flex-col gap-4">
+              <p class="text-sm font-medium text-white">
+                Already have an account?
+                <span class="text-sm font-medium text-[#07F468] cursor-pointer"
+                  >Log in</span
+                >
+              </p>
+
+              <!-- input-wrapper -->
+              <BaseInput
+                  type="text"
+                  v-model="titleModel"
+                  placeholder="Email"
+                  inputClass="bg-white/10 text-base text-[#F9FAFB] placeholder:text-base placeholder:text-[#F9FAFB]/50 w-full px-3 py-2 rounded-tl-sm rounded-tr-sm outline-none border-b border-gray-300"
                 />
-                <span class="text-xs leading-normal font-medium text-[#98A2B3]">
-                  Log out
-                </span>
-              </button>
             </div>
           </div>
 
           <div class="flex flex-col gap-6">
-
-            <!-- subscription-section  mobile-->
+             <!-- subscription-section  mobile-->
             <div class="flex flex-col gap-4 md:hidden">
               <!-- title-container -->
               <div
@@ -162,7 +140,7 @@ const subscribeLoginConfig = {
                 </div>
               </div>
             </div>
-            
+
             <!-- payment-method-section -->
             <div class="flex flex-col gap-4">
               <!-- title-container -->
@@ -184,23 +162,10 @@ const subscribeLoginConfig = {
                     PAYMENT METHOD
                   </h3>
                 </div>
-                <!-- arrow-container -->
-                <div class="flex items-center gap-2.5">
-                  <span class="text-sm font-medium text-[#EAECF0]">
-                    Change Card
-                  </span>
-                  <div
-                    class="flex justify-center items-center w-6 h-6 cursor-pointer"
-                  >
-                    <img
-                      src="https://i.ibb.co.com/qLW7tf3T/Arrows.webp"
-                      alt="chevron-down"
-                    />
-                  </div>
-                </div>
               </div>
-              <!-- form-container -->
-              <PaymentMethodLoggedIn />
+
+              <!-- card-wrapper -->
+              <PaymentMethodNotLoggedIn />
             </div>
 
             <!-- subscription-section  desktop-->
@@ -250,8 +215,8 @@ const subscribeLoginConfig = {
           </div>
         </div>
 
-        <!-- total-section (mobile) -->
-        <div class="flex gap-6 mt-auto">
+        <!-- total-section -->
+        <div class="flex gap-6">
           <div class="flex flex-col gap-4 w-full">
             <p
               class="text-sm leading-normal tracking-[0.0175rem] text-[#98A2B3] hidden md:inline"
@@ -271,7 +236,7 @@ const subscribeLoginConfig = {
             </p>
 
             <TotalAmountRow amount="USD$6.99" />
-           
+
             <!-- checkbox-container -->
             <CheckboxGroup
               checkboxClass="appearance-none border border-[#D0D5DD] rounded-[4px] w-4 min-w-4 h-4 checked:accent-[#07f468] checked:bg-[#07f468] checked:border-[#07f468] checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:border-[black] checked:after:border-b-[2px] checked:after:border-r-[2px] checked:after:rotate-45 checked:after:box-border cursor-pointer"
@@ -294,11 +259,11 @@ const subscribeLoginConfig = {
 
             <!-- button -->
             <DashboardPrimaryButton
-              text="Proceed Payment"
-              variant="checkoutProceedpayment"
-              :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'"
-              :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]`"
-            />
+                text="Next"
+                variant="disableBtn"
+                :rightIcon="'https://i.ibb.co.com/8LKPbgm1/arrow-right.webp'"
+                :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)_invert(100%)_sepia(6%)_saturate(678%)_hue-rotate(146deg)_brightness(115%)_contrast(100%)]`"
+              />
           </div>
         </div>
       </div>

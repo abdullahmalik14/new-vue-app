@@ -9,7 +9,7 @@ import {
 } from "@/utils/stateEngine";
 
 // Components
-import BasePopup from "@/components/ui/popup/BasePopup.vue";
+import BasePopup from "@/components/ui/popups/BasePopup.vue";
 import BaseSelect from "../checkout/BaseSelect.vue";
 import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import BaseInput from "@/components/forms/inputs/BaseInput.vue";
@@ -201,7 +201,7 @@ onUnmounted(() => {
 
 <template>
   <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="purchaseFlowSubscriptionPopupConfig">
+    :popup-config="purchaseFlowSubscriptionPopupConfig">
     <div
       class="bg-[#333333] h-full overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] [&.dark]:bg-[#35393b]">
       <div

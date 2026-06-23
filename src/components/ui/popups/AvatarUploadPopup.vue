@@ -2,7 +2,7 @@
   <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="avatarPopupConfig"
+    :popup-config="avatarPopupConfig"
   >
         <div class="flex flex-col backdrop-blur-[50px] bg-white/70 dark:bg-background-dark-app  md:rounded-[0.3125rem] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none] h-full">
           

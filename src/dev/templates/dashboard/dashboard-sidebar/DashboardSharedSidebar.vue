@@ -54,8 +54,8 @@
                 class="sidebar-menu-item block transition-all duration-200 ease-in-out rounded-md flex-col items-center justify-center self-stretch w-full"
                 :class="{ 'opacity-50 pointer-events-none grayscale': !item.isEnabled }"
                 :title="$t(item.translationKey, item.fallbackLabel)">
-                <a :href="item.route || '#'" @click.prevent="handleMenuClick(item)"
-                  class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active"
+                <button type="button" @click="handleMenuClick(item)"
+                  class="main-menu-item group flex flex-col items-center justify-center self-stretch w-full gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active cursor-pointer"
                   :class="{ 'bg-sidebar-active': isMenuItemRouteActive(item) }"
                   :style="!item.isEnabled ? { pointerEvents: 'none', opacity: '0.5' } : {}">
                   <img :src="getAssetUrlSync(item.iconAssetFlag, { section: 'dashboard-global' })" :alt="$t(item.translationKey, item.fallbackLabel)"
@@ -65,7 +65,7 @@
                         :class="{ 'text-sidebar-active-text': isMenuItemRouteActive(item) }">
                     {{ $t(item.translationKey, item.fallbackLabel) }}
                   </span>
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -76,14 +76,14 @@
             ref="moreMenuButtonWrapper"
             @mouseenter="handleMoreButtonMouseEnter"
             @mouseleave="handleMoreButtonMouseLeave">
-            <a data-dashboard-menu-item="more"
-              class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active cursor-pointer">
+            <button type="button" data-dashboard-menu-item="more"
+              class="main-menu-item group flex flex-col items-center justify-center self-stretch w-full gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-sidebar-active cursor-pointer">
               <img :src="sidebarChromeAssetUrls.more || ''" :alt="$t ? $t('dashboard.more') : 'More'"
                 class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
               <span class="pointer-events-none text-sidebar-text text-[0.625rem] font-medium leading-[1.125rem] text-center transition-all duration-200 group-hover:text-sidebar-active-text">
                 {{ $t ? $t('dashboard.more') : 'More' }}
               </span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -100,11 +100,11 @@
             <LanguageSwitcher variant="invisible" class="!m-0 !p-0 border-none" />
           </div>
 
-          <!-- help -->
+          <!-- help (not yet implemented: disabled, no interactive styling) -->
           <div
-            class="help-icon-container opacity-50 pointer-events-none flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out hover:bg-notification-hover group">
+            class="help-icon-container opacity-50 pointer-events-none flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out">
             <img v-if="sidebarChromeAssetUrls.help" :src="sidebarChromeAssetUrls.help" alt="help"
-              class="w-5 h-5 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
+              class="w-5 h-5 pointer-events-none" />
           </div>
         </div>
       </div>
@@ -117,11 +117,10 @@
            ref="moreMenuFlyoutPanel"
            @mouseenter="handleFlyoutMouseEnter" @mouseleave="handleFlyoutMouseLeave">
         <div class="grid grid-cols-2 gap-x-6 gap-y-6">
-          <a v-for="item in overflowMenuItems" :key="item.menuItemId"
-            :href="item.route || '#'"
+          <button type="button" v-for="item in overflowMenuItems" :key="item.menuItemId"
             class="flex flex-col items-center justify-center cursor-pointer group"
             :style="!item.isEnabled ? { pointerEvents: 'none', opacity: '0.5' } : {}"
-            @click.prevent="handleMenuClick(item)">
+            @click="handleMenuClick(item)">
             <div class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group-hover:bg-sidebar-active"
                  :class="{ 'bg-sidebar-active': isMenuItemRouteActive(item) }">
               <img :src="getAssetUrlSync(item.iconAssetFlag, { section: 'dashboard-global' })" :alt="$t(item.translationKey, item.fallbackLabel)"
@@ -132,7 +131,7 @@
                   :class="{ 'text-sidebar-active-text': isMenuItemRouteActive(item) }">
               {{ $t(item.translationKey, item.fallbackLabel) }}
             </span>
-          </a>
+          </button>
         </div>
       </div>
     </div>
@@ -140,10 +139,10 @@
     <!-- Hidden measurement container -->
     <div class="fixed top-[-9999px] left-[-9999px] invisibleMenuItemsBuffer flex flex-col items-center w-[5.625rem] pl-2 pr-2" ref="menuItemMeasureContainer">
       <div class="sidebar-menu-item block transition-all duration-200 ease-in-out rounded-md flex-col items-center justify-center self-stretch w-full" ref="menuItemMeasureElement">
-        <a class="main-menu-item group flex flex-col items-center justify-center self-stretch gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out">
+        <button type="button" class="main-menu-item group flex flex-col items-center justify-center self-stretch w-full gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out cursor-pointer">
           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="w-6 h-6 pointer-events-none" />
           <span class="pointer-events-none text-[0.625rem] font-medium leading-[1.125rem] text-center">Test</span>
-        </a>
+        </button>
       </div>
     </div>
 
@@ -161,8 +160,8 @@
       @item-click="handleSubmenuItemClick"
     />
 
-    <DashboardProfilePopup v-if="isProfileOpen" :config="avatarPopupConfig" v-model="isProfileOpen" @update:modelValue="handleProfilePopupVisibilityChange" />
-    <DashboardNotificationPopup v-if="isNotificationOpen" :config="notificationPopupConfig" v-model="isNotificationOpen" @update:modelValue="handleNotificationPopupVisibilityChange" />
+    <DashboardProfilePopup v-if="isProfileOpen" :popup-config="avatarPopupConfig" v-model="isProfileOpen" @update:modelValue="handleProfilePopupVisibilityChange" />
+    <DashboardNotificationPopup v-if="isNotificationOpen" :popup-config="notificationPopupConfig" v-model="isNotificationOpen" @update:modelValue="handleNotificationPopupVisibilityChange" />
   </div>
 </template>
 
@@ -172,13 +171,12 @@ import { useRouter, useRoute } from 'vue-router';
 
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useDashboardNavStore } from "@/stores/useDashboardNavStore";
-import { createRoutePrefetchIntentHandler } from "@/systems/routing/useRoutePrefetch.js";
 import { createDashboardSidebarSlideInConfig } from "@/systems/dashboard/createDashboardSidebarSlideInConfig.js";
 import { getAssetUrlSync } from "@/systems/assets/assetLibrary.js";
 
-import DashboardSubmenuPanel from "@/dev/templates/dashboard/shared/DashboardSubmenuPanel.vue";
-import DashboardProfilePopup from "@/components/ui/popup/DashboardProfilePopup.vue";
-import DashboardNotificationPopup from "@/components/ui/popup/DashboardNotificationPopup.vue";
+import DashboardSubmenuPanel from "@/dev/templates/dashboard/dashboard-sidebar/DashboardSubmenuPanel.vue";
+import DashboardProfilePopup from "@/components/ui/popups/DashboardProfilePopup.vue";
+import DashboardNotificationPopup from "@/components/ui/popups/DashboardNotificationPopup.vue";
 import DashboardMenuCounter from "@/components/ui/nav/dashboard/DashboardMenuCounter.vue";
 import LanguageSwitcher from "@/components/ui/nav/language/LanguageSwitcher.vue";
 
@@ -229,12 +227,6 @@ const handleLogout = async () => {
   await authStore.logout();
   if (router) {
     router.push('/login');
-  }
-};
-
-const prefetchMenuItemRoute = (item) => {
-  if (item?.isEnabled && item?.route) {
-    createRoutePrefetchIntentHandler(item.route)();
   }
 };
 

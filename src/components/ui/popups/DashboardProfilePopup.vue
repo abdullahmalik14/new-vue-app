@@ -2,7 +2,7 @@
   <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="config"
+    :popup-config="popupConfig"
   >
     <div
       class=" flex flex-col items-start overflow-hidden shadow-[4px_0_10px_0_rgba(0,0,0,0.08)]
@@ -16,7 +16,8 @@
       >
         <div class="relative flex flex-col items-start self-stretch">
           <!-- Back button -->
-          <a
+          <button
+            type="button"
             @click="emit('update:modelValue', false)"
             class="absolute top-2 right-2 z-[5] flex items-center justify-center w-8 h-8 transition-all duration-200 ease-in-out rounded-md hover:bg-panel-light-buttonHover dark:hover:bg-panel-dark-buttonHover md:p-1.5 md:w-auto md:h-auto"
           >
@@ -30,7 +31,7 @@
               v-if="profileAssets.closeDesktop" :src="profileAssets.closeDesktop"
               alt="back-button"
             />
-          </a>
+          </button>
 
           <!-- Profile cover section -->
           <div
@@ -43,7 +44,7 @@
               <!-- Profile info row -->
               <div class="flex items-start self-stretch gap-4 pr-6">
                 <!-- Avatar with status dot -->
-                <a href="#" class="relative flex w-14 h-14 rounded-[1.875rem] outline-none">
+                <button type="button" class="relative flex w-14 h-14 rounded-[1.875rem] outline-none cursor-pointer">
                   <img
                     v-if="profileAssets.avatar" :src="profileAssets.avatar"
                     alt="avatar"
@@ -53,7 +54,7 @@
                     class="absolute bottom-0 right-0 flex w-3.5 h-3.5 rounded-[0.438rem] bg-profile-status-dot"
                     >&nbsp;</span
                   >
-                </a>
+                </button>
 
                 <!-- Name and status -->
                 <div class="flex-1 flex flex-col items-start gap-1">
@@ -61,7 +62,7 @@
                   <div class="flex flex-wrap items-center gap-2 self-stretch">
                     <div class="flex items-center gap-2">
                       <span class="text-lg font-semibold leading-7 text-white"
-                        >{{ $t('dashboard.profile.name', 'lindenMay') }}</span
+                        >{{ navStore.profileSummary?.name || $t('dashboard.profile.name', 'lindenMay') }}</span
                       >
                       <img
                         v-if="profileAssets.verified" :src="profileAssets.verified"
@@ -71,7 +72,7 @@
                     </div>
                     <span
                       class="text-xs font-normal leading-[1.125rem] text-user-handle"
-                      >{{ $t('dashboard.profile.handle', '@linden') }}</span
+                      >{{ navStore.profileSummary?.handle || $t('dashboard.profile.handle', '@linden') }}</span
                     >
                   </div>
 
@@ -80,9 +81,9 @@
                     <div
                       class="overflow-hidden rounded-[0.938rem] z-[5] relative inline-flex"
                     >
-                      <a
-                        href="#"
-                        class="inline-flex items-center gap-2 px-2 py-1 rounded-[0.938rem] shadow-[0_0_0_1px] shadow-status-trigger-light bg-status-trigger-light"
+                      <button
+                        type="button"
+                        class="inline-flex items-center gap-2 px-2 py-1 rounded-[0.938rem] shadow-[0_0_0_1px] shadow-status-trigger-light bg-status-trigger-light cursor-pointer"
                       >
                         <span
                           class="text-sm font-medium uppercase leading-5 text-black pointer-events-none"
@@ -93,7 +94,7 @@
                           alt="arrow-down"
                           class="w-3 h-3 pointer-events-none"
                         />
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -139,16 +140,16 @@
                     :placeholder="$t('dashboard.profile.writeStatus', 'Write status here...')"
                     value="Second update message....."
                   />
-                  <a
-                    href="#"
-                    class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out"
+                  <button
+                    type="button"
+                    class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out cursor-pointer"
                   >
                     <img
                       v-if="profileAssets.edit" :src="profileAssets.edit"
                       alt="edit"
                       class="w-full h-full filter brightness-0 saturate-100 invert-0 sepia-4 saturate-17 hue-rotate-99 brightness-98 contrast-105 pointer-events-none"
                     />
-                  </a>
+                  </button>
                 </div>
               </div>
 
@@ -178,7 +179,7 @@
                       <span
                         class="transition-all duration-150 ease-in-out leading-7 text-base md:text-lg font-medium text-text group-hover:text-black"
                       >
-                        View profile
+                        {{ $t('dashboard.profile.viewProfile', 'View profile') }}
                       </span>
                     </div>
 
@@ -207,7 +208,7 @@
                       <span
                         class="transition-all duration-150 ease-in-out leading-6 text-base md:leading-7 md:text-lg font-medium text-disabled-light-text"
                       >
-                        Go Live
+                        {{ $t('dashboard.profile.goLive', 'Go Live') }}
                       </span>
                       <img
                         v-if="profileAssets.menuStats" :src="profileAssets.menuStats"
@@ -258,21 +259,21 @@
                   <div
                     class="overflow-hidden rounded-[0.938rem] z-[5] relative inline-flex"
                   >
-                    <a
-                      href="#"
-                      class="inline-flex items-center gap-2 px-2 py-1 rounded-[0.938rem]"
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-2 px-2 py-1 rounded-[0.938rem] cursor-pointer"
                     >
                       <span
                         class="text-sm font-medium uppercase leading-5 text-black pointer-events-none dark:text-text-dark"
                       >
-                        Offline
+                        {{ $t('dashboard.profile.status.offline', 'Offline') }}
                       </span>
                       <img
                         v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
                         alt="arrow-down"
                         class="w-3 h-3 pointer-events-none dark:[filter:brightness(0)_invert(100%)]"
                       />
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -287,16 +288,16 @@
                   :placeholder="$t('dashboard.profile.writeStatus', 'Write status here...')"
                   value="I am all dressed up ready to eat some chicken 💋"
                 />
-                <a
-                  href="#"
-                  class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out"
+                <button
+                  type="button"
+                  class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out cursor-pointer"
                 >
                   <img
                     v-if="profileAssets.edit" :src="profileAssets.edit"
                     alt="edit"
                     class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(0)_sepia(4%)_saturate(17%)_hue-rotate(99deg)_brightness(98%)_contrast(105%)] pointer-events-none"
                   />
-                </a>
+                </button>
               </div>
 
               <!-- Repost toggle -->
@@ -360,21 +361,21 @@
                   <div
                     class="overflow-hidden rounded-[0.938rem] z-[5] relative inline-flex"
                   >
-                    <a
-                      href="#"
-                      class="inline-flex items-center gap-2 px-2 py-1 rounded-[0.938rem]"
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-2 px-2 py-1 rounded-[0.938rem] cursor-pointer"
                     >
                       <span
                         class="text-sm font-medium uppercase leading-5 text-black pointer-events-none dark:text-text-dark"
                       >
-                        Offline
+                        {{ $t('dashboard.profile.status.offline', 'Offline') }}
                       </span>
                       <img
                         v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
                         alt="arrow-down"
                         class="w-3 h-3 pointer-events-none dark:[filter:brightness(0)_invert(100%)]"
                       />
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -388,16 +389,16 @@
                   class="flex-1 text-xs font-medium leading-6 bg-transparent outline-none border-none text-text-muted-light placeholder:text-text-muted-light dark:text-text-muted-dark dark:placeholder:text-text-muted-dark"
                   :placeholder="$t('dashboard.profile.awayMessage', 'Away Message...')"
                 />
-                <a
-                  href="#"
-                  class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out"
+                <button
+                  type="button"
+                  class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out cursor-pointer"
                 >
                   <img
                     v-if="profileAssets.edit" :src="profileAssets.edit"
                     alt="edit"
                     class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(0)_sepia(4%)_saturate(17%)_hue-rotate(99deg)_brightness(98%)_contrast(105%)] pointer-events-none"
                   />
-                </a>
+                </button>
               </div>
 
               <!-- Repost toggle -->
@@ -449,7 +450,7 @@
                   <span
                     class="text-sm font-medium uppercase leading-5 text-text-muted-light dark:text-text-muted-dark"
                   >
-                    Chat status
+                    {{ $t('dashboard.profile.chatStatus', 'Chat status') }}
                   </span>
                   <img
                     v-if="profileAssets.info" :src="profileAssets.info"
@@ -463,21 +464,21 @@
                   <div
                     class="overflow-hidden rounded-[0.938rem] z-[5] relative inline-flex"
                   >
-                    <a
-                      href="#"
-                      class="inline-flex items-center gap-2 px-2 py-1 rounded-[0.938rem]"
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-2 px-2 py-1 rounded-[0.938rem] cursor-pointer"
                     >
                       <span
                         class="text-sm font-medium uppercase leading-5 text-black pointer-events-none dark:text-text-dark"
                       >
-                        Offline
+                        {{ $t('dashboard.profile.status.offline', 'Offline') }}
                       </span>
                       <img
                         v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
                         alt="arrow-down"
                         class="w-3 h-3 pointer-events-none dark:[filter:brightness(0)_invert(100%)]"
                       />
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -492,16 +493,16 @@
                   :placeholder="$t('dashboard.profile.writeStatus', 'Write status here...')"
                   value="Can't type with my greasy fingers, call me instead 💋"
                 />
-                <a
-                  href="#"
-                  class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out"
+                <button
+                  type="button"
+                  class="w-4 h-4 opacity-50 hover:opacity-100 transition-all duration-150 ease-in-out cursor-pointer"
                 >
                   <img
                     v-if="profileAssets.edit" :src="profileAssets.edit"
                     alt="edit"
                     class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(0)_sepia(4%)_saturate(17%)_hue-rotate(99deg)_brightness(98%)_contrast(105%)] pointer-events-none"
                   />
-                </a>
+                </button>
               </div>
 
               <!-- Repost toggle -->
@@ -544,7 +545,7 @@
               <span
                 class="text-xs font-medium leading-[1.125rem] text-text-muted-light dark:text-text-muted-dark pointer-events-none"
               >
-                Advanced Repost Settings
+                {{ $t('dashboard.profile.advancedRepostSettings', 'Advanced Repost Settings') }}
               </span>
               <img
                 v-if="profileAssets.liveArrow" :src="profileAssets.liveArrow"
@@ -673,6 +674,9 @@ defineOptions({ name: 'DashboardProfilePopup' });
 import BasePopup from "./BasePopup.vue";
 import { ref, onBeforeMount } from 'vue';
 import { resolveSharedComponentAssets } from '@/systems/assets/resolveSharedComponentAssets.js';
+import { useDashboardNavStore } from '@/stores/useDashboardNavStore';
+
+const navStore = useDashboardNavStore();
 
 const profileAssets = ref({
   closeMobile: null,
@@ -706,7 +710,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  config: Object,
+  popupConfig: Object,
 });
 const emit = defineEmits(["update:modelValue"]);
 

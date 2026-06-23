@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
   <BasePopup
     :modelValue="props.modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="config"
+    :popup-config="config"
   >
     <div
       class="w-full flex flex-col gap-4 bg-white/90 dark:bg-[#181a1b]/90 md:p-6 py-6 px-4 rounded-none h-auto scrollbar-hide"

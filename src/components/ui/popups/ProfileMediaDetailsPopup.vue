@@ -1,6 +1,6 @@
 <template>
   <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="mediaDetailsPopupConfig">
+    :popup-config="mediaDetailsPopupConfig">
     <div
       class="h-full [background:linear-gradient(180deg,rgba(255,255,255,0.00)_0%,rgba(255,255,255,0.10)_50%,rgba(255,255,255,0.02)_100%),#0C111D] 
       md:[0px_0px_10px_-10px_#00000080] font-sans p-0 m-0 box-border overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none]">

@@ -72,13 +72,13 @@
       </div>
     </div>
     <NavDropdown v-model="isNavOpen" title="Menu" logo="your-logo-url" />
-    <DashboardNotificationPopup :config="notificationPopupConfig" v-model="isNotificationOpen" @update:modelValue="
+    <DashboardNotificationPopup :popup-config="notificationPopupConfig" v-model="isNotificationOpen" @update:modelValue="
       (val) => {
         isNotificationOpen = val;
       }
     " />
 
-    <DashboardProfilePopup :config="avatarPopupConfig" v-model="isProfileOpen" @update:modelValue="
+    <DashboardProfilePopup :popup-config="avatarPopupConfig" v-model="isProfileOpen" @update:modelValue="
       (val) => {
         isProfileOpen = val;
       }
@@ -89,8 +89,8 @@
 <script setup>
 import NavDropdown from '@/components/ui/nav/dashboard/NavDropdown.vue';
 import { ref, onMounted } from "vue";
-import DashboardNotificationPopup from "@/components/ui/popup/DashboardNotificationPopup.vue";
-import DashboardProfilePopup from "@/components/ui/popup/DashboardProfilePopup.vue";
+import DashboardNotificationPopup from "@/components/ui/popups/DashboardNotificationPopup.vue";
+import DashboardProfilePopup from "@/components/ui/popups/DashboardProfilePopup.vue";
 import { getAssetUrl } from "@/systems/assets/assetLibrary.js";
 import {
   getSharedComponentAssetMapping,

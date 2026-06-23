@@ -868,9 +868,9 @@
 
 <script setup>
 import EditProfileMenu from '@/components/ui/profile/EditProfileMenu.vue';
-import ImageCropperModal from '@/components/ui/popup/ImageCropperModal.vue';
-import AvatarUploadPopup from '@/components/ui/popup/AvatarUploadPopup.vue';
-import CancelUploadPopup from '@/components/ui/popup/CancelUploadPopup.vue';
+import ImageCropperModal from '@/components/ui/popups/ImageCropperModal.vue';
+import AvatarUploadPopup from '@/components/ui/popups/AvatarUploadPopup.vue';
+import CancelUploadPopup from '@/components/ui/popups/CancelUploadPopup.vue';
 import UploadingProgressBar from '@/components/ui/progress/UploadingProgressBar.vue';
 import DashboardSharedSectionLayout from '@/dev/templates/dashboard/shared/DashboardSharedSectionLayout.vue';
 import DashboardTextInput from '@/components/forms/inputs/DashboardTextInput.vue';

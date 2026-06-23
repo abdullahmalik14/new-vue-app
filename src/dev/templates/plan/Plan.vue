@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { createStepStateEngine, attachEngineLogging } from '@/utils/stateEngine';
-import BasePopup from '@/components/ui/popup/BasePopup.vue';
+import BasePopup from '@/components/ui/popups/BasePopup.vue';
 import TierCard from '@/components/ui/card/dashboard/TierCard.vue';
 import PlanDetail from '@/dev/components/plan/PlanDetail.vue';
 import PlanVariation from '@/dev/components/plan/PlanVariation.vue';
@@ -381,7 +381,7 @@ onUnmounted(() => {
             <BasePopup
                 :modelValue="isPreviewPopupOpen"
                 @update:modelValue="val => isPreviewPopupOpen = val"
-                :config="previewPopupConfig"
+                :popup-config="previewPopupConfig"
             >
                 <div class="h-full w-full flex items-center justify-center p-2 sm:px-6 bg-black/80 backdrop-blur-md">
                     <div class="shadow-[0px_0px_80px_0px_#07F46840,0px_0px_8px_0px_#07F46880] "> 

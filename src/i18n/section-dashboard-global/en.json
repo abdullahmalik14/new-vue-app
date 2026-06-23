@@ -133,6 +133,8 @@
       "goLive": "Go Live",
       "videoCallStatus": "Video call status",
       "audioCallStatus": "Audio call status",
+      "chatStatus": "Chat status",
+      "advancedRepostSettings": "Advanced Repost Settings",
       "changeCustomMessages": "Change Custom Messages",
       "repostStatusX": "Repost status message to X",
       "writeStatus": "Write status here...",
@@ -183,8 +185,9 @@
         "bankRequired": "Bank Details Required: To ensure seamless transactions, please complete your bank information."
       },
       "time": {
-        "1w": "1w",
-        "3m": "3m"
+        "oneWeek": "1w",
+        "oneMinute": "1m",
+        "threeMinutes": "3m"
       }
     }
   },

@@ -42,7 +42,7 @@ export const dashboardSidebarMenuItems = [
         menuItemId: 302,
         fallbackLabel: "Custom Product Request", // Fallback text
         translationKey: "dashboard.menu.customProductRequest", // Translation key
-        route: "/orders/custom-product-request",
+        route: "/dashboard/demo-page", // Placeholder: disabled until its route exists in routeConfig.json
         iconAssetFlag: "",
         isEnabled: false
       },
@@ -90,7 +90,7 @@ export const dashboardSidebarMenuItems = [
     fallbackLabel: "Shops", // Fallback text
     translationKey: "dashboard.menu.shops", // Translation key
     iconAssetFlag: "dashboard.menu.shops", // Asset flag instead of hardcoded URL
-    route: "/shop",
+    route: "/dashboard/demo-page", // Placeholder: disabled until its route exists in routeConfig.json
     submenuItems: [],
     isEnabled: false // Disabled as in original
   },
@@ -113,7 +113,7 @@ export const dashboardSidebarMenuItems = [
         menuItemId: 802,
         fallbackLabel: "Subscribers & Followers", // Fallback text
         translationKey: "dashboard.menu.subscribersFollowers", // Translation key
-        route: "/profile/subscribers-followers",
+        route: "/dashboard/demo-page", // Placeholder: disabled until its route exists in routeConfig.json
         iconAssetFlag: "",
         badgeId: "dashboard.menu.subscribersFollowers",
         isEnabled: false
@@ -122,7 +122,7 @@ export const dashboardSidebarMenuItems = [
         menuItemId: 803,
         fallbackLabel: "Your Posts", // Fallback text
         translationKey: "dashboard.menu.yourPosts", // Translation key
-        route: "/profile/your-posts",
+        route: "/dashboard/demo-page", // Placeholder: disabled until its route exists in routeConfig.json
         iconAssetFlag: "",
         isEnabled: false
       },
@@ -152,7 +152,7 @@ export const dashboardSidebarMenuItems = [
     fallbackLabel: "X Repost", // Fallback text
     translationKey: "dashboard.menu.xrepost", // Translation key
     iconAssetFlag: "dashboard.menu.xrepost", // Asset flag instead of hardcoded URL
-    route: "/x-repost",
+    route: "/dashboard/demo-page", // Placeholder: disabled until its route exists in routeConfig.json
     submenuItems: [],
     isEnabled: false // Disabled as in original
   },
@@ -161,7 +161,7 @@ export const dashboardSidebarMenuItems = [
     fallbackLabel: "Blog", // Fallback text
     translationKey: "dashboard.menu.blog", // Translation key
     iconAssetFlag: "dashboard.menu.blog", // Asset flag instead of hardcoded URL
-    route: "/blog",
+    route: "/dashboard/demo-page", // Placeholder: disabled until its route exists in routeConfig.json
     submenuItems: [],
     isEnabled: false // Disabled as in original
   }

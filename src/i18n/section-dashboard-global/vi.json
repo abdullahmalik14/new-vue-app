@@ -145,8 +145,9 @@
     },
     "notifications": {
       "time": {
-        "1w": "1w",
-        "3m": "3m"
+        "oneWeek": "1w",
+        "oneMinute": "1m",
+        "threeMinutes": "3m"
       }
     }
   },

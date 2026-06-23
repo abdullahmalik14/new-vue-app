@@ -16,7 +16,7 @@
 
 <script setup>
 import DashboardSharedHeader  from "@/dev/templates/dashboard/shared/DashboardSharedHeader.vue";
-import DashboardSharedSidebar from "./DashboardSharedSidebar.vue";
+import DashboardSharedSidebar from "../dashboard-sidebar/DashboardSharedSidebar.vue";
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { getAssetUrl } from '@/systems/assets/assetLibrary.js';

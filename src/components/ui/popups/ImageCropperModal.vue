@@ -2,7 +2,7 @@
   <BasePopup
     :modelValue="modelValue"
     @update:modelValue="(val) => emit('update:modelValue', val)"
-    :config="imageCropConfig"
+    :popup-config="imageCropConfig"
   >
     
       <div

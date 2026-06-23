@@ -2,8 +2,8 @@
 import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/DashboardSharedTwoColLayout.vue';
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue';
 import PayoutCard from '@/components/ui/card/dashboard/PayoutCard.vue';
-import PayoutSettingsPopup from '@/components/ui/popup/PayoutSettingsPopup.vue';
-import WithdrawEarningsPopup from '@/components/ui/popup/WithdrawEarningsPopup.vue';
+import PayoutSettingsPopup from '@/components/ui/popups/PayoutSettingsPopup.vue';
+import WithdrawEarningsPopup from '@/components/ui/popups/WithdrawEarningsPopup.vue';
 import { ref } from 'vue';
 
 const showPayoutSettingsPopup = ref(false);

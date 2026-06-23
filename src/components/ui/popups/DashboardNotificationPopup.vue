@@ -1,5 +1,5 @@
 <template>
-  <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)" :config="config">
+  <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)" :popup-config="popupConfig">
     <div
       class="w-full flex flex-col items-start overflow-hidden 
       shadow-[4px_0_10px_0_rgba(0,0,0,0.08)] bg-panel-light/70 
@@ -47,17 +47,17 @@
             class="md: flex flex-col self-stretch items-start gap-2 p-2 pb-0 md:p-2 md:pb-0 md:pr-0 md:pl-0 md:bg-transparent bg-background-header-light dark:bg-background-header-dark md:dark:bg-transparent fixed md:static w-full z-[99]">
             <ul
               class="flex flex-row justify-between items-center self-stretch overflow-x-auto whitespace-nowrap scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <li class="flex-1 flex" v-for="tab in tabs" :key="tab.tabId">
-                <button type="button" @click.prevent="activeTab = tab.tabId" :class="[
+              <li class="flex-1 flex" v-for="tab in notificationTabs" :key="tab.tabId">
+                <button type="button" @click.prevent="activeNotificationTab = tab.tabId" :class="[
                   'w-full flex flex-col items-center gap-2.5 whitespace-nowrap px-4 py-2 transition-all duration-200 ease-in-out',
-                  activeTab === tab.tabId
+                  activeNotificationTab === tab.tabId
                     ? 'opacity-100 shadow-[0_-1.5px_0_0_inset] shadow-border-tab-active-light dark:shadow-border-tab-active-dark'
                     : 'opacity-70 hover:opacity-100'
                 ]">
                   <span class="flex items-center gap-0.5 h-8 pointer-events-none">
                     <span :class="[
                       'text-sm uppercase leading-5',
-                      activeTab === tab.tabId
+                      activeNotificationTab === tab.tabId
                         ? 'font-semibold text-text-tab-active-light dark:text-text-tab-active-dark'
                         : 'font-medium text-text-tab-light dark:text-text-tab-dark'
                     ]">{{ $t(tab.translationKey, tab.fallback) }}</span>
@@ -230,6 +230,7 @@
                           <div class="self-stretch flex flex-col items-start">
                             <!-- text -->
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
+                              
                               <p
                                 class="text-sm leading-5 font-normal text-text-notification-light dark:text-text-notification-dark">
                                 {{ $t('dashboard.notifications.mock.bankRequired', 'Bank Details Required: To ensure seamless transactions, please complete your bank information.') }}
@@ -625,7 +626,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  config: Object,
+  popupConfig: Object,
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -639,12 +640,12 @@ const NOTIFICATION_TAB_ID_UNREAD = 'unread';
 const NOTIFICATION_TAB_ID_CUSTOM_REQUESTS = 'custom-requests';
 const NOTIFICATION_TAB_ID_ACCOUNT = 'account';
 
-const tabs = computed(() => [
+const notificationTabs = computed(() => [
   { tabId: NOTIFICATION_TAB_ID_ALL, translationKey: 'dashboard.notifications.tabs.all', fallback: 'All', badgeCount: navStore.getTabBadgeCount(NOTIFICATION_TAB_ID_ALL) },
   { tabId: NOTIFICATION_TAB_ID_UNREAD, translationKey: 'dashboard.notifications.tabs.unread', fallback: 'Unread', badgeCount: navStore.getTabBadgeCount(NOTIFICATION_TAB_ID_UNREAD) },
   { tabId: NOTIFICATION_TAB_ID_CUSTOM_REQUESTS, translationKey: 'dashboard.notifications.tabs.customRequests', fallback: 'Custom Requests', badgeCount: navStore.getTabBadgeCount(NOTIFICATION_TAB_ID_CUSTOM_REQUESTS) },
   { tabId: NOTIFICATION_TAB_ID_ACCOUNT, translationKey: 'dashboard.notifications.tabs.account', fallback: 'Account', badgeCount: navStore.getTabBadgeCount(NOTIFICATION_TAB_ID_ACCOUNT) }
 ]);
 
-const activeTab = ref('all');
+const activeNotificationTab = ref('all');
 </script>
