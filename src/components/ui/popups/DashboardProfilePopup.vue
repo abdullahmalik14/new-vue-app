@@ -24,12 +24,12 @@
             <img
               class="block w-6 h-6 pointer-events-none md:hidden"
               v-if="profileAssets.closeMobile" :src="profileAssets.closeMobile"
-              alt="back-button"
+              alt="" aria-hidden="true"
             />
             <img
               class="hidden w-5 h-5 pointer-events-none md:block"
               v-if="profileAssets.closeDesktop" :src="profileAssets.closeDesktop"
-              alt="back-button"
+              alt="" aria-hidden="true"
             />
           </button>
 
@@ -47,7 +47,7 @@
                 <button type="button" class="relative flex w-14 h-14 rounded-[1.875rem] outline-none cursor-pointer">
                   <img
                     v-if="profileAssets.avatar" :src="profileAssets.avatar"
-                    alt="avatar"
+                    :alt="$t('dashboard.profile.alt.avatar', 'Profile photo')"
                     class="object-cover w-14 h-14 pointer-events-none rounded-[1.875rem] bg-avatar-bg-light"
                   />
                   <span
@@ -66,7 +66,7 @@
                       >
                       <img
                         v-if="profileAssets.verified" :src="profileAssets.verified"
-                        alt="verified-icon"
+                        alt="" aria-hidden="true"
                         class="w-4 h-4"
                       />
                     </div>
@@ -91,7 +91,7 @@
                         >
                         <img
                           v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
-                          alt="arrow-down"
+                          alt="" aria-hidden="true"
                           class="w-3 h-3 pointer-events-none"
                         />
                       </button>
@@ -124,7 +124,7 @@
                     >
                     <img
                       v-if="profileAssets.info" :src="profileAssets.info"
-                      alt="info"
+                      alt="" aria-hidden="true"
                       class="w-4 h-4 cursor-pointer"
                     />
                   </div>
@@ -146,7 +146,7 @@
                   >
                     <img
                       v-if="profileAssets.edit" :src="profileAssets.edit"
-                      alt="edit"
+                      alt="" aria-hidden="true"
                       class="w-full h-full filter brightness-0 saturate-100 invert-0 sepia-4 saturate-17 hue-rotate-99 brightness-98 contrast-105 pointer-events-none"
                     />
                   </button>
@@ -163,7 +163,7 @@
                   >
                     <img
                       v-if="profileAssets.settings" :src="profileAssets.settings"
-                      alt="settings"
+                      alt="" aria-hidden="true"
                       class="w-4 h-4 md:w-6 md:h-6 transition-all duration-150 ease-in-out pointer-events-none"
                     />
                   </button>
@@ -212,7 +212,7 @@
                       </span>
                       <img
                         v-if="profileAssets.menuStats" :src="profileAssets.menuStats"
-                        alt="go-live"
+                        alt="" aria-hidden="true"
                         class="h-5 w-5 md:h-6 md:w-6 transition-all duration-150 ease-in-out [filter:brightness(0)_saturate(100%)_invert(55%)_sepia(10%)_saturate(5098%)_hue-rotate(296deg)_brightness(98%)_contrast(101%)]"
                       />
                     </div>
@@ -240,7 +240,7 @@
                   >
                     <img
                       v-if="profileAssets.menuDesign" :src="profileAssets.menuDesign"
-                      alt="video-call"
+                      alt="" aria-hidden="true"
                       class="w-[2.625rem] h-[2.625rem]"
                     />
                   </span>
@@ -249,7 +249,7 @@
                   >{{ $t('dashboard.profile.videoCallStatus', 'Video call status') }}</span>
                   <img
                     v-if="profileAssets.info" :src="profileAssets.info"
-                    alt="info"
+                    alt="" aria-hidden="true"
                     class="w-4 h-4 cursor-pointer"
                   />
                 </div>
@@ -270,7 +270,7 @@
                       </span>
                       <img
                         v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
-                        alt="arrow-down"
+                        alt="" aria-hidden="true"
                         class="w-3 h-3 pointer-events-none dark:[filter:brightness(0)_invert(100%)]"
                       />
                     </button>
@@ -294,7 +294,7 @@
                 >
                   <img
                     v-if="profileAssets.edit" :src="profileAssets.edit"
-                    alt="edit"
+                    alt="" aria-hidden="true"
                     class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(0)_sepia(4%)_saturate(17%)_hue-rotate(99deg)_brightness(98%)_contrast(105%)] pointer-events-none"
                   />
                 </button>
@@ -321,7 +321,7 @@
                   >{{ $t('dashboard.profile.repostStatusX', 'Repost status message to X') }}</span>
                   <img
                     v-if="profileAssets.info" :src="profileAssets.info"
-                    alt="info"
+                    alt="" aria-hidden="true"
                     class="w-4 h-4 cursor-pointer"
                   />
                 </div>
@@ -342,7 +342,7 @@
                   >
                     <img
                       v-if="profileAssets.menuCopy" :src="profileAssets.menuCopy"
-                      alt="audio-call"
+                      alt="" aria-hidden="true"
                       class="w-[2.625rem] h-[2.625rem]"
                     />
                   </span>
@@ -351,7 +351,7 @@
                   >{{ $t('dashboard.profile.audioCallStatus', 'Audio call status') }}</span>
                   <img
                     v-if="profileAssets.info" :src="profileAssets.info"
-                    alt="info"
+                    alt="" aria-hidden="true"
                     class="w-4 h-4 cursor-pointer"
                   />
                 </div>
@@ -372,7 +372,7 @@
                       </span>
                       <img
                         v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
-                        alt="arrow-down"
+                        alt="" aria-hidden="true"
                         class="w-3 h-3 pointer-events-none dark:[filter:brightness(0)_invert(100%)]"
                       />
                     </button>
@@ -395,7 +395,7 @@
                 >
                   <img
                     v-if="profileAssets.edit" :src="profileAssets.edit"
-                    alt="edit"
+                    alt="" aria-hidden="true"
                     class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(0)_sepia(4%)_saturate(17%)_hue-rotate(99deg)_brightness(98%)_contrast(105%)] pointer-events-none"
                   />
                 </button>
@@ -422,7 +422,7 @@
                   >{{ $t('dashboard.profile.repostStatusX', 'Repost status message to X') }}</span>
                   <img
                     v-if="profileAssets.info" :src="profileAssets.info"
-                    alt="info"
+                    alt="" aria-hidden="true"
                     class="w-4 h-4 cursor-pointer"
                   />
                 </div>
@@ -443,7 +443,7 @@
                   >
                     <img
                       v-if="profileAssets.menuView" :src="profileAssets.menuView"
-                      alt="chat"
+                      alt="" aria-hidden="true"
                       class="w-[2.625rem] h-[2.625rem]"
                     />
                   </span>
@@ -454,7 +454,7 @@
                   </span>
                   <img
                     v-if="profileAssets.info" :src="profileAssets.info"
-                    alt="info"
+                    alt="" aria-hidden="true"
                     class="w-4 h-4 cursor-pointer"
                   />
                 </div>
@@ -475,7 +475,7 @@
                       </span>
                       <img
                         v-if="profileAssets.arrowDown" :src="profileAssets.arrowDown"
-                        alt="arrow-down"
+                        alt="" aria-hidden="true"
                         class="w-3 h-3 pointer-events-none dark:[filter:brightness(0)_invert(100%)]"
                       />
                     </button>
@@ -499,7 +499,7 @@
                 >
                   <img
                     v-if="profileAssets.edit" :src="profileAssets.edit"
-                    alt="edit"
+                    alt="" aria-hidden="true"
                     class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(0)_sepia(4%)_saturate(17%)_hue-rotate(99deg)_brightness(98%)_contrast(105%)] pointer-events-none"
                   />
                 </button>
@@ -526,7 +526,7 @@
                   >{{ $t('dashboard.profile.repostStatusX', 'Repost status message to X') }}</span>
                   <img
                     v-if="profileAssets.info" :src="profileAssets.info"
-                    alt="info"
+                    alt="" aria-hidden="true"
                     class="w-4 h-4 cursor-pointer"
                   />
                 </div>
@@ -549,7 +549,7 @@
               </span>
               <img
                 v-if="profileAssets.liveArrow" :src="profileAssets.liveArrow"
-                alt="settings"
+                alt="" aria-hidden="true"
                 class="w-4 h-4 pointer-events-none"
               />
             </div>

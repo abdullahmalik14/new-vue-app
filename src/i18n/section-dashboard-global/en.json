@@ -125,6 +125,9 @@
     "profile": {
       "name": "lindenMay",
       "handle": "{'@'}linden",
+      "alt": {
+        "avatar": "Profile photo"
+      },
       "status": {
         "away": "Away",
         "offline": "Offline"
@@ -144,11 +147,22 @@
       },
       "signIn": "Sign In",
       "logOut": "Log Out",
-      "changesStatuses": "Changes Statuses",
-      "repostCondition": "Repost your status and custom message automatically when you:"
+      "changeStatuses": "Changes Statuses",
+      "repostStatusPrompt": "Repost your status and custom message automatically when you:"
     },
     "logout": "Logout",
     "more": "More",
+    "sidebar": {
+      "alt": {
+        "logo": "Dashboard home",
+        "userAvatar": "Open profile",
+        "logout": "Log out",
+        "notifications": "Notifications",
+        "language": "Language",
+        "help": "Help"
+      },
+      "measureItemLabel": "Test"
+    },
     "menu": {
       "analytics": "Analytics",
       "payout": "Payout",

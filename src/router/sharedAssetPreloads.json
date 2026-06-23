@@ -270,6 +270,30 @@
     "heart": "dashboard.notification.heart",
     "tip": "dashboard.notification.tip"
   },
+  "dashboardPopupChrome": [
+    { "flag": "dashboard.profile.bg", "type": "image", "priority": "low" },
+    { "flag": "dashboard.profile.verified", "type": "image", "priority": "low" },
+    { "flag": "dashboard.profile.arrowDown", "type": "image", "priority": "low" },
+    { "flag": "dashboard.profile.info", "type": "image", "priority": "low" },
+    { "flag": "dashboard.profile.edit", "type": "image", "priority": "low" },
+    { "flag": "dashboard.profile.settings", "type": "image", "priority": "low" },
+    { "flag": "dashboard.profile.menuStats", "type": "image", "priority": "low" },
+    { "flag": "dashboard.profile.menuDesign", "type": "image", "priority": "low" },
+    { "flag": "dashboard.profile.menuCopy", "type": "image", "priority": "low" },
+    { "flag": "dashboard.profile.menuView", "type": "image", "priority": "low" },
+    { "flag": "dashboard.profile.liveArrow", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.bell", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.settings", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.film", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.upload", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.dismiss", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.closeSmall", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.placeholder", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.userPlaceholder", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.comment", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.heart", "type": "image", "priority": "low" },
+    { "flag": "dashboard.notification.tip", "type": "image", "priority": "low" }
+  ],
   "dashboardAnalyticsIcons": [
     {
       "flag": "dashboard.analytics.icon1",

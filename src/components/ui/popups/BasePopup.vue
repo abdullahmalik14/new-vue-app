@@ -86,7 +86,7 @@ const { t } = useI18n();
  */
 
 import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { usePopupStack } from '../../../composables/usePopupStack.js';
+import { usePopupStack } from '@/composables/usePopupStack.js';
 
 const PANEL_EVENT_PHASE_OPEN = "open";
 const PANEL_EVENT_PHASE_CLOSE = "close";
@@ -183,7 +183,7 @@ const {
   setOverlayActive,
   setOverlayVisible,
   setOverlayZ,
-  overlayClick,
+  popupOverlayClick,
   bodyScrollLock,
 } = usePopupStack();
 
@@ -727,7 +727,7 @@ function handleCloseClick() {
 function buildEventDetail(panelEventPhase) {
   return {
     panelEventPhase: panelEventPhase, // "open" | "close"
-    type: mergedPopupConfig.value.actionType || 'popup',
+    actionType: mergedPopupConfig.value.actionType || 'popup',
     isPopup: isPopup.value,
     isSlideIn: isSlideIn.value,
     zIndex: currentZIndex.value,
@@ -746,10 +746,10 @@ function buildEventDetail(panelEventPhase) {
 // Helper to register the overlay click handler for THIS panel
 function registerOverlayClickHandler() {
   if (mergedPopupConfig.value.shouldCloseOnOutsideClick) {
-    overlayClick.setHandler(() => closeTopMostPanel());
+    popupOverlayClick.setHandler(() => closeTopMostPanel());
   } else if (mergedPopupConfig.value.shouldShowOverlay) {
     // If showing overlay but NOT closing on outside, swallow clicks
-    overlayClick.setHandler(() => {});
+    popupOverlayClick.setHandler(() => {});
   }
 }
 

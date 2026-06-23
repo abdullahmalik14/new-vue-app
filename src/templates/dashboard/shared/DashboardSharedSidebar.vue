@@ -6,7 +6,7 @@
       <!-- site-logo -->
       <div ref="sidebarLogoContainer" @click="$router.push('/dashboard')"
         class="flex items-center gap-2.5 rounded-xl cursor-pointer transition-opacity duration-200 ease-in-out bg-yellow-400 opacity-80">
-        <img v-if="sidebarChromeAssetUrls.logo" :src="sidebarChromeAssetUrls.logo" alt="logo" class="w-9 h-9 pointer-events-none" />
+        <img v-if="sidebarChromeAssetUrls.logo" :src="sidebarChromeAssetUrls.logo" :alt="$t('dashboard.sidebar.alt.logo', 'Dashboard home')" class="w-9 h-9 pointer-events-none" />
       </div>
 
       <!-- profile & controls -->
@@ -14,7 +14,7 @@
         <!-- avatar -->
         <div class="flex w-10 h-10 rounded-[1.25rem]">
           <div @click="isProfileOpen = true" class="flex relative w-10 h-10 rounded-[1.25rem] cursor-pointer">
-            <img v-if="sidebarChromeAssetUrls.avatar" :src="sidebarChromeAssetUrls.avatar" alt="user"
+            <img v-if="sidebarChromeAssetUrls.avatar" :src="sidebarChromeAssetUrls.avatar" :alt="$t('dashboard.sidebar.alt.userAvatar', 'Open profile')"
               class="w-full h-full rounded-[1.25rem] object-cover pointer-events-none" />
             <!-- status-indicator -->
             <div class="absolute bottom-0 right-0 flex w-2.5 h-2.5 rounded-[0.438rem] bg-status">
@@ -29,14 +29,14 @@
           <div
             @click="handleLogout"
             class="logout-icon-container flex cursor-pointer items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out hover:bg-notification-hover group">
-            <img v-if="sidebarChromeAssetUrls.logout" :src="sidebarChromeAssetUrls.logout" alt="logout"
+            <img v-if="sidebarChromeAssetUrls.logout" :src="sidebarChromeAssetUrls.logout" :alt="$t('dashboard.sidebar.alt.logout', 'Log out')"
               class="w-5 h-5 pointer-events-none [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
           </div>
 
           <!-- notification -->
           <div @click="isNotificationOpen = true"
             class="notification-icon-container cursor-pointer flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out hover:bg-notification-hover relative group">
-            <img v-if="sidebarChromeAssetUrls.notification" :src="sidebarChromeAssetUrls.notification" alt="notification"
+            <img v-if="sidebarChromeAssetUrls.notification" :src="sidebarChromeAssetUrls.notification" :alt="$t('dashboard.sidebar.alt.notifications', 'Notifications')"
               class="w-6 h-6 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
             <!-- status-indicator -->
             <DashboardMenuCounter badgeId="notifications" class="absolute -top-1 -right-1" />
@@ -49,7 +49,7 @@
         <div class="flex flex-col items-center self-stretch gap-1 w-full">
           <div class="flex flex-col relative z-[5] self-stretch w-full">
             <div class="flex flex-col items-center self-stretch gap-1">
-              <!-- Render visibleMenuItemsBuffer menu items -->
+              <!-- Render visible menu items -->
               <div v-for="item in visibleMenuItems" :key="item.menuItemId"
                 class="sidebar-menu-item block transition-all duration-200 ease-in-out rounded-md flex-col items-center justify-center self-stretch w-full"
                 :class="{ 'opacity-50 pointer-events-none grayscale': !item.isEnabled }"
@@ -95,7 +95,7 @@
           <!-- language -->
           <div
             class="language-icon-container relative flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out hover:bg-notification-hover group">
-            <img v-if="sidebarChromeAssetUrls.language" :src="sidebarChromeAssetUrls.language" alt="language"
+            <img v-if="sidebarChromeAssetUrls.language" :src="sidebarChromeAssetUrls.language" :alt="$t('dashboard.sidebar.alt.language', 'Language')"
               class="w-5 h-5 pointer-events-none group-hover:[filter:brightness(0)_saturate(100%)_invert(29%)_sepia(98%)_saturate(5809%)_hue-rotate(325deg)_brightness(92%)_contrast(121%)]" />
             <LanguageSwitcher variant="invisible" class="!m-0 !p-0 border-none" />
           </div>
@@ -103,7 +103,7 @@
           <!-- help (not yet implemented: disabled, no interactive styling) -->
           <div
             class="help-icon-container opacity-50 pointer-events-none flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 ease-in-out">
-            <img v-if="sidebarChromeAssetUrls.help" :src="sidebarChromeAssetUrls.help" alt="help"
+            <img v-if="sidebarChromeAssetUrls.help" :src="sidebarChromeAssetUrls.help" :alt="$t('dashboard.sidebar.alt.help', 'Help')"
               class="w-5 h-5 pointer-events-none" />
           </div>
         </div>
@@ -111,8 +111,8 @@
     </div>
 
     <!-- More Flyout (replaces manual data-floating-panel) -->
-    <div v-show="isMoreVisible" class="fixed z-[100]" :style="flyoutWrapperStyle">
-      <div class="more-menu-flyout-hover-bridge absolute" :style="bridgeStyle" @mouseenter="handleFlyoutMouseEnter" @mouseleave="handleFlyoutMouseLeave"></div>
+    <div v-show="isMoreVisible" class="fixed z-[100]" :style="moreMenuFlyoutPositionStyle">
+      <div class="more-menu-flyout-hover-bridge absolute" :style="moreMenuFlyoutHoverBridgeStyle" @mouseenter="handleFlyoutMouseEnter" @mouseleave="handleFlyoutMouseLeave"></div>
       <div class="more-menu-flyout bg-white rounded-2xl shadow-custom p-4 flex flex-col min-w-[200px]" 
            ref="moreMenuFlyoutPanel"
            @mouseenter="handleFlyoutMouseEnter" @mouseleave="handleFlyoutMouseLeave">
@@ -137,11 +137,11 @@
     </div>
 
     <!-- Hidden measurement container -->
-    <div class="fixed top-[-9999px] left-[-9999px] invisibleMenuItemsBuffer flex flex-col items-center w-[5.625rem] pl-2 pr-2" ref="menuItemMeasureContainer">
+    <div class="fixed top-[-9999px] left-[-9999px] invisible flex flex-col items-center w-[5.625rem] pl-2 pr-2" ref="menuItemMeasureContainer">
       <div class="sidebar-menu-item block transition-all duration-200 ease-in-out rounded-md flex-col items-center justify-center self-stretch w-full" ref="menuItemMeasureElement">
         <button type="button" class="main-menu-item group flex flex-col items-center justify-center self-stretch w-full gap-0.5 p-2 rounded-md transition-all duration-200 ease-in-out cursor-pointer">
           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="w-6 h-6 pointer-events-none" />
-          <span class="pointer-events-none text-[0.625rem] font-medium leading-[1.125rem] text-center">Test</span>
+          <span class="pointer-events-none text-[0.625rem] font-medium leading-[1.125rem] text-center">{{ $t('dashboard.sidebar.measureItemLabel', 'Test') }}</span>
         </button>
       </div>
     </div>
@@ -174,7 +174,7 @@ import { useDashboardNavStore } from "@/stores/useDashboardNavStore";
 import { createDashboardSidebarSlideInConfig } from "@/systems/dashboard/createDashboardSidebarSlideInConfig.js";
 import { getAssetUrlSync } from "@/systems/assets/assetLibrary.js";
 
-import DashboardSubmenuPanel from "@/dev/templates/dashboard/dashboard-sidebar/DashboardSubmenuPanel.vue";
+import DashboardSubmenuPanel from "@/templates/dashboard/shared/DashboardSubmenuPanel.vue";
 import DashboardProfilePopup from "@/components/ui/popups/DashboardProfilePopup.vue";
 import DashboardNotificationPopup from "@/components/ui/popups/DashboardNotificationPopup.vue";
 import DashboardMenuCounter from "@/components/ui/nav/dashboard/DashboardMenuCounter.vue";
@@ -259,8 +259,8 @@ const {
   handleMoreButtonMouseLeave,
   handleFlyoutMouseEnter,
   handleFlyoutMouseLeave,
-  flyoutWrapperStyle,
-  bridgeStyle
+  moreMenuFlyoutPositionStyle,
+  moreMenuFlyoutHoverBridgeStyle
 } = useSidebarOverflow(dashboardMenuItems, sidebarEl, sidebarMenuContainer, menuItemMeasureElement, moreMenuButtonWrapper);
 
 let resizeObserver = null;

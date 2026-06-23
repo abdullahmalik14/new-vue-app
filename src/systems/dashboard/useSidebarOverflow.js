@@ -83,7 +83,7 @@ export function useSidebarOverflow(dashboardMenuItems, elRef, menuContainerRef, 
     hideMoreMenuFlyout();
   };
 
-  const flyoutWrapperStyle = computed(() => {
+  const moreMenuFlyoutPositionStyle = computed(() => {
     if (!isMoreVisible.value || !moreMenuButtonWrapperRef.value) return { top: '-9999px', left: '-9999px' };
     const moreButtonBoundingRect = moreMenuButtonWrapperRef.value.getBoundingClientRect();
     
@@ -92,21 +92,21 @@ export function useSidebarOverflow(dashboardMenuItems, elRef, menuContainerRef, 
     if (overflowMenuItems.value.length === 0) moreFlyoutHeight = 0; 
     if (moreFlyoutHeight < 100) moreFlyoutHeight = 100;
 
-    let top = moreButtonBoundingRect.top;
+    let moreFlyoutTopPx = moreButtonBoundingRect.top;
     const windowHeight = window.innerHeight;
-    if (top + moreFlyoutHeight > windowHeight - 10) {
-      top = windowHeight - moreFlyoutHeight - 10;
+    if (moreFlyoutTopPx + moreFlyoutHeight > windowHeight - 10) {
+      moreFlyoutTopPx = windowHeight - moreFlyoutHeight - 10;
     }
-    if (top < 10) top = 10;
+    if (moreFlyoutTopPx < 10) moreFlyoutTopPx = 10;
     
     return {
-      top: `${top}px`,
+      top: `${moreFlyoutTopPx}px`,
       left: `${moreButtonBoundingRect.right + 4}px`,
       pointerEvents: 'auto'
     };
   });
 
-  const bridgeStyle = computed(() => {
+  const moreMenuFlyoutHoverBridgeStyle = computed(() => {
     if (!isMoreVisible.value || !moreMenuButtonWrapperRef.value) return { top: '-9999px', left: '-9999px' };
     const moreButtonBoundingRect = moreMenuButtonWrapperRef.value.getBoundingClientRect();
     return {
@@ -126,7 +126,7 @@ export function useSidebarOverflow(dashboardMenuItems, elRef, menuContainerRef, 
     handleMoreButtonMouseLeave,
     handleFlyoutMouseEnter,
     handleFlyoutMouseLeave,
-    flyoutWrapperStyle,
-    bridgeStyle
+    moreMenuFlyoutPositionStyle,
+    moreMenuFlyoutHoverBridgeStyle
   };
 }

@@ -27,12 +27,12 @@ backgroundColor: 'rgba(0, 0, 0, 0.05)'
   });
   document.body.appendChild(overlayEl);
   overlayEl.addEventListener('click', () => {
-    if (overlayClick._handler) overlayClick._handler();
+    if (popupOverlayClick._handler) popupOverlayClick._handler();
   });
   return overlayEl;
 }
 
-export const overlayClick = {
+export const popupOverlayClick = {
   _handler: null,
   setHandler(fn) { this._handler = fn; }
 };
@@ -55,7 +55,7 @@ export function usePopupStack() {
   function unregisterPanel(el) {
     const idx = stack.findIndex(s => s.el === el);
     if (idx !== -1) stack.splice(idx, 1);
-    // If no panels left, hide overlay & unlock scroll handled by caller via callbacks.onAllClosed
+    // If no panels left, hide overlay & unlock scroll handled by caller via callbacks.onPopupStackEmptied
     if (stack.length === 0) {
       setOverlayVisible(false);
       overlayActive = false;
@@ -63,7 +63,7 @@ export function usePopupStack() {
       // Re-position overlay zIndex below new top-most
       const top = stack[stack.length - 1];
       setOverlayZ(Number(top.el.style.zIndex) - 1);
-      if (top.callbacks?.onBecomeTop) top.callbacks.onBecomeTop();
+      if (top.callbacks?.onPanelBecameTopMost) top.callbacks.onPanelBecameTopMost();
     }
   }
 
@@ -141,7 +141,7 @@ export function usePopupStack() {
     setOverlayActive,
     setOverlayVisible,
     setOverlayZ,
-    overlayClick,
+    popupOverlayClick,
     bodyScrollLock,
     topZIndexBase: 2000
   };

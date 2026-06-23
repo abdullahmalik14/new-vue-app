@@ -43,7 +43,7 @@
       "all"
     ],
     "redirectIfNotAuth": "/log-in",
-    "assetPreloadRef": "dashboardMenuIcons",
+    "assetPreloadRef": ["dashboardMenuIcons", "dashboardPopupChrome"],
     "componentPath": "@/dev/templates/dashboard/role/DashboardDevPlaygroundPage.vue",
     "dependencies": {
       "roles": {

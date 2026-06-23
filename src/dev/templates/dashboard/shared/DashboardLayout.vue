@@ -11,7 +11,7 @@
 
 <script setup>
 import { default as DashboardHeader } from './DashboardSharedHeader.vue'
-import { default as DashboardSharedSidebar } from '../dashboard-sidebar/DashboardSharedSidebar.vue'
+import { default as DashboardSharedSidebar } from '@/templates/dashboard/shared/DashboardSharedSidebar.vue'
 import { default as DashboardSharedFooter } from './DashboardSharedFooter.vue'
 
 </script>

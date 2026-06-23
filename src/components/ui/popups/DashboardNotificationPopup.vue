@@ -12,13 +12,13 @@
         class="flex items-center self-stretch gap-2 p-2 pb-0 md:bg-transparent bg-background-header-light dark:bg-background-header-dark md:dark:bg-transparent">
         <div class="flex-1 flex items-center gap-2">
           <span class="flex items-center justify-start">
-            <img v-if="notificationAssets.bell" :src="notificationAssets.bell" alt="Notifications"
+            <img v-if="notificationAssets.bell" :src="notificationAssets.bell" alt="" aria-hidden="true"
               class="w-5 h-5 pointer-events-none" />
           </span>
-          <span class="text-sm font-semibold leading-5 text-text-secondary-light dark:text-text-secondary-dark">{{ $t('dashboard.notification.title', 'Notifications') }}</span>
+          <span class="text-sm font-semibold leading-5 text-text-secondary-light dark:text-text-secondary-dark">{{ $t('dashboard.notifications.title', 'Notifications') }}</span>
           <div class="flex">
             <span class="flex items-center justify-center w-6 h-6 p-1 rounded-[0.313rem] cursor-pointer">
-              <img v-if="notificationAssets.settings" :src="notificationAssets.settings" alt="settings"
+              <img v-if="notificationAssets.settings" :src="notificationAssets.settings" alt="" aria-hidden="true"
                 class="w-4 h-4 [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)]" />
             </span>
           </div>
@@ -29,10 +29,10 @@
             class="flex items-center justify-center w-6 h-6 md:w-auto md:h-auto p-0 md:p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-panel-light-buttonHover dark:hover:bg-panel-dark-buttonHover cursor-pointer">
             <img
               class="w-6 h-6 pointer-events-none hidden md:block [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)]"
-              v-if="notificationAssets.closeDesktop" :src="notificationAssets.closeDesktop" alt="close" />
+              v-if="notificationAssets.closeDesktop" :src="notificationAssets.closeDesktop" alt="" aria-hidden="true" />
             <img
               class="block w-6 h-6 pointer-events-none md:hidden [filter:brightness(0)_saturate(100%)_invert(45%)_sepia(13%)_saturate(594%)_hue-rotate(183deg)_brightness(92%)_contrast(92%)]"
-              v-if="notificationAssets.closeMobile" :src="notificationAssets.closeMobile" alt="close" />
+              v-if="notificationAssets.closeMobile" :src="notificationAssets.closeMobile" alt="" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -40,9 +40,9 @@
       <!-- body -->
       <div
         class="flex-1 z-[1] overflow-y-auto self-stretch flex flex-col [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <!-- tab-main-wrapper -->
+        <!-- dashboard-notifications-tab-wrapper -->
         <div class="flex-1 self-stretch flex flex-col">
-          <!-- tab-header-list -->
+          <!-- dashboard-notifications-tab-list -->
           <div
             class="md: flex flex-col self-stretch items-start gap-2 p-2 pb-0 md:p-2 md:pb-0 md:pr-0 md:pl-0 md:bg-transparent bg-background-header-light dark:bg-background-header-dark md:dark:bg-transparent fixed md:static w-full z-[99]">
             <ul
@@ -72,7 +72,7 @@
             </ul>
           </div>
 
-          <!-- tab-content-containers -->
+          <!-- dashboard-notifications-tab-panels -->
           <div class="flex flex-col items-stretch h-full self-stretch mt-14 md:mt-0">
             <div class="flex flex-1 justify-center self-stretch flex-col">
               <div
@@ -88,18 +88,18 @@
                         <!-- Warning Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(253,176,34,0.1)] dark:bg-[rgba(183,119,2,0.1)]">
-                          <img v-if="notificationAssets.film" :src="notificationAssets.film" alt="film"
+                          <img v-if="notificationAssets.film" :src="notificationAssets.film" alt="" aria-hidden="true"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(81%)_sepia(13%)_saturate(5746%)_hue-rotate(341deg)_brightness(102%)_contrast(98%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#fdb022] dark:bg-[#b77702]">
-                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="upload"
+                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="" aria-hidden="true"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
 
-                        <!-- notification-content -->
+                        <!-- dashboard-notifications-item-content -->
                         <div class="flex-1 self-stretch flex flex-col items-start">
-                          <!-- text-contents -->
+                          <!-- dashboard-notifications-item-body -->
                           <div class="self-stretch flex flex-col items-start">
                             <!-- text -->
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
@@ -109,7 +109,7 @@
                               </p>
                             </div>
 
-                            <!-- bottom-contents -->
+                            <!-- dashboard-notifications-item-footer -->
                             <div class="self-stretch flex justify-between items-end pt-2 gap-2">
                               <!-- time -->
                               <div class="flex justify-start items-end">
@@ -125,7 +125,7 @@
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
                                   <span>
-                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="" aria-hidden="true"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </button>
@@ -136,7 +136,7 @@
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-warning-light dark:text-cta-warning-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
                                   <span>
-                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="" aria-hidden="true"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(24%)_sepia(100%)_saturate(1622%)_hue-rotate(10deg)_brightness(98%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </button>
@@ -157,25 +157,25 @@
                         <!-- notification-close -->
                         <button type="button" 
                           class="absolute right-0 top-0 flex justify-center items-center w-6 h-6 hidden md:block">
-                          <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="close"
+                          <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="" aria-hidden="true"
                             class="w-4 h-4 pointer-events-none" />
                         </button>
 
                         <!-- Success Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(46,211,183,0.1)] dark:bg-[rgba(35,168,151,0.1)]">
-                          <img v-if="notificationAssets.placeholder" :src="notificationAssets.placeholder" alt="placeholder"
+                          <img v-if="notificationAssets.placeholder" :src="notificationAssets.placeholder" alt="" aria-hidden="true"
                             class="w-full h-full" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#2ed3b7] dark:bg-[#23a897]">
-                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="upload"
+                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="" aria-hidden="true"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
 
-                        <!-- notification-content -->
+                        <!-- dashboard-notifications-item-content -->
                         <div class="flex-1 self-stretch flex flex-col items-start">
-                          <!-- text-contents -->
+                          <!-- dashboard-notifications-item-body -->
                           <div class="self-stretch flex flex-col items-start">
                             <!-- text -->
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
@@ -185,7 +185,7 @@
                               </p>
                             </div>
 
-                            <!-- bottom-contents -->
+                            <!-- dashboard-notifications-item-footer -->
                             <div class="self-stretch flex justify-between items-end pt-2 gap-2">
                               <!-- time -->
                               <div class="flex justify-start items-end">
@@ -208,25 +208,25 @@
                         <!-- notification-close -->
                         <button type="button" 
                           class="absolute right-0 top-0 flex justify-center items-center w-6 h-6 hidden md:block">
-                          <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="close"
+                          <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="" aria-hidden="true"
                             class="w-4 h-4 pointer-events-none" />
                         </button>
 
                         <!-- Info Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(34,204,238,0.1)] dark:bg-[rgba(14,152,180,0.1)]">
-                          <img v-if="notificationAssets.userPlaceholder" :src="notificationAssets.userPlaceholder" alt="bank-deposit"
+                          <img v-if="notificationAssets.userPlaceholder" :src="notificationAssets.userPlaceholder" alt="" aria-hidden="true"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(67%)_sepia(37%)_saturate(913%)_hue-rotate(145deg)_brightness(95%)_contrast(97%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#2ce] dark:bg-[#0e98b4]">
-                            <img v-if="notificationAssets.comment" :src="notificationAssets.comment" alt="info"
+                            <img v-if="notificationAssets.comment" :src="notificationAssets.comment" alt="" aria-hidden="true"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
 
-                        <!-- notification-content -->
+                        <!-- dashboard-notifications-item-content -->
                         <div class="flex-1 self-stretch flex flex-col items-start">
-                          <!-- text-contents -->
+                          <!-- dashboard-notifications-item-body -->
                           <div class="self-stretch flex flex-col items-start">
                             <!-- text -->
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
@@ -237,7 +237,7 @@
                               </p>
                             </div>
 
-                            <!-- bottom-contents -->
+                            <!-- dashboard-notifications-item-footer -->
                             <div class="self-stretch flex justify-between items-end pt-2 gap-2">
                               <!-- time -->
                               <div class="flex justify-start items-end">
@@ -260,25 +260,25 @@
                         <!-- notification-close -->
                         <button type="button" 
                           class="absolute right-0 top-0 flex justify-center items-center w-6 h-6 hidden md:block">
-                          <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="close"
+                          <img v-if="notificationAssets.closeSmall" :src="notificationAssets.closeSmall" alt="" aria-hidden="true"
                             class="w-4 h-4 pointer-events-none" />
                         </button>
 
                         <!-- Destructive Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(255,68,5,0.1)] dark:bg-[rgba(201,51,0,0.1)]">
-                          <img v-if="notificationAssets.heart" :src="notificationAssets.heart" alt="plane"
+                          <img v-if="notificationAssets.heart" :src="notificationAssets.heart" alt="" aria-hidden="true"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(42%)_sepia(53%)_saturate(6174%)_hue-rotate(356deg)_brightness(98%)_contrast(105%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#ff4405] dark:bg-[#c93300]">
-                            <img v-if="notificationAssets.tip" :src="notificationAssets.tip" alt="text-input"
+                            <img v-if="notificationAssets.tip" :src="notificationAssets.tip" alt="" aria-hidden="true"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
 
-                        <!-- notification-content -->
+                        <!-- dashboard-notifications-item-content -->
                         <div class="flex-1 self-stretch flex flex-col items-start">
-                          <!-- text-contents -->
+                          <!-- dashboard-notifications-item-body -->
                           <div class="self-stretch flex flex-col items-start">
                             <!-- text -->
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
@@ -288,7 +288,7 @@
                               </p>
                             </div>
 
-                            <!-- bottom-contents -->
+                            <!-- dashboard-notifications-item-footer -->
                             <div class="self-stretch flex justify-between items-end pt-2 gap-2">
                               <!-- time -->
                               <div class="flex justify-start items-end">
@@ -311,18 +311,18 @@
                         <!-- Warning Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(253,176,34,0.1)] dark:bg-[rgba(183,119,2,0.1)]">
-                          <img v-if="notificationAssets.film" :src="notificationAssets.film" alt="film"
+                          <img v-if="notificationAssets.film" :src="notificationAssets.film" alt="" aria-hidden="true"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(81%)_sepia(13%)_saturate(5746%)_hue-rotate(341deg)_brightness(102%)_contrast(98%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#fdb022] dark:bg-[#b77702]">
-                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="upload"
+                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="" aria-hidden="true"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
 
-                        <!-- notification-content -->
+                        <!-- dashboard-notifications-item-content -->
                         <div class="flex-1 self-stretch flex flex-col items-start">
-                          <!-- text-contents -->
+                          <!-- dashboard-notifications-item-body -->
                           <div class="self-stretch flex flex-col items-start">
                             <!-- text -->
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
@@ -332,7 +332,7 @@
                               </p>
                             </div>
 
-                            <!-- bottom-contents -->
+                            <!-- dashboard-notifications-item-footer -->
                             <div class="self-stretch flex justify-between items-end pt-2 gap-2">
                               <!-- time -->
                               <div class="flex justify-start items-end">
@@ -348,7 +348,7 @@
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
                                   <span>
-                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="" aria-hidden="true"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </button>
@@ -359,7 +359,7 @@
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-warning-light dark:text-cta-warning-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
                                   <span>
-                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="" aria-hidden="true"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(24%)_sepia(100%)_saturate(1622%)_hue-rotate(10deg)_brightness(98%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </button>
@@ -380,18 +380,18 @@
                         <!-- Success Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(46,211,183,0.1)] dark:bg-[rgba(35,168,151,0.1)]">
-                          <img v-if="notificationAssets.placeholder" :src="notificationAssets.placeholder" alt="placeholder"
+                          <img v-if="notificationAssets.placeholder" :src="notificationAssets.placeholder" alt="" aria-hidden="true"
                             class="w-full h-full" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#2ed3b7] dark:bg-[#23a897]">
-                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="upload"
+                            <img v-if="notificationAssets.upload" :src="notificationAssets.upload" alt="" aria-hidden="true"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
 
-                        <!-- notification-content -->
+                        <!-- dashboard-notifications-item-content -->
                         <div class="flex-1 self-stretch flex flex-col items-start">
-                          <!-- text-contents -->
+                          <!-- dashboard-notifications-item-body -->
                           <div class="self-stretch flex flex-col items-start">
                             <!-- text -->
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
@@ -401,7 +401,7 @@
                               </p>
                             </div>
 
-                            <!-- bottom-contents -->
+                            <!-- dashboard-notifications-item-footer -->
                             <div class="self-stretch flex justify-between items-end pt-2 gap-2">
                               <!-- time -->
                               <div class="flex justify-start items-end">
@@ -417,7 +417,7 @@
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
                                   <span>
-                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="" aria-hidden="true"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </button>
@@ -428,7 +428,7 @@
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-success-light dark:text-cta-success-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
                                   <span>
-                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="" aria-hidden="true"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(34%)_sepia(63%)_saturate(508%)_hue-rotate(123deg)_brightness(94%)_contrast(97%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </button>
@@ -449,18 +449,18 @@
                         <!-- Info Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(34,204,238,0.1)] dark:bg-[rgba(14,152,180,0.1)]">
-                          <img v-if="notificationAssets.userPlaceholder" :src="notificationAssets.userPlaceholder" alt="bank-deposit"
+                          <img v-if="notificationAssets.userPlaceholder" :src="notificationAssets.userPlaceholder" alt="" aria-hidden="true"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(67%)_sepia(37%)_saturate(913%)_hue-rotate(145deg)_brightness(95%)_contrast(97%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#2ce] dark:bg-[#0e98b4]">
-                            <img v-if="notificationAssets.comment" :src="notificationAssets.comment" alt="info"
+                            <img v-if="notificationAssets.comment" :src="notificationAssets.comment" alt="" aria-hidden="true"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
 
-                        <!-- notification-content -->
+                        <!-- dashboard-notifications-item-content -->
                         <div class="flex-1 self-stretch flex flex-col items-start">
-                          <!-- text-contents -->
+                          <!-- dashboard-notifications-item-body -->
                           <div class="self-stretch flex flex-col items-start">
                             <!-- text -->
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
@@ -470,7 +470,7 @@
                               </p>
                             </div>
 
-                            <!-- bottom-contents -->
+                            <!-- dashboard-notifications-item-footer -->
                             <div class="self-stretch flex justify-between items-end pt-2 gap-2">
                               <!-- time -->
                               <div class="flex justify-start items-end">
@@ -486,7 +486,7 @@
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
                                   <span>
-                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="" aria-hidden="true"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </button>
@@ -497,7 +497,7 @@
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-info-light dark:text-cta-info-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
                                   <span>
-                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="" aria-hidden="true"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(39%)_sepia(96%)_saturate(762%)_hue-rotate(157deg)_brightness(88%)_contrast(94%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </button>
@@ -518,18 +518,18 @@
                         <!-- Destructive Notification Icon -->
                         <div
                           class="relative flex justify-center items-center w-10 h-10 rounded-lg bg-[rgba(255,68,5,0.1)] dark:bg-[rgba(201,51,0,0.1)]">
-                          <img v-if="notificationAssets.heart" :src="notificationAssets.heart" alt="plane"
+                          <img v-if="notificationAssets.heart" :src="notificationAssets.heart" alt="" aria-hidden="true"
                             class="w-6 h-6 min-w-[1.5rem] [filter:brightness(0)_saturate(100%)_invert(42%)_sepia(53%)_saturate(6174%)_hue-rotate(356deg)_brightness(98%)_contrast(105%)]" />
                           <div
                             class="absolute -bottom-[0.563rem] -right-[0.563rem] flex justify-center items-center w-[1.375rem] h-[1.375rem] rounded-lg bg-[#ff4405] dark:bg-[#c93300]">
-                            <img v-if="notificationAssets.tip" :src="notificationAssets.tip" alt="text-input"
+                            <img v-if="notificationAssets.tip" :src="notificationAssets.tip" alt="" aria-hidden="true"
                               class="w-4 h-4 opacity-90 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(107%)_contrast(100%)]" />
                           </div>
                         </div>
 
-                        <!-- notification-content -->
+                        <!-- dashboard-notifications-item-content -->
                         <div class="flex-1 self-stretch flex flex-col items-start">
-                          <!-- text-contents -->
+                          <!-- dashboard-notifications-item-body -->
                           <div class="self-stretch flex flex-col items-start">
                             <!-- text -->
                             <div class="self-stretch flex justify-start items-start pr-6 pt-2">
@@ -539,7 +539,7 @@
                               </p>
                             </div>
 
-                            <!-- bottom-contents -->
+                            <!-- dashboard-notifications-item-footer -->
                             <div class="self-stretch flex justify-between items-end pt-2 gap-2">
                               <!-- time -->
                               <div class="flex justify-start items-end">
@@ -555,7 +555,7 @@
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-dismiss-light dark:text-cta-dismiss-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.dismiss', 'Dismiss') }}</span>
                                   <span>
-                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="" aria-hidden="true"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(31%)_saturate(534%)_hue-rotate(179deg)_brightness(93%)_contrast(90%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </button>
@@ -566,7 +566,7 @@
                                   <span
                                     class="text-xs leading-[1.125rem] font-medium transition-all duration-200 ease-in-out text-cta-destructive-light dark:text-cta-destructive-dark group-hover:text-cta-dismiss-hover dark:group-hover:text-cta-dismiss-hover">{{ $t('dashboard.notification.action.takeAction', 'Take Action') }}</span>
                                   <span>
-                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="dismiss"
+                                    <img v-if="notificationAssets.dismiss" :src="notificationAssets.dismiss" alt="" aria-hidden="true"
                                       class="h-4 w-4 transition-all duration-200 ease-in-out [filter:brightness(0)_saturate(100%)_invert(12%)_sepia(50%)_saturate(4284%)_hue-rotate(351deg)_brightness(115%)_contrast(102%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(37%)_sepia(57%)_saturate(6169%)_hue-rotate(214deg)_brightness(91%)_contrast(106%)]" />
                                   </span>
                                 </button>

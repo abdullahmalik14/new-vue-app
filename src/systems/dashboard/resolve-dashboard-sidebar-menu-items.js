@@ -1,4 +1,5 @@
 import { dashboardSidebarMenuItems } from "@/config/dashboard-sidebar-menu-items.js";
+import { isAssetLibraryFlagCandidate } from "@/systems/assets/assetUrlPolicy.js";
 
 /**
  * Resolve menu items with asset URLs from assetLibrary and translated titles
@@ -8,25 +9,11 @@ import { dashboardSidebarMenuItems } from "@/config/dashboard-sidebar-menu-items
 export async function resolveDashboardSidebarMenuItems(items = dashboardSidebarMenuItems, userRole = null) {
   const { getAssetUrls } = await import("@/systems/assets/assetLibrary.js");
 
-  const isValidAssetLibraryFlagCandidate = (value) => {
-    if (typeof value !== "string") {
-      return false;
-    }
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return false;
-    }
-    if (trimmed.startsWith("data:") || trimmed.includes("://") || trimmed.includes("/")) {
-      return false;
-    }
-    return trimmed.includes(".");
-  };
-
   // Collect all unique asset flags from menu items
   const assetFlags = new Set();
   
   const collectFlags = (item) => {
-    if (isValidAssetLibraryFlagCandidate(item.iconAssetFlag)) {
+    if (isAssetLibraryFlagCandidate(item.iconAssetFlag)) {
       assetFlags.add(item.iconAssetFlag.trim());
     }
     if (item.submenuItems && item.submenuItems.length > 0) {
@@ -54,7 +41,7 @@ export async function resolveDashboardSidebarMenuItems(items = dashboardSidebarM
     }
 
     // Resolve image URL
-    if (isValidAssetLibraryFlagCandidate(item.iconAssetFlag)) {
+    if (isAssetLibraryFlagCandidate(item.iconAssetFlag)) {
       const resolvedIconUrl = iconAssetUrlsByFlag[item.iconAssetFlag.trim()] || null;
       if (!resolvedIconUrl) {
         console.warn(`[dashboardSidebarMenuItems] Missing asset for flag: ${item.iconAssetFlag}`);

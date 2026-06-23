@@ -182,6 +182,17 @@ export default {
         cover: {
           overlay: "rgba(0, 0, 0, 0.5)",
         },
+        // Domain-scoped profile popup tokens (same values as the generic
+        // cover/status/handle tokens, but namespaced to the profile domain).
+        profile: {
+          cover: {
+            overlay: "rgba(0, 0, 0, 0.5)",
+          },
+          status: {
+            dot: "#FDB022",
+          },
+        },
+        "user-handle": "#d0d5dd",
         panel: {
           light: {
             DEFAULT: "rgba(234, 236, 240, 0.7)",
