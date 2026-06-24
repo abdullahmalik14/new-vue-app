@@ -129,7 +129,14 @@ function formatDuration(sec) {
   if (!sec || sec <= 0) return '0h0m';
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
-  return `${h}h${m}m`;
+  const s = Math.floor(sec % 60);
+  if (h > 0) {
+    return `${h}h${m}m`;
+  }
+  if (m > 0) {
+    return `${m}m${s}s`;
+  }
+  return `${s}s`;
 }
 
 const topMediaRows = computed(() => {
