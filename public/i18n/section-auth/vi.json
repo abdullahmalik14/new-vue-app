@@ -33,7 +33,7 @@
       "success": "Tạo tài khoản thành công",
       "userNotFound": "Không tìm thấy người dùng. Vui lòng tạo tài khoản.",
       "accountNotFoundPrompt": "Không tìm thấy tài khoản. Vui lòng đăng ký trước.",
-      "Onboarding": {
+      "onboarding": {
         "title": "Hoàn thiện hồ sơ",
         "description": "Chọn vai trò và tên người dùng của bạn để tiếp tục.",
         "usernameLabel": "Tên người dùng",
@@ -48,7 +48,7 @@
         },
         "button": "Tiếp tục"
       },
-      "KYC": {
+      "kyc": {
         "title": "Xác minh danh tính",
         "description": "Vui lòng hoàn thành quy trình xác minh danh tính để tiếp tục",
         "button": "Hoàn thành KYC",
@@ -72,6 +72,7 @@
       "codeLabel": "Mã xác nhận",
       "codePlaceholder": "Mã 6 chữ số",
       "error": "Xác nhận thất bại",
+      "signInAfterConfirm": "Email đã được xác nhận. Vui lòng đăng nhập bằng mật khẩu của bạn.",
       "autoLoginError": "Email đã được xác nhận, nhưng đăng nhập tự động thất bại. Vui lòng đăng nhập thủ công.",
       "resending": "Đang gửi...",
       "resendCode": "Gửi lại mã",
@@ -129,7 +130,10 @@
       "usernameRequired": "Tên người dùng là bắt buộc",
       "usernameMinLength": "Tên người dùng phải có ít nhất 4 ký tự",
       "usernameMaxLength": "Tên người dùng phải ít hơn 100 ký tự",
-      "usernameTaken": "Tên người dùng đã được sử dụng"
+      "usernameTaken": "Tên người dùng đã được sử dụng",
+      "fixField": "Vui lòng sửa trường này",
+      "confirmationCodeRequired": "Mã xác nhận là bắt buộc",
+      "codeSixDigits": "Mã phải gồm 6 chữ số"
     },
     "common": {
       "logout": "Đăng xuất",
@@ -138,12 +142,79 @@
       "admin": "Quản trị viên",
       "showPassword": "Hiện mật khẩu",
       "hidePassword": "Ẩn mật khẩu",
-      "guest": "Khách"
+      "guest": "Khách",
+      "back": "Quay lại",
+      "required": "Bắt buộc",
+      "closeError": "Đóng thông báo lỗi"
+    },
+    "header": {
+      "globeAlt": "Biểu tượng địa cầu",
+      "logoAlt": "Logo"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Có lỗi xảy ra khi hoàn thiện hồ sơ"
       }
+    },
+    "errors": {
+      "assetLoadFailed": "Không thể tải tài nguyên cần thiết. Vui lòng làm mới trang.",
+      "unknown": "Lỗi không xác định",
+      "loginFailed": "Đăng nhập thất bại: {error}",
+      "signupFailed": "Đăng ký thất bại. Vui lòng thử lại.",
+      "onboardingFailed": "Không thể hoàn thành thiết lập hồ sơ: {error}",
+      "kycFailed": "Không thể hoàn thành KYC: {error}",
+      "emailMissing": "Thiếu địa chỉ email. Vui lòng đăng ký lại.",
+      "accountNotLinked": "Tài khoản đã tồn tại nhưng chưa được liên kết. Vui lòng đăng nhập bằng email.",
+      "accountNotLinkedTwitter": "Tài khoản với email này đã tồn tại nhưng chưa được liên kết với Twitter. Vui lòng đăng nhập bằng email.",
+      "twitterMissingData": "Đăng nhập Twitter thất bại: Thiếu dữ liệu ủy quyền",
+      "twitterInvalidState": "Đăng nhập Twitter thất bại: Trạng thái không hợp lệ",
+      "twitterFailed": "Đăng nhập Twitter thất bại: {error}",
+      "twitterLoginFailed": "Đăng nhập Twitter thất bại",
+      "twitterSignupFailed": "Đăng ký Twitter thất bại: {error}",
+      "twitterStartFailed": "Không thể bắt đầu đăng nhập Twitter: {error}",
+      "telegramInvalidState": "Đăng nhập Telegram thất bại: Trạng thái không hợp lệ",
+      "telegramFailed": "Đăng nhập Telegram thất bại: {error}",
+      "telegramLoginFailed": "Đăng nhập Telegram thất bại",
+      "telegramStartFailed": "Không thể bắt đầu đăng nhập Telegram: {error}"
+    },
+    "oauth": {
+      "twitter": {
+        "processing": "Đang xử lý đăng nhập Twitter...",
+        "sending": "Đang gửi ủy quyền đến cửa sổ chính...",
+        "complete": "Ủy quyền hoàn tất! Đang chờ cửa sổ chính...",
+        "timeoutNotice": "Đã gửi ủy quyền. Bạn có thể đóng cửa sổ này.",
+        "successClosing": "Thành công! Đang đóng cửa sổ...",
+        "manualClose": "Nếu đăng nhập thành công, bạn có thể đóng cửa sổ này.",
+        "errorOccurred": "Đã xảy ra lỗi. Vui lòng kiểm tra chi tiết ở trên.",
+        "closeHint": "Bạn có thể đóng cửa sổ này thủ công hoặc kiểm tra console để biết thêm chi tiết.",
+        "genericError": "Không thể hoàn thành đăng nhập Twitter"
+      },
+      "telegram": {
+        "loading": "Đang tải đăng nhập Telegram…",
+        "sending": "Đang gửi ủy quyền đến cửa sổ chính…",
+        "heading": "Tiếp tục với Telegram",
+        "widgetHelp": "Nếu bạn không thấy nút Telegram, hãy đảm bảo tên miền của bạn được thiết lập trong BotFather và tên người dùng bot đã được cấu hình.",
+        "parentUnavailable": "Cửa sổ chính không khả dụng. Vui lòng đóng cửa sổ này và thử lại.",
+        "genericError": "Đăng nhập Telegram thất bại",
+        "missingBotUsername": "Thiếu VITE_TELEGRAM_BOT_USERNAME",
+        "widgetLoadFailed": "Không thể tải tập lệnh widget Telegram",
+        "tryAgain": "Bạn có thể đóng cửa sổ này và thử lại."
+      },
+      "debug": {
+        "title": "Thông tin gỡ lỗi:",
+        "urlState": "Trạng thái URL:",
+        "storedState": "Trạng thái đã lưu:",
+        "code": "Mã:",
+        "localStorageKeys": "Khóa localStorage:",
+        "present": "có",
+        "missing": "thiếu",
+        "none": "không có"
+      }
+    },
+    "social": {
+      "googlePlaceholder": "Đây là đăng nhập google cho toàn cục",
+      "facebookPlaceholder": "Đây là đăng nhập facebook cho toàn cục",
+      "callbackPlaceholder": "Callback cho toàn cục"
     }
   },
   "dashboard": {

@@ -22,6 +22,7 @@ import { registerRule }   from './utils/validationRules'
 export { vInteractions }
 export { registerRule, getRules }         from './utils/validationRules'
 export { validateScope, safeParseConfig } from './utils/engine'
+export { setupDisableUntilScript, isScriptGateReady } from './utils/disableUntilScript'
 export {
   allowedScriptsRegistry,
   registerAllowedScript,

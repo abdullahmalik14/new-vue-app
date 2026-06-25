@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Հաստատեք գաղտնաբառը",
       "confirmPasswordPlaceholder": "Գաղտնաբառ",
       "haveAccount": "Արդեն ունե՞ք հաշիվ:",
-      "Onboarding": {
+      "onboarding": {
         "title": "Լրացրեք ձեր պրոֆիլը",
         "description": "Շարունակելու համար ընտրեք ձեր դերը և օգտվողի անունը:",
         "usernameLabel": "Օգտվողի անունը",
@@ -45,7 +45,7 @@
         },
         "button": "Շարունակեք"
       },
-      "KYC": {
+      "kyc": {
         "title": "Ստուգեք Ձեր ինքնությունը",
         "description": "Վահանակ մուտք գործելու համար ավարտեք հեղինակի հաստատումը:",
         "button": "Հաստատել և շարունակել",
@@ -107,7 +107,7 @@
       "hidePassword": "Թաքցնել գաղտնաբառը"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Ձեր պրոֆիլը լրացնելիս սխալ տեղի ունեցավ"
       }
     }

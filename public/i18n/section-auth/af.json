@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Bevestig wagwoord",
       "confirmPasswordPlaceholder": "Wagwoord",
       "haveAccount": "Het jy reeds 'n rekening?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Voltooi jou profiel",
         "description": "Kies jou rol en gebruikersnaam om voort te gaan.",
         "usernameLabel": "Gebruikersnaam",
@@ -45,7 +45,7 @@
         },
         "button": "Gaan voort"
       },
-      "KYC": {
+      "kyc": {
         "title": "Verifieer jou identiteit",
         "description": "Voltooi skepperverifikasie om toegang tot die kontroleskerm te kry.",
         "button": "Bevestig en gaan voort",
@@ -107,7 +107,7 @@
       "hidePassword": "Versteek wagwoord"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "'n Fout het voorgekom tydens die voltooiing van jou profiel"
       }
     }

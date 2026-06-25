@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "پاسورډ تایید کړئ",
       "confirmPasswordPlaceholder": "پټنوم",
       "haveAccount": "لا دمخه یو حساب لرئ؟",
-      "Onboarding": {
+      "onboarding": {
         "title": "خپل پروفایل بشپړ کړئ",
         "description": "د دوام لپاره خپل رول او کارن نوم غوره کړئ.",
         "usernameLabel": "کارن نوم",
@@ -45,7 +45,7 @@
         },
         "button": "ادامه ورکړئ"
       },
-      "KYC": {
+      "kyc": {
         "title": "خپل هویت تایید کړئ",
         "description": "ډشبورډ ته د لاسرسي لپاره د جوړونکي تایید بشپړ کړئ.",
         "button": "تایید کړئ او پرمخ لاړشئ",
@@ -107,7 +107,7 @@
       "hidePassword": "پټنوم پټ کړئ"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "ستاسو د پروفایل بشپړولو په وخت کې یوه تېروتنه رامنځته شوه"
       }
     }

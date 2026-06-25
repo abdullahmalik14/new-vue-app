@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Patvirtinkite slaptažodį",
       "confirmPasswordPlaceholder": "Slaptažodis",
       "haveAccount": "Jau turite paskyrą?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Užpildykite savo profilį",
         "description": "Norėdami tęsti, pasirinkite savo vaidmenį ir vartotojo vardą.",
         "usernameLabel": "Vartotojo vardas",
@@ -45,7 +45,7 @@
         },
         "button": "Tęsti"
       },
-      "KYC": {
+      "kyc": {
         "title": "Patvirtinkite savo tapatybę",
         "description": "Norėdami pasiekti prietaisų skydelį, užbaikite kūrėjo patvirtinimą.",
         "button": "Patvirtinkite ir tęskite",
@@ -107,7 +107,7 @@
       "hidePassword": "Slėpti slaptažodį"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Užpildant profilį įvyko klaida"
       }
     }

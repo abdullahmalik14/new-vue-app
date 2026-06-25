@@ -14,49 +14,6 @@
 
             </div>
 
-            
-            <!-- ===== SECTION: Analytics Dashboard Components ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="Analytics Dashboard Components" />
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Dashboard Tabs -->
-                    <div class="flex flex-col gap-3 lg:col-span-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">DashboardTabs</span>
-                        <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-100 w-full max-w-md">
-                            <DashboardTabs v-model="demoTabsModel" :tabs="['Daily', 'Weekly', 'Monthly', 'Yearly']" />
-                        </div>
-                    </div>
-
-                    <!-- Dashboard Stat Indicator -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">DashboardStatIndicator (Positive)</span>
-                        <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center">
-                            <DashboardStatIndicator percentage="17.5" period-label="vs yesterday" />
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">DashboardStatIndicator (Negative)</span>
-                        <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center">
-                            <DashboardStatIndicator percentage="-5.2" period-label="vs last week" />
-                        </div>
-                    </div>
-
-                    <!-- Dashboard Button -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">DashboardPrimaryButton</span>
-                        <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center">
-                            <DashboardPrimaryButton text="All Orders 25">
-                              <template #suffix>
-                                <div class="w-5 h-5 flex justify-center items-center">
-                                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-700 transition-transform group-hover:translate-x-0.5"><path d="M4.16666 10H15.8333M15.8333 10L9.99999 4.16667M15.8333 10L9.99999 15.8333" stroke="currentColor" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                                </div>
-                              </template>
-                            </DashboardPrimaryButton>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             <!-- ===== SECTION: MediaCardVariants ===== -->
             <div class="flex flex-col gap-12">
@@ -603,8 +560,7 @@
                 </div>
             </section>
 
-
-
+            
 
             <!-- ===== SECTION: Spinner ===== -->
             <section class="flex flex-col gap-6">
@@ -636,96 +592,272 @@
                 </div>
             </section>
 
-            <!-- ===== SECTION: Buttons ===== -->
+            <!-- ===== SECTION: All Buttons (full catalog) ===== -->
             <section class="flex flex-col gap-8 mb-20">
-                <DemoSectionHeader title="Button Showcase" />
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <DemoSectionHeader title="All Buttons — Full Catalog" />
 
-                    <!-- Auth Pink -->
-                    <div class="flex flex-col gap-4">
-                        <DashboardPrimaryButton :text="buttonText" variant="authPink" type="submit" />
-                        <ShowCodeToggle :code="demoSnippets.buttons.authPink" />
+                <p class="text-sm text-gray-500 -mt-4">
+                    Exactly the same buttons used across the app (same text, variant, size, width and icons),
+                    so another developer can copy the real thing. Each label shows the variant and where it is used.
+                </p>
+
+                <!-- Auth pages (login / sign up / onboarding) -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Auth pages — login / sign up / onboarding</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+                        <div class="flex flex-col gap-2 w-full max-w-[380px]">
+                            <DashboardPrimaryButton text="Sign in" variant="authPink" size="lg" type="submit" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authPink · size lg · login/signup submit</span>
+                        </div>
+                        <div class="flex flex-col gap-2 w-full max-w-[380px]">
+                            <DashboardPrimaryButton text="Continue with X (Twitter)" variant="authTransparent" size="lg"
+                                leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp" leftIconClass="w-8 h-8" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authTransparent · size lg · social</span>
+                        </div>
+                        <div class="flex flex-col gap-2 w-full max-w-[380px]">
+                            <DashboardPrimaryButton text="Continue with Telegram" variant="authTransparent" size="lg"
+                                :leftIcon="telegramIcon" leftIconClass="w-8 h-8" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authTransparent · size lg · social</span>
+                        </div>
                     </div>
-
-                    <!-- Auth Transparent (Telegram) -->
-                    <div class="flex flex-col gap-4">
-                        <DashboardPrimaryButton text="Continue with Telegram" variant="authTransparent" size="lg"
-                            :leftIcon="telegramIcon" leftIconClass="w-8 h-8" />
-                        <ShowCodeToggle :code="demoSnippets.buttons.authTransparent" />
-                    </div>
-
-                    <!-- New Events -->
-                    <div class="flex flex-col gap-4">
-                        <DashboardPrimaryButton text="NEW EVENTS" variant="none"
-                            customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]"
-                            :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'"
-                            :leftIconClass="`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`" />
-                        <ShowCodeToggle :code="demoSnippets.buttons.newEvents" />
-                    </div>
-
-                    <!-- Polygon Next -->
-                    <div class="flex flex-col gap-4">
-                        <DashboardPrimaryButton text="Next" variant="polygonLeft"
-                            :rightIcon="'https://i.ibb.co.com/hx8ztZFf/svgviewer-png-output-8.webp'" :rightIconClass="`
-                                w-6 h-6 transition duration-200
-                                filter brightness-0 invert-0
-                                group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]
-                                `" btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468" />
-                        <ShowCodeToggle :code="demoSnippets.buttons.polygonNext" />
-                    </div>
-
-                    <!-- Publish Schedule -->
-                    <div class="flex flex-col gap-4">
-                        <DashboardPrimaryButton text="PUBLISH SCHEDULE" variant="polygonLeft"
-                            :leftIcon="'https://i.ibb.co/S74jfvBw/Icon-1.png'" :leftIconClass="`
-                            w-6 h-6 transition duration-200
-                            filter brightness-0
-                            group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]
-                            `" />
-                        <ShowCodeToggle :code="demoSnippets.buttons.publishSchedule" />
-                    </div>
-
-                    <!-- Add-on Service -->
-                    <div class="flex flex-col gap-4">
-                    <!-- Add-on Service -->
-                    <div class="flex flex-col gap-4">
-                        <DashboardPrimaryButton text="add-on service" variant="none"
-                            customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
-                            :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'" :leftIconClass="`
-                            w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]
-                            rounded-sm  outline outline-[1.50px] outline-offset-[-0.75px] `" />
-                        <ShowCodeToggle :code="demoSnippets.buttons.addonService" />
-                    </div>
-
-                    <!-- Add-on Service V2 -->
-                    <div class="flex flex-col gap-4">
-                        <DashboardPrimaryButton text="add-on service" variant="none"
-                            customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
-                            :leftIcon="'https://i.ibb.co.com/bRYvsTVs/Icon.png'" :leftIconClass="`
-                            w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]
-                            `" />
-                        <ShowCodeToggle :code="demoSnippets.buttons.addonServiceV2" />
-                    </div>
-
-                    <!-- Proceed Payment -->
-                    <div class="flex flex-col gap-4">
-                        <DashboardPrimaryButton text="Proceed Payment" variant="checkoutProceedpayment"
-                            :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'"
-                            :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]`" />
-                        <ShowCodeToggle :code="demoSnippets.buttons.proceedPayment" />
-                    </div>
-
-
-
-                    <!-- Action Green (X) -->
-                    <div class="flex flex-col gap-4">
-                        <DashboardPrimaryButton text="Continue with X (Twitter)" variant="actionGreen"
-                            leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp"
-                            leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]" />
-                        <ShowCodeToggle :code="demoSnippets.buttons.actionGreenX" />
-                    </div>
-
                 </div>
+
+                <!-- Checkout / purchase / cart popups -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Checkout / purchase / cart popups</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+                        <div class="flex flex-col gap-2 w-full max-w-[380px]">
+                            <DashboardPrimaryButton text="Proceed Payment" variant="checkoutProceedpayment"
+                                :rightIcon="'https://i.ibb.co.com/NdmC2BjP/arrow-right.webp'"
+                                :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]`" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">checkoutProceedpayment · checkout/buy-now</span>
+                        </div>
+                        <div class="flex flex-col gap-2 w-full max-w-[380px]">
+                            <DashboardPrimaryButton text="Next" variant="disableBtn"
+                                :rightIcon="'https://i.ibb.co.com/8LKPbgm1/arrow-right.webp'"
+                                :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)_invert(100%)_sepia(6%)_saturate(678%)_hue-rotate(146deg)_brightness(115%)_contrast(100%)]`" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">disableBtn · disabled "Next" state</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton text="Continue with X (Twitter)" variant="actionGreen"
+                                leftIcon="https://i.ibb.co.com/HTj6TpFh/x.webp"
+                                leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">actionGreen · guest purchase</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile / media -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Profile / media</span>
+                    <div class="flex flex-wrap items-start gap-6">
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton text="Back" variant="profileMediaBtn"
+                                :leftIcon="'https://i.ibb.co.com/HLCwss7q/arrow-left.webp'"
+                                :leftIconClass="`w-8 h-8 [filter:brightness(0)_saturate(100%)_invert(81%)_sepia(45%)_saturate(3798%)_hue-rotate(87deg)_brightness(100%)_contrast(98%)] drop-shadow-[0px_0px_8px_0px_#00000080]`" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">profileMediaBtn · ProfileViewAll popup</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payout settings -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Payout settings</span>
+                    <div class="flex flex-wrap items-start gap-6">
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton variant="none" text="SAVE"
+                                customClass="flex items-center gap-2.5 pl-[1.48rem] pr-2 h-10 shadow-[0px_0px_16px_0px_#FFFFFF80] [clip-path:polygon(100%_0%,100%_100%,0%_100%,0.98rem_0%)] bg-black group/button hover:bg-[#07F468]"
+                                textClass="text-lg font-medium text-[#07F468] group-hover/button:text-black">
+                                <template #leftIcon>
+                                    <img src="https://i.ibb.co.com/Fb2Xxf9S/tick-circle.webp" alt="tick circle" class="w-6 h-6 [filter:brightness(0)_saturate(100%)_invert(53%)_sepia(97%)_saturate(459%)_hue-rotate(93deg)_brightness(114%)_contrast(94%)] group-hover/button:[filter:brightness(0)_saturate(100%)]" />
+                                </template>
+                            </DashboardPrimaryButton>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · PayoutSettings step 2/3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plan sharing -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Plan sharing</span>
+                    <div class="flex flex-wrap items-start gap-6">
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton text="Send invite" variant="simpleBtn"
+                                :leftIcon="'https://i.ibb.co.com/PZcHd96N/send-01.webp'"
+                                :leftIconClass="`w-6 h-6 group-hover/button:[filter:brightness(0)_saturate(100%)_invert(74%)_sepia(36%)_saturate(5644%)_hue-rotate(95deg)_brightness(111%)_contrast(94%)]`"
+                                btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">simpleBtn · PlanSharing</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media uploader -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Media uploader</span>
+                    <div class="flex flex-wrap items-start gap-6">
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton text="Add Tier" variant="polygonLeft" customClass="gap-[2px] text-sm"
+                                :leftIcon="'https://i.ibb.co/N2xH2QVV/svgviewer-png-output-13.webp'"
+                                :leftIconClass="`w-6 h-6 transition duration-200 [filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)] group-hover:[filter:brightness(0)]`"
+                                btnBg="#000" btnHoverBg="#07f468" btnText="#07f468" btnHoverText="#000" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft · Add Tier</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton text="Next" variant="polygonLeft"
+                                :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'"
+                                :rightIconClass="`w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]`"
+                                btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft · Next</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton text="SUBMIT MEDIA FOR APPROVAL" variant="polygonLeft"
+                                :rightIcon="'https://i.ibb.co/hx8ztZFf/svgviewer-png-output-8.webp'"
+                                :rightIconClass="`w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]`"
+                                btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft · Submit</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard analytics -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Dashboard analytics</span>
+                    <div class="flex flex-wrap items-start gap-6">
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton variant="none" text="All Orders"
+                                customClass="inline-flex items-center gap-2.5 pr-2 pl-6 py-1 bg-white border border-gray-200 rounded-none [clip-path:polygon(0_100%,100%_100%,100%_0,16%_0)] shadow-sm hover:bg-gray-50 transition-colors"
+                                textClass="text-blue-700 text-base font-medium"
+                                :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
+                                <template #rightIcon>
+                                    <span class="text-blue-700 text-[10px] font-bold -translate-y-2 -ml-1">25</span>
+                                    <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 5H13M13 5L9 1M13 5L9 9" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </template>
+                            </DashboardPrimaryButton>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · orders table</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton variant="none" text="Trend"
+                                customClass="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-white [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border border-gray-200 hover:bg-gray-100 transition-colors"
+                                textClass="text-xs font-medium text-gray-700"
+                                :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]">
+                                <template #rightIcon>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#374151" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7 17L17 7M17 7H9M17 7V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </template>
+                            </DashboardPrimaryButton>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · metric card</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events / add-ons / scheduling -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Events / add-ons / scheduling</span>
+                    <div class="flex flex-wrap items-start gap-6">
+                        <div class="flex flex-col gap-2 w-full max-w-[220px]">
+                            <DashboardPrimaryButton text="NEW EVENTS" variant="none"
+                                customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] hover:text-black hover:bg-[#07F468]"
+                                :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'"
+                                :leftIconClass="`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · NEW EVENTS</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton text="PUBLISH SCHEDULE" variant="polygonLeft"
+                                :leftIcon="'https://i.ibb.co/S74jfvBw/Icon-1.png'"
+                                :leftIconClass="`w-6 h-6 transition duration-200 filter brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]`" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft · PUBLISH SCHEDULE</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton text="add-on service" variant="none"
+                                customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
+                                :leftIcon="'https://i.ibb.co.com/RpWmJkcb/plus.webp'"
+                                :leftIconClass="`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)] rounded-sm outline outline-[1.50px] outline-offset-[-0.75px]`" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · add-on service</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <DashboardPrimaryButton text="add-on service" variant="none"
+                                customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight hover:text-black hover:bg-[#07F468]"
+                                :leftIcon="'https://i.ibb.co.com/bRYvsTVs/Icon.png'"
+                                :leftIconClass="`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · add-on service v2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons with loader -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs text-gray-400 uppercase tracking-wider">Buttons with loader</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                        <!-- Static loading (auth pink) -->
+                        <div class="flex flex-col items-center justify-center gap-3">
+                            <DashboardPrimaryButton text="Loading..." variant="authPink" :disabled="true">
+                                <template #leftIcon>
+                                    <LoadingSpinner size="sm" color="text-white" :showTrack="false" />
+                                </template>
+                            </DashboardPrimaryButton>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">static spinner</span>
+                        </div>
+
+                        <!-- Static loading (primary) -->
+                        <div class="flex flex-col items-center justify-center gap-3">
+                            <DashboardPrimaryButton text="Saving..." variant="primary" :disabled="true">
+                                <template #leftIcon>
+                                    <LoadingSpinner size="sm" color="text-white" :showTrack="false" />
+                                </template>
+                            </DashboardPrimaryButton>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">static spinner</span>
+                        </div>
+
+                        <!-- Interactive: click to load -->
+                        <div class="flex flex-col items-center justify-center gap-3">
+                            <DashboardPrimaryButton
+                                :text="isButtonLoading ? 'Processing...' : 'Click to Load'"
+                                variant="success"
+                                :disabled="isButtonLoading"
+                                @click="triggerButtonLoading">
+                                <template #leftIcon>
+                                    <LoadingSpinner v-if="isButtonLoading" size="sm" color="text-white" :showTrack="false" />
+                                </template>
+                            </DashboardPrimaryButton>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">interactive (click)</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TwoPieceButton variants -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">TwoPieceButton — variants</span>
+                    <div class="flex flex-wrap items-start gap-8">
+                        <div class="flex flex-col gap-2">
+                            <TwoPieceButton variant="link-x" tag="button" text="Link your X account">
+                                <template #icon>
+                                    <img src="https://i.ibb.co.com/35nPv7by/x.webp" alt="x" class="w-6 h-6 brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(83%)_sepia(37%)_saturate(2897%)_hue-rotate(81deg)_brightness(94%)_contrast(103%)]" />
+                                </template>
+                            </TwoPieceButton>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">link-x · Settings</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <TwoPieceButton variant="premium-upgrade" tag="button" text="Upgrade To Premium" textClass="text-lg font-medium text-white">
+                                <template #icon>
+                                    <img src="https://i.ibb.co.com/M5c8F9Mb/star-06.webp" alt="star" class="w-6 h-6" />
+                                </template>
+                            </TwoPieceButton>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">premium-upgrade · Settings</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <TwoPieceButton tag="button" variant="link-x"
+                                rootClass="filter drop-shadow-[4px_3px_0px_#000000] group hover:drop-shadow-[4px_3px_0px_#FF439D] block w-max appearance-button"
+                                contentWrapperClass="flex justify-center items-center gap-2.5 pl-2 pr-[20.5px] min-h-[2rem] [clip-path:polygon(calc(100%-12.5px)_0%,100%_100%,0%_100%,0%_0%)] bg-[linear-gradient(135deg,#F093FB_0%,#FF439D_100%)] group-hover:[background:black]"
+                                textClass="text-lg font-medium text-black group-hover:text-[#FF439D]"
+                                text="Unlock premium to upload videos" />
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">link-x (pink) · Edit Profile</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -752,6 +884,7 @@ import DemoCard from '@/dev/templates/demo/DemoCard.vue';
 import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue';
 import DashboardStatIndicator from '@/components/ui/badge/dashboard/DashboardStatIndicator.vue';
 import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
+import TwoPieceButton from '@/components/ui/buttons/TwoPieceButton.vue';
 import { tierData } from "/public/data/TierData.js";
 // Heroicons
 import {
@@ -945,6 +1078,7 @@ const cards = ref([
         videos: '0',
         photos: '0',
         mediaCount: '5',
+        
         image: 'https://i.ibb.co.com/SwFy98RJ/checkout-header.webp',
         features: [
             '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
@@ -1264,6 +1398,14 @@ const videoCard = ref({
 const buttonText = ref("Auth Button");
 const demoTabsModel = ref('Daily');
 const telegramIcon = "https://i.ibb.co.com/8LKPbgm1/telegram.webp"; // Using a consistent placeholder if not found
+
+// Interactive "button with loader" demo
+const isButtonLoading = ref(false);
+const triggerButtonLoading = () => {
+    if (isButtonLoading.value) return;
+    isButtonLoading.value = true;
+    setTimeout(() => { isButtonLoading.value = false; }, 2500);
+};
 
 </script>
 

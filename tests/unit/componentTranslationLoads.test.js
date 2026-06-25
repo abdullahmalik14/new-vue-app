@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
 const P07_FILES = [
-  'src/templates/auth/views/AuthLogIn.vue',
+  'src/templates/auth/views/AuthLogin.vue',
   'src/templates/auth/views/AuthSignUp.vue',
   'src/templates/auth/views/AuthLostPassword.vue',
   'src/templates/auth/views/AuthResetPassword.vue',

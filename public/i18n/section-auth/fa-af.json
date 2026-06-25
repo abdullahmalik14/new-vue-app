@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "رمز عبور را تایید کنید",
       "confirmPasswordPlaceholder": "رمز عبور",
       "haveAccount": "از قبل حساب کاربری دارید؟",
-      "Onboarding": {
+      "onboarding": {
         "title": "نمایه خود را تکمیل کنید",
         "description": "برای ادامه نقش و نام کاربری خود را انتخاب کنید.",
         "usernameLabel": "نام کاربری",
@@ -45,7 +45,7 @@
         },
         "button": "ادامه دهید"
       },
-      "KYC": {
+      "kyc": {
         "title": "هویت خود را تأیید کنید",
         "description": "برای دسترسی به داشبورد، تأیید سازنده را کامل کنید.",
         "button": "تایید و ادامه",
@@ -107,7 +107,7 @@
       "hidePassword": "پنهان کردن رمز عبور"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "هنگام تکمیل نمایه شما خطایی روی داد"
       }
     }

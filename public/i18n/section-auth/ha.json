@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Tabbatar da Kalmar wucewa",
       "confirmPasswordPlaceholder": "Kalmar wucewa",
       "haveAccount": "Kuna da asusu?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Cika Bayanan Bayananku",
         "description": "Zaɓi rawar ku da sunan mai amfani don ci gaba.",
         "usernameLabel": "Sunan mai amfani",
@@ -45,7 +45,7 @@
         },
         "button": "Ci gaba"
       },
-      "KYC": {
+      "kyc": {
         "title": "Tabbatar da Shaida",
         "description": "Cikakken tabbacin mahalicci don isa ga dashboard.",
         "button": "Tabbatar & Ci gaba",
@@ -107,7 +107,7 @@
       "hidePassword": "Ɓoye kalmar sirri"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "An sami kuskure yayin kammala bayanin martabar ku"
       }
     }

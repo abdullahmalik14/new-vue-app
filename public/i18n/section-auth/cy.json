@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Cadarnhau Cyfrinair",
       "confirmPasswordPlaceholder": "Cyfrinair",
       "haveAccount": "Oes gennych chi gyfrif yn barod?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Cwblhewch Eich Proffil",
         "description": "Dewiswch eich rôl a'ch enw defnyddiwr i barhau.",
         "usernameLabel": "Enw defnyddiwr",
@@ -45,7 +45,7 @@
         },
         "button": "Parhewch"
       },
-      "KYC": {
+      "kyc": {
         "title": "Gwiriwch Eich Hunaniaeth",
         "description": "Cwblhewch ddilysiad crëwr i gael mynediad i'r dangosfwrdd.",
         "button": "Cadarnhau ac Ymlaen",
@@ -107,7 +107,7 @@
       "hidePassword": "Cuddio cyfrinair"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Bu gwall wrth gwblhau eich proffil"
       }
     }

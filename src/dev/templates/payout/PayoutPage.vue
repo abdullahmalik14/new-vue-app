@@ -73,7 +73,7 @@ const tableThemeMobile = {
             <!-- top-page-settings -->
             <div class="flex flex-col items-start gap-2 z-[1] sm:gap-4 md:gap-2 lg:flex-row lg:gap-4">
               <!-- card-section -->
-            <PayoutCard @openWithdraw="showWithdrawPopup = true" />
+            <PayoutCard @openWithdraw="showWithdrawPopup = true" />     
             </div>
           </div>
 

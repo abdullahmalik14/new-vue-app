@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Jelszó megerősítése",
       "confirmPasswordPlaceholder": "Jelszó",
       "haveAccount": "Már van fiókja?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Töltse ki profilját",
         "description": "A folytatáshoz válassza ki szerepét és felhasználónevét.",
         "usernameLabel": "Felhasználónév",
@@ -45,7 +45,7 @@
         },
         "button": "Folytatás"
       },
-      "KYC": {
+      "kyc": {
         "title": "Igazolja személyazonosságát",
         "description": "Az irányítópult eléréséhez hajtsa végre az alkotói igazolást.",
         "button": "Erősítse meg és folytassa",
@@ -107,7 +107,7 @@
       "hidePassword": "Jelszó elrejtése"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Hiba történt a profil kitöltése közben"
       }
     }

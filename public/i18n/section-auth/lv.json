@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Apstipriniet paroli",
       "confirmPasswordPlaceholder": "Parole",
       "haveAccount": "Vai jums jau ir konts?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Pabeidziet savu profilu",
         "description": "Lai turpinātu, izvēlieties savu lomu un lietotājvārdu.",
         "usernameLabel": "Lietotājvārds",
@@ -45,7 +45,7 @@
         },
         "button": "Turpināt"
       },
-      "KYC": {
+      "kyc": {
         "title": "Apstipriniet savu identitāti",
         "description": "Pabeidziet satura veidotāja verifikāciju, lai piekļūtu informācijas panelim.",
         "button": "Apstipriniet un turpiniet",
@@ -107,7 +107,7 @@
       "hidePassword": "Slēpt paroli"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Aizpildot jūsu profilu, radās kļūda"
       }
     }

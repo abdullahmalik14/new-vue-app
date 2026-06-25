@@ -244,13 +244,13 @@ async function handleConnectTwitter() {
 
 async function handleOAuthCallback(event) {
   // Validate message origin and structure
-  // AuthTwitter.vue sends 'TWITTER_OAUTH_CODE' for success, 'TWITTER_AUTH_ERROR' for errors
+  // AuthTwitter.vue sends 'twitter-oauth-code' for success, 'twitter-auth-error' for errors
   if (!event.data) {
     return;
   }
 
   // Handle error messages from popup
-  if (event.data.type === 'TWITTER_AUTH_ERROR') {
+  if (event.data.type === 'twitter-auth-error') {
     log('TwitterPost.vue', 'handleOAuthCallback', 'error-received', 'Received OAuth error from popup', {
       error: event.data.error
     });
@@ -266,7 +266,7 @@ async function handleOAuthCallback(event) {
   }
 
   // Handle success messages
-  if (event.data.type !== 'TWITTER_OAUTH_CODE') {
+  if (event.data.type !== 'twitter-oauth-code') {
     return;
   }
 
@@ -314,7 +314,7 @@ async function handleOAuthCallback(event) {
 
     // Acknowledge the popup
     if (event.source) {
-      event.source.postMessage({ type: 'TWITTER_OAUTH_ACK', success: true, state }, event.origin || "*");
+      event.source.postMessage({ type: 'twitter-oauth-ack', success: true, state }, event.origin || "*");
     }
 
     // Show success and transition to create view
@@ -326,7 +326,7 @@ async function handleOAuthCallback(event) {
     log('TwitterPost.vue', 'handleOAuthCallback', 'error', 'OAuth callback failed', { error: err.message });
     
     if (event.source) {
-      event.source.postMessage({ type: 'TWITTER_OAUTH_ACK', success: false, state, error: err.message }, event.origin || "*");
+      event.source.postMessage({ type: 'twitter-oauth-ack', success: false, state, error: err.message }, event.origin || "*");
     }
     
     error.value = err.message || 'Failed to connect Twitter. Please try again.';

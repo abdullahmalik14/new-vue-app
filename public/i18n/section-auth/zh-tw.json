@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "確認密碼",
       "confirmPasswordPlaceholder": "密碼",
       "haveAccount": "已經有帳戶？",
-      "Onboarding": {
+      "onboarding": {
         "title": "填寫您的個人資料",
         "description": "選擇您的角色和用戶名以繼續。",
         "usernameLabel": "使用者名稱",
@@ -45,7 +45,7 @@
         },
         "button": "繼續"
       },
-      "KYC": {
+      "kyc": {
         "title": "驗證您的身份",
         "description": "完成創建者驗證以存取儀表板。",
         "button": "確認並繼續",
@@ -107,7 +107,7 @@
       "hidePassword": "隱藏密碼"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "填寫您的個人資料時出錯"
       }
     }

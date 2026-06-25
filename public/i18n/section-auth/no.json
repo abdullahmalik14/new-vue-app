@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Bekreft passord",
       "confirmPasswordPlaceholder": "Passord",
       "haveAccount": "Har du allerede en konto?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Fullfør profilen din",
         "description": "Velg din rolle og brukernavn for å fortsette.",
         "usernameLabel": "Brukernavn",
@@ -45,7 +45,7 @@
         },
         "button": "Fortsett"
       },
-      "KYC": {
+      "kyc": {
         "title": "Bekreft identiteten din",
         "description": "Fullfør skaperbekreftelsen for å få tilgang til dashbordet.",
         "button": "Bekreft og fortsett",
@@ -107,7 +107,7 @@
       "hidePassword": "Skjul passord"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Det oppsto en feil under fullføring av profilen din"
       }
     }

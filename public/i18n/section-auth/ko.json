@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "비밀번호 확인",
       "confirmPasswordPlaceholder": "비밀번호",
       "haveAccount": "이미 계정이 있습니까?",
-      "Onboarding": {
+      "onboarding": {
         "title": "프로필 작성",
         "description": "계속하려면 역할과 사용자 이름을 선택하세요.",
         "usernameLabel": "사용자 이름",
@@ -45,7 +45,7 @@
         },
         "button": "계속"
       },
-      "KYC": {
+      "kyc": {
         "title": "신원 확인",
         "description": "대시보드에 액세스하려면 작성자 인증을 완료하세요.",
         "button": "확인 및 진행",
@@ -107,7 +107,7 @@
       "hidePassword": "비밀번호 숨기기"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "프로필을 작성하는 중에 오류가 발생했습니다."
       }
     }

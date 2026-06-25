@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Konfirmasi Kata Sandi",
       "confirmPasswordPlaceholder": "Kata sandi",
       "haveAccount": "Sudah punya akun?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Lengkapi Profil Anda",
         "description": "Pilih peran dan nama pengguna Anda untuk melanjutkan.",
         "usernameLabel": "Nama pengguna",
@@ -45,7 +45,7 @@
         },
         "button": "Lanjutkan"
       },
-      "KYC": {
+      "kyc": {
         "title": "Verifikasi Identitas Anda",
         "description": "Selesaikan verifikasi kreator untuk mengakses dasbor.",
         "button": "Konfirmasi & Lanjutkan",
@@ -107,7 +107,7 @@
       "hidePassword": "Sembunyikan kata sandi"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Terjadi kesalahan saat melengkapi profil Anda"
       }
     }

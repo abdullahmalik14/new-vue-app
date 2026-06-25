@@ -261,7 +261,7 @@
             showLoading("Sending authorization to parent window…");
 
             window.opener.postMessage(
-              { type: "TELEGRAM_AUTH_SUCCESS", state, user, source: "telegram-widget", v: 1 },
+              { type: "telegram-auth-success", state, user, source: "telegram-widget", v: 1 },
               "*"
             );
 
@@ -269,7 +269,7 @@
             let acknowledged = false;
             const ackListener = (event) => {
               const data = event && event.data;
-              if (data && data.type === "TELEGRAM_AUTH_ACK" && data.state === state) {
+              if (data && data.type === "telegram-auth-ack" && data.state === state) {
                 acknowledged = true;
                 window.removeEventListener("message", ackListener);
                 showLoading("Success! Closing window…");
@@ -286,7 +286,7 @@
             }, 3000);
           } catch (e) {
             window.opener.postMessage(
-              { type: "TELEGRAM_AUTH_ERROR", state, error: (e && e.message) || String(e) },
+              { type: "telegram-auth-error", state, error: (e && e.message) || String(e) },
               "*"
             );
             showError((e && e.message) || String(e));

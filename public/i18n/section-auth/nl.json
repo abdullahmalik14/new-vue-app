@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Bevestig wachtwoord",
       "confirmPasswordPlaceholder": "Wachtwoord",
       "haveAccount": "Heeft u al een account?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Voltooi uw profiel",
         "description": "Kies uw rol en gebruikersnaam om door te gaan.",
         "usernameLabel": "Gebruikersnaam",
@@ -45,7 +45,7 @@
         },
         "button": "Ga door"
       },
-      "KYC": {
+      "kyc": {
         "title": "Controleer uw identiteit",
         "description": "Voltooi de verificatie van de maker om toegang te krijgen tot het dashboard.",
         "button": "Bevestig en ga verder",
@@ -107,7 +107,7 @@
       "hidePassword": "Wachtwoord verbergen"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Er is een fout opgetreden bij het invullen van uw profiel"
       }
     }

@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "אשר את הסיסמה",
       "confirmPasswordPlaceholder": "סיסמה",
       "haveAccount": "יש לך כבר חשבון?",
-      "Onboarding": {
+      "onboarding": {
         "title": "השלם את הפרופיל שלך",
         "description": "בחר את התפקיד ואת שם המשתמש שלך כדי להמשיך.",
         "usernameLabel": "שם משתמש",
@@ -45,7 +45,7 @@
         },
         "button": "המשך"
       },
-      "KYC": {
+      "kyc": {
         "title": "אמת את זהותך",
         "description": "השלם את אימות היוצר כדי לגשת ללוח המחוונים.",
         "button": "אשר והמשך",
@@ -107,7 +107,7 @@
       "hidePassword": "הסתר את הסיסמה"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "אירעה שגיאה בעת השלמת הפרופיל שלך"
       }
     }

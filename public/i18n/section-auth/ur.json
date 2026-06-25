@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "پاس ورڈ کی تصدیق کریں۔",
       "confirmPasswordPlaceholder": "پاس ورڈ",
       "haveAccount": "پہلے سے ہی ایک اکاؤنٹ ہے؟",
-      "Onboarding": {
+      "onboarding": {
         "title": "اپنا پروفائل مکمل کریں۔",
         "description": "جاری رکھنے کے لیے اپنا کردار اور صارف نام منتخب کریں۔",
         "usernameLabel": "صارف نام",
@@ -45,7 +45,7 @@
         },
         "button": "جاری رکھیں"
       },
-      "KYC": {
+      "kyc": {
         "title": "اپنی شناخت کی تصدیق کریں۔",
         "description": "ڈیش بورڈ تک رسائی کے لیے تخلیق کار کی توثیق مکمل کریں۔",
         "button": "تصدیق کریں اور آگے بڑھیں۔",
@@ -107,7 +107,7 @@
       "hidePassword": "پاس ورڈ چھپائیں۔"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "آپ کا پروفائل مکمل کرتے وقت ایک خرابی پیش آگئی"
       }
     }

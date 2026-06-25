@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Confirmați parola",
       "confirmPasswordPlaceholder": "Parolă",
       "haveAccount": "Ai deja un cont?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Completează-ți profilul",
         "description": "Alegeți rolul și numele de utilizator pentru a continua.",
         "usernameLabel": "Nume de utilizator",
@@ -45,7 +45,7 @@
         },
         "button": "Continuă"
       },
-      "KYC": {
+      "kyc": {
         "title": "Verificați-vă identitatea",
         "description": "Finalizați verificarea creatorului pentru a accesa tabloul de bord.",
         "button": "Confirmați și continuați",
@@ -107,7 +107,7 @@
       "hidePassword": "Ascunde parola"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "A apărut o eroare la completarea profilului dvs"
       }
     }

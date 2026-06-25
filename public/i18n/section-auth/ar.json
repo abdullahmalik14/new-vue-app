@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "تأكيد كلمة المرور",
       "confirmPasswordPlaceholder": "كلمة المرور",
       "haveAccount": "هل لديك حساب بالفعل؟",
-      "Onboarding": {
+      "onboarding": {
         "title": "أكمل ملفك الشخصي",
         "description": "اختر دورك واسم المستخدم للمتابعة.",
         "usernameLabel": "اسم المستخدم",
@@ -45,7 +45,7 @@
         },
         "button": "متابعة"
       },
-      "KYC": {
+      "kyc": {
         "title": "التحقق من هويتك",
         "description": "أكمل عملية التحقق من المنشئ للوصول إلى لوحة التحكم.",
         "button": "تأكيد والمضي قدما",
@@ -107,7 +107,7 @@
       "hidePassword": "إخفاء كلمة المرور"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "حدث خطأ أثناء إكمال ملف التعريف الخاص بك"
       }
     }

@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Потврдите лозинку",
       "confirmPasswordPlaceholder": "Лозинка",
       "haveAccount": "Већ имате налог?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Попуните свој профил",
         "description": "Изаберите своју улогу и корисничко име да бисте наставили.",
         "usernameLabel": "Корисничко име",
@@ -45,7 +45,7 @@
         },
         "button": "Настави"
       },
-      "KYC": {
+      "kyc": {
         "title": "Потврдите свој идентитет",
         "description": "Завршите верификацију аутора да бисте приступили контролној табли.",
         "button": "Потврди и настави",
@@ -107,7 +107,7 @@
       "hidePassword": "Сакриј лозинку"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Дошло је до грешке при попуњавању вашег профила"
       }
     }

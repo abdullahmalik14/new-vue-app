@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Confirm Password",
       "confirmPasswordPlaceholder": "Password",
       "haveAccount": "Already have an account ?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Complete Your Profile",
         "description": "Choose your role and username to continue.",
         "usernameLabel": "Username",
@@ -45,7 +45,7 @@
         },
         "button": "Continue"
       },
-      "KYC": {
+      "kyc": {
         "title": "Verify Your Identity",
         "description": "Complete creator verification to access the dashboard.",
         "button": "Confirm & Proceed",
@@ -130,7 +130,10 @@
       "usernameRequired": "Username is required",
       "usernameMinLength": "Username must be at least 4 characters",
       "usernameMaxLength": "Username must be less than 100 characters",
-      "usernameTaken": "Username is already taken"
+      "usernameTaken": "Username is already taken",
+      "fixField": "Please fix this field",
+      "confirmationCodeRequired": "Confirmation code is required",
+      "codeSixDigits": "Code must be 6 digits"
     },
     "common": {
       "logout": "Sign Out",
@@ -139,12 +142,79 @@
       "admin": "Admin",
       "guest": "Guest",
       "showPassword": "Show password",
-      "hidePassword": "Hide password"
+      "hidePassword": "Hide password",
+      "back": "Back",
+      "required": "Required",
+      "closeError": "Close error message"
+    },
+    "header": {
+      "globeAlt": "globe",
+      "logoAlt": "logo"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "An error occurred while completing your profile"
       }
+    },
+    "errors": {
+      "assetLoadFailed": "Failed to load required resources. Please refresh.",
+      "unknown": "Unknown error",
+      "loginFailed": "Login failed: {error}",
+      "signupFailed": "Sign up failed. Please try again.",
+      "onboardingFailed": "Failed to complete onboarding: {error}",
+      "kycFailed": "Failed to complete KYC: {error}",
+      "emailMissing": "Email address is missing. Please sign up again.",
+      "accountNotLinked": "Account exists but is not linked. Please log in with email.",
+      "accountNotLinkedTwitter": "Account exists with this email but is not linked to Twitter. Please login with email.",
+      "twitterMissingData": "Twitter login failed: Missing authorization data",
+      "twitterInvalidState": "Twitter login failed: Invalid state",
+      "twitterFailed": "Twitter login failed: {error}",
+      "twitterLoginFailed": "Twitter login failed",
+      "twitterSignupFailed": "Twitter signup failed: {error}",
+      "twitterStartFailed": "Failed to start Twitter login: {error}",
+      "telegramInvalidState": "Telegram login failed: Invalid state",
+      "telegramFailed": "Telegram login failed: {error}",
+      "telegramLoginFailed": "Telegram login failed",
+      "telegramStartFailed": "Failed to start Telegram login: {error}"
+    },
+    "oauth": {
+      "twitter": {
+        "processing": "Processing Twitter login...",
+        "sending": "Sending authorization to parent window...",
+        "complete": "Authorization complete! Waiting for parent window...",
+        "timeoutNotice": "Authorization sent. You can close this window.",
+        "successClosing": "Success! Closing window...",
+        "manualClose": "If login succeeded, you can close this window.",
+        "errorOccurred": "Error occurred. Please check the details above.",
+        "closeHint": "You can close this window manually or check the console for more details.",
+        "genericError": "Failed to complete Twitter login"
+      },
+      "telegram": {
+        "loading": "Loading Telegram login…",
+        "sending": "Sending authorization to parent window…",
+        "heading": "Continue with Telegram",
+        "widgetHelp": "If you don't see the Telegram button, ensure your domain is set in BotFather and that the bot username is configured.",
+        "parentUnavailable": "Parent window not available. Please close this window and try again.",
+        "genericError": "Telegram login failed",
+        "missingBotUsername": "Missing VITE_TELEGRAM_BOT_USERNAME",
+        "widgetLoadFailed": "Failed to load Telegram widget script",
+        "tryAgain": "You can close this window and try again."
+      },
+      "debug": {
+        "title": "Debug Info:",
+        "urlState": "URL State:",
+        "storedState": "Stored State:",
+        "code": "Code:",
+        "localStorageKeys": "localStorage Keys:",
+        "present": "present",
+        "missing": "missing",
+        "none": "none"
+      }
+    },
+    "social": {
+      "googlePlaceholder": "This is google auth for global",
+      "facebookPlaceholder": "This is facebook auth for global",
+      "callbackPlaceholder": "Callback for global"
     }
   },
   "dashboard": {

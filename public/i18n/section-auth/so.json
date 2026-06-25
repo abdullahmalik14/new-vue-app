@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Xaqiiji erayga sirta ah",
       "confirmPasswordPlaceholder": "Furaha",
       "haveAccount": "Horeba akoon u yeeshay ?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Buuxi Profile-kaaga",
         "description": "Dooro doorkaaga iyo magacaaga isticmaale si aad u sii wadato.",
         "usernameLabel": "Magaca isticmaale",
@@ -45,7 +45,7 @@
         },
         "button": "Sii wad"
       },
-      "KYC": {
+      "kyc": {
         "title": "Xaqiiji aqoonsigaaga",
         "description": "Xaqiijinta abuuraha oo dhammaystiran si aad u gasho dashboard-ka.",
         "button": "Xaqiiji & sii wad",
@@ -107,7 +107,7 @@
       "hidePassword": "Qari erayga sirta ah"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Khalad ayaa dhacay markii la dhammaystirayay astaantaada"
       }
     }

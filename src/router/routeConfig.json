@@ -7,7 +7,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/ConfirmEmailPage.vue",
+    "componentPath": "@/templates/auth/page/shared/ConfirmEmailPage.vue",
     "preLoadSections": [
       "dashboard"
     ]
@@ -20,7 +20,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/TwitterAuthPage.vue",
+    "componentPath": "@/templates/auth/page/shared/TwitterAuthPage.vue",
     "preLoadSections": [],
     "hideLayout": true
   },
@@ -97,7 +97,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/LoginPage.vue",
+    "componentPath": "@/templates/auth/page/shared/LoginPage.vue",
     "assetPreload": [
       {
         "src": "https://i.ibb.co/jPw7ChWb/auth-bg.webp",
@@ -121,7 +121,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/LostPasswordPage.vue",
+    "componentPath": "@/templates/auth/page/shared/LostPasswordPage.vue",
     "preLoadSections": [
       "dashboard"
     ]
@@ -133,7 +133,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/ResetPasswordPage.vue",
+    "componentPath": "@/templates/auth/page/shared/ResetPasswordPage.vue",
     "preLoadSections": [
       "dashboard"
     ]
@@ -146,7 +146,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/SignUpPage.vue",
+    "componentPath": "@/templates/auth/page/shared/SignUpPage.vue",
     "preLoadSections": [
       "dashboard"
     ]
@@ -250,7 +250,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/creator/CreatorSignUpOnboardingPage.vue",
+    "componentPath": "@/templates/auth/page/creator/CreatorSignUpOnboardingPage.vue",
     "preLoadSections": [
       "dashboard"
     ],
@@ -295,7 +295,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/dev/templates/auth/page/creator/CreatorSignUpOnboardingKycPage.vue",
+    "componentPath": "@/templates/auth/page/creator/CreatorSignUpOnboardingKycPage.vue",
     "preLoadSections": [
       "dashboard"
     ],
@@ -340,7 +340,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/FacebookAuthPage.vue"
+    "componentPath": "@/templates/auth/page/shared/FacebookAuthPage.vue"
   },
   {
     "slug": "/auth/callback/social/google",
@@ -350,7 +350,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/GoogleAuthPage.vue"
+    "componentPath": "@/templates/auth/page/shared/GoogleAuthPage.vue"
   },
   {
     "slug": "/auth/callback/social/twitter",
@@ -360,7 +360,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/TwitterAuthPage.vue"
+    "componentPath": "@/templates/auth/page/shared/TwitterAuthPage.vue"
   },
   {
     "slug": "/auth/callback/social/telegram",
@@ -370,7 +370,7 @@
     "supportedRoles": [
       "all"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/TelegramAuthPage.vue"
+    "componentPath": "@/templates/auth/page/shared/TelegramAuthPage.vue"
   },
   {
     "slug": "/sign-up/onboarding/kyc/callback",
@@ -383,7 +383,7 @@
       "agent",
       "vendor"
     ],
-    "componentPath": "@/dev/templates/auth/page/role/SignUpOnboardingKycCallbackPage.vue",
+    "componentPath": "@/templates/auth/page/shared/SignUpOnboardingKycCallbackPage.vue",
     "preLoadSections": [
       "dashboard"
     ],
@@ -406,7 +406,7 @@
     "supportedRoles": [
       "creator"
     ],
-    "componentPath": "@/dev/templates/auth/page/creator/CreatorSignUpOnboardingKycStatusPage.vue",
+    "componentPath": "@/templates/auth/page/creator/CreatorSignUpOnboardingKycStatusPage.vue",
     "preLoadSections": [
       "dashboard"
     ],
@@ -459,6 +459,16 @@
     "envAccess": "development",
     "section": "dev",
     "componentPath": "@/dev/templates/demo/UnifiedBookingFormPage.vue",
+    "supportedRoles": [
+      "all"
+    ]
+  },
+  {
+    "slug": "/demo/lazy-sections",
+    "envAccess": "development",
+    "section": "demo",
+    "componentPath": "@/dev/templates/demo/LazySectionDemo.vue",
+    "requiresAuth": false,
     "supportedRoles": [
       "all"
     ]

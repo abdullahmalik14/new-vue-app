@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "የይለፍ ቃል ያረጋግጡ",
       "confirmPasswordPlaceholder": "የይለፍ ቃል",
       "haveAccount": "መለያ አለህ?",
-      "Onboarding": {
+      "onboarding": {
         "title": "መገለጫዎን ያጠናቅቁ",
         "description": "ለመቀጠል የእርስዎን ሚና እና የተጠቃሚ ስም ይምረጡ።",
         "usernameLabel": "የተጠቃሚ ስም",
@@ -45,7 +45,7 @@
         },
         "button": "ቀጥል"
       },
-      "KYC": {
+      "kyc": {
         "title": "ማንነትዎን ያረጋግጡ",
         "description": "ዳሽቦርዱን ለመድረስ የፈጣሪ ማረጋገጫን ያጠናቅቁ።",
         "button": "ያረጋግጡ እና ይቀጥሉ",
@@ -107,7 +107,7 @@
       "hidePassword": "የይለፍ ቃል ደብቅ"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "መገለጫዎን በማጠናቀቅ ላይ ስህተት አጋጥሟል"
       }
     }

@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Konfime Modpas",
       "confirmPasswordPlaceholder": "Modpas",
       "haveAccount": "Ou deja gen yon kont?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Ranpli pwofil ou a",
         "description": "Chwazi wòl ou ak non itilizatè pou kontinye.",
         "usernameLabel": "Non itilizatè",
@@ -45,7 +45,7 @@
         },
         "button": "Kontinye"
       },
-      "KYC": {
+      "kyc": {
         "title": "Verifye idantite w",
         "description": "Ranpli verifikasyon kreyatè pou jwenn aksè nan tablodbò a.",
         "button": "Konfime & Kontinye",
@@ -107,7 +107,7 @@
       "hidePassword": "Kache modpas"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Yon erè te fèt pandan w ap ranpli pwofil ou a"
       }
     }

@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Vahvista salasana",
       "confirmPasswordPlaceholder": "Salasana",
       "haveAccount": "Onko sinulla jo tili?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Täydennä profiilisi",
         "description": "Valitse roolisi ja käyttäjänimesi jatkaaksesi.",
         "usernameLabel": "Käyttäjätunnus",
@@ -45,7 +45,7 @@
         },
         "button": "Jatka"
       },
-      "KYC": {
+      "kyc": {
         "title": "Vahvista henkilöllisyytesi",
         "description": "Suorita sisällöntuottajan vahvistus päästäksesi hallintapaneeliin.",
         "button": "Vahvista ja jatka",
@@ -107,7 +107,7 @@
       "hidePassword": "Piilota salasana"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Profiilisi viimeistelyssä tapahtui virhe"
       }
     }

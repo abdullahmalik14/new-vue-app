@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Bekräfta lösenord",
       "confirmPasswordPlaceholder": "Lösenord",
       "haveAccount": "Har du redan ett konto?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Komplettera din profil",
         "description": "Välj din roll och användarnamn för att fortsätta.",
         "usernameLabel": "Användarnamn",
@@ -45,7 +45,7 @@
         },
         "button": "Fortsätt"
       },
-      "KYC": {
+      "kyc": {
         "title": "Verifiera din identitet",
         "description": "Slutför skaparverifieringen för att komma åt instrumentpanelen.",
         "button": "Bekräfta och fortsätt",
@@ -107,7 +107,7 @@
       "hidePassword": "Dölj lösenord"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Ett fel uppstod när din profil fylldes i"
       }
     }

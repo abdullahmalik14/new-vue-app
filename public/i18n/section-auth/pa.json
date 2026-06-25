@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "ਪਾਸਵਰਡ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
       "confirmPasswordPlaceholder": "ਪਾਸਵਰਡ",
       "haveAccount": "ਪਹਿਲਾਂ ਹੀ ਇੱਕ ਖਾਤਾ ਹੈ?",
-      "Onboarding": {
+      "onboarding": {
         "title": "ਆਪਣਾ ਪ੍ਰੋਫਾਈਲ ਪੂਰਾ ਕਰੋ",
         "description": "ਜਾਰੀ ਰੱਖਣ ਲਈ ਆਪਣੀ ਭੂਮਿਕਾ ਅਤੇ ਉਪਭੋਗਤਾ ਨਾਮ ਚੁਣੋ।",
         "usernameLabel": "ਯੂਜ਼ਰਨੇਮ",
@@ -45,7 +45,7 @@
         },
         "button": "ਜਾਰੀ ਰੱਖੋ"
       },
-      "KYC": {
+      "kyc": {
         "title": "ਆਪਣੀ ਪਛਾਣ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
         "description": "ਡੈਸ਼ਬੋਰਡ ਤੱਕ ਪਹੁੰਚ ਕਰਨ ਲਈ ਸਿਰਜਣਹਾਰ ਪੁਸ਼ਟੀਕਰਨ ਨੂੰ ਪੂਰਾ ਕਰੋ।",
         "button": "ਪੁਸ਼ਟੀ ਕਰੋ ਅਤੇ ਅੱਗੇ ਵਧੋ",
@@ -107,7 +107,7 @@
       "hidePassword": "ਪਾਸਵਰਡ ਲੁਕਾਓ"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "ਤੁਹਾਡੀ ਪ੍ਰੋਫਾਈਲ ਨੂੰ ਪੂਰਾ ਕਰਨ ਦੌਰਾਨ ਇੱਕ ਤਰੁੱਟੀ ਉਤਪੰਨ ਹੋਈ"
       }
     }

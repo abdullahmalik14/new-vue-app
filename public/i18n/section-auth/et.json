@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Kinnitage parool",
       "confirmPasswordPlaceholder": "Parool",
       "haveAccount": "Kas teil on juba konto?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Täitke oma profiil",
         "description": "Jätkamiseks valige oma roll ja kasutajanimi.",
         "usernameLabel": "Kasutajanimi",
@@ -45,7 +45,7 @@
         },
         "button": "Jätka"
       },
-      "KYC": {
+      "kyc": {
         "title": "Kinnitage oma identiteet",
         "description": "Juhtpaneelile juurdepääsu saamiseks viige looja kinnitus lõpule.",
         "button": "Kinnitage ja jätkake",
@@ -107,7 +107,7 @@
       "hidePassword": "Peida parool"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Teie profiili täitmisel ilmnes viga"
       }
     }

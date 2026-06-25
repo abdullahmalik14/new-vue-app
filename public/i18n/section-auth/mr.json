@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "पासवर्डची पुष्टी करा",
       "confirmPasswordPlaceholder": "पासवर्ड",
       "haveAccount": "आधीच खाते आहे?",
-      "Onboarding": {
+      "onboarding": {
         "title": "तुमचे प्रोफाइल पूर्ण करा",
         "description": "सुरू ठेवण्यासाठी तुमची भूमिका आणि वापरकर्तानाव निवडा.",
         "usernameLabel": "वापरकर्तानाव",
@@ -45,7 +45,7 @@
         },
         "button": "चालू ठेवा"
       },
-      "KYC": {
+      "kyc": {
         "title": "तुमची ओळख सत्यापित करा",
         "description": "डॅशबोर्डमध्ये प्रवेश करण्यासाठी निर्मात्याची पडताळणी पूर्ण करा.",
         "button": "पुष्टी करा आणि पुढे जा",
@@ -107,7 +107,7 @@
       "hidePassword": "पासवर्ड लपवा"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "तुमचे प्रोफाइल पूर्ण करताना एक त्रुटी आली"
       }
     }

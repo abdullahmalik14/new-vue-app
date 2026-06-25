@@ -32,6 +32,7 @@ import {
   resolveScope,
   evictScopeCache,
 } from '../utils/engine'
+import { setupDisableUntilScript } from '../utils/disableUntilScript'
 
 const CLEANUP = Symbol('v-interactions:cleanup')
 const PASSIVE_EVENTS = new Set(['wheel', 'touchstart', 'touchmove'])
@@ -74,6 +75,12 @@ function wire(el, value) {
 
   for (let i = 0; i < configs.length; i++) {
     const cfg    = configs[i]
+
+    // "Disable until script in DOM" — gate the element until a required script is ready.
+    if (cfg.disableUntilScript) {
+      cleanups.push(setupDisableUntilScript(el, cfg.disableUntilScript))
+    }
+
     const events = Array.isArray(cfg.triggerEvents) ? cfg.triggerEvents : []
 
     for (let j = 0; j < events.length; j++) {

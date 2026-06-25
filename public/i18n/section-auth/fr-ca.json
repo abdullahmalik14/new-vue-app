@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Confirmer le mot de passe",
       "confirmPasswordPlaceholder": "Mot de passe",
       "haveAccount": "Vous avez déjà un compte ?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Complétez votre profil",
         "description": "Choisissez votre rôle et votre nom d'utilisateur pour continuer.",
         "usernameLabel": "Nom d'utilisateur",
@@ -45,7 +45,7 @@
         },
         "button": "Continuer"
       },
-      "KYC": {
+      "kyc": {
         "title": "Vérifiez votre identité",
         "description": "Effectuez la vérification du créateur pour accéder au tableau de bord.",
         "button": "Confirmer et continuer",
@@ -107,7 +107,7 @@
       "hidePassword": "Masquer le mot de passe"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Une erreur s'est produite lors de la complétion de votre profil"
       }
     }

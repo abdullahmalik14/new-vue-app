@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Sahkan Kata Laluan",
       "confirmPasswordPlaceholder": "Kata laluan",
       "haveAccount": "Sudah mempunyai akaun?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Lengkapkan Profil Anda",
         "description": "Pilih peranan dan nama pengguna anda untuk meneruskan.",
         "usernameLabel": "Nama pengguna",
@@ -45,7 +45,7 @@
         },
         "button": "teruskan"
       },
-      "KYC": {
+      "kyc": {
         "title": "Sahkan Identiti Anda",
         "description": "Lengkapkan pengesahan pencipta untuk mengakses papan pemuka.",
         "button": "Sahkan & Teruskan",
@@ -107,7 +107,7 @@
       "hidePassword": "Sembunyikan kata laluan"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Ralat berlaku semasa melengkapkan profil anda"
       }
     }

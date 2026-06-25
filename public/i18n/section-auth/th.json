@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "ยืนยันรหัสผ่าน",
       "confirmPasswordPlaceholder": "รหัสผ่าน",
       "haveAccount": "มีบัญชีอยู่แล้ว?",
-      "Onboarding": {
+      "onboarding": {
         "title": "กรอกโปรไฟล์ของคุณให้สมบูรณ์",
         "description": "เลือกบทบาทและชื่อผู้ใช้ของคุณเพื่อดำเนินการต่อ",
         "usernameLabel": "ชื่อผู้ใช้",
@@ -45,7 +45,7 @@
         },
         "button": "ดำเนินการต่อ"
       },
-      "KYC": {
+      "kyc": {
         "title": "ยืนยันตัวตนของคุณ",
         "description": "ยืนยันผู้สร้างให้เสร็จสิ้นเพื่อเข้าถึงแดชบอร์ด",
         "button": "ยืนยันและดำเนินการต่อ",
@@ -107,7 +107,7 @@
       "hidePassword": "ซ่อนรหัสผ่าน"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "เกิดข้อผิดพลาดขณะกรอกโปรไฟล์ของคุณ"
       }
     }

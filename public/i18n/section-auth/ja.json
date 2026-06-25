@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "パスワードの確認",
       "confirmPasswordPlaceholder": "パスワード",
       "haveAccount": "すでにアカウントをお持ちですか?",
-      "Onboarding": {
+      "onboarding": {
         "title": "プロフィールを完成させましょう",
         "description": "続行するには、ロールとユーザー名を選択してください。",
         "usernameLabel": "ユーザー名",
@@ -45,7 +45,7 @@
         },
         "button": "続ける"
       },
-      "KYC": {
+      "kyc": {
         "title": "身元を確認する",
         "description": "作成者認証を完了してダッシュボードにアクセスします。",
         "button": "確認して続行",
@@ -107,7 +107,7 @@
       "hidePassword": "パスワードを隠す"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "プロフィールの入力中にエラーが発生しました"
       }
     }

@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Confirmeu la contrasenya",
       "confirmPasswordPlaceholder": "Contrasenya",
       "haveAccount": "Ja tens un compte?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Completa el teu perfil",
         "description": "Trieu la vostra funció i nom d'usuari per continuar.",
         "usernameLabel": "Nom d'usuari",
@@ -45,7 +45,7 @@
         },
         "button": "Continua"
       },
-      "KYC": {
+      "kyc": {
         "title": "Verifiqueu la vostra identitat",
         "description": "Completa la verificació del creador per accedir al tauler.",
         "button": "Confirmeu i continueu",
@@ -107,7 +107,7 @@
       "hidePassword": "Amaga la contrasenya"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "S'ha produït un error en completar el vostre perfil"
       }
     }

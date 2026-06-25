@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Confirm Password",
       "confirmPasswordPlaceholder": "********",
       "haveAccount": "Already have an account?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Complete Your Profile",
         "description": "Choose your role and username to continue.",
         "usernameLabel": "Username",
@@ -45,7 +45,7 @@
         },
         "button": "Continue"
       },
-      "KYC": {
+      "kyc": {
         "title": "Verify Your Identity",
         "description": "Complete creator verification to access the dashboard.",
         "button": "Confirm & Proceed",
@@ -105,7 +105,7 @@
       "guest": "Guest"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "An error occurred while completing your profile"
       }
     }

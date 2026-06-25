@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Deimhnigh Pasfhocal",
       "confirmPasswordPlaceholder": "Pasfhocal",
       "haveAccount": "An bhfuil cuntas agat cheana féin?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Críochnaigh Do Phróifíl",
         "description": "Roghnaigh do ról agus ainm úsáideora chun leanúint ar aghaidh.",
         "usernameLabel": "Ainm úsáideora",
@@ -45,7 +45,7 @@
         },
         "button": "Lean ort"
       },
-      "KYC": {
+      "kyc": {
         "title": "Fíoraigh D'Aitheantas",
         "description": "Críochnaigh fíorú cruthaitheora chun rochtain a fháil ar an deais.",
         "button": "Deimhnigh & Lean ar aghaidh",
@@ -107,7 +107,7 @@
       "hidePassword": "Folaigh pasfhocal"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Tharla earráid agus do phróifíl á comhlánú"
       }
     }

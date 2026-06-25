@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "પાસવર્ડની પુષ્ટિ કરો",
       "confirmPasswordPlaceholder": "પાસવર્ડ",
       "haveAccount": "પહેલેથી જ એકાઉન્ટ છે?",
-      "Onboarding": {
+      "onboarding": {
         "title": "તમારી પ્રોફાઇલ પૂર્ણ કરો",
         "description": "ચાલુ રાખવા માટે તમારી ભૂમિકા અને વપરાશકર્તા નામ પસંદ કરો.",
         "usernameLabel": "વપરાશકર્તા નામ",
@@ -45,7 +45,7 @@
         },
         "button": "ચાલુ રાખો"
       },
-      "KYC": {
+      "kyc": {
         "title": "તમારી ઓળખ ચકાસો",
         "description": "ડેશબોર્ડને ઍક્સેસ કરવા માટે સર્જકની ચકાસણી પૂર્ણ કરો.",
         "button": "પુષ્ટિ કરો અને આગળ વધો",
@@ -107,7 +107,7 @@
       "hidePassword": "પાસવર્ડ છુપાવો"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "તમારી પ્રોફાઇલ પૂર્ણ કરતી વખતે એક ભૂલ આવી"
       }
     }

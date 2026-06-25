@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Potvrďte heslo",
       "confirmPasswordPlaceholder": "Heslo",
       "haveAccount": "Už máte účet?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Vyplňte svůj profil",
         "description": "Chcete-li pokračovat, vyberte svou roli a uživatelské jméno.",
         "usernameLabel": "Uživatelské jméno",
@@ -45,7 +45,7 @@
         },
         "button": "Pokračovat"
       },
-      "KYC": {
+      "kyc": {
         "title": "Ověřte svou identitu",
         "description": "Pro přístup k řídicímu panelu dokončete ověření tvůrce.",
         "button": "Potvrdit a pokračovat",
@@ -107,7 +107,7 @@
       "hidePassword": "Skrýt heslo"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Při vyplňování vašeho profilu došlo k chybě"
       }
     }

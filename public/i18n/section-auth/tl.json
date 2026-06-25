@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Kumpirmahin ang Password",
       "confirmPasswordPlaceholder": "Password",
       "haveAccount": "Mayroon ka nang account?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Kumpletuhin ang Iyong Profile",
         "description": "Piliin ang iyong tungkulin at username upang magpatuloy.",
         "usernameLabel": "Username",
@@ -45,7 +45,7 @@
         },
         "button": "Magpatuloy"
       },
-      "KYC": {
+      "kyc": {
         "title": "I-verify ang Iyong Pagkakakilanlan",
         "description": "Kumpletuhin ang pag-verify ng creator para ma-access ang dashboard.",
         "button": "Kumpirmahin at Magpatuloy",
@@ -107,7 +107,7 @@
       "hidePassword": "Itago ang password"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "May naganap na error habang kinukumpleto ang iyong profile"
       }
     }

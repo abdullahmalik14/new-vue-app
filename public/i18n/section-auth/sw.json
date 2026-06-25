@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Thibitisha Nenosiri",
       "confirmPasswordPlaceholder": "Nenosiri",
       "haveAccount": "Je, tayari una akaunti?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Kamilisha Wasifu Wako",
         "description": "Chagua jukumu lako na jina la mtumiaji ili kuendelea.",
         "usernameLabel": "Jina la mtumiaji",
@@ -45,7 +45,7 @@
         },
         "button": "Endelea"
       },
-      "KYC": {
+      "kyc": {
         "title": "Thibitisha Utambulisho Wako",
         "description": "Kamilisha uthibitishaji wa mtayarishi ili kufikia dashibodi.",
         "button": "Thibitisha na Uendelee",
@@ -107,7 +107,7 @@
       "hidePassword": "Ficha nenosiri"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Hitilafu ilitokea wakati wa kukamilisha wasifu wako"
       }
     }

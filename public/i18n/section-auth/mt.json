@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Ikkonferma l-Password",
       "confirmPasswordPlaceholder": "Password",
       "haveAccount": "Diġà għandek kont?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Imla l-Profil Tiegħek",
         "description": "Agħżel ir-rwol u l-isem tal-utent tiegħek biex tkompli.",
         "usernameLabel": "Isem tal-utent",
@@ -45,7 +45,7 @@
         },
         "button": "Kompli"
       },
-      "KYC": {
+      "kyc": {
         "title": "Ivverifika l-Identità Tiegħek",
         "description": "Imla l-verifika tal-kreatur biex taċċessa d-dashboard.",
         "button": "Ikkonferma & Ipproċedi",
@@ -107,7 +107,7 @@
       "hidePassword": "Aħbi l-password"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Sar żball waqt li tlesti l-profil tiegħek"
       }
     }

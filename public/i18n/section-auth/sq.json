@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Konfirmo fjalëkalimin",
       "confirmPasswordPlaceholder": "Fjalëkalimi",
       "haveAccount": "Keni tashmë një llogari?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Plotësoni profilin tuaj",
         "description": "Zgjidhni rolin tuaj dhe emrin e përdoruesit për të vazhduar.",
         "usernameLabel": "Emri i përdoruesit",
@@ -45,7 +45,7 @@
         },
         "button": "Vazhdoni"
       },
-      "KYC": {
+      "kyc": {
         "title": "Verifikoni identitetin tuaj",
         "description": "Përfundoni verifikimin e krijuesit për të hyrë në panelin e kontrollit.",
         "button": "Konfirmo dhe vazhdo",
@@ -107,7 +107,7 @@
       "hidePassword": "Fshih fjalëkalimin"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Ndodhi një gabim gjatë plotësimit të profilit tuaj"
       }
     }

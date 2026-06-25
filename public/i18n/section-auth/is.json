@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Staðfestu lykilorð",
       "confirmPasswordPlaceholder": "Lykilorð",
       "haveAccount": "Ertu nú þegar með reikning?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Ljúktu við prófílinn þinn",
         "description": "Veldu hlutverk þitt og notendanafn til að halda áfram.",
         "usernameLabel": "Notendanafn",
@@ -45,7 +45,7 @@
         },
         "button": "Halda áfram"
       },
-      "KYC": {
+      "kyc": {
         "title": "Staðfestu auðkenni þitt",
         "description": "Ljúktu við höfundarstaðfestingu til að fá aðgang að mælaborðinu.",
         "button": "Staðfestu og haltu áfram",
@@ -107,7 +107,7 @@
       "hidePassword": "Fela lykilorð"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Villa kom upp við að klára prófílinn þinn"
       }
     }

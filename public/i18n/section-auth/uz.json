@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Parolni tasdiqlang",
       "confirmPasswordPlaceholder": "Parol",
       "haveAccount": "Hisobingiz bormi?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Profilingizni toʻldiring",
         "description": "Davom etish uchun rolingiz va foydalanuvchi nomingizni tanlang.",
         "usernameLabel": "Foydalanuvchi nomi",
@@ -45,7 +45,7 @@
         },
         "button": "Davom eting"
       },
-      "KYC": {
+      "kyc": {
         "title": "Shaxsingizni tasdiqlang",
         "description": "Boshqaruv paneliga kirish uchun yaratuvchini toʻliq tekshirish.",
         "button": "Tasdiqlang va davom eting",
@@ -107,7 +107,7 @@
       "hidePassword": "Parolni yashirish"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Profilingizni to‘ldirishda xatolik yuz berdi"
       }
     }

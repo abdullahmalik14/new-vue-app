@@ -207,7 +207,7 @@ async function handleTwitterMessage(event) {
 
   if (twitterPopupRef.value && event.source !== twitterPopupRef.value) return;
 
-  if (data.type === 'TWITTER_OAUTH_CODE') {
+  if (data.type === 'twitter-oauth-code') {
     const { code, state } = data;
 
     // Clear popup check interval since we got a response
@@ -218,7 +218,7 @@ async function handleTwitterMessage(event) {
 
     // Send acknowledgment that we received the message to allow popup to close
     if (event.source) {
-      event.source.postMessage({ type: 'TWITTER_OAUTH_ACK', success: true, state }, event.origin || "*");
+      event.source.postMessage({ type: 'twitter-oauth-ack', success: true, state }, event.origin || "*");
     }
 
     try {
@@ -269,14 +269,14 @@ async function handleTwitterMessage(event) {
       // Send error acknowledgment if something failed during processing (though popup might be closed already)
       if (event.source) {
         try {
-          event.source.postMessage({ type: 'TWITTER_OAUTH_ACK', success: false, state, error: err.message }, event.origin || "*");
+          event.source.postMessage({ type: 'twitter-oauth-ack', success: false, state, error: err.message }, event.origin || "*");
         } catch (e) { /* ignore if closed */ }
       }
     } finally {
       isLoading.value = false;
       cleanupListeners();
     }
-  } else if (data.type === 'TWITTER_AUTH_ERROR') {
+  } else if (data.type === 'twitter-auth-error') {
     isLoading.value = false;
     error.value = data.error || "Twitter login failed";
     cleanupListeners();
@@ -320,7 +320,7 @@ async function handleTelegramMessage(event) {
 
   if (telegramPopupRef.value && event.source !== telegramPopupRef.value) return;
 
-  if (data.type === 'TELEGRAM_AUTH_SUCCESS') {
+  if (data.type === 'telegram-auth-success') {
     const telegramUser = data.user;
 
     // Clear popup check interval since we got a response
@@ -331,7 +331,7 @@ async function handleTelegramMessage(event) {
 
     // Ack
     if (event.source) {
-      event.source.postMessage({ type: "TELEGRAM_AUTH_ACK", success: true, state: data.state }, event.origin || "*");
+      event.source.postMessage({ type: "telegram-auth-ack", success: true, state: data.state }, event.origin || "*");
     }
 
     try {
@@ -366,14 +366,14 @@ async function handleTelegramMessage(event) {
       // Send error ack
       if (event.source) {
         try {
-          event.source.postMessage({ type: "TELEGRAM_AUTH_ACK", success: false, state: data.state, error: err.message }, event.origin || "*");
+          event.source.postMessage({ type: "telegram-auth-ack", success: false, state: data.state, error: err.message }, event.origin || "*");
         } catch (e) { /* ignore */ }
       }
     } finally {
       isLoading.value = false;
       cleanupListeners();
     }
-  } else if (data.type === 'TELEGRAM_AUTH_ERROR') {
+  } else if (data.type === 'telegram-auth-error') {
     isLoading.value = false;
     error.value = data.error || "Telegram login failed";
     cleanupListeners();

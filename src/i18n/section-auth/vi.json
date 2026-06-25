@@ -28,7 +28,7 @@
       "confirmPasswordPlaceholder": "Xác nhận mật khẩu",
       "haveAccount": "Đã có tài khoản? Đăng nhập",
       "success": "Tạo tài khoản thành công",
-      "Onboarding": {
+      "onboarding": {
         "title": "Hoàn thiện hồ sơ",
         "description": "Chọn vai trò và tên người dùng của bạn để tiếp tục.",
         "usernameLabel": "Tên người dùng",
@@ -43,7 +43,7 @@
         },
         "button": "Tiếp tục"
       },
-      "KYC": {
+      "kyc": {
         "title": "Xác minh danh tính",
         "description": "Vui lòng hoàn thành quy trình xác minh danh tính để tiếp tục",
         "button": "Hoàn thành KYC",
@@ -110,7 +110,7 @@
       "guest": "Khách"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Có lỗi xảy ra khi hoàn thiện hồ sơ"
       }
     }

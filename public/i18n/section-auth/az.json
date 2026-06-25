@@ -30,7 +30,7 @@
       "confirmPasswordLabel": "Şifrəni təsdiqləyin",
       "confirmPasswordPlaceholder": "parol",
       "haveAccount": "Artıq hesabınız var?",
-      "Onboarding": {
+      "onboarding": {
         "title": "Profilinizi tamamlayın",
         "description": "Davam etmək üçün rolunuzu və istifadəçi adınızı seçin.",
         "usernameLabel": "İstifadəçi adı",
@@ -45,7 +45,7 @@
         },
         "button": "Davam et"
       },
-      "KYC": {
+      "kyc": {
         "title": "Şəxsiyyətinizi Doğrulayın",
         "description": "İdarə panelinə daxil olmaq üçün yaradıcı yoxlanışını tamamlayın.",
         "button": "Təsdiq et və Davam et",
@@ -107,7 +107,7 @@
       "hidePassword": "Parolu gizlədin"
     },
     "messages": {
-      "Onboarding": {
+      "onboarding": {
         "error": "Profilinizi tamamlayarkən xəta baş verdi"
       }
     }
