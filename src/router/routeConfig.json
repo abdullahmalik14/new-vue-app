@@ -435,15 +435,7 @@
   },
   {
     "slug": "/dashboard/demo-page",
-    "envAccess": "development",
-    "requiresAuth": false,
-    "section": "dev",
-    "supportedRoles": [
-      "all"
-    ],
-    "enabled": true,
-    "componentPath": "@/dev/templates/demo/DemoPage.vue",
-    "preLoadSections": []
+    "componentPath": "@/dev/templates/demo/DemoPage.vue"
   },
   {
     "slug": "/dev/datepicker-showcase",

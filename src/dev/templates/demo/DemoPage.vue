@@ -560,7 +560,7 @@
                 </div>
             </section>
 
-            
+
 
             <!-- ===== SECTION: Spinner ===== -->
             <section class="flex flex-col gap-6">
@@ -878,11 +878,7 @@ import BaseParagraph from '@/components/ui/typography/BaseParagraph.vue';
 import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vue';
 import QuillEditor from '@/components/forms/inputs/QuillEditor.vue';
 // import SubscriptionCard from '@/templates/profile/views/SubscriptionCard.vue';
-import CountryStateDemo from '@/dev/templates/demo/CountryStateDemo.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
-import DemoCard from '@/dev/templates/demo/DemoCard.vue';
-import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue';
-import DashboardStatIndicator from '@/components/ui/badge/dashboard/DashboardStatIndicator.vue';
 import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import TwoPieceButton from '@/components/ui/buttons/TwoPieceButton.vue';
 import { tierData } from "/public/data/TierData.js";
