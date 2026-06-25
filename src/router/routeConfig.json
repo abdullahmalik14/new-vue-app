@@ -623,6 +623,11 @@
   },
   {
     "slug": "/home",
+    "section": "misc",
+    "requiresAuth": false,
+    "supportedRoles": [
+      "all"
+    ],
     "componentPath": "@/dev/templates/home/Home.vue"
   },
   {
