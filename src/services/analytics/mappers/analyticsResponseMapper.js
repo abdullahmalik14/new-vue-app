@@ -193,7 +193,9 @@ export function mapTrendingCountries(countries) {
 
 export function buildSubscriberInsights(subscriptionsBundle) {
   const daily = subscriptionsBundle.daily || [];
-  const { latest, prev } = findLatestNonZeroEntry(daily, ['sub', 'tip', 'total']);
+  const latestIdx = daily.length - 1;
+  const latest = daily[latestIdx] || {};
+  const prev = daily[latestIdx - 1] || {};
 
   const buildPeriodInsights = (arr) => {
     const last = arr[arr.length - 1] || {};
@@ -230,7 +232,9 @@ export function buildSubscriberInsights(subscriptionsBundle) {
 
 export function buildEarningsInsights(earnings) {
   const daily = earnings.daily || [];
-  const { latest, prev } = findLatestNonZeroEntry(daily, ['total']);
+  const latestIdx = daily.length - 1;
+  const latest = daily[latestIdx] || {};
+  const prev = daily[latestIdx - 1] || {};
 
   return {
     daily: {

@@ -1849,7 +1849,7 @@ export const flowRegistry = {
         FETCH_ANALYTICS_FAILED: "Could not load analytics data.",
       },
     },
-    refresh: { enabled: true, intervalMs: 300000, scopeKey: "analytics.fetch" },
+    refresh: { enabled: true, intervalMs: 5000, scopeKey: "analytics.fetch" },
   },
 };
 
