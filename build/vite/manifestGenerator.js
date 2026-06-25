@@ -42,12 +42,12 @@ export function scanDistAssetsForSections(distPath) {
 
         // Extract section name from filename
         // Format: section-{name}-{hash}.{ext}
-        // const match = file.match(/^section-([^-]+)-.+\.(js|css)$/);
-        const match = file.match(/^section-(.+)-[A-Za-z0-9]{8,}\.(js|css)$/);
+        // Vite content hashes may include "_" and "-" (e.g. BeAW_-zl, Bk6-2_wu)
+        const match = file.match(/^section-(.+)-([A-Za-z0-9_-]{8,})\.(js|css)$/);
 
         if (match) {
           const sectionName = match[1];
-          const fileType = match[2];
+          const fileType = match[3];
 
           foundBundles.push({
             sectionName,
@@ -110,15 +110,19 @@ export function generateSectionManifestFile(bundles, distPath) {
     }
 
     const sectionEntry = sectionMap.get(sectionName);
+    const absoluteAssetPath = join(distPath, 'assets', fileName);
 
-    // Add file path based on type
-    if (fileType === 'js') {
-      sectionEntry.js = filePath;
-    } else if (fileType === 'css') {
-      sectionEntry.css = filePath;
+    // Some sections emit multiple CSS/JS bundles (e.g. Tailwind section CSS + tiny Vue chunk CSS).
+    // Keep the largest file per type so manifest paths/integrity stay stable across platforms.
+    const sizeKey = fileType === 'js' ? '_jsSize' : '_cssSize';
+    const pathKey = fileType;
+    const previousSize = sectionEntry[sizeKey] || 0;
+
+    if (fileSize >= previousSize) {
+      sectionEntry[pathKey] = filePath;
+      sectionEntry.integrity[fileType] = computeFileIntegritySri(absoluteAssetPath);
+      sectionEntry[sizeKey] = fileSize;
     }
-
-    sectionEntry.integrity[fileType] = computeFileIntegritySri(join(distPath, 'assets', fileName));
 
     // Update size and timestamp
     sectionEntry.size += fileSize;
@@ -127,9 +131,10 @@ export function generateSectionManifestFile(bundles, distPath) {
     }
   }
 
-  // Convert map to manifest object
+  // Convert map to manifest object (strip internal size tracking fields)
   for (const [sectionName, sectionData] of sectionMap.entries()) {
-    manifest[sectionName] = sectionData;
+    const { _jsSize, _cssSize, ...publicSectionData } = sectionData;
+    manifest[sectionName] = publicSectionData;
   }
 
   // Write manifest to dist directory
@@ -258,6 +263,10 @@ export function createManifestGeneratorPlugin() {
       // Enrich with metadata from route config
       const routeConfigPath = join(process.cwd(), 'src/router/routeConfig.json');
       const enrichedManifest = enrichManifestWithMetadata(manifest, routeConfigPath);
+
+      // Persist enriched metadata (preloadSections, priority, etc.) to disk
+      const manifestPath = join(distPath, 'section-manifest.json');
+      writeFileSync(manifestPath, JSON.stringify(enrichedManifest, null, 2), 'utf-8');
 
       console.log('[ManifestGenerator] Manifest generation complete:', {
         sections: Object.keys(enrichedManifest).length,
