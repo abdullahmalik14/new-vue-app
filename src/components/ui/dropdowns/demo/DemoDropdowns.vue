@@ -26,7 +26,8 @@ Based on demopageTestsTODO.txt requirements
         </button>
         <div v-if="showMissingAnchorTest">
           <DropdownMenu :anchor="null" :config="{ trigger: 'click', width: 300 }">
-            <div class="p-4">This should error</div>
+            <div class="p-4">This
+               should error</div>
           </DropdownMenu>
         </div>
       </div>

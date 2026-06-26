@@ -168,6 +168,287 @@
     "save": "Lưu",
     "cancel": "Hủy",
     "edit": "Chỉnh Sửa",
-    "delete": "Xóa"
+    "delete": "Xóa",
+    "optional": "Tùy chọn",
+    "tokens": "Token",
+    "descriptionOptional": "Mô tả (Tùy chọn)",
+    "searchByUsernameEmail": "Tìm theo tên người dùng & email",
+    "requiredField": "Trường này là bắt buộc."
+  },
+  "booking": {
+    "eventTitlePlaceholder": "Tiêu đề sự kiện",
+    "eventDescriptionPlaceholder": "Mô tả sự kiện...",
+    "basePrice": "Giá cơ bản",
+    "sessionDuration": "Thời lượng phiên",
+    "minutes": "Phút",
+    "perSession": "/phiên",
+    "coPerformerOptional": "Người đồng diễn (Tùy chọn)",
+    "blockedUser": "Người dùng bị chặn",
+    "bookingFee": "Bật phí đặt lịch",
+    "bookingFeeTooltip": "Số tiền này sẽ được giữ trong số dư token của fan.",
+    "offHourSurcharge": "Phụ phí ngoài giờ",
+    "percentFromBasePrice": "% so với giá cơ bản",
+    "remindMe": "Nhắc tôi",
+    "minutesBeforeCall": "phút trước",
+    "scheduledCall": "cuộc gọi đã lên lịch.",
+    "originalPrice": "Giá gốc",
+    "discountedPriceOptional": "Giá giảm (tùy chọn)",
+    "priceRangeDescription": "Giá phải từ USD$ 1.95 đến 500.",
+    "validationEventTitleRequired": "Tiêu đề sự kiện là bắt buộc.",
+    "validationBasePriceMin": "Giá cơ bản phải từ 0 trở lên.",
+    "maximumSessionAllowed": "Thời lượng phiên tối đa",
+    "sessions": "phiên"
+  },
+  "mediaCard": {
+    "published": "Đã xuất bản",
+    "resume": "Tiếp tục",
+    "galleryImages": "hình ảnh",
+    "subscribeOrBuy": "Đăng ký hoặc Mua",
+    "menu": {
+      "editDetails": "Chỉnh sửa chi tiết",
+      "addToSubscriptionTier": "Thêm vào gói đăng ký",
+      "unpublish": "Hủy xuất bản",
+      "deleteMedia": "Xóa media",
+      "goToProfile": "Đến hồ sơ creator",
+      "share": "Chia sẻ",
+      "report": "Báo cáo"
+    },
+    "demo": {
+      "creators": {
+        "creatorAllen": "Creator Allen",
+        "mistressJessica": "Mistress Jessica"
+      },
+      "titles": {
+        "walkInPark": "Took a walk in the park.",
+        "walkInParkToday": "Took a walk in the park today.",
+        "walkInParkMorning": "Took a walk in the park this morning",
+        "mySecondComingSoon": "My 2nd coming soon",
+        "morningWorkout": "Morning workout session"
+      },
+      "tags": {
+        "subscriberExclusive": "Subscriber Exclusive",
+        "subscribeOrBuy": "Subscribe or Buy",
+        "free": "Free",
+        "subOnly": "Sub Only"
+      },
+      "timeAgo": {
+        "fiveMonths": "5mo",
+        "twoDays": "2d"
+      }
+    }
+  },
+  "tierCard": {
+    "demo": {
+      "labels": {
+        "tier1StandardClaim": "Chủ đề hồng — footer claim tiêu chuẩn (còn 5)",
+        "tier2SpendToClaim": "Chủ đề vàng — footer spend to claim",
+        "tier3Standard95Left": "Chủ đề hồng — claim tiêu chuẩn (còn 95)",
+        "tier4HiddenProgress": "Chủ đề hồng — footer ẩn progress",
+        "tier5SubscribeGreen": "Chủ đề xanh — footer subscribe"
+      },
+      "title": "My VVIP Lounge ❤️",
+      "description": "Welcome to Jenny's VIP Lounge! Gói này bao gồm mọi thứ trong Basic/VIP Lounge, cộng thêm: Hậu trường mỗi shoot, đồ tôi mặc trong shoot để bán, và trò chuyện 24/7.",
+      "plans": {
+        "oneDay": "1 day",
+        "oneMonth": "1 month",
+        "sixMonth": "6 month",
+        "oneYear": "1 year"
+      },
+      "flashSale": {
+        "endsIn": "02:13:07",
+        "originalPrice": "$111.72"
+      },
+      "footer": {
+        "claimOffer": "CLAIM<br>OFFER",
+        "subscribe": "SUBSCRIBE",
+        "fiveLeft": "5 Left!",
+        "ninetyFiveLeft": "95 Left!",
+        "offerProgressLow": "95/100 Offer",
+        "offerProgressHigh": "5/100 Offer",
+        "spendMore": "Spend $200 more to claim",
+        "spendProgress": "200/ USD400"
+      }
+    }
+  },
+  "eventCard": {
+    "demo": {
+      "labels": {
+        "orangeButton": "Chủ đề cam — có nút CTA",
+        "orangeProgress": "Chủ đề cam — dual progress (không nút)",
+        "pinkButton": "Chủ đề hồng — có nút CTA",
+        "pinkProgress": "Chủ đề hồng — dual progress (không nút)"
+      },
+      "titles": {
+        "subscriberDiscount": "Subscriber Discount",
+        "luckyDraw": "Lucky Draw!"
+      },
+      "creatorName": "Princess Carrot Pop",
+      "spendMoreClaim": "Spend $200 more to claim",
+      "spendMoreEnter": "Spend $200 more to enter",
+      "offersLeft": "10 offers left!",
+      "chancesLeft": "5 chances left!",
+      "progressOffer": "95/100 Offer",
+      "progressRatio": "200/ USD400",
+      "endsIn": "Ends in",
+      "buttons": {
+        "claimDiscount": "CLAIM DISCOUNT",
+        "enterLuckyDraw": "ENTER LUCKY DRAW"
+      }
+    }
+  },
+  "notificationCard": {
+    "demo": {
+      "labels": {
+        "warningMediaRequired": "Biến thể cảnh báo (yêu cầu media)",
+        "successApproved": "Biến thể thành công (đã duyệt)",
+        "infoBankDetails": "Biến thể thông tin (ngân hàng)",
+        "errorDestructive": "Biến thể lỗi (destructive)",
+        "noticeCyan": "Biến thể notice (cyan)",
+        "alertAmber": "Biến thể alert (amber)",
+        "successTeal": "Biến thể success-teal",
+        "limitExceededDark": "Biến thể limit-exceeded (tối)",
+        "withIcon": "Có icon (mặc định)",
+        "withoutIcon": "Không icon",
+        "withDescription": "Có mô tả",
+        "withoutDescription": "Không mô tả (chỉ tiêu đề)",
+        "withoutTitle": "Không tiêu đề (chỉ mô tả)",
+        "withClose": "Có nút đóng",
+        "withoutClose": "Không nút đóng",
+        "customIcon": "Icon tùy chỉnh (assetMap URL)",
+        "withLink": "Có liên kết",
+        "withoutLink": "Không liên kết"
+      },
+      "titles": {
+        "mediaRequired": "Yêu cầu nội dung media",
+        "congratulations": "Chúc mừng",
+        "bankDetails": "Yêu cầu thông tin ngân hàng",
+        "actionRequired": "Cần hành động",
+        "unsavedChanges": "Bạn có thay đổi chưa lưu",
+        "activeSubscribers": "Bạn có 3 subscriber đang hoạt động trong gói này",
+        "profileUpdated": "Cập nhật hồ sơ thành công",
+        "uploadLimit": "Đã vượt giới hạn tải lên",
+        "connectX": "Kết nối tài khoản X của bạn",
+        "titleOnly": "Nhắc nhở: hoàn thiện hồ sơ"
+      },
+      "descriptions": {
+        "mediaRequired": "Hồ sơ của bạn hiện không có media. Thêm ít nhất 5 mục media để tăng khả năng hiển thị.",
+        "mediaApproved": "Media 'Audio with placeholder and no preview' của bạn đã được duyệt.",
+        "bankDetails": "Để đảm bảo giao dịch suôn sẻ, vui lòng hoàn thiện thông tin ngân hàng.",
+        "securityUpdate": "Cần cập nhật quan trọng cho cài đặt bảo mật tài khoản.",
+        "unsavedChanges": "Bạn đã thay đổi kể từ lần lưu cuối. Nhớ nhấn SAVE để xuất bản thay đổi.",
+        "activeSubscribers": "Thay đổi chi tiết gói này có thể ảnh hưởng phí và quyền lợi của subscriber hiện tại.",
+        "profileUpdated": "Thay đổi hồ sơ đã được lưu và hiển thị với subscriber.",
+        "uploadLimit": "Bạn đã đạt số lượng tải lên tối đa của gói hiện tại.",
+        "connectX": "Bạn phải kết nối tài khoản X trước khi dùng tính năng tự đăng lại.",
+        "completeProfile": "Thêm tiểu sử và ảnh đại diện để subscriber dễ tìm thấy bạn."
+      },
+      "links": {
+        "learnMore": "Tìm hiểu thêm",
+        "connectNow": "Kết nối ngay",
+        "viewDetails": "Xem chi tiết"
+      }
+    }
+  },
+  "demo": {
+    "dashboardTextInput": {
+      "generalVariations": "Các biến thể chung",
+      "bookingPatterns": "Mẫu form đặt lịch ($t + assetMap)",
+      "username": "Tên người dùng",
+      "usernamePlaceholder": "carrot_popxoxo123",
+      "usernameDescription": "Tên người dùng không thể thay đổi sau tháng đầu tiên trên trang web của chúng tôi, nhưng có thể có ngoại lệ trong trường hợp đặc biệt.",
+      "email": "Email",
+      "emailPlaceholder": "mscarrot_pops@gmail.com",
+      "firstName": "Tên",
+      "noLabelPlaceholder": "Nhập không có nhãn...",
+      "title": "Tiêu đề",
+      "displayName": "Tên hiển thị",
+      "plainNoIconsPlaceholder": "Ô nhập thuần, không icon",
+      "emailSupport": "Email hỗ trợ",
+      "enterEmailPlaceholder": "Nhập email...",
+      "fullName": "Họ và tên",
+      "requiredPlaceholder": "Trường bắt buộc",
+      "emailAddress": "Địa chỉ email",
+      "advancedSearch": "Tìm kiếm nâng cao",
+      "searchFiltersPlaceholder": "Tìm kiếm với bộ lọc...",
+      "bio": "Tiểu sử",
+      "tipMessage": "Tin nhắn tip",
+      "tipMessagePlaceholder": "Cảm ơn bạn đã tip!",
+      "tipMessageDescription": "Fan của bạn sẽ thấy tin nhắn này khi họ tip bạn.",
+      "quantity": "Số lượng",
+      "age": "Tuổi",
+      "usernameAvailable": "Tên người dùng có sẵn.",
+      "usdPrefix": "USD$",
+      "variations": {
+        "labelDescPlaceholder": "Nhãn + Mô tả + Placeholder",
+        "labelPlaceholder": "Nhãn + Placeholder (Không mô tả)",
+        "labelNoPlaceholder": "Nhãn, Không placeholder",
+        "noLabelWithPlaceholder": "Không nhãn, Có placeholder",
+        "plain": "Không nhãn / Không placeholder / Không mô tả",
+        "title": "Nhãn + Placeholder (Tiêu đề)",
+        "leftIconSearch": "Icon trái — Tìm kiếm (assetMap: icon.search)",
+        "noIcon": "Không icon",
+        "rightIcon": "Icon phải — EnvelopeIcon",
+        "autofill": "Autofill (email đã lưu trình duyệt)",
+        "requiredStar": "Bắt buộc — Dấu sao (*)",
+        "requiredItalic": "Bắt buộc — Chữ nghiêng \"Required\"",
+        "bothIcons": "Cả hai icon (Trái + Phải)",
+        "textareaCounter": "Textarea — Bộ đếm maxLength",
+        "textareaDescCounter": "Textarea — Mô tả + Bộ đếm",
+        "noLabelEventTitle": "Không nhãn — Placeholder tiêu đề sự kiện",
+        "coPerformerSearch": "Tìm người đồng diễn (i18n + icon.search)",
+        "numberMinutes": "Số + Phút (hậu tố ngoài input)",
+        "basePriceTokens": "Giá cơ bản + Token (hậu tố ngoài input)",
+        "leftSpanUsd": "Span trái — Tiền tố USD$",
+        "numberStepper": "Số — Stepper",
+        "numberNoStepper": "Số — Không stepper (:showControls=\"false\")",
+        "tooltipOnly": "Chỉ tooltip — DropdownMenu",
+        "offHourSurcharge": "Phụ phí ngoài giờ % (hậu tố ngoài input)",
+        "disabled": "Trạng thái vô hiệu",
+        "validationErrors": "Lỗi xác thực",
+        "requiredTextError": "Lỗi văn bản bắt buộc",
+        "success": "Trạng thái thành công",
+        "remindMe": "Nhắc tôi — Văn bản inline (ngoài input)"
+      }
+    },
+    "buttons": {
+      "showLoadingState": "Hiển thị trạng thái loading trên tất cả nút catalog (văn bản thay bằng spinner)",
+      "loadingSection": "Trạng thái loading — prop :loading (văn bản thay bằng spinner)",
+      "clickToLoadHint": "Nhấn bất kỳ nút nào để xem :loading — văn bản và icon được thay bằng spinner (không có chữ \"Loading...\")."
+    },
+    "spinner": {
+      "assetMapImage": "Ảnh asset map (icon.spinner)",
+      "svgStyled": "SVG nội tuyến — track có kiểu",
+      "svgThin": "SVG nội tuyến — track mỏng"
+    },
+    "tierCard": {
+      "sectionDescription": "Thẻ tier hiện đại với danh sách tính năng và bộ chọn giá ($t + assetMap)"
+    },
+    "eventCard": {
+      "sectionDescription": "Thẻ sự kiện với biến thể theme và layout nút/progress ($t + assetMap)"
+    },
+    "quillEditor": {
+      "labels": {
+        "default": "Mặc định (trống)",
+        "customPlaceholder": "Placeholder tùy chỉnh",
+        "initialContent": "Có nội dung ban đầu",
+        "richInitialContent": "Nội dung ban đầu phong phú (HTML)",
+        "withLabelWrapper": "Có nhãn bọc ngoài (mẫu production)"
+      },
+      "fieldLabels": {
+        "description": "Mô tả",
+        "tierDescription": "Mô tả gói",
+        "eventDescription": "Mô tả sự kiện"
+      },
+      "placeholders": {
+        "default": "Description...",
+        "tierDescription": "Tier Description...",
+        "eventDescription": "Event Description...",
+        "bio": "Write your bio..."
+      },
+      "initialContent": {
+        "simple": "<p><strong>Hello World!</strong> This is pre-loaded content.</p>",
+        "rich": "<p><strong>Welcome!</strong> Edit this <em>tier description</em> with the toolbar.</p><ul><li>Bold, italic, and links</li><li>Ordered and bullet lists</li></ul><p><a href=\"#\">Example link</a></p>"
+      }
+    }
   }
 }

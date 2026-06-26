@@ -435,7 +435,11 @@
   },
   {
     "slug": "/dashboard/demo-page",
-    "componentPath": "@/dev/templates/demo/DemoPage.vue"
+    "section": "dashboard-global",
+    "componentPath": "@/dev/templates/demo/DemoPage.vue",
+    "supportedRoles": [
+      "all"
+    ]
   },
   {
     "slug": "/dev/datepicker-showcase",

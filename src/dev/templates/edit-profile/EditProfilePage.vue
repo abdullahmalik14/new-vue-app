@@ -619,9 +619,7 @@
                         <!-- textarea-container -->
                         <div class="flex flex-col gap-1 w-full">
                             <DashboardTextInput v-model="profileData.tipMessage" :showLabel="false" type="textarea"
-                                textAreaRows="4" placeholder="Thank you for your tip!" />
-
-                            <span class="text-sm text-[#475467] dark:text-[#b1aba0]">{{ profileData.tipMessage?.length || 0 }}/200 characters</span>
+                                textAreaRows="4" placeholder="Thank you for your tip!" :maxLength="200" />
                         </div>
                     </div>
 
@@ -652,9 +650,7 @@
                                         <!-- input-container -->
                                         <div class="flex flex-col gap-1 w-full">
                                             <DashboardTextInput v-model="profileData.postMessage" :showLabel="false" type="textarea"
-                                                textAreaRows="3" placeholder="I got some lovely tips from @username..." />
-
-                                            <span class="text-sm text-[#475467] dark:text-[#b1aba0]">{{ profileData.postMessage?.length || 0 }}/72 characters</span>
+                                                textAreaRows="3" placeholder="I got some lovely tips from @username..." :maxLength="72" />
                                         </div>
 
                                         <div class="flex items-center gap-2">

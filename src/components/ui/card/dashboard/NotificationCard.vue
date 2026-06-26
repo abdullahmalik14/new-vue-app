@@ -7,11 +7,15 @@
       <!-- Card body -->
       <div class="dashboard-toast-inner-wrapper flex gap-4 py-3 px-3 flex-1 min-w-0 min-h-0"
         :class="variantConfig.bgClass">
-        <div class="dashboard-toast-inner-container relative w-full flex items-start gap-5">
+        <div class="dashboard-toast-inner-container relative w-full flex gap-5"
+          :class="isSingleLineContent ? 'items-center' : 'items-start'">
           <!-- Close button -->
-          <div v-if="closable" class="absolute top-0 right-0 p-3 cursor-pointer" @click="handleClose">
+          <div v-if="closable"
+            class="absolute right-0 p-3 cursor-pointer"
+            :class="isSingleLineContent ? 'top-1/2 -translate-y-1/2' : 'top-0'"
+            @click="handleClose">
             <div class="w-6 h-6 flex justify-center items-center">
-              <img src="https://i.ibb.co.com/W4TXDR0j/x-close.webp" alt="x-close" class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(92%)_sepia(5%)_saturate(392%)_hue-rotate(182deg)_brightness(94%)_contrast(92%)]">
+              <img v-if="closeIconUrl" :src="closeIconUrl" alt="" class="w-full h-full [filter:brightness(0)_saturate(100%)_invert(92%)_sepia(5%)_saturate(392%)_hue-rotate(182deg)_brightness(94%)_contrast(92%)]">
             </div>
           </div>
 
@@ -39,9 +43,10 @@
           </div>
 
           <!-- Content -->
-          <div class="flex flex-col flex-1 min-w-0 min-h-0 pr-[1.125rem] md:pr-0">
-            <div class="flex flex-col gap-2 pb-2" v-if="title">
-              <div class="flex justify-between items-center pt-1 pr-1">
+          <div class="flex flex-col flex-1 min-w-0 min-h-0 pr-[1.125rem] md:pr-0"
+            :class="isSingleLineContent ? 'justify-center' : ''">
+            <div v-if="title" class="flex flex-col gap-2" :class="hasDescription ? 'pb-2' : ''">
+              <div class="flex justify-between items-center pr-1" :class="hasDescription ? 'pt-1' : ''">
                 <span v-if="title" class="toast-heading text-sm" :class="variantConfig.titleTextClass">{{ title
                 }}</span>
                 <slot name="title" />
@@ -69,6 +74,9 @@
 
 <script setup>
 import { computed, ref, watch } from "vue";
+import { useAssetUrl } from "@/composables/useAssetUrl.js";
+
+const { url: closeIconUrl } = useAssetUrl("icon.notification.close");
 
 const props = defineProps({
   variant: {
@@ -125,6 +133,10 @@ watch(
 watch(isOpen, (v) => emit("update:modelValue", v));
 
 const showIconComputed = computed(() => props.showIcon !== false);
+
+const hasTitle = computed(() => Boolean(props.title));
+const hasDescription = computed(() => Boolean(props.description));
+const isSingleLineContent = computed(() => hasTitle.value !== hasDescription.value);
 
 const palettes = {
   notice: {

@@ -210,6 +210,287 @@
     "save": "Save",
     "cancel": "Cancel",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "optional": "Optional",
+    "tokens": "Tokens",
+    "descriptionOptional": "Description (Optional)",
+    "searchByUsernameEmail": "Search by username & email",
+    "requiredField": "This field is required."
+  },
+  "booking": {
+    "eventTitlePlaceholder": "Event Title",
+    "eventDescriptionPlaceholder": "Event Description...",
+    "basePrice": "Base Price",
+    "sessionDuration": "Session duration",
+    "minutes": "Minutes",
+    "perSession": "/session",
+    "coPerformerOptional": "Co-performer (Optional)",
+    "blockedUser": "Blocked user",
+    "bookingFee": "Enable booking fee",
+    "bookingFeeTooltip": "This amount will be on hold in fan's token balance. If booking is rejected after negotiation period, this amount will be deducted from fan's balance. If booking is accepted, the balance on hold will be deducted towards the call session payment.",
+    "offHourSurcharge": "Off-hour Surcharge",
+    "percentFromBasePrice": "% from base price",
+    "remindMe": "Remind me",
+    "minutesBeforeCall": "minutes before a",
+    "scheduledCall": "scheduled call.",
+    "originalPrice": "Original Price",
+    "discountedPriceOptional": "Discounted Price (optional)",
+    "priceRangeDescription": "Price must be between USD$ 1.95 to 500.",
+    "validationEventTitleRequired": "Event title is required.",
+    "validationBasePriceMin": "Base price must be 0 or higher.",
+    "maximumSessionAllowed": "Maximum Session Allowed",
+    "sessions": "sessions"
+  },
+  "mediaCard": {
+    "published": "Published",
+    "resume": "Resume",
+    "galleryImages": "images",
+    "subscribeOrBuy": "Subscribe or Buy",
+    "menu": {
+      "editDetails": "Edit Details",
+      "addToSubscriptionTier": "Add To Subscription Tier",
+      "unpublish": "Unpublish",
+      "deleteMedia": "Delete Media",
+      "goToProfile": "Go to Creator's Profile",
+      "share": "Share",
+      "report": "Report"
+    },
+    "demo": {
+      "creators": {
+        "creatorAllen": "Creator Allen",
+        "mistressJessica": "Mistress Jessica"
+      },
+      "titles": {
+        "walkInPark": "Took a walk in the park.",
+        "walkInParkToday": "Took a walk in the park today.",
+        "walkInParkMorning": "Took a walk in the park this morning",
+        "mySecondComingSoon": "My 2nd coming soon",
+        "morningWorkout": "Morning workout session"
+      },
+      "tags": {
+        "subscriberExclusive": "Subscriber Exclusive",
+        "subscribeOrBuy": "Subscribe or Buy",
+        "free": "Free",
+        "subOnly": "Sub Only"
+      },
+      "timeAgo": {
+        "fiveMonths": "5mo",
+        "twoDays": "2d"
+      }
+    }
+  },
+  "tierCard": {
+    "demo": {
+      "labels": {
+        "tier1StandardClaim": "Pink theme — standard claim footer (5 left)",
+        "tier2SpendToClaim": "Gold theme — spend to claim footer",
+        "tier3Standard95Left": "Pink theme — standard claim (95 left)",
+        "tier4HiddenProgress": "Pink theme — hidden progress footer",
+        "tier5SubscribeGreen": "Green theme — subscribe footer"
+      },
+      "title": "My VVIP Lounge ❤️",
+      "description": "Welcome to Jenny's VIP Lounge! This plan includes everything in Basic/VIP Lounge, plus: Behind the scene of every shot, stuff I wore from the shot for sale, and talk to me 24/7.",
+      "plans": {
+        "oneDay": "1 day",
+        "oneMonth": "1 month",
+        "sixMonth": "6 month",
+        "oneYear": "1 year"
+      },
+      "flashSale": {
+        "endsIn": "02:13:07",
+        "originalPrice": "$111.72"
+      },
+      "footer": {
+        "claimOffer": "CLAIM<br>OFFER",
+        "subscribe": "SUBSCRIBE",
+        "fiveLeft": "5 Left!",
+        "ninetyFiveLeft": "95 Left!",
+        "offerProgressLow": "95/100 Offer",
+        "offerProgressHigh": "5/100 Offer",
+        "spendMore": "Spend $200 more to claim",
+        "spendProgress": "200/ USD400"
+      }
+    }
+  },
+  "eventCard": {
+    "demo": {
+      "labels": {
+        "orangeButton": "Orange theme — with CTA button",
+        "orangeProgress": "Orange theme — dual progress (no button)",
+        "pinkButton": "Pink theme — with CTA button",
+        "pinkProgress": "Pink theme — dual progress (no button)"
+      },
+      "titles": {
+        "subscriberDiscount": "Subscriber Discount",
+        "luckyDraw": "Lucky Draw!"
+      },
+      "creatorName": "Princess Carrot Pop",
+      "spendMoreClaim": "Spend $200 more to claim",
+      "spendMoreEnter": "Spend $200 more to enter",
+      "offersLeft": "10 offers left!",
+      "chancesLeft": "5 chances left!",
+      "progressOffer": "95/100 Offer",
+      "progressRatio": "200/ USD400",
+      "endsIn": "Ends in",
+      "buttons": {
+        "claimDiscount": "CLAIM DISCOUNT",
+        "enterLuckyDraw": "ENTER LUCKY DRAW"
+      }
+    }
+  },
+  "notificationCard": {
+    "demo": {
+      "labels": {
+        "warningMediaRequired": "Warning variant (media required)",
+        "successApproved": "Success variant (approved)",
+        "infoBankDetails": "Info variant (bank details)",
+        "errorDestructive": "Error variant (destructive)",
+        "noticeCyan": "Notice variant (cyan)",
+        "alertAmber": "Alert variant (amber)",
+        "successTeal": "Success-teal variant",
+        "limitExceededDark": "Limit-exceeded variant (dark)",
+        "withIcon": "With icon (default)",
+        "withoutIcon": "Without icon",
+        "withDescription": "With description",
+        "withoutDescription": "Without description (title only)",
+        "withoutTitle": "Without title (description only)",
+        "withClose": "With close button",
+        "withoutClose": "Without close button",
+        "customIcon": "Custom icon (assetMap URL)",
+        "withLink": "With link",
+        "withoutLink": "Without link"
+      },
+      "titles": {
+        "mediaRequired": "Media Content Required",
+        "congratulations": "Congratulations",
+        "bankDetails": "Bank Details Required",
+        "actionRequired": "Action Required",
+        "unsavedChanges": "You have unsaved changes",
+        "activeSubscribers": "You have 3 active subscribers in this tier",
+        "profileUpdated": "Profile updated successfully",
+        "uploadLimit": "Upload limit exceeded",
+        "connectX": "Connect your X account",
+        "titleOnly": "Reminder: complete your profile"
+      },
+      "descriptions": {
+        "mediaRequired": "Your profile currently has no media. Enhance your profile's visibility by adding at least 5 media items.",
+        "mediaApproved": "Your media 'Audio with placeholder and no preview' has been approved.",
+        "bankDetails": "To ensure seamless transactions, please complete your bank information.",
+        "securityUpdate": "Critical update needed for your account security settings.",
+        "unsavedChanges": "You have made changes since your last save. Remember to click SAVE to publish your changes.",
+        "activeSubscribers": "Changing details of this plan might affect current subscribers' subscription fee and benefits.",
+        "profileUpdated": "Your profile changes were saved and are now visible to subscribers.",
+        "uploadLimit": "You have reached the maximum number of uploads allowed on your current plan.",
+        "connectX": "You must connect to your X account before using the auto repost feature.",
+        "completeProfile": "Add a bio and profile photo to help subscribers discover you."
+      },
+      "links": {
+        "learnMore": "Learn more",
+        "connectNow": "Connect now",
+        "viewDetails": "View details"
+      }
+    }
+  },
+  "demo": {
+    "dashboardTextInput": {
+      "generalVariations": "General variations",
+      "bookingPatterns": "Booking form patterns ($t + assetMap)",
+      "username": "Username",
+      "usernamePlaceholder": "carrot_popxoxo123",
+      "usernameDescription": "Usernames cannot be changed after your first month on our website, but special circumstances may allow for exceptions.",
+      "email": "Email",
+      "emailPlaceholder": "mscarrot_pops@gmail.com",
+      "firstName": "First Name",
+      "noLabelPlaceholder": "Type without a label...",
+      "title": "Title",
+      "displayName": "Display Name",
+      "plainNoIconsPlaceholder": "Plain input, no icons",
+      "emailSupport": "Email Support",
+      "enterEmailPlaceholder": "Enter email...",
+      "fullName": "Full Name",
+      "requiredPlaceholder": "Required field",
+      "emailAddress": "Email Address",
+      "advancedSearch": "Advanced Search",
+      "searchFiltersPlaceholder": "Search with filters...",
+      "bio": "Bio",
+      "tipMessage": "Tip Message",
+      "tipMessagePlaceholder": "Thank you for your tip!",
+      "tipMessageDescription": "Your fan will see this message when they tip you.",
+      "quantity": "Quantity",
+      "age": "Age",
+      "usernameAvailable": "Username is available.",
+      "usdPrefix": "USD$",
+      "variations": {
+        "labelDescPlaceholder": "Label + Description + Placeholder",
+        "labelPlaceholder": "Label + Placeholder (No Description)",
+        "labelNoPlaceholder": "Label, No Placeholder",
+        "noLabelWithPlaceholder": "No Label, With Placeholder",
+        "plain": "No Label / No Placeholder / No Description",
+        "title": "Label + Placeholder (Title)",
+        "leftIconSearch": "Left Icon — Search (assetMap: icon.search)",
+        "noIcon": "No Icon",
+        "rightIcon": "Right Icon — EnvelopeIcon",
+        "autofill": "Autofill (browser saved email)",
+        "requiredStar": "Required — Asterisk (*)",
+        "requiredItalic": "Required — Italic \"Required\"",
+        "bothIcons": "Both Icons (Left + Right)",
+        "textareaCounter": "Textarea — maxLength Counter",
+        "textareaDescCounter": "Textarea — Description + Counter",
+        "noLabelEventTitle": "No Label — Event Title Placeholder",
+        "coPerformerSearch": "Co-performer Search (i18n + icon.search)",
+        "numberMinutes": "Number + Minutes (suffix outside input)",
+        "basePriceTokens": "Base Price + Tokens (suffix outside input)",
+        "leftSpanUsd": "Left Span — USD$ Prefix",
+        "numberStepper": "Number — Stepper",
+        "numberNoStepper": "Number — No Stepper (:showControls=\"false\")",
+        "tooltipOnly": "Tooltip Only — DropdownMenu",
+        "offHourSurcharge": "Off-hour Surcharge % (suffix outside input)",
+        "disabled": "Disabled State",
+        "validationErrors": "Validation Errors",
+        "requiredTextError": "Required Text Error",
+        "success": "Success State",
+        "remindMe": "Remind Me — Inline Copy (text outside input)"
+      }
+    },
+    "buttons": {
+      "showLoadingState": "Show loading state on all catalog buttons (text replaced by spinner)",
+      "loadingSection": "Loading state — :loading prop (text replaced by spinner)",
+      "clickToLoadHint": "Click any button to preview :loading — text and icons are replaced by spinner only (no \"Loading...\" text)."
+    },
+    "spinner": {
+      "assetMapImage": "Asset map image (icon.spinner)",
+      "svgStyled": "Inline SVG — styled track",
+      "svgThin": "Inline SVG — thin track"
+    },
+    "tierCard": {
+      "sectionDescription": "Modern tier cards with integrated feature lists and price toggles ($t + assetMap)"
+    },
+    "eventCard": {
+      "sectionDescription": "Event promo cards with theme variants and button/progress layouts ($t + assetMap)"
+    },
+    "quillEditor": {
+      "labels": {
+        "default": "Default (empty)",
+        "customPlaceholder": "Custom placeholder",
+        "initialContent": "With initial content",
+        "richInitialContent": "With rich initial content (HTML)",
+        "withLabelWrapper": "With label wrapper (production pattern)"
+      },
+      "fieldLabels": {
+        "description": "Description",
+        "tierDescription": "Tier description",
+        "eventDescription": "Event description"
+      },
+      "placeholders": {
+        "default": "Description...",
+        "tierDescription": "Tier Description...",
+        "eventDescription": "Event Description...",
+        "bio": "Write your bio..."
+      },
+      "initialContent": {
+        "simple": "<p><strong>Hello World!</strong> This is pre-loaded content.</p>",
+        "rich": "<p><strong>Welcome!</strong> Edit this <em>tier description</em> with the toolbar.</p><ul><li>Bold, italic, and links</li><li>Ordered and bullet lists</li></ul><p><a href=\"#\">Example link</a></p>"
+      }
+    }
   }
 }

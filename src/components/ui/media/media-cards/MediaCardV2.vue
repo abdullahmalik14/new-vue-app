@@ -1,25 +1,25 @@
 <template>
-  <li class="relative aspect-video [box-shadow:0_0_10px_-34px_rgba(0,0,0,0.10)] group">
-    
+  <li class="relative aspect-video [box-shadow:0_0_10px_-34px_rgba(0,0,0,0.10)] group z-0 hover:z-30 focus-within:z-30">
+
     <a
-      class="block transition-all duration-150 ease-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible shadow-[0_0_10px_-34px_rgba(0,0,0,0.10)] w-full h-full bg-no-repeat bg-center bg-cover group-hover:delay-[150ms] group-hover:z-[2] xl:group-hover:w-[26.25rem] xl:group-hover:h-[21.875rem] xl:group-hover:shrink-0 xl:group-hover:rounded-[0.313rem] xl:group-hover:shadow-[0_0_0.625rem_-2.125rem_rgba(0,0,0,0.10)] outline-none"
+      class="block transition-all duration-150 ease-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible shadow-[0_0_10px_-34px_rgba(0,0,0,0.10)] w-full h-full bg-no-repeat bg-center bg-cover group-hover:delay-[150ms] xl:group-hover:w-[26.25rem] xl:group-hover:h-[21.875rem] xl:group-hover:shrink-0 xl:group-hover:rounded-[0.313rem] xl:group-hover:shadow-[0_0_0.625rem_-2.125rem_rgba(0,0,0,0.10)] outline-none"
       @mouseenter="playVideo"
       @mouseleave="pauseVideo"
     >
-      <div v-if="media.type === 'gallery'" class="absolute w-full h-full z-[10011]">
+      <div v-if="media.type === 'gallery'" class="absolute w-full h-full z-[2]">
         <div class="flex relative w-full h-full justify-end items-end">
-          <div 
+          <div
             class="w-1/2 h-full flex justify-center items-center bg-center bg-cover bg-no-repeat"
             :style="{ backgroundImage: `url(${media.poster})` }"
           ></div>
           <div class="absolute right-0 top-0 w-1/2 h-full flex flex-col justify-center items-center bg-black/50 backdrop-blur-sm">
             <span class="text-xl leading-6 md:text-3xl md:leading-9 text-center text-[#EAECF0]">{{ media.galleryCount }}+</span>
-            <span class="text-sm leading-normal md:text-lg md:leading-normal text-center text-[#EAECF0]">images</span>
+            <span class="text-sm leading-normal md:text-lg md:leading-normal text-center text-[#EAECF0]">{{ t('mediaCard.galleryImages') }}</span>
           </div>
         </div>
       </div>
 
-      <div class="w-full h-full block bg-cover bg-center bg-no-repeat overflow-hidden relative z-[10010] after:content-[''] after:absolute after:inset-0 after:w-full after:h-full after:rounded-none after:bg-[linear-gradient(180deg,rgba(0,0,0,0.6)_-24.72%,rgba(0,0,0,0)_41.92%,rgba(0,0,0,0.6)_108.57%)] after:z-[10010]">
+      <div class="w-full h-full block bg-cover bg-center bg-no-repeat overflow-hidden relative z-[1] after:content-[''] after:absolute after:inset-0 after:w-full after:h-full after:rounded-none after:bg-[linear-gradient(180deg,rgba(0,0,0,0.6)_-24.72%,rgba(0,0,0,0)_41.92%,rgba(0,0,0,0.6)_108.57%)] after:z-[1]">
         <div class="w-full h-full flex justify-center items-center">
           <video
             v-if="media.type === 'video'"
@@ -29,7 +29,7 @@
             :src="media.videoUrl"
             :poster="media.poster"
           ></video>
-          <img 
+          <img
             v-else
             :src="media.poster"
             alt="bg"
@@ -38,9 +38,9 @@
         </div>
       </div>
 
-      <div class="flex justify-between items-center w-full absolute left-0 pl-1 top-1 z-[99999]">
+      <div class="flex justify-between items-center w-full absolute left-0 pl-1 top-1 z-[3]">
         <div class="flex justify-center items-center gap-[0.188rem] px-1 py-0.5 rounded bg-[rgba(24,34,48,0.50)] drop-shadow-[0_0_20px_rgba(0,0,0,0.25)]">
-          <img :src="mediaIcon" class="w-4 h-4" />
+          <img v-if="mediaIcon" :src="mediaIcon" alt="" class="w-4 h-4" />
           <span v-if="media.type === 'video'" class="text-xs text-white leading-normal tracking-[0.008rem]">{{ media.duration }}</span>
         </div>
 
@@ -50,19 +50,19 @@
           </span>
           <div class="flex items-center gap-[0.813rem] px-1 opacity-70">
             <span class="flex justify-center items-center gap-[0.188rem] filter drop-shadow-[0_0_.313rem_#000]">
-              <img src="https://i.ibb.co.com/7tbwzFsQ/heart.webp" class="w-[0.75rem] brightness-100 saturate-0" />
+              <img v-if="heartIconUrl" :src="heartIconUrl" alt="" class="w-[0.75rem] brightness-100 saturate-0" />
               <span class="text-xs leading-normal font-medium text-white tracking-[0.008rem]">{{ media.likes }}</span>
             </span>
             <span class="flex justify-center items-center gap-[0.1875rem] filter drop-shadow-[0_0_.313rem_#000]">
-              <img src="https://i.ibb.co.com/Kjv16vLZ/eye.webp" class="w-[0.75rem] brightness-100 saturate-0" />
+              <img v-if="eyeIconUrl" :src="eyeIconUrl" alt="" class="w-[0.75rem] brightness-100 saturate-0" />
               <span class="text-xs leading-normal font-medium text-white tracking-[0.0075rem]">{{ media.views }}</span>
             </span>
           </div>
         </div>
       </div>
 
-      <div v-if="media.showTag" class="flex xl:group-hover:hidden absolute left-0 bottom-0 z-[99999]">
-        <span 
+      <div v-if="media.showTag" class="flex xl:group-hover:hidden absolute left-0 bottom-0 z-[3]">
+        <span
           class="flex justify-center items-center px-[0.625rem] gap-1 py-1"
           :class="tagClasses"
         >
@@ -70,21 +70,21 @@
         </span>
       </div>
 
-      <div class="hidden group-hover:xl:flex [will-change:transform] [transform:translateZ(0)] [backface-visibility:hidden] [perspective:1000px] opacity-0 xl:group-hover:opacity-100 transition-opacity duration-150 ease-in-out overflow-hidden p-2 z-[10100] gap-[0.875rem] absolute inset-0 w-full h-full flex-col justify-end items-start">
-        
-        <div v-if="media.isLocked" class="flex justify-center items-center w-full h-full absolute left-0 top-0">
-          <img src="https://i.ibb.co.com/5WgkFsdY/locked-icon.webp" alt="locked-icon" class="w-[8.125rem] h-[8.125rem]" />
+      <div class="hidden group-hover:xl:flex [will-change:transform] [transform:translateZ(0)] [backface-visibility:hidden] [perspective:1000px] opacity-0 xl:group-hover:opacity-100 transition-opacity duration-150 ease-in-out overflow-hidden p-2 z-[4] gap-[0.875rem] absolute inset-0 w-full h-full flex-col justify-end items-start">
+
+        <div v-if="media.isLocked" class="flex justify-center items-center w-full h-full absolute left-0 top-0 z-[1]">
+          <img v-if="lockedIconUrl" :src="lockedIconUrl" alt="" class="w-[8.125rem] h-[8.125rem]" />
         </div>
 
-        <span 
+        <span
           v-if="media.showTag"
-          class="flex justify-center items-center px-[0.625rem] gap-1 py-1 transition-opacity duration-150 ease-in-out"
+          class="relative z-[2] flex justify-center items-center px-[0.625rem] gap-1 py-1 transition-opacity duration-150 ease-in-out"
           :class="tagClasses"
         >
           <span class="text-white text-xs leading-[.875rem]">{{ media.tagText }}</span>
         </span>
 
-        <span class="text-sm line-clamp-1 text-white [text-shadow:0px_0px_4px_rgba(0,0,0,0.5)] line-clamp-2 transition-opacity duration-150 ease-in-out">
+        <span class="relative z-[2] text-sm text-white [text-shadow:0px_0px_4px_rgba(0,0,0,0.5)] line-clamp-2 transition-opacity duration-150 ease-in-out">
           {{ media.title }}
         </span>
       </div>
@@ -95,6 +95,8 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useAssetUrl } from '@/composables/useAssetUrl.js';
 
 const props = defineProps({
   media: {
@@ -103,11 +105,18 @@ const props = defineProps({
   }
 });
 
+const { t } = useI18n();
+const { url: videoIconUrl } = useAssetUrl('icon.media.video');
+const { url: imageIconUrl } = useAssetUrl('icon.media.image');
+const { url: heartIconUrl } = useAssetUrl('icon.media.heart');
+const { url: eyeIconUrl } = useAssetUrl('icon.media.eye');
+const { url: lockedIconUrl } = useAssetUrl('icon.media.locked');
+
 const videoRef = ref(null);
 
 const playVideo = () => {
   if (props.media.type === 'video' && videoRef.value) {
-    videoRef.value.play().catch(e => console.log('Autoplay blocked', e));
+    videoRef.value.play().catch(() => {});
   }
 };
 
@@ -119,16 +128,14 @@ const pauseVideo = () => {
 };
 
 const mediaIcon = computed(() => {
-  if (props.media.type === 'video') return 'https://i.ibb.co.com/wN978Hjm/video.webp';
-  return 'https://i.ibb.co.com/tP25fy0Z/image-icon.png';
+  if (props.media.type === 'video') return videoIconUrl.value;
+  return imageIconUrl.value;
 });
 
-// Dynamic class for Pink vs Green tag
 const tagClasses = computed(() => {
   if (props.media.tagColor === 'pink') {
     return 'bg-[#fb0464]';
   }
-  // Default green
   return 'bg-[#07f468]';
 });
 </script>

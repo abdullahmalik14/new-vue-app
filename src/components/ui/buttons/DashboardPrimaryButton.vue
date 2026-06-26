@@ -1,17 +1,33 @@
 <template>
   <div v-bind="resolvedAttrs.wrapperAttrs.wrapper1">
     <div v-bind="resolvedAttrs.wrapperAttrs.wrapper2">
-      <button :type="type" v-bind="resolvedAttrs.inputAttrs" :disabled="disabled" @click="handleClick">
-        <span class="relative z-10 flex items-center justify-center gap-[inherit] pointer-events-none w-full">
-          <slot name="leftIcon">
-            <img v-if="leftIcon" :src="leftIcon" :class="` inline-block ${leftIconClass}`" />
-          </slot>
+      <button :type="type" v-bind="resolvedAttrs.inputAttrs" :disabled="disabled || loading" :aria-busy="loading || undefined" :class="loading ? '[&:disabled]:opacity-100' : ''" @click="handleClick">
+        <span class="inline-grid [grid-template-areas:'stack'] place-items-center justify-items-center gap-[inherit] pointer-events-none min-h-[1em]">
+          <span
+            class="[grid-area:stack] inline-flex items-center justify-center gap-[inherit]"
+            :class="loading ? 'invisible' : ''"
+            aria-hidden="true"
+          >
+            <slot name="leftIcon">
+              <img v-if="leftIcon" :src="leftIcon" :class="` inline-block ${leftIconClass}`" />
+            </slot>
 
-          <span :class="textClass || ''">{{ text }}</span>
+            <span :class="textClass || ''">{{ text }}</span>
 
-          <slot name="rightIcon">
-            <img v-if="rightIcon" :src="rightIcon" :class="` inline-block ${rightIconClass}`" />
-          </slot>
+            <slot name="rightIcon">
+              <img v-if="rightIcon" :src="rightIcon" :class="` inline-block ${rightIconClass}`" />
+            </slot>
+          </span>
+          <span
+            v-if="loading"
+            class="[grid-area:stack] relative z-20 inline-flex items-center justify-center pointer-events-none"
+          >
+            <LoadingSpinner
+              size="sm"
+              :color="loadingSpinnerColor"
+              :showTrack="false"
+            />
+          </span>
         </span>
       </button>
     </div>
@@ -21,10 +37,12 @@
 <script setup>
 import { computed } from "vue";
 import { resolveAllConfigs } from "@/utils/componentRenderingUtils";
+import LoadingSpinner from "@/components/ui/spinners/LoadingSpinner.vue";
 
 const emit = defineEmits(["click"]);
 
 const handleClick = (event) => {
+  if (props.loading) return;
   emit("click", event);
 };
 
@@ -48,6 +66,8 @@ const props = defineProps({
   rightIcon: [String, Object, Function],
 
   disabled: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false },
+  loadingSpinnerColor: { type: String, default: "text-current" },
   type: { type: String, default: "button" },
 
   btnBg: { type: String, default: "#07f468" },
@@ -72,44 +92,44 @@ const themeClasses = {
   none: "",
 
   primary:
-    "bg-primary text-white font-medium rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed",
+    "bg-primary text-white font-medium rounded-md enabled:hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed",
   secondary:
-    "bg-gray-600 text-white font-medium rounded-md hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed",
+    "bg-gray-600 text-white font-medium rounded-md enabled:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed",
   success:
-    "bg-green-600 text-white font-medium rounded-md hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed",
+    "bg-green-600 text-white font-medium rounded-md enabled:hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed",
   danger:
-    "bg-red-600 text-white font-medium rounded-md hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed",
+    "bg-red-600 text-white font-medium rounded-md enabled:hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed",
   warning:
-    "bg-yellow-500 text-black font-medium rounded-md hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed",
+    "bg-yellow-500 text-black font-medium rounded-md enabled:hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed",
   outline:
-    "border border-gray-400 text-gray-700 font-medium rounded-md hover:bg-gray-100 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed",
+    "border border-gray-400 text-gray-700 font-medium rounded-md enabled:hover:bg-gray-100 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed",
   authTransparent:
-    " w-full relative [caret-color:transparent] h-12 px-6 py-2 gap-2.5 rounded-[0.625rem] inline-flex justify-center items-center text-text border border-buttonSecondaryBorder bg-buttonSecondary font-medium text-[15px] transition-opacity duration-100 ease-in-out hover:bg-[linear-gradient(180deg,_rgba(87,_85,_85,_0.50)_0%,_rgba(0,_0,_0,_0.50)_100%)] hover:[box-shadow:0px_0px_20px_0px_rgba(255,150,192,0.8)_inset,_8px_8px_30px_0px_rgba(255,0,102,0.7),_0px_0px_35px_0px_rgba(255,255,221,0.5),_-8px_-8px_30px_0px_rgba(255,0,0,0.7)]",
+    " w-full relative [caret-color:transparent] h-12 px-6 py-2 gap-2.5 rounded-[0.625rem] inline-flex justify-center items-center text-text border border-buttonSecondaryBorder bg-buttonSecondary font-medium text-[15px] transition-opacity duration-100 ease-in-out enabled:hover:bg-[linear-gradient(180deg,_rgba(87,_85,_85,_0.50)_0%,_rgba(0,_0,_0,_0.50)_100%)] enabled:hover:[box-shadow:0px_0px_20px_0px_rgba(255,150,192,0.8)_inset,_8px_8px_30px_0px_rgba(255,0,102,0.7),_0px_0px_35px_0px_rgba(255,255,221,0.5),_-8px_-8px_30px_0px_rgba(255,0,0,0.7)]",
   authPink:
-    "w-full relative [caret-color:transparent] h-12 px-6 py-2 gap-2.5 rounded-[0.625rem] inline-flex items-center justify-center text-text bg-buttonPrimary  border border-buttonPrimaryBorder font-medium text-[15px] transition-opacity duration-100 ease-in-out hover:bg-gradient-to-b hover:from-[#FF408C] hover:to-[#F00] hover:[box-shadow:0px_0px_20px_0px_rgba(255,150,192,0.8)_inset,_8px_8px_30px_0px_rgba(255,0,102,0.7),_0px_0px_35px_0px_rgba(255,255,221,0.5),_-8px_-8px_30px_0px_rgba(255,0,0,0.7)]",
+    "w-full relative [caret-color:transparent] h-12 px-6 py-2 gap-2.5 rounded-[0.625rem] inline-flex items-center justify-center text-text bg-buttonPrimary  border border-buttonPrimaryBorder font-medium text-[15px] transition-opacity duration-100 ease-in-out enabled:hover:bg-gradient-to-b enabled:hover:from-[#FF408C] enabled:hover:to-[#F00] enabled:hover:[box-shadow:0px_0px_20px_0px_rgba(255,150,192,0.8)_inset,_8px_8px_30px_0px_rgba(255,0,102,0.7),_0px_0px_35px_0px_rgba(255,255,221,0.5),_-8px_-8px_30px_0px_rgba(255,0,0,0.7)]",
   hoverBgWhite:
-    "flex items-center text-[1.125rem] break-words justify-center min-w-[6.25rem] px-2 py-1 font-medium leading-7 text-[#0c111d] bg-transparent border-none outline-none hover:bg-white",
+    "flex items-center text-[1.125rem] break-words justify-center min-w-[6.25rem] px-2 py-1 font-medium leading-7 text-[#0c111d] bg-transparent border-none outline-none enabled:hover:bg-white",
   greyBg:
     "flex items-center justify-center text-[#98a2b3] uppercase font-medium break-words gap-2 leading-7 text-[1.125rem] min-w-[5.3125rem] px-2 py-1 bg-[rgba(52,64,84,0.05)] border-0",
   "skew-right":
-    "group w-max pl-2 gap-2.5 pr-2.5 h-10 relative flex justify-center items-center appearance-button transition-opacity duration-100 ease-in-out normal-case overflow-visible outline-none border-none bg-[var(--btn-bg)] hover:bg-[var(--btn-hover-bg)] hover:after:bg-[var(--btn-hover-bg)] before:content-[''] before:block before:w-full before:h-full before:absolute before:top-0 before:right-0 before:z-[1] before:shadow-[4px_4px_0_0_#000] before:transition-all before:ease-in-out before:duration-0 after:content-[''] after:block after:w-4 after:h-full after:absolute after:top-0 after:-right-[0.43rem] after:z-[1] after:shadow-[4px_4px_0_0_#000] after:skew-x-[20deg] after:translate-x-0 after:transition-all after:ease-in-out after:duration-0 after:bg-[var(--btn-bg)]",
+    "group w-max pl-2 gap-2.5 pr-2.5 h-10 relative flex justify-center items-center appearance-button transition-opacity duration-100 ease-in-out normal-case overflow-visible outline-none border-none bg-[var(--btn-bg)] enabled:hover:bg-[var(--btn-hover-bg)] enabled:hover:after:bg-[var(--btn-hover-bg)] before:content-[''] before:block before:w-full before:h-full before:absolute before:top-0 before:right-0 before:z-[1] before:shadow-[4px_4px_0_0_#000] before:transition-all before:ease-in-out before:duration-0 after:content-[''] after:block after:w-4 after:h-full after:absolute after:top-0 after:-right-[0.43rem] after:z-[1] after:shadow-[4px_4px_0_0_#000] after:skew-x-[20deg] after:translate-x-0 after:transition-all after:ease-in-out after:duration-0 after:bg-[var(--btn-bg)]",
   polygonLeft:
-    "w-max group flex items-center justify-center gap-[0.625rem] py-1 pl-[1.4rem] pr-2 bg-[var(--btn-bg)] hover:bg-[var(--btn-hover-bg)] text-[var(--btn-text)] hover:text-[var(--btn-hover-text)] text-sm sm:text-lg  leading-7 font-medium uppercase transition-colors duration-200 relative cursor-pointer [clip-path:polygon(8%_0,100%_0,105%_105%,0_105%)]",
+    "w-max group flex items-center justify-center gap-[0.625rem] py-1 pl-[1.4rem] pr-2 bg-[var(--btn-bg)] enabled:hover:bg-[var(--btn-hover-bg)] text-[var(--btn-text)] enabled:hover:text-[var(--btn-hover-text)] text-sm sm:text-lg  leading-7 font-medium uppercase transition-colors duration-200 relative cursor-pointer [clip-path:polygon(8%_0,100%_0,105%_105%,0_105%)]",
   polygonRight:
-    "w-max group flex items-center justify-center gap-[0.625rem] py-1 pr-[1.4rem] pl-2 bg-black hover:bg-[#07f468] text-[#fff] text-[1.125rem] leading-7 font-medium uppercase transition-colors duration-200 hover:text-black relative cursor-pointer [clip-path:polygon(0_0,92%_0,100%_105%,0_105%)]",
+    "w-max group flex items-center justify-center gap-[0.625rem] py-1 pr-[1.4rem] pl-2 bg-black enabled:hover:bg-[#07f468] text-[#fff] text-[1.125rem] leading-7 font-medium uppercase transition-colors duration-200 enabled:hover:text-black relative cursor-pointer [clip-path:polygon(0_0,92%_0,100%_105%,0_105%)]",
   bgGreen:
-    "group flex items-center justify-center gap-2.5 py-6 px-[1.4rem] bg-[#07f468] hover:bg-black text-[#000] text-[1.125rem] leading-7 font-medium uppercase transition-colors duration-200 hover:text-[#07f468] relative cursor-pointer ",
+    "group flex items-center justify-center gap-2.5 py-6 px-[1.4rem] bg-[#07f468] enabled:hover:bg-black text-[#000] text-[1.125rem] leading-7 font-medium uppercase transition-colors duration-200 enabled:hover:text-[#07f468] relative cursor-pointer ",
   mediaBtn:
-    "flex justify-center items-center gap-2.5 h-10 px-2 py-1 cursor-pointer text-lg font-medium text-[#07F468] hover:text-black bg-black border-none outline-none group hover:bg-[#07F468]",
+    "flex justify-center items-center gap-2.5 h-10 px-2 py-1 cursor-pointer text-lg font-medium text-[#07F468] enabled:hover:text-black bg-black border-none outline-none group enabled:hover:bg-[#07F468]",
   profileMediaBtn:
     "flex justify-center items-center h-11 p-2.5 rounded-[3.125rem] text-sm leading-6 text-[#07F468] bg-black/90 cursor-pointer dark:bg-background-dark-app",
   checkoutProceedpayment:
-    "w-full flex justify-center items-center gap-2 w-full h-12 border-t-[1.5px] border-b-[1.5px] border-transparent bg-[#07F468] px-4 [clip-path:polygon(24px_0,100%_0,calc(100%_-_24px)_100%,0_100%)] cursor-pointer group/button hover:bg-black text-base leading-[1.875rem] font-semibold uppercase text-black hover:text-[#07F468]",
+    "w-full flex justify-center items-center gap-2 w-full h-12 border-t-[1.5px] border-b-[1.5px] border-transparent bg-[#07F468] px-4 [clip-path:polygon(24px_0,100%_0,calc(100%_-_24px)_100%,0_100%)] cursor-pointer group/button enabled:hover:bg-black text-base leading-[1.875rem] font-semibold uppercase text-black enabled:hover:text-[#07F468]",
   disableBtn:
     "flex justify-center items-center gap-2 w-full text-base leading-[1.875rem] font-semibold uppercase text-white/30 h-12 border-t-[1.5px] border-b-[1.5px] border-transparent bg-white/20 px-4 [clip-path:polygon(24px_0,100%_0,calc(100%_-_24px)_100%,0_100%)] cursor-not-allowed",
-  actionGreen: "w-full sm:flex-grow sm:min-w-[17.125rem] h-10 flex justify-center items-center gap-2 px-6 sm:pl-2 bg-[#101828] border border-[#07F468] hover:bg-[#07F468] group/xbtn text-base font-medium tracking-[0.0218rem] whitespace-nowrap text-[#07F468] hover:text-[#0C111D]",
-  retryAction: "flex items-center gap-2.5 px-4 justify-center items-center h-10 shadow-[5px_4px_0px_0px_#07F468] cursor-pointer border-none outline-none bg-black group/button hover:bg-[#07F468] hover:shadow-[5px_4px_0px_0px_black] dark:bg-[#181a1b] dark:shadow-[5px_4px_0px_0px_#06c454] dark:hover:bg-[#06c454] dark:hover:shadow-[5px_4px_0px_0px_#181a1b] text-lg font-medium text-[#07F468] hover/button:text-black dark:text-[#07F468] dark:group-hover/button:text-[#181a1b]",
-  simpleBtn: "flex justify-center items-center gap-1 px-3.5 h-12 shrink-0 cursor-pointer group/button [&.disabled]:pointer-events-none min-w-max text-sm font-semibold whitespace-nowrap bg-[var(--btn-bg)] hover:bg-[var(--btn-hover-bg)] text-[var(--btn-text)] hover:text-[var(--btn-hover-text)]"
+  actionGreen: "w-full sm:flex-grow sm:min-w-[17.125rem] h-10 flex justify-center items-center gap-2 px-6 sm:pl-2 bg-[#101828] border border-[#07F468] enabled:hover:bg-[#07F468] group/xbtn text-base font-medium tracking-[0.0218rem] whitespace-nowrap text-[#07F468] enabled:hover:text-[#0C111D]",
+  retryAction: "flex items-center gap-2.5 px-4 justify-center items-center h-10 shadow-[5px_4px_0px_0px_#07F468] cursor-pointer border-none outline-none bg-black group/button enabled:hover:bg-[#07F468] enabled:hover:shadow-[5px_4px_0px_0px_black] dark:bg-[#181a1b] dark:shadow-[5px_4px_0px_0px_#06c454] dark:enabled:hover:bg-[#06c454] dark:enabled:hover:shadow-[5px_4px_0px_0px_#181a1b] text-lg font-medium text-[#07F468] enabled:hover/button:text-black dark:text-[#07F468] dark:group-hover/button:text-[#181a1b]",
+  simpleBtn: "flex justify-center items-center gap-1 px-3.5 h-12 shrink-0 cursor-pointer group/button [&.disabled]:pointer-events-none min-w-max text-sm font-semibold whitespace-nowrap bg-[var(--btn-bg)] enabled:hover:bg-[var(--btn-hover-bg)] text-[var(--btn-text)] enabled:hover:text-[var(--btn-hover-text)]"
 };
 
 // Tailwind size classes
