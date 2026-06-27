@@ -182,6 +182,25 @@ function createInitialDashboardAnalyticsState() {
   };
 }
 
+let lastAppliedAnalyticsBundleSignature = null;
+
+function buildAnalyticsBundleSignature(mapped) {
+  return JSON.stringify({
+    subscriptionsBundle: mapped.subscriptionsBundle,
+    earnings: mapped.earnings,
+    fans: mapped.fans,
+    fanInsights: mapped.fanInsights,
+    likes: mapped.likes,
+    contributors: mapped.contributors,
+    trendingMedia: mapped.trendingMedia,
+    trendingMerch: mapped.trendingMerch,
+    trendingTags: mapped.trendingTags,
+    trendingCountries: mapped.trendingCountries,
+    countries: mapped.countries,
+    recentOrders: mapped.recentOrders,
+  });
+}
+
 export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
   state: createInitialDashboardAnalyticsState,
 
@@ -270,11 +289,20 @@ export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
       if (!bundle) return;
 
       const now = new Date();
-      console.log('📡 Pipeline bundle set at:', now.toLocaleTimeString());
 
       try {
         const mapped = mapAnalyticsBundleResponse(bundle);
         if (!mapped) return;
+
+        const signature = buildAnalyticsBundleSignature(mapped);
+        if (signature === lastAppliedAnalyticsBundleSignature) {
+          this.metadata.lastUpdated = now.toISOString();
+          this.lastUpdated = now.toISOString();
+          return;
+        }
+
+        lastAppliedAnalyticsBundleSignature = signature;
+        console.log('📡 Pipeline bundle set at:', now.toLocaleTimeString());
 
         applyMappedAnalyticsState(this, mapped, now.toISOString());
         validateAnalyticsBundleIntegrity(bundle, { earningsDaily: this.earnings?.daily });
@@ -284,6 +312,7 @@ export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
     },
 
     resetAnalyticsState() {
+      lastAppliedAnalyticsBundleSignature = null;
       Object.assign(this, createInitialDashboardAnalyticsState());
     },
   },

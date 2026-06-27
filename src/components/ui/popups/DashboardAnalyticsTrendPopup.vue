@@ -117,9 +117,9 @@ onBeforeUnmount(() => {
           <h3 class="text-lg md:text-2xl font-semibold text-[#0c111d] dark:text-[#dbd8d3] m-0">{{ props.title }}</h3>
         </div>
 
-        <div class="flex items-center gap-4 w-full md:w-auto md:justify-end">
+        <div class="flex items-center gap-3 w-full md:w-auto md:justify-end">
           <!-- select-dropdown -->
-          <div class="select-dropdown w-full md:w-auto relative z-[10000]" id="select-dropdown">
+          <div class="select-dropdown flex-1 min-w-0 md:flex-none md:w-auto relative z-[10000]" id="select-dropdown">
             <div
               class="trends-select cursor-pointer min-w-[5.75rem] rounded-[0.5rem] border-none bg-white/30 dark:bg-[#181a1b]/30"
               @click.stop="toggleDropdown"
@@ -196,7 +196,7 @@ onBeforeUnmount(() => {
           <!-- close-button -->
           <div
             @click="emit('update:modelValue', false)"
-            class="close-button cursor-pointer absolute top-4 right-4 p-2.5 bg-white shadow-[0px_1px_3px_0px_rgba(16,24,40,0.1),0px_1px_2px_0px_rgba(16,24,40,0.06)] rounded-full flex justify-center items-center dark:bg-[#181a1b] dark:shadow-[0px_1px_3px_0px_rgba(13,19,32,0.1),0px_1px_2px_0px_rgba(13,19,32,0.06)] md:static z-[10005]"
+            class="close-button shrink-0 cursor-pointer p-2.5 bg-white shadow-[0px_1px_3px_0px_rgba(16,24,40,0.1),0px_1px_2px_0px_rgba(16,24,40,0.06)] rounded-full flex justify-center items-center dark:bg-[#181a1b] dark:shadow-[0px_1px_3px_0px_rgba(13,19,32,0.1),0px_1px_2px_0px_rgba(13,19,32,0.06)] z-[10005]"
           >
             <img
               :src="iconClosePopup || ''"

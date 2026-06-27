@@ -345,10 +345,6 @@ watch(() => props.modelValue, async (isOpen) => {
   if (isOpen) { await nextTick(); await renderAllCharts() }
 })
 
-watch(() => props.insightData, async () => {
-  if (props.modelValue) { await nextTick(); await renderAllCharts() }
-}, { deep: true })
-
 onMounted(async () => {
   if (props.modelValue) { await nextTick(); await renderAllCharts() }
 })

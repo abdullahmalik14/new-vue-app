@@ -65,7 +65,7 @@
               </button>
             </div>
           </div>
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && insightData?.total > 0">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': showChartLoadingOverlay, 'opacity-100': !showChartLoadingOverlay }" v-show="analyticsStore.bundleLoaded && insightData?.total > 0">
              
              <div data-chart-container data-chart-id="sales-daily-donut" :hidden="!isDaily||undefined" class="absolute inset-0"
                :data-chart-config='JSON.stringify({type:"donut",period:"slot",datasetKey:"sales-donut",fields:{category:"name",total:"value"},categoryKeyMap:{subscription:"subscription",paytoview:"paytoview",merch:"merch",wishtender:"wishtender",customrequest:"customrequest"},seriesStyles:salesChartStyles,legentHint:legendConfig})'>
@@ -81,13 +81,13 @@
              <div data-chart-container data-chart-id="sales-alltime-line" :hidden="isDaily||!(activePeriod==='alltime'&&activeSalesViewMode==='line')||undefined" class="absolute inset-0" :data-chart-config='getSalesLineCfg("sales-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
           </div>
           
-          <!-- Loading State -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-if="!analyticsStore.bundleLoaded || isChartRendering">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#101828] dark:border-white"></div>
-            <span class="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">Loading Chart...</span>
+          <!-- Loading State (initial only — not on polling refresh) -->
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-if="showChartLoadingOverlay">
+            <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
+            <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.loadingChart', 'Loading chart...') }}</span>
           </div>
           <!-- Empty State -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-else-if="!insightData?.total">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-else-if="analyticsStore.bundleLoaded && !insightData?.total">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
             <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
@@ -107,7 +107,7 @@
               </button>
             </div>
           </div>
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': isChartRendering, 'opacity-100': !isChartRendering }" v-show="analyticsStore.bundleLoaded && insightData?.totalTokens > 0">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] transition-opacity duration-200" :class="{ 'opacity-0': showChartLoadingOverlay, 'opacity-100': !showChartLoadingOverlay }" v-show="analyticsStore.bundleLoaded && insightData?.totalTokens > 0">
              
              <div data-chart-container data-chart-id="tokens-daily-donut" :hidden="!isDaily||undefined" class="absolute inset-0"
                :data-chart-config='JSON.stringify({type:"donut",period:"slot",datasetKey:"tokens-donut",fields:{category:"name",total:"value"},categoryKeyMap:{tipTokens:"tipTokens",callTokens:"callTokens",chatTokens:"chatTokens",liveStreamTokens:"liveStreamTokens"},seriesStyles:tokensChartStyles,legentHint:legendConfig})'>
@@ -123,13 +123,13 @@
              <div data-chart-container data-chart-id="tokens-alltime-line" :hidden="isDaily||!(activePeriod==='alltime'&&activeTokensViewMode==='line')||undefined" class="absolute inset-0" :data-chart-config='getTokensLineCfg("tokens-alltime")'><div amchart data-role="chart" style="width:100%;height:100%;"></div></div>
           </div>
 
-          <!-- Loading State -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-if="!analyticsStore.bundleLoaded || isChartRendering">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#101828] dark:border-white"></div>
-            <span class="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">Loading Chart...</span>
+          <!-- Loading State (initial only — not on polling refresh) -->
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-if="showChartLoadingOverlay">
+            <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
+            <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.loadingChart', 'Loading chart...') }}</span>
           </div>
           <!-- Empty State -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-else-if="!insightData?.totalTokens">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-else-if="analyticsStore.bundleLoaded && !insightData?.totalTokens">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
             <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
@@ -300,7 +300,12 @@ function injectChartData() {
   }
 }
 
-const isChartRendering = ref(true)
+const isChartRendering = ref(false)
+const hasChartsRendered = ref(false)
+
+const showChartLoadingOverlay = computed(
+  () => (!analyticsStore.bundleLoaded || isChartRendering.value) && !hasChartsRendered.value,
+)
 
 async function ensureReady() {
   if (!window.chartsHandler) return
@@ -320,8 +325,9 @@ async function renderChart(chartId) {
   await window.chartsHandler.renderChartInstance(container)
 }
 
-async function renderCurrentCharts() {
-  isChartRendering.value = true
+async function renderCurrentCharts(options = {}) {
+  const showLoading = options.showLoading ?? !hasChartsRendered.value
+  if (showLoading) isChartRendering.value = true
   await ensureReady()
   if (isDaily.value) {
     
@@ -335,7 +341,8 @@ async function renderCurrentCharts() {
   if (props.insightData?.topCountries?.length > 0) {
     await renderChart('countries-map')
   }
-  isChartRendering.value = false
+  if (showLoading) isChartRendering.value = false
+  hasChartsRendered.value = true
 }
 
 async function setSalesView(v) { activeSalesViewMode.value = v; await nextTick(); if (!isDaily.value) await renderChart(`sales-${activePeriod.value}-${v}`) }
@@ -347,9 +354,16 @@ async function handlePeriodChange(val) {
   await renderCurrentCharts()
 }
 
-watch(() => props.modelValue, async (isOpen) => { if (isOpen) { await nextTick(); await renderCurrentCharts() } })
-watch(() => props.insightData, async () => { if (props.modelValue) { await nextTick(); await renderCurrentCharts() } }, { deep: true })
-onMounted(async () => { if (props.modelValue) { await nextTick(); await renderCurrentCharts() } })
+watch(() => props.modelValue, async (isOpen) => {
+  if (isOpen) {
+    await nextTick()
+    await renderCurrentCharts({ showLoading: true })
+    return
+  }
+  hasChartsRendered.value = false
+  isChartRendering.value = false
+})
+onMounted(async () => { if (props.modelValue) { await nextTick(); await renderCurrentCharts({ showLoading: true }) } })
 
 const earningsTopCountriesColumns = [
   { key: 'media', label: 'Media', grow: true, align: 'left' },
