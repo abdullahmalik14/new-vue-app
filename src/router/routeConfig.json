@@ -520,26 +520,6 @@
     ]
   },
   {
-    "slug": "/demo/audit/checkbox-group",
-    "envAccess": "development",
-    "section": "demo",
-    "componentPath": "@/dev/templates/demo/demo-audit/CheckboxGroupDemo.vue",
-    "requiresAuth": false,
-    "supportedRoles": [
-      "all"
-    ]
-  },
-  {
-    "slug": "/demo/audit/checkbox-switch",
-    "envAccess": "development",
-    "section": "demo",
-    "componentPath": "@/dev/templates/demo/demo-audit/CheckboxSwitchDemo.vue",
-    "requiresAuth": false,
-    "supportedRoles": [
-      "all"
-    ]
-  },
-  {
     "slug": "/settings",
     "section": "misc",
     "componentPath": "@/dev/templates/settings/SettingsPage.vue",

@@ -853,6 +853,24 @@
                 </div>
             </section>
 
+            <!-- ===== SECTION: CheckboxGroup ===== -->
+            <CheckboxGroupDemo />
+
+            <!-- ===== SECTION: CheckboxSwitch ===== -->
+            <CheckboxSwitchDemo />
+
+            <!-- ===== SECTION: ActionMenuDropdown ===== -->
+            <ActionMenuDropdownDemo />
+
+            <!-- ===== SECTION: UploadingProgressBar ===== -->
+            <UploadingProgressBarDemo />
+
+            <!-- ===== SECTION: DashProfileSettings ===== -->
+            <DashProfileSettings />
+
+            <!-- ===== SECTION: PremiumOrdersTable ===== -->
+            <OrdersPremiumTable />
+
             <!-- ===== SECTION: SubscriptionCard ===== -->
             <!-- Temporarily removed as SubscriptionCard is missing
             <section class="flex flex-col gap-12">
@@ -1244,6 +1262,12 @@ import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vu
 import QuillEditor from '@/components/forms/inputs/QuillEditor.vue';
 // import SubscriptionCard from '@/templates/profile/views/SubscriptionCard.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
+import CheckboxGroupDemo from '@/dev/templates/demo/demo-audit/CheckboxGroupDemo.vue';
+import CheckboxSwitchDemo from '@/dev/templates/demo/demo-audit/CheckboxSwitchDemo.vue';
+import OrdersPremiumTable from '@/dev/components/ui/table/dashboard/OrdersPremiumTable.vue';
+import DashProfileSettings from '@/dev/components/ui/nav/dashboard/DashProfileSettings.vue';
+import UploadingProgressBarDemo from '@/dev/templates/demo/demo-audit/UploadingProgressBarDemo.vue';
+import ActionMenuDropdownDemo from '@/dev/templates/demo/demo-audit/ActionMenuDropdownDemo.vue';
 import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import TwoPieceButton from '@/components/ui/buttons/TwoPieceButton.vue';
 // Heroicons
@@ -1290,8 +1314,6 @@ const { url: tierButtonGreenUrl } = useAssetUrl('tier.demo.buttonBgGreen');
 import TierCard from '@/components/ui/card/dashboard/TierCard.vue';
 import EventCard from '@/components/ui/card/dashboard/EventCard.vue';
 import Cart from '@/components/ui/cart/Cart.vue';
-
-
 // ─────────────────────────────────────────────
 // Inline ShowCode toggle component (no external file needed)
 // ─────────────────────────────────────────────
@@ -2008,78 +2030,3 @@ const buttonText = ref("Auth Button");
 const demoTabsModel = ref('Daily');
 
 </script>
-
-<style>
-/* Premium Light Theme Showcase Styles */
-.dynamic-premium-bg-light {
-    background-color: #f8fafc;
-    background-image:
-        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0, transparent 40%),
-        radial-gradient(at 100% 0%, rgba(244, 63, 94, 0.06) 0, transparent 40%),
-        radial-gradient(at 50% 100%, rgba(20, 184, 166, 0.05) 0, transparent 50%);
-    background-attachment: fixed;
-    position: relative;
-    overflow-x: hidden;
-}
-
-.dynamic-premium-bg-light::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    opacity: 0.15;
-    pointer-events: none;
-    background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
-}
-
-/* Ensure content stays above background effects */
-.dynamic-premium-bg-light>* {
-    position: relative;
-    z-index: 1;
-}
-
-/* Section entrance animations */
-section {
-    animation: slideUpFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes slideUpFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Scrollbar Refinement */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 20px;
-    border: 2px solid #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* Glassmorphic containers for sections if needed */
-.glass-container {
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 24px;
-    padding: 2rem;
-}
-</style>

@@ -197,7 +197,122 @@
     "validationEventTitleRequired": "Tiêu đề sự kiện là bắt buộc.",
     "validationBasePriceMin": "Giá cơ bản phải từ 0 trở lên.",
     "maximumSessionAllowed": "Thời lượng phiên tối đa",
-    "sessions": "phiên"
+    "sessions": "phiên",
+    "moreOptions": {
+      "title": "Menu tùy chọn",
+      "moreTime": "Yêu cầu thêm thời gian",
+      "reschedule": "Yêu cầu đổi lịch",
+      "cancelCall": "Hủy cuộc gọi",
+      "icons": {
+        "clock": "Đồng hồ cộng",
+        "calendar": "Lịch",
+        "cancel": "Hủy cuộc gọi"
+      }
+    },
+    "adjustment": {
+      "titles": {
+        "moreTime": "Yêu cầu thêm thời gian",
+        "reschedule": "Yêu cầu đổi lịch",
+        "cancel": "Hủy cuộc gọi"
+      },
+      "eventDate": "Ngày sự kiện",
+      "newEventDate": "Ngày sự kiện mới",
+      "originalEventDate": "Ngày sự kiện gốc: {date}",
+      "newStartTime": "Giờ bắt đầu mới",
+      "originalStartTime": "Giờ bắt đầu gốc: {time}",
+      "sendRequest": "Gửi yêu cầu tới",
+      "cancel": {
+        "description": "Bạn có chắc muốn hủy sự kiện này? Phí đặt lịch vẫn sẽ bị trừ khỏi ví của bạn.",
+        "back": "Quay lại",
+        "confirm": "Hủy cuộc gọi"
+      },
+      "icons": {
+        "header": "Biểu tượng hành động",
+        "close": "Đóng",
+        "calendar": "Lịch",
+        "chevron": "Mở rộng",
+        "send": "Gửi"
+      }
+    }
+  },
+  "avatarMenu": {
+    "edit": "chỉnh sửa",
+    "uploadNew": "tải lên mới",
+    "chooseFromAvatars": "chọn từ avatar",
+    "icons": {
+      "edit": "chỉnh sửa",
+      "upload": "tải lên",
+      "avatars": "avatar"
+    }
+  },
+  "uploadProgress": {
+    "uploading": "Đang tải lên...",
+    "complete": "Hoàn tất"
+  },
+  "profileSettings": {
+    "editProfile": "Chỉnh sửa hồ sơ",
+    "badges": {
+      "comingSoon": "(Sắp ra mắt)"
+    },
+    "icons": {
+      "avatar": "Ảnh đại diện",
+      "edit": "Chỉnh sửa hồ sơ",
+      "menuItem": "Biểu tượng mục menu"
+    },
+    "creator": {
+      "categories": {
+        "general": "CHUNG",
+        "callLive": "CÀI ĐẶT CUỘC GỌI & LIVE STREAM",
+        "transaction": "GIAO DỊCH",
+        "social": "MẠNG XÃ HỘI VÀ CHIA SẺ"
+      },
+      "items": {
+        "accountInformation": "Thông tin tài khoản",
+        "changePassword": "Đổi mật khẩu",
+        "privacySecurity": "Quyền riêng tư & Bảo mật",
+        "liveStreamSettings": "Cài đặt Live Stream",
+        "callSettings": "Cài đặt cuộc gọi",
+        "shippingAddress": "Địa chỉ giao hàng",
+        "payoutDetails": "Chi tiết thanh toán",
+        "newsletterEmailSettings": "Cài đặt bản tin & Email",
+        "xRepostAutomation": "Tự động đăng lại X"
+      }
+    },
+    "vendor": {
+      "categories": {
+        "storeSettings": "CÀI ĐẶT CỬA HÀNG",
+        "ordersFinance": "ĐƠN HÀNG & TÀI CHÍNH"
+      },
+      "items": {
+        "shopProfile": "Hồ sơ cửa hàng",
+        "inventoryManagement": "Quản lý kho",
+        "orderHistory": "Lịch sử đơn hàng",
+        "payoutSettings": "Cài đặt thanh toán"
+      }
+    },
+    "fan": {
+      "categories": {
+        "myAccount": "TÀI KHOẢN CỦA TÔI",
+        "billing": "THANH TOÁN"
+      },
+      "items": {
+        "profileSettings": "Cài đặt hồ sơ",
+        "mySubscriptions": "Đăng ký của tôi",
+        "paymentMethods": "Phương thức thanh toán",
+        "purchaseHistory": "Lịch sử mua hàng"
+      }
+    },
+    "agent": {
+      "categories": {
+        "agencyControls": "ĐIỀU KHIỂN AGENCY",
+        "finance": "TÀI CHÍNH"
+      },
+      "items": {
+        "agencyDashboard": "Bảng điều khiển Agency",
+        "manageCreators": "Quản lý Creator",
+        "commissionReports": "Báo cáo hoa hồng"
+      }
+    }
   },
   "mediaCard": {
     "published": "Đã xuất bản",
@@ -448,6 +563,165 @@
       "initialContent": {
         "simple": "<p><strong>Hello World!</strong> This is pre-loaded content.</p>",
         "rich": "<p><strong>Welcome!</strong> Edit this <em>tier description</em> with the toolbar.</p><ul><li>Bold, italic, and links</li><li>Ordered and bullet lists</li></ul><p><a href=\"#\">Example link</a></p>"
+      }
+    },
+    "checkboxGroup": {
+      "sectionTitle": "CheckboxGroup",
+      "value": "Giá trị: {value}",
+      "optionsSummary": "A: {a} | B: {b} | C: {c}",
+      "cards": {
+        "default": "Mặc định",
+        "checked": "Đã chọn",
+        "disabled": "Vô hiệu",
+        "metaText": "Có meta text",
+        "withTags": "Có thẻ",
+        "customStyles": "Style tùy chỉnh",
+        "withMidImg": "Có ảnh giữa",
+        "multiple": "Nhiều checkbox",
+        "rowLayout": "Bố cục hàng",
+        "twoTags": "Nhiều thẻ",
+        "expandable": "Logic UI có điều kiện"
+      },
+      "fields": {
+        "subscribeNewsletter": "Đăng ký bản tin",
+        "agreeTerms": "Tôi đồng ý với điều khoản",
+        "disabledOption": "Tùy chọn vô hiệu",
+        "premiumFeature": "Tính năng premium",
+        "proOnly": "Chỉ Pro",
+        "newFeature": "Tính năng mới",
+        "rememberMe": "Ghi nhớ đăng nhập",
+        "visa": "Visa",
+        "optionA": "Tùy chọn A",
+        "optionB": "Tùy chọn B",
+        "optionC": "Tùy chọn C",
+        "enableNotifications": "Bật thông báo",
+        "betaFeature": "Tính năng beta",
+        "referralCode": "Tôi có mã giới thiệu",
+        "referralInputLabel": "Nhập mã giới thiệu",
+        "referralPlaceholder": "vd. FRIEND50"
+      },
+      "tags": {
+        "new": "NEW",
+        "beta": "BETA",
+        "free": "FREE"
+      }
+    },
+    "checkboxSwitch": {
+      "sectionTitle": "CheckboxSwitch",
+      "active": "Đang bật: {value}",
+      "alertsSummary": "Email: {email} | SMS: {sms} | Push: {push}",
+      "cards": {
+        "defaultOff": "Mặc định (Tắt)",
+        "defaultOn": "Mặc định (Bật)",
+        "wrapperLabel": "Có nhãn bọc",
+        "customTrackGreen": "Track tùy chỉnh (Xanh lá)",
+        "customTrackBlue": "Track tùy chỉnh (Xanh dương)",
+        "customTrackRed": "Track tùy chỉnh (Đỏ)",
+        "largeSwitch": "Công tắc lớn",
+        "customLabelStyle": "Style nhãn tùy chỉnh",
+        "multiple": "Nhiều công tắc",
+        "boldLabel": "Nhãn đậm",
+        "expandable": "Logic mở rộng có điều kiện"
+      },
+      "fields": {
+        "darkMode": "Chế độ tối",
+        "notifications": "Thông báo",
+        "enableFeature": "Bật tính năng",
+        "featureSettings": "Cài đặt tính năng",
+        "active": "Đang hoạt động",
+        "sync": "Đồng bộ",
+        "alertMode": "Chế độ cảnh báo",
+        "largeToggle": "Công tắc lớn",
+        "premiumFeature": "Tính năng premium",
+        "emailAlerts": "Cảnh báo email",
+        "smsAlerts": "Cảnh báo SMS",
+        "pushAlerts": "Cảnh báo push",
+        "autoRenew": "Tự gia hạn đăng ký",
+        "showAdvanced": "Hiện cài đặt nâng cao",
+        "advancedTitle": "Tùy chọn nâng cao",
+        "advancedDescription": "Panel này chỉ mở rộng khi công tắc phía trên được bật, mô phỏng logic UI có điều kiện."
+      }
+    },
+    "actionMenuDropdown": {
+      "sectionTitle": "ActionMenuDropdown",
+      "cards": {
+        "actionMenu": "ActionMenuDropdown",
+        "avatarMenu": "AvatarMenu"
+      }
+    },
+    "bookingAdjustment": {
+      "sectionTitle": "BookingAdjustmentPopup",
+      "cards": {
+        "moreTime": "Yêu cầu thêm thời gian",
+        "reschedule": "Yêu cầu đổi lịch",
+        "cancel": "Hủy cuộc gọi"
+      },
+      "sample": {
+        "eventDate": "24 tháng 4, 2025",
+        "eventDateReschedule": "Thứ Ba, 24 tháng 8, 2025",
+        "originalDate": "24 tháng 4, 2025",
+        "newTime": "9:30pm",
+        "endTime": "10:30pm",
+        "originalTime": "9:15pm",
+        "userName": "jennyhunny"
+      }
+    },
+    "premiumOrders": {
+      "sectionTitle": "PremiumOrdersTable",
+      "title": "Đơn hàng",
+      "searchPlaceholder": "Tìm kiếm...",
+      "searchAlt": "Tìm kiếm",
+      "dropdownAlt": "Dropdown",
+      "orderTypeLabel": "Loại đơn hàng",
+      "empty": "Không tìm thấy đơn hàng",
+      "tabs": {
+        "inProgress": "Đang xử lý",
+        "completed": "Hoàn thành",
+        "canceled": "Đã hủy",
+        "all": "Tất cả"
+      },
+      "orderTypes": {
+        "all": "Tất cả loại",
+        "p2v": "P2V",
+        "subscription": "Đăng ký",
+        "merch": "Merch",
+        "mix": "Mix"
+      },
+      "columns": {
+        "orderNum": "Mã đơn",
+        "from": "Từ",
+        "status": "Trạng thái",
+        "date": "Ngày",
+        "total": "Tổng"
+      },
+      "links": {
+        "eventDetail": "Chi tiết sự kiện",
+        "bookingDetail": "Chi tiết đặt lịch"
+      }
+    },
+    "uploadingProgressBar": {
+      "sectionTitle": "UploadingProgressBar",
+      "cards": {
+        "start": "0%",
+        "quarter": "25%",
+        "half": "50%",
+        "threeQuarter": "75%",
+        "complete": "100%",
+        "animated": "Hoạt ảnh"
+      }
+    },
+    "dashProfileSettings": {
+      "sectionTitle": "DashProfileSettings",
+      "cards": {
+        "creator": "Creator",
+        "vendor": "Vendor",
+        "fan": "Fan",
+        "agent": "Agent"
+      },
+      "sample": {
+        "displayName": "lindenMay",
+        "handle": "@linden",
+        "email": "developer@contactlinden.com"
       }
     }
   }

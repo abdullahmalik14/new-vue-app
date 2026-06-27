@@ -239,7 +239,122 @@
     "validationEventTitleRequired": "Event title is required.",
     "validationBasePriceMin": "Base price must be 0 or higher.",
     "maximumSessionAllowed": "Maximum Session Allowed",
-    "sessions": "sessions"
+    "sessions": "sessions",
+    "moreOptions": {
+      "title": "Options Dropdown",
+      "moreTime": "Ask for more time",
+      "reschedule": "Ask to reschedule",
+      "cancelCall": "Cancel Call",
+      "icons": {
+        "clock": "Clock plus",
+        "calendar": "Calendar",
+        "cancel": "Cancel call"
+      }
+    },
+    "adjustment": {
+      "titles": {
+        "moreTime": "Ask for more time",
+        "reschedule": "Ask to reschedule",
+        "cancel": "Cancel Call"
+      },
+      "eventDate": "Event date",
+      "newEventDate": "New event date",
+      "originalEventDate": "Original event date: {date}",
+      "newStartTime": "New start time",
+      "originalStartTime": "Original start time: {time}",
+      "sendRequest": "Send request to",
+      "cancel": {
+        "description": "Are you sure you want to cancel this event? Booking Fee will still be deducted from your wallet.",
+        "back": "Back",
+        "confirm": "Cancel Call"
+      },
+      "icons": {
+        "header": "Action icon",
+        "close": "Close",
+        "calendar": "Calendar",
+        "chevron": "Expand",
+        "send": "Send"
+      }
+    }
+  },
+  "avatarMenu": {
+    "edit": "edit",
+    "uploadNew": "upload new",
+    "chooseFromAvatars": "choose from avatars",
+    "icons": {
+      "edit": "edit",
+      "upload": "upload",
+      "avatars": "avatar"
+    }
+  },
+  "uploadProgress": {
+    "uploading": "Uploading...",
+    "complete": "Complete"
+  },
+  "profileSettings": {
+    "editProfile": "Edit Profile",
+    "badges": {
+      "comingSoon": "(Coming Soon)"
+    },
+    "icons": {
+      "avatar": "Profile avatar",
+      "edit": "Edit profile",
+      "menuItem": "Menu item icon"
+    },
+    "creator": {
+      "categories": {
+        "general": "GENERAL",
+        "callLive": "CALL & LIVE STREAM SETTINGS",
+        "transaction": "TRANSACTION",
+        "social": "SOCIAL MEDIA AND SHARING"
+      },
+      "items": {
+        "accountInformation": "Account Information",
+        "changePassword": "Change Password",
+        "privacySecurity": "Privacy & Security",
+        "liveStreamSettings": "Live Stream Settings",
+        "callSettings": "Call Settings",
+        "shippingAddress": "Shipping Address",
+        "payoutDetails": "Payout Details",
+        "newsletterEmailSettings": "Newsletter & Email Settings",
+        "xRepostAutomation": "X Repost Automation"
+      }
+    },
+    "vendor": {
+      "categories": {
+        "storeSettings": "STORE SETTINGS",
+        "ordersFinance": "ORDERS & FINANCE"
+      },
+      "items": {
+        "shopProfile": "Shop Profile",
+        "inventoryManagement": "Inventory Management",
+        "orderHistory": "Order History",
+        "payoutSettings": "Payout Settings"
+      }
+    },
+    "fan": {
+      "categories": {
+        "myAccount": "MY ACCOUNT",
+        "billing": "BILLING"
+      },
+      "items": {
+        "profileSettings": "Profile Settings",
+        "mySubscriptions": "My Subscriptions",
+        "paymentMethods": "Payment Methods",
+        "purchaseHistory": "Purchase History"
+      }
+    },
+    "agent": {
+      "categories": {
+        "agencyControls": "AGENCY CONTROLS",
+        "finance": "FINANCE"
+      },
+      "items": {
+        "agencyDashboard": "Agency Dashboard",
+        "manageCreators": "Manage Creators",
+        "commissionReports": "Commission Reports"
+      }
+    }
   },
   "mediaCard": {
     "published": "Published",
@@ -490,6 +605,165 @@
       "initialContent": {
         "simple": "<p><strong>Hello World!</strong> This is pre-loaded content.</p>",
         "rich": "<p><strong>Welcome!</strong> Edit this <em>tier description</em> with the toolbar.</p><ul><li>Bold, italic, and links</li><li>Ordered and bullet lists</li></ul><p><a href=\"#\">Example link</a></p>"
+      }
+    },
+    "checkboxGroup": {
+      "sectionTitle": "CheckboxGroup",
+      "value": "Value: {value}",
+      "optionsSummary": "A: {a} | B: {b} | C: {c}",
+      "cards": {
+        "default": "Default",
+        "checked": "Checked",
+        "disabled": "Disabled",
+        "metaText": "With Meta Text",
+        "withTags": "With Tags",
+        "customStyles": "Custom Styles",
+        "withMidImg": "With Mid Image",
+        "multiple": "Multiple Checkboxes",
+        "rowLayout": "Row Layout",
+        "twoTags": "Multiple Tags",
+        "expandable": "Conditional UI Logic"
+      },
+      "fields": {
+        "subscribeNewsletter": "Subscribe to newsletter",
+        "agreeTerms": "I agree to terms",
+        "disabledOption": "Disabled option",
+        "premiumFeature": "Premium feature",
+        "proOnly": "Pro only",
+        "newFeature": "New feature",
+        "rememberMe": "Remember me",
+        "visa": "Visa",
+        "optionA": "Option A",
+        "optionB": "Option B",
+        "optionC": "Option C",
+        "enableNotifications": "Enable notifications",
+        "betaFeature": "Beta feature",
+        "referralCode": "I have a referral code",
+        "referralInputLabel": "Enter Referral Code",
+        "referralPlaceholder": "e.g. FRIEND50"
+      },
+      "tags": {
+        "new": "NEW",
+        "beta": "BETA",
+        "free": "FREE"
+      }
+    },
+    "checkboxSwitch": {
+      "sectionTitle": "CheckboxSwitch",
+      "active": "Active: {value}",
+      "alertsSummary": "Email: {email} | SMS: {sms} | Push: {push}",
+      "cards": {
+        "defaultOff": "Default (Off)",
+        "defaultOn": "Default (On)",
+        "wrapperLabel": "With Wrapper Label",
+        "customTrackGreen": "Custom Track (Green)",
+        "customTrackBlue": "Custom Track (Blue)",
+        "customTrackRed": "Custom Track (Red)",
+        "largeSwitch": "Large Switch",
+        "customLabelStyle": "Custom Label Style",
+        "multiple": "Multiple Switches",
+        "boldLabel": "Bold Label",
+        "expandable": "Expandable Section Logic"
+      },
+      "fields": {
+        "darkMode": "Dark mode",
+        "notifications": "Notifications",
+        "enableFeature": "Enable feature",
+        "featureSettings": "Feature Settings",
+        "active": "Active",
+        "sync": "Sync",
+        "alertMode": "Alert mode",
+        "largeToggle": "Large toggle",
+        "premiumFeature": "Premium feature",
+        "emailAlerts": "Email alerts",
+        "smsAlerts": "SMS alerts",
+        "pushAlerts": "Push alerts",
+        "autoRenew": "Auto-renew subscription",
+        "showAdvanced": "Show advanced settings",
+        "advancedTitle": "Advanced Options",
+        "advancedDescription": "This panel dynamically expands only when the switch above is toggled ON, simulating conditional UI logic."
+      }
+    },
+    "actionMenuDropdown": {
+      "sectionTitle": "ActionMenuDropdown",
+      "cards": {
+        "actionMenu": "ActionMenuDropdown",
+        "avatarMenu": "AvatarMenu"
+      }
+    },
+    "bookingAdjustment": {
+      "sectionTitle": "BookingAdjustmentPopup",
+      "cards": {
+        "moreTime": "Ask for more time",
+        "reschedule": "Ask to reschedule",
+        "cancel": "Cancel Call"
+      },
+      "sample": {
+        "eventDate": "April 24, 2025",
+        "eventDateReschedule": "Tue, August 24, 2025",
+        "originalDate": "April 24, 2025",
+        "newTime": "9:30pm",
+        "endTime": "10:30pm",
+        "originalTime": "9:15pm",
+        "userName": "jennyhunny"
+      }
+    },
+    "premiumOrders": {
+      "sectionTitle": "PremiumOrdersTable",
+      "title": "Orders",
+      "searchPlaceholder": "Search...",
+      "searchAlt": "Search",
+      "dropdownAlt": "Dropdown",
+      "orderTypeLabel": "Order Type",
+      "empty": "No orders found",
+      "tabs": {
+        "inProgress": "In Progress",
+        "completed": "Completed",
+        "canceled": "Canceled",
+        "all": "All"
+      },
+      "orderTypes": {
+        "all": "All Types",
+        "p2v": "P2V",
+        "subscription": "Subscription",
+        "merch": "Merch",
+        "mix": "Mix"
+      },
+      "columns": {
+        "orderNum": "Order#",
+        "from": "From",
+        "status": "Status",
+        "date": "Date",
+        "total": "Total"
+      },
+      "links": {
+        "eventDetail": "Event detail",
+        "bookingDetail": "Booking detail"
+      }
+    },
+    "uploadingProgressBar": {
+      "sectionTitle": "UploadingProgressBar",
+      "cards": {
+        "start": "0%",
+        "quarter": "25%",
+        "half": "50%",
+        "threeQuarter": "75%",
+        "complete": "100%",
+        "animated": "Animated"
+      }
+    },
+    "dashProfileSettings": {
+      "sectionTitle": "DashProfileSettings",
+      "cards": {
+        "creator": "Creator",
+        "vendor": "Vendor",
+        "fan": "Fan",
+        "agent": "Agent"
+      },
+      "sample": {
+        "displayName": "lindenMay",
+        "handle": "@linden",
+        "email": "developer@contactlinden.com"
       }
     }
   }
