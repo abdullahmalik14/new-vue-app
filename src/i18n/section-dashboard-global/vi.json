@@ -357,7 +357,7 @@
       "usernamePlaceholder": "carrot_popxoxo123",
       "usernameDescription": "Tên người dùng không thể thay đổi sau tháng đầu tiên trên trang web của chúng tôi, nhưng có thể có ngoại lệ trong trường hợp đặc biệt.",
       "email": "Email",
-      "emailPlaceholder": "mscarrot_pops@gmail.com",
+      "emailPlaceholder": "mscarrot_pops{'@'}gmail.com",
       "firstName": "Tên",
       "noLabelPlaceholder": "Nhập không có nhãn...",
       "title": "Tiêu đề",
@@ -412,8 +412,8 @@
     },
     "buttons": {
       "showLoadingState": "Hiển thị trạng thái loading trên tất cả nút catalog (văn bản thay bằng spinner)",
-      "loadingSection": "Trạng thái loading — prop :loading (văn bản thay bằng spinner)",
-      "clickToLoadHint": "Nhấn bất kỳ nút nào để xem :loading — văn bản và icon được thay bằng spinner (không có chữ \"Loading...\")."
+      "loadingSection": "Trạng thái loading — prop loading (văn bản thay bằng spinner)",
+      "clickToLoadHint": "Nhấn bất kỳ nút nào để xem loading — văn bản và icon được thay bằng spinner (không có chữ \"Loading...\")."
     },
     "spinner": {
       "assetMapImage": "Ảnh asset map (icon.spinner)",

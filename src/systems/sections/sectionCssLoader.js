@@ -8,7 +8,7 @@
 
 import { log } from "../../infrastructure/logging/logHandler.js";
 import { logError } from "../../infrastructure/errors/errorHandler.js";
-import { getSectionBundlePaths } from "../build/manifestLoader.js";
+import { getSectionBundlePaths, clearManifestCache } from "../build/manifestLoader.js";
 import {
   isTrustedBundlePath,
   escapeSelectorAttributeValue,
@@ -152,7 +152,7 @@ async function getSectionCssPath(sectionName) {
  * @param {string} sectionName - Section name
  * @returns {Promise<HTMLLinkElement>} Link element
  */
-async function injectCssLink(cssPath, sectionName, integrity = null) {
+async function injectCssLink(cssPath, sectionName, integrity = null, allowManifestRecovery = true) {
   log("sectionCssLoader.js", "injectCssLink", "start", "Injecting CSS link", {
     cssPath,
     sectionName,
@@ -210,12 +210,43 @@ async function injectCssLink(cssPath, sectionName, integrity = null) {
     };
 
     // Handle load error
-    linkElement.onerror = (error) => {
+    linkElement.onerror = async () => {
+      if (linkElement.parentNode) {
+        linkElement.parentNode.removeChild(linkElement);
+      }
+
+      if (allowManifestRecovery && integrity) {
+        log(
+          "sectionCssLoader.js",
+          "injectCssLink",
+          "retry",
+          "CSS integrity/load failed — refreshing manifest and retrying",
+          { cssPath, sectionName },
+        );
+        clearManifestCache();
+        try {
+          const freshBundle = await getSectionCssBundle(sectionName);
+          if (freshBundle?.cssPath) {
+            resolve(
+              await injectCssLink(
+                freshBundle.cssPath,
+                sectionName,
+                freshBundle.integrity,
+                false,
+              ),
+            );
+            return;
+          }
+        } catch {
+          // fall through to hard error below
+        }
+      }
+
       logError(
         "sectionCssLoader.js",
         "injectCssLink",
         "CSS load failed",
-        error,
+        new Error(`Failed to load CSS for section: ${sectionName}`),
         {
           cssPath,
           sectionName,

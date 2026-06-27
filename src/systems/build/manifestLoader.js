@@ -127,11 +127,15 @@ function readManifestFromSession() {
     }
 
     const parsed = JSON.parse(raw);
-    if (parsed.buildHash !== getManifestBuildHash()) {
-      return null;
-    }
+    const currentBuildHash = getManifestBuildHash();
 
-    if (!parsed.manifest || typeof parsed.manifest !== "object") {
+    if (
+      !parsed.buildHash ||
+      !currentBuildHash ||
+      parsed.buildHash !== currentBuildHash ||
+      !parsed.manifest ||
+      typeof parsed.manifest !== "object"
+    ) {
       return null;
     }
 
@@ -146,11 +150,16 @@ function persistManifestToSession(manifest) {
     return;
   }
 
+  const buildHash = getManifestBuildHash();
+  if (!buildHash) {
+    return;
+  }
+
   try {
     sessionStorage.setItem(
       MANIFEST_SESSION_KEY,
       JSON.stringify({
-        buildHash: getManifestBuildHash(),
+        buildHash,
         manifest,
       }),
     );

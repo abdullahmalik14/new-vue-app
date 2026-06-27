@@ -399,7 +399,7 @@
       "usernamePlaceholder": "carrot_popxoxo123",
       "usernameDescription": "Usernames cannot be changed after your first month on our website, but special circumstances may allow for exceptions.",
       "email": "Email",
-      "emailPlaceholder": "mscarrot_pops@gmail.com",
+      "emailPlaceholder": "mscarrot_pops{'@'}gmail.com",
       "firstName": "First Name",
       "noLabelPlaceholder": "Type without a label...",
       "title": "Title",
@@ -454,8 +454,8 @@
     },
     "buttons": {
       "showLoadingState": "Show loading state on all catalog buttons (text replaced by spinner)",
-      "loadingSection": "Loading state — :loading prop (text replaced by spinner)",
-      "clickToLoadHint": "Click any button to preview :loading — text and icons are replaced by spinner only (no \"Loading...\" text)."
+      "loadingSection": "Loading state — loading prop (text replaced by spinner)",
+      "clickToLoadHint": "Click any button to preview loading — text and icons are replaced by spinner only (no \"Loading...\" text)."
     },
     "spinner": {
       "assetMapImage": "Asset map image (icon.spinner)",

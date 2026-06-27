@@ -33,6 +33,11 @@ const sectionCssBuilder = createSectionCssBuilderPlugin();
 export default defineConfig(({ mode }) => {
   console.log(`[Vite] Building in ${mode} mode`);
 
+  const appBuildHash =
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.VITE_BUILD_HASH ||
+    (mode === 'production' ? `build-${Date.now()}` : 'dev');
+
   return {
     // Plugins
     plugins: [
@@ -50,7 +55,10 @@ export default defineConfig(({ mode }) => {
       __VUE_OPTIONS_API__: true,
       __VUE_PROD_DEVTOOLS__: false,
       __ASSET_MAP_SHA256__: JSON.stringify(assetMapSha256),
-      'import.meta.env.VITE_ASSET_MAP_SHA256': JSON.stringify(assetMapSha256)
+      'import.meta.env.VITE_ASSET_MAP_SHA256': JSON.stringify(assetMapSha256),
+      'import.meta.env.VITE_BUILD_HASH': JSON.stringify(
+        mode === 'production' ? appBuildHash : (process.env.VITE_BUILD_HASH || '')
+      ),
     },
 
     // Path resolution
