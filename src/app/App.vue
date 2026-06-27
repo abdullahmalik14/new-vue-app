@@ -2,7 +2,7 @@
   <div id="app" class="min-h-screen bg-gray-50 flex flex-col">
     <NavigationProgressBar />
     <TemporaryLocaleBanner />
-    <div class="fixed top-2 right-2 z-[90] flex flex-col items-end gap-2">
+    <div v-if="!hideChromeForEmbed" class="fixed top-2 right-2 z-[90] flex flex-col items-end gap-2">
       <!-- <LanguageSwitcher @locale-changed="onLocaleChanged" @locale-change-error="onLocaleChangeError" /> -->
       <TranslatePageControl />
     </div>
@@ -90,9 +90,13 @@ function onLocaleChangeError(payload) {
   console.warn('[App] locale-change-error', payload);
 }
 
+const hideChromeForEmbed = computed(
+  () => Boolean(route.meta?.routeConfig?.hideLayout || route.meta?.hideLayout),
+);
+
 const shouldShowLayout = computed(() => {
   // Check meta config first
-  if (route.meta?.routeConfig?.hideLayout) return false;
+  if (hideChromeForEmbed.value) return false;
 
   // Fallback: Check specific routes by name/path if meta isn't ready
   if (route.name === '/callback' || route.path?.includes('/callback')) return false;

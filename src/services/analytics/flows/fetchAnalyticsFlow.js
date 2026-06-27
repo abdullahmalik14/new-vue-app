@@ -13,7 +13,11 @@ export async function fetchAnalyticsFlow({ payload, context }) {
   let creatorId = "456";
   if (typeof window !== "undefined") {
     const urlParams = new URLSearchParams(window.location.search);
-    creatorId = urlParams.get("creator_id") || urlParams.get("creatorId") || "456";
+    creatorId =
+      urlParams.get("creator") ||
+      urlParams.get("creator_id") ||
+      urlParams.get("creatorId") ||
+      "456";
   }
   const bundleFile = `/api/charts/${creatorId}?nocache=1`;
 
