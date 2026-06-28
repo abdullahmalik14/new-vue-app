@@ -39,7 +39,11 @@
             v-if="loading"
             class="[grid-area:stack] relative z-20 inline-flex items-center justify-center pointer-events-none"
           >
-            <LoadingSpinner size="sm" :color="loadingSpinnerColor" :showTrack="false" />
+            <LoadingSpinner v-bind="loadingSpinnerBindings">
+              <template v-if="$slots.loadingSpinner" #spinner>
+                <slot name="loadingSpinner" />
+              </template>
+            </LoadingSpinner>
           </span>
         </div>
       </div>
@@ -61,7 +65,11 @@
           v-if="loading"
           class="[grid-area:stack] relative z-20 inline-flex items-center justify-center pointer-events-none"
         >
-          <LoadingSpinner size="sm" :color="loadingSpinnerColor" :showTrack="false" />
+          <LoadingSpinner v-bind="loadingSpinnerBindings">
+            <template v-if="$slots.loadingSpinner" #spinner>
+              <slot name="loadingSpinner" />
+            </template>
+          </LoadingSpinner>
         </span>
       </div>
     </template>
@@ -80,6 +88,12 @@ const props = withDefaults(
     disabled?: boolean;
     loading?: boolean;
     loadingSpinnerColor?: string;
+    loadingSpinnerSrc?: string;
+    loadingSpinnerSize?: string;
+    loadingSpinnerShowTrack?: boolean;
+    loadingSpinnerThickness?: string | number;
+    loadingSpinnerImgFilter?: string;
+    loadingSpinnerCustomClass?: string;
     text?: string;
     skewPosition?: "left" | "right";
     variant?: "two-piece" | "skew-right" | "link-x" | "premium-upgrade";
@@ -97,6 +111,12 @@ const props = withDefaults(
     disabled: false,
     loading: false,
     loadingSpinnerColor: "text-current",
+    loadingSpinnerSrc: "",
+    loadingSpinnerSize: "sm",
+    loadingSpinnerShowTrack: false,
+    loadingSpinnerThickness: "4",
+    loadingSpinnerImgFilter: "",
+    loadingSpinnerCustomClass: "",
     text: "",
     skewPosition: "right",
     variant: "two-piece",
@@ -110,6 +130,16 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{ (e: "click", ev: MouseEvent): void }>();
+
+const loadingSpinnerBindings = computed(() => ({
+  size: props.loadingSpinnerSize,
+  color: props.loadingSpinnerColor,
+  showTrack: props.loadingSpinnerShowTrack,
+  thickness: props.loadingSpinnerThickness,
+  src: props.loadingSpinnerSrc,
+  imgFilter: props.loadingSpinnerImgFilter,
+  customClass: props.loadingSpinnerCustomClass,
+}));
 
 function onClick(ev: MouseEvent) {
   if (props.disabled || props.loading) return;

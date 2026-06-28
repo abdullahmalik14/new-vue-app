@@ -207,7 +207,7 @@ import CartCheckoutNotLoginPopup from "@/components/ui/popups/cart-checkout/Cart
 import SubscribeLoginPopup from "@/components/ui/popups/subscribe/SubscribeLoginPopup.vue";
 import SubscribeNotLoginPopup from "@/components/ui/popups/subscribe/SubscribeNotLoginPopup.vue";
 import SubscribeUpdateLoginPopup from "@/components/ui/popups/subscribe/SubscribeUpdateLoginPopup.vue";
-import DashProfileSettings from "@/components/ui/nav/dashboard/DashProfileSettings.vue";
+import DashProfileSettings from '@/dev/components/ui/nav/dashboard/DashProfileSettings.vue';
 import PurchaseTipFlowPopup from "@/components/ui/popups/purchase/PurchaseTipFlowPopup.vue";
 import PurchaseFlowSubscriptionOrderPopup from "@/components/ui/popups/purchase/PurchaseFlowSubscriptionOrderPopup.vue";
 import GuestPurchaseFlowPopup from "@/components/ui/popups/purchase/GuestPurchaseFlowPopup.vue";

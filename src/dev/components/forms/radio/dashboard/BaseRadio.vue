@@ -3,13 +3,13 @@
     <div v-bind="resolvedAttrs.wrapperAttrs.wrapper2">
       <input
         :id="id"
-        type="radio"
-        :name="name"
+        :type="multiple ? 'checkbox' : 'radio'"
+        :name="multiple ? undefined : name"
         :value="value"
-        :checked="modelValue === value"
+        :checked="isChecked"
         class="hidden peer"
         :class="resolvedAttrs.inputAttrs.class"
-        @change="$emit('update:modelValue', value)"
+        @change="onChange"
       />
       <label v-if="label" :for="id" :class="[resolvedAttrs.labelAttrs.class, radioLabelClass]">
         {{ label }}
@@ -23,13 +23,17 @@ import { resolveAllConfigs } from "@/utils/componentRenderingUtils";
 import { computed } from "vue";
 
 const props = defineProps({
-  modelValue: [String, Number],
+  modelValue: [String, Number, Array],
   value: [String, Number],
   name: String,
   label: String,
   id: String,
   radioLabelClass: String,
   version: String,
+  multiple: {
+    type: Boolean,
+    default: false,
+  },
   addId: String,
   removeId: Boolean,
   addClass: String,
@@ -39,7 +43,32 @@ const props = defineProps({
   wrapperOverrides: Array,
 });
 
-defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue"]);
+
+const isChecked = computed(() => {
+  if (props.multiple) {
+    return Array.isArray(props.modelValue) && props.modelValue.includes(props.value);
+  }
+  return props.modelValue === props.value;
+});
+
+function onChange(event) {
+  if (props.multiple) {
+    const current = Array.isArray(props.modelValue) ? [...props.modelValue] : [];
+    const index = current.indexOf(props.value);
+
+    if (event.target.checked) {
+      if (index === -1) current.push(props.value);
+    } else if (index >= 0) {
+      current.splice(index, 1);
+    }
+
+    emit("update:modelValue", current);
+    return;
+  }
+
+  emit("update:modelValue", props.value);
+}
 
 const inputConfig = {
   wrappers: [
@@ -47,7 +76,7 @@ const inputConfig = {
       targetAttribute: "wrapper1",
       addClass:
         props.version === "dashboard"
-          ? "flex flex-col gap-2"
+          ? "flex flex-col gap-2" // untouched
           : props.version === "auth"
             ? "flex flex-col gap-[0.375rem] flex-1 self-stretch"
             : "flex flex-col gap-1.5",
@@ -57,7 +86,7 @@ const inputConfig = {
       targetAttribute: "wrapper2",
       addClass:
         props.version === "dashboard"
-          ? "flex items-center gap-2"
+          ? "flex items-center gap-2" // removed relative
           : props.version === "auth"
             ? "flex flex-col gap-2"
             : "flex gap-2",
@@ -67,8 +96,8 @@ const inputConfig = {
   elm: {
     addClass: "hidden peer",
     addAttributes: {
-      type: "radio",
-      name: props.name,
+      type: "radio", // always radio
+      name: props.name, // ensure group works
     },
   },
   additionalConfig: {

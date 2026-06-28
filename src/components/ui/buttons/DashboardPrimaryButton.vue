@@ -23,10 +23,12 @@
             class="[grid-area:stack] relative z-20 inline-flex items-center justify-center pointer-events-none"
           >
             <LoadingSpinner
-              size="sm"
-              :color="loadingSpinnerColor"
-              :showTrack="false"
-            />
+              v-bind="loadingSpinnerBindings"
+            >
+              <template v-if="$slots.loadingSpinner" #spinner>
+                <slot name="loadingSpinner" />
+              </template>
+            </LoadingSpinner>
           </span>
         </span>
       </button>
@@ -68,6 +70,12 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
   loadingSpinnerColor: { type: String, default: "text-current" },
+  loadingSpinnerSrc: { type: String, default: "" },
+  loadingSpinnerSize: { type: String, default: "sm" },
+  loadingSpinnerShowTrack: { type: Boolean, default: false },
+  loadingSpinnerThickness: { type: [String, Number], default: "4" },
+  loadingSpinnerImgFilter: { type: String, default: "" },
+  loadingSpinnerCustomClass: { type: String, default: "" },
   type: { type: String, default: "button" },
 
   btnBg: { type: String, default: "#07f468" },
@@ -114,7 +122,7 @@ const themeClasses = {
   "skew-right":
     "group w-max pl-2 gap-2.5 pr-2.5 h-10 relative flex justify-center items-center appearance-button transition-opacity duration-100 ease-in-out normal-case overflow-visible outline-none border-none bg-[var(--btn-bg)] enabled:hover:bg-[var(--btn-hover-bg)] enabled:hover:after:bg-[var(--btn-hover-bg)] before:content-[''] before:block before:w-full before:h-full before:absolute before:top-0 before:right-0 before:z-[1] before:shadow-[4px_4px_0_0_#000] before:transition-all before:ease-in-out before:duration-0 after:content-[''] after:block after:w-4 after:h-full after:absolute after:top-0 after:-right-[0.43rem] after:z-[1] after:shadow-[4px_4px_0_0_#000] after:skew-x-[20deg] after:translate-x-0 after:transition-all after:ease-in-out after:duration-0 after:bg-[var(--btn-bg)]",
   polygonLeft:
-    "w-max group flex items-center justify-center gap-[0.625rem] py-1 pl-[1.4rem] pr-2 bg-[var(--btn-bg)] enabled:hover:bg-[var(--btn-hover-bg)] text-[var(--btn-text)] enabled:hover:text-[var(--btn-hover-text)] text-sm sm:text-lg  leading-7 font-medium uppercase transition-colors duration-200 relative cursor-pointer [clip-path:polygon(8%_0,100%_0,105%_105%,0_105%)]",
+    "w-max group flex items-center justify-center gap-[0.625rem] py-1 pl-[1.4rem] pr-2 bg-[var(--btn-bg)] enabled:hover:bg-[var(--btn-hover-bg)] text-[var(--btn-text)] enabled:hover:text-[var(--btn-hover-text)] text-sm sm:text-lg leading-7 font-medium uppercase transition-colors duration-200 relative enabled:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 [clip-path:polygon(8%_0,100%_0,105%_105%,0_105%)]",
   polygonRight:
     "w-max group flex items-center justify-center gap-[0.625rem] py-1 pr-[1.4rem] pl-2 bg-black enabled:hover:bg-[#07f468] text-[#fff] text-[1.125rem] leading-7 font-medium uppercase transition-colors duration-200 enabled:hover:text-black relative cursor-pointer [clip-path:polygon(0_0,92%_0,100%_105%,0_105%)]",
   bgGreen:
@@ -178,4 +186,14 @@ const buttonConfig = {
 const resolvedAttrs = computed(() =>
   resolveAllConfigs(buttonConfig, props.version, props)
 );
+
+const loadingSpinnerBindings = computed(() => ({
+  size: props.loadingSpinnerSize,
+  color: props.loadingSpinnerColor,
+  showTrack: props.loadingSpinnerShowTrack,
+  thickness: props.loadingSpinnerThickness,
+  src: props.loadingSpinnerSrc,
+  imgFilter: props.loadingSpinnerImgFilter,
+  customClass: props.loadingSpinnerCustomClass,
+}));
 </script>

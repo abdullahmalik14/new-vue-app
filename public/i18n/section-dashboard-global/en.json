@@ -301,6 +301,82 @@
       }
     }
   },
+  "calendar": {
+    "newMessage": {
+      "badge": "{count} NEW MESSAGES",
+      "icons": {
+        "message": "New messages",
+        "close": "Close"
+      }
+    },
+    "chat": {
+      "title": "Chat",
+      "icons": {
+        "edit": "Edit",
+        "dropdown": "Menu",
+        "avatar": "Contact avatar"
+      },
+      "contacts": {
+        "oliviaRhye": "Olivia Rhye",
+        "portiaRhye": "Portia Rhye",
+        "samanthaRhye": "Samantha Rhye"
+      },
+      "messages": {
+        "jennyBackTonight": "Jenny: Jenny is back! Tonight I will eat mostly fruits.-> 8pm EST time👅!",
+        "jamBackInStock": "Jenny: My Jam is back in stock!",
+        "checkOutNewContent": "Jenny: Check out my new content",
+        "jennyBack": "Jenny: Jenny is back!"
+      }
+    },
+    "adjustCost": {
+      "title": "Call me and i will sing with you",
+      "date": "April 24, 2025",
+      "timeRange": "2:15pm-9:30pm",
+      "originalPrice": "500",
+      "adjustedPrice": "1337 Token",
+      "remarksLabel": "Your remarks",
+      "remarks": "I charge a flat rate of 500 tokens for each personal request. for you I need to charge USD 40 worth of tokens more for the special costume you requested on top of that.",
+      "waitingForResponse": "waiting for response",
+      "viewDetails": "View Details",
+      "icons": {
+        "dots": "More options",
+        "hourglass": "Waiting",
+        "arrowRight": "View details"
+      }
+    },
+    "callSoon": {
+      "title": "Call me and i will sing with you",
+      "date": "April 24, 2025",
+      "timeRange": "2:15pm-9:30pm",
+      "startsIn": "in 5 min",
+      "joinCall": "Join Call",
+      "otherOptions": "Other Options",
+      "icons": {
+        "dots": "More options",
+        "phoneIncoming": "Join call",
+        "dotsHorizontal": "Other options"
+      }
+    }
+  },
+  "subscriptionCard": {
+    "badges": {
+      "featured": "FEATURED",
+      "currentSubscription": "Current Subscription"
+    },
+    "actions": {
+      "upgrade": "Upgrade",
+      "downgrade": "Downgrade"
+    },
+    "readMore": "...Read more",
+    "discount": "-80%",
+    "perMonth": "/mo",
+    "currencyPrefix": "USD$",
+    "icons": {
+      "videos": "Videos",
+      "photos": "Photos",
+      "media": "Media"
+    }
+  },
   "mediaCard": {
     "published": "Published",
     "resume": "Resume",
@@ -515,7 +591,7 @@
     "buttons": {
       "showLoadingState": "Show loading state on all catalog buttons (text replaced by spinner)",
       "loadingSection": "Loading state — loading prop (text replaced by spinner)",
-      "clickToLoadHint": "Click any button to preview loading — text and icons are replaced by spinner only (no \"Loading...\" text)."
+      "clickToLoadHint": "Click any button to preview loading — text and icons are replaced by spinner only (no Loading label)."
     },
     "spinner": {
       "assetMapImage": "Asset map image (icon.spinner)",
@@ -555,7 +631,7 @@
     "checkboxGroup": {
       "sectionTitle": "CheckboxGroup",
       "value": "Value: {value}",
-      "optionsSummary": "A: {a} | B: {b} | C: {c}",
+      "optionsSummary": "A: {a} {'|'} B: {b} {'|'} C: {c}",
       "cards": {
         "default": "Default",
         "checked": "Checked",
@@ -596,7 +672,7 @@
     "checkboxSwitch": {
       "sectionTitle": "CheckboxSwitch",
       "active": "Active: {value}",
-      "alertsSummary": "Email: {email} | SMS: {sms} | Push: {push}",
+      "alertsSummary": "Email: {email} {'|'} SMS: {sms} {'|'} Push: {push}",
       "cards": {
         "defaultOff": "Default (Off)",
         "defaultOn": "Default (On)",
@@ -707,8 +783,74 @@
       },
       "sample": {
         "displayName": "lindenMay",
-        "handle": "@linden",
-        "email": "developer@contactlinden.com"
+        "handle": "{'@'}linden",
+        "email": "developer{'@'}contactlinden.com"
+      }
+    },
+    "radioGroup": {
+      "sectionTitle": "RadioGroup",
+      "selected": "Selected",
+      "labels": {
+        "pickOne": "Pick one option",
+        "pickMultiple": "Pick multiple options",
+        "attachMedia": "Attach Media"
+      },
+      "options": {
+        "optionA": "Option A",
+        "optionB": "Option B",
+        "optionC": "Option C",
+        "useOriginal": "Use original thumbnail and preview",
+        "useCustom": "Upload a different thumbnail and preview",
+        "none": "Do not attach thumbnail and preview"
+      },
+      "cards": {
+        "default": "Default",
+        "withLabel": "With Label",
+        "mediaUploaderStyle": "Media Uploader Style",
+        "preselected": "Pre-selected"
+      }
+    },
+    "calendarChat": {
+      "sectionTitle": "CalendarChat",
+      "cards": {
+        "newMessage": "NewMessage",
+        "chatSection": "ChatSection",
+        "adjustCostBooking": "AdjustCostBooking",
+        "callSoonChat": "CallSoonChat"
+      }
+    },
+    "subscriptionCards": {
+      "sectionTitle": "Subscription Cards",
+      "labels": {
+        "card1": "Card 1 — Standard",
+        "card2Featured": "Card 2 — Featured",
+        "card3Current": "Card 3 — Current Subscription",
+        "card4": "Card 4 — Standard",
+        "card5": "Card 5 — Standard"
+      },
+      "cards": {
+        "1": {
+          "title": "FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
+        },
+        "2": {
+          "title": "FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
+        },
+        "3": {
+          "title": "Library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
+        },
+        "4": {
+          "title": "FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
+        },
+        "5": {
+          "title": "FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit."
+        },
+        "description": "Watch all of my mango eating content! content update weekly!<br><br>• 100% real content<br>• no editing<br>• 100% real content<br>• no editing<br>• 100% real content<br>• no editing<br>• 100% real content<br>• no editing"
+      },
+      "features": {
+        "freeTokens": "<span class=\"font-semibold text-[#FF0066]\">10 free tokens</span> each month",
+        "merchandise": "<span class=\"font-semibold text-[#FF0066]\">10% off</span> on all Merchandise",
+        "customRequest": "<span class=\"font-semibold text-[#FF0066]\">10% off</span> on all Custom Request",
+        "payToView": "<span class=\"font-semibold text-[#FF0066]\">10% off</span> on all Pay to View videos"
       }
     }
   }

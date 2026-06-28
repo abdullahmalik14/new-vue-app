@@ -5,56 +5,86 @@
                 <DemoSectionHeader title="BaseTextInput" class="text-white" />
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10 text-white">
                     <!-- 1. Default -->
-                    <DemoCard label="Default" dark :code="codeExamples.default">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Default</h3>
+
                         <BaseTextInput v-model="vals.id1" placeholder="Enter text..." showLabel
                             labelText="Name" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.default" />
+                    </div>
                     <!-- 2. With left icon -->
-                    <DemoCard label="With Left Icon" dark :code="codeExamples.leftIcon">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">With Left Icon</h3>
+
                         <BaseTextInput v-model="vals.id2" placeholder="Search..." showLabel labelText="Search"
                             :leftIcon="MagnifyingGlassIcon" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.leftIcon" />
+                    </div>
                     <!-- 3. With right icon -->
-                    <DemoCard label="With Right Icon" dark :code="codeExamples.rightIcon">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">With Right Icon</h3>
+
                         <BaseTextInput v-model="vals.id3" placeholder="Email..." showLabel labelText="Email"
                             :rightIcon="EnvelopeIcon" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.rightIcon" />
+                    </div>
                     <!-- 4. Dynamic Error state -->
-                    <DemoCard label="Array Validations" dark :code="codeExamples.errorState">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Array Validations</h3>
+
                         <BaseTextInput v-model="vals.id4" placeholder="Enter valid email" showLabel labelText="Email"
                             :showErrors="emailErrors.length > 0" :errors="emailErrors"
                             :onSuccess="emailSuccess.length > 0" :success="emailSuccess" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.errorState" />
+                    </div>
                     <!-- 5. Required -->
-                    <DemoCard label="Required (*)" dark :code="codeExamples.required">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Required (*)</h3>
+
                         <BaseTextInput v-model="vals.id5" placeholder="Required" showLabel
                             labelText="Required Field" requiredDisplay="*" 
                             :error="vals.id5.trim() === ''" errorMessage="This field is required." />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.required" />
+                    </div>
                     <!-- 6. Optional label -->
-                    <DemoCard label="Optional Label" dark :code="codeExamples.optionalLabel">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Optional Label</h3>
+
                         <BaseTextInput v-model="vals.id6" placeholder="Optional..." showLabel
                             labelText="Nickname" isOptional />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.optionalLabel" />
+                    </div>
                     <!-- 7. Textarea -->
-                    <DemoCard label="Textarea" dark :code="codeExamples.textarea">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Textarea</h3>
+
                         <BaseTextInput v-model="vals.id7" type="textarea" showLabel labelText="Description" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.textarea" />
+                    </div>
                     <!-- 8. Number type -->
-                    <DemoCard label="Number Type" dark :code="codeExamples.numberType">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Number Type</h3>
+
                         <BaseTextInput v-model="vals.id8" type="number" showLabel labelText="Amount"
                             placeholder="0" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.numberType" />
+                    </div>
                     <!-- 9. Left span prefix -->
-                    <DemoCard label="Left Span Prefix" dark :code="codeExamples.leftSpan">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Left Span Prefix</h3>
+
                         <BaseTextInput v-model="vals.id9" placeholder="0.00" showLabel labelText="Price"
                             leftSpan leftSpanText="$" leftSpanClass="text-white/70 bg-transparent pr-2" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.leftSpan" />
+                    </div>
                     <!-- 10. With description -->
-                    <DemoCard label="With Description" dark :code="codeExamples.withDescription">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">With Description</h3>
+
                         <BaseTextInput v-model="vals.id10" placeholder="username" showLabel labelText="Username"
                             description="Only letters and numbers allowed." />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.withDescription" />
+                    </div>
                 </div>
             </section>
         </div>
@@ -65,7 +95,7 @@
 import { reactive, computed } from 'vue';
 import BaseTextInput from '@/components/forms/inputs/BaseTextInput.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
-import DemoCard from '@/dev/templates/demo/DemoCard.vue';
+import ShowCodeToggle from '@/dev/templates/demo/ShowCodeToggle.vue';
 import { MagnifyingGlassIcon, EnvelopeIcon } from '@heroicons/vue/24/outline';
 
 const vals = reactive({

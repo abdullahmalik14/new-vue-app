@@ -1,6 +1,11 @@
 <template>
-    <div class="bg-[#ececec] py-16 px-4 font-sans antialiased text-slate-900">
-        <div class="max-w-7xl mx-auto flex flex-col gap-24">
+    <div class="min-h-screen bg-[#F9FAFBE5] md:bg-transparent dark:bg-background-dark-app relative isolate py-16 px-4 font-sans antialiased text-slate-900">
+        <div
+            v-if="dashboardBgUrl"
+            class="fixed inset-0 pointer-events-none -z-10 bg-cover bg-no-repeat w-full h-full"
+            :style="{ backgroundImage: `url(${dashboardBgUrl})` }"
+        />
+        <div class="max-w-7xl mx-auto flex flex-col gap-24 relative">
 
             <!-- PAGE TITLE -->
             <div class="text-center relative py-12">
@@ -232,7 +237,7 @@
                             :description="t('demo.dashboardTextInput.tipMessageDescription')" :maxLength="200" />
                         <ShowCodeToggle :code="demoSnippets.icd.textareaWithDesc" />
                     </div>
-                </div>
+                    </div>
 
              
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -326,7 +331,7 @@
                             <div class="flex items-center gap-2">
                                 <div class="w-44 shrink-0">
                                     <DashboardTextInput v-model="inputs.offHourSurcharge" type="number" />
-                                </div>
+                        </div>
                                 <span class="text-base font-medium text-[#101828] dark:text-[#d6d3cd] leading-normal whitespace-nowrap">{{ t('booking.percentFromBasePrice') }}</span>
                             </div>
                         </div>
@@ -681,7 +686,7 @@
                                 v-model="notifOpen.limitExceeded" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.notification.limitExceeded" />
-                    </div>
+                </div>
 
                     <!-- With / without icon -->
                     <div class="flex flex-col gap-3">
@@ -862,21 +867,30 @@
             <!-- ===== SECTION: ActionMenuDropdown ===== -->
             <ActionMenuDropdownDemo />
 
+            <!-- ===== SECTION: RadioGroup ===== -->
+            <RadioGroupDemo />
+
+            <!-- ===== SECTION: Calendar Chat ===== -->
+            <CalendarChatDemo />
+
             <!-- ===== SECTION: UploadingProgressBar ===== -->
             <UploadingProgressBarDemo />
 
             <!-- ===== SECTION: DashProfileSettings ===== -->
             <DashProfileSettings />
 
+            <!-- ===== SECTION: Cookies ===== -->
+            <section class="flex flex-col gap-6">
+                <DemoSectionHeader title="Cookies" />
+                <Cookies />
+                <ShowCodeToggle :code="demoSnippets.cookies.default" />
+            </section>
+
             <!-- ===== SECTION: PremiumOrdersTable ===== -->
             <OrdersPremiumTable />
 
             <!-- ===== SECTION: SubscriptionCard ===== -->
-            <!-- Temporarily removed as SubscriptionCard is missing
-            <section class="flex flex-col gap-12">
-                ...
-            </section>
-            -->
+            <SubscriptionCardsDemo />
 
             <!-- ===== SECTION: TierCard ===== -->
             <section class="flex flex-col gap-12">
@@ -989,7 +1003,7 @@
                             <ShowCodeToggle :code="demoSnippets.buttons.authTelegram" />
                         </div>
                     </div>
-                </div>
+                    </div>
 
                 <!-- Checkout / purchase / cart popups -->
                 <div class="flex flex-col gap-3">
@@ -1014,7 +1028,7 @@
                             <ShowCodeToggle :code="demoSnippets.buttons.actionGreenX" />
                         </div>
                     </div>
-                </div>
+                    </div>
 
                 <!-- Profile / media -->
                 <div class="flex flex-col gap-3">
@@ -1030,7 +1044,7 @@
                             <ShowCodeToggle :code="demoSnippets.buttons.profileBack" />
                         </div>
                     </div>
-                </div>
+                    </div>
 
                 <!-- Payout settings -->
                 <div class="flex flex-col gap-3">
@@ -1087,17 +1101,17 @@
                             <div class="flex flex-wrap items-center gap-3">
                                 <DashboardPrimaryButton text="Next" variant="polygonLeft" type="button"
                                     :rightIcon="polygonArrowUrl"
-                                    :rightIconClass="`w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]`"
+                                    :rightIconClass="'w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]'"
                                     btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468"
                                     :loading="buttonLoaders.polygonNext" loadingSpinnerColor="text-black"
                                     @click="runButtonDemo('polygonNext')" />
                                 <DashboardPrimaryButton text="Next" variant="polygonLeft" type="button" disabled
                                     :rightIcon="polygonArrowUrl"
-                                    :rightIconClass="`w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]`"
+                                    :rightIconClass="'w-6 h-6 filter brightness-0 invert-0'"
                                     btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468" />
                             </div>
                             <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft · Next (enabled + disabled)</span>
-                            <ShowCodeToggle :code="demoSnippets.buttons.polygonNext" />
+                        <ShowCodeToggle :code="demoSnippets.buttons.polygonNext" />
                         </div>
                         <div class="flex flex-col gap-2">
                             <DashboardPrimaryButton text="SUBMIT MEDIA FOR APPROVAL" variant="polygonLeft" type="button"
@@ -1110,7 +1124,7 @@
                             <ShowCodeToggle :code="demoSnippets.buttons.submitMedia" />
                         </div>
                     </div>
-                </div>
+                    </div>
 
                 <!-- Dashboard analytics -->
                 <div class="flex flex-col gap-3">
@@ -1150,7 +1164,7 @@
                             <ShowCodeToggle :code="demoSnippets.buttons.trend" />
                         </div>
                     </div>
-                </div>
+                    </div>
 
                 <!-- Events / add-ons / scheduling -->
                 <div class="flex flex-col gap-3">
@@ -1183,8 +1197,8 @@
                                 :loading="buttonLoaders.addonService" loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('addonService')" />
                             <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · add-on service</span>
-                            <ShowCodeToggle :code="demoSnippets.buttons.addonService" />
-                        </div>
+                        <ShowCodeToggle :code="demoSnippets.buttons.addonService" />
+                    </div>
                         <div class="flex flex-col gap-2">
                             <DashboardPrimaryButton text="add-on service" variant="none" type="button"
                                 customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight enabled:hover:text-black enabled:hover:bg-[#07F468]"
@@ -1193,10 +1207,10 @@
                                 :loading="buttonLoaders.addonServiceV2" loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('addonServiceV2')" />
                             <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · add-on service v2</span>
-                            <ShowCodeToggle :code="demoSnippets.buttons.addonServiceV2" />
-                        </div>
+                        <ShowCodeToggle :code="demoSnippets.buttons.addonServiceV2" />
                     </div>
-                </div>
+                    </div>
+                    </div>
 
                 <!-- TwoPieceButton variants -->
                 <div class="flex flex-col gap-3">
@@ -1238,7 +1252,7 @@
                             <span class="text-[10px] text-gray-400 uppercase tracking-wider">link-x (pink) · Edit Profile</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.twoPiecePink" />
                         </div>
-                    </div>
+                </div>
                 </div>
             </section>
 
@@ -1247,7 +1261,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, defineComponent, h } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 // Components
@@ -1260,14 +1274,18 @@ import BaseHeading from '@/components/ui/typography/BaseHeading.vue';
 import BaseParagraph from '@/components/ui/typography/BaseParagraph.vue';
 import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vue';
 import QuillEditor from '@/components/forms/inputs/QuillEditor.vue';
-// import SubscriptionCard from '@/templates/profile/views/SubscriptionCard.vue';
+// import SubscriptionCard from '@/dev/components/profile/SubscriptionCard.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
+import ShowCodeToggle from '@/dev/templates/demo/ShowCodeToggle.vue';
 import CheckboxGroupDemo from '@/dev/templates/demo/demo-audit/CheckboxGroupDemo.vue';
 import CheckboxSwitchDemo from '@/dev/templates/demo/demo-audit/CheckboxSwitchDemo.vue';
 import OrdersPremiumTable from '@/dev/components/ui/table/dashboard/OrdersPremiumTable.vue';
+import RadioGroupDemo from '@/dev/templates/demo/demo-audit/RadioGroupDemo.vue';
+import CalendarChatDemo from '@/dev/templates/demo/demo-audit/CalendarChatDemo.vue';
 import DashProfileSettings from '@/dev/components/ui/nav/dashboard/DashProfileSettings.vue';
 import UploadingProgressBarDemo from '@/dev/templates/demo/demo-audit/UploadingProgressBarDemo.vue';
 import ActionMenuDropdownDemo from '@/dev/templates/demo/demo-audit/ActionMenuDropdownDemo.vue';
+import SubscriptionCardsDemo from '@/dev/templates/demo/demo-audit/SubscriptionCardsDemo.vue';
 import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import TwoPieceButton from '@/components/ui/buttons/TwoPieceButton.vue';
 // Heroicons
@@ -1279,6 +1297,7 @@ import {
 } from '@heroicons/vue/24/outline';
 
 const { t } = useI18n();
+const { url: dashboardBgUrl } = useAssetUrl('dashboard.bg.gradient');
 const { url: searchIconUrl } = useAssetUrl('icon.search');
 const { url: spinnerIconUrl } = useAssetUrl('icon.spinner');
 const { url: xLogoUrl } = useAssetUrl('icon.social.x.logo');
@@ -1314,42 +1333,7 @@ const { url: tierButtonGreenUrl } = useAssetUrl('tier.demo.buttonBgGreen');
 import TierCard from '@/components/ui/card/dashboard/TierCard.vue';
 import EventCard from '@/components/ui/card/dashboard/EventCard.vue';
 import Cart from '@/components/ui/cart/Cart.vue';
-// ─────────────────────────────────────────────
-// Inline ShowCode toggle component (no external file needed)
-// ─────────────────────────────────────────────
-const ShowCodeToggle = defineComponent({
-    props: { code: { type: String, default: '' } },
-    setup(props) {
-        const open = ref(false);
-        const copied = ref(false);
-        const copy = async () => {
-            await navigator.clipboard.writeText(props.code).catch(() => { });
-            copied.value = true;
-            setTimeout(() => (copied.value = false), 2000);
-        };
-        return () => h('div', { class: 'flex flex-col gap-0 mb-4' }, [
-            h('button', {
-                type: 'button',
-                onClick: () => (open.value = !open.value),
-                class: 'self-start flex items-center gap-1.5 text-[0.7rem] font-medium text-gray-500 hover:text-gray-800 dark:text-white/50 dark:hover:text-white/80 transition-colors mt-1 px-0 py-0',
-            }, [
-                h('svg', { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', 'stroke-width': '1.8', stroke: 'currentColor', class: 'w-3 h-3' },
-                    [h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5' })]),
-                open.value ? 'Hide Code' : 'Show Code',
-            ]),
-            open.value && h('div', { class: 'mt-2 rounded-lg overflow-hidden bg-[#1a1a1a]' }, [
-                h('div', { class: 'flex justify-between items-center px-3 py-1.5 bg-[#252525]' }, [
-                    h('span', { class: 'text-[0.6rem] font-mono text-white/30 uppercase tracking-wider' }, 'Vue'),
-                    h('button', { type: 'button', onClick: copy, class: 'text-[0.65rem] text-white/40 hover:text-white/70 transition-colors' }, copied.value ? '✓ Copied' : 'Copy'),
-                ]),
-                h('pre', { class: 'p-3 overflow-x-auto text-[0.72rem] leading-relaxed text-[#d4d4d4] font-mono' },
-                    h('code', {}, props.code)),
-            ]),
-        ]);
-    },
-});
-
-
+import Cookies from '@/components/ui/badge/dashboard/Cookies.vue';
 const vals = reactive({
     // DashboardTextInput
     icd1: '', icd2: '', icd3: '', icd4: '', icd5: '', icd6: '',
@@ -1927,6 +1911,9 @@ const demoSnippets = {
     cart: {
         default: `<!-- Template -->\n<Cart />\n\n<!-- Interaction Logic (Custom Events) -->\n// To add an item via console or script:\nwindow.dispatchEvent(new CustomEvent('cart:add', {\n  detail: {\n    item: {\n      title: "NBA Hoops Card",\n      productId: "nba123",\n      qty: 1,\n      price: 12.23,\n      originalPrice: 20.00,\n      shipping: 12.23,\n      seller: "Princess Carrot Pop",\n      image: "https://i.ibb.co.com/70sHrpv/featured-media-bg.webp",\n      promoCodes: ["PROMOCODE2025", "MEMBER BENEFIT"]\n    }\n  }\n}));`,
     },
+    cookies: {
+        default: `<!-- Template -->\n<Cookies />\n\n<!-- Script -->\nimport Cookies from '@/components/ui/badge/dashboard/Cookies.vue';`,
+    },
     spinner: {
         img: `<LoadingSpinner \n  :src="spinnerIconUrl" \n  size="2xl" \n/>\n\n<!-- Script -->\nconst { url: spinnerIconUrl } = useAssetUrl('icon.spinner');`,
         styled: `<LoadingSpinner \n  thickness="3.5" \n  size="lg" \n  color="text-green-500" \n  trackColor="text-white" \n/>`,
@@ -1937,7 +1924,37 @@ const demoSnippets = {
         authSignIn: `<DashboardPrimaryButton \n  text="Sign in" \n  variant="authPink" \n  size="lg" \n  type="button" \n  :loading="buttonLoaders.authSignIn" \n  loadingSpinnerColor="text-white" \n  @click="runButtonDemo('authSignIn')" \n/>`,
         authX: `<DashboardPrimaryButton \n  text="Continue with X (Twitter)" \n  variant="authTransparent" \n  size="lg" \n  type="button" \n  :leftIcon="xLogoUrl" \n  leftIconClass="w-8 h-8" \n  :loading="buttonLoaders.authX" \n  @click="runButtonDemo('authX')" \n/>\n\n<!-- Script -->\nconst { url: xLogoUrl } = useAssetUrl('icon.social.x.logo');`,
         authTelegram: `<DashboardPrimaryButton \n  text="Continue with Telegram" \n  variant="authTransparent" \n  size="lg" \n  type="button" \n  :leftIcon="telegramIconUrl" \n  leftIconClass="w-8 h-8" \n  :loading="buttonLoaders.authTelegram" \n  @click="runButtonDemo('authTelegram')" \n/>\n\n<!-- Script -->\nconst { url: telegramIconUrl } = useAssetUrl('icon.social.telegram');`,
-        polygonNext: `<DashboardPrimaryButton \n  text="Next" \n  variant="polygonLeft" \n  type="button" \n  :rightIcon="polygonArrowUrl" \n  :loading="buttonLoaders.polygonNext" \n  loadingSpinnerColor="text-black" \n  @click="runButtonDemo('polygonNext')" \n  btnBg="#07f468" \n  btnHoverBg="black" \n  btnText="black" \n  btnHoverText="#07f468" \n/>\n\n<!-- Disabled (same look) -->\n<DashboardPrimaryButton \n  text="Next" \n  variant="polygonLeft" \n  type="button" \n  disabled \n  :rightIcon="polygonArrowUrl" \n  btnBg="#07f468" \n  btnHoverBg="black" \n  btnText="black" \n  btnHoverText="#07f468" \n/>\n\n<!-- Script -->\nconst { url: polygonArrowUrl } = useAssetUrl('icon.polygon.arrow');`,
+        polygonNext: `<DashboardPrimaryButton
+  text="Next"
+  variant="polygonLeft"
+  type="button"
+  :rightIcon="polygonArrowUrl"
+  :rightIconClass="'w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]'"
+  btnBg="#07f468"
+  btnHoverBg="black"
+  btnText="black"
+  btnHoverText="#07f468"
+  :loading="buttonLoaders.polygonNext"
+  loadingSpinnerColor="text-black"
+  @click="runButtonDemo('polygonNext')"
+/>
+
+<!-- Disabled -->
+<DashboardPrimaryButton
+  text="Next"
+  variant="polygonLeft"
+  type="button"
+  disabled
+  :rightIcon="polygonArrowUrl"
+  :rightIconClass="'w-6 h-6 filter brightness-0 invert-0'"
+  btnBg="#07f468"
+  btnHoverBg="black"
+  btnText="black"
+  btnHoverText="#07f468"
+/>
+
+<!-- Script -->
+const { url: polygonArrowUrl } = useAssetUrl('icon.polygon.arrow');`,
         profileBack: `<DashboardPrimaryButton \n  text="Back" \n  variant="profileMediaBtn" \n  type="button" \n  :leftIcon="arrowLeftUrl" \n  :loading="buttonLoaders.profileBack" \n  @click="runButtonDemo('profileBack')" \n/>\n\n<!-- Script -->\nconst { url: arrowLeftUrl } = useAssetUrl('icon.arrow.left');`,
         payoutSave: `<DashboardPrimaryButton \n  variant="none" \n  text="SAVE" \n  type="button" \n  :loading="buttonLoaders.payoutSave" \n  loadingSpinnerColor="text-[#07F468]" \n  @click="runButtonDemo('payoutSave')" \n  customClass="..." \n  textClass="..." \n>\n  <template #leftIcon>\n    <img :src="tickCircleUrl" alt="" class="w-6 h-6 ..." />\n  </template>\n</DashboardPrimaryButton>\n\n<!-- Script -->\nconst { url: tickCircleUrl } = useAssetUrl('icon.tick.circle');`,
         sendInvite: `<DashboardPrimaryButton \n  text="Send invite" \n  variant="simpleBtn" \n  type="button" \n  :leftIcon="sendIconUrl" \n  :loading="buttonLoaders.sendInvite" \n  @click="runButtonDemo('sendInvite')" \n  btnBg="#07f468" \n  btnHoverBg="black" \n  btnText="black" \n  btnHoverText="#07f468" \n/>\n\n<!-- Script -->\nconst { url: sendIconUrl } = useAssetUrl('icon.send');`,

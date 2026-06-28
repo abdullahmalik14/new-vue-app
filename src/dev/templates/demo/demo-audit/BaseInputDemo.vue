@@ -5,62 +5,89 @@
                 <DemoSectionHeader title="BaseInput" class="text-white" />
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10 text-white">
                     <!-- 1. Default text -->
-                    <DemoCard label="Default Text" dark :code="codeExamples.defaultText">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Default Text</h3>
+
                         <BaseInput v-model="vals.bi1" placeholder="Enter text..." label="Name"
                             :labelClass="labelGlassClass"
                             :inputClass="inputGlassClass" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.defaultText" />
+                    </div>
                     <!-- 2. With label -->
-                    <DemoCard label="With Label" dark :code="codeExamples.withLabel">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">With Label</h3>
+
                         <BaseInput v-model="vals.bi2" placeholder="john@example.com" label="Email Address"
                             labelFor="email-base" :labelClass="labelGlassClass"
                             :inputClass="inputGlassClass" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.withLabel" />
+                    </div>
                     <!-- 3. Disabled -->
-                    <DemoCard label="Disabled" dark :code="codeExamples.disabled">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Disabled</h3>
+
                         <BaseInput v-model="vals.bi3" placeholder="Disabled input" label="Disabled" :disabled="true"
                             :labelClass="labelGlassClass"
                             inputClass="w-full border border-white/10 bg-white/5 rounded-xl px-4 py-2.5 min-h-[3rem] text-sm text-white/50 cursor-not-allowed" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.disabled" />
+                    </div>
                     <!-- 4. Number with controls -->
-                    <DemoCard label="Number with Controls" dark :code="codeExamples.numberControls">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Number with Controls</h3>
+
                         <BaseInput v-model="vals.bi4" type="number" label="Quantity" :showControls="true"
                             :labelClass="labelGlassClass"
                             :inputClass="inputGlassClass" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.numberControls" />
+                    </div>
                     <!-- 5. With max length counter -->
-                    <DemoCard label="With Character Counter" dark :code="codeExamples.charCounter">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">With Character Counter</h3>
+
                         <BaseInput v-model="vals.bi5" placeholder="Max 50 chars..." label="Title" :maxLength="50"
                             :labelClass="labelGlassClass"
                             :inputClass="inputGlassClass" counterClass="text-xs text-white/60 mt-1" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.charCounter" />
+                    </div>
                     <!-- 6. Textarea mode -->
-                    <DemoCard label="Textarea Mode" dark :code="codeExamples.textarea">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Textarea Mode</h3>
+
                         <BaseInput v-model="vals.bi6" type="textarea" label="Description"
                             placeholder="Enter description..." :rows="3"
                             :labelClass="labelGlassClass"
                             :inputClass="inputGlassClass" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.textarea" />
+                    </div>
                     <!-- 7. Textarea with max length -->
-                    <DemoCard label="Textarea + Counter" dark :code="codeExamples.textareaCounter">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Textarea + Counter</h3>
+
                         <BaseInput v-model="vals.bi7" type="textarea" label="Bio" placeholder="Your bio..." :rows="3"
                             :maxLength="200" :labelClass="labelGlassClass"
                             :inputClass="inputGlassClass" counterClass="text-xs text-white/60 mt-1" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.textareaCounter" />
+                    </div>
                     <!-- 8. Dynamic Array Validation -->
-                    <DemoCard label="Array Validations" dark :code="codeExamples.errorState">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Array Validations</h3>
+
                         <BaseInput v-model="vals.bi8" placeholder="Type valid email..." label="Email"
                             :labelClass="labelGlassClass"
                             :inputClass="errorClassBi8" 
                             :showErrors="emailErrors.length > 0" :errors="emailErrors"
                             :onSuccess="emailSuccess.length > 0" :success="emailSuccess" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.errorState" />
+                    </div>
                     <!-- 9. Number no controls -->
-                    <DemoCard label="Number (No Controls)" dark :code="codeExamples.numberNoControls">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-lg font-semibold text-white/90">Number (No Controls)</h3>
+
                         <BaseInput v-model="vals.bi10" type="number" label="Age" :showControls="false"
                             :labelClass="labelGlassClass"
                             :inputClass="inputGlassClass" />
-                    </DemoCard>
+                        <ShowCodeToggle :code="codeExamples.numberNoControls" />
+                    </div>
                 </div>
             </section>
         </div>
@@ -71,7 +98,7 @@
 import { reactive, computed } from 'vue';
 import BaseInput from '@/components/forms/inputs/BaseInput.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
-import DemoCard from '@/dev/templates/demo/DemoCard.vue';
+import ShowCodeToggle from '@/dev/templates/demo/ShowCodeToggle.vue';
 
 const vals = reactive({
     bi1: '', bi2: '', bi3: 'Readonly Text', bi4: 5, bi5: '', bi6: '', bi7: '', bi8: 'bademail', bi9: 'good@email.com', bi10: ''

@@ -2,30 +2,42 @@
     <section class="flex flex-col gap-6">
         <DemoSectionHeader :title="t('demo.uploadingProgressBar.sectionTitle')" />
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            <DemoCard :label="t('demo.uploadingProgressBar.cards.start')" :code="codeExamples.start">
+            <div class="flex flex-col gap-4">
+                <h3 class="text-lg font-semibold text-[#344054]">{{ t('demo.uploadingProgressBar.cards.start') }}</h3>
                 <UploadingProgressBar :progress="0" />
-            </DemoCard>
+                <ShowCodeToggle :code="codeExamples.start" />
+            </div>
 
-            <DemoCard :label="t('demo.uploadingProgressBar.cards.quarter')" :code="codeExamples.quarter">
+            <div class="flex flex-col gap-4">
+                <h3 class="text-lg font-semibold text-[#344054]">{{ t('demo.uploadingProgressBar.cards.quarter') }}</h3>
                 <UploadingProgressBar :progress="25" />
-            </DemoCard>
+                <ShowCodeToggle :code="codeExamples.quarter" />
+            </div>
 
-            <DemoCard :label="t('demo.uploadingProgressBar.cards.half')" :code="codeExamples.half">
+            <div class="flex flex-col gap-4">
+                <h3 class="text-lg font-semibold text-[#344054]">{{ t('demo.uploadingProgressBar.cards.half') }}</h3>
                 <UploadingProgressBar :progress="50" />
-            </DemoCard>
+                <ShowCodeToggle :code="codeExamples.half" />
+            </div>
 
-            <DemoCard :label="t('demo.uploadingProgressBar.cards.threeQuarter')" :code="codeExamples.threeQuarter">
+            <div class="flex flex-col gap-4">
+                <h3 class="text-lg font-semibold text-[#344054]">{{ t('demo.uploadingProgressBar.cards.threeQuarter') }}</h3>
                 <UploadingProgressBar :progress="75" />
-            </DemoCard>
+                <ShowCodeToggle :code="codeExamples.threeQuarter" />
+            </div>
 
-            <DemoCard :label="t('demo.uploadingProgressBar.cards.complete')" :code="codeExamples.complete">
+            <div class="flex flex-col gap-4">
+                <h3 class="text-lg font-semibold text-[#344054]">{{ t('demo.uploadingProgressBar.cards.complete') }}</h3>
                 <UploadingProgressBar :progress="100" label-key="uploadProgress.complete" />
-            </DemoCard>
+                <ShowCodeToggle :code="codeExamples.complete" />
+            </div>
 
-            <DemoCard :label="t('demo.uploadingProgressBar.cards.animated')" :code="codeExamples.animated">
+            <div class="flex flex-col gap-4">
+                <h3 class="text-lg font-semibold text-[#344054]">{{ t('demo.uploadingProgressBar.cards.animated') }}</h3>
                 <UploadingProgressBar :progress="animatedProgress" />
                 <p class="text-xs text-gray-400 mt-2">{{ animatedProgress }}%</p>
-            </DemoCard>
+                <ShowCodeToggle :code="codeExamples.animated" />
+            </div>
         </div>
     </section>
 </template>
@@ -35,7 +47,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UploadingProgressBar from '@/dev/components/ui/progress/UploadingProgressBar.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
-import DemoCard from '@/dev/templates/demo/DemoCard.vue';
+import ShowCodeToggle from '@/dev/templates/demo/ShowCodeToggle.vue';
 
 const { t } = useI18n();
 

@@ -13,6 +13,7 @@
         :label="option.label"
         :id="`${name}-${option.value}`"
         :version="version"
+        :multiple="multiple"
         :radio-label-class="radioLabelClass"
         @update:model-value="$emit('update:modelValue', $event)"
       />
@@ -21,38 +22,42 @@
 </template>
 
 <script setup>
-import BaseRadio from './BaseRadio.vue';
+import BaseRadio from './BaseRadio.vue'
 
-defineProps({
+const props = defineProps({
   modelValue: {
-    type: [String, Number],
+    type: [String, Number, Array],
     required: true,
   },
   name: {
     type: String,
-    required: true,
+    required: true
   },
   label: {
     type: String,
-    default: "",
+    default: ""
   },
   options: {
     type: Array,
-    required: true,
+    required: true
   },
   version: {
     type: String,
-    required: true,
+    required: true
   },
   radioLabelClass: {
     type: String,
-    default: "",
+    default: ""
   },
   labelClass: {
     type: String,
     default: "",
   },
-});
+  multiple: {
+    type: Boolean,
+    default: false,
+  },
+})
 
-defineEmits(['update:modelValue']);
+defineEmits(['update:modelValue'])
 </script>

@@ -2,18 +2,30 @@
   <div 
     class="inline-flex justify-center items-center" 
     :class="[wrapperClass]"
+    role="status"
+    :aria-label="ariaLabel"
   >
+    <!-- Custom slot: pass your own img/svg/markup; size + spin applied by wrapper -->
+    <span
+      v-if="hasSpinnerSlot"
+      class="inline-flex items-center justify-center animate-spin"
+      :class="[sizeClass, customClass]"
+      :style="dynamicStyle"
+    >
+      <slot name="spinner" />
+    </span>
+
     <!-- Use img if src provided -->
     <img 
-      v-if="src" 
+      v-else-if="src" 
       :src="src" 
       class="animate-spin"
       :class="[sizeClass, customClass]" 
-      :style="[dynamicStyle, { filter: imgFilter }]"
-      alt="Loading..."
+      :style="[dynamicStyle, imgFilter ? { filter: imgFilter } : undefined]"
+      :alt="alt"
     />
     
-    <!-- Otherwise use inline SVG -->
+    <!-- Default inline SVG -->
     <svg 
       v-else 
       class="animate-spin"
@@ -22,6 +34,7 @@
       xmlns="http://www.w3.org/2000/svg" 
       fill="none" 
       viewBox="0 0 24 24"
+      aria-hidden="true"
     >
       <!-- Background Track -->
       <circle 
@@ -51,7 +64,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, useSlots } from 'vue';
+
+const slots = useSlots();
+const hasSpinnerSlot = computed(() => Boolean(slots.spinner));
 
 const props = defineProps({
   // Size preset ('xs', 'sm', 'md', 'lg', 'xl', '2xl') or arbitrary classes if empty string
@@ -69,6 +85,10 @@ const props = defineProps({
   thickness: { type: [String, Number], default: '4' },
   // Source if they want to use an external img instead of SVG inline
   src: { type: String, default: '' },
+  // Alt text when using src (img mode)
+  alt: { type: String, default: 'Loading...' },
+  // Accessible label on the wrapper (hidden when text prop is shown)
+  ariaLabel: { type: String, default: 'Loading' },
   // CSS filter string for img (e.g., 'hue-rotate(90deg)', 'invert(1)')
   imgFilter: { type: String, default: '' },
   // Optional Text next to spinner
