@@ -1,20 +1,20 @@
 <template>
   <label class="cursor-pointer" :class="wrapperClass">
-    <div class="flex items-center gap-2 flex-1 min-w-0">
+    <div :class="innerRowClass">
       <input
         type="checkbox"
         :checked="modelValue"
         :disabled="disabled"
-        class="flex-shrink-0"
-        :class="checkboxClass"
+        :class="inputClass"
+        :style="checkboxStyle"
         @change="$emit('update:modelValue', $event.target.checked)"
       />
 
       <img v-if="midImg" :src="midImg" alt="">
       
-      <span :class="labelClass">
-        <slot>
-          {{ label }}
+      <span :class="labelSpanClass">
+        <slot name="label">
+          <slot>{{ label }}</slot>
         </slot>
       </span>
 
@@ -50,8 +50,36 @@ export default {
     wrapperClass: { type: String, default: "" },
     tags: { type: Array, default: () => [] },
     metaText: { type: String, default: "" } ,
-    midImg: { type: String, default: "" }
+    midImg: { type: String, default: "" },
+    checkboxStyle: { type: [Object, String], default: () => ({}) },
   },
   emits: ["update:modelValue"],
+  computed: {
+    isStartAlign() {
+      return String(this.wrapperClass).includes('items-start');
+    },
+    innerRowClass() {
+      return [
+        'flex gap-2 flex-1 min-w-0',
+        this.isStartAlign ? 'items-start' : 'items-center',
+      ];
+    },
+    inputClass() {
+      return [
+        'm-0 shrink-0',
+        this.checkboxClass ? 'appearance-none' : '',
+        this.isStartAlign ? 'self-start' : 'self-center',
+        this.checkboxClass,
+      ];
+    },
+    labelSpanClass() {
+      return [
+        this.labelClass,
+        this.isStartAlign
+          ? 'min-w-0'
+          : 'inline-flex items-center flex-wrap gap-x-1 min-w-0',
+      ];
+    },
+  },
 };
 </script>

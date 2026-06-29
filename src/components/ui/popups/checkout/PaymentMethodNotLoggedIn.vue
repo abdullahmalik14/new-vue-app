@@ -37,8 +37,8 @@ const emit = defineEmits([
             :modelValue="saveCard"
             @update:modelValue="(val) => emit('update:saveCard', val)"
             checkboxClass="appearance-none bg-white border border-[#D0D5DD] rounded-[4px] w-4 min-w-4 h-4 mr-1 checked:accent-[#07f468] checked:bg-[#07f468] checked:border-[#07f468] checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:border-black checked:after:border-w-0 checked:after:border-b-2 checked:after:border-r-2 checked:after:rotate-45 checked:after:box-border cursor-pointer"
-            labelClass="text-xs sm:text-sm leading-normal tracking-[0.0175rem] text-[#98A2B3] cursor-pointer mt-1"
-            wrapperClass="flex items-center"
+            labelClass="text-xs sm:text-sm leading-normal tracking-[0.0175rem] text-[#98A2B3] cursor-pointer"
+            wrapperClass="flex items-center gap-2"
           />
           <img src="https://i.ibb.co.com/pr2VM4zR/svgviewer-png-output-32.png" alt="visa" class="h-[1.0625rem]" />
         </div>

@@ -52,7 +52,7 @@
                 <slot name="title" />
               </div>
             </div>
-            <div class="flex justify-between items-center gap-4">
+            <div class="flex gap-4 w-full" :class="description ? 'justify-between items-center' : 'items-start'">
               <span v-if="description"
                 class="text-sm flex-1 [text-shadow:0_0_10px_rgba(0,0,0,0.10)] text-[#0F172A] pr-5">{{ description
                 }}</span>

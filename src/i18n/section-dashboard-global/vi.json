@@ -643,79 +643,243 @@
     },
     "checkboxGroup": {
       "sectionTitle": "CheckboxGroup",
-      "value": "Giá trị: {value}",
-      "optionsSummary": "A: {a} {'|'} B: {b} {'|'} C: {c}",
-      "cards": {
-        "default": "Mặc định",
-        "checked": "Đã chọn",
-        "disabled": "Vô hiệu",
-        "metaText": "Có meta text",
-        "withTags": "Có thẻ",
-        "customStyles": "Style tùy chỉnh",
-        "withMidImg": "Có ảnh giữa",
-        "multiple": "Nhiều checkbox",
-        "rowLayout": "Bố cục hàng",
-        "twoTags": "Nhiều thẻ",
-        "expandable": "Logic UI có điều kiện"
+      "sections": {
+        "checkout": "Thanh toán",
+        "auth": "Auth — Đăng nhập",
+        "checkoutDark": "Checkout — Dark Section",
+        "dashboard": "Dashboard",
+        "mediaSubmit": "Media Uploader — Bước gửi",
+        "mediaPublish": "Media Uploader — Xuất bản & Chia sẻ",
+        "mediaSubscription": "Media Uploader — Subscription P2V",
+        "booking": "Đặt lịch",
+        "calendar": "Lịch",
+        "calendarEventDropdown": "Calendar — Event Dropdown",
+        "adjustEvent": "Điều chỉnh chi tiết sự kiện",
+        "bookingStep2": "Booking — Additional Request",
+        "topUp": "Form nạp tiền",
+        "trailer": "Media Uploader — Trailer"
       },
-      "fields": {
-        "subscribeNewsletter": "Đăng ký bản tin",
-        "agreeTerms": "Tôi đồng ý với điều khoản",
-        "disabledOption": "Tùy chọn vô hiệu",
-        "premiumFeature": "Tính năng premium",
-        "proOnly": "Chỉ Pro",
-        "newFeature": "Tính năng mới",
-        "rememberMe": "Ghi nhớ đăng nhập",
-        "visa": "Visa",
-        "optionA": "Tùy chọn A",
-        "optionB": "Tùy chọn B",
-        "optionC": "Tùy chọn C",
-        "enableNotifications": "Bật thông báo",
-        "betaFeature": "Tính năng beta",
-        "referralCode": "Tôi có mã giới thiệu",
-        "referralInputLabel": "Nhập mã giới thiệu",
-        "referralPlaceholder": "vd. FRIEND50"
+      "links": {
+        "terms": "Điều khoản và Điều kiện",
+        "privacy": "Chính sách bảo mật"
+      },
+      "checkout": {
+        "websiteTermsPrefix": "Tôi đồng ý với",
+        "fansocialTermsPrefix": "Tôi đồng ý với Fansocial",
+        "and": "và",
+        "saveAddress": "Lưu địa chỉ này cho lần sau.",
+        "sameShipping": "Giống địa chỉ giao hàng",
+        "saveCard": "Lưu thẻ này để thanh toán nhanh hơn."
+      },
+      "checkoutDark": {
+        "saveAddress": "Lưu địa chỉ này cho lần sau.",
+        "saveCard": "Lưu thẻ này để thanh toán nhanh hơn."
+      },
+      "auth": {
+        "rememberMe": "Ghi nhớ đăng nhập"
+      },
+      "planSharing": {
+        "verifiedFan": "Chỉ fan đã xác minh"
+      },
+      "dashboard": {
+        "applySale": "Áp dụng cho các mục đang giảm giá",
+        "verifiedFan": "Chỉ fan đã xác minh"
+      },
+      "planMedia": {
+        "someContent": "Truy cập một số nội dung",
+        "moreContent": "Truy cập thêm nội dung",
+        "draftContent": "Truy cập thêm nội dung nữa",
+        "noMeta": "Truy cập nhiều nội dung nhất",
+        "meta16": "16 Media",
+        "meta24": "24 Media",
+        "meta3": "3 Media"
+      },
+      "mediaSubmit": {
+        "item0": "All individuals appearing in the piece of content I am presently uploading on Fansocial (the Content):",
+        "item1": "I have verified, preserved and currently hold all identification cards and documents required under Record Keeping Requirements, 18 U.S.C. 2257 and 28 C.F.R. 75, or applicable laws in any other jurisdictions, countries, and territories (2257 documentation), for all individuals appearing in the Content.",
+        "item2": "The Content does not violate Fansocial's Terms of Service, and any of its related policies namely but without limitation, its Child Sexual Abuse Material Policy, or Anti-Sexual Exploitation Policies, all of which I have read and expressly agree to."
+      },
+      "mediaPublish": {
+        "comingSoon": "Đưa media này lên mục sắp ra mắt"
+      },
+      "mediaSubscription": {
+        "freePlan": "Gói miễn phí",
+        "premiumTier": "Gói Premium",
+        "discovery": "Trang Discovery",
+        "profile": "Trang hồ sơ của tôi"
+      },
+      "booking": {
+        "longerSessions": "Cho phép phiên dài hơn",
+        "longerDiscount": "Bật giảm giá phiên dài hơn",
+        "recurringDiscount": "Bật giảm giá sự kiện định kỳ",
+        "instantBooking": "Cho phép đặt lịch tức thì",
+        "disableChat": "Tắt chat trước cuộc gọi",
+        "emojiReply": "Cho phép trả lời bằng emoji",
+        "allowRecording": "Cho phép ghi âm",
+        "cancellationFee": "Bật phí hủy",
+        "bufferTime": "Đặt thời gian đệm giữa các lịch hẹn",
+        "bufferTooltip": "Thời gian đệm giữa các lịch hẹn",
+        "waitlist": "Cho phép fan vào danh sách chờ khi sự kiện đầy"
+      },
+      "calendar": {
+        "videoCall": "Cuộc gọi video",
+        "audioCall": "Cuộc gọi thoại",
+        "groupEvent": "Sự kiện nhóm",
+        "showSchedule": "Hiển thị lịch trình đặt chỗ",
+        "showExisting": "Hiển thị lịch trình hiện có"
+      },
+      "calendarEventDropdown": {
+        "videoCall": "Cuộc gọi video",
+        "audioCall": "Cuộc gọi thoại",
+        "groupCall": "Cuộc gọi nhóm"
+      },
+      "calendarMain": {
+        "showExistingEvents": "Show existing events/booking schedule"
+      },
+      "bookingStep2": {
+        "allowFanRecord": "Allow fan record the session",
+        "allowPersonalRequest": "Allow personal request",
+        "allowFanRecordTooltip": "If enabled, fans can purchase a session recording as an add-on. The recording includes the creator's full video feed and will be available after the booking ends.",
+        "allowPersonalRequestTooltip": "If enabled, fans can include a personal request in the booking form. You can review it and adjust the price before confirming the booking."
+      },
+      "adjustEvent": {
+        "recordSession": "Ghi lại phiên của chúng ta",
+        "exclusiveVideo": "Video độc quyền",
+        "cosplay": "Cosplay",
+        "topless": "Topless"
+      },
+      "trailer": {
+        "uploadOwn": "Tải trailer của bạn"
       },
       "tags": {
-        "new": "NEW",
-        "beta": "BETA",
-        "free": "FREE"
+        "publishedTier": "Published Tier",
+        "draft": "Draft"
       }
     },
     "checkboxSwitch": {
       "sectionTitle": "CheckboxSwitch",
-      "active": "Đang bật: {value}",
-      "alertsSummary": "Email: {email} {'|'} SMS: {sms} {'|'} Push: {push}",
-      "cards": {
-        "defaultOff": "Mặc định (Tắt)",
-        "defaultOn": "Mặc định (Bật)",
-        "wrapperLabel": "Có nhãn bọc",
-        "customTrackGreen": "Track tùy chỉnh (Xanh lá)",
-        "customTrackBlue": "Track tùy chỉnh (Xanh dương)",
-        "customTrackRed": "Track tùy chỉnh (Đỏ)",
-        "largeSwitch": "Công tắc lớn",
-        "customLabelStyle": "Style nhãn tùy chỉnh",
-        "multiple": "Nhiều công tắc",
-        "boldLabel": "Nhãn đậm",
-        "expandable": "Logic mở rộng có điều kiện"
+      "sections": {
+        "mediaPublish": "Media Uploader — Publish & Sharing",
+        "mediaSubscription": "Media Uploader — Subscription P2V",
+        "trailerSettings": "Media Uploader — Trailer Settings",
+        "videoThumbnail": "Media Uploader — Video Thumbnail Selector",
+        "planDetail": "Plan — Plan Detail",
+        "planSharing": "Plan — Plan Sharing",
+        "profileViewAll": "Profile — View All Popup",
+        "editProfile": "Edit Profile — Share Settings",
+        "bookingXRepost": "Booking — X Repost Settings",
+        "twitterRepostPopup": "Twitter Repost Settings Popup",
+        "devDemo": "Dev Demo Page"
       },
-      "fields": {
-        "darkMode": "Chế độ tối",
-        "notifications": "Thông báo",
-        "enableFeature": "Bật tính năng",
-        "featureSettings": "Cài đặt tính năng",
-        "active": "Đang hoạt động",
-        "sync": "Đồng bộ",
-        "alertMode": "Chế độ cảnh báo",
-        "largeToggle": "Công tắc lớn",
-        "premiumFeature": "Tính năng premium",
-        "emailAlerts": "Cảnh báo email",
-        "smsAlerts": "Cảnh báo SMS",
-        "pushAlerts": "Cảnh báo push",
-        "autoRenew": "Tự gia hạn đăng ký",
-        "showAdvanced": "Hiện cài đặt nâng cao",
-        "advancedTitle": "Tùy chọn nâng cao",
-        "advancedDescription": "Panel này chỉ mở rộng khi công tắc phía trên được bật, mô phỏng logic UI có điều kiện."
+      "wrapperLabels": {
+        "darkMode": "Chế độ tối"
+      },
+      "mediaPublish": {
+        "postToX": "Đăng lên X khi media được xuất bản"
+      },
+      "mediaSubscription": {
+        "linkPlan": "Liên kết media với gói đăng ký",
+        "payToView": "Cho phép media trả phí để xem"
+      },
+      "trailer": {
+        "showPreview": "Hiển thị trailer xem trước"
+      },
+      "thumbnail": {
+        "blur": "Làm mờ thumbnail"
+      },
+      "planDetail": {
+        "featuredTier": "Đây là gói nổi bật"
+      },
+      "planSharing": {
+        "postToX": "Đăng cập nhật gói này lên X"
+      },
+      "profile": {
+        "payPerView": "Trả phí để xem",
+        "watchNow": "Xem ngay"
+      },
+      "editProfile": {
+        "postToXTips": "Post to X when you receive tips"
+      },
+      "booking": {
+        "xPostLive": "Đăng lên X khi lịch đặt chỗ được mở",
+        "xPostBooked": "Đăng lên X khi nhận được đặt chỗ",
+        "xPostInSession": "Đăng lên X khi đang trong phiên",
+        "xPostTipped": "Đăng lên X khi được tip trong phiên",
+        "xPostPurchase": "Đăng lên X khi có người mua hàng trong phiên"
+      },
+      "devDemo": {
+        "toggleDarkMode": "Bật/tắt chế độ tối"
+      }
+    },
+    "notificationCard": {
+      "sectionTitle": "NotificationCard",
+      "sections": {
+        "devDemo": "Dev Demo Page",
+        "mediaPublish": "Media Uploader — Xuất bản & Chia sẻ",
+        "mediaSubmit": "Media Uploader — Bước gửi",
+        "mediaPreviewToast": "Media Uploader — Preview Settings (Toast)",
+        "bookingCalendar": "Booking — Unified Booking Form",
+        "planDetail": "Plan — Chi tiết gói",
+        "tipStep2": "Tip — Tip Step 2",
+        "editProfileUnsaved": "Edit Profile — Thay đổi chưa lưu",
+        "editProfileGallery": "Edit Profile — Toast tải gallery",
+        "mediaPreviewSettings": "Media Uploader — Cài đặt xem trước",
+        "bookingUnified": "Booking — Unified Booking Form (Active Subscribers)",
+        "bookingStep1": "Booking — One-on-One Bước 1",
+        "withdrawEarnings": "Rút tiền — Bước 5"
+      },
+      "devDemo": {
+        "activeSubscribersTitle": "You have 3 active subscriber in this tier",
+        "activeSubscribersDescription": "Changing detail of this plan might affect current subscriber's subscription fee and benefits.",
+        "learnMore": "Learn more",
+        "successTitle": "Action completed successfully",
+        "successDescription": "All systems are now up and running.",
+        "errorTitle": "Payment failed",
+        "errorDescription": "Please update your billing information to continue.",
+        "infoTitle": "Heads up",
+        "infoDescription": "We updated our terms of service."
+      },
+      "editProfile": {
+        "unsavedTitle": "You have unsaved changes",
+        "unsavedDescription": "You have made changes to your profile since your last saved. Remember to click ‘SAVE’ to publish your changes.",
+        "galleryTitle": "3 files uploaded to your free gallery successfully.",
+        "galleryDescription": "Click ‘Save’ on header to update change."
+      },
+      "mediaPublish": {
+        "connectXTitle": "You must connect to your X account before using auto repost feature.",
+        "connectXButton": "Connect X account"
+      },
+      "mediaSubmit": {
+        "warningDescription": "WARNING: Uploading (or attempting to upload) content that violates any laws or criminal laws (ex: child pornography or non-consensual content), our Child Sexual Abuse Material Policy or Anti-Sexual Exploitation Policies, will result in related accounts to be immediately terminated and reported to law enforcement authorities."
+      },
+      "mediaPreviewSettings": {
+        "trailerReviewTitle": "Your media will be under review because you have uploaded a new trailer."
+      },
+      "mediaPreviewToast": {
+        "uploadedTitle": "Successfully uploaded new video."
+      },
+      "bookingCalendar": {
+        "title": "Your are now viewing your booking setting in personal event calendar view.",
+        "description": "To preview how your booking schedule will look like on your profile, go to preview booking schedule."
+      },
+      "tipStep2": {
+        "limitExceededTitle": "Input value exceeds maximum allowance (14,000 tokens)",
+        "setToMax": "Set to Max"
+      },
+      "bookingUnified": {
+        "activeSubscribersTitle": "You have 3 active subscriber in this tier",
+        "activeSubscribersDescription": "Changing detail of this plan might affect current subscriber's subscription fee and benefits."
+      },
+      "bookingStep1": {
+        "validationTitle": "Validation Error",
+        "validationDescription": "Title is required."
+      },
+      "planDetail": {
+        "featuredTierTitle": "Your ‘VIP Lounge tier’ will not longer be a featured tier.",
+        "featuredTierDescription": "This tier will be updated as the feature tier in your profile after saving."
+      },
+      "withdrawEarnings": {
+        "payoutAcceptedTitle": "Your payout request has been accepted."
       }
     },
     "actionMenuDropdown": {

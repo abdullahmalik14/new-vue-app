@@ -4,12 +4,12 @@
       {{ wrapperLabel }}
     </label>
 
-    <div class="flex gap-4">
-      <label :class="['relative inline-block mt-1 shrink-0', switchWrapperClass || 'w-8 h-4 ']">
+    <div class="flex gap-2 items-center">
+      <label :class="['relative inline-block shrink-0', switchWrapperClass || 'w-8 h-4 ']">
         <input
           type="checkbox"
           class="peer h-0 w-0 opacity-0"
-          :id="id"
+          :id="inputId"
           :checked="modelValue"
           @change="toggle"
         />
@@ -17,7 +17,7 @@
         <span
           :class="[
             'absolute cursor-pointer transition-all duration-100 ease-in-out', // Structural Classes (Fixed)
-            trackClass || 'top-0 left-0 right-0 bottom-0 bg-[#98A2B3] rounded-[0.75rem] peer-checked:bg-[#101828]' // Default Visuals (Overridable)
+            trackClass || 'top-0 left-0 right-0 bottom-0 bg-[rgba(152,162,179,0.5)] rounded-[0.75rem] peer-checked:bg-[#101828]' // Default Visuals (Overridable)
           ]"
         ></span>
 
@@ -30,7 +30,7 @@
       </label>
 
       <label
-        :for="id"
+        :for="inputId"
         :class="[
           'cursor-pointer',
           labelClass || 'text-sm sm:text-base font-medium  text-dash-gray-900',
@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, useId } from "vue";
 import { resolveAllConfigs } from "@/utils/componentRenderingUtils";
 
 const props = defineProps<{
@@ -58,7 +58,7 @@ const props = defineProps<{
   trackClass?: string;
   knobClass?: string;
   labelClass?: string;
-  switchWrapperClass?: string; 
+  switchWrapperClass?: string; // New prop agar wrapper size badalna ho
   
   // Standard props...
   addId?: string;
@@ -73,6 +73,9 @@ const props = defineProps<{
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
 }>();
+
+const fallbackId = useId();
+const inputId = computed(() => props.id ?? fallbackId);
 
 const toggle = () => {
   emit("update:modelValue", !props.modelValue);

@@ -1,11 +1,11 @@
-<template>
-    <div class="min-h-screen bg-[#F9FAFBE5] md:bg-transparent dark:bg-background-dark-app relative isolate py-16 px-4 font-sans antialiased text-slate-900">
+﻿<template>
+    <div class="min-h-screen bg-[#F9FAFBE5] md:bg-transparent dark:bg-background-dark-app relative isolate py-16 px-4 md:px-10 font-sans antialiased text-slate-900">
         <div
             v-if="dashboardBgUrl"
             class="fixed inset-0 pointer-events-none -z-10 bg-cover bg-no-repeat w-full h-full"
             :style="{ backgroundImage: `url(${dashboardBgUrl})` }"
         />
-        <div class="max-w-7xl mx-auto flex flex-col gap-24 relative">
+        <div class="flex flex-col gap-24 relative">
 
             <!-- PAGE TITLE -->
             <div class="text-center relative py-12">
@@ -188,7 +188,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.rightIcon" />
                     </div>
 
-                    <!-- Autofill styling (no icon — browser saved email) -->
+                    <!-- Autofill styling (no icon â€” browser saved email) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.autofill') }}</span>
                         <DashboardTextInput v-model="inputs.autofillEmail" :placeholder="t('demo.dashboardTextInput.enterEmailPlaceholder')" showLabel
@@ -242,7 +242,7 @@
              
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
-                    <!-- Event title — no label (booking step 1) -->
+                    <!-- Event title â€” no label (booking step 1) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.noLabelEventTitle') }}</span>
                         <DashboardTextInput v-model="inputs.eventTitle" :placeholder="t('booking.eventTitlePlaceholder')" />
@@ -258,7 +258,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingCoPerformer" />
                     </div>
 
-                    <!-- Session duration — Minutes outside input (booking step 1) -->
+                    <!-- Session duration â€” Minutes outside input (booking step 1) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.numberMinutes') }}</span>
                         <div class="flex flex-col gap-1.5 w-full">
@@ -273,7 +273,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingDuration" />
                     </div>
 
-                    <!-- Base price — Tokens /session outside input -->
+                    <!-- Base price â€” Tokens /session outside input -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.basePriceTokens') }}</span>
                         <div class="flex flex-col gap-1.5 w-full">
@@ -314,7 +314,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.numberNoControls" />
                     </div>
 
-                    <!-- Booking fee — tooltip only (no suffix inside input) -->
+                    <!-- Booking fee â€” tooltip only (no suffix inside input) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.tooltipOnly') }}</span>
                         <DashboardTextInput v-model="inputs.bookingFee" type="number" showLabel
@@ -323,7 +323,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingTooltip" />
                     </div>
 
-                    <!-- Off-hour surcharge — % outside input -->
+                    <!-- Off-hour surcharge â€” % outside input -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.offHourSurcharge') }}</span>
                         <div class="flex flex-col gap-1.5 w-full">
@@ -378,7 +378,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingSuccess" />
                     </div>
 
-                    <!-- Remind me — inline copy outside input (booking settings) -->
+                    <!-- Remind me â€” inline copy outside input (booking settings) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.remindMe') }}</span>
                         <div class="flex flex-wrap items-center gap-2">
@@ -399,7 +399,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- 1. h1 defaultPrimary -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 —
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 â€”
                             defaultPrimaryHeading</span>
                         <div class="p-2  flex items-center">
                             <BaseHeading text="Primary H1" tag="h1" theme="defaultPrimaryHeading" class="!text-black"
@@ -410,7 +410,7 @@
 
                     <!-- 2. h2 defaultSecondary -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 —
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 â€”
                             defaultSecondaryHeading</span>
                         <div class="p-2  flex items-center">
                             <BaseHeading text="Secondary H2" tag="h2" theme="defaultSecondaryHeading" class="!text-black"
@@ -421,7 +421,7 @@
 
                     <!-- 3. h3 sectionHeading -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h3 — sectionHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h3 â€” sectionHeading</span>
                         <div class="p-2  flex items-center">
                             <BaseHeading text="Section H3" tag="h3" theme="sectionHeading" class="!text-black"
                                 version="basic" />
@@ -431,7 +431,7 @@
 
                     <!-- 4. dashboardHeading -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 — dashboardHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 â€” dashboardHeading</span>
                         <div class="p-2  flex items-center">
                             <BaseHeading text="Dashboard Title" tag="h2" theme="dashboardHeading" version="basic" />
                         </div>
@@ -440,7 +440,7 @@
 
                     <!-- 5. AuthHeading -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 — AuthHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 â€” AuthHeading</span>
                         <div class="p-2  flex items-center">
                             <BaseHeading text="Login" tag="h2" theme="AuthHeading" class="!text-black" version="basic" />
                         </div>
@@ -449,7 +449,7 @@
 
                     <!-- 6. formHeading -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h4 — formHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h4 â€” formHeading</span>
                         <div class="p-2  flex items-center">
                             <BaseHeading text="Profile Settings" tag="h4" theme="formHeading" version="basic" />
                         </div>
@@ -458,7 +458,7 @@
 
                     <!-- 7. demoHeadings h1 -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 — demoHeadings</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 â€” demoHeadings</span>
                         <div class="p-2  flex items-center">
                             <BaseHeading text="Demo H1 Bold" tag="h1" theme="demoHeadings" version="basic" />
                         </div>
@@ -467,7 +467,7 @@
 
                     <!-- 8. demoHeadings h3 -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h3 — demoHeadings</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h3 â€” demoHeadings</span>
                         <div class="p-2  flex items-center">
                             <BaseHeading text="Demo H3 Medium" tag="h3" theme="demoHeadings" version="basic" />
                         </div>
@@ -486,7 +486,7 @@
 
                     <!-- 10. orderHeading -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 — orderHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 â€” orderHeading</span>
                         <div class="p-2  flex items-center">
                             <BaseHeading text="Order #1234" tag="h1" theme="orderHeading" version="basic" />
                         </div>
@@ -594,269 +594,8 @@
                 </div>
             </section>
 
-            <!-- ===== SECTION: NotificationCard ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="NotificationCard" />
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Colour variants -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.warningMediaRequired') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="warning"
-                                :title="t('notificationCard.demo.titles.mediaRequired')"
-                                :description="t('notificationCard.demo.descriptions.mediaRequired')"
-                                :icon="notifFilmIconUrl" :badgeIcon="notifUploadIconUrl"
-                                v-model="notifOpen.warning" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.warning" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.successApproved') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="success"
-                                :title="t('notificationCard.demo.titles.congratulations')"
-                                :description="t('notificationCard.demo.descriptions.mediaApproved')"
-                                :icon="notifPlaceholderIconUrl" :badgeIcon="tickCircleUrl"
-                                v-model="notifOpen.success" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.success" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.infoBankDetails') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="info"
-                                :title="t('notificationCard.demo.titles.bankDetails')"
-                                :description="t('notificationCard.demo.descriptions.bankDetails')"
-                                :icon="notifSettingsIconUrl" :badgeIcon="notifSettingsIconUrl"
-                                v-model="notifOpen.info" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.info" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.errorDestructive') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="error"
-                                :title="t('notificationCard.demo.titles.actionRequired')"
-                                :description="t('notificationCard.demo.descriptions.securityUpdate')"
-                                :icon="notifBellIconUrl" :badgeIcon="notifDeleteIconUrl"
-                                v-model="notifOpen.error" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.error" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.noticeCyan') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="notice"
-                                :title="t('notificationCard.demo.titles.unsavedChanges')"
-                                :description="t('notificationCard.demo.descriptions.unsavedChanges')"
-                                :icon="notifHeartIconUrl" :badgeIcon="notifTipIconUrl"
-                                v-model="notifOpen.notice" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.notice" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.alertAmber') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="alert"
-                                :title="t('notificationCard.demo.titles.activeSubscribers')"
-                                :description="t('notificationCard.demo.descriptions.activeSubscribers')"
-                                :icon="notifCommentIconUrl"
-                                v-model="notifOpen.alert" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.alert" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.successTeal') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="success-teal"
-                                :title="t('notificationCard.demo.titles.profileUpdated')"
-                                :description="t('notificationCard.demo.descriptions.profileUpdated')"
-                                :icon="notifHeartIconUrl"
-                                v-model="notifOpen.successTeal" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.successTeal" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.limitExceededDark') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="limit-exceeded"
-                                :title="t('notificationCard.demo.titles.uploadLimit')"
-                                :description="t('notificationCard.demo.descriptions.uploadLimit')"
-                                :icon="notifBellIconUrl"
-                                v-model="notifOpen.limitExceeded" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.limitExceeded" />
-                </div>
-
-                    <!-- With / without icon -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.withIcon') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="info"
-                                :title="t('notificationCard.demo.titles.bankDetails')"
-                                :description="t('notificationCard.demo.descriptions.bankDetails')"
-                                :icon="notifSettingsIconUrl"
-                                v-model="notifOpen.withIcon" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.withIcon" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.withoutIcon') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="alert" :showIcon="false"
-                                :title="t('notificationCard.demo.titles.activeSubscribers')"
-                                :description="t('notificationCard.demo.descriptions.activeSubscribers')"
-                                v-model="notifOpen.withoutIcon" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.withoutIcon" />
-                    </div>
-
-                    <!-- With / without description -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.withDescription') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="success"
-                                :title="t('notificationCard.demo.titles.congratulations')"
-                                :description="t('notificationCard.demo.descriptions.mediaApproved')"
-                                :icon="notifPlaceholderIconUrl"
-                                v-model="notifOpen.withDescription" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.withDescription" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.withoutDescription') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="notice"
-                                :title="t('notificationCard.demo.titles.titleOnly')"
-                                :icon="notifHeartIconUrl"
-                                v-model="notifOpen.withoutDescription" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.withoutDescription" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.withoutTitle') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="info"
-                                :description="t('notificationCard.demo.descriptions.completeProfile')"
-                                :icon="notifUserPlaceholderIconUrl"
-                                v-model="notifOpen.withoutTitle" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.withoutTitle" />
-                    </div>
-
-                    <!-- With / without close -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.withClose') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="info"
-                                :title="t('notificationCard.demo.titles.bankDetails')"
-                                :description="t('notificationCard.demo.descriptions.bankDetails')"
-                                :icon="notifSettingsIconUrl" :closable="true"
-                                v-model="notifOpen.withClose" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.withClose" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.withoutClose') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="notice"
-                                :title="t('notificationCard.demo.titles.unsavedChanges')"
-                                :description="t('notificationCard.demo.descriptions.unsavedChanges')"
-                                :icon="notifHeartIconUrl" :closable="false"
-                                v-model="notifOpen.withoutClose" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.withoutClose" />
-                    </div>
-
-                    <!-- Custom icon -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.customIcon') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="success-teal"
-                                :title="t('notificationCard.demo.titles.profileUpdated')"
-                                :description="t('notificationCard.demo.descriptions.profileUpdated')"
-                                :icon="notifHeartIconUrl" :badgeIcon="notifTipIconUrl"
-                                v-model="notifOpen.customIcon" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.customIcon" />
-                    </div>
-
-                    <!-- With / without link -->
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.withLink') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="notice"
-                                :title="t('notificationCard.demo.titles.connectX')"
-                                :description="t('notificationCard.demo.descriptions.connectX')"
-                                :icon="notifCommentIconUrl"
-                                :linkLabel="t('notificationCard.demo.links.connectNow')"
-                                linkHref="#"
-                                v-model="notifOpen.withLink" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.withLink" />
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('notificationCard.demo.labels.withoutLink') }}</span>
-                        <div class="p-2 flex items-center">
-                            <NotificationCard variant="info"
-                                :title="t('notificationCard.demo.titles.titleOnly')"
-                                :description="t('notificationCard.demo.descriptions.completeProfile')"
-                                :icon="notifUserPlaceholderIconUrl"
-                                v-model="notifOpen.withoutLink" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.notification.withoutLink" />
-                    </div>
-                </div>
-            </section>
-
-            <!-- ===== SECTION: QuillEditor ===== -->
-            <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="QuillEditor" />
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.quillEditor.labels.default') }}</span>
-                        <div class="bg-transparent overflow-hidden">
-                            <QuillEditor v-model="vals.q1" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.quill.default" />
-                    </div>
-
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.quillEditor.labels.customPlaceholder') }}</span>
-                        <div class="bg-transparent overflow-hidden">
-                            <QuillEditor v-model="vals.q2" :placeholder="t('demo.quillEditor.placeholders.tierDescription')" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.quill.customPlaceholder" />
-                    </div>
-
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.quillEditor.labels.initialContent') }}</span>
-                        <div class="bg-transparent overflow-hidden">
-                            <QuillEditor v-model="vals.q3" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.quill.initialContent" />
-                    </div>
-
-                    <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.quillEditor.labels.richInitialContent') }}</span>
-                        <div class="bg-transparent overflow-hidden">
-                            <QuillEditor v-model="vals.q4" />
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.quill.richInitialContent" />
-                    </div>
-
-                    <div class="flex flex-col gap-3 md:col-span-2">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.quillEditor.labels.withLabelWrapper') }}</span>
-                        <div class="bg-transparent overflow-hidden max-w-xl">
-                            <div class="flex flex-col gap-1.5">
-                                <span class="text-sm font-medium text-[#667085]">{{ t('demo.quillEditor.fieldLabels.eventDescription') }}</span>
-                                <QuillEditor v-model="vals.q5" :placeholder="t('demo.quillEditor.placeholders.eventDescription')" />
-                            </div>
-                        </div>
-                        <ShowCodeToggle :code="demoSnippets.quill.withLabelWrapper" />
-                    </div>
-                </div>
-            </section>
+            <!-- ===== SECTION: ActionMenuDropdown ===== -->
+            <ActionMenuDropdownDemo />
 
             <!-- ===== SECTION: CheckboxGroup ===== -->
             <CheckboxGroupDemo />
@@ -864,8 +603,8 @@
             <!-- ===== SECTION: CheckboxSwitch ===== -->
             <CheckboxSwitchDemo />
 
-            <!-- ===== SECTION: ActionMenuDropdown ===== -->
-            <ActionMenuDropdownDemo />
+            <!-- ===== SECTION: NotificationCard ===== -->
+            <NotificationCardDemo />
 
             <!-- ===== SECTION: RadioGroup ===== -->
             <RadioGroupDemo />
@@ -874,7 +613,11 @@
             <CalendarChatDemo />
 
             <!-- ===== SECTION: UploadingProgressBar ===== -->
-            <UploadingProgressBarDemo />
+            <section class="flex flex-col gap-6">
+                <DemoSectionHeader :title="t('demo.uploadingProgressBar.sectionTitle')" />
+                <UploadingProgressBar :progress="uploadProgressDemo" :image-src="uploadPreviewDemoUrl" />
+                <ShowCodeToggle :code="uploadProgressBarSnippet" />
+            </section>
 
             <!-- ===== SECTION: DashProfileSettings ===== -->
             <DashProfileSettings />
@@ -940,7 +683,7 @@
             <!-- ===== SECTION: Spinner ===== -->
             <section class="flex flex-col gap-6">
                 <DemoSectionHeader title="Spinner" />
-                <p class="text-sm text-gray-500 -mt-4">{{ t('demo.spinner.assetMapImage') }} — useAssetUrl + assetMap (no hardcoded URLs)</p>
+                <p class="text-sm text-gray-500 -mt-4">{{ t('demo.spinner.assetMapImage') }} â€” useAssetUrl + assetMap (no hardcoded URLs)</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     <div class="flex flex-col items-center gap-3 p-4 border border-gray-200 rounded-lg bg-white/60">
@@ -967,7 +710,7 @@
 
             <!-- ===== SECTION: All Buttons (full catalog) ===== -->
             <section class="flex flex-col gap-8 mb-20">
-                <DemoSectionHeader title="All Buttons — Full Catalog" />
+                <DemoSectionHeader title="All Buttons â€” Full Catalog" />
 
                 <p class="text-sm text-gray-500 -mt-4">
                     Exactly the same buttons used across the app (same text, variant, size, width and icons),
@@ -977,13 +720,13 @@
 
                 <!-- Auth pages (login / sign up / onboarding) -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Auth pages — login / sign up / onboarding</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Auth pages â€” login / sign up / onboarding</span>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                         <div class="flex flex-col gap-2 w-full max-w-[380px]">
                             <DashboardPrimaryButton text="Sign in" variant="authPink" size="lg" type="button"
                                 :loading="buttonLoaders.authSignIn" loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('authSignIn')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authPink · size lg · login/signup submit</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authPink Â· size lg Â· login/signup submit</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.authSignIn" />
                         </div>
                         <div class="flex flex-col gap-2 w-full max-w-[380px]">
@@ -991,7 +734,7 @@
                                 :leftIcon="xLogoUrl" leftIconClass="w-8 h-8"
                                 :loading="buttonLoaders.authX" loadingSpinnerColor="text-current"
                                 @click="runButtonDemo('authX')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authTransparent · size lg · social</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authTransparent Â· size lg Â· social</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.authX" />
                         </div>
                         <div class="flex flex-col gap-2 w-full max-w-[380px]">
@@ -999,7 +742,7 @@
                                 :leftIcon="telegramIconUrl" leftIconClass="w-8 h-8"
                                 :loading="buttonLoaders.authTelegram" loadingSpinnerColor="text-current"
                                 @click="runButtonDemo('authTelegram')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authTransparent · size lg · social</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authTransparent Â· size lg Â· social</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.authTelegram" />
                         </div>
                     </div>
@@ -1015,7 +758,7 @@
                                 :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]`"
                                 :loading="buttonLoaders.checkoutProceed" loadingSpinnerColor="text-black"
                                 @click="runButtonDemo('checkoutProceed')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">checkoutProceedpayment · checkout/buy-now</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">checkoutProceedpayment Â· checkout/buy-now</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.proceedPayment" />
                         </div>
                         <div class="flex flex-col gap-2">
@@ -1024,7 +767,7 @@
                                 leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]"
                                 :loading="buttonLoaders.checkoutActionGreenX" loadingSpinnerColor="text-current"
                                 @click="runButtonDemo('checkoutActionGreenX')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">actionGreen · guest purchase</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">actionGreen Â· guest purchase</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.actionGreenX" />
                         </div>
                     </div>
@@ -1040,7 +783,7 @@
                                 :leftIconClass="`w-8 h-8 [filter:brightness(0)_saturate(100%)_invert(81%)_sepia(45%)_saturate(3798%)_hue-rotate(87deg)_brightness(100%)_contrast(98%)] drop-shadow-[0px_0px_8px_0px_#00000080]`"
                                 :loading="buttonLoaders.profileBack" loadingSpinnerColor="text-[#07F468]"
                                 @click="runButtonDemo('profileBack')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">profileMediaBtn · ProfileViewAll popup</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">profileMediaBtn Â· ProfileViewAll popup</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.profileBack" />
                         </div>
                     </div>
@@ -1060,7 +803,7 @@
                                     <img v-if="tickCircleUrl" :src="tickCircleUrl" alt="" class="w-6 h-6 [filter:brightness(0)_saturate(100%)_invert(53%)_sepia(97%)_saturate(459%)_hue-rotate(93deg)_brightness(114%)_contrast(94%)] group-hover/button:[filter:brightness(0)_saturate(100%)]" />
                                 </template>
                             </DashboardPrimaryButton>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · PayoutSettings step 2/3</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· PayoutSettings step 2/3</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.payoutSave" />
                         </div>
                     </div>
@@ -1077,7 +820,7 @@
                                 btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468"
                                 :loading="buttonLoaders.sendInvite" loadingSpinnerColor="text-black"
                                 @click="runButtonDemo('sendInvite')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">simpleBtn · PlanSharing</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">simpleBtn Â· PlanSharing</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.sendInvite" />
                         </div>
                     </div>
@@ -1094,7 +837,7 @@
                                 btnBg="#000" btnHoverBg="#07f468" btnText="#07f468" btnHoverText="#000"
                                 :loading="buttonLoaders.addTier" loadingSpinnerColor="text-[#07F468]"
                                 @click="runButtonDemo('addTier')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft · Add Tier</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft Â· Add Tier</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.addTier" />
                         </div>
                         <div class="flex flex-col gap-2">
@@ -1110,7 +853,7 @@
                                     :rightIconClass="'w-6 h-6 filter brightness-0 invert-0'"
                                     btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468" />
                             </div>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft · Next (enabled + disabled)</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft Â· Next (enabled + disabled)</span>
                         <ShowCodeToggle :code="demoSnippets.buttons.polygonNext" />
                         </div>
                         <div class="flex flex-col gap-2">
@@ -1120,7 +863,7 @@
                                 btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468"
                                 :loading="buttonLoaders.submitMedia" loadingSpinnerColor="text-black"
                                 @click="runButtonDemo('submitMedia')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft · Submit</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft Â· Submit</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.submitMedia" />
                         </div>
                     </div>
@@ -1144,7 +887,7 @@
                                     </svg>
                                 </template>
                             </DashboardPrimaryButton>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · orders table</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· orders table</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.allOrders" />
                         </div>
                         <div class="flex flex-col gap-2">
@@ -1160,7 +903,7 @@
                                     </svg>
                                 </template>
                             </DashboardPrimaryButton>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · metric card</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· metric card</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.trend" />
                         </div>
                     </div>
@@ -1177,7 +920,7 @@
                                 :leftIconClass="`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`"
                                 :loading="buttonLoaders.newEvents" loadingSpinnerColor="text-[#07F468]"
                                 @click="runButtonDemo('newEvents')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · NEW EVENTS</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· NEW EVENTS</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.newEvents" />
                         </div>
                         <div class="flex flex-col gap-2">
@@ -1186,7 +929,7 @@
                                 :leftIconClass="`w-6 h-6 transition duration-200 filter brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]`"
                                 :loading="buttonLoaders.publishSchedule" loadingSpinnerColor="text-black"
                                 @click="runButtonDemo('publishSchedule')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft · PUBLISH SCHEDULE</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft Â· PUBLISH SCHEDULE</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.publishSchedule" />
                         </div>
                         <div class="flex flex-col gap-2">
@@ -1196,7 +939,7 @@
                                 :leftIconClass="`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)] rounded-sm outline outline-[1.50px] outline-offset-[-0.75px]`"
                                 :loading="buttonLoaders.addonService" loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('addonService')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · add-on service</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· add-on service</span>
                         <ShowCodeToggle :code="demoSnippets.buttons.addonService" />
                     </div>
                         <div class="flex flex-col gap-2">
@@ -1206,7 +949,7 @@
                                 :leftIconClass="`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`"
                                 :loading="buttonLoaders.addonServiceV2" loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('addonServiceV2')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom · add-on service v2</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· add-on service v2</span>
                         <ShowCodeToggle :code="demoSnippets.buttons.addonServiceV2" />
                     </div>
                     </div>
@@ -1214,7 +957,7 @@
 
                 <!-- TwoPieceButton variants -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">TwoPieceButton — variants</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">TwoPieceButton â€” variants</span>
                     <div class="flex flex-wrap items-start gap-8">
                         <div class="flex flex-col gap-2">
                             <TwoPieceButton variant="link-x" tag="button" text="Link your X account" type="button"
@@ -1225,7 +968,7 @@
                                     <img v-if="xTwoPieceUrl" :src="xTwoPieceUrl" alt="" class="w-6 h-6 brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(83%)_sepia(37%)_saturate(2897%)_hue-rotate(81deg)_brightness(94%)_contrast(103%)]" />
                                 </template>
                             </TwoPieceButton>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">link-x · Settings</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">link-x Â· Settings</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.twoPieceLinkX" />
                         </div>
                         <div class="flex flex-col gap-2">
@@ -1237,7 +980,7 @@
                                     <img v-if="starIconUrl" :src="starIconUrl" alt="" class="w-6 h-6" />
                                 </template>
                             </TwoPieceButton>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">premium-upgrade · Settings</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">premium-upgrade Â· Settings</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.twoPiecePremium" />
                         </div>
                         <div class="flex flex-col gap-2">
@@ -1249,7 +992,7 @@
                                 :loading="buttonLoaders.twoPiecePink"
                                 loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('twoPiecePink')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">link-x (pink) · Edit Profile</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">link-x (pink) Â· Edit Profile</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.twoPiecePink" />
                         </div>
                 </div>
@@ -1272,18 +1015,17 @@ import DashboardTextInput from '@/components/forms/inputs/DashboardTextInput.vue
 import { useAssetUrl } from '@/composables/useAssetUrl.js';
 import BaseHeading from '@/components/ui/typography/BaseHeading.vue';
 import BaseParagraph from '@/components/ui/typography/BaseParagraph.vue';
-import NotificationCard from '@/components/ui/card/dashboard/NotificationCard.vue';
-import QuillEditor from '@/components/forms/inputs/QuillEditor.vue';
 // import SubscriptionCard from '@/dev/components/profile/SubscriptionCard.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
 import ShowCodeToggle from '@/dev/templates/demo/ShowCodeToggle.vue';
+import OrdersPremiumTable from '@/dev/components/ui/table/dashboard/OrdersPremiumTable.vue';
 import CheckboxGroupDemo from '@/dev/templates/demo/demo-audit/CheckboxGroupDemo.vue';
 import CheckboxSwitchDemo from '@/dev/templates/demo/demo-audit/CheckboxSwitchDemo.vue';
-import OrdersPremiumTable from '@/dev/components/ui/table/dashboard/OrdersPremiumTable.vue';
+import NotificationCardDemo from '@/dev/templates/demo/demo-audit/NotificationCardDemo.vue';
 import RadioGroupDemo from '@/dev/templates/demo/demo-audit/RadioGroupDemo.vue';
 import CalendarChatDemo from '@/dev/templates/demo/demo-audit/CalendarChatDemo.vue';
 import DashProfileSettings from '@/dev/components/ui/nav/dashboard/DashProfileSettings.vue';
-import UploadingProgressBarDemo from '@/dev/templates/demo/demo-audit/UploadingProgressBarDemo.vue';
+import UploadingProgressBar from '@/components/ui/progress/UploadingProgressBar.vue';
 import ActionMenuDropdownDemo from '@/dev/templates/demo/demo-audit/ActionMenuDropdownDemo.vue';
 import SubscriptionCardsDemo from '@/dev/templates/demo/demo-audit/SubscriptionCardsDemo.vue';
 import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
@@ -1297,6 +1039,17 @@ import {
 } from '@heroicons/vue/24/outline';
 
 const { t } = useI18n();
+const uploadProgressDemo = ref(45);
+const { url: uploadPreviewDemoUrl } = useAssetUrl('profile.uploadPreview');
+const uploadProgressBarSnippet = `import UploadingProgressBar from '@/components/ui/progress/UploadingProgressBar.vue';
+
+<UploadingProgressBar
+  v-if="isUploading"
+  :progress="uploadProgress"
+  :imageSrc="tempUploadSrc"
+/>
+
+<!-- Same as EditProfilePage.vue -->`;
 const { url: dashboardBgUrl } = useAssetUrl('dashboard.bg.gradient');
 const { url: searchIconUrl } = useAssetUrl('icon.search');
 const { url: spinnerIconUrl } = useAssetUrl('icon.spinner');
@@ -1317,16 +1070,6 @@ const { url: demoPosterUrl } = useAssetUrl('media.demo.poster');
 const { url: demoSampleBgUrl } = useAssetUrl('media.demo.sampleBg');
 const { url: demoAvatarUrl } = useAssetUrl('media.demo.avatar');
 const { url: demoSampleVideoUrl } = useAssetUrl('media.demo.sampleVideo');
-const { url: notifFilmIconUrl } = useAssetUrl('dashboard.notification.film');
-const { url: notifUploadIconUrl } = useAssetUrl('dashboard.notification.upload');
-const { url: notifPlaceholderIconUrl } = useAssetUrl('dashboard.notification.placeholder');
-const { url: notifSettingsIconUrl } = useAssetUrl('dashboard.notification.settings');
-const { url: notifBellIconUrl } = useAssetUrl('dashboard.notification.bell');
-const { url: notifDeleteIconUrl } = useAssetUrl('icon.media.menu.delete');
-const { url: notifHeartIconUrl } = useAssetUrl('dashboard.notification.heart');
-const { url: notifTipIconUrl } = useAssetUrl('dashboard.notification.tip');
-const { url: notifCommentIconUrl } = useAssetUrl('dashboard.notification.comment');
-const { url: notifUserPlaceholderIconUrl } = useAssetUrl('dashboard.notification.userPlaceholder');
 const { url: tierBgUrl } = useAssetUrl('tier.demo.background');
 const { url: tierButtonPinkUrl } = useAssetUrl('tier.demo.buttonBgPink');
 const { url: tierButtonGreenUrl } = useAssetUrl('tier.demo.buttonBgGreen');
@@ -1346,42 +1089,9 @@ const vals = reactive({
     id1: '', id2: '', id3: '', id4: 'bademail', id5: '', id6: '', id7: '', id8: 0, id9: '', id10: '',
     // CodeInput
     ci1: '', ci2: '', ci3: '', ci4: '', ci5: '', ci6: '',
-    // CheckboxGroup
-    cg1: false, cg2: true, cg3: false, cg4: true, cg5: false, cg6: false, cg7: true,
-    cg8a: true, cg8b: false, cg8c: true, cg9: false, cg10: false,
-    // CheckboxSwitch
-    cs1: false, cs2: true, cs3: false, cs4: true, cs5: false, cs6: true, cs7: false, cs8: true,
-    cs9a: true, cs9b: false, cs9c: true, cs10: false,
-    // QuillEditor
-    q1: '', q2: '',
-    q3: t('demo.quillEditor.initialContent.simple'),
-    q4: t('demo.quillEditor.initialContent.rich'),
-    q5: '',
 });
 
-// ===== NotificationCard open states =====
-const notifOpen = reactive({
-    warning: true,
-    success: true,
-    info: true,
-    error: true,
-    notice: true,
-    alert: true,
-    successTeal: true,
-    limitExceeded: true,
-    withIcon: true,
-    withoutIcon: true,
-    withDescription: true,
-    withoutDescription: true,
-    withoutTitle: true,
-    withClose: true,
-    withoutClose: true,
-    customIcon: true,
-    withLink: true,
-    withoutLink: true,
-});
-
-// ===== Media demo data (assetMap + i18n — no hardcoded URLs) =====
+// ===== Media demo data (assetMap + i18n â€” no hardcoded URLs) =====
 const myMediaList = computed(() => [
     {
         id: 1,
@@ -1868,33 +1578,6 @@ const demoSnippets = {
         bookingSuccess: `<DashboardTextInput \n  v-model="inputs.successField" \n  showLabel \n  :labelText="$t('demo.dashboardTextInput.username')" \n  onSuccess \n  :success="[{ message: $t('demo.dashboardTextInput.usernameAvailable') }]" \n/>`,
         bookingRemindMe: `<div class="flex flex-wrap items-center gap-2">\n  <span class="text-base font-normal whitespace-nowrap">{{ $t('booking.remindMe') }}</span>\n  <div class="w-44 shrink-0">\n    <DashboardTextInput v-model="inputs.remindMeTime" type="number" />\n  </div>\n  <span class="text-base font-normal">{{ $t('booking.minutesBeforeCall') }} {{ $t('booking.scheduledCall') }}</span>\n</div>`,
     },
-    notification: {
-        warning: `<NotificationCard \n  variant="warning" \n  :title="t('notificationCard.demo.titles.mediaRequired')" \n  :description="t('notificationCard.demo.descriptions.mediaRequired')" \n  :icon="notifFilmIconUrl" \n  :badgeIcon="notifUploadIconUrl" \n  v-model="notifOpen.warning" \n/>\n\n<!-- Script -->\nconst { url: notifFilmIconUrl } = useAssetUrl('dashboard.notification.film');\nconst { url: notifUploadIconUrl } = useAssetUrl('dashboard.notification.upload');`,
-        success: `<NotificationCard \n  variant="success" \n  :title="t('notificationCard.demo.titles.congratulations')" \n  :description="t('notificationCard.demo.descriptions.mediaApproved')" \n  :icon="notifPlaceholderIconUrl" \n  :badgeIcon="tickCircleUrl" \n  v-model="notifOpen.success" \n/>\n\n<!-- Script -->\nconst { url: notifPlaceholderIconUrl } = useAssetUrl('dashboard.notification.placeholder');\nconst { url: tickCircleUrl } = useAssetUrl('icon.tick.circle');`,
-        info: `<NotificationCard \n  variant="info" \n  :title="t('notificationCard.demo.titles.bankDetails')" \n  :description="t('notificationCard.demo.descriptions.bankDetails')" \n  :icon="notifSettingsIconUrl" \n  :badgeIcon="notifSettingsIconUrl" \n  v-model="notifOpen.info" \n/>\n\n<!-- Script -->\nconst { url: notifSettingsIconUrl } = useAssetUrl('dashboard.notification.settings');`,
-        error: `<NotificationCard \n  variant="error" \n  :title="t('notificationCard.demo.titles.actionRequired')" \n  :description="t('notificationCard.demo.descriptions.securityUpdate')" \n  :icon="notifBellIconUrl" \n  :badgeIcon="notifDeleteIconUrl" \n  v-model="notifOpen.error" \n/>\n\n<!-- Script -->\nconst { url: notifBellIconUrl } = useAssetUrl('dashboard.notification.bell');\nconst { url: notifDeleteIconUrl } = useAssetUrl('icon.media.menu.delete');`,
-        notice: `<NotificationCard \n  variant="notice" \n  :title="t('notificationCard.demo.titles.unsavedChanges')" \n  :description="t('notificationCard.demo.descriptions.unsavedChanges')" \n  :icon="notifHeartIconUrl" \n  :badgeIcon="notifTipIconUrl" \n  v-model="notifOpen.notice" \n/>\n\n<!-- Script -->\nconst { url: notifHeartIconUrl } = useAssetUrl('dashboard.notification.heart');\nconst { url: notifTipIconUrl } = useAssetUrl('dashboard.notification.tip');`,
-        alert: `<NotificationCard \n  variant="alert" \n  :title="t('notificationCard.demo.titles.activeSubscribers')" \n  :description="t('notificationCard.demo.descriptions.activeSubscribers')" \n  :icon="notifCommentIconUrl" \n  v-model="notifOpen.alert" \n/>`,
-        successTeal: `<NotificationCard \n  variant="success-teal" \n  :title="t('notificationCard.demo.titles.profileUpdated')" \n  :description="t('notificationCard.demo.descriptions.profileUpdated')" \n  :icon="notifHeartIconUrl" \n  v-model="notifOpen.successTeal" \n/>`,
-        limitExceeded: `<NotificationCard \n  variant="limit-exceeded" \n  :title="t('notificationCard.demo.titles.uploadLimit')" \n  :description="t('notificationCard.demo.descriptions.uploadLimit')" \n  :icon="notifBellIconUrl" \n  v-model="notifOpen.limitExceeded" \n/>`,
-        withIcon: `<NotificationCard \n  variant="info" \n  :title="t('notificationCard.demo.titles.bankDetails')" \n  :description="t('notificationCard.demo.descriptions.bankDetails')" \n  :icon="notifSettingsIconUrl" \n  v-model="notifOpen.withIcon" \n/>`,
-        withoutIcon: `<NotificationCard \n  variant="alert" \n  :showIcon="false" \n  :title="t('notificationCard.demo.titles.activeSubscribers')" \n  :description="t('notificationCard.demo.descriptions.activeSubscribers')" \n  v-model="notifOpen.withoutIcon" \n/>`,
-        withDescription: `<NotificationCard \n  variant="success" \n  :title="t('notificationCard.demo.titles.congratulations')" \n  :description="t('notificationCard.demo.descriptions.mediaApproved')" \n  :icon="notifPlaceholderIconUrl" \n  v-model="notifOpen.withDescription" \n/>`,
-        withoutDescription: `<NotificationCard \n  variant="notice" \n  :title="t('notificationCard.demo.titles.titleOnly')" \n  :icon="notifHeartIconUrl" \n  v-model="notifOpen.withoutDescription" \n/>`,
-        withoutTitle: `<NotificationCard \n  variant="info" \n  :description="t('notificationCard.demo.descriptions.completeProfile')" \n  :icon="notifUserPlaceholderIconUrl" \n  v-model="notifOpen.withoutTitle" \n/>`,
-        withClose: `<NotificationCard \n  variant="info" \n  :title="t('notificationCard.demo.titles.bankDetails')" \n  :description="t('notificationCard.demo.descriptions.bankDetails')" \n  :icon="notifSettingsIconUrl" \n  :closable="true" \n  v-model="notifOpen.withClose" \n/>`,
-        withoutClose: `<NotificationCard \n  variant="notice" \n  :title="t('notificationCard.demo.titles.unsavedChanges')" \n  :description="t('notificationCard.demo.descriptions.unsavedChanges')" \n  :icon="notifHeartIconUrl" \n  :closable="false" \n  v-model="notifOpen.withoutClose" \n/>`,
-        customIcon: `<NotificationCard \n  variant="success-teal" \n  :title="t('notificationCard.demo.titles.profileUpdated')" \n  :description="t('notificationCard.demo.descriptions.profileUpdated')" \n  :icon="notifHeartIconUrl" \n  :badgeIcon="notifTipIconUrl" \n  v-model="notifOpen.customIcon" \n/>\n\n<!-- Custom icon via assetMap URL string (not Heroicon component) -->`,
-        withLink: `<NotificationCard \n  variant="notice" \n  :title="t('notificationCard.demo.titles.connectX')" \n  :description="t('notificationCard.demo.descriptions.connectX')" \n  :icon="notifCommentIconUrl" \n  :linkLabel="t('notificationCard.demo.links.connectNow')" \n  linkHref="#" \n  v-model="notifOpen.withLink" \n/>`,
-        withoutLink: `<NotificationCard \n  variant="info" \n  :title="t('notificationCard.demo.titles.titleOnly')" \n  :description="t('notificationCard.demo.descriptions.completeProfile')" \n  :icon="notifUserPlaceholderIconUrl" \n  v-model="notifOpen.withoutLink" \n/>`,
-    },
-    quill: {
-        default: `<!-- Template -->\n<QuillEditor v-model="editorContent" />\n\n<!-- Script -->\nimport { ref } from 'vue';\nimport QuillEditor from '@/components/forms/inputs/QuillEditor.vue';\n\nconst editorContent = ref('');\n\n<!-- Notes -->\n// v-model stores HTML string (innerHTML)\n// Default placeholder: "Description..."\n// Toolbar: bold, italic, link, ordered list, bullet list`,
-        customPlaceholder: `<!-- Template -->\n<QuillEditor \n  v-model="tierDescription" \n  :placeholder="t('demo.quillEditor.placeholders.tierDescription')" \n/>\n\n<!-- Script -->\nimport { ref } from 'vue';\nimport { useI18n } from 'vue-i18n';\nimport QuillEditor from '@/components/forms/inputs/QuillEditor.vue';\n\nconst { t } = useI18n();\nconst tierDescription = ref('');`,
-        initialContent: `<!-- Template -->\n<QuillEditor v-model="editorContent" />\n\n<!-- Script -->\nimport { ref } from 'vue';\nimport { useI18n } from 'vue-i18n';\nimport QuillEditor from '@/components/forms/inputs/QuillEditor.vue';\n\nconst { t } = useI18n();\nconst editorContent = ref(t('demo.quillEditor.initialContent.simple'));\n\n<!-- Example value -->\n// "<p><strong>Hello World!</strong> This is pre-loaded content.</p>"`,
-        richInitialContent: `<!-- Template -->\n<QuillEditor v-model="editorContent" />\n\n<!-- Script -->\nimport { ref } from 'vue';\nimport { useI18n } from 'vue-i18n';\nimport QuillEditor from '@/components/forms/inputs/QuillEditor.vue';\n\nconst { t } = useI18n();\nconst editorContent = ref(t('demo.quillEditor.initialContent.rich'));\n\n<!-- Supports formatted HTML: bold, italic, links, ul/ol -->`,
-        withLabelWrapper: `<!-- Template (PlanDetail / Booking pattern) -->\n<div class="flex flex-col gap-1.5">\n  <span class="text-sm font-medium text-[#667085]">\n    {{ t('demo.quillEditor.fieldLabels.eventDescription') }}\n  </span>\n  <QuillEditor \n    v-model="eventDescription" \n    :placeholder="t('demo.quillEditor.placeholders.eventDescription')" \n  />\n</div>\n\n<!-- Script -->\nimport { ref } from 'vue';\nimport { useI18n } from 'vue-i18n';\nimport QuillEditor from '@/components/forms/inputs/QuillEditor.vue';\n\nconst { t } = useI18n();\nconst eventDescription = ref('');`,
-    },
     tierCard: {
         1: `<!-- Template -->\n<TierCard :tier="tierStandardClaim" />\n\n<!-- Script -->\nimport { computed } from 'vue';\nimport { useI18n } from 'vue-i18n';\nimport TierCard from '@/components/ui/card/dashboard/TierCard.vue';\nimport { useAssetUrl } from '@/composables/useAssetUrl.js';\n\nconst { t } = useI18n();\nconst { url: tierBgUrl } = useAssetUrl('tier.demo.background');\nconst { url: tierButtonPinkUrl } = useAssetUrl('tier.demo.buttonBgPink');\n\nconst tierStandardClaim = computed(() => ({\n  id: 1,\n  title: t('tierCard.demo.title'),\n  backgroundImage: tierBgUrl.value,\n  isFeatured: true,\n  stats: { video: 100, image: 80, audio: 70 },\n  theme: {\n    textPrimary: '#FB0464',\n    textSecondary: 'text-[#FFED29] dark:text-[#ffee37]',\n    shadow: 'shadow-[0px_0px_80px_0px_#FF8FBA40,0px_0px_8px_0px_#FF8FBA40]',\n    barColor: 'bg-[#FB0464] dark:bg-[#c90350]',\n    barTextColor: 'text-[#FFED29]',\n    featuredBg: 'bg-[#FB0464] dark:bg-[#c90350]',\n    buttonBgImage: \`url('\${tierButtonPinkUrl.value}')\`,\n    flashLabel: 'text-white dark:text-[#e8e6e3]',\n    flashText: '#FB0464',\n    textReNew: 'text-white dark:text-[#e8e6e3]',\n    featuredText: 'text-white dark:text-[#e8e6e3]',\n  },\n  plans: [\n    { id: '1d', label: t('tierCard.demo.plans.oneDay'), price: '55.86', discount: null },\n    { id: '1m', label: t('tierCard.demo.plans.oneMonth'), price: '55.86', discount: '-5%' },\n    { id: '6m', label: t('tierCard.demo.plans.sixMonth'), price: '55.86', discount: '-50%', isMostValue: true },\n    { id: '1y', label: t('tierCard.demo.plans.oneYear'), price: '55.86', discount: '-5%' },\n  ],\n  defaultPlan: '6m',\n  flashSale: {\n    active: true,\n    endsIn: t('tierCard.demo.flashSale.endsIn'),\n    originalPrice: t('tierCard.demo.flashSale.originalPrice'),\n  },\n  description: t('tierCard.demo.description'),\n  footer: {\n    type: 'standard',\n    buttonText: t('tierCard.demo.footer.claimOffer'),\n    progress: {\n      visible: true,\n      width: '5%',\n      leftText: t('tierCard.demo.footer.fiveLeft'),\n      rightText: t('tierCard.demo.footer.offerProgressLow'),\n    },\n  },\n}));\n\n<!-- Notes -->\n// footer.type: 'standard' | 'spend' | 'hidden' | 'subscribe'\n// backgroundImage + theme.buttonBgImage from assetMap`,
         2: `<!-- Template -->\n<TierCard :tier="tierSpendToClaim" />\n\n<!-- Script -->\nimport { computed } from 'vue';\nimport { useI18n } from 'vue-i18n';\nimport TierCard from '@/components/ui/card/dashboard/TierCard.vue';\nimport { useAssetUrl } from '@/composables/useAssetUrl.js';\n\nconst { t } = useI18n();\nconst { url: tierBgUrl } = useAssetUrl('tier.demo.background');\nconst { url: tierButtonPinkUrl } = useAssetUrl('tier.demo.buttonBgPink');\n\nconst tierSpendToClaim = computed(() => ({\n  id: 2,\n  title: t('tierCard.demo.title'),\n  backgroundImage: tierBgUrl.value,\n  isFeatured: true,\n  stats: { video: 100, image: 80, audio: 70 },\n  theme: {\n    textPrimary: 'text-[#FFED29]',\n    textSecondary: 'text-[#FFED29] dark:text-[#ffee37]',\n    shadow: 'shadow-[0px_0px_80px_0px_#FFED2940,0px_0px_8px_0px_#FFED2980]',\n    barColor: 'bg-[#ffffff]',\n    barTextColor: 'text-[#FFED29]',\n    featuredBg: 'bg-[#FB0464] dark:bg-[#c90350]',\n    buttonBgImage: \`url('\${tierButtonPinkUrl.value}')\`,\n    flashLabel: 'text-white dark:text-[#e8e6e3]',\n    flashText: '#FB0464',\n    textReNew: 'text-white dark:text-[#e8e6e3]',\n    featuredText: 'text-white dark:text-[#e8e6e3]',\n  },\n  plans: [/* same plans pattern as tier 1 */],\n  defaultPlan: '6m',\n  flashSale: { active: true, endsIn: t('tierCard.demo.flashSale.endsIn'), originalPrice: t('tierCard.demo.flashSale.originalPrice') },\n  description: t('tierCard.demo.description'),\n  footer: {\n    type: 'spend',\n    buttonText: t('tierCard.demo.footer.claimOffer'),\n    progress: {\n      visible: true,\n      width: '80%',\n      leftText: t('tierCard.demo.footer.spendMore'),\n      rightText: t('tierCard.demo.footer.spendProgress'),\n    },\n  },\n}));`,
@@ -1903,7 +1586,7 @@ const demoSnippets = {
         5: `<!-- Template -->\n<TierCard :tier="tierSubscribeGreen" />\n\n<!-- Script -->\nimport { computed } from 'vue';\nimport { useI18n } from 'vue-i18n';\nimport TierCard from '@/components/ui/card/dashboard/TierCard.vue';\nimport { useAssetUrl } from '@/composables/useAssetUrl.js';\n\nconst { t } = useI18n();\nconst { url: tierBgUrl } = useAssetUrl('tier.demo.background');\nconst { url: tierButtonGreenUrl } = useAssetUrl('tier.demo.buttonBgGreen');\n\nconst tierSubscribeGreen = computed(() => ({\n  id: 5,\n  title: t('tierCard.demo.title'),\n  backgroundImage: tierBgUrl.value,\n  isFeatured: false,\n  stats: { video: 100, image: 80, audio: 70 },\n  theme: {\n    textPrimary: 'text-[#07F468] dark:text-[#06c454]',\n    textSecondary: 'text-[#FFED29] dark:text-[#FFED29]',\n    shadow: 'shadow-[0px_0px_80px_0px_#07F46840,0px_0px_8px_0px_#07F46880]',\n    barColor: 'bg-[#FFED29] dark:bg-[#ffee37]',\n    barTextColor: 'text-[#FFED29]',\n    featuredBg: 'bg-black dark:bg-[#181a1b]',\n    buttonBgImage: \`url('\${tierButtonGreenUrl.value}')\`,\n    flashLabel: 'text-[#07F468] dark:text-[#06c454]',\n    flashText: '#07F468',\n    textReNew: 'text-white dark:text-[#e8e6e3]',\n    featuredText: 'text-[#07F468] dark:text-[#06c454]',\n  },\n  plans: [/* same plans pattern as tier 1 */],\n  defaultPlan: '6m',\n  flashSale: { active: true, endsIn: t('tierCard.demo.flashSale.endsIn'), originalPrice: t('tierCard.demo.flashSale.originalPrice') },\n  description: t('tierCard.demo.description'),\n  footer: {\n    type: 'subscribe',\n    buttonText: t('tierCard.demo.footer.subscribe'),\n    progress: { visible: false },\n  },\n}));`,
     },
     eventCard: {
-        orangeButton: `<!-- Template -->\n<EventCard theme="orange" :hasButton="true" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'orange' | 'pink'\n// hasButton: true = single progress + CTA button footer\n\n<!-- Assets (inside EventCard via useAssetUrl) -->\n// tier.demo.background — card background\n// event.demo.catImage — mascot image\n// icon.notification.close — dismiss icon\n// icon.media.verified — creator badge\n// event.demo.tooltip — progress tooltip icon\n\n<!-- i18n (inside EventCard via $t) -->\n// eventCard.demo.titles.subscriberDiscount\n// eventCard.demo.buttons.claimDiscount\n// eventCard.demo.creatorName`,
+        orangeButton: `<!-- Template -->\n<EventCard theme="orange" :hasButton="true" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'orange' | 'pink'\n// hasButton: true = single progress + CTA button footer\n\n<!-- Assets (inside EventCard via useAssetUrl) -->\n// tier.demo.background â€” card background\n// event.demo.catImage â€” mascot image\n// icon.notification.close â€” dismiss icon\n// icon.media.verified â€” creator badge\n// event.demo.tooltip â€” progress tooltip icon\n\n<!-- i18n (inside EventCard via $t) -->\n// eventCard.demo.titles.subscriberDiscount\n// eventCard.demo.buttons.claimDiscount\n// eventCard.demo.creatorName`,
         orangeProgress: `<!-- Template -->\n<EventCard theme="orange" :hasButton="false" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'orange'\n// hasButton: false = dual progress bars, no CTA button\n\n<!-- i18n keys used -->\n// eventCard.demo.spendMoreClaim\n// eventCard.demo.offersLeft\n// eventCard.demo.progressRatio`,
         pinkButton: `<!-- Template -->\n<EventCard theme="pink" :hasButton="true" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'pink'\n// hasButton: true = single progress + pink CTA button\n\n<!-- i18n keys used -->\n// eventCard.demo.titles.luckyDraw\n// eventCard.demo.buttons.enterLuckyDraw\n// eventCard.demo.chancesLeft`,
         pinkProgress: `<!-- Template -->\n<EventCard theme="pink" :hasButton="false" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'pink'\n// hasButton: false = dual progress + dark overlay (card 4 layout)\n\n<!-- i18n keys used -->\n// eventCard.demo.spendMoreEnter\n// eventCard.demo.chancesLeft\n// eventCard.demo.progressOffer`,
@@ -2035,7 +1718,7 @@ const inputs = reactive({
     price: '99.99',
 });
 
-// Button Showcase — click any catalog button to preview :loading (spinner only, no text)
+// Button Showcase â€” click any catalog button to preview :loading (spinner only, no text)
 const buttonLoaders = reactive({});
 const runButtonDemo = (id) => {
     if (buttonLoaders[id]) return;

@@ -3,6 +3,8 @@ import { ref, watch } from "vue";
 import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
 import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
 import DashboardTextInput from "@/components/forms/inputs/DashboardTextInput.vue";
+import DropdownTooltipIcon from "@/components/ui/dropdowns/DropdownTooltipIcon.vue";
+import { useAssetUrl } from "@/composables/useAssetUrl.js";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
 import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import BookingSectionsWrapper from "@/dev/components/forms/booking-form/parts/BookingSectionsWrapper.vue";
@@ -41,6 +43,8 @@ const toggleSection = (key) => {
   sectionsState.value[key] = !sectionsState.value[key];
 };
 
+const { url: bookingHelpIconUrl } = useAssetUrl('icon.booking.help');
+
 const goToBack = () => {
   props.engine.goToStep(1);
 };
@@ -71,14 +75,15 @@ const publishSchedule = async () => {
       @toggle="toggleSection('additionalRequest')">
       <div v-show="sectionsState.additionalRequest" class="inline-flex flex-col gap-5 w-full mt-5">
         <div class="flex flex-col justify-center items-start gap-1">
-          <div class="flex gap-2">
+          <div class="flex items-center gap-2">
             <CheckboxGroup v-model="formData.allowRecording" label="Allow fan record the session"
               checkboxClass="m-0 border border-gray-300 [appearance:none] w-4 h-4 rounded bg-white relative cursor-pointer outline-none focus:outline-none checked:bg-checkbox checked:border-checkbox checked:[&::after]:content-[''] checked:[&::after]:absolute checked:[&::after]:left-[0.3rem] checked:[&::after]:top-[0.15rem] checked:[&::after]:w-[0.25rem] checked:[&::after]:h-[0.5rem] checked:[&::after]:border checked:[&::after]:border-solid checked:[&::after]:border-white checked:[&::after]:border-r-[2px] checked:[&::after]:border-b-[2px] checked:[&::after]:border-t-0 checked:[&::after]:border-l-0 checked:[&::after]:rotate-45"
-              labelClass="text-slate-700 text-[16px] mt-[2px] leading-normal"
-              wrapperClass="flex items-center gap-2 mb-3" />
-            <div class="mt-[2px]">
-              <img src="https://i.ibb.co/HD78k3Sf/Icon.png" alt="" />
-            </div>
+              labelClass="text-slate-700 text-[16px] leading-normal cursor-pointer"
+              wrapperClass="flex items-center gap-2" />
+            <DropdownTooltipIcon
+              text="If enabled, fans can purchase a session recording as an add-on. The recording includes the creator's full video feed and will be available after the booking ends."
+              :icon-src="bookingHelpIconUrl"
+            />
           </div>
           <div class="inline-flex gap-2">
             <div class="w-6" />
@@ -96,14 +101,15 @@ const publishSchedule = async () => {
         </div>
         <div class="flex flex-col justify-center items-start gap-3">
           <div class="flex flex-col justify-center items-start gap-1">
-            <div class="flex gap-2">
+            <div class="flex items-center gap-2">
               <CheckboxGroup v-model="formData.allowPersonalRequest" label="Allow personal request"
                 checkboxClass="m-0 border border-gray-300 [appearance:none] w-4 h-4 rounded bg-white relative cursor-pointer outline-none focus:outline-none checked:bg-checkbox checked:border-checkbox checked:[&::after]:content-[''] checked:[&::after]:absolute checked:[&::after]:left-[0.3rem] checked:[&::after]:top-[0.15rem] checked:[&::after]:w-[0.25rem] checked:[&::after]:h-[0.5rem] checked:[&::after]:border checked:[&::after]:border-solid checked:[&::after]:border-white checked:[&::after]:border-r-[2px] checked:[&::after]:border-b-[2px] checked:[&::after]:border-t-0 checked:[&::after]:border-l-0 checked:[&::after]:rotate-45"
-                labelClass="text-slate-700 text-[16px] mt-[2px] leading-normal"
-                wrapperClass="flex items-center gap-2 mb-3" />
-              <div class="mt-[2px]">
-                <img src="https://i.ibb.co/HD78k3Sf/Icon.png" alt="" />
-              </div>
+                labelClass="text-slate-700 text-[16px] leading-normal cursor-pointer"
+                wrapperClass="flex items-center gap-2" />
+              <DropdownTooltipIcon
+                text="If enabled, fans can include a personal request in the booking form. You can review it and adjust the price before confirming the booking."
+                :icon-src="bookingHelpIconUrl"
+              />
             </div>
             <div class="h-10 inline-flex justify-start items-center gap-2">
               <div class="w-6" />

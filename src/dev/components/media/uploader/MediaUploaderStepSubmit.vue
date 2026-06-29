@@ -21,9 +21,9 @@
         <CheckboxGroup
           v-model="term1"
           label="All individuals appearing in the piece of content I am presently uploading on Fansocial (the Content):"
-          checkboxClass="appearance-none flex-shrink-0 mt-[1px] bg-white border border-gray-300 rounded-[4px] w-2 h-3 cursor-pointer checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
+          checkboxClass="appearance-none flex-shrink-0 self-start mt-[2px] bg-white border border-gray-300 rounded-[4px] w-4 min-w-4 h-4 min-h-4 cursor-pointer outline-none focus:outline-none focus:ring-0 checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
           labelClass="text-[12px] sm:text-[14px] text-[#0C111D] font-[400] cursor-pointer"
-          wrapperClass="flex"
+          wrapperClass="flex items-start gap-2"
         />
 
         <ul class="pl-2 list-none text-[12px] sm:text-[14px] font-normal leading-5 text-dark-text">

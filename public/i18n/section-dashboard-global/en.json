@@ -630,79 +630,243 @@
     },
     "checkboxGroup": {
       "sectionTitle": "CheckboxGroup",
-      "value": "Value: {value}",
-      "optionsSummary": "A: {a} {'|'} B: {b} {'|'} C: {c}",
-      "cards": {
-        "default": "Default",
-        "checked": "Checked",
-        "disabled": "Disabled",
-        "metaText": "With Meta Text",
-        "withTags": "With Tags",
-        "customStyles": "Custom Styles",
-        "withMidImg": "With Mid Image",
-        "multiple": "Multiple Checkboxes",
-        "rowLayout": "Row Layout",
-        "twoTags": "Multiple Tags",
-        "expandable": "Conditional UI Logic"
+      "sections": {
+        "checkout": "Checkout",
+        "auth": "Auth — Login",
+        "checkoutDark": "Checkout — Dark Section",
+        "dashboard": "Dashboard",
+        "mediaSubmit": "Media Uploader — Submit Step",
+        "mediaPublish": "Media Uploader — Publish & Sharing",
+        "mediaSubscription": "Media Uploader — Subscription P2V",
+        "booking": "Booking",
+        "calendar": "Calendar",
+        "calendarEventDropdown": "Calendar — Event Dropdown",
+        "adjustEvent": "Adjust Event Details",
+        "bookingStep2": "Booking — Additional Request",
+        "topUp": "Top Up Form",
+        "trailer": "Media Uploader — Trailer"
       },
-      "fields": {
-        "subscribeNewsletter": "Subscribe to newsletter",
-        "agreeTerms": "I agree to terms",
-        "disabledOption": "Disabled option",
-        "premiumFeature": "Premium feature",
-        "proOnly": "Pro only",
-        "newFeature": "New feature",
-        "rememberMe": "Remember me",
-        "visa": "Visa",
-        "optionA": "Option A",
-        "optionB": "Option B",
-        "optionC": "Option C",
-        "enableNotifications": "Enable notifications",
-        "betaFeature": "Beta feature",
-        "referralCode": "I have a referral code",
-        "referralInputLabel": "Enter Referral Code",
-        "referralPlaceholder": "e.g. FRIEND50"
+      "links": {
+        "terms": "Terms and Condition",
+        "privacy": "Privacy Policy"
+      },
+      "checkout": {
+        "websiteTermsPrefix": "I agree to Our Website's",
+        "fansocialTermsPrefix": "I agree to Fansocial's",
+        "and": "and",
+        "saveAddress": "Save this address for future use.",
+        "sameShipping": "Same as Shipping Address",
+        "saveCard": "Save this card for faster checkout."
+      },
+      "checkoutDark": {
+        "saveAddress": "Save this address for future use.",
+        "saveCard": "Save this card for faster checkout."
+      },
+      "auth": {
+        "rememberMe": "Remember me"
+      },
+      "planSharing": {
+        "verifiedFan": "Verified fan only"
+      },
+      "dashboard": {
+        "applySale": "Apply to items already on sale",
+        "verifiedFan": "Verified fan only"
+      },
+      "planMedia": {
+        "someContent": "Access to some content",
+        "moreContent": "Access to more content",
+        "draftContent": "Access to even some more content",
+        "noMeta": "Access to even more the most content",
+        "meta16": "16 Media",
+        "meta24": "24 Media",
+        "meta3": "3 Media"
+      },
+      "mediaSubmit": {
+        "item0": "All individuals appearing in the piece of content I am presently uploading on Fansocial (the Content):",
+        "item1": "I have verified, preserved and currently hold all identification cards and documents required under Record Keeping Requirements, 18 U.S.C. 2257 and 28 C.F.R. 75, or applicable laws in any other jurisdictions, countries, and territories (2257 documentation), for all individuals appearing in the Content.",
+        "item2": "The Content does not violate Fansocial's Terms of Service, and any of its related policies namely but without limitation, its Child Sexual Abuse Material Policy, or Anti-Sexual Exploitation Policies, all of which I have read and expressly agree to."
+      },
+      "mediaPublish": {
+        "comingSoon": "Feature this media on 'coming soon' section"
+      },
+      "mediaSubscription": {
+        "freePlan": "Free Plan",
+        "premiumTier": "Premium Tier",
+        "discovery": "Discovery Page",
+        "profile": "My Profile Page"
+      },
+      "booking": {
+        "longerSessions": "Allow longer sessions",
+        "longerDiscount": "Enable longer session discount",
+        "recurringDiscount": "Enable discount for recurring events",
+        "instantBooking": "Allow instant booking",
+        "disableChat": "Disable chat before call",
+        "emojiReply": "Allow reply with emoji",
+        "allowRecording": "Allow recording",
+        "cancellationFee": "Enable cancellation fee",
+        "bufferTime": "Set buffer time between booked appointments",
+        "bufferTooltip": "Buffer time between booked appointments",
+        "waitlist": "Allow fans to join waitlist if event is full"
+      },
+      "calendar": {
+        "videoCall": "Video Call",
+        "audioCall": "Audio Call",
+        "groupEvent": "Group Event",
+        "showSchedule": "Show booking schedule availability",
+        "showExisting": "Show existing schedule"
+      },
+      "calendarEventDropdown": {
+        "videoCall": "Video Call",
+        "audioCall": "Audio Call",
+        "groupCall": "Group Call"
+      },
+      "calendarMain": {
+        "showExistingEvents": "Show existing events/booking schedule"
+      },
+      "bookingStep2": {
+        "allowFanRecord": "Allow fan record the session",
+        "allowPersonalRequest": "Allow personal request",
+        "allowFanRecordTooltip": "If enabled, fans can purchase a session recording as an add-on. The recording includes the creator's full video feed and will be available after the booking ends.",
+        "allowPersonalRequestTooltip": "If enabled, fans can include a personal request in the booking form. You can review it and adjust the price before confirming the booking."
+      },
+      "adjustEvent": {
+        "recordSession": "Record our session",
+        "exclusiveVideo": "Make video exclusive",
+        "cosplay": "Cosplay",
+        "topless": "Topless"
+      },
+      "trailer": {
+        "uploadOwn": "Upload your own trailer"
       },
       "tags": {
-        "new": "NEW",
-        "beta": "BETA",
-        "free": "FREE"
+        "publishedTier": "Published Tier",
+        "draft": "Draft"
       }
     },
     "checkboxSwitch": {
       "sectionTitle": "CheckboxSwitch",
-      "active": "Active: {value}",
-      "alertsSummary": "Email: {email} {'|'} SMS: {sms} {'|'} Push: {push}",
-      "cards": {
-        "defaultOff": "Default (Off)",
-        "defaultOn": "Default (On)",
-        "wrapperLabel": "With Wrapper Label",
-        "customTrackGreen": "Custom Track (Green)",
-        "customTrackBlue": "Custom Track (Blue)",
-        "customTrackRed": "Custom Track (Red)",
-        "largeSwitch": "Large Switch",
-        "customLabelStyle": "Custom Label Style",
-        "multiple": "Multiple Switches",
-        "boldLabel": "Bold Label",
-        "expandable": "Expandable Section Logic"
+      "sections": {
+        "mediaPublish": "Media Uploader — Publish & Sharing",
+        "mediaSubscription": "Media Uploader — Subscription P2V",
+        "trailerSettings": "Media Uploader — Trailer Settings",
+        "videoThumbnail": "Media Uploader — Video Thumbnail Selector",
+        "planDetail": "Plan — Plan Detail",
+        "planSharing": "Plan — Plan Sharing",
+        "profileViewAll": "Profile — View All Popup",
+        "editProfile": "Edit Profile — Share Settings",
+        "bookingXRepost": "Booking — X Repost Settings",
+        "twitterRepostPopup": "Twitter Repost Settings Popup",
+        "devDemo": "Dev Demo Page"
       },
-      "fields": {
-        "darkMode": "Dark mode",
-        "notifications": "Notifications",
-        "enableFeature": "Enable feature",
-        "featureSettings": "Feature Settings",
-        "active": "Active",
-        "sync": "Sync",
-        "alertMode": "Alert mode",
-        "largeToggle": "Large toggle",
-        "premiumFeature": "Premium feature",
-        "emailAlerts": "Email alerts",
-        "smsAlerts": "SMS alerts",
-        "pushAlerts": "Push alerts",
-        "autoRenew": "Auto-renew subscription",
-        "showAdvanced": "Show advanced settings",
-        "advancedTitle": "Advanced Options",
-        "advancedDescription": "This panel dynamically expands only when the switch above is toggled ON, simulating conditional UI logic."
+      "wrapperLabels": {
+        "darkMode": "Dark Mode"
+      },
+      "mediaPublish": {
+        "postToX": "Post to X when my media is published"
+      },
+      "mediaSubscription": {
+        "linkPlan": "Link this media to subscription plan",
+        "payToView": "Make this media available for pay to view"
+      },
+      "trailer": {
+        "showPreview": "Show Preview Trailer"
+      },
+      "thumbnail": {
+        "blur": "Blur thumbnail"
+      },
+      "planDetail": {
+        "featuredTier": "This is a Featured Tier"
+      },
+      "planSharing": {
+        "postToX": "Post updates of this tier to X"
+      },
+      "profile": {
+        "payPerView": "Pay per view",
+        "watchNow": "Watch now"
+      },
+      "editProfile": {
+        "postToXTips": "Post to X when you receive tips"
+      },
+      "booking": {
+        "xPostLive": "Post to X when my booking schedule is live",
+        "xPostBooked": "Post to X when a booking is received",
+        "xPostInSession": "Post to X when I am in a session",
+        "xPostTipped": "Post to X when I am tipped in a session",
+        "xPostPurchase": "Post to X when someone made a purchase in a session"
+      },
+      "devDemo": {
+        "toggleDarkMode": "Toggle Dark mode"
+      }
+    },
+    "notificationCard": {
+      "sectionTitle": "NotificationCard",
+      "sections": {
+        "devDemo": "Dev Demo Page",
+        "mediaPublish": "Media Uploader — Publish & Sharing",
+        "mediaSubmit": "Media Uploader — Submit Step",
+        "mediaPreviewToast": "Media Uploader — Preview Settings (Toast)",
+        "bookingCalendar": "Booking — Unified Booking Form",
+        "planDetail": "Plan — Plan Detail",
+        "tipStep2": "Tip — Tip Step 2",
+        "editProfileUnsaved": "Edit Profile — Unsaved Changes",
+        "editProfileGallery": "Edit Profile — Gallery Upload Toast",
+        "mediaPreviewSettings": "Media Uploader — Preview Settings",
+        "bookingUnified": "Booking — Unified Booking Form (Active Subscribers)",
+        "bookingStep1": "Booking — One-on-One Step 1",
+        "withdrawEarnings": "Withdraw Earnings — Step 5"
+      },
+      "devDemo": {
+        "activeSubscribersTitle": "You have 3 active subscriber in this tier",
+        "activeSubscribersDescription": "Changing detail of this plan might affect current subscriber's subscription fee and benefits.",
+        "learnMore": "Learn more",
+        "successTitle": "Action completed successfully",
+        "successDescription": "All systems are now up and running.",
+        "errorTitle": "Payment failed",
+        "errorDescription": "Please update your billing information to continue.",
+        "infoTitle": "Heads up",
+        "infoDescription": "We updated our terms of service."
+      },
+      "editProfile": {
+        "unsavedTitle": "You have unsaved changes",
+        "unsavedDescription": "You have made changes to your profile since your last saved. Remember to click ‘SAVE’ to publish your changes.",
+        "galleryTitle": "3 files uploaded to your free gallery successfully.",
+        "galleryDescription": "Click ‘Save’ on header to update change."
+      },
+      "mediaPublish": {
+        "connectXTitle": "You must connect to your X account before using auto repost feature.",
+        "connectXButton": "Connect X account"
+      },
+      "mediaSubmit": {
+        "warningDescription": "WARNING: Uploading (or attempting to upload) content that violates any laws or criminal laws (ex: child pornography or non-consensual content), our Child Sexual Abuse Material Policy or Anti-Sexual Exploitation Policies, will result in related accounts to be immediately terminated and reported to law enforcement authorities."
+      },
+      "mediaPreviewSettings": {
+        "trailerReviewTitle": "Your media will be under review because you have uploaded a new trailer."
+      },
+      "mediaPreviewToast": {
+        "uploadedTitle": "Successfully uploaded new video."
+      },
+      "bookingCalendar": {
+        "title": "Your are now viewing your booking setting in personal event calendar view.",
+        "description": "To preview how your booking schedule will look like on your profile, go to preview booking schedule."
+      },
+      "tipStep2": {
+        "limitExceededTitle": "Input value exceeds maximum allowance (14,000 tokens)",
+        "setToMax": "Set to Max"
+      },
+      "bookingUnified": {
+        "activeSubscribersTitle": "You have 3 active subscriber in this tier",
+        "activeSubscribersDescription": "Changing detail of this plan might affect current subscriber's subscription fee and benefits."
+      },
+      "bookingStep1": {
+        "validationTitle": "Validation Error",
+        "validationDescription": "Title is required."
+      },
+      "planDetail": {
+        "featuredTierTitle": "Your ‘VIP Lounge tier’ will not longer be a featured tier.",
+        "featuredTierDescription": "This tier will be updated as the feature tier in your profile after saving."
+      },
+      "withdrawEarnings": {
+        "payoutAcceptedTitle": "Your payout request has been accepted."
       }
     },
     "actionMenuDropdown": {
@@ -796,9 +960,9 @@
         "attachMedia": "Attach Media"
       },
       "options": {
-        "optionA": "Option A",
-        "optionB": "Option B",
-        "optionC": "Option C",
+        "optionA": "Choice A",
+        "optionB": "Choice B",
+        "optionC": "Choice C",
         "useOriginal": "Use original thumbnail and preview",
         "useCustom": "Upload a different thumbnail and preview",
         "none": "Do not attach thumbnail and preview"

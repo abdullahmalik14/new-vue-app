@@ -2,18 +2,7 @@
     <section class="flex flex-col gap-6">
         <DemoSectionHeader :title="t('demo.radioGroup.sectionTitle')" />
         <div class="flex flex-col gap-10 max-w-xl">
-            <div class="flex flex-col gap-3">
-                <RadioGroup
-                    v-model="radioVals.withLabel"
-                    name="radio-with-label"
-                    :label="t('demo.radioGroup.labels.attachMedia')"
-                    :options="attachMediaOptions"
-                    version="dashboard"
-                    label-class="text-sm font-semibold text-[#667085]"
-                />
-                <p class="text-xs text-gray-400">{{ t('demo.radioGroup.selected') }}: {{ radioVals.withLabel }}</p>
-                <ShowCodeToggle :code="codeExamples.withLabel" />
-            </div>
+           
 
             <div class="flex flex-col gap-3">
                 <RadioGroup
