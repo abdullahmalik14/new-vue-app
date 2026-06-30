@@ -34,6 +34,10 @@
       "destination": "https://unified-api-handler-six.vercel.app/api/charts/:path*"
     },
     {
+      "source": "/api/events/:path*",
+      "destination": "https://unified-api-handler-six.vercel.app/api/events/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }

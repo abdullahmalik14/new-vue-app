@@ -1,6 +1,4 @@
-import { PERIODS } from '../eventExpectations.js';
-
-const CHART_PERIODS = PERIODS.filter((p) => p !== 'alltime');
+import { POPUP_SCAN_PERIODS } from '../../utils/periodMap.js';
 
 export function createRow(id, row) {
   return { tolerance: 0.01, ...row, id };
@@ -9,8 +7,8 @@ export function createRow(id, row) {
 export function addMainSubscriptionRows(rows, testCaseKey, { newCount = 1, recurringCount = 0 } = {}) {
   rows.push(
     createRow(`${testCaseKey}.main.subscribers.new.day.dom`, {
-      view: 'Main',
-      metric: 'Subscribers NEW',
+      view: 'Main · Subscribers',
+      metric: 'NEW',
       period: 'day',
       source: 'dom',
       expectedValue: newCount,
@@ -21,8 +19,8 @@ export function addMainSubscriptionRows(rows, testCaseKey, { newCount = 1, recur
   if (recurringCount > 0) {
     rows.push(
       createRow(`${testCaseKey}.main.subscribers.recurring.day.dom`, {
-        view: 'Main',
-        metric: 'Subscribers RECURRING',
+        view: 'Main · Subscribers',
+        metric: 'RECURRING',
         period: 'day',
         source: 'dom',
         expectedValue: recurringCount,
@@ -35,8 +33,8 @@ export function addMainSubscriptionRows(rows, testCaseKey, { newCount = 1, recur
 export function addMainEarningsRow(rows, testCaseKey, amount) {
   rows.push(
     createRow(`${testCaseKey}.main.earnings.total.day.dom`, {
-      view: 'Main',
-      metric: 'Total Earnings',
+      view: 'Main · Earnings',
+      metric: 'Total',
       period: 'day',
       source: 'dom',
       expectedValue: amount,
@@ -45,16 +43,34 @@ export function addMainEarningsRow(rows, testCaseKey, amount) {
   );
 }
 
-export function addEarningsPopupRows(rows, testCaseKey, amount, { subscription = null, merch = null, tipTokens = null } = {}) {
-  const chartExpected = { total: amount };
-  if (subscription != null) chartExpected.subscription = subscription;
-  if (merch != null) chartExpected.merch = merch;
-  if (tipTokens != null) chartExpected.tipTokens = tipTokens;
+function addPopupDatasetRows(rows, testCaseKey, { view, popupHeading, period, chartIdIncludes, fields }) {
+  Object.entries(fields).forEach(([fieldName, expectedValue]) => {
+    if (expectedValue == null) return;
+    rows.push(
+      createRow(`${testCaseKey}.popup.${popupHeading}.${fieldName}.${period}.dataset`, {
+        view,
+        metric: fieldName,
+        period,
+        source: 'dataset',
+        expectedValue,
+        popup: { openFromHeading: popupHeading },
+        periodToggle: period,
+        chart: { chartIdIncludes, field: fieldName },
+      }),
+    );
+  });
+}
 
-  CHART_PERIODS.forEach((period) => {
+export function addEarningsPopupRows(rows, testCaseKey, amount, { subscription = null, merch = null, tipTokens = null } = {}) {
+  const datasetFields = { total: amount };
+  if (subscription != null) datasetFields.subscription = subscription;
+  if (merch != null) datasetFields.merch = merch;
+  if (tipTokens != null) datasetFields.tipTokens = tipTokens;
+
+  POPUP_SCAN_PERIODS.forEach((period) => {
     rows.push(
       createRow(`${testCaseKey}.popup.earnings.total.${period}.dom`, {
-        view: 'Popup Earnings',
+        view: 'Popup · Earnings',
         metric: 'Total Earnings',
         period,
         source: 'dom',
@@ -63,43 +79,26 @@ export function addEarningsPopupRows(rows, testCaseKey, amount, { subscription =
         periodToggle: period,
         scan: { type: 'popupValueNearLabel', label: 'Total Earnings' },
       }),
-      createRow(`${testCaseKey}.popup.earnings.chart.${period}.amcharts`, {
-        view: 'Popup Earnings',
-        metric: 'Chart JSON earnings',
-        period,
-        source: 'amcharts',
-        expectedValue: chartExpected,
-        popup: { openFromHeading: 'Earnings' },
-        periodToggle: period,
-        chart: {
-          visibleOnly: true,
-          chartIdIncludes: 'earnings',
-          expectedDatasetKeyIncludes: 'earnings',
-          fields: { total: 'total', subscription: 'subscription', merch: 'merch', tipTokens: 'tipTokens' },
-        },
-      }),
     );
+    addPopupDatasetRows(rows, testCaseKey, {
+      view: 'Popup · Earnings',
+      popupHeading: 'Earnings',
+      period,
+      chartIdIncludes: 'earnings',
+      fields: datasetFields,
+    });
   });
 }
 
-export function addSubscribersPopupRows(rows, testCaseKey, { newSubscriber = 1 } = {}) {
-  CHART_PERIODS.forEach((period) => {
-    rows.push(
-      createRow(`${testCaseKey}.popup.subscribers.chart.${period}.amcharts`, {
-        view: 'Popup Subscribers',
-        metric: 'Chart JSON newSubscriber',
-        period,
-        source: 'amcharts',
-        expectedValue: { newSubscriber },
-        popup: { openFromHeading: 'Subscribers' },
-        periodToggle: period,
-        chart: {
-          visibleOnly: true,
-          chartIdIncludes: 'subs',
-          fields: { newSubscriber: 'newSubscriber', recurringSubscriber: 'recurringSubscriber' },
-        },
-      }),
-    );
+export function addSubscribersPopupRows(rows, testCaseKey, { newSubscriber = 1, recurringSubscriber = 0 } = {}) {
+  POPUP_SCAN_PERIODS.forEach((period) => {
+    addPopupDatasetRows(rows, testCaseKey, {
+      view: 'Popup · Subscribers',
+      popupHeading: 'Subscribers',
+      period,
+      chartIdIncludes: 'subs',
+      fields: { newSubscriber, recurringSubscriber },
+    });
   });
 }
 
@@ -107,7 +106,7 @@ export function addContributorsApiRow(rows, testCaseKey, fanLabel) {
   rows.push(
     createRow(`${testCaseKey}.api.contributors.top`, {
       view: 'API',
-      metric: 'Top contributor name',
+      metric: 'Top contributor',
       period: 'day',
       source: 'api',
       expectedValue: fanLabel,
@@ -120,10 +119,12 @@ export function addRecentOrdersApiRow(rows, testCaseKey, tab, minLength = 1) {
   rows.push(
     createRow(`${testCaseKey}.api.recentOrders.${tab}`, {
       view: 'Orders Received',
-      metric: `${tab} row count`,
+      location: 'Orders Received table',
+      metric: `${tab} rows`,
       period: 'day',
       source: 'api',
       expectedValue: minLength,
+      knownGap: 'recentOrders missing from /api/charts payload — Orders Received table stays empty',
       scan: { type: 'apiPath', path: `recentOrders.${tab}.length` },
     }),
   );
@@ -133,7 +134,7 @@ export function addTrendingTagsApiRow(rows, testCaseKey, tagId, minViews = 1) {
   rows.push(
     createRow(`${testCaseKey}.api.trendingTags.${tagId}`, {
       view: 'Trends',
-      metric: `Tag ${tagId} views`,
+      metric: tagId,
       period: 'day',
       source: 'api',
       expectedValue: minViews,
@@ -153,7 +154,7 @@ export function addTrendingMerchApiRow(rows, testCaseKey, minItems = 1) {
   rows.push(
     createRow(`${testCaseKey}.api.trendingMerch.daily`, {
       view: 'Trends',
-      metric: 'Top Merch items',
+      metric: 'Top Merch count',
       period: 'day',
       source: 'api',
       expectedValue: minItems,
@@ -165,7 +166,7 @@ export function addTrendingMerchApiRow(rows, testCaseKey, minItems = 1) {
 export function addMainFansMetricRow(rows, testCaseKey, metricLabel, expectedValue, { knownGap } = {}) {
   rows.push(
     createRow(`${testCaseKey}.main.fans.${metricLabel.replace(/\s+/g, '_').toLowerCase()}.day.dom`, {
-      view: 'Main',
+      view: 'Main · Fans',
       metric: metricLabel,
       period: 'day',
       source: 'dom',
@@ -180,7 +181,7 @@ export function addFanInsightsApiRow(rows, testCaseKey, field, minValue = 1, { k
   rows.push(
     createRow(`${testCaseKey}.api.fanInsights.${field}.daily`, {
       view: 'API',
-      metric: `fanInsights.daily ${field}`,
+      metric: field,
       period: 'day',
       source: 'api',
       expectedValue: minValue,
@@ -191,13 +192,13 @@ export function addFanInsightsApiRow(rows, testCaseKey, field, minValue = 1, { k
 }
 
 export function addFansPopupRows(rows, testCaseKey, { newFollowers = null, profileVisit = null } = {}) {
-  const popupPeriods = CHART_PERIODS.filter((p) => p !== 'day');
+  const chartPeriods = POPUP_SCAN_PERIODS.filter((period) => period !== 'day');
 
-  popupPeriods.forEach((period) => {
+  POPUP_SCAN_PERIODS.forEach((period) => {
     if (newFollowers != null) {
       rows.push(
         createRow(`${testCaseKey}.popup.fans.newFollowers.${period}.dom`, {
-          view: 'Popup Fans',
+          view: 'Popup · Fans',
           metric: 'New Followers',
           period,
           source: 'dom',
@@ -206,28 +207,14 @@ export function addFansPopupRows(rows, testCaseKey, { newFollowers = null, profi
           periodToggle: period,
           scan: { type: 'popupStatByHeading', heading: 'New Followers' },
         }),
-        createRow(`${testCaseKey}.popup.fans.chart.newFollowers.${period}.amcharts`, {
-          view: 'Popup Fans',
-          metric: 'Chart JSON newFollowers',
-          period,
-          source: 'amcharts',
-          expectedValue: { newFollowers },
-          popup: { openFromHeading: 'Fans' },
-          periodToggle: period,
-          chart: {
-            visibleOnly: true,
-            chartIdIncludes: 'fans',
-            fields: { newFollowers: 'newFollowers', profileVisits: 'profileVisits' },
-          },
-        }),
       );
     }
 
     if (profileVisit != null) {
       rows.push(
         createRow(`${testCaseKey}.popup.fans.profileVisit.${period}.dom`, {
-          view: 'Popup Fans',
-          metric: 'Total Profile Visit',
+          view: 'Popup · Fans',
+          metric: 'Profile Visit',
           period,
           source: 'dom',
           expectedValue: profileVisit,
@@ -238,13 +225,34 @@ export function addFansPopupRows(rows, testCaseKey, { newFollowers = null, profi
       );
     }
   });
+
+  chartPeriods.forEach((period) => {
+    if (newFollowers != null) {
+      addPopupDatasetRows(rows, testCaseKey, {
+        view: 'Popup · Fans',
+        popupHeading: 'Fans',
+        period,
+        chartIdIncludes: 'fans',
+        fields: { newFollowers },
+      });
+    }
+    if (profileVisit != null) {
+      addPopupDatasetRows(rows, testCaseKey, {
+        view: 'Popup · Fans',
+        popupHeading: 'Fans',
+        period,
+        chartIdIncludes: 'fans',
+        fields: { profileVisits: profileVisit },
+      });
+    }
+  });
 }
 
 export function addTokenEarningsApiRow(rows, testCaseKey, amount) {
   rows.push(
     createRow(`${testCaseKey}.api.earnings.tipTokens.day`, {
       view: 'API',
-      metric: 'Daily tipTokens',
+      metric: 'tipTokens',
       period: 'day',
       source: 'api',
       expectedValue: amount,

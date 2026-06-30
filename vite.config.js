@@ -128,14 +128,14 @@ export default defineConfig(({ mode }) => {
 
       // Proxy configuration for Twitter OAuth (bypasses CORS)
       proxy: {
-        // Analytics + events → admin backend (same DB as admin.uy4sdjn4f7.com)
+        // Analytics + events → unified-api-handler (production parity with vercel.json)
         '/api/charts': {
-          target: 'https://admin.uy4sdjn4f7.com',
+          target: 'https://unified-api-handler-six.vercel.app',
           changeOrigin: true,
           secure: true
         },
         '/api/events': {
-          target: 'https://admin.uy4sdjn4f7.com',
+          target: 'https://unified-api-handler-six.vercel.app',
           changeOrigin: true,
           secure: true
         },

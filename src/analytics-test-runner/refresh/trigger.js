@@ -1,6 +1,6 @@
 import { markScannedElement } from '../utils/markScannedElement.js';
-import { normalizeNumber } from '../utils/normalizeNumber.js';
 import { sleep } from '../utils/sleep.js';
+import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js';
 
 export function getAnalyticsRefreshButton() {
   const wrapper = document.querySelector('[data-testid="dashboard-analytics-refresh-button"]');
@@ -8,15 +8,35 @@ export function getAnalyticsRefreshButton() {
   return wrapper.querySelector('button');
 }
 
-export async function waitForAnalyticsDomUpdate(timeoutMs = 15000) {
-  const refreshButton = getAnalyticsRefreshButton();
+function isRefreshButtonReady(button) {
+  if (!button) return false;
+  if (button.disabled) return false;
+  if (button.getAttribute('aria-busy') === 'true') return false;
+  return true;
+}
+
+export { isRefreshButtonReady };
+
+export async function waitForAnalyticsDomUpdate(timeoutMs = 20000) {
+  const store = useDashboardAnalyticsStore();
+  const lastUpdatedBefore = store.lastUpdated;
   const start = Date.now();
 
   while (Date.now() - start < timeoutMs) {
-    if (refreshButton && !refreshButton.disabled) {
+    const refreshButton = getAnalyticsRefreshButton();
+    const storeTicked = Boolean(store.lastUpdated && store.lastUpdated !== lastUpdatedBefore);
+
+    if (isRefreshButtonReady(refreshButton) && storeTicked) {
+      await sleep(400);
       return true;
     }
+
     await sleep(250);
+  }
+
+  const refreshButton = getAnalyticsRefreshButton();
+  if (isRefreshButtonReady(refreshButton)) {
+    return true;
   }
 
   throw new Error('Timed out waiting for analytics refresh to complete');

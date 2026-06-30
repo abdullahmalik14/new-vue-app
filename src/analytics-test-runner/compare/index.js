@@ -3,9 +3,9 @@ import { normalizeNumber } from '../utils/normalizeNumber.js';
 export function compareNumbers(expected, found, tolerance = 0.01) {
   const diff = Math.abs(Number(found) - Number(expected));
   if (Number.isNaN(diff) || diff > tolerance) {
-    return { pass: false, message: `Numeric mismatch: expected ${expected}, found ${found}` };
+    return { pass: false, message: `Numeric mismatch: API ${expected}, DOM ${found}` };
   }
-  return { pass: true, message: 'Matched within tolerance' };
+  return { pass: true, message: 'API matches DOM' };
 }
 
 export function compareExpectedObject(expectedObject, foundObject, tolerance = 0.01) {
@@ -29,68 +29,42 @@ export function compareExpectedObject(expectedObject, foundObject, tolerance = 0
   return { pass: messages.length === 0, messages };
 }
 
+function baseComparison(expected, found, pass, message) {
+  return {
+    expectedId: expected.id,
+    valueKind: expected.valueKind,
+    view: expected.view,
+    location: expected.location,
+    metric: expected.metric,
+    period: expected.period,
+    apiPath: expected.apiPath,
+    source: expected.source,
+    knownGap: expected.knownGap,
+    expectedValue: expected.expectedValue,
+    foundValue: found?.foundValue ?? null,
+    pass,
+    message,
+  };
+}
+
 export function compareExpectedToFound(expectedRows, foundRows) {
   return expectedRows.map((expected) => {
     const found = foundRows.find((row) => row.expectedId === expected.id);
 
     if (!found || !found.ok) {
-      return {
-        expectedId: expected.id,
-        view: expected.view,
-        metric: expected.metric,
-        period: expected.period,
-        source: expected.source,
-        expectedValue: expected.expectedValue,
-        foundValue: found?.foundValue ?? null,
-        pass: false,
-        message: found?.error || 'No found row',
-      };
+      return baseComparison(expected, found, false, found?.error || 'DOM scan failed');
     }
 
     if (typeof expected.expectedValue === 'number') {
       const result = compareNumbers(expected.expectedValue, found.foundValue, expected.tolerance ?? 0.01);
-      return {
-        expectedId: expected.id,
-        view: expected.view,
-        metric: expected.metric,
-        period: expected.period,
-        source: expected.source,
-        expectedValue: expected.expectedValue,
-        foundValue: found.foundValue,
-        pass: result.pass,
-        message: result.message,
-      };
+      return baseComparison(expected, found, result.pass, result.message);
     }
 
-    if (expected.expectedValue && typeof expected.expectedValue === 'object') {
-      const result = compareExpectedObject(
-        expected.expectedValue,
-        found.foundValue,
-        expected.tolerance ?? 0.01,
-      );
-      return {
-        expectedId: expected.id,
-        view: expected.view,
-        metric: expected.metric,
-        period: expected.period,
-        source: expected.source,
-        expectedValue: expected.expectedValue,
-        foundValue: found.foundValue,
-        pass: result.pass,
-        message: result.messages?.join('; ') || 'Matched',
-      };
-    }
-
-    return {
-      expectedId: expected.id,
-      view: expected.view,
-      metric: expected.metric,
-      period: expected.period,
-      source: expected.source,
-      expectedValue: expected.expectedValue,
-      foundValue: found.foundValue,
-      pass: String(found.foundValue) === String(expected.expectedValue),
-      message: 'Equality check',
-    };
+    return baseComparison(
+      expected,
+      found,
+      String(found.foundValue) === String(expected.expectedValue),
+      'Equality check',
+    );
   });
 }

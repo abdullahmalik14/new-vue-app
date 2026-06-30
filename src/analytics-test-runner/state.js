@@ -1,4 +1,4 @@
-/** @typedef {'dom'|'amcharts'|'api'} TestSource */
+/** @typedef {'dom'|'amcharts'|'api'|'dataset'} TestSource */
 
 /**
  * @typedef {Object} ExpectedRow
@@ -57,6 +57,8 @@ export function createInitialAnalyticsTestState() {
     scannedElements: [],
     errors: [],
     refreshVerification: null,
+    currentStepId: null,
+    activityLog: [],
   };
 }
 

@@ -171,8 +171,12 @@ export function scanPopupStatByHeading(statHeading) {
     };
   }
 
-  const container = headingEl.closest('div');
-  const valueEl = Array.from(container?.querySelectorAll('span') || []).find((el) => {
+  const section =
+    headingEl.closest('.flex-1') ||
+    headingEl.parentElement?.parentElement ||
+    headingEl.closest('div');
+
+  const valueEl = Array.from(section?.querySelectorAll('span') || []).find((el) => {
     const text = el.textContent.trim().replace(/,/g, '');
     return /^-?\d+(\.\d+)?$/.test(text);
   });
@@ -244,19 +248,3 @@ export async function openTrendPopupFromHeading(headingText) {
   trendButton.click();
 }
 
-export async function switchPopupPeriod(periodLabel) {
-  const normalizedPeriod = periodLabel.toLowerCase();
-  const candidates = Array.from(document.querySelectorAll('button, [role="button"], select, option'));
-
-  const target = candidates.find((element) => {
-    const text = element.textContent.trim().toLowerCase();
-    const ariaLabel = (element.getAttribute('aria-label') || '').toLowerCase();
-    const dataPeriod = (element.getAttribute('data-period') || '').toLowerCase();
-    return text === normalizedPeriod || ariaLabel.includes(normalizedPeriod) || dataPeriod === normalizedPeriod;
-  });
-
-  if (!target) throw new Error(`Period toggle not found: ${periodLabel}`);
-
-  markScannedElement(target, `Period toggle: ${periodLabel}`);
-  target.click();
-}

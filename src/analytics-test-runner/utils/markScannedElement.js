@@ -16,12 +16,19 @@ export function buildElementSelectorHint(element) {
 export function markScannedElement(element, label) {
   if (!element) return;
 
-  element.style.outline = '2px solid red';
+  element.style.outline = '3px solid #ef4444';
   element.style.outlineOffset = '2px';
+  element.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.35)';
   element.setAttribute('data-analytics-test-scanned', 'true');
 
   if (label) {
     element.setAttribute('data-analytics-test-scan-label', label);
+  }
+
+  try {
+    element.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
+  } catch {
+    // ignore scroll errors
   }
 
   analyticsTestState.scannedElements.push({

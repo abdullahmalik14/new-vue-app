@@ -4,9 +4,8 @@ import {
   scanDataValueNearLabel,
   scanPopupStatByHeading,
   openTrendPopupFromHeading,
-  switchPopupPeriod,
 } from '../scanners/domScanners.js';
-import { closeTrendPopup } from '../scanners/popupControls.js';
+import { closeTrendPopup, waitForPopupPaint, switchPopupPeriod } from '../scanners/popupControls.js';
 import { waitForChartRenderSettle } from '../refresh/chartSettle.js';
 import {
   collectRenderedAmChartsData,
@@ -15,6 +14,7 @@ import {
 } from '../charts/collect.js';
 import { buildElementSelectorHint } from '../utils/markScannedElement.js';
 import { normalizeNumber } from '../utils/normalizeNumber.js';
+import { sleep } from '../utils/sleep.js';
 
 function getApiPathValue(payload, path) {
   return path.split('.').reduce((acc, key) => {
@@ -78,26 +78,55 @@ function scanApiArrayMatch(scan, payload) {
   };
 }
 
-function scanAmChartsExpected(expected) {
+function scanDatasetField(expected) {
   const latest = window.__analyticsTestLatestCharts || { charts: [] };
-  const snapshot = findChartSnapshot(latest.charts, expected.chart || {});
+  const chartRule = expected.chart || {};
+  const snapshot = findChartSnapshot(latest.charts, chartRule);
   if (!snapshot) {
-    return { ok: false, foundValue: null, rawText: '', element: null, error: 'Chart snapshot not found' };
+    return { ok: false, foundValue: null, rawText: '', element: null, error: 'Chart not visible for dataset field' };
   }
 
   const rows = extractChartRows(snapshot);
-  const lastRow = rows[rows.length - 1]?.row || rows[0]?.row || null;
+  const field = chartRule.field;
+
+  if (chartRule.donutName) {
+    const match = rows.find(({ row }) => {
+      const label = String(row?.name ?? row?.category ?? '').trim().toLowerCase();
+      const needle = String(chartRule.donutName).trim().toLowerCase();
+      return label === needle || label.includes(needle);
+    });
+
+    const value = normalizeNumber(match?.row?.value ?? match?.row?.[field]);
+    const ok = match != null && value != null && !Number.isNaN(value);
+
+    return {
+      ok,
+      foundValue: value,
+      rawText: String(value),
+      element: null,
+      error: ok ? null : `Dataset field missing: ${chartRule.donutName}`,
+    };
+  }
+
+  const slotRows = rows
+    .map((entry) => entry.row)
+    .filter((row) => row && typeof row === 'object' && ('period' in row || field in row));
+
+  const lastRow = slotRows.length > 0 ? slotRows[slotRows.length - 1] : rows[rows.length - 1]?.row ?? null;
   if (!lastRow) {
     return { ok: false, foundValue: null, rawText: '', element: null, error: 'Chart has no data rows' };
   }
 
-  const fields = expected.chart?.fields || {};
-  const foundValue = {};
-  Object.keys(fields).forEach((key) => {
-    foundValue[key] = normalizeNumber(lastRow[fields[key]] ?? lastRow[key]);
-  });
+  const value = normalizeNumber(lastRow[field] ?? lastRow[expected.chart?.dataKey]);
+  const ok = value != null && !Number.isNaN(value);
 
-  return { ok: true, foundValue, rawText: JSON.stringify(foundValue), element: null, error: null };
+  return {
+    ok,
+    foundValue: value,
+    rawText: String(value),
+    element: null,
+    error: ok ? null : `Dataset field missing: ${field}`,
+  };
 }
 
 function resolveCardFieldValue(result, field) {
@@ -139,17 +168,19 @@ export async function executeExpectedScan(expected, chartsPayload, options = {})
 
     if (expected.popup && !options.skipPopupSetup) {
       await openTrendPopupFromHeading(expected.popup.openFromHeading);
+      await waitForPopupPaint();
       if (expected.periodToggle) {
         await switchPopupPeriod(expected.periodToggle);
+        await waitForPopupPaint();
         await waitForChartRenderSettle({
           chartIdIncludes: expected.chart?.chartIdIncludes,
         });
       }
     }
 
-    if (expected.source === 'amcharts') {
+    if (expected.source === 'dataset' || expected.source === 'amcharts') {
       collectRenderedAmChartsData();
-      const result = scanAmChartsExpected(expected);
+      const result = scanDatasetField(expected);
       return toFoundRow(expected, result);
     }
 
@@ -187,12 +218,14 @@ export async function executeExpectedScan(expected, chartsPayload, options = {})
 }
 
 /**
- * Open each popup once per heading, toggle periods, scan batch, then close.
+ * Open each popup once per heading, toggle all periods, scan, then close.
  * @param {object[]} popupRows
  * @param {object} chartsPayload
+ * @param {{ onProgress?: (msg: string) => void }} [options]
  */
-export async function executePopupScanBatch(popupRows, chartsPayload) {
+export async function executePopupScanBatch(popupRows, chartsPayload, options = {}) {
   const foundRows = [];
+  const onProgress = options.onProgress;
   const byHeading = new Map();
 
   popupRows.forEach((row) => {
@@ -202,16 +235,29 @@ export async function executePopupScanBatch(popupRows, chartsPayload) {
     byHeading.get(heading).push(row);
   });
 
-  for (const [heading, rows] of byHeading) {
+  const orderedHeadings = ['Subscribers', 'Fans', 'Earnings', 'Likes', 'Contributors'].filter((heading) =>
+    byHeading.has(heading),
+  );
+  const remaining = [...byHeading.keys()].filter((heading) => !orderedHeadings.includes(heading));
+  const headings = [...orderedHeadings, ...remaining];
+
+  for (const heading of headings) {
+    const rows = byHeading.get(heading);
+    onProgress?.(`Opening popup: ${heading}`);
     await openTrendPopupFromHeading(heading);
+    await waitForPopupPaint();
+    onProgress?.(`Popup open: ${heading} — waiting for paint`);
 
     const periods = [...new Set(rows.map((row) => row.periodToggle).filter(Boolean))];
     if (periods.length === 0) periods.push(null);
 
     for (const period of periods) {
       if (period) {
+        onProgress?.(`${heading}: switching period → ${period}`);
         await switchPopupPeriod(period);
+        await waitForPopupPaint();
         const chartHint = rows.find((row) => row.periodToggle === period && row.chart)?.chart?.chartIdIncludes;
+        onProgress?.(`${heading} / ${period}: waiting for chart paint`);
         await waitForChartRenderSettle({ chartIdIncludes: chartHint });
       }
 
@@ -220,12 +266,15 @@ export async function executePopupScanBatch(popupRows, chartsPayload) {
 
       const batch = period ? rows.filter((row) => row.periodToggle === period) : rows;
       for (const expected of batch) {
+        onProgress?.(`Scanning ${heading} · ${period || 'default'} · ${expected.metric}`);
         const found = await executeExpectedScan(expected, chartsPayload, { skipPopupSetup: true });
         foundRows.push(found);
       }
     }
 
+    onProgress?.(`Closing popup: ${heading}`);
     await closeTrendPopup();
+    await sleep(300);
   }
 
   return foundRows;

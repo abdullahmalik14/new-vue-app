@@ -6,16 +6,36 @@ import {
   markRefreshSession,
 } from '@/analytics-test-runner/refresh/verifyRefresh.js';
 
+const chartsPayload = {
+  earnings: {
+    daily: [{ total: 29.99, subscription: 29.99, merch: 5, tipTokens: 10 }],
+    weekly: [{ total: 29.99, subscription: 29.99 }],
+    monthly: [{ total: 29.99, subscription: 29.99 }],
+    yearly: [{ total: 29.99, subscription: 29.99 }],
+  },
+  subscriptions: {
+    daily: [{ newSubscriber: 1, recurringSubscriber: 0, tier2: 1 }],
+    weekly: [{ newSubscriber: 1, tier2: 1 }],
+    monthly: [{ newSubscriber: 1, tier2: 1 }],
+    yearly: [{ newSubscriber: 1, tier2: 1 }],
+  },
+  fanInsights: {
+    daily: [{ newFollowers: 9, profileVisits: 34 }],
+    weekly: [{ newFollowers: 9, profileVisits: 34 }],
+    monthly: [{ newFollowers: 9, profileVisits: 34 }],
+    yearly: [{ newFollowers: 9, profileVisits: 23 }],
+  },
+};
+
 describe('analytics test runner refresh verification (Step 10)', () => {
-  it('buildRefreshVerificationChecks passes when API and DOM update after refresh', () => {
+  it('buildRefreshVerificationChecks passes when DOM matches UI-expected API values', () => {
     markRefreshSession();
 
     const checks = buildRefreshVerificationChecks({
       testCaseKey: 'newSubscription',
-      baseline: { earnings: 0, subscribersNew: 0, newFollowers: 0, profileVisit: 0 },
-      beforeRefresh: { earnings: 0, subscribersNew: 0, newFollowers: 0, profileVisit: 0 },
       afterRefresh: { earnings: 29.99, subscribersNew: 1, newFollowers: 0, profileVisit: 0 },
       apiMetric: 29.99,
+      chartsPayload,
     });
 
     expect(assertPageNotReloaded()).toBe(true);
@@ -23,15 +43,14 @@ describe('analytics test runner refresh verification (Step 10)', () => {
     expect(checks.find((c) => c.id === 'step10.domUpdatedAfterRefresh')?.pass).toBe(true);
   });
 
-  it('buildRefreshVerificationChecks fails when DOM unchanged after refresh', () => {
+  it('buildRefreshVerificationChecks fails when DOM does not match post-event API', () => {
     markRefreshSession();
 
     const checks = buildRefreshVerificationChecks({
       testCaseKey: 'follow',
-      baseline: { earnings: 0, newFollowers: 0 },
-      beforeRefresh: { earnings: 0, newFollowers: 0 },
-      afterRefresh: { earnings: 0, newFollowers: 0 },
-      apiMetric: 1,
+      afterRefresh: { earnings: 0, newFollowers: 0, profileVisit: 0 },
+      apiMetric: 9,
+      chartsPayload,
     });
 
     expect(checks.find((c) => c.id === 'step10.domUpdatedAfterRefresh')?.pass).toBe(false);
