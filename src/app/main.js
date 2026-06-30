@@ -681,6 +681,10 @@ async function mountApplication() {
 
   app.mount("#app");
 
+  if (import.meta.env.DEV) {
+    import("@/analytics-test-runner/index.js");
+  }
+
   log("main.js", "init", "mount", "Application mounted successfully", {});
 
   if (window.performanceTracker) {
