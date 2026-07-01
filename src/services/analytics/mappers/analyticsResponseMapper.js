@@ -116,7 +116,7 @@ export function mapFansFromFanInsights(fanInsights) {
     yearly: mapFanInsightsPeriod(fanInsights.yearly, fanInsights.countries?.yearly),
     alltime: mapFanInsightsPeriod(
       fanInsights.alltime || fanInsights.yearly,
-      fanInsights.countries?.alltime,
+      fanInsights.countries?.alltime || fanInsights.countries?.yearly,
     ),
   };
 }
@@ -188,6 +188,7 @@ export function mapTrendingCountries(countries) {
     weekly: countries.weekly || [],
     monthly: countries.monthly || [],
     yearly: countries.yearly || [],
+    alltime: countries.alltime || countries.yearly || [],
   };
 }
 

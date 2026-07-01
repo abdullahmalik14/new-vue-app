@@ -163,7 +163,7 @@ function createInitialDashboardAnalyticsState() {
     trendingMerch: {},
     trendingTags: {},
     trendingCountries: {},
-    countries: { daily: [], weekly: [], monthly: [], yearly: [] },
+    countries: { daily: [], weekly: [], monthly: [], yearly: [], alltime: [] },
     fanInsights: { daily: [], weekly: [], monthly: [], yearly: [], grandTotal: {} },
     recentOrders: {
       subscriptions: [],
@@ -221,7 +221,12 @@ export const useDashboardAnalyticsStore = defineStore('dashboardAnalytics', {
       const arr = state.earnings[key]
       const earningsInsightRow = arr && arr.length ? { ...arr[arr.length - 1] } : null
       if (earningsInsightRow) {
-        const countries = state.countries?.[key] || []
+        const countries =
+          state.countries?.[key]?.length
+            ? state.countries[key]
+            : key === 'alltime'
+              ? (state.countries?.yearly || state.trendingCountries?.yearly || state.trendingCountries?.alltime || [])
+              : (state.countries?.[key] || [])
         earningsInsightRow.topCountries = countries.map((c, i) => ({
           rank: c.rank || i + 1,
           country: analyticsCountryCodeToDisplayName[c.country] || c.country,
