@@ -1,7 +1,7 @@
 export function getContributorsListForPeriod(source, periodKey) {
   if (!source) return []
   if (Array.isArray(source)) return source 
-  return source[periodKey] || [] 
+  return source[periodKey]?.length ? source[periodKey] : (source['alltime'] || [])
 }
 
 export function mapContributorToPreviewRow(arr) {

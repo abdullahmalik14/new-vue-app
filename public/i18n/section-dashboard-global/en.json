@@ -527,6 +527,42 @@
       }
     }
   },
+  "mediaUploader": {
+    "search": {
+      "defaultPlaceholder": "Search...",
+      "add": "Add",
+      "remove": "Remove",
+      "maxItemsAlert": "Maximum {max} items allowed",
+      "languageLabel": "繁體中文",
+      "iconAlt": "search"
+    },
+    "tagTabs": {
+      "az": "A-Z",
+      "hobby": "癖好",
+      "clothing": "服裝",
+      "scene": "場景",
+      "identity": "身分",
+      "body": "身型"
+    },
+    "thumbnail": {
+      "label": "Thumbnail",
+      "blurToggle": "Blur thumbnail"
+    },
+    "postPreview": {
+      "heading": "POST PREVIEW",
+      "displayName": "Jelly FISH",
+      "handle": "@jellyf1sh",
+      "defaultMessage": "Don't miss out—check this exclusive content and be the first to experience it!",
+      "linkPreview": "fansocial.app/model/jellyskitchen/..."
+    },
+    "publishDatePicker": {
+      "defaultLabel": "Set date and time for publishing:",
+      "placeholder": "--/--/----   --:-- --"
+    },
+    "fileUploadPlaceholder": {
+      "alt": "file-upload-placeholder"
+    }
+  },
   "demo": {
     "dashboardTextInput": {
       "generalVariations": "General variations",
@@ -867,6 +903,189 @@
       },
       "withdrawEarnings": {
         "payoutAcceptedTitle": "Your payout request has been accepted."
+      }
+    },
+    "checkoutReuseable": {
+      "sectionTitle": "Checkout Reusable Components",
+      "sections": {
+        "mediaPreview": "CheckoutMediaPreview — Subscribe Login Popup",
+        "sectionHeader": "SectionHeader — Subscribe / Cart Checkout Login",
+        "orderSummaryToggle": "SectionToggleHeader — Cart Checkout (ORDER SUMMARY)",
+        "paymentToggle": "SectionToggleHeader no toggleable— Purchase Flow (PAYMENT METHOD)",
+        "addressCard": "AddressCard — Cart Checkout Login",
+        "planDropdown": "BasePlanDropdown — Purchase / Cart Checkout (Dark)",
+        "orderSummary": "OrderSummary — Cart / Guest Purchase",
+        "paymentCompact": "PaymentMethodLoggedIn — Purchase Flow (Compact)",
+        "paymentLarge": "PaymentMethodLoggedIn — Purchase Flow / Fan Booking (Large)",
+        "paymentNotLoggedIn": "PaymentMethodNotLoggedIn — Purchase Flow (max-width)",
+        "subscriptionDefault": "SubscriptionPlanCard — Subscribe Login (Default)",
+        "subscriptionUpdate": "SubscriptionPlanCard — Subscribe Update (Current / New)",
+        "subscriptionNew": "SubscriptionPlanCard — Purchase Flow (variant new)",
+        "notesWithAvatars": "CheckoutNotes — Cart Checkout (showAvatars true)",
+        "notesWithoutAvatars": "CheckoutNotes — Subscribe Login (showAvatars false)",
+        "notesGuest": "CheckoutNotes — Guest Purchase / Subscription Order",
+        "totalAmount": "TotalAmountRow — All Checkout Popups",
+        "accountEmail": "SectionToggleHeader — Tip Step 3 (ACCOUNT EMAIL)",
+        "topUpPayment": "SectionToggleHeader toggleable — Top Up Step 2 (PAYMENT METHOD)",
+        "addressTopUp": "AddressCard — Top Up / Tip (Saved Billing)"
+      },
+      "mediaPreview": {
+        "creatorName": "Princess Carrot Pop",
+        "creatorHandle": "@sammisjelly187",
+        "description": "Subscribe now to instantly unlock 300+ premium media resources."
+      },
+      "sectionHeader": {
+        "title": "ACCOUNT EMAIL"
+      },
+      "orderSummary": {
+        "title": "ORDER SUMMARY"
+      },
+      "payment": {
+        "title": "PAYMENT METHOD",
+        "holderName": "John Carter"
+      },
+      "address": {
+        "cart": "Chan Tai Man,10/F Block5,Fook Yip Bldg,12345,Kwai Chung,Hong Kong",
+        "topUp": "John Carter, 123 Main Street, Los Angeles, CA, 90001, United States"
+      },
+      "planDropdown": {
+        "country": "Country",
+        "state": "State"
+      },
+      "cart": {
+        "itemName": "Orange (Philippines)",
+        "creatorName": "Princess Carrot Pop",
+        "price": "$5.99/mo",
+        "oldPrice": "$123.45"
+      },
+      "subscription": {
+        "title": "FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.",
+        "priceMonthly": "USD$499.99/mo",
+        "price": "USD$499.99",
+        "footerBillingCycle": "Your membership will update in your next billing cycle (xx-xx-xxxx)",
+        "footerCheckoutStart": "Your subscription will begin as soon as you complete checkout. Your billing cycle will start (02-26-2025)."
+      },
+      "total": {
+        "amount": "USD$6.99"
+      },
+      "options": {
+        "hongKong": "Hong Kong",
+        "australia": "Australia",
+        "usa": "USA",
+        "florida": "Florida",
+        "hawaii": "Hawaii",
+        "newYork": "New York",
+        "unitedStates": "United States",
+        "canada": "Canada",
+        "unitedKingdom": "United Kingdom",
+        "california": "California",
+        "texas": "Texas"
+      }
+    },
+    "mediaUploaderHelper": {
+      "sectionTitle": "Media Uploader Helper Components",
+      "sections": {
+        "searchTags": "ReusableSearchInput — Media Details (Tags)",
+        "searchCoPerformer": "ReusableSearchInput — Media Details (Co-performer)",
+        "searchInviteList": "ReusableSearchInput — Plan Sharing (Invite list)",
+        "publishDatePicker": "PublishDatePicker — Publish & Sharing (Schedule)",
+        "postPreview": "PostPreview — Publish & Sharing",
+        "socialPreviewThumbnail": "SocialCustomPreview — Publish & Sharing (Thumbnail)",
+        "socialPreviewTrailer": "SocialCustomPreview — Publish & Sharing (Trailer)",
+        "thumbnailUploaderDefault": "ThumbnailUploader — Preview Settings (Upload Thumbnail)",
+        "thumbnailUploaderTrailer": "ThumbnailUploader — Preview Settings (Upload Own Trailer)",
+        "thumbnailUploaderImage": "ThumbnailUploader — Publish & Sharing (Thumbnail Image)",
+        "thumbnailUploaderVideo": "ThumbnailUploader — Publish & Sharing (Trailer File)",
+        "thumbnailUploaderTier": "ThumbnailUploader — Add Tier Popup",
+        "thumbnailUploaderNayTwitter": "ThumbnailUploaderNay — Twitter Repost Settings",
+        "thumbnailUploaderNayBooking": "ThumbnailUploaderNay — Booking Step 1 (Event Image)",
+        "videoThumbnailSelector": "VideoThumbnailSelector — Preview Settings (Choose Screenshot)",
+        "thumbnailSelector": "ThumbnailSelector — Video Thumbnail Selector (child)",
+        "blurEffect": "BlurEffect — Video Thumbnail Selector (child)",
+        "uploadThumbnailPreview": "UploadThumbnailPreview — Preview Settings (Upload Thumbnail)",
+        "systemGeneratedImage": "SystemGeneratedImage — Preview Settings (Site Generated)",
+        "uploadYourOwnTrailer": "UploadYourOwnTrailer — Preview Settings (Upload Own)",
+        "fileUploadPlaceholder": "FileUploadPlaceholder — Preview Settings (Use Placeholder)",
+        "trailerSettingScreenshot": "TrailerSetting — Preview Settings (Screenshot)",
+        "trailerSettingPlaceholder": "TrailerSetting — Preview Settings (Placeholder)",
+        "trailerSettingUpload": "TrailerSetting — Preview Settings (Upload)"
+      },
+      "search": {
+        "tags": {
+          "title": "Tags",
+          "subtitle": "Add maximum of 10 tags to your media.",
+          "placeholder": "Search Tags..."
+        },
+        "coPerformer": {
+          "title": "Co-performer",
+          "subtitle": "If this media includes other performers, please tag them below.",
+          "placeholder": "Jelly"
+        },
+        "inviteList": {
+          "subtitle": "Invite list",
+          "placeholder": "Search fan by username..."
+        }
+      },
+      "publishDatePicker": {
+        "label": "Set date and time for publishing:",
+        "message": "Date must be minimum 2 days ahead."
+      },
+      "socialPreview": {
+        "thumbnailLabel": "Thumbnail",
+        "trailerLabel": "Trailer"
+      },
+      "thumbnailUploader": {
+        "trailerSubtitle": "or drag and drop video file here",
+        "trailerFileInfo": "MP4, AVI, MOV, WEBM, JPEG, PNG. (Max. 2000MB)",
+        "imageSubtitle": "or drag and drop thumbnail image",
+        "imageFileInfo": "SVG, PNG, JPG or GIF (max. 800x400px)",
+        "videoSubtitle": "or drag and drop trailer file",
+        "videoFileInfo": "MP3, MP4, AVI, QUICKTIME, X-MATROSKA, X-MS-WMV, WEBM, OGG. (Max. 2000MB)",
+        "tierTitle": "Click here",
+        "tierSubtitle": "to select image or drag and drop image here",
+        "tierFileInfo": "(Allowed formats: JPEG, PNG. Max size: 10MB)"
+      },
+      "thumbnailUploaderNay": {
+        "clickToUpload": "Click to upload",
+        "dropText": " or drag and drop",
+        "twitterAllowedTypes": "SVG, PNG, JPG or GIF",
+        "twitterMaxSize": "800x400px",
+        "bookingDropText": "or drag and drop image file here",
+        "bookingAllowedTypes": "PNG or JPG (max. 10MB)",
+        "bookingMaxSize": "10MB"
+      },
+      "tags": {
+        "history": {
+          "bluebettle": "Bluebettle",
+          "dhdt": "dhdt",
+          "hello": "Hello"
+        },
+        "list": {
+          "apple": "Apple",
+          "april": "April",
+          "apricote": "Apricote",
+          "bigSmile": "Big smile",
+          "bigEnergy": "Big Energy",
+          "bluebettle": "Bluebettle",
+          "cantonese": "Cantonese",
+          "chinese": "Chinese",
+          "dumplings": "Dumplings",
+          "eeeee": "EEEEE"
+        }
+      },
+      "performers": {
+        "jellyJam": {
+          "name": "Jelly's Jam",
+          "username": "sommijellyll67"
+        },
+        "sammiJelly": {
+          "name": "Sammi's Jelly",
+          "username": "sommijellyll67"
+        }
+      },
+      "planSharing": {
+        "userOne": "User One",
+        "userTwo": "User Two"
       }
     },
     "actionMenuDropdown": {

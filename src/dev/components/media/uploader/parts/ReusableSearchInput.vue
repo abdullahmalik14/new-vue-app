@@ -27,11 +27,11 @@
       >
         <div class="flex items-center self-stretch pt-2 pb-3 gap-2 flex-1">
           <div class="flex items-center gap-2 flex-1">
-            <img :src="iconUrl" :alt="iconAlt" class="w-5 h-5" />
+            <img v-if="resolvedIconUrl" :src="resolvedIconUrl" :alt="resolvedIconAlt" class="w-5 h-5" />
             <input
               v-model="searchQuery"
               type="text"
-              :placeholder="placeholder"
+              :placeholder="resolvedPlaceholder"
               @input="handleSearch"
               @focus="showResults = true"
               :class="[
@@ -43,10 +43,11 @@
 
           <!-- Language/Filter Icon (Optional) -->
           <button
-            v-if="showLanguageIcon"
-            class="flex items-center gap-1 text-sm text-[#667085]"
+          v-if="showLanguageIcon"
+          class="flex items-center gap-1 text-sm text-[#667085]"
           >
-            繁體中文
+          <img v-if="assets.globeIcon" :src="assets.globeIcon" alt="globe-icon">
+            {{ t('mediaUploader.search.languageLabel') }}
             <svg
               class="h-4 w-4 text-gray-400 transition-transform duration-200"
               viewBox="0 0 20 20"
@@ -64,6 +65,21 @@
     </div>
 
     <!-- Selected Items (Tags/Co-performers) -->
+    <div v-if="selectedItems.length > 0" class="flex flex-wrap gap-2 mb-3 mt-2">
+      <div 
+        v-for="item in selectedItems" 
+        :key="item.id"
+        class="flex items-center gap-1.5 px-2.5 py-1 bg-[#0C111D] text-white text-xs font-medium rounded-full"
+      >
+        <img v-if="type === 'performer' && item.avatar" :src="item.avatar" class="w-4 h-4 rounded-full" />
+        <span>{{ item.name }}</span>
+        <button @click.stop="removeItem(item.id)" class="text-white/70 hover:text-white ml-0.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+      </div>
+    </div>
 
     <!-- Search Results Dropdown -->
     <div
@@ -88,7 +104,7 @@
             @click="activeTab = tab.id"
             :class="[
               'flex flex-col items-center justify-center w-full gap-0.5 whitespace-nowrap pt-[.563rem] pb-[.563rem] px-4 min-w-[5rem]',
-              activeTab !== tab.id ? 'opacity-70' : 'opacity-100',
+              activeTab !== tab.id ? 'opacity-70' : 'opacity-100'
             ]"
           >
             <img :src="tab.icon" :alt="tab.label" class="w-5 h-5" />
@@ -198,13 +214,13 @@
             <img
               :src="
                 isSelected(performer.id)
-                  ? 'https://i.ibb.co/4ZhsKf1R/svgviewer-png-output-27.webp' // MINUS ICON
-                  : 'https://i.ibb.co/SLFjFwP/svgviewer-png-output-26.webp' // PLUS ICON
+                  ? assets.minusIcon
+                  : assets.plusIcon
               "
               class="w-4 h-4"
             />
 
-            {{ isSelected(performer.id) ? "Remove" : "Add" }}
+            {{ isSelected(performer.id) ? t('mediaUploader.search.remove') : t('mediaUploader.search.add') }}
           </div>
         </button>
       </div>
@@ -214,8 +230,11 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { useI18n } from "vue-i18n";
+import { useMediaUploaderAssets } from "@/dev/composables/useMediaUploaderAssets.js";
 
-// Props
+const { t } = useI18n();
+const { assets } = useMediaUploaderAssets();
 const props = defineProps({
   title: {
     type: String,
@@ -227,15 +246,15 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: "Search...",
+    default: "",
   },
   iconUrl: {
     type: String,
-    default: "https://i.ibb.co.com/jvc93MC4/search.webp",
+    default: "",
   },
   iconAlt: {
     type: String,
-    default: "search",
+    default: "",
   },
   type: {
     type: String,
@@ -289,43 +308,18 @@ const showResults = ref(false);
 const selectedItems = ref([...props.modelValue]);
 const activeTab = ref("az");
 
-// Tabs configuration with actual image URLs
-const tabs = ref([
-  {
-    id: "az",
-    icon: "https://i.ibb.co/Kz93m55z/svgviewer-png-output-18.webp",
-    label: "A-Z",
-  },
-  {
-    id: "sort",
-    icon: "https://i.ibb.co/jkjtwC9C/svgviewer-png-output-17.webp",
-    label: "",
-  },
-  {
-    id: "hobby",
-    icon: "https://i.ibb.co/WNRLqNhJ/svgviewer-png-output-19.webp",
-    label: "癖好",
-  },
-  {
-    id: "clothing",
-    icon: "https://i.ibb.co/39N92CGq/svgviewer-png-output-20.webp",
-    label: "服裝",
-  },
-  {
-    id: "scene",
-    icon: "https://i.ibb.co/NdgG4wHg/svgviewer-png-output-21.webp",
-    label: "場景",
-  },
-  {
-    id: "identity",
-    icon: "https://i.ibb.co/JWBKYGH1/svgviewer-png-output-22.webp",
-    label: "身分",
-  },
-  {
-    id: "body",
-    icon: "https://i.ibb.co/DDps3vy4/svgviewer-png-output-23.webp",
-    label: "身型",
-  },
+const resolvedPlaceholder = computed(() => props.placeholder || t('mediaUploader.search.defaultPlaceholder'));
+const resolvedIconUrl = computed(() => props.iconUrl || assets.value.searchIcon);
+const resolvedIconAlt = computed(() => props.iconAlt || t('mediaUploader.search.iconAlt'));
+
+const tabs = computed(() => [
+  { id: "az", icon: assets.value.tagTabAz, label: t('mediaUploader.tagTabs.az') },
+  { id: "sort", icon: assets.value.tagTabSort, label: "" },
+  { id: "hobby", icon: assets.value.tagTabHobby, label: t('mediaUploader.tagTabs.hobby') },
+  { id: "clothing", icon: assets.value.tagTabClothing, label: t('mediaUploader.tagTabs.clothing') },
+  { id: "scene", icon: assets.value.tagTabScene, label: t('mediaUploader.tagTabs.scene') },
+  { id: "identity", icon: assets.value.tagTabIdentity, label: t('mediaUploader.tagTabs.identity') },
+  { id: "body", icon: assets.value.tagTabBody, label: t('mediaUploader.tagTabs.body') },
 ]);
 
 // Computed
@@ -384,7 +378,7 @@ const selectItem = (item) => {
     selectedItems.value.splice(index, 1);
   } else {
     if (selectedItems.value.length >= props.maxItems) {
-      alert(`Maximum ${props.maxItems} items allowed`);
+      alert(t('mediaUploader.search.maxItemsAlert', { max: props.maxItems }));
       return;
     }
     selectedItems.value.push(item);

@@ -619,6 +619,19 @@
                 <ShowCodeToggle :code="uploadProgressBarSnippet" />
             </section>
 
+            <!-- ===== SECTION: CloudflareSuccess ===== -->
+            <section class="flex flex-col gap-6">
+                <DemoSectionHeader title="CloudflareSuccess" />
+                <CloudflareSuccess />
+                <ShowCodeToggle :code="cloudflareSuccessSnippet" />
+            </section>
+
+            <!-- ===== SECTION: Checkout Reusable Components ===== -->
+            <CheckoutReuseableComponentsDemo />
+
+            <!-- ===== SECTION: Media Uploader Helper Components ===== -->
+            <MediaUploaderHelperComponentsDemo />
+
             <!-- ===== SECTION: DashProfileSettings ===== -->
             <DashProfileSettings />
 
@@ -1026,6 +1039,9 @@ import RadioGroupDemo from '@/dev/templates/demo/demo-audit/RadioGroupDemo.vue';
 import CalendarChatDemo from '@/dev/templates/demo/demo-audit/CalendarChatDemo.vue';
 import DashProfileSettings from '@/dev/components/ui/nav/dashboard/DashProfileSettings.vue';
 import UploadingProgressBar from '@/components/ui/progress/UploadingProgressBar.vue';
+import CloudflareSuccess from '@/dev/components/ui/badge/dashboard/CloudflareSuccess.vue';
+import CheckoutReuseableComponentsDemo from '@/dev/templates/demo/demo-audit/CheckoutReuseableComponentsDemo.vue';
+import MediaUploaderHelperComponentsDemo from '@/dev/templates/demo/demo-audit/MediaUploaderHelperComponentsDemo.vue';
 import ActionMenuDropdownDemo from '@/dev/templates/demo/demo-audit/ActionMenuDropdownDemo.vue';
 import SubscriptionCardsDemo from '@/dev/templates/demo/demo-audit/SubscriptionCardsDemo.vue';
 import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
@@ -1050,6 +1066,9 @@ const uploadProgressBarSnippet = `import UploadingProgressBar from '@/components
 />
 
 <!-- Same as EditProfilePage.vue -->`;
+const cloudflareSuccessSnippet = `import CloudflareSuccess from '@/dev/components/ui/badge/dashboard/CloudflareSuccess.vue';
+
+<CloudflareSuccess />`;
 const { url: dashboardBgUrl } = useAssetUrl('dashboard.bg.gradient');
 const { url: searchIconUrl } = useAssetUrl('icon.search');
 const { url: spinnerIconUrl } = useAssetUrl('icon.spinner');

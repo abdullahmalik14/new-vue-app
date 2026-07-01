@@ -1,5 +1,5 @@
 <template>
-    <section class="flex flex-col gap-6">
+            <section class="flex flex-col gap-6">
         <DemoSectionHeader :title="t('demo.checkboxSwitch.sectionTitle')" />
         <div class="flex flex-col gap-10 max-w-3xl">
             <div class="flex flex-col gap-3">
@@ -89,7 +89,7 @@
                 <ShowCodeToggle :code="code.editProfilePostToX" />
             </div>
 
-            <div class="flex flex-col gap-3">
+                        <div class="flex flex-col gap-3">
                 <p class="text-sm font-semibold text-[#344054]">{{ t('demo.checkboxSwitch.sections.profileViewAll') }}</p>
                 <div v-for="item in profileItems" :key="item.key" class="flex flex-col gap-3">
                     <div class="bg-black/90 p-4 rounded-[3.125rem] inline-flex w-fit">
@@ -105,8 +105,8 @@
                         />
                     </div>
                     <ShowCodeToggle :code="code[item.key]" />
-                </div>
-            </div>
+                        </div>
+                        </div>
 
             <div class="flex flex-col gap-3">
                 <p class="text-sm font-semibold text-[#344054]">{{ t('demo.checkboxSwitch.sections.bookingXRepost') }}</p>

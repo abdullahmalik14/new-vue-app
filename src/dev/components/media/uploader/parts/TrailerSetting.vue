@@ -1,12 +1,12 @@
 <script setup>
 import { computed } from "vue";
-import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
+import CheckboxSwitch from '@/components/forms/checkboxes/CheckboxSwitch.vue';
+import { useMediaUploaderStore } from "@/stores/useMediaUploaderStore";
+
+const uploaderStore = useMediaUploaderStore();
 
 const props = defineProps({
-  uploader: {
-    type: Object,
-    required: true,
-  },
+  // 👇 Naya Prop: Batayega ke state mein konsi key update karni hai
   stateKey: {
     type: String,
     required: true, // Zaroori hai
@@ -22,9 +22,9 @@ const props = defineProps({
 });
 
 const showPreviewModel = computed({
-  get: () => props.uploader.state[props.stateKey] || false,
+  get: () => uploaderStore.form[props.stateKey] || false,
   set: (val) => {
-    props.uploader.setState(props.stateKey, val, { reason: `user:toggle:${props.stateKey}` });
+    uploaderStore.updateFormField(props.stateKey, val);
   }
 });
 </script>

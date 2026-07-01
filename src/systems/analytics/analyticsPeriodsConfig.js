@@ -7,8 +7,8 @@ export const DASHBOARD_ANALYTICS_PERIODS = {
 }
 
 export const dashboardAnalyticsTrendPeriodTabs = [
-  { id: DASHBOARD_ANALYTICS_PERIODS.YEARLY, labelKey: 'dashboard.analytics.periods.yearly' },
-  { id: DASHBOARD_ANALYTICS_PERIODS.MONTHLY, labelKey: 'dashboard.analytics.periods.monthly' },
+  { id: DASHBOARD_ANALYTICS_PERIODS.DAILY, labelKey: 'dashboard.analytics.periods.daily' },
   { id: DASHBOARD_ANALYTICS_PERIODS.WEEKLY, labelKey: 'dashboard.analytics.periods.weekly' },
-  { id: DASHBOARD_ANALYTICS_PERIODS.DAILY, labelKey: 'dashboard.analytics.periods.daily' }
+  { id: DASHBOARD_ANALYTICS_PERIODS.MONTHLY, labelKey: 'dashboard.analytics.periods.monthly' },
+  { id: DASHBOARD_ANALYTICS_PERIODS.YEARLY, labelKey: 'dashboard.analytics.periods.yearly' }
 ]

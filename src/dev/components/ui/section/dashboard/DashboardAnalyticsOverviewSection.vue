@@ -390,7 +390,7 @@
 
                   <!-- data-table -->
                   <div class="flex-grow flex-shrink [flex-basis:auto] min-w-0 min-h-0 -mx-4 -mb-4">
-                    <DashboardAnalyticsContributorsPreviewTable :rows="dashboardAnalyticsStore.getContributorsViewModel('daily').topContributors.slice(0, 6)" />
+                    <DashboardAnalyticsContributorsPreviewTable :rows="dashboardAnalyticsStore.getContributorsViewModel(contributorsPeriod).topContributors.slice(0, 6)" />
                   </div>
                 </div>
               </div>
@@ -409,7 +409,7 @@ import DashboardAnalyticsContributorsPreviewTable from '@/dev/components/ui/tabl
 import SparkLine from '@/components/ui/charts/SparkLine.vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 import { useAssetUrl } from '@/composables/useAssetUrl.js'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 
@@ -425,6 +425,7 @@ const displayCurrency = (val) => {
   return val == null ? 0 : n(Number(val))
 }
 
+const contributorsPeriod = ref('alltime')
 const dashboardAnalyticsStore = useDashboardAnalyticsStore()
 const { lastUpdated } = storeToRefs(dashboardAnalyticsStore)
 

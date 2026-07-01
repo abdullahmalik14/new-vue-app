@@ -1,9 +1,80 @@
+<script setup>
+import { computed } from "vue";
+import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
+import NotificationCard from "@/components/ui/card/dashboard/NotificationCard.vue";
+import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
+import { ExclamationTriangleIcon } from "@heroicons/vue/24/solid";
+import { useMediaUploaderStore } from "@/stores/useMediaUploaderStore";
+
+const uploaderStore = useMediaUploaderStore();
+
+// ===========================================
+// STATE CONNECTIONS (Terms & Conditions)
+// ===========================================
+
+// Term 1
+const term1 = computed({
+  get: () => uploaderStore.form.termsCheckbox1 || false,
+  set: (val) => uploaderStore.updateFormField("termsCheckbox1", val)
+});
+
+// Term 2
+const term2 = computed({
+  get: () => uploaderStore.form.termsCheckbox2 || false,
+  set: (val) => uploaderStore.updateFormField("termsCheckbox2", val)
+});
+
+// Term 3
+const term3 = computed({
+  get: () => uploaderStore.form.termsCheckbox3 || false,
+  set: (val) => uploaderStore.updateFormField("termsCheckbox3", val)
+});
+
+// Term 4
+const term4 = computed({
+  get: () => uploaderStore.form.termsCheckbox4 || false,
+  set: (val) => uploaderStore.updateFormField("termsCheckbox4", val)
+});
+
+// Term 5
+const term5 = computed({
+  get: () => uploaderStore.form.termsCheckbox5 || false,
+  set: (val) => uploaderStore.updateFormField("termsCheckbox5", val)
+});
+
+// ===========================================
+// SUBMIT LOGIC
+// ===========================================
+
+async function handleSubmit() {
+  const { termsCheckbox1, termsCheckbox2, termsCheckbox3, termsCheckbox4, termsCheckbox5 } = uploaderStore.form;
+  
+  if (!termsCheckbox1 || !termsCheckbox2 || !termsCheckbox3 || !termsCheckbox4 || !termsCheckbox5) {
+    alert("Please accept all terms and conditions before submitting.");
+    return;
+  }
+
+  try {
+    const success = await uploaderStore.submitUploader();
+    if (success) {
+      alert("Media Submitted Successfully!");
+      // Reset or redirect as per requirement (optional)
+    } else {
+      alert("Submission failed. Please try again.");
+    }
+  } catch (error) {
+    console.error("Submit Error:", error);
+    alert("An error occurred during submission.");
+  }
+}
+</script>
+
 <template>
-  <div class="relative md:py-[16px] md:px-[10px] lg:px-[24px]">
+  <div class="relative py-[16px] px-[10px] lg:px-[24px]">
     
     <div
-      @click="uploader.goToStep(4, { intent: 'user' })"
-      class="flex gap-2 items-center cursor-pointer py-[16px]"
+      @click="uploaderStore.setStep(4)"
+      class="flex gap-2 items-center cursor-pointer "
     >
       <img src="/images/backIcon.png" alt="" srcset="" />
       <button class="text-xs font-medium leading-[1.125rem] text-medium-text break-words">
@@ -21,7 +92,7 @@
         <CheckboxGroup
           v-model="term1"
           label="All individuals appearing in the piece of content I am presently uploading on Fansocial (the Content):"
-          checkboxClass="appearance-none flex-shrink-0 self-start mt-[2px] bg-white border border-gray-300 rounded-[4px] w-4 min-w-4 h-4 min-h-4 cursor-pointer outline-none focus:outline-none focus:ring-0 checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
+          checkboxClass="appearance-none flex-shrink-0 mt-[2px] bg-white border border-gray-300 rounded-[4px] w-4 h-4 cursor-pointer checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
           labelClass="text-[12px] sm:text-[14px] text-[#0C111D] font-[400] cursor-pointer"
           wrapperClass="flex items-start gap-2"
         />
@@ -41,33 +112,33 @@
         <CheckboxGroup
           v-model="term2"
           label="I have verified, preserved and currently hold all identification cards and documents required under Record Keeping Requirements, 18 U.S.C. 2257 and 28 C.F.R. 75, or applicable laws in any other jurisdictions, countries, and territories (“2257 documentation”), for all individuals appearing in the Content."
-          checkboxClass="appearance-none mt-[1px] bg-white border border-gray-300 rounded-[4px] w-4 h-3 cursor-pointer checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
+          checkboxClass="appearance-none flex-shrink-0 mt-[2px] bg-white border border-gray-300 rounded-[4px] w-4 h-4 cursor-pointer checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
           labelClass="text-[12px] sm:text-[14px] text-[#0C111D] font-[400] cursor-pointer"
-          wrapperClass="flex gap-2"
+          wrapperClass="flex items-start gap-2"
         />
         
         <CheckboxGroup
           v-model="term3"
           label="I have verified, preserved and currently hold all identification cards and documents required under Record Keeping Requirements, 18 U.S.C. 2257 and 28 C.F.R. 75, or applicable laws in any other jurisdictions, countries, and territories (“2257 documentation”), for all individuals appearing in the Content."
-          checkboxClass="appearance-none mt-[1px] bg-white border border-gray-300 rounded-[4px] w-4 h-3 cursor-pointer checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
+          checkboxClass="appearance-none flex-shrink-0 mt-[2px] bg-white border border-gray-300 rounded-[4px] w-4 h-4 cursor-pointer checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
           labelClass="text-[12px] sm:text-[14px] text-[#0C111D] font-[400] cursor-pointer"
-          wrapperClass="flex gap-2"
+          wrapperClass="flex items-start gap-2"
         />
         
         <CheckboxGroup
           v-model="term4"
           label="The Content does not violate Fansocial’s Terms of Service, and any of its related policies namely but without limitation, its Child Sexual Abuse Material Policy, or Anti-Sexual Exploitation Policies, all of which I have read and expressly agree to."
-          checkboxClass="appearance-none mt-[1px] bg-white border border-gray-300 rounded-[4px] w-4 h-3 cursor-pointer checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
+          checkboxClass="appearance-none flex-shrink-0 mt-[2px] bg-white border border-gray-300 rounded-[4px] w-4 h-4 cursor-pointer checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
           labelClass="text-[12px] sm:text-[14px] text-[#0C111D] font-[400] cursor-pointer"
-          wrapperClass="flex gap-2"
+          wrapperClass="flex items-start gap-2"
         />
 
         <CheckboxGroup
           v-model="term5"
           label="The Content does not violate Fansocial’s Terms of Service, and any of its related policies namely but without limitation, its Child Sexual Abuse Material Policy, or Anti-Sexual Exploitation Policies, all of which I have read and expressly agree to."
-          checkboxClass="appearance-none mt-[1px] bg-white border border-gray-300 rounded-[4px] w-4 h-3 cursor-pointer checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
+          checkboxClass="appearance-none flex-shrink-0 mt-[2px] bg-white border border-gray-300 rounded-[4px] w-4 h-4 cursor-pointer checked:bg-success checked:border-success checked:relative checked:after:content-[''] checked:after:absolute checked:after:left-[0.3rem] checked:after:top-[0.15rem] checked:after:w-1 checked:after:h-2 checked:after:border-black checked:after:border-[2px] checked:after:border-solid checked:after:border-t-0 checked:after:border-l-0 checked:after:rotate-45 checked:after:box-border"
           labelClass="text-[12px] sm:text-[14px] text-[#0C111D] font-[400] cursor-pointer"
-          wrapperClass="flex gap-2"
+          wrapperClass="flex items-start gap-2"
         />
 
         <NotificationCard
@@ -96,69 +167,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { computed } from "vue";
-import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
-import NotificationCard from "@/components/ui/card/dashboard/NotificationCard.vue";
-import CheckboxGroup from "@/components/forms/checkboxes/CheckboxGroup.vue";
-import { ExclamationTriangleIcon } from "@heroicons/vue/24/solid";
-
-const props = defineProps({
-  uploader: {
-    type: Object,
-    required: true
-  }
-});
-
-// ===========================================
-// STATE CONNECTIONS (Terms & Conditions)
-// ===========================================
-
-// Term 1
-const term1 = computed({
-  get: () => props.uploader.state.termsCheckbox1 || false,
-  set: (val) => props.uploader.setState("termsCheckbox1", val, { reason: "user:agree1" })
-});
-
-// Term 2
-const term2 = computed({
-  get: () => props.uploader.state.termsCheckbox2 || false,
-  set: (val) => props.uploader.setState("termsCheckbox2", val, { reason: "user:agree2" })
-});
-
-// Term 3
-const term3 = computed({
-  get: () => props.uploader.state.termsCheckbox3 || false,
-  set: (val) => props.uploader.setState("termsCheckbox3", val, { reason: "user:agree3" })
-});
-
-// Term 4
-const term4 = computed({
-  get: () => props.uploader.state.termsCheckbox4 || false,
-  set: (val) => props.uploader.setState("termsCheckbox4", val, { reason: "user:agree4" })
-});
-
-// Term 5
-const term5 = computed({
-  get: () => props.uploader.state.termsCheckbox5 || false,
-  set: (val) => props.uploader.setState("termsCheckbox5", val, { reason: "user:agree5" })
-});
-
-// ===========================================
-// SUBMIT LOGIC
-// ===========================================
-
-function handleSubmit() {
-  const { termsCheckbox1, termsCheckbox2, termsCheckbox3, termsCheckbox4, termsCheckbox5 } = props.uploader.state;
-  
-  if (!termsCheckbox1 || !termsCheckbox2 || !termsCheckbox3 || !termsCheckbox4 || !termsCheckbox5) {
-    alert("Please accept all terms and conditions before submitting.");
-    return;
-  }
-
-  console.log("🚀 FINAL PAYLOAD:", JSON.parse(JSON.stringify(props.uploader.state)));
-  alert("Media Submitted Successfully! Check Console for JSON.");
-  
-}
-</script>
