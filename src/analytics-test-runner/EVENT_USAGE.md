@@ -6,9 +6,13 @@ Local copy of [Copy of Event Usage (Google Doc)](https://docs.google.com/documen
 **API server:** `http://15.235.59.191` (Node API at `/var/www/unified-api-handler/`)  
 **Clear before each run:** `POST /api/events/clear` with `{ "creatorId": 99999 }`  
 **Trigger event:** `POST /api/events/trigger` with `{ masterEventType, data }` (server requires `data`, not `fields`)  
-**Ground truth:** `GET /api/charts/99999?nocache=1`
+**Ground truth:** Internal **ExpectationState** ledger (`config/expectationState.js`), updated via master→child map (`config/masterEventChildMap.js`).  
+**Under test:** `GET /api/charts/99999?nocache=1` and DOM/amCharts scans are compared **against** internal state (not the other way around).
 
-Each test case fires **one** master event after a clean database. Expected values = **baseline (post-clear) + single increment** from the payload below.
+**Server sync:** Keep `masterEventChildMap.js` aligned with Node unified-api-handler ingest projection when backend mapping changes.
+
+Each single-event run: DB clear → optional seed → one master event → refresh → compare internal vs API/DOM.  
+Mixed batches: DB clear → N events → one refresh (`runAnalyticsTestMixedBatch()` / panel dropdown).
 
 ---
 

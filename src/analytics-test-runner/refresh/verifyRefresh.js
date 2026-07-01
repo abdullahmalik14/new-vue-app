@@ -5,10 +5,8 @@ import {
 import { getAnalyticsRefreshButton, isRefreshButtonReady } from './trigger.js';
 import { normalizeNumber } from '../utils/normalizeNumber.js';
 import { EVENT_EXPECTATIONS } from '../config/eventExpectations.js';
-import {
-  mapChartsPayloadToUiState,
-  resolveRefreshDomExpectation,
-} from '../config/uiExpectationResolver.js';
+import { resolveRefreshExpectationFromState, resolveRefreshApiExpectationFromState } from '../config/stateMetricResolver.js';
+import { readApiFoundValue } from '../config/hydrateApiRow.js';
 
 const BOOT_KEY = 'analytics-test-runner-boot-id';
 let refreshBootId = null;
@@ -114,11 +112,15 @@ export function readApiMetricForTestCase(testCaseKey, chartsPayload) {
 }
 
 export function buildRefreshVerificationChecks(input) {
-  const { testCaseKey, afterRefresh, apiMetric, chartsPayload } = input;
+  const { testCaseKey, afterRefresh, apiMetric, expectationState } = input;
   const checks = [];
   const pageOk = assertPageNotReloaded();
-  const mapped = chartsPayload ? mapChartsPayloadToUiState(chartsPayload) : null;
-  const expectedDom = mapped ? resolveRefreshDomExpectation(testCaseKey, mapped) : null;
+  const expectedInternal = expectationState
+    ? resolveRefreshExpectationFromState(testCaseKey, expectationState)
+    : null;
+  const expectedApiInternal = expectationState
+    ? resolveRefreshApiExpectationFromState(testCaseKey, expectationState)
+    : null;
 
   const domMetricKey = {
     newSubscription: 'subscribersNew',
@@ -170,27 +172,41 @@ export function buildRefreshVerificationChecks(input) {
   checks.push({
     id: 'step10.apiHasData',
     label: 'HTTP /api/charts has post-event data',
-    pass: isBlocked ? true : apiMetric != null && apiMetric > 0,
+    pass: isBlocked ? true : apiMetric != null && Number(apiMetric) !== 0,
     message: isBlocked
       ? `Skipped — ${testCaseKey} trigger is known blocked`
-      : apiMetric != null && apiMetric > 0
+      : apiMetric != null && Number(apiMetric) !== 0
         ? `API metric for ${testCaseKey}: ${apiMetric}`
         : `API metric missing or zero for ${testCaseKey}`,
   });
 
-  if (domMetricKey) {
-    const domMatchesApi =
-      afterDom != null &&
-      expectedDom != null &&
-      Math.abs(Number(afterDom) - Number(expectedDom)) <= 0.01;
+  if (domMetricKey && expectedInternal != null) {
+    const domMatchesInternal =
+      afterDom != null && Math.abs(Number(afterDom) - Number(expectedInternal)) <= 0.01;
+
+    const apiMatchesInternal =
+      apiMetric != null &&
+      expectedApiInternal != null &&
+      Math.abs(Number(apiMetric) - Number(expectedApiInternal)) <= 0.01;
 
     checks.push({
       id: 'step10.domUpdatedAfterRefresh',
-      label: `DOM reflects post-event API after refresh`,
-      pass: domMatchesApi,
-      message: domMatchesApi
-        ? `DOM ${afterDom} matches UI-expected ${expectedDom} (API metric ${apiMetric})`
-        : `DOM ${afterDom ?? '—'} does not match UI-expected ${expectedDom ?? '—'} (API metric ${apiMetric})`,
+      label: 'DOM reflects internal expectation after refresh',
+      pass: domMatchesInternal,
+      message: domMatchesInternal
+        ? `DOM ${afterDom} matches internal ${expectedInternal}`
+        : `DOM ${afterDom ?? '—'} does not match internal ${expectedInternal}`,
+    });
+
+    checks.push({
+      id: 'step10.apiMatchesInternal',
+      label: 'API reflects internal expectation',
+      pass: isBlocked ? true : apiMatchesInternal,
+      message: isBlocked
+        ? `Skipped — ${testCaseKey} trigger is known blocked`
+        : apiMatchesInternal
+          ? `API ${apiMetric} matches internal ${expectedApiInternal}`
+          : `API ${apiMetric ?? '—'} does not match internal ${expectedApiInternal ?? '—'}`,
     });
   }
 

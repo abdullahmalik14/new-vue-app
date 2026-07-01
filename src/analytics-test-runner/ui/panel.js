@@ -3,7 +3,7 @@ import { DROPDOWN_TEST_OPTIONS, getDefaultTestCaseKey } from '../config/testCase
 import { RUNNER_STEPS } from './activityLog.js';
 import { initPanelResize } from './panelResize.js';
 
-const PANEL_VERSION = '8';
+const PANEL_VERSION = '10';
 let panelOpen = false;
 
 function el(tag, className, text) {
@@ -25,7 +25,7 @@ function isDisplayRow() {
 }
 
 function injectStyles() {
-  const STYLE_VERSION = '8';
+  const STYLE_VERSION = '10';
   let style = document.querySelector('[data-analytics-test-runner-styles]');
   if (style?.getAttribute('data-style-version') === STYLE_VERSION) return;
   if (style) style.remove();
@@ -104,7 +104,7 @@ function injectStyles() {
       min-height: 320px;
     }
     .runner-col h3 {
-      margin: 0; font-size: 13px; font-weight: 600; color: #cbd5e1;
+      margin: 0; font-size: 14px; font-weight: 700; color: #cbd5e1;
       flex-shrink: 0;
     }
     .runner-current-step {
@@ -157,9 +157,13 @@ function injectStyles() {
       white-space: pre-wrap; word-break: break-word;
       flex-shrink: 0;
     }
+    .runner-payload-block {
+      min-height: 0; max-height: none; overflow: visible;
+      flex-shrink: 0;
+    }
     .runner-debug-block:empty { display: none; min-height: 0; }
     .runner-debug-title {
-      margin: 6px 0 4px; font-size: 11px; font-weight: 600; color: #94a3b8;
+      margin: 6px 0 4px; font-size: 13px; font-weight: 700; color: #cbd5e1;
       flex-shrink: 0;
     }
   `;
@@ -231,10 +235,10 @@ export function ensureTestRunnerPanel() {
         <div class="runner-refresh-block" data-refresh-verification></div>
         <div class="runner-batch-block" data-batch-summary></div>
         <div class="runner-log" data-activity-log></div>
+        <div class="runner-debug-title">Payload sent</div>
+        <div class="runner-debug-block runner-payload-block" data-sent-payloads></div>
         <h3>API log</h3>
         <div class="runner-api-log" data-api-log></div>
-        <div class="runner-debug-title">Payload sent</div>
-        <div class="runner-debug-block" data-sent-payloads></div>
         <div class="runner-debug-title">JSON validation</div>
         <div class="runner-debug-block" data-validation-summary></div>
         <div class="runner-debug-title">Chart debug (last snapshot)</div>

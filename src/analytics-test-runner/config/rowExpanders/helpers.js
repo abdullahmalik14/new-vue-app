@@ -105,6 +105,7 @@ export function addSubscribersPopupRows(rows, testCaseKey, { newSubscriber = 1, 
 export function addRecentOrdersApiRow(rows, testCaseKey, tab, minLength = 1) {
   rows.push(
     createRow(`${testCaseKey}.api.recentOrders.${tab}`, {
+      valueKind: 'api',
       view: 'Orders Received',
       location: 'Orders Received table',
       metric: `${tab} rows`,
@@ -120,6 +121,7 @@ export function addRecentOrdersApiRow(rows, testCaseKey, tab, minLength = 1) {
 export function addTrendingTagsApiRow(rows, testCaseKey, tagId, minViews = 1) {
   rows.push(
     createRow(`${testCaseKey}.api.trendingTags.${tagId}`, {
+      valueKind: 'api',
       view: 'Trends',
       metric: tagId,
       period: 'day',
@@ -140,6 +142,7 @@ export function addTrendingTagsApiRow(rows, testCaseKey, tagId, minViews = 1) {
 export function addTrendingMerchApiRow(rows, testCaseKey, minItems = 1) {
   rows.push(
     createRow(`${testCaseKey}.api.trendingMerch.daily`, {
+      valueKind: 'api',
       view: 'Trends',
       metric: 'Top Merch count',
       period: 'day',
@@ -167,6 +170,7 @@ export function addMainFansMetricRow(rows, testCaseKey, metricLabel, expectedVal
 export function addFanInsightsApiRow(rows, testCaseKey, field, minValue = 1, { knownGap } = {}) {
   rows.push(
     createRow(`${testCaseKey}.api.fanInsights.${field}.daily`, {
+      valueKind: 'api',
       view: 'API',
       metric: field,
       period: 'day',
@@ -238,6 +242,7 @@ export function addFansPopupRows(rows, testCaseKey, { newFollowers = null, profi
 export function addTokenEarningsApiRow(rows, testCaseKey, amount) {
   rows.push(
     createRow(`${testCaseKey}.api.earnings.tipTokens.day`, {
+      valueKind: 'api',
       view: 'API',
       metric: 'tipTokens',
       period: 'day',

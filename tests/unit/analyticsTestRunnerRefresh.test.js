@@ -5,6 +5,7 @@ import {
   assertPageNotReloaded,
   markRefreshSession,
 } from '@/analytics-test-runner/refresh/verifyRefresh.js';
+import { createEmptyExpectationState, applyMasterEvent } from '@/analytics-test-runner/config/expectationState.js';
 
 const chartsPayload = {
   earnings: {
@@ -28,29 +29,42 @@ const chartsPayload = {
 };
 
 describe('analytics test runner refresh verification (Step 10)', () => {
-  it('buildRefreshVerificationChecks passes when DOM matches UI-expected API values', () => {
+  it('buildRefreshVerificationChecks passes when DOM matches internal expectation', () => {
     markRefreshSession();
+
+    const expectationState = createEmptyExpectationState();
+    applyMasterEvent(expectationState, {
+      testCaseKey: 'newSubscription',
+      fields: { amount: 29.99, planId: 2, countryId: 702 },
+      fanId: 88001,
+    });
 
     const checks = buildRefreshVerificationChecks({
       testCaseKey: 'newSubscription',
       afterRefresh: { earnings: 29.99, subscribersNew: 1, newFollowers: 0, profileVisit: 0 },
       apiMetric: 29.99,
       chartsPayload,
+      expectationState,
     });
 
     expect(assertPageNotReloaded()).toBe(true);
     expect(checks.find((c) => c.id === 'step10.apiHasData')?.pass).toBe(true);
     expect(checks.find((c) => c.id === 'step10.domUpdatedAfterRefresh')?.pass).toBe(true);
+    expect(checks.find((c) => c.id === 'step10.apiMatchesInternal')?.pass).toBe(true);
   });
 
-  it('buildRefreshVerificationChecks fails when DOM does not match post-event API', () => {
+  it('buildRefreshVerificationChecks fails when DOM does not match internal expectation', () => {
     markRefreshSession();
+
+    const expectationState = createEmptyExpectationState();
+    applyMasterEvent(expectationState, { testCaseKey: 'follow', fields: {} });
 
     const checks = buildRefreshVerificationChecks({
       testCaseKey: 'follow',
       afterRefresh: { earnings: 0, newFollowers: 0, profileVisit: 0 },
       apiMetric: 9,
       chartsPayload,
+      expectationState,
     });
 
     expect(checks.find((c) => c.id === 'step10.domUpdatedAfterRefresh')?.pass).toBe(false);

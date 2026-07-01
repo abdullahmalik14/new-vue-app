@@ -1,5 +1,6 @@
 import { EVENT_EXPECTATIONS } from './eventExpectations.js';
 import { TEST_FAN_IDS } from './testCreator.js';
+import { MIXED_BATCH_SCENARIOS } from './mixedBatchScenarios.js';
 
 /** Dropdown value: run every single-event case sequentially (clear + 1 event each). */
 export const BATCH_RUN_ALL_KEY = '__batch_all__';
@@ -38,13 +39,18 @@ export const RUNNABLE_TEST_CASES = Object.keys(EVENT_EXPECTATIONS).map((key) => 
   fanId: FAN_BY_KEY[key] ?? ((ids) => ids.primary),
 }));
 
-/** Panel dropdown entries (batch option + all single-event cases). */
+/** Panel dropdown entries (batch option + mixed batches + all single-event cases). */
 export const DROPDOWN_TEST_OPTIONS = [
   {
     key: BATCH_RUN_ALL_KEY,
     label: 'Batch: all cases (sequential)',
     batch: true,
   },
+  ...Object.entries(MIXED_BATCH_SCENARIOS).map(([key, scenario]) => ({
+    key,
+    label: scenario.label,
+    mixedBatch: true,
+  })),
   ...RUNNABLE_TEST_CASES,
 ];
 
@@ -67,5 +73,5 @@ export function getDefaultTestCaseKey() {
 }
 
 export function isRunnableTestCaseKey(testCaseKey) {
-  return testCaseKey in EVENT_EXPECTATIONS;
+  return testCaseKey in EVENT_EXPECTATIONS || testCaseKey in MIXED_BATCH_SCENARIOS;
 }

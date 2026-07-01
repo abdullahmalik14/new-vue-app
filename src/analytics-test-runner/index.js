@@ -8,7 +8,9 @@ import {
 } from './ui/panel.js';
 import { runAnalyticsTestCase } from './runAnalyticsTestCase.js';
 import { runAnalyticsTestBatch } from './runAnalyticsTestBatch.js';
+import { runAnalyticsTestMixedBatch } from './runAnalyticsTestMixedBatch.js';
 import { isBatchRunSelection } from './config/testCaseRegistry.js';
+import { isMixedBatchKey } from './config/mixedBatchScenarios.js';
 import { initPageBootGuard } from './refresh/verifyRefresh.js';
 import router from '@/router/index.js';
 
@@ -47,6 +49,8 @@ export function bootstrapAnalyticsTestRunner() {
         const selected = getSelectedTestCaseKey();
         if (isBatchRunSelection(selected)) {
           await runAnalyticsTestBatch();
+        } else if (isMixedBatchKey(selected)) {
+          await runAnalyticsTestMixedBatch(selected);
         } else {
           await runAnalyticsTestCase(selected);
         }

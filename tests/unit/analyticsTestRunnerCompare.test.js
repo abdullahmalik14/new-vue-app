@@ -8,7 +8,7 @@ import {
 
 describe('analytics test runner compare', () => {
   it('compareNumbers passes within tolerance', () => {
-    expect(compareNumbers(29.99, 29.991, 0.01).message).toContain('API matches DOM');
+    expect(compareNumbers(29.99, 29.991, 0.01).message).toContain('Internal matches found');
   });
 
   it('compareNumbers fails outside tolerance', () => {

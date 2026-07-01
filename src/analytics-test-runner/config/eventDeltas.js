@@ -1,109 +1,50 @@
 /**
- * Single-event increments per test case (one ingest after a clean database).
- * Expected UI values = baseline (post-clear) + these deltas.
- * Unlike/unfollow/cancel cases use seed baseline — delta applies after seed.
+ * @deprecated Use masterEventChildMap + expectationState. Kept for legacy test imports.
  */
+import { resolveMasterEventFromTestCase } from './masterEventChildMap.js';
+import { applyMasterEvent, createEmptyExpectationState } from './expectationState.js';
 
 /**
  * @param {string} testCaseKey
  * @param {Record<string, unknown>} fields
  */
 export function getEventIncrement(testCaseKey, fields = {}) {
-  const amount = Number(fields.amount ?? 0);
-  const planId = Number(fields.planId ?? 2);
+  const before = createEmptyExpectationState();
+  const after = createEmptyExpectationState();
+  applyMasterEvent(after, { testCaseKey, fields });
 
-  const deltas = {
-    newSubscription: {
-      subscribersNew: 1,
-      subscribersRecurring: 0,
-      earningsTotal: Number(fields.amount ?? 29.99),
-      earningsSubscription: Number(fields.amount ?? 29.99),
-      contributorAmount: Number(fields.amount ?? 29.99),
-      subsNewChart: 1,
-      planTierKey: `tier${planId}`,
-      planTierCount: 1,
-      countrySales: Number(fields.amount ?? 29.99),
-      countryId: Number(fields.countryId ?? 702),
-    },
-    recurringSubscription: {
-      subscribersNew: 0,
-      subscribersRecurring: 1,
-      earningsTotal: amount || 10,
-      earningsSubscription: amount || 10,
-      contributorAmount: amount || 10,
-      subsRecurringChart: 1,
-      countrySales: amount || 10,
-      countryId: Number(fields.countryId ?? 840),
-    },
-    switchSubscription: {
-      subscribersNew: 1,
-      subscribersRecurring: 0,
-      earningsTotal: amount || 30,
-      earningsSubscription: amount || 30,
-      contributorAmount: amount || 30,
-      subsNewChart: 1,
-      planTierKey: `tier${planId}`,
-      planTierCount: 1,
-      countrySales: amount || 30,
-      countryId: Number(fields.countryId ?? 840),
-    },
-    merchOrder: {
-      earningsTotal: amount || 15,
-      earningsMerch: amount || 15,
-      contributorAmount: amount || 15,
-      countrySales: amount || 15,
-      countryId: Number(fields.countryId ?? 634),
-    },
-    p2vOrder: {
-      earningsTotal: amount || 15.02,
-      earningsPaytoview: amount || 15.02,
-      contributorAmount: amount || 15.02,
-      countryId: Number(fields.countryId ?? 392),
-    },
-    tokenOrder: {
-      earningsTotal: 0,
-      earningsTipTokens: amount || 5,
-      contributorAmount: amount || 5,
-      countrySales: amount || 5,
-      countryId: Number(fields.countryId ?? 250),
-    },
-    follow: {
-      newFollowers: 1,
-      countryId: Number(fields.countryId ?? 352),
-    },
-    unfollow: {
-      newFollowers: -1,
-    },
-    profileVisit: {
-      profileVisit: 1,
-      countryId: Number(fields.countryId ?? 643),
-    },
-    mediaLike: { likesMedia: 1 },
-    mediaUnlike: { likesMedia: -1 },
-    profileLike: { likesProfile: 1 },
-    profileUnlike: { likesProfile: -1 },
-    merchLike: { likesMerch: 1 },
-    merchUnlike: { likesMerch: -1 },
-    feedLike: { likesFeed: 1 },
-    feedUnlike: { likesFeed: -1 },
-    tagEngagement: {
-      tagViews: 1,
-      tagId: String(fields.tagId ?? 'Panty_Fetish'),
-    },
-    cancelSubscription: {
-      subscribersNew: -1,
-      earningsTotal: -29.99,
-      earningsSubscription: -29.99,
-    },
-    mediaView: {
-      mediaViews: 1,
-      mediaId: Number(fields.mediaId ?? 5117),
-    },
-    mediaWatchDuration: {
-      mediaWatchDurationSec: Number(fields.durationMs ?? 50000) / 1000,
-      mediaId: Number(fields.mediaId ?? 2811),
-    },
+  const inc = {
+    subscribersNew: readSub(after, 'newSubscriber') - readSub(before, 'newSubscriber'),
+    subscribersRecurring: readSub(after, 'recurringSubscriber') - readSub(before, 'recurringSubscriber'),
+    earningsTotal: readEarn(after, 'total') - readEarn(before, 'total'),
+    earningsSubscription: readEarn(after, 'subscription') - readEarn(before, 'subscription'),
+    earningsMerch: readEarn(after, 'merch') - readEarn(before, 'merch'),
+    earningsPaytoview: readEarn(after, 'paytoview') - readEarn(before, 'paytoview'),
+    earningsTipTokens: readEarn(after, 'tipTokens') - readEarn(before, 'tipTokens'),
+    newFollowers: readFan(after, 'newFollowers') - readFan(before, 'newFollowers'),
+    profileVisit: readFan(after, 'profileVisits') - readFan(before, 'profileVisits'),
+    countrySales: Number(fields.amount ?? 0),
+    countryId: Number(fields.countryId ?? 0),
+    planTierKey: `tier${Number(fields.planId ?? 2)}`,
+    planTierCount: readSub(after, `tier${Number(fields.planId ?? 2)}`) - readSub(before, `tier${Number(fields.planId ?? 2)}`),
   };
 
-  return deltas[testCaseKey] || {};
+  return inc;
 }
+
+function readSub(state, key) {
+  const row = state.subscriptions.daily?.at(-1) || {};
+  return Number(row[key] ?? 0);
+}
+
+function readEarn(state, key) {
+  const row = state.earnings.daily?.at(-1) || {};
+  return Number(row[key] ?? 0);
+}
+
+function readFan(state, key) {
+  const row = state.fans.daily?.at(-1) || {};
+  return Number(row[key] ?? 0);
+}
+
+export { resolveMasterEventFromTestCase };

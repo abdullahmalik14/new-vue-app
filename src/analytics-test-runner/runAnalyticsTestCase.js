@@ -1,6 +1,7 @@
 import { analyticsTestState, resetAnalyticsTestState } from './state.js';
 import { EVENT_EXPECTATIONS } from './config/eventExpectations.js';
 import { buildTestExpectations } from './config/buildTestExpectations.js';
+import { createEmptyExpectationState, applyMasterEvent } from './config/expectationState.js';
 import { resolveTestCreatorId } from './config/testCreator.js';
 import { resolveFanIdForTestCase } from './config/testCaseRegistry.js';
 import { resolveSeedForTestCase } from './config/eventSeeds.js';
@@ -22,18 +23,27 @@ import { lockPageForDomScan, unlockPageAfterDomScan } from './ui/pageLock.js';
 import { waitForDomScanContinue } from './ui/scanPause.js';
 import { sleep } from './utils/sleep.js';
 
-async function runSeedEvent(creatorId, seedConfig, log) {
+function formatDomScanLabel(expected) {
+  const kind = expected.valueKind || (expected.source === 'api' ? 'api' : 'singular');
+  const where = expected.location || expected.view || 'Main';
+  return `${kind.toUpperCase()} · ${where} · ${expected.metric}`;
+}
+
+async function runSeedEvent(creatorId, seedConfig, log, expectationState) {
   let masterEventType;
   let seedFields;
   let fanId;
+  let testCaseKey;
 
   if (seedConfig.useTestCase) {
+    testCaseKey = seedConfig.useTestCase;
     const seedCase = EVENT_EXPECTATIONS[seedConfig.useTestCase];
     if (!seedCase) throw new Error(`Unknown seed test case: ${seedConfig.useTestCase}`);
     masterEventType = seedCase.trigger.masterEventType;
     seedFields = { ...seedCase.trigger.fields };
     fanId = resolveFanIdForTestCase(seedConfig.useTestCase);
   } else {
+    testCaseKey = seedConfig.fanIdKey || 'newSubscription';
     masterEventType = seedConfig.masterEventType;
     seedFields = { ...seedConfig.fields };
     fanId = resolveFanIdForTestCase(seedConfig.fanIdKey || 'newSubscription');
@@ -48,6 +58,17 @@ async function runSeedEvent(creatorId, seedConfig, log) {
   if (!result.ok) {
     throw new Error(`Seed event failed: ${JSON.stringify(result.response)}`);
   }
+
+  applyMasterEvent(expectationState, {
+    testCaseKey,
+    fields: seedFields,
+    fanId,
+    fanLabel: fanId != null ? `Fan ${fanId}` : undefined,
+    seedSubscriptionAmount: seedFields.amount,
+    seedPlanId: seedFields.planId,
+  });
+  analyticsTestState.eventHistory.push({ testCaseKey, fields: seedFields, fanId });
+
   await sleep(6000);
 }
 
@@ -89,6 +110,9 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
     logActivity(`Database cleared for creator ${creatorId}`, 'reset');
     await sleep(2000);
 
+    analyticsTestState.expectationState = createEmptyExpectationState();
+    analyticsTestState.eventHistory = [];
+
     setRunnerStep('refresh', 'Refreshing analytics UI after database reset');
     await refreshAnalyticsWithoutPageReload();
     logActivity('Dashboard refreshed to post-clear state (no page reload)', 'refresh');
@@ -104,7 +128,7 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
 
     if (seedConfig) {
       setRunnerStep('trigger', 'Seeding prerequisite event before main test');
-      await runSeedEvent(creatorId, seedConfig, logActivity);
+      await runSeedEvent(creatorId, seedConfig, logActivity, analyticsTestState.expectationState);
       analyticsTestState.baselinePayload = await fetchChartsPayload(creatorId);
       logActivity('Baseline updated after seed event', 'trigger');
     }
@@ -138,6 +162,16 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
       }
     } else {
       logActivity(`Event accepted: ${JSON.stringify(triggerResult.response)}`, 'trigger');
+      applyMasterEvent(analyticsTestState.expectationState, {
+        testCaseKey,
+        fields: eventFields,
+        fanId,
+        fanLabel: fanId != null ? `Fan ${fanId}` : undefined,
+        seedSubscriptionAmount:
+          seedConfig?.fields?.amount ?? analyticsTestState.eventHistory[0]?.fields?.amount,
+        seedPlanId: seedConfig?.fields?.planId ?? analyticsTestState.eventHistory[0]?.fields?.planId,
+      });
+      analyticsTestState.eventHistory.push({ testCaseKey, fields: eventFields, fanId });
     }
 
     if (triggerResult.ok) {
@@ -173,6 +207,7 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
         afterRefresh: afterRefreshSnapshot,
         apiMetric,
         chartsPayload: analyticsTestState.chartsPayload,
+        expectationState: analyticsTestState.expectationState,
       }),
     };
 
@@ -181,10 +216,11 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
 
     analyticsTestState.expectedRows = buildTestExpectations(testCaseKey, analyticsTestState.chartsPayload, {
       fields,
-      baselinePayload: analyticsTestState.baselinePayload,
+      expectationState: analyticsTestState.expectationState,
+      eventHistory: analyticsTestState.eventHistory,
     });
     logActivity(
-      `Built ${analyticsTestState.expectedRows.length} expectations (DOM + internal API config)`,
+      `Built ${analyticsTestState.expectedRows.length} expectations (internal state → DOM/API validation)`,
       'validate',
     );
     renderRunnerPanel();
@@ -193,20 +229,25 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
     lockPageForDomScan('DOM runner starting — scanning main cards');
 
     setRunnerStep('scan-main', 'DOM runner: scanning main cards');
-    const mainRows = analyticsTestState.expectedRows.filter((row) => !row.popup);
-    const popupRows = analyticsTestState.expectedRows.filter((row) => row.popup);
+    const mainRows = analyticsTestState.expectedRows.filter(
+      (row) => !row.popup && !row.validationOnly,
+    );
+    const popupRows = analyticsTestState.expectedRows.filter(
+      (row) => row.popup && !row.validationOnly,
+    );
 
     try {
       for (const expected of mainRows) {
-        const label = `${expected.valueKind.toUpperCase()} · ${expected.location} · ${expected.metric}`;
+        const label = formatDomScanLabel(expected);
         await waitForDomScanContinue(label);
         lockPageForDomScan(`DOM SCAN: ${label}`);
-        logActivity(`DOM SCAN: ${label} (API ${expected.apiPath} = ${expected.expectedValue})`, 'scan-main');
+        logActivity(`DOM SCAN: ${label} (internal ${expected.expectedValue})`, 'scan-main');
         const found = await executeExpectedScan(expected, analyticsTestState.chartsPayload);
         analyticsTestState.foundRows.push(found);
         analyticsTestState.comparisonRows = compareExpectedToFound(
           analyticsTestState.expectedRows,
           analyticsTestState.foundRows,
+          analyticsTestState.chartsPayload,
         );
         renderRunnerPanel();
         await sleep(400);
@@ -226,10 +267,11 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
       setTestRunnerPanelOpen(true);
     }
 
-    setRunnerStep('compare', 'Final report: API vs DOM');
+    setRunnerStep('compare', 'Final report: internal vs DOM/API');
     analyticsTestState.comparisonRows = compareExpectedToFound(
       analyticsTestState.expectedRows,
       analyticsTestState.foundRows,
+      analyticsTestState.chartsPayload,
     );
 
     const failed = analyticsTestState.comparisonRows.filter((row) => !row.pass && !row.knownGap).length;
@@ -242,7 +284,7 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
       'done',
       totalFailed
         ? `Report: ${totalFailed} FAIL (${failed} comparisons, ${refreshFailed} refresh)${knownGaps ? ` · ${knownGaps} known gaps` : ''}`
-        : 'Report: all PASS (API matches DOM)',
+        : 'Report: all PASS (internal matches DOM/API)',
     );
   } catch (error) {
     unlockPageAfterDomScan();

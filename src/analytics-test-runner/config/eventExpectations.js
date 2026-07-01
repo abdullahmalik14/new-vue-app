@@ -72,7 +72,7 @@ export const EVENT_EXPECTATIONS = {
     gapStatus: 'partial',
   },
 
-  switchSubscription: {
+    switchSubscription: {
     label: 'Switch Subscription',
     trigger: {
       masterEventType: 'newOrder',
@@ -81,6 +81,7 @@ export const EVENT_EXPECTATIONS = {
         amount: 30,
         is_switch: true,
         calculated_amount: 20,
+        earningsCreditField: 'calculated_amount',
         planId: 3,
         old_plan_id: 2,
         countryCode: 'US',

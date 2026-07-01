@@ -9,6 +9,11 @@ import {
   resolvePopupEarningsPercent,
   resolvePopupFansPercent,
 } from './percentageResolvers.js';
+import {
+  resolveMainSubscribersNewPercentageFromState,
+  resolveMainEarningsPercentageFromState,
+} from './stateMetricResolver.js';
+import { projectStateToChartPaths } from './expectationState.js';
 
 const PERCENT_ROW = {
   tolerance: 0,
@@ -257,5 +262,129 @@ export function appendAllPercentageRows(rows, testCaseKey, mapped, singularRow) 
   appendMainOverviewPercentageRows(rows, testCaseKey, mapped, singularRow);
   appendLikesPercentageRows(rows, testCaseKey, mapped, singularRow);
   appendPopupPercentageRows(rows, testCaseKey, mapped, singularRow);
+  return rows;
+}
+
+function resolveFansPercentageFromState(state, metric) {
+  const projected = projectStateToChartPaths(state);
+  const daily = projected.fanInsights?.daily || [];
+  const today = daily[daily.length - 1]?.[metric === 'profileVisit' ? 'profileVisits' : 'newFollowers'] ?? 0;
+  const yesterday = daily.length > 1 ? daily[daily.length - 2]?.[metric === 'profileVisit' ? 'profileVisits' : 'newFollowers'] ?? 0 : 0;
+  if (today == null || today === 0) return null;
+  if (!yesterday || yesterday === 0) return 100;
+  return Math.round(((today - yesterday) / yesterday) * 100);
+}
+
+function resolveLikesPercentageFromState(state, field) {
+  const projected = projectStateToChartPaths(state);
+  const daily = projected.likes?.daily || [];
+  const today = daily[daily.length - 1]?.[field] ?? 0;
+  const yesterday = daily.length > 1 ? daily[daily.length - 2]?.[field] ?? 0 : 0;
+  if (today == null || today === 0) return null;
+  if (!yesterday || yesterday === 0) return 100;
+  return Math.round(((today - yesterday) / yesterday) * 100);
+}
+
+export function appendStatePercentageRows(rows, testCaseKey, state, singularRow) {
+  const subscriptionCases = new Set(['newSubscription', 'recurringSubscription', 'switchSubscription', 'cancelSubscription']);
+  const earningsCases = new Set(['newSubscription', 'recurringSubscription', 'merchOrder', 'switchSubscription', 'cancelSubscription']);
+  const fansCases = new Set(['follow', 'profileVisit', 'unfollow']);
+
+  if (subscriptionCases.has(testCaseKey)) {
+    rows.push(
+      singularRow(testCaseKey, {
+        idSuffix: 'singular.main.subscribers.newPercentage',
+        view: 'Main',
+        location: 'Subscribers card',
+        metric: 'NEW subscribers % vs yesterday',
+        period: 'day',
+        apiPath: 'ui.subscriberInsights.daily.newPercentage',
+        expectedValue: resolveMainSubscribersNewPercentageFromState(state),
+        tolerance: 0,
+        source: 'dom',
+        scan: { type: 'cardPercentageByHeading', heading: 'Subscribers', field: 'new' },
+      }),
+    );
+  }
+
+  if (earningsCases.has(testCaseKey)) {
+    rows.push(
+      singularRow(testCaseKey, {
+        idSuffix: 'singular.main.earnings.percentage',
+        view: 'Main',
+        location: 'Earnings card',
+        metric: 'Earnings % vs yesterday',
+        period: 'day',
+        apiPath: 'ui.earningsInsights.daily.percentage',
+        expectedValue: resolveMainEarningsPercentageFromState(state),
+        tolerance: 0,
+        source: 'dom',
+        scan: { type: 'cardPercentageByHeading', heading: 'Earnings' },
+      }),
+    );
+  }
+
+  if (fansCases.has(testCaseKey)) {
+    rows.push(
+      singularRow(testCaseKey, {
+        idSuffix: 'singular.main.fans.newFollowersPercentage',
+        view: 'Main',
+        location: 'Fans card',
+        metric: 'NEW FOLLOWERS % vs yesterday',
+        period: 'day',
+        apiPath: 'ui.fans.daily.newFollowersPercentage',
+        expectedValue: resolveFansPercentageFromState(state, 'newFollowers'),
+        tolerance: 0,
+        source: 'dom',
+        scan: { type: 'cardMetricPercentage', heading: 'Fans', label: 'NEW FOLLOWERS' },
+      }),
+    );
+  }
+
+  if (testCaseKey === 'profileVisit') {
+    rows.push(
+      singularRow(testCaseKey, {
+        idSuffix: 'singular.main.fans.profileVisitPercentage',
+        view: 'Main',
+        location: 'Fans card',
+        metric: 'PROFILE VISIT % vs yesterday',
+        period: 'day',
+        apiPath: 'ui.fans.daily.profileVisitPercentage',
+        expectedValue: resolveFansPercentageFromState(state, 'profileVisit'),
+        tolerance: 0,
+        source: 'dom',
+        scan: { type: 'cardMetricPercentage', heading: 'Fans', label: 'PROFILE VISIT' },
+      }),
+    );
+  }
+
+  const likesFieldByCase = {
+    mediaLike: 'media',
+    mediaUnlike: 'media',
+    profileLike: 'profile',
+    profileUnlike: 'profile',
+    merchLike: 'merch',
+    merchUnlike: 'merch',
+    feedLike: 'feed',
+    feedUnlike: 'feed',
+  };
+  const likesField = likesFieldByCase[testCaseKey];
+  if (likesField) {
+    rows.push(
+      singularRow(testCaseKey, {
+        idSuffix: `singular.main.likes.${likesField}Percentage`,
+        view: 'Main',
+        location: 'Likes card',
+        metric: `${likesField.toUpperCase()} % vs yesterday`,
+        period: 'day',
+        apiPath: `ui.likes.${likesField}Percentage`,
+        expectedValue: resolveLikesPercentageFromState(state, likesField),
+        tolerance: 0,
+        source: 'dom',
+        scan: { type: 'cardMetricPercentage', heading: 'Likes', label: likesField.toUpperCase() },
+      }),
+    );
+  }
+
   return rows;
 }

@@ -60,6 +60,8 @@ export function createInitialAnalyticsTestState() {
     currentStepId: null,
     activityLog: [],
     baselinePayload: null,
+    expectationState: null,
+    eventHistory: [],
     pauseDomScanBeforeEachStep: false,
     batchResults: [],
   };
