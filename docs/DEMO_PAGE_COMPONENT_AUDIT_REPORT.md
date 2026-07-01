@@ -29,12 +29,6 @@ Production build verification: **`npm run build` — PASS**
 - Locale files: `src/i18n/section-dashboard-global/` + `public/i18n/section-dashboard-global/` (en + vi)
 - Asset registry: `src/config/assetMap.json` + `public/config/assetMap.json`
 
-### Out of scope (not on demo page)
-- Standalone audit routes: `BaseInputDemo`, `BaseTextInputDemo`, `AuthCodeInputDemo`, `AuthComponentDemo`, `DashboardTextInputDemo`, `ValidationRulesShowcase`
-- Full `DemoPage.vue` monolith extraction (architecture refactor — optional future work)
-- Show Code **snippet strings** inside `DemoPage.vue` / demo wrappers (developer copy-paste examples only; not rendered as live UI)
-
----
 
 ## 3. Audit Criteria Applied
 

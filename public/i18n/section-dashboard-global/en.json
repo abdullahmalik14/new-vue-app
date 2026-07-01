@@ -632,7 +632,7 @@
         "tierCards": "Tier Cards",
         "eventCards": "Event Cards",
         "shoppingCart": "Shopping Cart",
-        "shoppingCartDescription": "Interactive cart component driven by custom events. Open console to see interaction commands."
+        "shoppingCartDescription": "Interactive cart component driven by custom events. Open console to see interaction commands.",
         "spinner": "Spinner",
         "allButtons": "All Buttons — Full Catalog"
       },
