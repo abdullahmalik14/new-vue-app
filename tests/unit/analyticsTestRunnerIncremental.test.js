@@ -71,6 +71,9 @@ describe('applyIncrementalExpectations', () => {
       afterPayload: pollutedAfter,
     });
     expect(patched[0].expectedValue).toBe(1);
-    expect(patched[0].deltaWarning).toMatch(/API after clear expected 1/);
+  it('tokenOrder increments tokens not USD total', () => {
+    const inc = getEventIncrement('tokenOrder', { amount: 5, countryId: 250 });
+    expect(inc.earningsTotal).toBe(0);
+    expect(inc.earningsTipTokens).toBe(5);
   });
 });

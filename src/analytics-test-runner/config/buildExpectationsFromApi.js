@@ -5,6 +5,7 @@ import {
   resolveMainSubscribersRecurring,
   resolveMainEarningsTotal,
   resolveEarningsPopupTotal,
+  resolveEarningsPopupTokensReceived,
   resolveEarningsChartField,
   resolveSubsChartField,
   resolveTrendingCountryDisplayName,
@@ -338,39 +339,48 @@ function buildMerchOrderExpectations(testCaseKey, payload, fields) {
   return rows;
 }
 
-function buildTokenOrderExpectations(testCaseKey, payload) {
+function buildTokenOrderExpectations(testCaseKey, payload, fields) {
   const mapped = mapChartsPayloadToUiState(payload);
   const rows = [];
-  rows.push(
-    singularRow(testCaseKey, {
-      idSuffix: 'singular.main.earnings.total',
-      view: 'Main',
-      location: 'Earnings card',
-      metric: 'Total earnings',
-      apiPath: 'ui.earningsInsights.daily.total',
-      payload,
-      expectedValue: resolveMainEarningsTotal(mapped),
-      scan: { type: 'cardValueByHeading', heading: 'Earnings' },
-    }),
-  );
+
   POPUP_SCAN_PERIODS_WITH_ALLTIME.forEach((period) => {
     const apiP = apiPeriod(period);
     rows.push(
+      singularRow(testCaseKey, {
+        idSuffix: `singular.popup.earnings.tokensReceived.${period}`,
+        view: 'Popup · Earnings',
+        location: 'Earnings popup header',
+        metric: 'Tokens Received',
+        period,
+        apiPath: `ui.earningsPopup.${apiP}.totalTokens`,
+        payload,
+        expectedValue: resolveEarningsPopupTokensReceived(mapped, period),
+        popup: { openFromHeading: 'Earnings' },
+        periodToggle: period,
+        scan: { type: 'popupStatByHeading', heading: 'Tokens Received' },
+      }),
       chartRow(testCaseKey, {
         idSuffix: `chart.popup.earnings.tipTokens.${period}`,
         view: 'Popup · Earnings',
-        location: 'Earnings chart dataset',
+        location: 'Token insights chart dataset',
         metric: 'tipTokens',
         period,
         apiPath: `ui.earningsChart.${apiP}.tipTokens`,
         payload,
         expectedValue: resolveEarningsChartField(mapped, period, 'tipTokens'),
+        knownGap:
+          period === 'day'
+            ? 'Daily tokens donut may not expose tipTokens to amCharts scan — verify Tokens Received stat'
+            : undefined,
         popup: { openFromHeading: 'Earnings' },
         periodToggle: period,
         chart: tokensChartRule(period, 'tipTokens'),
       }),
     );
   });
+
+  rows.push(buildCountryTrendRow(testCaseKey, payload, fields, { singularRow, chartRow }));
+
   return rows;
 }
 

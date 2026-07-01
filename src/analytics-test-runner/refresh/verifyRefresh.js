@@ -125,7 +125,6 @@ export function buildRefreshVerificationChecks(input) {
     recurringSubscription: 'earnings',
     switchSubscription: 'subscribersNew',
     merchOrder: 'earnings',
-    tokenOrder: 'earnings',
     p2vOrder: 'earnings',
     follow: 'newFollowers',
     unfollow: 'newFollowers',

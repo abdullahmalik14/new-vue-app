@@ -45,7 +45,6 @@ export function appendMainOverviewPercentageRows(rows, testCaseKey, mapped, sing
     'newSubscription',
     'recurringSubscription',
     'merchOrder',
-    'tokenOrder',
     'cancelSubscription',
   ]);
   const fansCases = new Set(['follow', 'profileVisit']);
@@ -146,9 +145,9 @@ export function appendPopupPercentageRows(rows, testCaseKey, mapped, singularRow
     'newSubscription',
     'recurringSubscription',
     'merchOrder',
-    'tokenOrder',
     'cancelSubscription',
   ]);
+  const tokenPopups = new Set(['tokenOrder']);
   const fansPopups = new Set(['follow', 'profileVisit']);
 
   POPUP_SCAN_PERIODS_WITH_ALLTIME.forEach((period) => {
@@ -191,6 +190,23 @@ export function appendPopupPercentageRows(rows, testCaseKey, mapped, singularRow
           periodToggle: period,
           scan: { type: 'popupPercentageByStatHeading', statHeading: 'Total Earnings' },
         }),
+        popupPercentRow(testCaseKey, singularRow, {
+          idSuffix: `singular.popup.earnings.tokensPercentage.${period}`,
+          view: 'Popup · Earnings',
+          location: 'Earnings popup stat header',
+          metric: 'Tokens received %',
+          period,
+          apiPath: `ui.popupEarnings.${period}.tokensPercentage`,
+          expectedValue: resolvePopupEarningsPercent(mapped, period, 'tokens'),
+          popup: { openFromHeading: 'Earnings' },
+          periodToggle: period,
+          scan: { type: 'popupPercentageByStatHeading', statHeading: 'Tokens Received' },
+        }),
+      );
+    }
+
+    if (tokenPopups.has(testCaseKey)) {
+      rows.push(
         popupPercentRow(testCaseKey, singularRow, {
           idSuffix: `singular.popup.earnings.tokensPercentage.${period}`,
           view: 'Popup · Earnings',

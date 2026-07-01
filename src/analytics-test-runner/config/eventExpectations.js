@@ -158,12 +158,16 @@ export const EVENT_EXPECTATIONS = {
       fields: { orderType: 'token', amount: 5, tokenChannel: 'tip', countryCode: 'FR', countryId: 250 },
     },
     expectedViews: [
-      { view: 'Main', metrics: ['Total Earnings', 'Top Contributors'], periods: ['day'], sources: ['dom'] },
+      { view: 'Popup Earnings', metrics: ['Tokens Received', 'tipTokens / channel breakdown'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
       { view: 'Trends', metrics: ['Top Countries'], periods: ['day'], sources: ['dom'] },
-      { view: 'Popup Earnings', metrics: ['tipTokens / channel breakdown'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
       { view: 'Popup Contributors', metrics: ['token spend on fan'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
     ],
-    knownGaps: ['recentOrders missing', 'Verify call/chat/livestream channels separately'],
+    knownGaps: [
+      'Token tips increment Tokens Received / tipTokens — not USD Total Earnings on main card',
+      'contributors.topContributors may be missing from API',
+      'recentOrders missing',
+      'Verify call/chat/livestream channels separately',
+    ],
     gapStatus: 'partial',
   },
 

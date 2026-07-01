@@ -56,7 +56,7 @@ export function getEventIncrement(testCaseKey, fields = {}) {
       countryId: Number(fields.countryId ?? 392),
     },
     tokenOrder: {
-      earningsTotal: amount || 5,
+      earningsTotal: 0,
       earningsTipTokens: amount || 5,
       countrySales: amount || 5,
       countryId: Number(fields.countryId ?? 250),

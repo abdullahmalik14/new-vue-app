@@ -11,6 +11,7 @@ import {
   resolveFansPeriodStat,
   resolveLikesMainMetric,
   resolveLikesChartField,
+  resolveEarningsPopupTokensReceived,
 } from './uiExpectationResolver.js';
 import {
   resolveMainSubscribersNewPercentageFromMapped,
@@ -145,6 +146,15 @@ export function applyIncrementalExpectations(rows, ctx) {
       const period = row.period;
       const expected = applyDelta(resolveEarningsPopupTotal(baseline, period), increment.earningsTotal ?? 0);
       return patch(row, expected, resolveEarningsPopupTotal(after, period));
+    }
+
+    if (id.includes('singular.popup.earnings.tokensReceived.')) {
+      const period = row.period || 'day';
+      const expected = applyDelta(
+        resolveEarningsPopupTokensReceived(baseline, period),
+        increment.earningsTipTokens ?? 0,
+      );
+      return patch(row, expected, resolveEarningsPopupTokensReceived(after, period));
     }
 
     if (id.includes('singular.main.fans.newFollowers')) {

@@ -1,5 +1,4 @@
 import {
-  addMainEarningsRow,
   addEarningsPopupRows,
   addContributorsApiRow,
   addTokenEarningsApiRow,
@@ -10,8 +9,7 @@ export function expandTokenOrder(testCaseKey, testCase) {
   const fanId = testCase.fields?.fanId ?? '88007';
   const rows = [];
 
-  addMainEarningsRow(rows, testCaseKey, amount);
-  addEarningsPopupRows(rows, testCaseKey, amount, { tipTokens: amount });
+  addEarningsPopupRows(rows, testCaseKey, 0, { tipTokens: amount });
   addTokenEarningsApiRow(rows, testCaseKey, amount);
   addContributorsApiRow(rows, testCaseKey, `Fan ${fanId}`);
 

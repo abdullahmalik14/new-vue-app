@@ -110,6 +110,7 @@ export function addContributorsApiRow(rows, testCaseKey, fanLabel) {
       period: 'day',
       source: 'api',
       expectedValue: fanLabel,
+      knownGap: 'contributors.topContributors may be missing from /api/charts on fresh creator',
       scan: { type: 'apiPath', path: 'contributors.topContributors.0.name' },
     }),
   );

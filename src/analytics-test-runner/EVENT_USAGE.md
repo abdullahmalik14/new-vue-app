@@ -119,8 +119,9 @@ Each test case fires **one** master event after a clean database. Expected value
 
 | Metric | Delta |
 |--------|-------|
-| Total earnings | +5 |
-| Earnings chart · tipTokens | +5 |
+| Total earnings (USD) | **0** (tips are tokens, not USD `total`) |
+| Tokens Received / `tipTokens` | +5 |
+| Top Countries (France) | +5 (`countryId` 250) |
 
 ---
 

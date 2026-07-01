@@ -80,7 +80,7 @@ export function resolveEarningsChartField(mapped, period, field) {
 
   if (period === 'day') {
     const daily = mapped.earnings?.daily || [];
-    const row = daily[0] || {};
+    const row = daily[daily.length - 1] || daily[0] || {};
     return row[field] ?? null;
   }
 
@@ -231,6 +231,24 @@ export function likesChartRule(field) {
   };
 }
 
+/** Mirrors Earnings popup "Tokens Received" (totalTokens / channel sum). */
+export function resolveEarningsPopupTokensReceived(mapped, period = 'day') {
+  const key = PERIOD_API_KEY[period] || period;
+  const arr = mapped.earnings?.[key] || [];
+  const summary = mapped.earnings?.summaries?.[key];
+  if (summary?.tokensReceived != null) return summary.tokensReceived;
+
+  const last = arr[arr.length - 1] || arr[0] || {};
+  if (last.totalTokens != null) return last.totalTokens;
+
+  const channelSum =
+    (last.tipTokens || 0) +
+    (last.callTokens || 0) +
+    (last.chatTokens || 0) +
+    (last.liveStreamTokens || 0);
+  return channelSum > 0 ? channelSum : null;
+}
+
 /** Main-card / refresh metric for a test case (UI-aligned). */
 export function resolveRefreshDomExpectation(testCaseKey, mapped) {
   switch (testCaseKey) {
@@ -240,10 +258,11 @@ export function resolveRefreshDomExpectation(testCaseKey, mapped) {
     case 'recurringSubscription':
       return resolveMainSubscribersRecurring(mapped) ?? resolveMainEarningsTotal(mapped);
     case 'merchOrder':
-    case 'tokenOrder':
     case 'p2vOrder':
     case 'cancelSubscription':
       return resolveMainEarningsTotal(mapped);
+    case 'tokenOrder':
+      return resolveEarningsPopupTokensReceived(mapped, 'day');
     case 'follow':
     case 'unfollow':
       return resolveFansPeriodStat(mapped, 'day', 'newFollowers');
