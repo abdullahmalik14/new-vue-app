@@ -470,6 +470,16 @@
     ]
   },
   {
+    "slug": "/demo/lazy-sizes",
+    "envAccess": "development",
+    "section": "dashboard-global",
+    "componentPath": "@/dev/lazyimagedemo/LazySizesDemoPage.vue",
+    "requiresAuth": false,
+    "supportedRoles": [
+      "all"
+    ]
+  },
+  {
     "slug": "/demo/audit/base-input",
     "envAccess": "development",
     "section": "demo",

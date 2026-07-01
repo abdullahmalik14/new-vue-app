@@ -61,6 +61,10 @@ import InteractionsPlugin from '@/interactions/index.js';
 import '@/assets/main.css';
 import '@/assets/route-transitions.css';
 
+// Lazy-load images only when they enter the viewport (strict — no early expFactor load)
+import '@/dev/lazyimagedemo/lazySizesConfig.js';
+import 'lazysizes';
+
 // Initialize mock API and utilities
 import { initUtilities } from "@/lib/mock-api-demo/utilities/index.js";
 import "@/lib/mock-api-demo/apiWrapper.js";

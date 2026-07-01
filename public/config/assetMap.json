@@ -165,6 +165,8 @@
     "media.demo.sampleBg": "https://i.ibb.co/bjGQxr5S/sample-bg-image.webp",
     "media.demo.avatar": "https://i.ibb.co/jk1F8MqJ/featured-media-bg.webp",
     "media.demo.sampleVideo": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "lazyImageDemo.poster": "/images/featured-media-bg.webp",
+    "lazyImageDemo.sampleBg": "/images/sample-bg-image.png",
     "mediaUploader.demo.slideImage": "/images/slide-2.webp",
     "mediaUploader.demo.thumbA": "https://i.ibb.co/bjGQxr5S/sample-bg-image.webp",
     "mediaUploader.demo.thumbB": "https://i.ibb.co/jk1F8MqJ/featured-media-bg.webp",

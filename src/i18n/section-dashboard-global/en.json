@@ -687,8 +687,7 @@
         "tierCards": "Tier Cards",
         "eventCards": "Event Cards",
         "shoppingCart": "Shopping Cart",
-        "shoppingCartDescription": "Interactive cart component driven by custom events. Open console to see interaction commands."
-        "shoppingCartDescription": "Interactive cart component driven by custom events. Open console to see interaction commands."
+        "shoppingCartDescription": "Interactive cart component driven by custom events. Open console to see interaction commands.",
         "spinner": "Spinner",
         "allButtons": "All Buttons — Full Catalog"
       },
@@ -877,6 +876,24 @@
       "copy": "Copy",
       "copied": "✓ Copied",
       "vueLabel": "Vue"
+    },
+    "lazySizes": {
+      "pageTitle": "LazySizes — Image & Background Test",
+      "intro": "This page uses lazysizes with assetMap URLs. Open DevTools → Network, filter by Img, reload, and confirm the demo assets below are not fetched until you scroll them into view.",
+      "networkHint": "Tip: disable cache in Network tab, reload at the top of this page, then scroll down slowly.",
+      "scrollHint": "Scroll down ↓ — lazy assets are below these spacers",
+      "spacer": "Keep scrolling ↓",
+      "lazyImageTitle": "Lazy <img> (data-src)",
+      "lazyImageDescription": "Uses LazyImage with lazysizes — loads only when the container enters the viewport (IntersectionObserver + data-src).",
+      "lazyImageAlt": "Demo poster image",
+      "contentImageLabel": "Content <img> — the image itself is the UI",
+      "lazyBackgroundTitle": "Lazy CSS background (cover layer + overlay)",
+      "lazyBackgroundDescription": "Background image loads lazily behind content. Text and button sit on top — the image is decorative (not a content <img>).",
+      "backgroundBadge": "Background layer",
+      "backgroundOverlayTitle": "Premium tier hero card",
+      "backgroundOverlaySubtitle": "This text is foreground UI. The photo behind it is the lazy-loaded background.",
+      "backgroundCta": "Subscribe now",
+      "footer": "End of lazysizes test page."
     },
     "spinner": {
       "assetMapImage": "Asset map image (icon.spinner)",

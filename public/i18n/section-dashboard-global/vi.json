@@ -665,6 +665,24 @@
       "copied": "✓ Copied",
       "vueLabel": "Vue"
     },
+    "lazySizes": {
+      "pageTitle": "LazySizes — Kiểm tra ảnh & nền",
+      "intro": "Trang này dùng lazysizes với URL từ assetMap. Mở DevTools → Network, lọc Img, tải lại trang và xác nhận tài nguyên demo bên dưới chỉ được tải khi cuộn vào vùng nhìn thấy.",
+      "networkHint": "Mẹo: tắt cache trong tab Network, tải lại ở đầu trang, rồi cuộn chậm xuống.",
+      "scrollHint": "Cuộn xuống ↓ — tài nguyên lazy ở dưới các khoảng trống này",
+      "spacer": "Tiếp tục cuộn ↓",
+      "lazyImageTitle": "Lazy <img> (data-src)",
+      "lazyImageDescription": "Dùng LazyImage với class=\"lazyload\" và data-src từ useAssetUrl('media.demo.poster').",
+      "lazyImageAlt": "Ảnh poster demo",
+      "contentImageLabel": "Content <img> — chính ảnh là UI",
+      "lazyBackgroundTitle": "Lazy CSS background (lớp cover + overlay)",
+      "lazyBackgroundDescription": "Ảnh nền lazy-load phía sau nội dung. Text và nút nằm trên — ảnh chỉ trang trí (không phải <img> nội dung).",
+      "backgroundBadge": "Lớp nền",
+      "backgroundOverlayTitle": "Thẻ hero tier premium",
+      "backgroundOverlaySubtitle": "Đây là UI foreground. Ảnh phía sau là background lazy-load.",
+      "backgroundCta": "Đăng ký ngay",
+      "footer": "Hết trang kiểm tra lazysizes."
+    },
     "spinner": {
       "assetMapImage": "Ảnh asset map (icon.spinner)",
       "svgStyled": "SVG nội tuyến — track có kiểu",
