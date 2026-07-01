@@ -1,6 +1,10 @@
 import {
   scanCardValueByHeading,
   scanCardMetricByLabel,
+  scanCardPercentageByHeading,
+  scanCardMetricPercentage,
+  scanPopupPercentageByStatHeading,
+  scanTrendTableCountrySales,
   scanDataValueNearLabel,
   scanPopupStatByHeading,
   openTrendPopupFromHeading,
@@ -194,6 +198,14 @@ export async function executeExpectedScan(expected, chartsPayload, options = {})
       result = scanDataValueNearLabel(expected.scan.label);
     } else if (expected.scan?.type === 'cardMetricByLabel') {
       result = scanCardMetricByLabel(expected.scan.heading, expected.scan.label);
+    } else if (expected.scan?.type === 'cardPercentageByHeading') {
+      result = scanCardPercentageByHeading(expected.scan.heading, expected.scan.field);
+    } else if (expected.scan?.type === 'cardMetricPercentage') {
+      result = scanCardMetricPercentage(expected.scan.heading, expected.scan.label);
+    } else if (expected.scan?.type === 'popupPercentageByStatHeading') {
+      result = scanPopupPercentageByStatHeading(expected.scan.statHeading);
+    } else if (expected.scan?.type === 'trendTableCountrySales') {
+      result = scanTrendTableCountrySales(expected.scan.tableHeading, expected.scan.countryName);
     } else if (expected.scan?.type === 'popupStatByHeading') {
       result = scanPopupStatByHeading(expected.scan.heading);
     } else {
@@ -221,7 +233,7 @@ export async function executeExpectedScan(expected, chartsPayload, options = {})
  * Open each popup once per heading, toggle all periods, scan, then close.
  * @param {object[]} popupRows
  * @param {object} chartsPayload
- * @param {{ onProgress?: (msg: string) => void }} [options]
+ * @param {{ onProgress?: (msg: string) => void | Promise<void> }} [options]
  */
 export async function executePopupScanBatch(popupRows, chartsPayload, options = {}) {
   const foundRows = [];
@@ -243,21 +255,21 @@ export async function executePopupScanBatch(popupRows, chartsPayload, options = 
 
   for (const heading of headings) {
     const rows = byHeading.get(heading);
-    onProgress?.(`Opening popup: ${heading}`);
+    await onProgress?.(`Opening popup: ${heading}`);
     await openTrendPopupFromHeading(heading);
     await waitForPopupPaint();
-    onProgress?.(`Popup open: ${heading} — waiting for paint`);
+    await onProgress?.(`Popup open: ${heading} — waiting for paint`);
 
     const periods = [...new Set(rows.map((row) => row.periodToggle).filter(Boolean))];
     if (periods.length === 0) periods.push(null);
 
     for (const period of periods) {
       if (period) {
-        onProgress?.(`${heading}: switching period → ${period}`);
+        await onProgress?.(`${heading}: switching period → ${period}`);
         await switchPopupPeriod(period);
         await waitForPopupPaint();
         const chartHint = rows.find((row) => row.periodToggle === period && row.chart)?.chart?.chartIdIncludes;
-        onProgress?.(`${heading} / ${period}: waiting for chart paint`);
+        await onProgress?.(`${heading} / ${period}: waiting for chart paint`);
         await waitForChartRenderSettle({ chartIdIncludes: chartHint });
       }
 
@@ -266,13 +278,13 @@ export async function executePopupScanBatch(popupRows, chartsPayload, options = 
 
       const batch = period ? rows.filter((row) => row.periodToggle === period) : rows;
       for (const expected of batch) {
-        onProgress?.(`Scanning ${heading} · ${period || 'default'} · ${expected.metric}`);
+        await onProgress?.(`Scanning ${heading} · ${period || 'default'} · ${expected.metric}`);
         const found = await executeExpectedScan(expected, chartsPayload, { skipPopupSetup: true });
         foundRows.push(found);
       }
     }
 
-    onProgress?.(`Closing popup: ${heading}`);
+    await onProgress?.(`Closing popup: ${heading}`);
     await closeTrendPopup();
     await sleep(300);
   }

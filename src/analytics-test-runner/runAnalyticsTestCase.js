@@ -1,9 +1,9 @@
 import { analyticsTestState, resetAnalyticsTestState } from './state.js';
 import { EVENT_EXPECTATIONS } from './config/eventExpectations.js';
 import { buildTestExpectations } from './config/buildTestExpectations.js';
-import { TEST_CREATOR_ID } from './config/testCreator.js';
+import { resolveTestCreatorId } from './config/testCreator.js';
 import { resolveFanIdForTestCase } from './config/testCaseRegistry.js';
-import { clearCreatorDatabase, triggerMasterEvent, fetchChartsPayload } from './api/endpoints.js';
+import { resetTestDatabase, triggerMasterEvent, fetchChartsPayload } from './api/endpoints.js';
 import { refreshAnalyticsWithoutPageReload } from './refresh/trigger.js';
 import {
   initPageBootGuard,
@@ -18,6 +18,7 @@ import { executeExpectedScan, executePopupScanBatch } from './scanners/executeSc
 import { renderRunnerPanel, setTestRunnerPanelOpen } from './ui/panel.js';
 import { setRunnerStep, logActivity } from './ui/activityLog.js';
 import { lockPageForDomScan, unlockPageAfterDomScan } from './ui/pageLock.js';
+import { waitForDomScanContinue } from './ui/scanPause.js';
 import { sleep } from './utils/sleep.js';
 
 const CANCEL_SEED = {
@@ -33,12 +34,21 @@ const CANCEL_SEED = {
   },
 };
 
+let runnerInFlight = false;
+
 /**
  * @param {string} testCaseKey
  */
 export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
+  if (runnerInFlight) {
+    throw new Error('Test runner already in progress — wait for the current run to finish');
+  }
+
   const testCase = EVENT_EXPECTATIONS[testCaseKey];
   if (!testCase) throw new Error(`Unknown test case: ${testCaseKey}`);
+
+  const creatorId = resolveTestCreatorId();
+  runnerInFlight = true;
 
   resetAnalyticsTestState();
   initPageBootGuard();
@@ -49,48 +59,64 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
   try {
     markRefreshSession();
 
-    setRunnerStep('reset', 'Resetting test data for creator 99999');
-    const clearResult = await clearCreatorDatabase(TEST_CREATOR_ID);
+    // Build instructions step 2–3: clear in-memory state, then reset database (always, every run).
+    setRunnerStep('reset', `Resetting database for creator ${creatorId}`);
+    const clearResult = await resetTestDatabase(creatorId);
     if (!clearResult.ok) {
-      const msg = `Clear endpoint unavailable (${clearResult.status ?? 'error'}) — using live API numbers as expected values`;
-      analyticsTestState.errors.push(msg);
-      logActivity(msg, 'reset');
+      throw new Error(
+        `Database reset failed (${clearResult.status ?? 'error'}). ` +
+          `POST ${clearResult.url ?? '/api/events/clear'} must succeed before any event. ` +
+          'Ensure dev proxy targets the Node API server (15.235.59.191), not Vercel.',
+      );
     }
+    logActivity(`Database cleared for creator ${creatorId}`, 'reset');
     await sleep(2000);
+
+    setRunnerStep('refresh', 'Refreshing analytics UI after database reset');
+    await refreshAnalyticsWithoutPageReload();
+    logActivity('Dashboard refreshed to post-clear state (no page reload)', 'refresh');
+
+    setRunnerStep('fetch-api', `Fetching baseline GET /api/charts/${creatorId} (post-clear)`);
+    analyticsTestState.baselinePayload = await fetchChartsPayload(creatorId);
+    logActivity('Baseline charts payload captured after clear', 'fetch-api');
 
     const baselineSnapshot = captureMainAnalyticsSnapshot();
 
     const fanId = resolveFanIdForTestCase(testCaseKey);
 
     if (testCaseKey === 'cancelSubscription') {
-      const seedPayload = {
-        masterEventType: CANCEL_SEED.masterEventType,
-        fields: {
-          ...CANCEL_SEED.fields,
-          creatorId: TEST_CREATOR_ID,
-          fanId: resolveFanIdForTestCase('newSubscription'),
-        },
+      const seedFields = {
+        ...CANCEL_SEED.fields,
+        creatorId,
+        fanId: resolveFanIdForTestCase('newSubscription'),
       };
-      logActivity(`POST /api/events/trigger (seed)\n${JSON.stringify(seedPayload, null, 2)}`, 'trigger');
-      await triggerMasterEvent(seedPayload);
+      logActivity(
+        `POST /api/events/trigger (seed)\n${JSON.stringify({ masterEventType: CANCEL_SEED.masterEventType, data: seedFields }, null, 2)}`,
+        'trigger',
+      );
+      await triggerMasterEvent({ masterEventType: CANCEL_SEED.masterEventType, fields: seedFields });
       await sleep(6000);
+      analyticsTestState.baselinePayload = await fetchChartsPayload(creatorId);
+      logActivity('Baseline updated after cancel seed subscription', 'trigger');
     }
 
     setRunnerStep('trigger', `Triggering live event: ${testCase.trigger.masterEventType}`);
 
     const fields = {
       ...testCase.trigger.fields,
-      creatorId: TEST_CREATOR_ID,
+      creatorId,
       fanId,
     };
 
-    const triggerPayload = {
+    logActivity(
+      `POST /api/events/trigger\n${JSON.stringify({ masterEventType: testCase.trigger.masterEventType, data: fields }, null, 2)}`,
+      'trigger',
+    );
+
+    const triggerResult = await triggerMasterEvent({
       masterEventType: testCase.trigger.masterEventType,
       fields,
-    };
-    logActivity(`POST /api/events/trigger\n${JSON.stringify(triggerPayload, null, 2)}`, 'trigger');
-
-    const triggerResult = await triggerMasterEvent(triggerPayload);
+    });
 
     if (!triggerResult.ok) {
       throw new Error(`Event trigger failed: ${JSON.stringify(triggerResult.response)}`);
@@ -101,7 +127,7 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
     await sleep(8000);
 
     setRunnerStep('fetch-api', 'Fetching GET /api/charts/99999 (HTTP ground truth)');
-    const chartsBeforeRefresh = await fetchChartsPayload(TEST_CREATOR_ID);
+    const chartsBeforeRefresh = await fetchChartsPayload(creatorId);
     const apiMetric = readApiMetricForTestCase(testCaseKey, chartsBeforeRefresh);
     logActivity(`HTTP charts metric: ${apiMetric ?? 'n/a'}`, 'fetch-api');
 
@@ -111,10 +137,10 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
     await refreshAnalyticsWithoutPageReload();
 
     const afterRefreshSnapshot = captureMainAnalyticsSnapshot();
-    analyticsTestState.chartsPayload = await fetchChartsPayload(TEST_CREATOR_ID);
+    analyticsTestState.chartsPayload = await fetchChartsPayload(creatorId);
 
     analyticsTestState.refreshVerification = {
-      creatorId: TEST_CREATOR_ID,
+      creatorId,
       testCaseKey,
       baseline: baselineSnapshot,
       beforeRefresh: beforeRefreshSnapshot,
@@ -136,6 +162,7 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
 
     analyticsTestState.expectedRows = buildTestExpectations(testCaseKey, analyticsTestState.chartsPayload, {
       fields,
+      baselinePayload: analyticsTestState.baselinePayload,
     });
     logActivity(
       `Built ${analyticsTestState.expectedRows.length} expectations (DOM + internal API config)`,
@@ -153,6 +180,7 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
     try {
       for (const expected of mainRows) {
         const label = `${expected.valueKind.toUpperCase()} · ${expected.location} · ${expected.metric}`;
+        await waitForDomScanContinue(label);
         lockPageForDomScan(`DOM SCAN: ${label}`);
         logActivity(`DOM SCAN: ${label} (API ${expected.apiPath} = ${expected.expectedValue})`, 'scan-main');
         const found = await executeExpectedScan(expected, analyticsTestState.chartsPayload);
@@ -167,7 +195,8 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
 
       setRunnerStep('scan-popups', 'DOM runner: opening popups — day / week / month / year');
       const popupFound = await executePopupScanBatch(popupRows, analyticsTestState.chartsPayload, {
-        onProgress: (message) => {
+        onProgress: async (message) => {
+          await waitForDomScanContinue(message);
           lockPageForDomScan(`DOM SCAN: ${message}`);
           logActivity(`DOM SCAN: ${message}`, 'scan-popups');
         },
@@ -205,6 +234,8 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
     logActivity(`ERROR: ${error instanceof Error ? error.message : String(error)}`, 'done');
     renderRunnerPanel();
     throw error;
+  } finally {
+    runnerInFlight = false;
   }
 }
 

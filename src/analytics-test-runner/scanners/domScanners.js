@@ -228,6 +228,228 @@ export function scanDataValueNearLabel(labelText) {
   };
 }
 
+export function scanCardPercentageByHeading(headingText, field) {
+  const headingScan = findHeadingElement(headingText);
+  if (!headingScan.ok) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: null,
+      error: headingScan.error,
+    };
+  }
+
+  const cardElement =
+    headingScan.element.closest('.group\\/container') || headingScan.element.closest('div');
+
+  if (!cardElement) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: headingScan.element,
+      error: `Card container not found for heading "${headingText}"`,
+    };
+  }
+
+  markScannedElement(cardElement, `Card %: ${headingText}`);
+
+  if (headingText.toLowerCase() === 'subscribers' && (field === 'new' || field === 'recurring')) {
+    const newValueEl = Array.from(cardElement.querySelectorAll('[data-value]')).find((el) => {
+      const label = el.closest('.flex-col')?.querySelector('span')?.textContent || '';
+      if (field === 'recurring') return /recurring/i.test(label);
+      return /new/i.test(label);
+    });
+    const block = newValueEl?.closest('.flex-col')?.parentElement;
+    const pctEl = block?.querySelector('.text-sm.font-medium');
+    if (!pctEl) {
+      return {
+        ok: false,
+        foundValue: null,
+        rawText: '',
+        element: cardElement,
+        error: `${field} subscribers percentage not found`,
+      };
+    }
+    markScannedElement(pctEl, `${field} subscribers %`);
+    const pct = normalizeNumber(pctEl.textContent.replace('%', ''));
+    return { ok: true, foundValue: pct, rawText: pctEl.textContent.trim(), element: pctEl, error: null };
+  }
+
+  if (headingText.toLowerCase() === 'earnings') {
+    const totalEl = cardElement.querySelector('[data-value]');
+    const row = totalEl?.closest('.flex.justify-between') || totalEl?.parentElement?.parentElement;
+    const pctEl = row?.querySelector('.text-sm.font-medium');
+    if (!pctEl) {
+      return {
+        ok: false,
+        foundValue: null,
+        rawText: '',
+        element: cardElement,
+        error: 'Earnings percentage not found',
+      };
+    }
+    markScannedElement(pctEl, 'Earnings %');
+    const pct = normalizeNumber(pctEl.textContent.replace('%', ''));
+    return { ok: true, foundValue: pct, rawText: pctEl.textContent.trim(), element: pctEl, error: null };
+  }
+
+  return {
+    ok: false,
+    foundValue: null,
+    rawText: '',
+    element: cardElement,
+    error: `Unsupported percentage scan for ${headingText}/${field || 'default'}`,
+  };
+}
+
+export function scanCardMetricPercentage(headingText, metricLabel) {
+  const metricScan = scanCardMetricByLabel(headingText, metricLabel);
+  if (!metricScan.ok) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: metricScan.element,
+      error: metricScan.error,
+    };
+  }
+
+  const labelEl = metricScan.element?.closest('.flex-col') || metricScan.element;
+  const row = labelEl?.closest('.flex-col')?.querySelector('.flex.items-end') || labelEl?.parentElement;
+  const pctEl = row?.querySelector('.text-sm.font-medium');
+  if (!pctEl) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: metricScan.element,
+      error: `Percentage not found for ${headingText} / ${metricLabel}`,
+    };
+  }
+
+  markScannedElement(pctEl, `${headingText} / ${metricLabel} %`);
+  const pct = normalizeNumber(pctEl.textContent.replace('%', ''));
+  return {
+    ok: true,
+    foundValue: pct,
+    rawText: pctEl.textContent.trim(),
+    element: pctEl,
+    error: null,
+  };
+}
+
+export function scanPopupPercentageByStatHeading(statHeading) {
+  const needle = statHeading.toLowerCase();
+  const headingEl = Array.from(document.querySelectorAll('h3')).find((el) => {
+    return el.textContent.trim().toLowerCase().includes(needle);
+  });
+
+  if (!headingEl) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: null,
+      error: `Popup stat heading not found: ${statHeading}`,
+    };
+  }
+
+  const section = headingEl.closest('.flex-col') || headingEl.parentElement;
+  markScannedElement(headingEl, `Popup % heading: ${statHeading}`);
+
+  const pctEl = Array.from(section?.querySelectorAll('div') || []).find((el) => {
+    const text = el.textContent.trim();
+    return /%/.test(text) && /-?\d+/.test(text) && el.children.length <= 2;
+  });
+
+  if (!pctEl) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: headingEl,
+      error: `Popup percentage not visible for: ${statHeading}`,
+    };
+  }
+
+  markScannedElement(pctEl, `Popup %: ${statHeading}`);
+  const pct = normalizeNumber(pctEl.textContent.replace(/[^\d.-]/g, ''));
+  return {
+    ok: !Number.isNaN(pct),
+    foundValue: pct,
+    rawText: pctEl.textContent.trim(),
+    element: pctEl,
+    error: Number.isNaN(pct) ? `Could not parse popup % for ${statHeading}` : null,
+  };
+}
+
+export function scanTrendTableCountrySales(tableHeading, countryName) {
+  const headingEl =
+    document.querySelector('[data-testid="dashboard-analytics-top-countries-heading"]') ||
+    findHeadingElement(tableHeading).element;
+
+  if (!headingEl) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: null,
+      error: `Top Countries heading not found`,
+    };
+  }
+
+  const tableRoot =
+    headingEl.closest('.fourth-white-card-column') ||
+    headingEl.closest('[class*="white-card"]') ||
+    headingEl.closest('div');
+
+  markScannedElement(headingEl, `Table: ${tableHeading}`);
+
+  const countryCells = Array.from(tableRoot?.querySelectorAll('[data-value]') || []).filter((el) => {
+    const value = el.getAttribute('data-value') || el.textContent.trim();
+    return value === countryName || el.textContent.trim() === countryName;
+  });
+
+  if (countryCells.length === 0) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: tableRoot,
+      error: `Country row not found: ${countryName}`,
+    };
+  }
+
+  const countryEl = countryCells[0];
+  markScannedElement(countryEl, `Country: ${countryName}`);
+
+  const row = countryEl.closest('[class*="row"]') || countryEl.closest('.flex');
+  const salesEl = Array.from(row?.querySelectorAll('[data-value]') || []).find((el) => el !== countryEl);
+  if (!salesEl) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: countryEl.textContent.trim(),
+      element: countryEl,
+      error: `Sales cell not found for ${countryName}`,
+    };
+  }
+
+  markScannedElement(salesEl, `Sales: ${countryName}`);
+  const salesText = salesEl.getAttribute('data-value') || salesEl.textContent;
+  const sales = normalizeNumber(String(salesText).replace(/[^\d.-]/g, ''));
+
+  return {
+    ok: !Number.isNaN(sales),
+    foundValue: sales,
+    rawText: salesEl.textContent.trim(),
+    element: salesEl,
+    error: Number.isNaN(sales) ? `Could not parse sales for ${countryName}` : null,
+  };
+}
+
 export async function openTrendPopupFromHeading(headingText) {
   const headingScan = findHeadingElement(headingText);
   if (!headingScan.ok) throw new Error(headingScan.error);

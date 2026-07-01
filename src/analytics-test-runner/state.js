@@ -59,6 +59,8 @@ export function createInitialAnalyticsTestState() {
     refreshVerification: null,
     currentStepId: null,
     activityLog: [],
+    baselinePayload: null,
+    pauseDomScanBeforeEachStep: false,
   };
 }
 

@@ -4,7 +4,7 @@ const STORAGE_KEY = 'analytics-test-runner-size';
 export function getDefaultPanelSize() {
   return {
     width: Math.min(Math.round(window.innerWidth * 0.9), window.innerWidth - PANEL_MARGIN * 2),
-    height: Math.round(window.innerHeight * 0.42),
+    height: Math.round(window.innerHeight * 0.55),
   };
 }
 

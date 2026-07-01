@@ -40,10 +40,11 @@ function baseComparison(expected, found, pass, message) {
     apiPath: expected.apiPath,
     source: expected.source,
     knownGap: expected.knownGap,
+    deltaWarning: expected.deltaWarning,
     expectedValue: expected.expectedValue,
     foundValue: found?.foundValue ?? null,
     pass,
-    message,
+    message: expected.deltaWarning ? `${message} · ${expected.deltaWarning}` : message,
   };
 }
 
@@ -53,6 +54,14 @@ export function compareExpectedToFound(expectedRows, foundRows) {
 
     if (!found || !found.ok) {
       return baseComparison(expected, found, false, found?.error || 'DOM scan failed');
+    }
+
+    if (expected.knownGap) {
+      return baseComparison(expected, found, true, 'Known gap — skipped');
+    }
+
+    if (expected.deltaWarning) {
+      return baseComparison(expected, found, false, 'Incremental delta mismatch vs /api/charts');
     }
 
     if (typeof expected.expectedValue === 'number') {

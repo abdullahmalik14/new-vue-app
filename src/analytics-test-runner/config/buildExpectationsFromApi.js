@@ -7,6 +7,8 @@ import {
   resolveEarningsPopupTotal,
   resolveEarningsChartField,
   resolveSubsChartField,
+  resolveTrendingCountryDisplayName,
+  resolveTrendingCountrySales,
   earningsChartRule,
   subscribersChartRule,
   tokensChartRule,
@@ -14,6 +16,7 @@ import {
   resolveFansChartField,
   fansChartRule,
 } from './uiExpectationResolver.js';
+import { appendAllPercentageRows } from './percentageExpectationRows.js';
 
 const PERIOD_API_KEY = {
   day: 'daily',
@@ -103,13 +106,18 @@ export function buildExpectationsFromApi(testCaseKey, chartsPayload, { fields = 
   if (!builder) {
     throw new Error(`No API expectation builder for: ${testCaseKey}`);
   }
-  return builder(testCaseKey, chartsPayload, fields);
+  const mapped = mapChartsPayloadToUiState(chartsPayload);
+  const rows = builder(testCaseKey, chartsPayload, fields);
+  appendAllPercentageRows(rows, testCaseKey, mapped, singularRow);
+  return rows.filter((row) => row.expectedValue != null || row.knownGap);
 }
 
 function buildNewSubscriptionExpectations(testCaseKey, payload, fields) {
   const rows = [];
   const planId = Number(fields.planId ?? 2);
   const planTierKey = `tier${planId}`;
+  const countryId = Number(fields.countryId ?? 702);
+  const countryName = resolveTrendingCountryDisplayName(countryId);
   const mapped = mapChartsPayloadToUiState(payload);
 
   rows.push(
@@ -132,6 +140,21 @@ function buildNewSubscriptionExpectations(testCaseKey, payload, fields) {
       payload,
       expectedValue: resolveMainEarningsTotal(mapped),
       scan: { type: 'cardValueByHeading', heading: 'Earnings' },
+    }),
+    singularRow(testCaseKey, {
+      idSuffix: 'singular.trends.country.sales.day',
+      view: 'Trends',
+      location: 'Top Countries table',
+      metric: `${countryName} sales (USD)`,
+      period: 'day',
+      apiPath: `trendingCountries.daily[country=${countryId}].salesUSD`,
+      payload,
+      expectedValue: resolveTrendingCountrySales(payload, 'day', countryId),
+      scan: {
+        type: 'trendTableCountrySales',
+        tableHeading: 'Top Countries',
+        countryName,
+      },
     }),
     singularRow(testCaseKey, {
       idSuffix: 'singular.main.contributors.amount',

@@ -128,16 +128,16 @@ export default defineConfig(({ mode }) => {
 
       // Proxy configuration for Twitter OAuth (bypasses CORS)
       proxy: {
-        // Analytics + events → unified-api-handler (production parity with vercel.json)
+        // Analytics + events → Node API server (15.235.59.191). Do NOT use Vercel.
         '/api/charts': {
-          target: 'https://unified-api-handler-six.vercel.app',
+          target: 'http://15.235.59.191',
           changeOrigin: true,
-          secure: true
+          secure: false
         },
         '/api/events': {
-          target: 'https://unified-api-handler-six.vercel.app',
+          target: 'http://15.235.59.191',
           changeOrigin: true,
-          secure: true
+          secure: false
         },
         '/api/twitter/token': {
           target: 'https://api.twitter.com',

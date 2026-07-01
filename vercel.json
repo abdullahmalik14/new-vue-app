@@ -31,11 +31,11 @@
   "rewrites": [
     {
       "source": "/api/charts/:path*",
-      "destination": "https://unified-api-handler-six.vercel.app/api/charts/:path*"
+      "destination": "http://15.235.59.191/api/charts/:path*"
     },
     {
       "source": "/api/events/:path*",
-      "destination": "https://unified-api-handler-six.vercel.app/api/events/:path*"
+      "destination": "http://15.235.59.191/api/events/:path*"
     },
     {
       "source": "/(.*)",

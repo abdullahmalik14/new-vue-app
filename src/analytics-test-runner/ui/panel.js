@@ -25,7 +25,7 @@ function isDisplayRow() {
 }
 
 function injectStyles() {
-  const STYLE_VERSION = '7';
+  const STYLE_VERSION = '8';
   let style = document.querySelector('[data-analytics-test-runner-styles]');
   if (style?.getAttribute('data-style-version') === STYLE_VERSION) return;
   if (style) style.remove();
@@ -65,7 +65,10 @@ function injectStyles() {
       opacity: 0.7;
     }
     .runner-resize-handle:hover { opacity: 1; border-color: #93c5fd; }
-    .runner-panel-scroll { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
+    .runner-panel-scroll {
+      flex: 1; min-height: 280px; overflow: hidden;
+      display: flex; flex-direction: column; gap: 10px;
+    }
     .analytics-test-runner-panel[hidden] { display: none !important; }
     .analytics-test-runner-panel * { box-sizing: border-box; }
     .analytics-test-runner-panel h2 { margin: 0; font-size: 16px; font-weight: 600; }
@@ -81,20 +84,36 @@ function injectStyles() {
       font-size: 12px;
     }
     .runner-controls button[data-start-runner] { background: #2563eb; border-color: #3b82f6; font-weight: 600; }
+    .runner-pause-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #d1d5db; }
+    .runner-pause-toggle input { margin: 0; }
     .runner-controls button[data-close-runner] { background: transparent; }
     .runner-body {
       display: grid; grid-template-columns: 1fr 1.2fr; gap: 12px;
-      flex: 1; min-height: 200px;
+      flex: 1; min-height: 320px; overflow: hidden;
     }
     @media (max-width: 900px) { .runner-body { grid-template-columns: 1fr; } }
-    .runner-col { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-    .runner-col h3 { margin: 0; font-size: 13px; font-weight: 600; color: #cbd5e1; }
+    .runner-col {
+      display: flex; flex-direction: column; gap: 8px;
+      min-height: 280px; overflow: hidden;
+    }
+    .runner-col-left {
+      overflow-y: auto; overflow-x: hidden;
+      padding-right: 4px;
+    }
+    .runner-col-right {
+      min-height: 320px;
+    }
+    .runner-col h3 {
+      margin: 0; font-size: 13px; font-weight: 600; color: #cbd5e1;
+      flex-shrink: 0;
+    }
     .runner-current-step {
       padding: 10px 12px; border-radius: 8px; background: #1e293b;
       border: 1px solid #334155; font-size: 13px; font-weight: 600;
+      flex-shrink: 0; min-height: 42px;
     }
     .runner-current-step[data-running="true"] { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f680; }
-    .runner-step-track { display: flex; flex-wrap: wrap; gap: 4px; }
+    .runner-step-track { display: flex; flex-wrap: wrap; gap: 4px; flex-shrink: 0; min-height: 28px; }
     .runner-step-pill {
       padding: 3px 8px; border-radius: 999px; font-size: 10px;
       border: 1px solid #374151; color: #9ca3af; background: #111827;
@@ -102,15 +121,18 @@ function injectStyles() {
     .runner-step-pill.active { border-color: #3b82f6; color: #93c5fd; background: #172554; }
     .runner-step-pill.done { border-color: #166534; color: #86efac; background: #052e16; }
     .runner-log, .runner-api-log {
-      flex: 1; min-height: 72px; overflow: auto; border: 1px solid #374151;
+      flex: 0 0 auto;
+      min-height: 88px; max-height: 140px;
+      overflow: auto; border: 1px solid #374151;
       border-radius: 8px; background: #0b0f14; padding: 6px;
       font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
     }
+    .runner-api-log { min-height: 64px; max-height: 100px; }
     .runner-log-entry { padding: 3px 0; border-bottom: 1px solid #1f2937; }
     .runner-log-entry .time { color: #6b7280; margin-right: 6px; }
     .runner-expectations {
-      flex: 1; min-height: 120px; overflow: auto;
-      border: 1px solid #374151; border-radius: 8px;
+      flex: 1 1 auto; min-height: 240px;
+      overflow: auto; border: 1px solid #374151; border-radius: 8px;
     }
     .analytics-test-runner-panel table { width: 100%; border-collapse: collapse; font-size: 11px; }
     .analytics-test-runner-panel th {
@@ -121,16 +143,25 @@ function injectStyles() {
     .analytics-test-runner-panel tr.pass td:last-child { color: #4ade80; }
     .analytics-test-runner-panel tr.fail td:last-child { color: #f87171; }
     .analytics-test-runner-panel tr.pending td { color: #9ca3af; }
-    .runner-refresh-block { font-size: 11px; color: #cbd5e1; }
+    .runner-refresh-block {
+      font-size: 11px; color: #cbd5e1;
+      flex-shrink: 0; min-height: 52px;
+    }
+    .runner-refresh-block:empty { min-height: 0; }
     .runner-refresh-block table { margin-top: 4px; }
     .runner-debug-block {
       font: 10px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
       border: 1px solid #374151; border-radius: 8px; background: #0b0f14;
-      padding: 6px; max-height: 100px; overflow: auto; color: #cbd5e1;
+      padding: 6px; min-height: 72px; max-height: 120px;
+      overflow: auto; color: #cbd5e1;
       white-space: pre-wrap; word-break: break-word;
+      flex-shrink: 0;
     }
-    .runner-debug-block:empty { display: none; }
-    .runner-debug-title { margin: 6px 0 4px; font-size: 11px; font-weight: 600; color: #94a3b8; }
+    .runner-debug-block:empty { display: none; min-height: 0; }
+    .runner-debug-title {
+      margin: 6px 0 4px; font-size: 11px; font-weight: 600; color: #94a3b8;
+      flex-shrink: 0;
+    }
   `;
   document.head.appendChild(style);
 }
@@ -184,6 +215,7 @@ export function ensureTestRunnerPanel() {
       <div class="runner-header-actions">
         <div class="runner-controls">
           <label>Test case <select data-test-case-select>${optionsHtml}</select></label>
+          <label class="runner-pause-toggle"><input type="checkbox" data-pause-dom-scan /> Pause before each DOM scan</label>
           <button type="button" data-start-runner>Start Test Runner</button>
         </div>
         <button type="button" data-close-runner title="Minimize">✕</button>
@@ -218,6 +250,11 @@ export function ensureTestRunnerPanel() {
 
   const select = panel.querySelector('[data-test-case-select]');
   select.value = getDefaultTestCaseKey();
+  const pauseCheckbox = panel.querySelector('[data-pause-dom-scan]');
+  pauseCheckbox.checked = analyticsTestState.pauseDomScanBeforeEachStep;
+  pauseCheckbox.addEventListener('change', () => {
+    analyticsTestState.pauseDomScanBeforeEachStep = pauseCheckbox.checked;
+  });
   panel.querySelector('[data-close-runner]').addEventListener('click', () => setTestRunnerPanelOpen(false));
   document.body.appendChild(panel);
   initPanelResize(panel);
@@ -364,6 +401,8 @@ export function renderRunnerPanel() {
 
   const select = panel.querySelector('[data-test-case-select]');
   if (s.activeTestCase) select.value = s.activeTestCase;
+  const pauseCheckbox = panel.querySelector('[data-pause-dom-scan]');
+  if (pauseCheckbox) pauseCheckbox.checked = !!s.pauseDomScanBeforeEachStep;
 
   renderExpectationTable(panel, s);
 }

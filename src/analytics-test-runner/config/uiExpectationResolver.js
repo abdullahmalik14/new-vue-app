@@ -4,6 +4,7 @@ import {
   buildSubscriberInsights,
   buildEarningsInsights,
 } from '@/services/analytics/mappers/analyticsResponseMapper.js';
+import { analyticsCountryCodeToDisplayName } from '@/systems/analytics/analyticsCountryLabels.js';
 import { PERIOD_API_KEY } from './buildExpectationsFromApi.js';
 
 const TIER_DONUT_LABELS = {
@@ -36,6 +37,27 @@ export function resolveMainSubscribersRecurring(mapped) {
 
 export function resolveMainEarningsTotal(mapped) {
   return buildEarningsInsights(mapped.earnings || {}).daily?.total ?? null;
+}
+
+export function resolveMainSubscribersNewPercentage(mapped) {
+  return buildSubscriberInsights(mapped.subscriptionsBundle || {}).daily?.newPercentage ?? null;
+}
+
+export function resolveMainEarningsPercentage(mapped) {
+  return buildEarningsInsights(mapped.earnings || {}).daily?.percentage ?? null;
+}
+
+export function resolveTrendingCountryDisplayName(countryId) {
+  const code = `Country ${countryId}`;
+  return analyticsCountryCodeToDisplayName[code] || code;
+}
+
+export function resolveTrendingCountrySales(payload, period, countryId) {
+  const key = PERIOD_API_KEY[period] || period;
+  const arr = payload?.trendingCountries?.[key] || [];
+  const code = `Country ${countryId}`;
+  const row = arr.find((item) => item?.country === code || String(item?.country) === String(countryId));
+  return row?.salesUSD ?? row?.earningsUSD ?? row?.sales_usd ?? null;
 }
 
 /** Mirrors useDashboardAnalyticsStore.getEarningsViewModel */

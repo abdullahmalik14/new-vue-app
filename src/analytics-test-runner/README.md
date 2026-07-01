@@ -1,6 +1,8 @@
 # Analytics DOM + Chart Test Runner
 
-Browser-injected test suite for the analytics page. Validates visible DOM and amCharts runtime data against expectations from the [Event Usage Google Doc](https://docs.google.com/document/d/11YKEooxjfhCnxhX2W0X7Aks5m4ClfHl-4iMcDCjjgcs/edit?usp=sharing).
+Browser-injected test suite for the analytics page. Validates visible DOM and amCharts runtime data against expectations from [Event Usage](EVENT_USAGE.md) (local copy of the [Google Doc](https://docs.google.com/document/d/11YKEooxjfhCnxhX2W0X7Aks5m4ClfHl-4iMcDCjjgcs/edit?usp=sharing)).
+
+**API:** Dev proxy targets `http://15.235.59.191` (Node API — see `server-access-guide.pdf`). Do not use the Vercel handler for test runs.
 
 ## Test creator
 

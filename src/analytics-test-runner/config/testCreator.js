@@ -14,9 +14,32 @@ export const TEST_FAN_IDS = {
   tokenFan: 88007,
 };
 
+/** Matches dom_chart_test_scanner_runner_build_instructions.md resetEndpoint (live server path). */
 export const TEST_API = {
-  baseUrl: '', // same origin; dev proxy → admin.uy4sdjn4f7.com
+  /** Dev proxy → Node API on 15.235.59.191 (see server-access-guide.pdf). Never use Vercel. */
+  baseUrl: '',
+  reset: '/api/events/clear',
   clear: '/api/events/clear',
   trigger: '/api/events/trigger',
   charts: (creatorId) => `/api/charts/${creatorId}?nocache=1`,
 };
+
+/**
+ * Tests always run against TEST_CREATOR_ID. Warn if the page URL uses a different creator.
+ */
+export function resolveTestCreatorId() {
+  if (typeof window === 'undefined') return TEST_CREATOR_ID;
+
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = Number(
+    params.get('creator') || params.get('creator_id') || params.get('creatorId') || TEST_CREATOR_ID,
+  );
+
+  if (Number.isFinite(fromUrl) && fromUrl !== TEST_CREATOR_ID) {
+    console.warn(
+      `[AnalyticsTestRunner] Page creator=${fromUrl} — tests always clear/trigger/fetch creator ${TEST_CREATOR_ID} only`,
+    );
+  }
+
+  return TEST_CREATOR_ID;
+}

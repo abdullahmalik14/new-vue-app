@@ -2,6 +2,7 @@ import { EVENT_EXPECTATIONS } from './eventExpectations.js';
 import { expandExpectedRows } from './expandExpectedRows.js';
 import { buildExpectationsFromApi } from './buildExpectationsFromApi.js';
 import { hydrateApiRow } from './hydrateApiRow.js';
+import { applyIncrementalExpectations } from './incrementalExpectations.js';
 
 /**
  * Merge DOM expectations (API-hydrated, UI-aligned scan rules) with internal config
@@ -9,7 +10,7 @@ import { hydrateApiRow } from './hydrateApiRow.js';
  *
  * @param {string} testCaseKey
  * @param {object} chartsPayload
- * @param {{ fields?: Record<string, unknown> }} [options]
+ * @param {{ fields?: Record<string, unknown>, baselinePayload?: object }} [options]
  */
 export function buildTestExpectations(testCaseKey, chartsPayload, options = {}) {
   const fields = options.fields || {};
@@ -18,7 +19,15 @@ export function buildTestExpectations(testCaseKey, chartsPayload, options = {}) 
     throw new Error(`Unknown test case: ${testCaseKey}`);
   }
 
-  const domRows = buildExpectationsFromApi(testCaseKey, chartsPayload, { fields });
+  let domRows = buildExpectationsFromApi(testCaseKey, chartsPayload, { fields });
+  if (options.baselinePayload) {
+    domRows = applyIncrementalExpectations(domRows, {
+      testCaseKey,
+      fields,
+      baselinePayload: options.baselinePayload,
+      afterPayload: chartsPayload,
+    });
+  }
   const domIds = new Set(domRows.map((row) => row.id));
 
   let supplementalApiRows = [];
