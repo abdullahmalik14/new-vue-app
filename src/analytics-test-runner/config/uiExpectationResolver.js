@@ -5,6 +5,7 @@ import {
   buildEarningsInsights,
 } from '@/services/analytics/mappers/analyticsResponseMapper.js';
 import { analyticsCountryCodeToDisplayName } from '@/systems/analytics/analyticsCountryLabels.js';
+import { getContributorsListForPeriod } from '@/systems/analytics/analyticsDataMappers.js';
 import { PERIOD_API_KEY } from './buildExpectationsFromApi.js';
 
 const TIER_DONUT_LABELS = {
@@ -227,13 +228,8 @@ export function resolveLikesChartField(payload, period, field) {
 export const CONTRIBUTORS_PREVIEW_PERIOD = 'alltime';
 
 export function getTopContributorsArray(payload, period = CONTRIBUTORS_PREVIEW_PERIOD) {
-  const src = payload?.contributors?.topContributors;
-  if (!src) return [];
-  if (Array.isArray(src)) return src;
   const key = PERIOD_API_KEY[period] || period;
-  const periodArr = src[key];
-  if (Array.isArray(periodArr) && periodArr.length) return periodArr;
-  return src.alltime || src.daily || [];
+  return getContributorsListForPeriod(payload?.contributors?.topContributors, key);
 }
 
 export function resolveTopContributorField(payload, period = CONTRIBUTORS_PREVIEW_PERIOD, field = 'name') {

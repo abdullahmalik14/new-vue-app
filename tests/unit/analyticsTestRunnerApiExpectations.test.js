@@ -33,6 +33,8 @@ describe('buildExpectationsFromApi', () => {
     expect(rows.some((r) => r.valueKind === 'chart' && r.metric === 'total' && r.period === 'day')).toBe(false);
     expect(rows.some((r) => r.valueKind === 'chart' && r.metric === 'tier2' && r.period === 'week')).toBe(true);
     expect(rows.find((r) => r.location === 'Earnings popup header' && r.period === 'day')?.expectedValue).toBe(29.99);
+    expect(rows.some((r) => r.scan?.type === 'topContributorsPreview')).toBe(true);
+    expect(rows.some((r) => r.id.includes('api.contributors.popup.topContributors.week'))).toBe(true);
   });
 
   it('builds expectations for every registered event without throwing', () => {

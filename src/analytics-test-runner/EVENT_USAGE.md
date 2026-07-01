@@ -45,7 +45,7 @@ Each test case fires **one** master event after a clean database. Expected value
 | Popup · Subscribers | New subscriber donut / tier2 | +1 |
 | Popup · Earnings | subscription slice | +29.99 |
 | Popup · Earnings | total (week/month/year bars) | +29.99 |
-| Main · Contributors | Top fan amount | +29.99 (known backend gap) |
+| Main · Contributors | Top fan amount | +29.99 |
 
 **Country mapping (payload → UI)**
 

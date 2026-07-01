@@ -29,7 +29,7 @@ Local URL: `http://localhost:5173/iframe/analytics?creator=99999`
 | Top Countries | `trendingCountries.daily` has row | Shows **Singapore** on 566; **Country 702** on 99999 | ⚠️ PARTIAL — wrong country label |
 | Subscriptions Trend D/W/M/Y | `subscriptions.{daily,weekly,monthly,yearly}` all have data | Popup donuts on 566 | ✅ PASS |
 | Earnings Trend D/W/M/Y | `earnings.*` periods populated | Popup + donuts on 566 | ✅ PASS |
-| Contributors Trend D/W/M/Y | Flat contributor arrays (no per-period keys) | Popup bars on 566 | ⚠️ PARTIAL — period toggle may not change data |
+| Contributors Trend D/W/M/Y | `contributors.topContributors.{daily,weekly,monthly,yearly,alltime}` nested | Popup bars on 566 | ✅ PASS |
 | **Orders Received** subscription row | **`recentOrders` missing from API** | Tab visible but likely **empty** | ❌ FAIL |
 | Top Merch / Top Media | N/A for new sub | Empty on fresh creator | — N/A |
 

@@ -10,8 +10,6 @@ import {
   resolveSubsChartField,
   resolveTrendingCountryDisplayName,
   resolveTrendingCountrySales,
-  resolveTopContributorField,
-  CONTRIBUTORS_PREVIEW_PERIOD,
   earningsChartRule,
   subscribersChartRule,
   tokensChartRule,
@@ -29,6 +27,8 @@ import {
   buildMediaWatchDurationExpectations,
   buildMerchTrendRow,
   buildCountryTrendRow,
+  buildContributorsPreviewRows,
+  buildContributorsPopupApiRows,
 } from './allExpectationBuilders.js';
 
 const PERIOD_API_KEY = {
@@ -152,6 +152,7 @@ function buildNewSubscriptionExpectations(testCaseKey, payload, fields) {
   const countryId = Number(fields.countryId ?? 702);
   const countryName = resolveTrendingCountryDisplayName(countryId);
   const mapped = mapChartsPayloadToUiState(payload);
+  const rowFns = { singularRow, chartRow };
 
   rows.push(
     singularRow(testCaseKey, {
@@ -189,28 +190,8 @@ function buildNewSubscriptionExpectations(testCaseKey, payload, fields) {
         countryName,
       },
     }),
-    singularRow(testCaseKey, {
-      idSuffix: 'singular.main.contributors.amount',
-      view: 'Main',
-      location: 'Top Contributors preview',
-      metric: 'Top contributor amount (USD)',
-      period: CONTRIBUTORS_PREVIEW_PERIOD,
-      apiPath: `contributors.topContributors.${apiPeriod(CONTRIBUTORS_PREVIEW_PERIOD)}.-1.usdSpent`,
-      payload,
-      expectedValue: resolveTopContributorField(payload, CONTRIBUTORS_PREVIEW_PERIOD, 'amount'),
-      scan: { type: 'topContributorsPreview', field: 'total' },
-    }),
-    singularRow(testCaseKey, {
-      idSuffix: 'singular.main.contributors.name',
-      view: 'Main',
-      location: 'Top Contributors preview',
-      metric: 'Top contributor name',
-      period: CONTRIBUTORS_PREVIEW_PERIOD,
-      apiPath: `contributors.topContributors.${apiPeriod(CONTRIBUTORS_PREVIEW_PERIOD)}.-1.name`,
-      payload,
-      expectedValue: resolveTopContributorField(payload, CONTRIBUTORS_PREVIEW_PERIOD, 'name'),
-      scan: { type: 'topContributorsPreview', field: 'name' },
-    }),
+    ...buildContributorsPreviewRows(testCaseKey, payload, rowFns),
+    ...buildContributorsPopupApiRows(testCaseKey, payload, rowFns),
   );
 
   POPUP_SCAN_PERIODS_WITH_ALLTIME.forEach((period) => {
@@ -317,6 +298,7 @@ function buildRecurringSubscriptionExpectations(testCaseKey, payload, fields) {
 
 function buildMerchOrderExpectations(testCaseKey, payload, fields) {
   const mapped = mapChartsPayloadToUiState(payload);
+  const rowFns = { singularRow, chartRow };
   const rows = [];
   rows.push(
     singularRow(testCaseKey, {
@@ -329,6 +311,8 @@ function buildMerchOrderExpectations(testCaseKey, payload, fields) {
       expectedValue: resolveMainEarningsTotal(mapped),
       scan: { type: 'cardValueByHeading', heading: 'Earnings' },
     }),
+    ...buildContributorsPreviewRows(testCaseKey, payload, rowFns),
+    ...buildContributorsPopupApiRows(testCaseKey, payload, rowFns),
   );
   POPUP_SCAN_PERIODS_WITH_ALLTIME.forEach((period) => {
     const apiP = apiPeriod(period);
@@ -355,7 +339,11 @@ function buildMerchOrderExpectations(testCaseKey, payload, fields) {
 
 function buildTokenOrderExpectations(testCaseKey, payload, fields) {
   const mapped = mapChartsPayloadToUiState(payload);
-  const rows = [];
+  const rowFns = { singularRow, chartRow };
+  const rows = [
+    ...buildContributorsPreviewRows(testCaseKey, payload, rowFns),
+    ...buildContributorsPopupApiRows(testCaseKey, payload, rowFns),
+  ];
 
   POPUP_SCAN_PERIODS_WITH_ALLTIME.forEach((period) => {
     const apiP = apiPeriod(period);

@@ -1,5 +1,4 @@
 import { POPUP_SCAN_PERIODS } from '../../utils/periodMap.js';
-import { CONTRIBUTORS_PREVIEW_PERIOD } from '../uiExpectationResolver.js';
 
 export function createRow(id, row) {
   return { tolerance: 0.01, ...row, id };
@@ -101,28 +100,6 @@ export function addSubscribersPopupRows(rows, testCaseKey, { newSubscriber = 1, 
       fields: { newSubscriber, recurringSubscriber },
     });
   });
-}
-
-export function addContributorsApiRow(rows, testCaseKey, fanLabel) {
-  const periodKey = CONTRIBUTORS_PREVIEW_PERIOD === 'alltime' ? 'alltime' : 'daily';
-  rows.push(
-    createRow(`${testCaseKey}.api.contributors.top`, {
-      view: 'API',
-      metric: 'Top contributor name',
-      period: CONTRIBUTORS_PREVIEW_PERIOD,
-      source: 'api',
-      expectedValue: fanLabel,
-      knownGap: 'contributors.topContributors missing from /api/charts when section absent',
-      scan: { type: 'apiPath', path: `contributors.topContributors.${periodKey}.-1.name` },
-    }),
-    createRow(`${testCaseKey}.api.contributors.amount`, {
-      view: 'API',
-      metric: 'Top contributor amount',
-      period: CONTRIBUTORS_PREVIEW_PERIOD,
-      source: 'api',
-      scan: { type: 'apiPath', path: `contributors.topContributors.${periodKey}.-1.usdSpent` },
-    }),
-  );
 }
 
 export function addRecentOrdersApiRow(rows, testCaseKey, tab, minLength = 1) {

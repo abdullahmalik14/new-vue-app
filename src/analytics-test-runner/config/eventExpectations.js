@@ -50,7 +50,6 @@ export const EVENT_EXPECTATIONS = {
       'recentOrders missing from /api/charts payload → Orders Received empty',
       'trendingCountries.country shows "Country 702" not "Singapore"',
       'subscriptions.alltime / earnings.alltime missing from API (JSON validator fails)',
-      'contributors API returns flat array — period toggles may not change popup data',
     ],
     gapStatus: 'partial',
   },
@@ -164,7 +163,6 @@ export const EVENT_EXPECTATIONS = {
     ],
     knownGaps: [
       'Token tips increment Tokens Received / tipTokens — not USD Total Earnings on main card',
-      'contributors.topContributors may be missing from API',
       'recentOrders missing',
       'Verify call/chat/livestream channels separately',
     ],

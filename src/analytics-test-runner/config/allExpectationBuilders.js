@@ -18,6 +18,8 @@ import {
   resolveFansPeriodStat,
   resolveFansChartField,
   fansChartRule,
+  resolveTopContributorField,
+  CONTRIBUTORS_PREVIEW_PERIOD,
 } from './uiExpectationResolver.js';
 
 const PERIOD_API_KEY = {
@@ -296,6 +298,63 @@ export function buildCountryTrendRow(testCaseKey, payload, fields, rowFns) {
       countryName,
     },
   });
+}
+
+/** Main dashboard Top Contributors preview (alltime period, matches Vue overview). */
+export function buildContributorsPreviewRows(testCaseKey, payload, rowFns) {
+  const { singularRow } = rowFns;
+  const apiP = apiPeriod(CONTRIBUTORS_PREVIEW_PERIOD);
+
+  return [
+    createSingularRow(testCaseKey, singularRow, {
+      idSuffix: 'singular.main.contributors.amount',
+      view: 'Main',
+      location: 'Top Contributors preview',
+      metric: 'Top contributor amount (USD)',
+      period: CONTRIBUTORS_PREVIEW_PERIOD,
+      apiPath: `contributors.topContributors.${apiP}.-1.usdSpent`,
+      payload,
+      expectedValue: resolveTopContributorField(payload, CONTRIBUTORS_PREVIEW_PERIOD, 'amount'),
+      scan: { type: 'topContributorsPreview', field: 'total' },
+    }),
+    createSingularRow(testCaseKey, singularRow, {
+      idSuffix: 'singular.main.contributors.name',
+      view: 'Main',
+      location: 'Top Contributors preview',
+      metric: 'Top contributor name',
+      period: CONTRIBUTORS_PREVIEW_PERIOD,
+      apiPath: `contributors.topContributors.${apiP}.-1.name`,
+      payload,
+      expectedValue: resolveTopContributorField(payload, CONTRIBUTORS_PREVIEW_PERIOD, 'name'),
+      scan: { type: 'topContributorsPreview', field: 'name' },
+    }),
+  ];
+}
+
+/** API contract rows for nested contributors.topContributors per popup period. */
+export function buildContributorsPopupApiRows(testCaseKey, payload, rowFns) {
+  const { singularRow } = rowFns;
+  const rows = [];
+
+  POPUP_SCAN_PERIODS_WITH_ALLTIME.forEach((period) => {
+    const apiP = apiPeriod(period);
+    rows.push(
+      createSingularRow(testCaseKey, singularRow, {
+        idSuffix: `api.contributors.popup.topContributors.${period}`,
+        view: 'API',
+        location: 'Contributors popup contract',
+        metric: `Top contributor amount (${period})`,
+        period,
+        source: 'api',
+        apiPath: `contributors.topContributors.${apiP}.-1.usdSpent`,
+        payload,
+        expectedValue: resolveTopContributorField(payload, period, 'amount'),
+        scan: { type: 'apiPath', path: `contributors.topContributors.${apiP}.-1.usdSpent` },
+      }),
+    );
+  });
+
+  return rows;
 }
 
 export { PERIOD_API_KEY, apiPeriod };

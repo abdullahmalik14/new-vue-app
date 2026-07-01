@@ -31,4 +31,16 @@ describe('top contributors API resolvers', () => {
     };
     expect(resolveTopContributorField(sparse, 'daily', 'amount')).toBe(15);
   });
+
+  it('uses getContributorsListForPeriod semantics (nested keys only)', () => {
+    const nested = {
+      contributors: {
+        topContributors: {
+          weekly: [{ name: 'Fan 88002', usdSpent: 10 }],
+          alltime: [{ name: 'Fan 88001', usdSpent: 29.99 }],
+        },
+      },
+    };
+    expect(resolveTopContributorField(nested, 'week', 'amount')).toBe(10);
+  });
 });

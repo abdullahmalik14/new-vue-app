@@ -12,6 +12,8 @@ import {
   resolveLikesMainMetric,
   resolveLikesChartField,
   resolveEarningsPopupTokensReceived,
+  resolveTopContributorField,
+  CONTRIBUTORS_PREVIEW_PERIOD,
 } from './uiExpectationResolver.js';
 import {
   resolveMainSubscribersNewPercentageFromMapped,
@@ -203,6 +205,38 @@ export function applyIncrementalExpectations(rows, ctx) {
         increment.subsRecurringChart ?? 0,
       );
       return patch(row, expected, resolveSubsChartField(after, period, 'recurringSubscriber'));
+    }
+
+    if (id.includes('singular.main.contributors.amount')) {
+      const expected = applyDelta(
+        resolveTopContributorField(baselinePayload, CONTRIBUTORS_PREVIEW_PERIOD, 'amount'),
+        increment.contributorAmount ?? 0,
+      );
+      return patch(
+        row,
+        expected,
+        resolveTopContributorField(afterPayload, CONTRIBUTORS_PREVIEW_PERIOD, 'amount'),
+      );
+    }
+
+    if (id.includes('singular.main.contributors.name')) {
+      const fanId = fields.fanId;
+      const expectedName =
+        fanId != null ? `Fan ${fanId}` : resolveTopContributorField(baselinePayload, CONTRIBUTORS_PREVIEW_PERIOD, 'name');
+      return patch(
+        row,
+        expectedName,
+        resolveTopContributorField(afterPayload, CONTRIBUTORS_PREVIEW_PERIOD, 'name'),
+      );
+    }
+
+    if (id.includes('api.contributors.popup.topContributors.')) {
+      const period = row.period || CONTRIBUTORS_PREVIEW_PERIOD;
+      const expected = applyDelta(
+        resolveTopContributorField(baselinePayload, period, 'amount'),
+        increment.contributorAmount ?? 0,
+      );
+      return patch(row, expected, resolveTopContributorField(afterPayload, period, 'amount'));
     }
 
     return row;

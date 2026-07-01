@@ -12,8 +12,7 @@ describe('analytics test runner expandExpectedRows', () => {
 
     expect(rows.some((row) => row.id.includes('main.subscribers.new'))).toBe(true);
     expect(rows.some((row) => row.popup?.openFromHeading === 'Earnings')).toBe(true);
-    expect(rows.some((row) => row.scan?.type === 'topContributorsPreview')).toBe(true);
-    expect(rows.some((row) => row.scan?.path?.includes('contributors.topContributors.alltime'))).toBe(true);
+    expect(rows.some((row) => row.scan?.path === 'recentOrders.subscriptions.length')).toBe(true);
   });
 
   it('expands merchOrder with trending merch API check', () => {
