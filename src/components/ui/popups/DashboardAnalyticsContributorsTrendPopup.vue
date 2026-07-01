@@ -242,7 +242,7 @@ function getContribBarCfg(dk) {
     axisLabelColor: "#475467", axisLabelFontSize: "10px",
     xAxis: { minGridDistance: 60 },
     tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "$", valueSuffix: "" } },
-    yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true },
+    yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true },
     legentHint: legendConfig
   })
 }
@@ -258,7 +258,7 @@ function getContribLineCfg(dk) {
     axisLabelColor: "#475467", axisLabelFontSize: "10px",
     xAxis: { minGridDistance: 60 },
     tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "$", valueSuffix: "" } },
-    yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true },
+    yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true },
     line: { strokeWidth: 4 },
     legentHint: legendConfig
   })
