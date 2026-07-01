@@ -443,7 +443,7 @@
     "postPreview": {
       "heading": "XEM TRƯỚC BÀI ĐĂNG",
       "displayName": "Jelly FISH",
-      "handle": "@jellyf1sh",
+      "handle": "{'@'}jellyf1sh",
       "defaultMessage": "Đừng bỏ lỡ—xem nội dung độc quyền này và trải nghiệm đầu tiên!",
       "linkPreview": "fansocial.app/model/jellyskitchen/..."
     },
@@ -823,7 +823,7 @@
       },
       "mediaPreview": {
         "creatorName": "Princess Carrot Pop",
-        "creatorHandle": "@sammisjelly187",
+        "creatorHandle": "{'@'}sammisjelly187",
         "description": "Subscribe now to instantly unlock 300+ premium media resources."
       },
       "sectionHeader": {

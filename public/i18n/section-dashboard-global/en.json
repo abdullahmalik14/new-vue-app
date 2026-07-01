@@ -551,7 +551,7 @@
     "postPreview": {
       "heading": "POST PREVIEW",
       "displayName": "Jelly FISH",
-      "handle": "@jellyf1sh",
+      "handle": "{'@'}jellyf1sh",
       "defaultMessage": "Don't miss out—check this exclusive content and be the first to experience it!",
       "linkPreview": "fansocial.app/model/jellyskitchen/..."
     },
@@ -931,7 +931,7 @@
       },
       "mediaPreview": {
         "creatorName": "Princess Carrot Pop",
-        "creatorHandle": "@sammisjelly187",
+        "creatorHandle": "{'@'}sammisjelly187",
         "description": "Subscribe now to instantly unlock 300+ premium media resources."
       },
       "sectionHeader": {
