@@ -337,9 +337,18 @@ async function setSpendersView(v) {
 
 async function handlePeriodChange(val) {
   emit('update:period', val)
-  await nextTick()
-  await renderAllCharts()
+  // insightData watcher handles re-render once props update propagates
 }
+
+watch(() => props.insightData, async () => {
+  if (!props.modelValue) return
+  await nextTick()
+  injectChartData()
+  await renderChart(`contrib-top-${activeContribViewMode.value}`)
+  await renderChart(`contrib-fans-${activeFansViewMode.value}`)
+  await renderChart(`contrib-spenders-${activeSpendersViewMode.value}`)
+  isChartRendering.value = false
+})
 
 watch(() => props.modelValue, async (isOpen) => {
   if (isOpen) { await nextTick(); await renderAllCharts() }

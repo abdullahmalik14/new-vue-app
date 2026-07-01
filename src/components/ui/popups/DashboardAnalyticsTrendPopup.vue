@@ -49,7 +49,7 @@ const options = computed(() => {
 })
 
 const selected = computed({
-  get: () => props.period || DASHBOARD_ANALYTICS_PERIODS.DAILY.id,
+  get: () => props.period || DASHBOARD_ANALYTICS_PERIODS.DAILY,
   set: (val) => emit('update:period', val)
 })
 const isOpen = ref(false)
@@ -163,7 +163,8 @@ onBeforeUnmount(() => {
                   <div
                     v-for="option in options"
                     :key="option.value"
-                    class="option flex items-center justify-center gap-[0.625rem] hover:bg-white p-[0.75rem] dark:hover:bg-[#e8e6e3]"
+                    class="option flex items-center justify-center gap-[0.625rem] p-[0.75rem]"
+                    :class="option.value === selected ? 'bg-[#F2F4F7] dark:bg-[#2a2c2d]' : 'hover:bg-white dark:hover:bg-[#e8e6e3]'"
                     @click.stop="selectOption(option)"
                   >
                     <div

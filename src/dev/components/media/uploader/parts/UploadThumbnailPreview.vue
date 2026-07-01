@@ -1,7 +1,12 @@
 <script setup>
-import { onMounted } from "vue";
-import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
+import { onMounted, computed } from "vue";
+import { useI18n } from "vue-i18n";
+import CheckboxSwitch from '@/components/forms/checkboxes/CheckboxSwitch.vue';
 import { preloadIcons } from "@/utils/preload.js";
+import { useMediaUploaderStore } from "@/stores/useMediaUploaderStore";
+
+const { t } = useI18n();
+const uploaderStore = useMediaUploaderStore();
 
 // Props
 const props = defineProps({
@@ -9,9 +14,19 @@ const props = defineProps({
   deleteIcon: { type: String, default: "" }, // delete button icon
   expandIcon: { type: String, default: "" }, // expand button icon
   showLabel: { type: Boolean, default: true }, // show/hide "Thumbnail" label
-  labelText: { type: String, default: "Thumbnail" }, // label text
+  labelText: { type: String, default: "" },
   showBlurToggle: { type: Boolean, default: true }, // toggle visibility
   preloadImages: { type: Array, default: () => [] }, // preload images
+});
+
+const resolvedLabelText = computed(() => props.labelText || t('mediaUploader.thumbnail.label'));
+const blurToggleLabel = computed(() => t('mediaUploader.thumbnail.blurToggle'));
+
+const blurModel = computed({
+  get: () => uploaderStore.form.blurThumbnail || false,
+  set: (val) => {
+    uploaderStore.updateFormField("blurThumbnail", val);
+  }
 });
 
 onMounted(() => {
@@ -23,7 +38,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="flex flex-col mt-4 md:flex-row relative self-stretch w-full rounded-sm md:rounded-[1.5rem] gap-2"
+    class="flex flex-col md:flex-row relative self-stretch w-full rounded-sm md:rounded-[1.5rem] gap-2"
   >
     <!-- thumbnail area -->
     <div
@@ -36,14 +51,18 @@ onMounted(() => {
         <!-- Background Image -->
         <div class="block overflow-hidden">
           <div
-            class="w-full aspect-[16/9] md:aspect-auto min-h-0 md:min-h-[24.6875rem] h-auto md:h-full bg-cover"
-            :style="`background-image: url('${props.bgImage}')`"
+            class="w-full aspect-[16/9] md:aspect-auto min-h-0 md:min-h-[24.6875rem] h-auto md:h-full bg-cover transition-all duration-300"
+            :style="{ 
+              backgroundImage: `url('${uploaderStore.form.thumbnailUrl || props.bgImage}')`,
+              filter: blurModel ? 'blur(8px)' : 'none'
+            }"
           ></div>
         </div>
 
         <!-- Delete button (only if icon provided) -->
         <span
           v-if="props.deleteIcon"
+          @click="uploaderStore.updateFormField('thumbnailUrl', ''); uploaderStore.updateFormField('uploadedThumbnailFile', null)"
           class="absolute top-0 right-0 flex items-center justify-center h-6 w-6 cursor-pointer bg-error hover:bg-error-light"
         >
           <img :src="props.deleteIcon" alt="delete-icon" class="w-5 h-5" />
@@ -62,7 +81,7 @@ onMounted(() => {
           v-if="props.showLabel"
           class="bg-black text-[12px] font-[600] text-white py-[4px] px-[4px] absolute bottom-0 right-0"
         >
-          {{ props.labelText }}
+          {{ resolvedLabelText }}
         </div>
       </div>
     </div>
@@ -74,9 +93,10 @@ onMounted(() => {
           class="flex w-full flex-1 flex-row items-end justify-end gap-2 mt-2"
         >
           <CheckboxSwitch
-            label="Blur thumbnail"
+            :label="blurToggleLabel"
             version="dashboard"
             showWrapperLabel
+            v-model="blurModel"
           />
         </div>
       </div>

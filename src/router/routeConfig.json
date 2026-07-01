@@ -597,15 +597,7 @@
     ],
     "hideLayout": true
   },
-  {
-    "slug": "/home",
-    "section": "misc",
-    "requiresAuth": false,
-    "supportedRoles": [
-      "all"
-    ],
-    "componentPath": "@/dev/templates/home/Home.vue"
-  },
+ 
   {
     "slug": "/:pathMatch(.*)*",
     "redirect": "/404"
