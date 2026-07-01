@@ -12,6 +12,17 @@ export const TEST_FAN_IDS = {
   merchFan: 88005,
   p2vFan: 88006,
   tokenFan: 88007,
+  recurringFan: 88008,
+  switchSubFan: 88009,
+  followFan: 88010,
+  unfollowFan: 88011,
+  profileVisitFan: 88012,
+  mediaLikeFan: 88013,
+  profileLikeFan: 88014,
+  merchLikeFan: 88015,
+  feedLikeFan: 88016,
+  tagFan: 88017,
+  mediaWatchFan: 88018,
 };
 
 /** Matches dom_chart_test_scanner_runner_build_instructions.md resetEndpoint (live server path). */

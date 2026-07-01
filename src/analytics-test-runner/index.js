@@ -7,6 +7,8 @@ import {
   getSelectedTestCaseKey,
 } from './ui/panel.js';
 import { runAnalyticsTestCase } from './runAnalyticsTestCase.js';
+import { runAnalyticsTestBatch } from './runAnalyticsTestBatch.js';
+import { isBatchRunSelection } from './config/testCaseRegistry.js';
 import { initPageBootGuard } from './refresh/verifyRefresh.js';
 import router from '@/router/index.js';
 
@@ -42,7 +44,12 @@ export function bootstrapAnalyticsTestRunner() {
     bindStartButton(async () => {
       setTestRunnerPanelOpen(true);
       try {
-        await runAnalyticsTestCase(getSelectedTestCaseKey());
+        const selected = getSelectedTestCaseKey();
+        if (isBatchRunSelection(selected)) {
+          await runAnalyticsTestBatch();
+        } else {
+          await runAnalyticsTestCase(selected);
+        }
       } catch (error) {
         console.error('[AnalyticsTestRunner]', error);
       }

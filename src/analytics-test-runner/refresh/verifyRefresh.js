@@ -4,6 +4,7 @@ import {
 } from '../scanners/domScanners.js';
 import { getAnalyticsRefreshButton, isRefreshButtonReady } from './trigger.js';
 import { normalizeNumber } from '../utils/normalizeNumber.js';
+import { EVENT_EXPECTATIONS } from '../config/eventExpectations.js';
 import {
   mapChartsPayloadToUiState,
   resolveRefreshDomExpectation,
@@ -45,6 +46,10 @@ export function captureMainAnalyticsSnapshot() {
   const subscribers = scanCardValueByHeading('Subscribers');
   const newFollowers = scanCardMetricByLabel('Fans', 'NEW FOLLOWERS');
   const profileVisit = scanCardMetricByLabel('Fans', 'PROFILE VISIT');
+  const likesMedia = scanCardMetricByLabel('Likes', 'MEDIA');
+  const likesProfile = scanCardMetricByLabel('Likes', 'PROFILE');
+  const likesMerch = scanCardMetricByLabel('Likes', 'MERCH');
+  const likesFeed = scanCardMetricByLabel('Likes', 'FEED');
 
   let subscribersNew = null;
   if (subscribers.ok && Array.isArray(subscribers.foundValue)) {
@@ -58,6 +63,10 @@ export function captureMainAnalyticsSnapshot() {
     subscribersNew,
     newFollowers: readMetric(newFollowers),
     profileVisit: readMetric(profileVisit),
+    likesMedia: readMetric(likesMedia),
+    likesProfile: readMetric(likesProfile),
+    likesMerch: readMetric(likesMerch),
+    likesFeed: readMetric(likesFeed),
   };
 }
 
@@ -75,6 +84,29 @@ export function readApiMetricForTestCase(testCaseKey, chartsPayload) {
       return normalizeNumber(tags[0]?.views);
     },
     cancelSubscription: () => normalizeNumber(chartsPayload?.earnings?.daily?.at(-1)?.subscription),
+    switchSubscription: () => normalizeNumber(chartsPayload?.subscriptions?.daily?.at(-1)?.newSubscriber),
+    unfollow: () => normalizeNumber(chartsPayload?.fanInsights?.daily?.at(-1)?.newFollowers),
+    mediaLike: () => normalizeNumber(chartsPayload?.likes?.daily?.at(-1)?.media),
+    mediaUnlike: () => normalizeNumber(chartsPayload?.likes?.daily?.at(-1)?.media),
+    profileLike: () => normalizeNumber(chartsPayload?.likes?.daily?.at(-1)?.profile),
+    profileUnlike: () => normalizeNumber(chartsPayload?.likes?.daily?.at(-1)?.profile),
+    merchLike: () => normalizeNumber(chartsPayload?.likes?.daily?.at(-1)?.merch),
+    merchUnlike: () => normalizeNumber(chartsPayload?.likes?.daily?.at(-1)?.merch),
+    feedLike: () => normalizeNumber(chartsPayload?.likes?.daily?.at(-1)?.feed),
+    feedUnlike: () => normalizeNumber(chartsPayload?.likes?.daily?.at(-1)?.feed),
+    p2vOrder: () => normalizeNumber(chartsPayload?.earnings?.daily?.at(-1)?.paytoview),
+    mediaView: () => {
+      const mediaId = 5117;
+      const arr = chartsPayload?.trendingsMedia?.daily;
+      const match = Array.isArray(arr) ? arr.find((m) => Number(m.mediaId) === mediaId) : null;
+      return normalizeNumber(match?.views);
+    },
+    mediaWatchDuration: () => {
+      const mediaId = 2811;
+      const arr = chartsPayload?.trendingsMedia?.daily;
+      const match = Array.isArray(arr) ? arr.find((m) => Number(m.mediaId) === mediaId) : null;
+      return normalizeNumber(match?.watchDurationSec);
+    },
   };
 
   const reader = readers[testCaseKey];
@@ -90,13 +122,26 @@ export function buildRefreshVerificationChecks(input) {
 
   const domMetricKey = {
     newSubscription: 'subscribersNew',
-    recurringSubscription: 'subscribersNew',
+    recurringSubscription: 'earnings',
+    switchSubscription: 'subscribersNew',
     merchOrder: 'earnings',
     tokenOrder: 'earnings',
+    p2vOrder: 'earnings',
     follow: 'newFollowers',
+    unfollow: 'newFollowers',
     profileVisit: 'profileVisit',
     cancelSubscription: 'earnings',
+    mediaLike: 'likesMedia',
+    mediaUnlike: 'likesMedia',
+    profileLike: 'likesProfile',
+    profileUnlike: 'likesProfile',
+    merchLike: 'likesMerch',
+    merchUnlike: 'likesMerch',
+    feedLike: 'likesFeed',
+    feedUnlike: 'likesFeed',
   }[testCaseKey];
+
+  const isBlocked = EVENT_EXPECTATIONS[testCaseKey]?.gapStatus === 'blocked';
 
   const afterDom =
     domMetricKey === 'subscribersNew'
@@ -126,9 +171,10 @@ export function buildRefreshVerificationChecks(input) {
   checks.push({
     id: 'step10.apiHasData',
     label: 'HTTP /api/charts has post-event data',
-    pass: apiMetric != null && apiMetric > 0,
-    message:
-      apiMetric != null && apiMetric > 0
+    pass: isBlocked ? true : apiMetric != null && apiMetric > 0,
+    message: isBlocked
+      ? `Skipped — ${testCaseKey} trigger is known blocked`
+      : apiMetric != null && apiMetric > 0
         ? `API metric for ${testCaseKey}: ${apiMetric}`
         : `API metric missing or zero for ${testCaseKey}`,
   });

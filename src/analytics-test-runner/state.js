@@ -61,6 +61,7 @@ export function createInitialAnalyticsTestState() {
     activityLog: [],
     baselinePayload: null,
     pauseDomScanBeforeEachStep: false,
+    batchResults: [],
   };
 }
 

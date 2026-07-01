@@ -17,6 +17,16 @@ import {
   fansChartRule,
 } from './uiExpectationResolver.js';
 import { appendAllPercentageRows } from './percentageExpectationRows.js';
+import {
+  buildLikesFieldExpectations,
+  buildSwitchSubscriptionExpectations,
+  buildUnfollowExpectations,
+  buildP2vOrderExpectations,
+  buildMediaViewExpectations,
+  buildMediaWatchDurationExpectations,
+  buildMerchTrendRow,
+  buildCountryTrendRow,
+} from './allExpectationBuilders.js';
 
 const PERIOD_API_KEY = {
   day: 'daily',
@@ -91,15 +101,35 @@ function chartRow(testCaseKey, config) {
  * DOM scans are compared against these API-derived values.
  */
 export function buildExpectationsFromApi(testCaseKey, chartsPayload, { fields = {} } = {}) {
+  const rowFns = {
+    singularRow,
+    chartRow,
+    buildNewSubscriptionExpectations,
+    buildFollowExpectations,
+  };
+
   const builders = {
     newSubscription: buildNewSubscriptionExpectations,
     recurringSubscription: buildRecurringSubscriptionExpectations,
+    switchSubscription: (key, payload, f) => buildSwitchSubscriptionExpectations(key, payload, f, rowFns),
     merchOrder: buildMerchOrderExpectations,
+    p2vOrder: (key, payload, f) => buildP2vOrderExpectations(key, payload, f, rowFns),
     tokenOrder: buildTokenOrderExpectations,
     follow: buildFollowExpectations,
+    unfollow: (key, payload) => buildUnfollowExpectations(key, payload, rowFns),
     profileVisit: buildProfileVisitExpectations,
+    mediaLike: (key, payload) => buildLikesFieldExpectations(key, payload, 'media', rowFns),
+    mediaUnlike: (key, payload) => buildLikesFieldExpectations(key, payload, 'media', rowFns),
+    profileLike: (key, payload) => buildLikesFieldExpectations(key, payload, 'profile', rowFns),
+    profileUnlike: (key, payload) => buildLikesFieldExpectations(key, payload, 'profile', rowFns),
+    merchLike: (key, payload) => buildLikesFieldExpectations(key, payload, 'merch', rowFns),
+    merchUnlike: (key, payload) => buildLikesFieldExpectations(key, payload, 'merch', rowFns),
+    feedLike: (key, payload) => buildLikesFieldExpectations(key, payload, 'feed', rowFns),
+    feedUnlike: (key, payload) => buildLikesFieldExpectations(key, payload, 'feed', rowFns),
     tagEngagement: buildTagEngagementExpectations,
     cancelSubscription: buildCancelSubscriptionExpectations,
+    mediaView: (key, payload, f) => buildMediaViewExpectations(key, payload, f, rowFns),
+    mediaWatchDuration: (key, payload, f) => buildMediaWatchDurationExpectations(key, payload, f, rowFns),
   };
 
   const builder = builders[testCaseKey];
@@ -265,11 +295,12 @@ function buildRecurringSubscriptionExpectations(testCaseKey, payload, fields) {
       expectedValue: resolveMainSubscribersRecurring(mapped),
       scan: { type: 'cardValueByHeading', heading: 'Subscribers', field: 'recurring' },
     }),
+    buildCountryTrendRow(testCaseKey, payload, fields, { singularRow, chartRow }),
   );
   return rows;
 }
 
-function buildMerchOrderExpectations(testCaseKey, payload) {
+function buildMerchOrderExpectations(testCaseKey, payload, fields) {
   const mapped = mapChartsPayloadToUiState(payload);
   const rows = [];
   rows.push(
@@ -302,6 +333,8 @@ function buildMerchOrderExpectations(testCaseKey, payload) {
       }),
     );
   });
+  rows.push(buildMerchTrendRow(testCaseKey, payload, { singularRow, chartRow }));
+  rows.push(buildCountryTrendRow(testCaseKey, payload, fields, { singularRow, chartRow }));
   return rows;
 }
 

@@ -35,6 +35,7 @@ See `/Users/pro2019/Downloads/dom_chart_test_scanner_runner_build_instructions.m
 2. Open `http://localhost:5173/iframe/analytics?creator=99999`
 3. Click **Start Test Runner** in the bottom-right panel
 4. Or run in console: `runAnalyticsTestCase('newSubscription')`
+5. **Batch:** select **Batch: all cases (sequential)** — runs every event with a fresh DB clear + one ingest each (`runAnalyticsTestBatch()`). True mixed-event batches (multiple ingests before one refresh) are [Later Expansion #10](dom_chart_test_scanner_runner_build_instructions.md) (`mixedBatch`).
 
 ### Modules
 

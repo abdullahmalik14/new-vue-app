@@ -212,20 +212,61 @@ export function tokensChartRule(period, field) {
   };
 }
 
+export function resolveLikesMainMetric(mapped, field) {
+  return mapped.likes?.[field] ?? null;
+}
+
+export function resolveLikesChartField(payload, period, field) {
+  const key = PERIOD_API_KEY[period] || period;
+  const arr = payload?.likes?.[key] || [];
+  const last = arr[arr.length - 1] || {};
+  return last[field] ?? null;
+}
+
+export function likesChartRule(field) {
+  return {
+    chartIdIncludes: 'likes-chart',
+    field,
+    visibleOnly: true,
+  };
+}
+
 /** Main-card / refresh metric for a test case (UI-aligned). */
 export function resolveRefreshDomExpectation(testCaseKey, mapped) {
   switch (testCaseKey) {
     case 'newSubscription':
-    case 'recurringSubscription':
+    case 'switchSubscription':
       return resolveMainSubscribersNew(mapped) ?? resolveMainEarningsTotal(mapped);
+    case 'recurringSubscription':
+      return resolveMainSubscribersRecurring(mapped) ?? resolveMainEarningsTotal(mapped);
     case 'merchOrder':
     case 'tokenOrder':
+    case 'p2vOrder':
     case 'cancelSubscription':
       return resolveMainEarningsTotal(mapped);
     case 'follow':
+    case 'unfollow':
       return resolveFansPeriodStat(mapped, 'day', 'newFollowers');
     case 'profileVisit':
       return resolveFansPeriodStat(mapped, 'day', 'profileVisit');
+    case 'mediaLike':
+      return resolveLikesMainMetric(mapped, 'media');
+    case 'mediaUnlike':
+      return resolveLikesMainMetric(mapped, 'media');
+    case 'profileLike':
+    case 'profileUnlike':
+      return resolveLikesMainMetric(mapped, 'profile');
+    case 'merchLike':
+    case 'merchUnlike':
+      return resolveLikesMainMetric(mapped, 'merch');
+    case 'feedLike':
+    case 'feedUnlike':
+      return resolveLikesMainMetric(mapped, 'feed');
+    case 'tagEngagement':
+      return null;
+    case 'mediaView':
+    case 'mediaWatchDuration':
+      return null;
     default:
       return null;
   }

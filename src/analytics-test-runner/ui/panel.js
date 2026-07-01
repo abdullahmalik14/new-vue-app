@@ -1,9 +1,9 @@
 import { analyticsTestState } from '../state.js';
-import { RUNNABLE_TEST_CASES, getDefaultTestCaseKey } from '../config/testCaseRegistry.js';
+import { DROPDOWN_TEST_OPTIONS, getDefaultTestCaseKey } from '../config/testCaseRegistry.js';
 import { RUNNER_STEPS } from './activityLog.js';
 import { initPanelResize } from './panelResize.js';
 
-const PANEL_VERSION = '7';
+const PANEL_VERSION = '8';
 let panelOpen = false;
 
 function el(tag, className, text) {
@@ -199,7 +199,7 @@ export function ensureTestRunnerPanel() {
   if (panel && panel.getAttribute('data-runner-version') === PANEL_VERSION) return panel;
   if (panel) panel.remove();
 
-  const optionsHtml = RUNNABLE_TEST_CASES.map(
+  const optionsHtml = DROPDOWN_TEST_OPTIONS.map(
     (item) => `<option value="${item.key}">${item.label}</option>`,
   ).join('');
 
@@ -229,6 +229,7 @@ export function ensureTestRunnerPanel() {
         <div class="runner-current-step" data-current-step>Idle</div>
         <div class="runner-step-track" data-step-track></div>
         <div class="runner-refresh-block" data-refresh-verification></div>
+        <div class="runner-batch-block" data-batch-summary></div>
         <div class="runner-log" data-activity-log></div>
         <h3>API log</h3>
         <div class="runner-api-log" data-api-log></div>
@@ -397,6 +398,24 @@ export function renderRunnerPanel() {
       })
       .join('');
     refreshHost.innerHTML = `<strong>Refresh verification</strong><table><tr><th>Check</th><th>Result</th></tr>${checks}</table>`;
+  }
+
+  const batchHost = panel.querySelector('[data-batch-summary]');
+  if (!s.batchResults?.length) {
+    batchHost.innerHTML = '';
+  } else {
+    const passed = s.batchResults.filter((r) => r.pass).length;
+    const rows = s.batchResults
+      .map((row) => {
+        const cls = row.pass ? 'pass' : 'fail';
+        const detail =
+          row.comparisonFailed != null
+            ? `${row.comparisonFailed} comparison · ${row.refreshFailed ?? 0} refresh`
+            : escapeHtml(row.errors?.[0] || 'error');
+        return `<tr class="${cls}"><td>${escapeHtml(row.label)}</td><td>${row.pass ? 'PASS' : 'FAIL'}</td><td>${detail}</td></tr>`;
+      })
+      .join('');
+    batchHost.innerHTML = `<strong>Batch summary (${passed}/${s.batchResults.length} passed)</strong><table><tr><th>Case</th><th>Result</th><th>Detail</th></tr>${rows}</table>`;
   }
 
   const select = panel.querySelector('[data-test-case-select]');

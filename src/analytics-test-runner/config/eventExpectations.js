@@ -217,13 +217,82 @@ export const EVENT_EXPECTATIONS = {
     gapStatus: 'partial',
   },
 
-  mediaUnlike: { label: 'Media Unlike', trigger: { masterEventType: 'mediaUnlike', fields: { mediaId: 101 } }, expectedViews: [], knownGaps: ['Follow mediaLike pattern'], gapStatus: 'partial' },
-  profileLike: { label: 'Profile Like', trigger: { masterEventType: 'profileLike', fields: { profileId: 121 } }, expectedViews: [], knownGaps: ['Follow mediaLike pattern for PROFILE'], gapStatus: 'partial' },
-  profileUnlike: { label: 'Profile Unlike', trigger: { masterEventType: 'profileUnlike', fields: { profileId: 121 } }, expectedViews: [], knownGaps: [], gapStatus: 'partial' },
-  merchLike: { label: 'Merch Like', trigger: { masterEventType: 'merchLike', fields: { merchId: 4 } }, expectedViews: [], knownGaps: [], gapStatus: 'partial' },
-  merchUnlike: { label: 'Merch Unlike', trigger: { masterEventType: 'merchUnlike', fields: { merchId: 4 } }, expectedViews: [], knownGaps: [], gapStatus: 'partial' },
-  feedLike: { label: 'Feed Like', trigger: { masterEventType: 'feedLike', fields: { feedId: 215 } }, expectedViews: [], knownGaps: [], gapStatus: 'partial' },
-  feedUnlike: { label: 'Feed Unlike', trigger: { masterEventType: 'feedUnlike', fields: { feedId: 215 } }, expectedViews: [], knownGaps: [], gapStatus: 'partial' },
+  mediaUnlike: {
+    label: 'Media Unlike',
+    trigger: { masterEventType: 'mediaUnlike', fields: { mediaId: 101, countryCode: 'JP', countryId: 392 } },
+    expectedViews: [
+      { view: 'Main', metrics: ['Likes MEDIA decreases'], periods: ['day'], sources: ['dom'] },
+      { view: 'Popup Likes', metrics: ['Media bar decreases'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
+    ],
+    knownGaps: ['Requires seed mediaLike in runner before unlike'],
+    gapStatus: 'partial',
+  },
+
+  profileLike: {
+    label: 'Profile Like',
+    trigger: { masterEventType: 'profileLike', fields: { profileId: 121, countryCode: 'US', countryId: 840 } },
+    expectedViews: [
+      { view: 'Main', metrics: ['Likes PROFILE'], periods: ['day'], sources: ['dom'] },
+      { view: 'Popup Likes', metrics: ['Profile bar in chart'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
+    ],
+    knownGaps: [],
+    gapStatus: 'partial',
+  },
+
+  profileUnlike: {
+    label: 'Profile Unlike',
+    trigger: { masterEventType: 'profileUnlike', fields: { profileId: 121 } },
+    expectedViews: [
+      { view: 'Main', metrics: ['Likes PROFILE decreases'], periods: ['day'], sources: ['dom'] },
+      { view: 'Popup Likes', metrics: ['Profile bar decreases'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
+    ],
+    knownGaps: ['Requires seed profileLike in runner before unlike'],
+    gapStatus: 'partial',
+  },
+
+  merchLike: {
+    label: 'Merch Like',
+    trigger: { masterEventType: 'merchLike', fields: { merchId: 4, countryCode: 'BR', countryId: 634 } },
+    expectedViews: [
+      { view: 'Main', metrics: ['Likes MERCH'], periods: ['day'], sources: ['dom'] },
+      { view: 'Popup Likes', metrics: ['Merch bar in chart'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
+    ],
+    knownGaps: [],
+    gapStatus: 'partial',
+  },
+
+  merchUnlike: {
+    label: 'Merch Unlike',
+    trigger: { masterEventType: 'merchUnlike', fields: { merchId: 4 } },
+    expectedViews: [
+      { view: 'Main', metrics: ['Likes MERCH decreases'], periods: ['day'], sources: ['dom'] },
+      { view: 'Popup Likes', metrics: ['Merch bar decreases'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
+    ],
+    knownGaps: ['Requires seed merchLike in runner before unlike'],
+    gapStatus: 'partial',
+  },
+
+  feedLike: {
+    label: 'Feed Like',
+    trigger: { masterEventType: 'feedLike', fields: { feedId: 215, countryCode: 'CA', countryId: 124 } },
+    expectedViews: [
+      { view: 'Main', metrics: ['Likes FEED'], periods: ['day'], sources: ['dom'] },
+      { view: 'Popup Likes', metrics: ['Feed bar in chart'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
+    ],
+    knownGaps: [],
+    gapStatus: 'partial',
+  },
+
+  feedUnlike: {
+    label: 'Feed Unlike',
+    trigger: { masterEventType: 'feedUnlike', fields: { feedId: 215 } },
+    expectedViews: [
+      { view: 'Main', metrics: ['Likes FEED decreases'], periods: ['day'], sources: ['dom'] },
+      { view: 'Popup Likes', metrics: ['Feed bar decreases'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
+    ],
+    knownGaps: ['Requires seed feedLike in runner before unlike'],
+    gapStatus: 'partial',
+  },
 
   tagEngagement: {
     label: 'Tag Engagement',
@@ -237,7 +306,7 @@ export const EVENT_EXPECTATIONS = {
 
   mediaView: {
     label: 'Media View',
-    trigger: { masterEventType: 'mediaView', fields: { mediaId: 5117, countryCode: 'SG', countryId: 702, fanId: null } },
+    trigger: { masterEventType: 'mediaView', fields: { mediaId: 5117, countryCode: 'SG', countryId: 702 } },
     expectedViews: [
       { view: 'Trends', metrics: ['Top Media clicks'], periods: ['day'], sources: ['dom'] },
     ],

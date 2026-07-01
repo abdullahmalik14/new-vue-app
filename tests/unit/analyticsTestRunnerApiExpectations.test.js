@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildExpectationsFromApi } from '@/analytics-test-runner/config/buildExpectationsFromApi.js';
+import { EVENT_EXPECTATIONS } from '@/analytics-test-runner/config/eventExpectations.js';
 
 const samplePayload = {
   earnings: {
@@ -27,5 +28,31 @@ describe('buildExpectationsFromApi', () => {
     expect(rows.some((r) => r.valueKind === 'chart' && r.metric === 'total' && r.period === 'day')).toBe(false);
     expect(rows.some((r) => r.valueKind === 'chart' && r.metric === 'tier2' && r.period === 'week')).toBe(true);
     expect(rows.find((r) => r.location === 'Earnings popup header' && r.period === 'day')?.expectedValue).toBe(29.99);
+  });
+
+  it('builds expectations for every registered event without throwing', () => {
+    const keys = Object.keys(EVENT_EXPECTATIONS);
+    const richPayload = {
+      ...samplePayload,
+      likes: { daily: [{ media: 1, profile: 1, merch: 1, feed: 1 }] },
+      fanInsights: { daily: [{ newFollowers: 1, profileVisits: 1 }] },
+      trendingTags: { daily: [{ tag: 'Panty_Fetish', views: 1 }] },
+      trendingsMedia: {
+        daily: [
+          { mediaId: 5117, views: 1 },
+          { mediaId: 2811, watchDurationSec: 50 },
+          { mediaId: 101, ppvSalesUSD: 15.02 },
+        ],
+      },
+      trendingMerch: { daily: [{ merchId: 4 }] },
+      trendingCountries: { daily: [{ country: 'Country 702', salesUSD: 29.99 }] },
+    };
+
+    keys.forEach((key) => {
+      const fields = EVENT_EXPECTATIONS[key].trigger.fields;
+      expect(() => buildExpectationsFromApi(key, richPayload, fields)).not.toThrow();
+      const rows = buildExpectationsFromApi(key, richPayload, fields);
+      expect(rows.length).toBeGreaterThan(0);
+    });
   });
 });

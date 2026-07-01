@@ -110,10 +110,20 @@ export function appendMainOverviewPercentageRows(rows, testCaseKey, mapped, sing
  * Likes overview % — included when the event touches likes (runnable: none yet; kept for mediaLike etc.).
  */
 export function appendLikesPercentageRows(rows, testCaseKey, mapped, singularRow) {
-  const likesCases = new Set(['mediaLike', 'merchLike', 'profileLike', 'feedLike']);
-  if (!likesCases.has(testCaseKey)) return;
+  const likesFieldByCase = {
+    mediaLike: ['media'],
+    mediaUnlike: ['media'],
+    profileLike: ['profile'],
+    profileUnlike: ['profile'],
+    merchLike: ['merch'],
+    merchUnlike: ['merch'],
+    feedLike: ['feed'],
+    feedUnlike: ['feed'],
+  };
+  const fields = likesFieldByCase[testCaseKey];
+  if (!fields) return;
 
-  ['media', 'merch', 'profile', 'feed'].forEach((field) => {
+  fields.forEach((field) => {
     rows.push(
       mainCardPercentRow(testCaseKey, singularRow, {
         idSuffix: `singular.main.likes.${field}Percentage`,

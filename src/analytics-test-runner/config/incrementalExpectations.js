@@ -9,6 +9,8 @@ import {
   resolveSubsChartField,
   resolveTrendingCountrySales,
   resolveFansPeriodStat,
+  resolveLikesMainMetric,
+  resolveLikesChartField,
 } from './uiExpectationResolver.js';
 import {
   resolveMainSubscribersNewPercentageFromMapped,
@@ -153,6 +155,44 @@ export function applyIncrementalExpectations(rows, ctx) {
     if (id.includes('singular.main.fans.profileVisit')) {
       const expected = applyDelta(resolveFansPeriodStat(baseline, 'day', 'profileVisit'), increment.profileVisit ?? 0);
       return patch(row, expected, resolveFansPeriodStat(after, 'day', 'profileVisit'));
+    }
+
+    const likesFieldMatch = id.match(/singular\.main\.likes\.(media|profile|merch|feed)$/);
+    if (likesFieldMatch) {
+      const field = likesFieldMatch[1];
+      const incKey = `likes${field.charAt(0).toUpperCase()}${field.slice(1)}`;
+      const expected = applyDelta(resolveLikesMainMetric(baseline, field), increment[incKey] ?? 0);
+      return patch(row, expected, resolveLikesMainMetric(after, field));
+    }
+
+    const likesChartMatch = id.match(/chart\.popup\.likes\.(media|profile|merch|feed)\./);
+    if (likesChartMatch) {
+      const field = likesChartMatch[1];
+      const incKey = `likes${field.charAt(0).toUpperCase()}${field.slice(1)}`;
+      const period = row.period || 'day';
+      const expected = applyDelta(
+        resolveLikesChartField(baselinePayload, period, field),
+        increment[incKey] ?? 0,
+      );
+      return patch(row, expected, resolveLikesChartField(afterPayload, period, field));
+    }
+
+    if (id.includes('chart.popup.earnings.paytoview.')) {
+      const period = row.period;
+      const expected = applyDelta(
+        resolveEarningsChartField(baseline, period, 'paytoview'),
+        increment.earningsPaytoview ?? 0,
+      );
+      return patch(row, expected, resolveEarningsChartField(after, period, 'paytoview'));
+    }
+
+    if (id.includes('chart.popup.subscribers.recurring.')) {
+      const period = row.period;
+      const expected = applyDelta(
+        resolveSubsChartField(baseline, period, 'recurringSubscriber'),
+        increment.subsRecurringChart ?? 0,
+      );
+      return patch(row, expected, resolveSubsChartField(after, period, 'recurringSubscriber'));
     }
 
     return row;

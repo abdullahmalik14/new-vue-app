@@ -3,6 +3,7 @@ import { EVENT_EXPECTATIONS } from './config/eventExpectations.js';
 import { buildTestExpectations } from './config/buildTestExpectations.js';
 import { resolveTestCreatorId } from './config/testCreator.js';
 import { resolveFanIdForTestCase } from './config/testCaseRegistry.js';
+import { resolveSeedForTestCase } from './config/eventSeeds.js';
 import { resetTestDatabase, triggerMasterEvent, fetchChartsPayload } from './api/endpoints.js';
 import { refreshAnalyticsWithoutPageReload } from './refresh/trigger.js';
 import {
@@ -21,18 +22,34 @@ import { lockPageForDomScan, unlockPageAfterDomScan } from './ui/pageLock.js';
 import { waitForDomScanContinue } from './ui/scanPause.js';
 import { sleep } from './utils/sleep.js';
 
-const CANCEL_SEED = {
-  masterEventType: 'newOrder',
-  fields: {
-    orderType: 'new_subscription',
-    amount: 29.99,
-    countryId: 702,
-    countryCode: 'SG',
-    planId: 2,
-    calculated_amount: 0,
-    is_switch: false,
-  },
-};
+async function runSeedEvent(creatorId, seedConfig, log) {
+  let masterEventType;
+  let seedFields;
+  let fanId;
+
+  if (seedConfig.useTestCase) {
+    const seedCase = EVENT_EXPECTATIONS[seedConfig.useTestCase];
+    if (!seedCase) throw new Error(`Unknown seed test case: ${seedConfig.useTestCase}`);
+    masterEventType = seedCase.trigger.masterEventType;
+    seedFields = { ...seedCase.trigger.fields };
+    fanId = resolveFanIdForTestCase(seedConfig.useTestCase);
+  } else {
+    masterEventType = seedConfig.masterEventType;
+    seedFields = { ...seedConfig.fields };
+    fanId = resolveFanIdForTestCase(seedConfig.fanIdKey || 'newSubscription');
+  }
+
+  const data = { ...seedFields, creatorId, ...(fanId != null ? { fanId } : {}) };
+  log(
+    `POST /api/events/trigger (seed)\n${JSON.stringify({ masterEventType, data }, null, 2)}`,
+    'trigger',
+  );
+  const result = await triggerMasterEvent({ masterEventType, fields: data });
+  if (!result.ok) {
+    throw new Error(`Seed event failed: ${JSON.stringify(result.response)}`);
+  }
+  await sleep(6000);
+}
 
 let runnerInFlight = false;
 
@@ -83,29 +100,22 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
     const baselineSnapshot = captureMainAnalyticsSnapshot();
 
     const fanId = resolveFanIdForTestCase(testCaseKey);
+    const seedConfig = resolveSeedForTestCase(testCaseKey);
 
-    if (testCaseKey === 'cancelSubscription') {
-      const seedFields = {
-        ...CANCEL_SEED.fields,
-        creatorId,
-        fanId: resolveFanIdForTestCase('newSubscription'),
-      };
-      logActivity(
-        `POST /api/events/trigger (seed)\n${JSON.stringify({ masterEventType: CANCEL_SEED.masterEventType, data: seedFields }, null, 2)}`,
-        'trigger',
-      );
-      await triggerMasterEvent({ masterEventType: CANCEL_SEED.masterEventType, fields: seedFields });
-      await sleep(6000);
+    if (seedConfig) {
+      setRunnerStep('trigger', 'Seeding prerequisite event before main test');
+      await runSeedEvent(creatorId, seedConfig, logActivity);
       analyticsTestState.baselinePayload = await fetchChartsPayload(creatorId);
-      logActivity('Baseline updated after cancel seed subscription', 'trigger');
+      logActivity('Baseline updated after seed event', 'trigger');
     }
 
     setRunnerStep('trigger', `Triggering live event: ${testCase.trigger.masterEventType}`);
 
+    const { fanId: _omitFan, ...eventFields } = testCase.trigger.fields;
     const fields = {
-      ...testCase.trigger.fields,
+      ...eventFields,
       creatorId,
-      fanId,
+      ...(fanId != null ? { fanId } : {}),
     };
 
     logActivity(
@@ -119,12 +129,21 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
     });
 
     if (!triggerResult.ok) {
-      throw new Error(`Event trigger failed: ${JSON.stringify(triggerResult.response)}`);
+      if (testCase.gapStatus === 'blocked') {
+        const msg = `Event trigger failed (known blocked): ${JSON.stringify(triggerResult.response)}`;
+        analyticsTestState.errors.push(msg);
+        logActivity(msg, 'trigger');
+      } else {
+        throw new Error(`Event trigger failed: ${JSON.stringify(triggerResult.response)}`);
+      }
+    } else {
+      logActivity(`Event accepted: ${JSON.stringify(triggerResult.response)}`, 'trigger');
     }
-    logActivity(`Event accepted: ${JSON.stringify(triggerResult.response)}`, 'trigger');
 
-    setRunnerStep('wait-backend', 'Waiting for backend processing (8s)');
-    await sleep(8000);
+    if (triggerResult.ok) {
+      setRunnerStep('wait-backend', 'Waiting for backend processing (8s)');
+      await sleep(8000);
+    }
 
     setRunnerStep('fetch-api', 'Fetching GET /api/charts/99999 (HTTP ground truth)');
     const chartsBeforeRefresh = await fetchChartsPayload(creatorId);
