@@ -310,7 +310,7 @@ import {
     SUCCESS_GREEN_CLASS,
     TOPUP_CHECKBOX_CLASS,
     TRAILER_CHECKBOX_CLASS,
-} from '@/dev/composables/useCheckboxGroupDemoClasses.js';
+} from '@/dev/composables/checkboxGroupDemoClasses.js';
 
 const { t } = useI18n();
 const { url: bookingInstantIconUrl } = useAssetUrl('icon.booking.instant');

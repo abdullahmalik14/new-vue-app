@@ -1,4 +1,8 @@
 <script setup>
+import { useCheckoutDemoAssets } from '@/dev/composables/useCheckoutDemoAssets.js';
+
+const { assets } = useCheckoutDemoAssets();
+
 const props = defineProps({
   title: {
     type: String,
@@ -14,7 +18,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['section-close'])
 </script>
 
 <template>
@@ -37,11 +41,11 @@ const emit = defineEmits(['close'])
     <!-- close-button (desktop) -->
     <div
       v-if="showClose"
-      @click="emit('close')"
+      @click="emit('section-close')"
       class="hidden justify-center items-center w-12 h-12 bg-white/10 backdrop-blur-[20px] rounded-full cursor-pointer z-[99] md:flex"
     >
       <img
-        src="https://i.ibb.co.com/bMbk5v87/x-close.webp"
+        :src="assets.closeIcon"
         alt="close"
         class="w-8 h-8 drop-shadow-[0_0_8px_0_#00000080]"
       />

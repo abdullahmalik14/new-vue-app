@@ -4,7 +4,7 @@ import { MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
 import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import BaseInput from "@/components/forms/inputs/BaseInput.vue";
 import DashboardTextInput from "@/components/forms/inputs/DashboardTextInput.vue";
-import ReusableSearchInput from "./parts/ReusableSearchInput.vue";
+import MediaUploaderSearchInput from "./parts/MediaUploaderSearchInput.vue";
 import { useMediaUploaderStore } from "@/stores/useMediaUploaderStore";
 
 const uploaderStore = useMediaUploaderStore();
@@ -34,7 +34,7 @@ const descriptionModel = computed({
 const tagsModel = computed({
   get: () => uploaderStore.form.tags || [],
   set: (val) => {
-    // Note: Depends on what ReusableSearchInput returns (array of objects or strings)
+    // Note: Depends on what MediaUploaderSearchInput returns (array of objects or strings)
     uploaderStore.updateFormField("tags", val);
   },
 });
@@ -136,7 +136,7 @@ const handlePerformerSearch = (query) => {
         placeholder="Description (Optional)"
       />
 
-      <ReusableSearchInput
+      <MediaUploaderSearchInput
         title="Tags"
         subtitle="Add maximum of 10 tags to your media."
         placeholder="Search Tags..."
@@ -150,7 +150,7 @@ const handlePerformerSearch = (query) => {
         @manage-tags="openManageTags"
       />
 
-      <ReusableSearchInput
+      <MediaUploaderSearchInput
         title="Co-performer"
         subtitle="If this media includes other performers, please tag them below."
         placeholder="Jelly"

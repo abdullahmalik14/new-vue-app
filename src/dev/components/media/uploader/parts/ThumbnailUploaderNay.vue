@@ -51,7 +51,7 @@
           class="absolute bottom-0 right-0 w-12 h-12 sm:w-10 sm:h-10 rounded-full bg-green-500 flex items-center justify-center cursor-pointer"
         >
           <img
-            :src="'https://fansocial.app/wp-content/plugins/fansocial/assets/icons/svg/edit-pencil-black.svg'"
+            :src="editIconUrl"
             alt=""
             class="w-8 h-8 filter brightness-0"
           />
@@ -84,7 +84,7 @@
           <!-- Upload Icon/Button -->
           <span v-if="showButtonIcon" :class="buttonIconWrapperClass">
             <img
-              :src="'https://fansocial.app/wp-content/plugins/fansocial/assets/icons/svg/upload-cloud-02.svg'"
+              :src="uploadIconUrl"
               :alt="buttonIconName"
               class="w-5 h-5 filter brightness-0 invert"
             />
@@ -101,8 +101,8 @@
 
         <!-- Upload Text -->
         <div :class="dropTextClass">
-          <span :class="buttonTextClass" data-click-to-upload="">{{ buttonText }}</span>
-          <span v-if="dropText">{{ dropText }}</span>
+          <span :class="buttonTextClass" data-click-to-upload="">{{ resolvedButtonText }}</span>
+          <span v-if="resolvedDropText">{{ resolvedDropText }}</span>
         </div>
       </div>
 
@@ -167,12 +167,12 @@
         >
           <div data-button-text-wrap="" class="gap--4 flex items-center">
             <img
-              :src="'https://fansocial.app/wp-content/plugins/fansocial/assets/icons/svg/close-btn.svg'"
+              :src="closeIconUrl"
               alt="close-btn"
               class="w--16 h--16 filter--col--oxford-blue hov--filter--col--dodger-blue"
             />
             <span class="fs--12 fw5 lh--18 text-white col--oxford-blue hover--col--dodger-blue">
-              Cancel
+              {{ t('mediaUploader.thumbnailUploaderNay.cancel') }}
             </span>
           </div>
         </button>
@@ -183,6 +183,13 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useI18n } from 'vue-i18n';
+import { useAssetUrl } from '@/composables/useAssetUrl.js';
+
+const { t } = useI18n();
+const { url: editIconUrl } = useAssetUrl('icon.profileSettings.editArrow');
+const { url: uploadIconUrl } = useAssetUrl('icon.avatar.upload');
+const { url: closeIconUrl } = useAssetUrl('icon.notification.close');
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 const props = defineProps({
@@ -209,7 +216,7 @@ const props = defineProps({
   profileColorScheme: { type: String, default: "" },
 
   // Button / UI
-  buttonText: { type: String, default: "Click to upload" },
+  buttonText: { type: String, default: "" },
   buttonTextClass: { type: String, default: "font-semibold text-gray-700 cursor-pointer" },
   showButtonIcon: { type: Boolean, default: true },
   buttonIconName: { type: String, default: "upload" },
@@ -226,7 +233,7 @@ const props = defineProps({
     type: String,
     default: "w-10 h-10 flex justify-center items-center rounded-lg shadow-lg bg-green-500 hover:bg-gray-800 transition-colors",
   },
-  dropText: { type: String, default: "or drag and drop files here" },
+  dropText: { type: String, default: "" },
   dropTextClass: {
     type: String,
     default: "text-sm font-normal leading-5 text-gray-500 text-center",
@@ -255,6 +262,7 @@ const props = defineProps({
   mediaUrls: { type: Array, default: () => [] },
   mediaId: { type: [String, Number], default: null },
   mediaData: { type: Object, default: () => ({}) },
+  enableExternalScripts: { type: Boolean, default: false },
 });
 
 // ─── Emits ────────────────────────────────────────────────────────────────────
@@ -267,6 +275,8 @@ const componentRef = ref(null);
 
 // ─── Computed ─────────────────────────────────────────────────────────────────
 const effectiveInputName = computed(() => props.inputName || props.mediaType);
+const resolvedButtonText = computed(() => props.buttonText || t('demo.mediaUploaderComponents.thumbnailUploaderNay.clickToUpload'));
+const resolvedDropText = computed(() => props.dropText || t('demo.mediaUploaderComponents.thumbnailUploaderNay.dropText'));
 
 const effectiveCustomClass = computed(() => {
   if (props.customClass) return props.customClass;
@@ -372,7 +382,12 @@ const injectScript = (src) => {
 
 // ─── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(() => {
-  window.MEDIA_SITE_URL = "https://fansocial.app"; // Set global site URL for uploader scripts
+  if (!props.enableExternalScripts) {
+    document.addEventListener("mediaUploader-uploaded-all", handleUploadedAll);
+    return;
+  }
+
+  window.MEDIA_SITE_URL = import.meta.env.VITE_MEDIA_SITE_URL || "https://fansocial.app";
 
   // Bridge globals from parent frame
   window.userData = window.parent?.userData;
@@ -419,8 +434,8 @@ onMounted(() => {
     "media_uploader_image_gallery_title": "Image Gallery Title",
   }
 
-  injectScript("https://fansocial.app/wp-content/plugins/fansocial/dev/media-upload-new/js/mediaUploader.js");
-  injectScript("https://fansocial.app/wp-content/plugins/fansocial/dev/media-upload-new/js/mediaUploadHandler.js");
+  injectScript(`${window.MEDIA_SITE_URL}/wp-content/plugins/fansocial/dev/media-upload-new/js/mediaUploader.js`);
+  injectScript(`${window.MEDIA_SITE_URL}/wp-content/plugins/fansocial/dev/media-upload-new/js/mediaUploadHandler.js`);
 
   document.addEventListener("mediaUploader-uploaded-all", handleUploadedAll);
 });

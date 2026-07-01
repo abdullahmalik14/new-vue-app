@@ -189,7 +189,7 @@ const transferTypeOptions = [
                   :src="uploaderStore.form.socialThumbnailCustomImageSrc"
                   label="Thumbnail"
                   type="image"
-                  @delete="uploaderStore.updateFormField('socialThumbnailCustomImageSrc', '')"
+                  @preview-delete="uploaderStore.updateFormField('socialThumbnailCustomImageSrc', '')"
                 />
                 <ThumbnailUploader v-else subtitle="or drag and drop thumbnail image"
                   fileInfo="SVG, PNG, JPG or GIF (max. 800x400px)" stateUrlKey="socialThumbnailCustomImageSrc"
@@ -201,7 +201,7 @@ const transferTypeOptions = [
                   :src="uploaderStore.form.socialThumbnailCustomVideoSrc"
                   label="Trailer"
                   type="video"
-                  @delete="uploaderStore.updateFormField('socialThumbnailCustomVideoSrc', '')"
+                  @preview-delete="uploaderStore.updateFormField('socialThumbnailCustomVideoSrc', '')"
                 />
                 <ThumbnailUploader v-else subtitle="or drag and drop trailer file"
                   fileInfo="MP3, MP4, AVI, QUICKTIME, X-MATROSKA, X-MS-WMV, WEBM, OGG. (Max. 2000MB)"
@@ -310,7 +310,7 @@ const transferTypeOptions = [
                   :src="uploaderStore.form.socialThumbnailCustomImageSrc"
                   label="Thumbnail"
                   type="image"
-                  @delete="uploaderStore.updateFormField('socialThumbnailCustomImageSrc', '')"
+                  @preview-delete="uploaderStore.updateFormField('socialThumbnailCustomImageSrc', '')"
                 />
                 <ThumbnailUploader v-else subtitle="or drag and drop thumbnail image"
                   fileInfo="SVG, PNG, JPG or GIF (max. 800x400px)" stateUrlKey="socialThumbnailCustomImageSrc"
@@ -322,7 +322,7 @@ const transferTypeOptions = [
                   :src="uploaderStore.form.socialThumbnailCustomVideoSrc"
                   label="Trailer"
                   type="video"
-                  @delete="uploaderStore.updateFormField('socialThumbnailCustomVideoSrc', '')"
+                  @preview-delete="uploaderStore.updateFormField('socialThumbnailCustomVideoSrc', '')"
                 />
                 <ThumbnailUploader v-else subtitle="or drag and drop trailer file"
                   fileInfo="MP3, MP4, AVI, QUICKTIME, X-MATROSKA, X-MS-WMV, WEBM, OGG. (Max. 2000MB)"

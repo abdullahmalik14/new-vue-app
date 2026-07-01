@@ -574,9 +574,144 @@
     },
     "fileUploadPlaceholder": {
       "alt": "file-upload-placeholder"
+    },
+    "trailerSetting": {
+      "label": "Show Preview Trailer",
+      "paragraph": "Allow non-subscriber to preview your video on your media detail page."
+    },
+    "thumbnailUploader": {
+      "title": "Click to upload",
+      "subtitle": "or drag and drop image file here",
+      "fileInfo": "PNG or JPG (max. 10MB)",
+      "selected": "Selected: {name}"
+    },
+    "thumbnailUploaderNay": {
+      "cancel": "Cancel"
     }
   },
+  "cart": {
+    "title": "Your Cart",
+    "primaryCart": "Primary Cart",
+    "defaultBadge": "Default",
+    "setAsDefault": "Set as Default",
+    "syncLive": "SYNC LIVE",
+    "renamePlaceholder": "Rename Cart...",
+    "save": "SAVE",
+    "couponAppliedPlaceholder": "Coupon Applied",
+    "couponPlaceholder": "Coupon Code...",
+    "apply": "APPLY",
+    "remove": "REMOVE",
+    "emptyTitle": "Cart is Empty",
+    "emptyDescription": "Your cart is currently empty.",
+    "addNbaCard": "+ ADD NBA CARD ($12.23)",
+    "addVintageShirt": "+ ADD VINTAGE T-SHIRT ($25.00)",
+    "lookupTestHint": "(Strict products.json lookup test)",
+    "standardSeller": "Standard Seller",
+    "shipFromGermany": "Ship from Germany",
+    "shipping": "+${amount} shipping",
+    "syncAt": "Sync: {time}",
+    "subtotal": "Subtotal ({count} items)",
+    "serviceFees": "Service Fees",
+    "couponDiscount": "Coupon Discount",
+    "planDiscount": "Plan Discount",
+    "estimatedTotal": "ESTIMATED TOTAL",
+    "checkout": "ChECK OUT",
+    "chevronLeftAlt": "chevron-left",
+    "avatarAlt": "avatar",
+    "decreaseAlt": "decrease",
+    "increaseAlt": "increase",
+    "tagAlt": "tag"
+  },
+  "cookies": {
+    "title": "This website uses cookies.",
+    "description": "We use cookies to analyze website traffic and optmize your website experience. By accepting our use of cookies, your data will be aggregated with all other user data.",
+    "accept": "Accept"
+  },
+  "cloudflareSuccess": {
+    "success": "Success!",
+    "brand": "CLOUDFLARE",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
   "demo": {
+    "page": {
+      "title": "Trưng bày Component Dashboard",
+      "sections": {
+        "dashboardTextInput": "DashboardTextInput",
+        "heading": "Heading",
+        "paragraph": "Paragraph",
+        "cloudflareSuccess": "CloudflareSuccess",
+        "cookies": "Cookies",
+        "tierCards": "Thẻ Tier",
+        "eventCards": "Thẻ Sự kiện",
+        "shoppingCart": "Giỏ hàng",
+        "shoppingCartDescription": "Component giỏ hàng tương tác qua custom events. Mở console để xem lệnh tương tác."
+        "spinner": "Spinner",
+        "allButtons": "Tất cả nút — Danh mục đầy đủ"
+      },
+      "mediaCards": {
+        "mediaCardV1Title": "Biến thể Thẻ Media (V1)",
+        "mediaCardV1Description": "Nhiều logic hiển thị và biến thể bố cục cho thẻ media chính của chúng ta.",
+        "creatorMyMedia": "1. Creator: Media của tôi",
+        "continueWatching": "2. Fan: Tiếp tục xem",
+        "latestMedia": "3. Fan: Media mới nhất",
+        "purchasedMedia": "4. Fan: Media đã mua",
+        "gridView": "5. Fan: Lưới (Hiệu ứng Zoom)",
+        "mediaCardV2Title": "Biến thể Thẻ Media (V2)",
+        "mediaCardV2Description": "Ngôn ngữ thiết kế thay thế cho thẻ với hiệu ứng mở rộng khi hover.",
+        "gallery": "Thư viện",
+        "image": "Ảnh",
+        "video": "Video"
+      }
+    },
+    "heading": {
+      "h1Primary": "H1 Chính",
+      "h2Secondary": "H2 Phụ",
+      "h3Section": "H3 Phần",
+      "h2Dashboard": "Tiêu đề Dashboard",
+      "h2Auth": "Đăng nhập",
+      "h4Form": "Cài đặt hồ sơ",
+      "h1Demo": "Demo H1 Đậm",
+      "h3Demo": "Demo H3 Vừa",
+      "withIcon": "Có Icon",
+      "order": "Đơn hàng #1234",
+      "labels": {
+        "h1Primary": "h1 — defaultPrimaryHeading",
+        "h2Secondary": "h2 — defaultSecondaryHeading",
+        "h3Section": "h3 — sectionHeading",
+        "h2Dashboard": "h2 — dashboardHeading",
+        "h2Auth": "h2 — AuthHeading",
+        "h4Form": "h4 — formHeading",
+        "h1Demo": "h1 — demoHeadings",
+        "h3Demo": "h3 — demoHeadings",
+        "withLeftIcon": "Có Icon Trái",
+        "orderHeading": "h1 — orderHeading"
+      }
+    },
+    "paragraph": {
+      "default": "Đây là đoạn văn mặc định với kiểu chuẩn.",
+      "small": "Đoạn văn chữ nhỏ cho chú thích.",
+      "large": "Đoạn văn chữ lớn.",
+      "bold": "Đoạn văn in đậm.",
+      "blue": "Đoạn văn màu xanh.",
+      "error": "Trường này là bắt buộc.",
+      "success": "Thao tác thành công!",
+      "italic": "Đoạn văn in nghiêng cho ghi chú.",
+      "withIcon": "Thông báo thông tin tại đây",
+      "xs": "Văn bản trợ giúp hiển thị bên dưới trường nhập.",
+      "labels": {
+        "default": "Mặc định",
+        "small": "Nhỏ (text-sm)",
+        "large": "Lớn (text-xl)",
+        "bold": "In đậm",
+        "customColor": "Màu tùy chỉnh (Xanh)",
+        "errorRed": "Đỏ lỗi",
+        "successGreen": "Xanh thành công",
+        "italic": "In nghiêng",
+        "withLeftIcon": "Có Icon Trái",
+        "extraSmall": "Cực nhỏ (text-xs)"
+      }
+    },
     "dashboardTextInput": {
       "generalVariations": "Các biến thể chung",
       "bookingPatterns": "Mẫu form đặt lịch ($t + assetMap)",
@@ -640,7 +775,65 @@
     "buttons": {
       "showLoadingState": "Hiển thị trạng thái loading trên tất cả nút catalog (văn bản thay bằng spinner)",
       "loadingSection": "Trạng thái loading — prop loading (văn bản thay bằng spinner)",
-      "clickToLoadHint": "Nhấn bất kỳ nút nào để xem loading — văn bản và icon được thay bằng spinner (không có chữ Loading)."
+      "clickToLoadHint": "Nhấn bất kỳ nút nào để xem loading — văn bản và icon được thay bằng spinner (không có chữ Loading).",
+      "catalogIntro": "Cùng các nút thật dùng trong app (cùng text, variant, size, width và icon) để dev khác copy đúng component.",
+      "sections": {
+        "auth": "Trang auth — login / sign up / onboarding",
+        "checkout": "Checkout / purchase / cart popups",
+        "profileMedia": "Profile / media",
+        "payoutSettings": "Payout settings",
+        "planSharing": "Plan sharing",
+        "mediaUploader": "Media uploader",
+        "dashboardAnalytics": "Dashboard analytics",
+        "eventsAddons": "Events / add-ons / scheduling",
+        "twoPieceButton": "TwoPieceButton — variants"
+      },
+      "labels": {
+        "authSignIn": "authPink — size lg — login/signup submit",
+        "authTransparentSocial": "authTransparent — size lg — social",
+        "checkoutProceed": "checkoutProceedpayment — checkout/buy-now",
+        "actionGreenX": "actionGreen — guest purchase",
+        "profileBack": "profileMediaBtn — ProfileViewAll popup",
+        "payoutSave": "none + custom — PayoutSettings step 2/3",
+        "sendInvite": "simpleBtn — PlanSharing",
+        "addTier": "polygonLeft — Add Tier",
+        "polygonNext": "polygonLeft — Next (enabled + disabled)",
+        "submitMedia": "polygonLeft — Submit",
+        "allOrders": "none + custom — orders table",
+        "trend": "none + custom — metric card",
+        "newEvents": "none + custom — NEW EVENTS",
+        "publishSchedule": "polygonLeft — PUBLISH SCHEDULE",
+        "addonService": "none + custom — add-on service",
+        "addonServiceV2": "none + custom — add-on service v2",
+        "twoPieceLinkX": "link-x — Settings",
+        "twoPiecePremium": "premium-upgrade — Settings",
+        "twoPiecePink": "link-x (pink) — Edit Profile"
+      },
+      "authSignIn": "Sign in",
+      "continueWithX": "Continue with X (Twitter)",
+      "continueWithTelegram": "Continue with Telegram",
+      "proceedPayment": "Proceed Payment",
+      "back": "Back",
+      "save": "SAVE",
+      "sendInvite": "Send invite",
+      "addTier": "Add Tier",
+      "next": "Next",
+      "submitMediaForApproval": "SUBMIT MEDIA FOR APPROVAL",
+      "allOrders": "All Orders",
+      "trend": "Trend",
+      "newEvents": "NEW EVENTS",
+      "publishSchedule": "PUBLISH SCHEDULE",
+      "addonService": "add-on service",
+      "linkYourXAccount": "Link your X account",
+      "upgradeToPremium": "Upgrade To Premium",
+      "unlockPremiumVideos": "Unlock premium to upload videos"
+    },
+    "showCodeToggle": {
+      "showCode": "Show Code",
+      "hideCode": "Hide Code",
+      "copy": "Copy",
+      "copied": "✓ Copied",
+      "vueLabel": "Vue"
     },
     "spinner": {
       "assetMapImage": "Ảnh asset map (icon.spinner)",
@@ -918,7 +1111,7 @@
         "payoutAcceptedTitle": "Your payout request has been accepted."
       }
     },
-    "checkoutReuseable": {
+    "checkoutReusable": {
       "sectionTitle": "Checkout Reusable Components",
       "sections": {
         "mediaPreview": "CheckoutMediaPreview — Subscribe Login Popup",
@@ -981,6 +1174,31 @@
       "total": {
         "amount": "USD$6.99"
       },
+      "paymentLoggedIn": {
+        "deleteCard": "Delete Card",
+        "cardHolderName": "Card Holder Name",
+        "expiryDate": "Expiry Date",
+        "noName": "No Name",
+        "expiryPlaceholder": "MM/YY",
+        "expPrefix": "EXP"
+      },
+      "paymentNotLoggedIn": {
+        "saveCard": "Save this card for faster checkout.",
+        "cardNumber": "Card Number",
+        "expirationDate": "Expiration Date",
+        "cardholderName": "Cardholder Name",
+        "cvv": "CVV"
+      },
+      "notes": {
+        "title": "Notes",
+        "optional": "Optional",
+        "creatorName": "Princess Carrot Pop",
+        "placeholder": "Enter notes to {'@'}jenny1234....",
+        "charactersLeft": "{count} Characters Left"
+      },
+      "totalAmount": {
+        "label": "Total"
+      },
       "options": {
         "hongKong": "Hong Kong",
         "australia": "Australia",
@@ -995,12 +1213,12 @@
         "texas": "Texas"
       }
     },
-    "mediaUploaderHelper": {
+    "mediaUploaderComponents": {
       "sectionTitle": "Media Uploader Helper Components",
       "sections": {
-        "searchTags": "ReusableSearchInput — Media Details (Tags)",
-        "searchCoPerformer": "ReusableSearchInput — Media Details (Co-performer)",
-        "searchInviteList": "ReusableSearchInput — Plan Sharing (Invite list)",
+        "searchTags": "MediaUploaderSearchInput — Media Details (Tags)",
+        "searchCoPerformer": "MediaUploaderSearchInput — Media Details (Co-performer)",
+        "searchInviteList": "MediaUploaderSearchInput — Plan Sharing (Invite list)",
         "publishDatePicker": "PublishDatePicker — Publish & Sharing (Schedule)",
         "postPreview": "PostPreview — Publish & Sharing",
         "socialPreviewThumbnail": "SocialCustomPreview — Publish & Sharing (Thumbnail)",

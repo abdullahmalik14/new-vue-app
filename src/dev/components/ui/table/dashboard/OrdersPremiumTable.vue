@@ -1,7 +1,5 @@
 <template>
-  <section class="flex flex-col gap-6">
-    <DemoSectionHeader :title="t('demo.premiumOrders.sectionTitle')" />
-
+  <div class="flex flex-col gap-6">
     <div class="flex flex-col gap-[16px]">
       <div class="p-2 flex flex-col gap-[24px]">
         <h1 class="text-[28px] font-semibold text-[#101828]">{{ t('demo.premiumOrders.title') }}</h1>
@@ -132,7 +130,7 @@
     </div>
 
     <ShowCodeToggle :code="codeExamples.fullPage" />
-  </section>
+  </div>
 </template>
 
 <script setup>
@@ -142,7 +140,6 @@ import FlexTable from '@/dev/components/ui/table/FlexTable.vue';
 import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue';
 import BasePlanDropdown from '@/dev/components/plan/parts/BasePlanDropdown.vue';
 import OrdersTableSearchInput from '@/dev/components/ui/table/dashboard/OrdersTableSearchInput.vue';
-import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
 import { useAssetUrl } from '@/composables/useAssetUrl.js';
 
 const ShowCodeToggle = defineComponent({

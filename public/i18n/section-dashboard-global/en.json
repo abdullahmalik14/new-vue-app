@@ -561,9 +561,144 @@
     },
     "fileUploadPlaceholder": {
       "alt": "file-upload-placeholder"
+    },
+    "trailerSetting": {
+      "label": "Show Preview Trailer",
+      "paragraph": "Allow non-subscriber to preview your video on your media detail page."
+    },
+    "thumbnailUploader": {
+      "title": "Click to upload",
+      "subtitle": "or drag and drop image file here",
+      "fileInfo": "PNG or JPG (max. 10MB)",
+      "selected": "Selected: {name}"
+    },
+    "thumbnailUploaderNay": {
+      "cancel": "Cancel"
     }
   },
+  "cart": {
+    "title": "Your Cart",
+    "primaryCart": "Primary Cart",
+    "defaultBadge": "Default",
+    "setAsDefault": "Set as Default",
+    "syncLive": "SYNC LIVE",
+    "renamePlaceholder": "Rename Cart...",
+    "save": "SAVE",
+    "couponAppliedPlaceholder": "Coupon Applied",
+    "couponPlaceholder": "Coupon Code...",
+    "apply": "APPLY",
+    "remove": "REMOVE",
+    "emptyTitle": "Cart is Empty",
+    "emptyDescription": "Your cart is currently empty.",
+    "addNbaCard": "+ ADD NBA CARD ($12.23)",
+    "addVintageShirt": "+ ADD VINTAGE T-SHIRT ($25.00)",
+    "lookupTestHint": "(Strict products.json lookup test)",
+    "standardSeller": "Standard Seller",
+    "shipFromGermany": "Ship from Germany",
+    "shipping": "+${amount} shipping",
+    "syncAt": "Sync: {time}",
+    "subtotal": "Subtotal ({count} items)",
+    "serviceFees": "Service Fees",
+    "couponDiscount": "Coupon Discount",
+    "planDiscount": "Plan Discount",
+    "estimatedTotal": "ESTIMATED TOTAL",
+    "checkout": "ChECK OUT",
+    "chevronLeftAlt": "chevron-left",
+    "avatarAlt": "avatar",
+    "decreaseAlt": "decrease",
+    "increaseAlt": "increase",
+    "tagAlt": "tag"
+  },
+  "cookies": {
+    "title": "This website uses cookies.",
+    "description": "We use cookies to analyze website traffic and optmize your website experience. By accepting our use of cookies, your data will be aggregated with all other user data.",
+    "accept": "Accept"
+  },
+  "cloudflareSuccess": {
+    "success": "Success!",
+    "brand": "CLOUDFLARE",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
   "demo": {
+    "page": {
+      "title": "Dashboard Component Showcase",
+      "sections": {
+        "dashboardTextInput": "DashboardTextInput",
+        "heading": "Heading",
+        "paragraph": "Paragraph",
+        "cloudflareSuccess": "CloudflareSuccess",
+        "cookies": "Cookies",
+        "tierCards": "Tier Cards",
+        "eventCards": "Event Cards",
+        "shoppingCart": "Shopping Cart",
+        "shoppingCartDescription": "Interactive cart component driven by custom events. Open console to see interaction commands."
+        "spinner": "Spinner",
+        "allButtons": "All Buttons — Full Catalog"
+      },
+      "mediaCards": {
+        "mediaCardV1Title": "Media Card Variations (V1)",
+        "mediaCardV1Description": "Multiple display logic and layout variants for our primary media card.",
+        "creatorMyMedia": "1. Creator: My Media",
+        "continueWatching": "2. Fan: Continue Watching",
+        "latestMedia": "3. Fan: Latest Media",
+        "purchasedMedia": "4. Fan: Purchased Media",
+        "gridView": "5. Fan: Grid View (Zoom Effect)",
+        "mediaCardV2Title": "Media Card Variations (V2)",
+        "mediaCardV2Description": "An alternative design language for cards with hover expansion effects.",
+        "gallery": "Gallery",
+        "image": "Image",
+        "video": "Video"
+      }
+    },
+    "heading": {
+      "h1Primary": "Primary H1",
+      "h2Secondary": "Secondary H2",
+      "h3Section": "Section H3",
+      "h2Dashboard": "Dashboard Title",
+      "h2Auth": "Login",
+      "h4Form": "Profile Settings",
+      "h1Demo": "Demo H1 Bold",
+      "h3Demo": "Demo H3 Medium",
+      "withIcon": "With Icon",
+      "order": "Order #1234",
+      "labels": {
+        "h1Primary": "h1 — defaultPrimaryHeading",
+        "h2Secondary": "h2 — defaultSecondaryHeading",
+        "h3Section": "h3 — sectionHeading",
+        "h2Dashboard": "h2 — dashboardHeading",
+        "h2Auth": "h2 — AuthHeading",
+        "h4Form": "h4 — formHeading",
+        "h1Demo": "h1 — demoHeadings",
+        "h3Demo": "h3 — demoHeadings",
+        "withLeftIcon": "With Left Icon",
+        "orderHeading": "h1 — orderHeading"
+      }
+    },
+    "paragraph": {
+      "default": "This is a default paragraph with standard styling.",
+      "small": "Small text paragraph for captions.",
+      "large": "Large paragraph text.",
+      "bold": "Bold paragraph text.",
+      "blue": "Blue paragraph text.",
+      "error": "This field is required.",
+      "success": "Action successful!",
+      "italic": "Italic paragraph text for notes.",
+      "withIcon": "Info message here",
+      "xs": "Helper text displayed below the input field.",
+      "labels": {
+        "default": "Default",
+        "small": "Small (text-sm)",
+        "large": "Large (text-xl)",
+        "bold": "Bold",
+        "customColor": "Custom Color (Blue)",
+        "errorRed": "Error Red",
+        "successGreen": "Success Green",
+        "italic": "Italic",
+        "withLeftIcon": "With Left Icon",
+        "extraSmall": "Extra Small (text-xs)"
+      }
+    },
     "dashboardTextInput": {
       "generalVariations": "General variations",
       "bookingPatterns": "Booking form patterns ($t + assetMap)",
@@ -627,7 +762,65 @@
     "buttons": {
       "showLoadingState": "Show loading state on all catalog buttons (text replaced by spinner)",
       "loadingSection": "Loading state — loading prop (text replaced by spinner)",
-      "clickToLoadHint": "Click any button to preview loading — text and icons are replaced by spinner only (no Loading label)."
+      "clickToLoadHint": "Click any button to preview loading — text and icons are replaced by spinner only (no Loading label).",
+      "catalogIntro": "Exactly the same buttons used across the app (same text, variant, size, width and icons), so another developer can copy the real thing. Each label shows the variant and where it is used.",
+      "sections": {
+        "auth": "Auth pages — login / sign up / onboarding",
+        "checkout": "Checkout / purchase / cart popups",
+        "profileMedia": "Profile / media",
+        "payoutSettings": "Payout settings",
+        "planSharing": "Plan sharing",
+        "mediaUploader": "Media uploader",
+        "dashboardAnalytics": "Dashboard analytics",
+        "eventsAddons": "Events / add-ons / scheduling",
+        "twoPieceButton": "TwoPieceButton — variants"
+      },
+      "labels": {
+        "authSignIn": "authPink — size lg — login/signup submit",
+        "authTransparentSocial": "authTransparent — size lg — social",
+        "checkoutProceed": "checkoutProceedpayment — checkout/buy-now",
+        "actionGreenX": "actionGreen — guest purchase",
+        "profileBack": "profileMediaBtn — ProfileViewAll popup",
+        "payoutSave": "none + custom — PayoutSettings step 2/3",
+        "sendInvite": "simpleBtn — PlanSharing",
+        "addTier": "polygonLeft — Add Tier",
+        "polygonNext": "polygonLeft — Next (enabled + disabled)",
+        "submitMedia": "polygonLeft — Submit",
+        "allOrders": "none + custom — orders table",
+        "trend": "none + custom — metric card",
+        "newEvents": "none + custom — NEW EVENTS",
+        "publishSchedule": "polygonLeft — PUBLISH SCHEDULE",
+        "addonService": "none + custom — add-on service",
+        "addonServiceV2": "none + custom — add-on service v2",
+        "twoPieceLinkX": "link-x — Settings",
+        "twoPiecePremium": "premium-upgrade — Settings",
+        "twoPiecePink": "link-x (pink) — Edit Profile"
+      },
+      "authSignIn": "Sign in",
+      "continueWithX": "Continue with X (Twitter)",
+      "continueWithTelegram": "Continue with Telegram",
+      "proceedPayment": "Proceed Payment",
+      "back": "Back",
+      "save": "SAVE",
+      "sendInvite": "Send invite",
+      "addTier": "Add Tier",
+      "next": "Next",
+      "submitMediaForApproval": "SUBMIT MEDIA FOR APPROVAL",
+      "allOrders": "All Orders",
+      "trend": "Trend",
+      "newEvents": "NEW EVENTS",
+      "publishSchedule": "PUBLISH SCHEDULE",
+      "addonService": "add-on service",
+      "linkYourXAccount": "Link your X account",
+      "upgradeToPremium": "Upgrade To Premium",
+      "unlockPremiumVideos": "Unlock premium to upload videos"
+    },
+    "showCodeToggle": {
+      "showCode": "Show Code",
+      "hideCode": "Hide Code",
+      "copy": "Copy",
+      "copied": "✓ Copied",
+      "vueLabel": "Vue"
     },
     "spinner": {
       "assetMapImage": "Asset map image (icon.spinner)",
@@ -905,7 +1098,7 @@
         "payoutAcceptedTitle": "Your payout request has been accepted."
       }
     },
-    "checkoutReuseable": {
+    "checkoutReusable": {
       "sectionTitle": "Checkout Reusable Components",
       "sections": {
         "mediaPreview": "CheckoutMediaPreview — Subscribe Login Popup",
@@ -968,6 +1161,31 @@
       "total": {
         "amount": "USD$6.99"
       },
+      "paymentLoggedIn": {
+        "deleteCard": "Delete Card",
+        "cardHolderName": "Card Holder Name",
+        "expiryDate": "Expiry Date",
+        "noName": "No Name",
+        "expiryPlaceholder": "MM/YY",
+        "expPrefix": "EXP"
+      },
+      "paymentNotLoggedIn": {
+        "saveCard": "Save this card for faster checkout.",
+        "cardNumber": "Card Number",
+        "expirationDate": "Expiration Date",
+        "cardholderName": "Cardholder Name",
+        "cvv": "CVV"
+      },
+      "notes": {
+        "title": "Notes",
+        "optional": "Optional",
+        "creatorName": "Princess Carrot Pop",
+        "placeholder": "Enter notes to {'@'}jenny1234....",
+        "charactersLeft": "{count} Characters Left"
+      },
+      "totalAmount": {
+        "label": "Total"
+      },
       "options": {
         "hongKong": "Hong Kong",
         "australia": "Australia",
@@ -982,12 +1200,12 @@
         "texas": "Texas"
       }
     },
-    "mediaUploaderHelper": {
+    "mediaUploaderComponents": {
       "sectionTitle": "Media Uploader Helper Components",
       "sections": {
-        "searchTags": "ReusableSearchInput — Media Details (Tags)",
-        "searchCoPerformer": "ReusableSearchInput — Media Details (Co-performer)",
-        "searchInviteList": "ReusableSearchInput — Plan Sharing (Invite list)",
+        "searchTags": "MediaUploaderSearchInput — Media Details (Tags)",
+        "searchCoPerformer": "MediaUploaderSearchInput — Media Details (Co-performer)",
+        "searchInviteList": "MediaUploaderSearchInput — Plan Sharing (Invite list)",
         "publishDatePicker": "PublishDatePicker — Publish & Sharing (Schedule)",
         "postPreview": "PostPreview — Publish & Sharing",
         "socialPreviewThumbnail": "SocialCustomPreview — Publish & Sharing (Thumbnail)",

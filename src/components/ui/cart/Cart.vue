@@ -13,15 +13,16 @@
           @click="$emit('close')"
         >
           <img
-            src="https://i.ibb.co.com/SwdkNf80/chevron-left.webp"
-            alt="chevron-left"
+            v-if="chevronLeftUrl"
+            :src="chevronLeftUrl"
+            :alt="t('cart.chevronLeftAlt')"
             class="h-6"
           />
         </span>
         <div class="flex flex-grow flex-col">
           <div class="flex items-center gap-2">
             <span class="text-base font-semibold tracking-[0.025rem] text-white">
-              {{ cartStore.label || 'Your Cart' }}
+              {{ cartStore.label || t('cart.title') }}
             </span>
             <!-- Star SVG Icon (Mobile) -->
             <svg 
@@ -35,7 +36,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
             </svg>
           </div>
-          <span v-if="cartStore.isDefault" class="text-[0.625rem] text-[#07F468] font-bold uppercase tracking-wider">Primary Cart</span>
+          <span v-if="cartStore.isDefault" class="text-[0.625rem] text-[#07F468] font-bold uppercase tracking-wider">{{ t('cart.primaryCart') }}</span>
         </div>
       </div>
 
@@ -46,11 +47,11 @@
         <div class="flex flex-col gap-1">
           <div class="flex items-center gap-3">
             <span class="text-base font-semibold tracking-[0.025rem] text-white">
-              {{ cartStore.label || 'Your Cart' }}
+              {{ cartStore.label || t('cart.title') }}
             </span>
             <div class="flex items-center gap-2">
               <span class="text-[0.625rem] text-white/40 px-1.5 py-0.5 border border-white/20 rounded capitalize">{{ cartStore.cartType }}</span>
-              <span v-if="cartStore.isDefault" class="text-[0.625rem] bg-[#07F468]/20 text-[#07F468] px-1.5 py-0.5 border border-[#07F468]/30 rounded font-bold uppercase tracking-wider">Default</span>
+              <span v-if="cartStore.isDefault" class="text-[0.625rem] bg-[#07F468]/20 text-[#07F468] px-1.5 py-0.5 border border-[#07F468]/30 rounded font-bold uppercase tracking-wider">{{ t('cart.defaultBadge') }}</span>
             </div>
             <!-- Star SVG Icon (Desktop) -->
             <svg 
@@ -60,14 +61,14 @@
               class="w-4 h-4 cursor-pointer transition-all"
               :fill="cartStore.isDefault ? '#07F468' : 'none'"
               :stroke="cartStore.isDefault ? '#07F468' : 'rgba(255,255,255,0.4)'"
-              :title="cartStore.isDefault ? 'Primary Cart' : 'Set as Default'"
+              :title="cartStore.isDefault ? t('cart.primaryCart') : t('cart.setAsDefault')"
             >
               <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
             </svg>
           </div>
         </div>
         <button @click="syncLiveData" class="text-[0.625rem] text-[#07F468] hover:text-white transition-colors flex items-center gap-1">
-          <i class="fas fa-sync-alt"></i> SYNC LIVE
+          <i class="fas fa-sync-alt"></i> {{ t('cart.syncLive') }}
         </button>
       </div>
 
@@ -81,10 +82,10 @@
             <input 
               v-model="newLabel" 
               class="flex-1 bg-white/5 border border-[#344054] rounded h-8 px-2 text-xs text-white outline-none focus:border-[#07F468]" 
-              placeholder="Rename Cart..."
+              :placeholder="t('cart.renamePlaceholder')"
             />
             <button @click="renameCart" class="px-3 bg-[#07F468]/10 border border-[#07F468]/30 rounded text-[0.625rem] text-[#07F468] font-bold hover:bg-[#07F468] hover:text-black transition-all">
-              SAVE
+              {{ t('cart.save') }}
             </button>
           </div>
           <div class="flex gap-2">
@@ -92,13 +93,13 @@
               v-model="couponCode" 
               :disabled="cartStore.couponCode"
               class="flex-1 bg-white/5 border border-[#344054] rounded h-8 px-2 text-xs text-white outline-none focus:border-[#07F468] disabled:opacity-50" 
-              :placeholder="cartStore.couponCode ? 'Coupon Applied' : 'Coupon Code...'"
+              :placeholder="cartStore.couponCode ? t('cart.couponAppliedPlaceholder') : t('cart.couponPlaceholder')"
             />
             <button v-if="!cartStore.couponCode" @click="applyCoupon" class="px-3 bg-white/10 border border-white/20 rounded text-[0.625rem] text-white font-bold hover:bg-white hover:text-black transition-all">
-              APPLY
+              {{ t('cart.apply') }}
             </button>
             <button v-else @click="removeCoupon" class="px-3 bg-red-500/10 border border-red-500/30 rounded text-[0.625rem] text-red-500 font-bold hover:bg-red-500 hover:text-white transition-all">
-              REMOVE
+              {{ t('cart.remove') }}
             </button>
           </div>
         </div>
@@ -113,9 +114,9 @@
             class="flex flex-col items-center justify-center h-full p-8 text-center"
           >
             <div class="text-6xl mb-4">🛒</div>
-            <h3 class="text-xl font-semibold text-white mb-2">Cart is Empty</h3>
+            <h3 class="text-xl font-semibold text-white mb-2">{{ t('cart.emptyTitle') }}</h3>
             <p class="text-sm text-white/70 mb-6">
-              Your cart is currently empty.
+              {{ t('cart.emptyDescription') }}
             </p>
             
             <!-- Quick Test Buttons -->
@@ -124,16 +125,16 @@
                 @click="quickBuy('nba123')"
                 class="px-4 py-2 bg-[#07F468] text-black text-xs font-bold rounded hover:opacity-90 transition-all"
               >
-               + ADD NBA CARD ($12.23)
+               {{ t('cart.addNbaCard') }}
               </button>
               <button 
                 @click="quickBuy('item456')"
                 class="px-4 py-2 bg-white/10 border border-white/20 text-white text-xs font-bold rounded hover:bg-white/20 transition-all"
               >
-               + ADD VINTAGE T-SHIRT ($25.00)
+               {{ t('cart.addVintageShirt') }}
               </button>
               <p class="text-[0.625rem] text-white/40 mt-2">
-                (Strict products.json lookup test)
+                {{ t('cart.lookupTestHint') }}
               </p>
             </div>
           </div>
@@ -160,25 +161,27 @@
                     <div class="flex items-center gap-[0.4168rem] h-[1.875rem]">
                       <div class="w-5 h-5 flex justify-center items-center">
                         <img
-                          src="https://i.ibb.co.com/67B4Cz6d/Frame-1410098582.webp"
-                          alt="avatar"
+                          v-if="sellerAvatarUrl"
+                          :src="sellerAvatarUrl"
+                          :alt="t('cart.avatarAlt')"
                           class="h-full"
                         />
                       </div>
                       <div class="flex items-center gap-[0.208rem]">
                         <span
                           class="text-[0.625rem] leading-normal font-medium text-[#667085]"
-                          >{{ item.seller || 'Standard Seller' }}</span
+                          >{{ item.seller || t('cart.standardSeller') }}</span
                         >
                         <img
-                          src="https://i.ibb.co.com/nMhY8CpS/svgviewer-png-output-22.webp"
+                          v-if="verifiedBadgeUrl"
+                          :src="verifiedBadgeUrl"
                           alt=""
                           class="w-[0.5206rem] h-[0.5206rem]"
                         />
                       </div>
                       <span
                         class="text-[0.625rem] leading-normal font-medium tracking-[0.003125rem] text-white opacity-50"
-                        >Ship from Germany</span
+                        >{{ t('cart.shipFromGermany') }}</span
                       >
                     </div>
                   </div>
@@ -219,8 +222,9 @@
                           class="flex justify-center items-center gap-1 w-max h-4 px-[0.3125rem] rounded-[1.875rem] [background:linear-gradient(90deg,#D8AF0D_0%,#9F8009_100%)]"
                         >
                           <img
-                            src="https://i.ibb.co.com/fztC70H0/tag.webp"
-                            alt="tag"
+                            v-if="tagIconUrl"
+                            :src="tagIconUrl"
+                            :alt="t('cart.tagAlt')"
                             class="w-3 h-3"
                           />
                           <span
@@ -236,23 +240,19 @@
                       v-if="item.shipping > 0"
                       class="text-[0.625rem] leading-normal tracking-[0.003125rem] text-white"
                     >
-                      +${{ item.shipping }} shipping
+                      {{ t('cart.shipping', { amount: item.shipping }) }}
                     </span>
 
                     <span v-if="item.lastSyncedAt" class="text-[0.5rem] text-[#07F468] opacity-70">
-                      <i class="fas fa-check-circle"></i> Sync: {{ new Date(item.lastSyncedAt).toLocaleTimeString() }}
+                      <i class="fas fa-check-circle"></i> {{ t('cart.syncAt', { time: new Date(item.lastSyncedAt).toLocaleTimeString() }) }}
                     </span>
                   </div>
 
                   <!-- Quantity Controls -->
                   <div class="flex items-center gap-2">
                     <img
-                      :src="
-                        item.qty > 1 || item.quantity > 1
-                          ? 'https://i.ibb.co.com/LXwdW794/minus-circle.webp'
-                          : 'https://i.ibb.co.com/3YVrnBJz/trash-bin.webp'
-                      "
-                      alt="decrease"
+                      :src="quantityDecreaseIcon(item)"
+                      :alt="t('cart.decreaseAlt')"
                       class="w-5 h-5 [filter:brightness(0)_saturate(100%)_invert(76%)_sepia(26%)_saturate(7143%)_hue-rotate(94deg)_brightness(110%)_contrast(94%)] cursor-pointer"
                       @click="updateQty(item.productId, (item.qty || item.quantity) - 1)"
                     />
@@ -265,8 +265,9 @@
                     </div>
 
                     <img
-                      src="https://i.ibb.co.com/VYqPvctj/plus-circle.webp"
-                      alt="increase"
+                      v-if="plusCircleUrl"
+                      :src="plusCircleUrl"
+                      :alt="t('cart.increaseAlt')"
                       class="w-5 h-5 [filter:brightness(0)_saturate(100%)_invert(76%)_sepia(26%)_saturate(7143%)_hue-rotate(94deg)_brightness(110%)_contrast(94%)] cursor-pointer"
                       @click="updateQty(item.productId, (item.qty || item.quantity) + 1)"
                     />
@@ -294,19 +295,19 @@
           <!-- detailed-summary -->
           <div class="flex flex-col gap-1 px-4 py-3 border-b border-white/5">
             <div class="flex justify-between text-[0.625rem] text-white/50">
-              <span>Subtotal ({{ cartStore.summary.totalItems }} items)</span>
+              <span>{{ t('cart.subtotal', { count: cartStore.summary.totalItems }) }}</span>
               <span>${{ cartStore.summary.subtotal.toFixed(2) }}</span>
             </div>
             <div v-if="cartStore.summary.feesTotal > 0" class="flex justify-between text-[0.625rem] text-white/50">
-              <span>Service Fees</span>
+              <span>{{ t('cart.serviceFees') }}</span>
               <span>+${{ cartStore.summary.feesTotal.toFixed(2) }}</span>
             </div>
             <div v-if="cartStore.summary.couponDiscount > 0" class="flex justify-between text-[0.625rem] text-[#F04438]">
-              <span>Coupon Discount</span>
+              <span>{{ t('cart.couponDiscount') }}</span>
               <span>-${{ cartStore.summary.couponDiscount.toFixed(2) }}</span>
             </div>
             <div v-if="cartStore.summary.planDiscount > 0" class="flex justify-between text-[0.625rem] text-[#2E90FA]">
-              <span>Plan Discount</span>
+              <span>{{ t('cart.planDiscount') }}</span>
               <span>-${{ cartStore.summary.planDiscount.toFixed(2) }}</span>
             </div>
           </div>
@@ -318,7 +319,7 @@
                 <span
                   class="text-[0.625rem] leading-normal font-medium tracking-[0.015rem] text-white/50"
                 >
-                  ESTIMATED TOTAL
+                  {{ t('cart.estimatedTotal') }}
                 </span>
                 <h3 class="text-xl font-semibold text-[#07F468]">
                   ${{ cartStore.summary.grandTotal.toFixed(2) }}
@@ -327,9 +328,9 @@
             </div>
 
             <DashboardPrimaryButton
-              text="ChECK OUT"
+              :text="t('cart.checkout')"
               variant="bgGreen"
-              :rightIcon="'https://i.ibb.co.com/v28S0Zt/arrow-up-right.webp'"
+              :rightIcon="checkoutArrowUrl"
               :rightIconClass="`
     w-6 h-6 transition duration-200
     filter brightness-0 invert-0   /* Default: black */
@@ -349,16 +350,32 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
+import { useI18n } from 'vue-i18n';
 import { useCartStore } from "@/stores/useCartStore.js";
 import { FlowHandler } from "@/services/flow-system/FlowHandler";
 import flowRefreshManager from "@/services/flow-system/flowRefreshManager";
 import DashboardPrimaryButton from "@/components/ui/buttons/DashboardPrimaryButton.vue";
 import { preloadIcons } from "@/utils/preload";
+import { useAssetUrl } from '@/composables/useAssetUrl.js';
 
+const { t } = useI18n();
 const cartStore = useCartStore();
 const newLabel = ref("");
 const couponCode = ref("");
+
+const { url: chevronLeftUrl } = useAssetUrl('icon.notification.chevronLeft');
+const { url: sellerAvatarUrl } = useAssetUrl('checkout.demo.creatorAvatar');
+const { url: verifiedBadgeUrl } = useAssetUrl('icon.media.verified');
+const { url: tagIconUrl } = useAssetUrl('cart.demo.tagIcon');
+const { url: minusCircleUrl } = useAssetUrl('cart.demo.minusCircle');
+const { url: plusCircleUrl } = useAssetUrl('cart.demo.plusCircle');
+const { url: trashBinUrl } = useAssetUrl('checkout.demo.trashBin');
+const { url: checkoutArrowUrl } = useAssetUrl('cart.demo.checkoutArrow');
+
+function quantityDecreaseIcon(item) {
+  return (item.qty > 1 || item.quantity > 1) ? minusCircleUrl.value : trashBinUrl.value;
+}
 
 // Methods using FlowHandler
 const updateQty = async (productId, newQty) => {
@@ -431,10 +448,10 @@ const handleCheckout = () => {
 // Lifecycle hooks
 onMounted(() => {
   preloadIcons([
-    "https://i.ibb.co.com/LXwdW794/minus-circle.webp",
-    "https://i.ibb.co.com/3YVrnBJz/trash-bin.webp",
-    "https://i.ibb.co.com/VYqPvctj/plus-circle.webp",
-  ]);
+    minusCircleUrl.value,
+    trashBinUrl.value,
+    plusCircleUrl.value,
+  ].filter(Boolean));
 
   // Start background sync from registry (includes initial fetch)
   flowRefreshManager.startFromRegistry("cart.fetch", {

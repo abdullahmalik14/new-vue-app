@@ -7,16 +7,16 @@
         <div class="flex items-center gap-2">
           <div class="flex justify-center items-center w-5 h-5">
             <img
-              src="https://i.ibb.co.com/rRp5t6qr/Finance-e-Commerce.webp"
+              :src="assets.financeIcon"
               alt="coins"
               class="w-5 h-5 [filter:brightness(0)_saturate(100%)_invert(98%)_sepia(1%)_saturate(934%)_hue-rotate(29deg)_brightness(120%)_contrast(100%)]"
             />
           </div>
           <h3 class="text-base font-semibold text-[#F9FAFB] align-middle">
-            Notes
+            {{ t('demo.checkoutReusable.notes.title') }}
             <span
               class="text-xs font-normal leading-normal italic text-[#98A2B3]"
-              >Optional</span
+              >{{ t('demo.checkoutReusable.notes.optional') }}</span
             >
           </h3>
         </div>
@@ -28,7 +28,7 @@
             <div class="flex items-center gap-1 py-1">
               <div class="w-6 h-6 relative">
                 <img
-                  src="https://i.ibb.co.com/67B4Cz6d/Frame-1410098582.webp"
+                  :src="assets.creatorAvatar"
                   alt="avatar"
                 />
                 <div
@@ -38,7 +38,7 @@
               <div>
                 <div class="flex gap-1">
                   <span class="text-xs leading-normal text-[#07F468]"
-                    >Princess Carrot Pop</span
+                    >{{ t('demo.checkoutReusable.notes.creatorName') }}</span
                   >
                 </div>
               </div>
@@ -49,7 +49,7 @@
             <div class="flex justify-center items-center gap-1 py-1">
               <div class="w-6 h-6 relative">
             <img
-              src="https://i.ibb.co.com/67B4Cz6d/Frame-1410098582.webp"
+              :src="assets.creatorAvatar"
               alt="avatar"
             />
             <div
@@ -63,7 +63,7 @@
             <div class="flex justify-center items-center gap-1 py-1">
               <div class="w-6 h-6">
                 <img
-                  src="https://i.ibb.co.com/67B4Cz6d/Frame-1410098582.webp"
+                  :src="assets.creatorAvatar"
                   alt="avatar"
                 />
               </div>
@@ -74,7 +74,7 @@
             <div class="flex justify-center items-center gap-1 py-1">
               <div class="w-6 h-6">
                 <img
-                  src="https://i.ibb.co.com/67B4Cz6d/Frame-1410098582.webp"
+                  :src="assets.creatorAvatar"
                   alt="avatar"
                 />
               </div>
@@ -85,7 +85,7 @@
             <div class="flex justify-center items-center gap-1 py-1">
               <div class="w-6 h-6">
                 <img
-                  src="https://i.ibb.co.com/67B4Cz6d/Frame-1410098582.webp"
+                  :src="assets.creatorAvatar"
                   alt="avatar"
                 />
               </div>
@@ -106,12 +106,12 @@
           >
             <div class="w-6 h-6">
               <img
-                src="https://i.ibb.co.com/67B4Cz6d/Frame-1410098582.webp"
+                :src="assets.creatorAvatar"
                 alt="avatar"
               />
             </div>
             <span class="text-base text-[#98A2B3]"
-              >Enter notes to @jenny1234....</span
+              >{{ t('demo.checkoutReusable.notes.placeholder') }}</span
             >
           </div>
 
@@ -121,11 +121,11 @@
             <span
               class="text-xs leading-loose text-right tracking-[0.0075rem] opacity-70 text-[#F9FAFB]"
             >
-              {{ modelValue ? 300 - modelValue.length : 300 }} Characters Left
+              {{ t('demo.checkoutReusable.notes.charactersLeft', { count: modelValue ? 300 - modelValue.length : 300 }) }}
             </span>
             <div class="flex justify-center items-center cursor-pointer">
               <img
-                src="https://i.ibb.co.com/G3rtn7Sj/face-smile.webp"
+                :src="assets.faceSmile"
                 alt="face-smile"
                 class="w-5 h-5"
               />
@@ -138,7 +138,12 @@
 </template>
 
 <script setup>
-// ✅ UPDATE: Accepting modelValue for v-model support
+import { useI18n } from 'vue-i18n';
+import { useCheckoutDemoAssets } from '@/dev/composables/useCheckoutDemoAssets.js';
+
+const { t } = useI18n();
+const { assets } = useCheckoutDemoAssets();
+
 defineProps({
   showAvatars: {
     type: Boolean,

@@ -2,8 +2,8 @@ import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getAssetUrl } from '@/systems/assets/assetLibrary.js';
 import {
-    subscriptionCardsDemoEntries,
-    subscriptionCardFeatureKeys,
+    SUBSCRIPTION_CARDS_DEMO_ENTRIES,
+    SUBSCRIPTION_CARD_FEATURE_KEYS,
 } from '@/dev/assets/data/subscriptionCardsDemoConfig.js';
 
 export function useSubscriptionCardsDemo() {
@@ -12,7 +12,7 @@ export function useSubscriptionCardsDemo() {
 
     onMounted(async () => {
         const resolved = await Promise.all(
-            subscriptionCardsDemoEntries.map(async (entry) => {
+            SUBSCRIPTION_CARDS_DEMO_ENTRIES.map(async (entry) => {
                 try {
                     const url = await getAssetUrl(entry.imageKey);
                     return [entry.imageKey, url];
@@ -25,7 +25,7 @@ export function useSubscriptionCardsDemo() {
         imageUrls.value = Object.fromEntries(resolved);
     });
 
-    const cards = computed(() => subscriptionCardsDemoEntries.map((entry) => ({
+    const cards = computed(() => SUBSCRIPTION_CARDS_DEMO_ENTRIES.map((entry) => ({
         id: entry.id,
         title: t(entry.titleKey),
         price: entry.price,
@@ -37,7 +37,7 @@ export function useSubscriptionCardsDemo() {
         isFeatured: entry.isFeatured,
         isCurrentSubscription: entry.isCurrentSubscription,
         image: imageUrls.value[entry.imageKey] || '',
-        features: subscriptionCardFeatureKeys.map((key) => t(key)),
+        features: SUBSCRIPTION_CARD_FEATURE_KEYS.map((key) => t(key)),
         fullDescription: t(entry.descriptionKey),
     })));
 
@@ -47,7 +47,7 @@ export function useSubscriptionCardsDemo() {
     });
 
     return {
-        entries: subscriptionCardsDemoEntries,
+        entries: SUBSCRIPTION_CARDS_DEMO_ENTRIES,
         cards,
         currentSubscriptionPrice,
     };

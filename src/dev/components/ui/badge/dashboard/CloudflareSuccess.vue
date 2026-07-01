@@ -1,14 +1,17 @@
+<script setup>
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+</script>
+
 <template>
   <div
     class="bg-slate-900/60 border-2 w-[270px] sm:w-[300px]  border-[#736f70] flex items-center justify-between gap-4 px-4 py-2"
   >
-    <!-- Left: success icon & texts -->
     <div class="flex items-center gap-3">
-      <!-- green circular icon -->
       <div
         class="flex items-center justify-center w-9 h-9 rounded-full bg-[#0aa937] ring-1 ring-[#0aa937]"
       >
-        <!-- check icon -->
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="w-5 h-5 text-green-600"
@@ -21,16 +24,13 @@
             clip-rule="evenodd"
           />
         </svg>
-        
       </div>
 
-        <!-- Title -->
         <div class="text-sm text-white">
-          Success!
+          {{ t('cloudflareSuccess.success') }}
       </div>
     </div>
 
-    <!-- Right -->
         <div >
        <div class="flex flex-col items-end">
           <svg 
@@ -43,18 +43,12 @@
         <path d="M22.67 15.39a3.85 3.85 0 0 0-2.38.82 6.45 6.45 0 0 0-12.5 2v.09a5.81 5.81 0 0 0 .18 13.22h20.31a4.66 4.66 0 0 0 .16-9.32 7 7 0 0 0-.1-1.16h-1.85a3.89 3.89 0 0 0-3.82-4.65z" fill="#faae40"/>
       </svg>
        </div>
-          <div class="text-[8px] text-white font-[500] text-right">CLOUDFLARE</div>
+          <div class="text-[8px] text-white font-[500] text-right">{{ t('cloudflareSuccess.brand') }}</div>
           <div class="text-[10px] text-gray-300 text-right ">
-            <span class="underline cursor-pointer">Privacy</span>
+            <span class="underline cursor-pointer">{{ t('cloudflareSuccess.privacy') }}</span>
             <span> •</span> 
-            <span class="underline cursor-pointer">Terms</span>
+            <span class="underline cursor-pointer">{{ t('cloudflareSuccess.terms') }}</span>
           </div>
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  name: "CloudflareSuccess",
-};
-</script>

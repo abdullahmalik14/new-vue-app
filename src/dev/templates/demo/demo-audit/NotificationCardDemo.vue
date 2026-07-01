@@ -100,7 +100,7 @@
                             <div class="relative w-full flex gap-4">
                                 <div class="relative">
                                     <img
-                                        src="https://i.ibb.co.com/Y49kymq4/alert-icon.webp"
+                                        :src="alertIconUrl"
                                         alt="alert-icon"
                                         class="h-10"
                                     />
@@ -118,7 +118,7 @@
                                                 {{ t('demo.notificationCard.tipStep2.setToMax') }}
                                             </span>
                                             <img
-                                                src="https://i.ibb.co.com/8njxTqWK/chevron-left.webp"
+                                                :src="chevronLeftIconUrl"
                                                 alt="chevron-left"
                                                 class="w-4 h-4 [filter:brightness(100)] rotate-180"
                                             />
@@ -222,6 +222,8 @@ const { url: smileyFaceIconUrl } = useAssetUrl('icon.notification.smileyFace');
 const { url: infoSquareIconUrl } = useAssetUrl('icon.notification.infoSquare');
 const { url: tickMarkIconUrl } = useAssetUrl('icon.notification.tickMark');
 const { url: checkCircleIconUrl } = useAssetUrl('icon.notification.checkCircle');
+const { url: alertIconUrl } = useAssetUrl('icon.notification.alertIcon');
+const { url: chevronLeftIconUrl } = useAssetUrl('icon.notification.chevronLeft');
 
 const devDemoItems = [
     {
@@ -406,7 +408,7 @@ ${importLine}
     <template #default>
       <div class="relative w-full flex gap-4">
         <div class="relative">
-          <img src="https://i.ibb.co.com/Y49kymq4/alert-icon.webp" alt="alert-icon" class="h-10" />
+          <img :src="alertIconUrl" alt="alert-icon" class="h-10" />
         </div>
         <div class="flex flex-col w-full">
           <p class="text-sm font-semibold text-[#ff4405]">
@@ -415,7 +417,7 @@ ${importLine}
           <div class="flex justify-end items-end w-full">
             <button type="button" class="flex items-center gap-1 p-0 bg-transparent outline-none border-none cursor-pointer">
               <span class="text-xs leading-normal font-medium text-[#ff4405]">Set to Max</span>
-              <img src="https://i.ibb.co.com/8njxTqWK/chevron-left.webp" alt="chevron-left" class="w-4 h-4 [filter:brightness(100)] rotate-180" />
+              <img :src="chevronLeftIconUrl" alt="chevron-left" class="w-4 h-4 [filter:brightness(100)] rotate-180" />
             </button>
           </div>
         </div>

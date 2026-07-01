@@ -1,4 +1,4 @@
-export const subscriptionCardsDemoEntries = [
+export const SUBSCRIPTION_CARDS_DEMO_ENTRIES = [
   {
     id: 1,
     labelKey: 'demo.subscriptionCards.labels.card1',
@@ -68,7 +68,7 @@ export const subscriptionCardsDemoEntries = [
   },
 ];
 
-export const subscriptionCardFeatureKeys = [
+export const SUBSCRIPTION_CARD_FEATURE_KEYS = [
   'demo.subscriptionCards.features.freeTokens',
   'demo.subscriptionCards.features.merchandise',
   'demo.subscriptionCards.features.customRequest',

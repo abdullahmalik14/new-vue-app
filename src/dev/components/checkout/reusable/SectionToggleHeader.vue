@@ -23,7 +23,7 @@
       </div>
 
       <div v-if="showChevron" class="flex justify-center items-center w-6 h-6">
-        <img src="https://i.ibb.co.com/qLW7tf3T/Arrows.webp" alt="chevron" class="transition-transform duration-300"
+        <img :src="assets.chevronArrows" alt="chevron" class="transition-transform duration-300"
           :class="isOpen ? 'rotate-180' : 'rotate-0'" />
       </div>
     </div>
@@ -37,6 +37,9 @@
 
 <script setup>
 import { computed } from "vue";
+import { useCheckoutDemoAssets } from '@/dev/composables/useCheckoutDemoAssets.js';
+
+const { assets } = useCheckoutDemoAssets();
 
 const props = defineProps({
   title: {

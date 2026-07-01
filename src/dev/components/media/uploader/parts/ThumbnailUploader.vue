@@ -30,17 +30,17 @@
         </div>
 
         <h4 class="text-dark-gray text-sm leading-5 text-center font-normal">
-          <span class="text-dark-text font-semibold">{{ title }}</span> {{ subtitle }}
+          <span class="text-dark-text font-semibold">{{ resolvedTitle }}</span> {{ resolvedSubtitle }}
         </h4>
       </div>
 
       <div v-if="fileName">
-         <p class="text-success text-xs text-center font-semibold mt-2">Selected: {{ fileName }}</p>
+         <p class="text-success text-xs text-center font-semibold mt-2">{{ t('mediaUploader.thumbnailUploader.selected', { name: fileName }) }}</p>
       </div>
 
       <div>
         <p class="text-dark-gray text-xs leading-[1.125rem] text-center mb-0">
-          {{ fileInfo }}
+          {{ resolvedFileInfo }}
         </p>
       </div>
     </div>
@@ -49,22 +49,24 @@
 
 <script setup>
 import { computed } from "vue";
+import { useI18n } from 'vue-i18n';
 import { useMediaUploaderStore } from "@/stores/useMediaUploaderStore";
 
+const { t } = useI18n();
 const uploaderStore = useMediaUploaderStore();
 
 const props = defineProps({
   title: {
     type: String,
-    default: "Click to upload",
+    default: "",
   },
   subtitle: {
     type: String,
-    default: "or drag and drop image file here",
+    default: "",
   },
   fileInfo: {
     type: String,
-    default: "PNG or JPG (max. 10MB)",
+    default: "",
   },
   accept: {
     type: String,
@@ -84,6 +86,10 @@ const fileName = computed(() => {
   const fileData = uploaderStore.form[props.stateFileKey];
   return fileData ? fileData.name : null;
 });
+
+const resolvedTitle = computed(() => props.title || t('mediaUploader.thumbnailUploader.title'));
+const resolvedSubtitle = computed(() => props.subtitle || t('mediaUploader.thumbnailUploader.subtitle'));
+const resolvedFileInfo = computed(() => props.fileInfo || t('mediaUploader.thumbnailUploader.fileInfo'));
 
 const handleFileChange = (event) => {
   const file = event.target.files[0];

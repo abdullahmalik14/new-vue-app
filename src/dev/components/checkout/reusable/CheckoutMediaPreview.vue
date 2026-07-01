@@ -1,4 +1,8 @@
 <script setup>
+import { useCheckoutDemoAssets } from '@/dev/composables/useCheckoutDemoAssets.js';
+
+const { assets } = useCheckoutDemoAssets();
+
 defineProps({
   modelValue: {
     type: Boolean,
@@ -48,7 +52,7 @@ const emit = defineEmits(["update:modelValue"]);
         class="w-10 h-10 flex justify-center items-center cursor-pointer sm:hidden"
       >
         <img
-          src="https://i.ibb.co.com/Gvkq58F5/chevron-left.webp"
+          :src="assets.chevronLeft"
           alt="chevron-left"
           class="w-6 h-6"
         />
@@ -75,7 +79,7 @@ const emit = defineEmits(["update:modelValue"]);
             </h3>
             <img
               v-if="isVerified"
-              src="https://i.ibb.co.com/nMhY8CpS/svgviewer-png-output-22.webp"
+              :src="assets.verifiedTick"
               alt="verified-tick"
               class="w-2.5 h-2.5"
             />

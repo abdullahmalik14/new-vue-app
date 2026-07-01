@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-start self-stretch w-full rounded-sm gap-4 md:gap-6">
     <div class="flex flex-wrap items-start justify-start gap-2">
-      <div class="w-full relative cursor-pointer" @click="$emit('click')">
+      <div class="w-full relative cursor-pointer" @click="$emit('placeholder-click')">
         <div class="block overflow-hidden">
           <div
             :class="['flex flex-col justify-center items-center gap-[0.875rem] w-full rounded', bgLightClass, darkBgClass]"
@@ -47,7 +47,7 @@ const props = defineProps({
   },
 });
 
-defineEmits(['click']);
+defineEmits(['placeholder-click']);
 
 const { t } = useI18n();
 const { assets } = useMediaUploaderAssets();

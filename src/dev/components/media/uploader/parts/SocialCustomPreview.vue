@@ -9,7 +9,7 @@ const props = defineProps({
   label: { type: String, default: "" },
 });
 
-const emit = defineEmits(["delete"]);
+const emit = defineEmits(["preview-delete"]);
 const { t } = useI18n();
 const { assets } = useMediaUploaderAssets();
 
@@ -42,7 +42,7 @@ function isVideo(url) {
     </div>
 
     <button
-      @click="emit('delete')"
+      @click="emit('preview-delete')"
       class="absolute top-0 right-0 w-6 h-6 flex items-center justify-center bg-error hover:bg-error-light transition-all z-10"
     >
       <img :src="assets.deleteIcon" alt="delete" class="w-5 h-5" />

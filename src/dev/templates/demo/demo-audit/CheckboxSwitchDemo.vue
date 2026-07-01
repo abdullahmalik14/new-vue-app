@@ -163,7 +163,7 @@ import {
     PROFILE_KNOB_CLASS,
     PROFILE_LABEL_CLASS,
     PROFILE_TRACK_CLASS,
-} from '@/dev/composables/useCheckboxSwitchDemoClasses.js';
+} from '@/dev/composables/checkboxSwitchDemoClasses.js';
 
 const { t } = useI18n();
 

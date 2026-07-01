@@ -1,5 +1,8 @@
 <script setup>
 import { ref } from 'vue';
+import { useCheckoutDemoAssets } from '@/dev/composables/useCheckoutDemoAssets.js';
+
+const { assets } = useCheckoutDemoAssets();
 
 defineProps({
   title: {
@@ -72,7 +75,7 @@ const toggleSection = () => {
                       {{ item.creatorName }}
                     </h3>
                     <img v-if="item.isVerified"
-                      src="https://i.ibb.co.com/nMhY8CpS/svgviewer-png-output-22.webp"
+                      :src="assets.verifiedTick"
                       alt="verified-tick"
                       class="w-2.5 h-2.5"
                     />

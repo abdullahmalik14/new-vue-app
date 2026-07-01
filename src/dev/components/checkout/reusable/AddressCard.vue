@@ -12,25 +12,34 @@
       </div>
 
       <img
-        :src="icon"
+        :src="resolvedIcon"
         alt="edit"
         class="w-[1.125rem] cursor-pointer
         [filter:brightness(0)_saturate(100%)_invert(98%)_sepia(2%)_saturate(335%)_hue-rotate(184deg)_brightness(97%)_contrast(95%)]"
-        @click="$emit('edit')"
+        @click="$emit('address-edit')"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue';
+import { useCheckoutDemoAssets } from '@/dev/composables/useCheckoutDemoAssets.js';
+
+const { assets } = useCheckoutDemoAssets();
+
+const props = defineProps({
   address: {
     type: String,
     required: true,
   },
   icon: {
     type: String,
-    default: 'https://i.ibb.co.com/JWT03TyR/svgviewer-png-output-33.png',
+    default: '',
   },
 });
+
+const resolvedIcon = computed(() => props.icon || assets.value.addressIcon);
+
+defineEmits(['address-edit']);
 </script>

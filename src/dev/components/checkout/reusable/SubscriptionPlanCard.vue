@@ -1,5 +1,8 @@
 <script setup>
 import { computed } from "vue";
+import { useCheckoutDemoAssets } from '@/dev/composables/useCheckoutDemoAssets.js';
+
+const { assets } = useCheckoutDemoAssets();
 
 const props = defineProps({
   // Variant Control
@@ -25,11 +28,11 @@ const props = defineProps({
   // Images
   backgroundImage: {
     type: String,
-    required: true,
+    default: "",
   },
   logoImage: {
     type: String,
-    default: "https://i.ibb.co.com/PvS68T8W/logo-no-bg.webp",
+    default: "",
   },
 
   // Styling & Colors
@@ -58,10 +61,13 @@ const props = defineProps({
   },
 });
 
+const resolvedBackgroundImage = computed(() => props.backgroundImage || assets.value.featuredMediaBg);
+const resolvedLogoImage = computed(() => props.logoImage || assets.value.planLogoNoBg);
+
 // --- OLD STYLE LOGIC ---
 const oldCardStyle = computed(() => {
   return {
-    backgroundImage: `url(${props.backgroundImage})`,
+    backgroundImage: `url(${resolvedBackgroundImage.value})`,
     boxShadow: `4px 4px 0 0 ${props.accentColor}, 4px 4px 4px 0 rgba(0,0,0,0.15)`,
   };
 });
@@ -69,7 +75,7 @@ const oldCardStyle = computed(() => {
 // --- NEW STYLE LOGIC ---
 const newCardStyle = computed(() => {
   return {
-    backgroundImage: `url(${props.backgroundImage})`,
+    backgroundImage: `url(${resolvedBackgroundImage.value})`,
     boxShadow: `4px 4px 0px 0px ${props.accentColor}, 4px 4px 4px 0px #00000026`,
   };
 });
@@ -77,7 +83,7 @@ const newCardStyle = computed(() => {
 // Background image for the left small box
 const newLeftSectionBgImage = computed(() => {
   return {
-    backgroundImage: `url(${props.backgroundImage})`,
+    backgroundImage: `url(${resolvedBackgroundImage.value})`,
   };
 });
 
@@ -104,7 +110,7 @@ const computedFooterColor = computed(() => {
         ></div>
 
         <img
-          :src="logoImage"
+          :src="resolvedLogoImage"
           alt="logo"
           class="w-[3.125rem] h-[3.125rem] object-contain z-10"
         />
@@ -145,7 +151,7 @@ const computedFooterColor = computed(() => {
     >
       <div class="w-32 min-w-[8rem] relative shrink-0">
         <img
-          :src="backgroundImage"
+          :src="resolvedBackgroundImage"
           alt="background"
           class="w-full h-full object-cover"
         />
@@ -153,7 +159,7 @@ const computedFooterColor = computed(() => {
         <div
           class="w-8 h-8 flex justify-center items-center absolute top-0 left-0 z-[1]"
         >
-          <img :src="logoImage" alt="logo" class="w-full h-full" />
+          <img :src="resolvedLogoImage" alt="logo" class="w-full h-full" />
         </div>
       </div>
 

@@ -3,7 +3,7 @@
     <div class="flex gap-4 border-t border-transparent w-full">
       <div class="flex justify-between items-end gap-1 w-full">
         <h3 class="text-base font-semibold flex-grow text-[#F9FAFB]">
-          {{ label }}
+          {{ displayLabel }}
         </h3>
 
         <h2
@@ -18,10 +18,13 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const props = defineProps({
   label: {
     type: String,
-    default: "Total",
+    default: "",
   },
   amount: {
     type: String,
@@ -32,4 +35,7 @@ defineProps({
     default: "text-[#07F468]",
   },
 });
+
+const { t } = useI18n();
+const displayLabel = computed(() => props.label || t('demo.checkoutReusable.totalAmount.label'));
 </script>
