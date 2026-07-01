@@ -5,6 +5,7 @@ import {
   scanCardMetricPercentage,
   scanPopupPercentageByStatHeading,
   scanTrendTableCountrySales,
+  scanTopContributorsPreview,
   scanDataValueNearLabel,
   scanPopupStatByHeading,
   openTrendPopupFromHeading,
@@ -206,6 +207,8 @@ export async function executeExpectedScan(expected, chartsPayload, options = {})
       result = scanPopupPercentageByStatHeading(expected.scan.statHeading);
     } else if (expected.scan?.type === 'trendTableCountrySales') {
       result = scanTrendTableCountrySales(expected.scan.tableHeading, expected.scan.countryName);
+    } else if (expected.scan?.type === 'topContributorsPreview') {
+      result = scanTopContributorsPreview(expected.scan.field);
     } else if (expected.scan?.type === 'popupStatByHeading') {
       result = scanPopupStatByHeading(expected.scan.heading);
     } else {
@@ -247,7 +250,7 @@ export async function executePopupScanBatch(popupRows, chartsPayload, options = 
     byHeading.get(heading).push(row);
   });
 
-  const orderedHeadings = ['Subscribers', 'Fans', 'Earnings', 'Likes', 'Contributors'].filter((heading) =>
+  const orderedHeadings = ['Subscribers', 'Fans', 'Earnings', 'Likes', 'Top Contributors'].filter((heading) =>
     byHeading.has(heading),
   );
   const remaining = [...byHeading.keys()].filter((heading) => !orderedHeadings.includes(heading));

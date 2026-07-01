@@ -16,7 +16,12 @@ const samplePayload = {
     monthly: [{ newSubscriber: 1, tier2: 1 }],
     yearly: [{ newSubscriber: 1, tier2: 1 }],
   },
-  contributors: { topContributors: [{ amount: 29.99, name: 'Fan 88001' }] },
+  contributors: {
+    topContributors: {
+      alltime: [{ amount: 29.99, name: 'Fan 88001', usdSpent: 29.99 }],
+      daily: [{ amount: 29.99, name: 'Fan 88001', usdSpent: 29.99 }],
+    },
+  },
 };
 
 describe('buildTestExpectations', () => {

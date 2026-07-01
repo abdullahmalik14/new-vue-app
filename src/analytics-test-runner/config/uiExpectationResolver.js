@@ -223,6 +223,29 @@ export function resolveLikesChartField(payload, period, field) {
   return last[field] ?? null;
 }
 
+/** Mirrors getContributorsViewModel period selection (overview uses alltime). */
+export const CONTRIBUTORS_PREVIEW_PERIOD = 'alltime';
+
+export function getTopContributorsArray(payload, period = CONTRIBUTORS_PREVIEW_PERIOD) {
+  const src = payload?.contributors?.topContributors;
+  if (!src) return [];
+  if (Array.isArray(src)) return src;
+  const key = PERIOD_API_KEY[period] || period;
+  const periodArr = src[key];
+  if (Array.isArray(periodArr) && periodArr.length) return periodArr;
+  return src.alltime || src.daily || [];
+}
+
+export function resolveTopContributorField(payload, period = CONTRIBUTORS_PREVIEW_PERIOD, field = 'name') {
+  const arr = getTopContributorsArray(payload, period);
+  const row = arr[arr.length - 1] || arr[0];
+  if (!row) return null;
+  if (field === 'amount') {
+    return row.usdSpent ?? row.totalSpent ?? row.amount ?? row.tokens ?? null;
+  }
+  return row[field] ?? null;
+}
+
 export function likesChartRule(field) {
   return {
     chartIdIncludes: 'likes-chart',

@@ -385,6 +385,98 @@ export function scanPopupPercentageByStatHeading(statHeading) {
   };
 }
 
+/**
+ * Top Contributors preview table (overview card title is "Top Contributors").
+ * @param {'total'|'name'} field
+ */
+export function scanTopContributorsPreview(field = 'total') {
+  const headingScan = findHeadingElement('Top Contributors');
+  if (!headingScan.ok) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: null,
+      error: headingScan.error,
+    };
+  }
+
+  const cardElement =
+    headingScan.element.closest('.group\\/container') || headingScan.element.closest('div');
+
+  if (!cardElement) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: headingScan.element,
+      error: 'Top Contributors card container not found',
+    };
+  }
+
+  markScannedElement(cardElement, 'Card: Top Contributors');
+
+  const valueElements = Array.from(cardElement.querySelectorAll('[data-value]'));
+  if (valueElements.length === 0) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: cardElement,
+      error: 'No contributor rows in Top Contributors preview',
+    };
+  }
+
+  if (field === 'name') {
+    const nameEl = valueElements.find((el) => {
+      const raw = el.getAttribute('data-value') || '';
+      return raw && !raw.startsWith('@') && Number.isNaN(Number(raw));
+    });
+    if (!nameEl) {
+      return {
+        ok: false,
+        foundValue: null,
+        rawText: '',
+        element: cardElement,
+        error: 'Top contributor name not found in preview table',
+      };
+    }
+    markScannedElement(nameEl, 'Top contributor name');
+    return {
+      ok: true,
+      foundValue: nameEl.getAttribute('data-value')?.trim() || nameEl.textContent.trim(),
+      rawText: nameEl.textContent.trim(),
+      element: nameEl,
+      error: null,
+    };
+  }
+
+  const totalEl = valueElements.find((el) => {
+    const num = normalizeNumber(el.getAttribute('data-value'));
+    return num != null && !Number.isNaN(num);
+  });
+
+  if (!totalEl) {
+    return {
+      ok: false,
+      foundValue: null,
+      rawText: '',
+      element: cardElement,
+      error: 'Top contributor USD total not found in preview table',
+    };
+  }
+
+  const total = normalizeNumber(totalEl.getAttribute('data-value'));
+  markScannedElement(totalEl, 'Top contributor total');
+  return {
+    ok: true,
+    foundValue: total,
+    rawText: totalEl.textContent.trim(),
+    element: totalEl,
+    error: null,
+  };
+}
+
 export function scanTrendTableCountrySales(tableHeading, countryName) {
   const headingEl =
     document.querySelector('[data-testid="dashboard-analytics-top-countries-heading"]') ||
