@@ -4536,8 +4536,12 @@ const datasetsPromise = configJson.datasets
 
         // Apply only strict max when all values are non negative
       } else {
-        // Set Y axis max with strict bound
-        yAxis.setAll({ max: calculatedMax, strictMinMax: true });
+        // Set Y axis max with strict bound; floor at 0 (or configured min) so bars are not squashed
+        yAxis.setAll({
+          min: styleConfig.yAxis?.min ?? 0,
+          max: calculatedMax,
+          strictMinMax: true,
+        });
       }
     }
 
@@ -4858,7 +4862,10 @@ const datasetsPromise = configJson.datasets
       const legendItems = (
         seriesBreakdownKeys.length ? seriesBreakdownKeys : [fieldConfig.total]
       ).map((k) => ({
-        name: styleConfig.seriesLabels?.[k] || k,
+        name:
+          styleConfig.seriesLabels?.[k] ||
+          styleConfig.seriesStyles?.[k]?.name ||
+          k,
         color: this.normalizeColorHex(colorMapByKey[k]),
       }));
 
