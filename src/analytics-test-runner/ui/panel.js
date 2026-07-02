@@ -295,7 +295,7 @@ function renderExpectationTable(panel, state) {
   }
 
   const header = `<tr>
-    <th>Type</th><th>Location</th><th>Period</th><th>Field</th><th>API</th><th>DOM</th><th>Result</th>
+    <th>Type</th><th>Location</th><th>Period</th><th>Field</th><th>Expected</th><th>DOM</th><th>Result</th>
   </tr>`;
 
   const body = expected
