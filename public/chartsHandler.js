@@ -4862,7 +4862,10 @@ const datasetsPromise = configJson.datasets
       const legendItems = (
         seriesBreakdownKeys.length ? seriesBreakdownKeys : [fieldConfig.total]
       ).map((k) => ({
-        name: styleConfig.seriesLabels?.[k] || k,
+        name:
+          styleConfig.seriesLabels?.[k] ||
+          styleConfig.seriesStyles?.[k]?.name ||
+          k,
         color: this.normalizeColorHex(colorMapByKey[k]),
       }));
 
