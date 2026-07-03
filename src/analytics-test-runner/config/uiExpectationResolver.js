@@ -6,7 +6,7 @@ import {
 } from '@/services/analytics/mappers/analyticsResponseMapper.js';
 import { analyticsCountryCodeToDisplayName } from '@/systems/analytics/analyticsCountryLabels.js';
 import { getContributorsListForPeriod } from '@/systems/analytics/analyticsDataMappers.js';
-import { PERIOD_API_KEY } from './buildExpectationsFromApi.js';
+import { PERIOD_API_KEY } from './apiPath.js';
 
 const TIER_DONUT_LABELS = {
   free: 'Free',

@@ -2,7 +2,7 @@ import { calculatePeriodChangePercent } from '@/services/analytics/mappers/analy
 import { mapAnalyticsBundleResponse } from '@/services/analytics/mappers/analyticsResponseMapper.js';
 import { analyticsCountryCodeToDisplayName } from '@/systems/analytics/analyticsCountryLabels.js';
 import { projectStateToChartPaths } from './expectationState.js';
-import { PERIOD_API_KEY } from './buildExpectationsFromApi.js';
+import { PERIOD_API_KEY } from './apiPath.js';
 
 function num(value) {
   const n = Number(value);
@@ -189,6 +189,18 @@ export function resolveRefreshApiExpectationFromState(testCaseKey, state) {
       return getStateMetric(state, 'ui.fans.daily.newFollowers', { period: 'day' });
     case 'profileVisit':
       return getStateMetric(state, 'ui.fans.daily.profileVisit', { period: 'day' });
+    case 'mediaLike':
+    case 'mediaUnlike':
+      return getStateMetric(state, 'ui.likes.media');
+    case 'profileLike':
+    case 'profileUnlike':
+      return getStateMetric(state, 'ui.likes.profile');
+    case 'merchLike':
+    case 'merchUnlike':
+      return getStateMetric(state, 'ui.likes.merch');
+    case 'feedLike':
+    case 'feedUnlike':
+      return getStateMetric(state, 'ui.likes.feed');
     default:
       return resolveMainEarningsTotalFromState(state);
   }

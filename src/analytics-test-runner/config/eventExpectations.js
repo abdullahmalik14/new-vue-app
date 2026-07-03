@@ -244,7 +244,7 @@ export const EVENT_EXPECTATIONS = {
 
   profileUnlike: {
     label: 'Profile Unlike',
-    trigger: { masterEventType: 'profileUnlike', fields: { profileId: 121 } },
+    trigger: { masterEventType: 'profileUnlike', fields: { profileId: 121, countryCode: 'US', countryId: 840 } },
     expectedViews: [
       { view: 'Main', metrics: ['Likes PROFILE decreases'], periods: ['day'], sources: ['dom'] },
       { view: 'Popup Likes', metrics: ['Profile bar decreases'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
@@ -266,7 +266,7 @@ export const EVENT_EXPECTATIONS = {
 
   merchUnlike: {
     label: 'Merch Unlike',
-    trigger: { masterEventType: 'merchUnlike', fields: { merchId: 4 } },
+    trigger: { masterEventType: 'merchUnlike', fields: { merchId: 4, countryCode: 'BR', countryId: 634 } },
     expectedViews: [
       { view: 'Main', metrics: ['Likes MERCH decreases'], periods: ['day'], sources: ['dom'] },
       { view: 'Popup Likes', metrics: ['Merch bar decreases'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },
@@ -288,7 +288,7 @@ export const EVENT_EXPECTATIONS = {
 
   feedUnlike: {
     label: 'Feed Unlike',
-    trigger: { masterEventType: 'feedUnlike', fields: { feedId: 215 } },
+    trigger: { masterEventType: 'feedUnlike', fields: { feedId: 215, countryCode: 'CA', countryId: 124 } },
     expectedViews: [
       { view: 'Main', metrics: ['Likes FEED decreases'], periods: ['day'], sources: ['dom'] },
       { view: 'Popup Likes', metrics: ['Feed bar decreases'], periods: ['day', 'week', 'month', 'year'], sources: ['dom', 'amcharts'] },

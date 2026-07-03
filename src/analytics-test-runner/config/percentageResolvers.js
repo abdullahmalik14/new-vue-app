@@ -3,7 +3,7 @@ import {
   buildEarningsInsights,
   mapFansFromFanInsights,
 } from '@/services/analytics/mappers/analyticsResponseMapper.js';
-import { PERIOD_API_KEY } from './buildExpectationsFromApi.js';
+import { PERIOD_API_KEY } from './apiPath.js';
 
 /**
  * Mirrors popup components (Fans/Earnings/Subscribers trend popups).

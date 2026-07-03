@@ -1,5 +1,5 @@
 import { getStateMetric } from './stateMetricResolver.js';
-import { getApiPathValue } from './buildExpectationsFromApi.js';
+import { getApiPathValue } from './apiPath.js';
 
 /**
  * Attach expectedValue from internal state; keep scan rules for API found reads.
