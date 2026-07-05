@@ -188,7 +188,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.rightIcon" />
                     </div>
 
-                    <!-- Autofill styling (no icon ù browser saved email) -->
+                    <!-- Autofill styling (no icon ? browser saved email) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.autofill') }}</span>
                         <DashboardTextInput v-model="inputs.autofillEmail" :placeholder="t('demo.dashboardTextInput.enterEmailPlaceholder')" showLabel
@@ -242,7 +242,7 @@
              
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
-                    <!-- Event title ù no label (booking step 1) -->
+                    <!-- Event title ? no label (booking step 1) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.noLabelEventTitle') }}</span>
                         <DashboardTextInput v-model="inputs.eventTitle" :placeholder="t('booking.eventTitlePlaceholder')" />
@@ -258,7 +258,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingCoPerformer" />
                     </div>
 
-                    <!-- Session duration ù Minutes outside input (booking step 1) -->
+                    <!-- Session duration ? Minutes outside input (booking step 1) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.numberMinutes') }}</span>
                         <div class="flex flex-col gap-1.5 w-full">
@@ -273,7 +273,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingDuration" />
                     </div>
 
-                    <!-- Base price ù Tokens /session outside input -->
+                    <!-- Base price ? Tokens /session outside input -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.basePriceTokens') }}</span>
                         <div class="flex flex-col gap-1.5 w-full">
@@ -314,7 +314,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.numberNoControls" />
                     </div>
 
-                    <!-- Booking fee ù tooltip only (no suffix inside input) -->
+                    <!-- Booking fee ? tooltip only (no suffix inside input) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.tooltipOnly') }}</span>
                         <DashboardTextInput v-model="inputs.bookingFee" type="number" showLabel
@@ -323,7 +323,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingTooltip" />
                     </div>
 
-                    <!-- Off-hour surcharge ù % outside input -->
+                    <!-- Off-hour surcharge ? % outside input -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.offHourSurcharge') }}</span>
                         <div class="flex flex-col gap-1.5 w-full">
@@ -378,7 +378,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingSuccess" />
                     </div>
 
-                    <!-- Remind me ù inline copy outside input (booking settings) -->
+                    <!-- Remind me ? inline copy outside input (booking settings) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.remindMe') }}</span>
                         <div class="flex flex-wrap items-center gap-2">
@@ -646,6 +646,9 @@
             <!-- ===== SECTION: SubscriptionCard ===== -->
             <SubscriptionCardsDemo />
 
+            <!-- ===== SECTION: Profile Section Components ===== -->
+            <ProfileSectionComponentsDemo />
+
             <!-- ===== SECTION: TierCard ===== -->
             <section class="flex flex-col gap-12">
                 <DemoSectionHeader :title="t('demo.page.sections.tierCards')" />
@@ -694,7 +697,7 @@
             <!-- ===== SECTION: Spinner ===== -->
             <section class="flex flex-col gap-6">
                 <DemoSectionHeader :title="t('demo.page.sections.spinner')" />
-                <p class="text-sm text-gray-500 -mt-4">{{ t('demo.spinner.assetMapImage') }} ù useAssetUrl + assetMap (no hardcoded URLs)</p>
+                <p class="text-sm text-gray-500 -mt-4">{{ t('demo.spinner.assetMapImage') }} ? useAssetUrl + assetMap (no hardcoded URLs)</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     <div class="flex flex-col items-center gap-3 p-4 border border-gray-200 rounded-lg bg-white/60">
@@ -1041,6 +1044,7 @@ import CheckoutReusableComponentsDemo from '@/dev/templates/demo/demo-audit/Chec
 import MediaUploaderComponentsDemo from '@/dev/templates/demo/demo-audit/MediaUploaderComponentsDemo.vue';
 import ActionMenuDropdownDemo from '@/dev/templates/demo/demo-audit/ActionMenuDropdownDemo.vue';
 import SubscriptionCardsDemo from '@/dev/templates/demo/demo-audit/SubscriptionCardsDemo.vue';
+import ProfileSectionComponentsDemo from '@/dev/templates/demo/demo-audit/ProfileSectionComponentsDemo.vue';
 import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import TwoPieceButton from '@/components/ui/buttons/TwoPieceButton.vue';
 // Heroicons
@@ -1107,7 +1111,7 @@ const vals = reactive({
     ci1: '', ci2: '', ci3: '', ci4: '', ci5: '', ci6: '',
 });
 
-// ===== Media demo data (assetMap + i18n ù no hardcoded URLs) =====
+// ===== Media demo data (assetMap + i18n ? no hardcoded URLs) =====
 const myMediaList = computed(() => [
     {
         id: 1,
@@ -1461,7 +1465,7 @@ const demoSnippets = {
         5: `<!-- Template -->\n<TierCard :tier="tierSubscribeGreen" />\n\n<!-- Script -->\nimport { computed } from 'vue';\nimport { useI18n } from 'vue-i18n';\nimport TierCard from '@/components/ui/card/dashboard/TierCard.vue';\nimport { useAssetUrl } from '@/composables/useAssetUrl.js';\n\nconst { t } = useI18n();\nconst { url: tierBgUrl } = useAssetUrl('tier.demo.background');\nconst { url: tierButtonGreenUrl } = useAssetUrl('tier.demo.buttonBgGreen');\n\nconst tierSubscribeGreen = computed(() => ({\n  id: 5,\n  title: t('tierCard.demo.title'),\n  backgroundImage: tierBgUrl.value,\n  isFeatured: false,\n  stats: { video: 100, image: 80, audio: 70 },\n  theme: {\n    textPrimary: 'text-[#07F468] dark:text-[#06c454]',\n    textSecondary: 'text-[#FFED29] dark:text-[#FFED29]',\n    shadow: 'shadow-[0px_0px_80px_0px_#07F46840,0px_0px_8px_0px_#07F46880]',\n    barColor: 'bg-[#FFED29] dark:bg-[#ffee37]',\n    barTextColor: 'text-[#FFED29]',\n    featuredBg: 'bg-black dark:bg-[#181a1b]',\n    buttonBgImage: \`url('\${tierButtonGreenUrl.value}')\`,\n    flashLabel: 'text-[#07F468] dark:text-[#06c454]',\n    flashText: '#07F468',\n    textReNew: 'text-white dark:text-[#e8e6e3]',\n    featuredText: 'text-[#07F468] dark:text-[#06c454]',\n  },\n  plans: [/* same plans pattern as tier 1 */],\n  defaultPlan: '6m',\n  flashSale: { active: true, endsIn: t('tierCard.demo.flashSale.endsIn'), originalPrice: t('tierCard.demo.flashSale.originalPrice') },\n  description: t('tierCard.demo.description'),\n  footer: {\n    type: 'subscribe',\n    buttonText: t('tierCard.demo.footer.subscribe'),\n    progress: { visible: false },\n  },\n}));`,
     },
     eventCard: {
-        orangeButton: `<!-- Template -->\n<EventCard theme="orange" :hasButton="true" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'orange' | 'pink'\n// hasButton: true = single progress + CTA button footer\n\n<!-- Assets (inside EventCard via useAssetUrl) -->\n// tier.demo.background ù card background\n// event.demo.catImage ù mascot image\n// icon.notification.close ù dismiss icon\n// icon.media.verified ù creator badge\n// event.demo.tooltip ù progress tooltip icon\n\n<!-- i18n (inside EventCard via $t) -->\n// eventCard.demo.titles.subscriberDiscount\n// eventCard.demo.buttons.claimDiscount\n// eventCard.demo.creatorName`,
+        orangeButton: `<!-- Template -->\n<EventCard theme="orange" :hasButton="true" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'orange' | 'pink'\n// hasButton: true = single progress + CTA button footer\n\n<!-- Assets (inside EventCard via useAssetUrl) -->\n// tier.demo.background ? card background\n// event.demo.catImage ? mascot image\n// icon.notification.close ? dismiss icon\n// icon.media.verified ? creator badge\n// event.demo.tooltip ? progress tooltip icon\n\n<!-- i18n (inside EventCard via $t) -->\n// eventCard.demo.titles.subscriberDiscount\n// eventCard.demo.buttons.claimDiscount\n// eventCard.demo.creatorName`,
         orangeProgress: `<!-- Template -->\n<EventCard theme="orange" :hasButton="false" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'orange'\n// hasButton: false = dual progress bars, no CTA button\n\n<!-- i18n keys used -->\n// eventCard.demo.spendMoreClaim\n// eventCard.demo.offersLeft\n// eventCard.demo.progressRatio`,
         pinkButton: `<!-- Template -->\n<EventCard theme="pink" :hasButton="true" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'pink'\n// hasButton: true = single progress + pink CTA button\n\n<!-- i18n keys used -->\n// eventCard.demo.titles.luckyDraw\n// eventCard.demo.buttons.enterLuckyDraw\n// eventCard.demo.chancesLeft`,
         pinkProgress: `<!-- Template -->\n<EventCard theme="pink" :hasButton="false" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'pink'\n// hasButton: false = dual progress + dark overlay (card 4 layout)\n\n<!-- i18n keys used -->\n// eventCard.demo.spendMoreEnter\n// eventCard.demo.chancesLeft\n// eventCard.demo.progressOffer`,
@@ -1593,7 +1597,7 @@ const inputs = reactive({
     price: '99.99',
 });
 
-// Button Showcase ù click any catalog button to preview :loading (spinner only, no text)
+// Button Showcase ? click any catalog button to preview :loading (spinner only, no text)
 const buttonLoaders = reactive({});
 const runButtonDemo = (id) => {
     if (buttonLoaders[id]) return;

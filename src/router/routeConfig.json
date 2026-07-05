@@ -568,6 +568,16 @@
     ]
   },
   {
+    "slug": "/profile",
+    "envAccess": "development",
+    "section": "dashboard-global",
+    "componentPath": "@/dev/templates/profile/ProfileWrapper.vue",
+    "requiresAuth": false,
+    "supportedRoles": [
+      "all"
+    ]
+  },
+  {
     "slug": "/MediaUploader",
     "section": "misc",
     "componentPath": "@/dev/templates/media/MediaUploaderPage.vue",

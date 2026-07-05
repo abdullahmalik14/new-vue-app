@@ -67,6 +67,15 @@
 
 ---
 
+## Conventions & utilities
+
+| Document | Description |
+|----------|-------------|
+| [FORMATTERS.md](./FORMATTERS.md) | Global decimal / currency / date formatters — full documentation |
+| [FORMATTERS_USAGE_CHECKLIST.md](./FORMATTERS_USAGE_CHECKLIST.md) | When to use `formatDecimal`/`formatCurrency`/`formatPrice` + per-file adoption checklist |
+
+---
+
 ## Quick start
 
 ```bash

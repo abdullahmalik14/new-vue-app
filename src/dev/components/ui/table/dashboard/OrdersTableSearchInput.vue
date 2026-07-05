@@ -8,6 +8,7 @@
         class="w-5 h-5 absolute left-0 top-1/2 -translate-y-1/2 [filter:brightness(0)_saturate(100%)_invert(47%)_sepia(11%)_saturate(772%)_hue-rotate(182deg)_brightness(89%)_contrast(86%)]"
       />
       <input
+        :id="inputId"
         :value="modelValue"
         type="text"
         :placeholder="t('demo.premiumOrders.searchPlaceholder')"
@@ -26,6 +27,10 @@ defineProps({
   modelValue: {
     type: String,
     default: '',
+  },
+  inputId: {
+    type: String,
+    default: 'orders-search',
   },
 });
 

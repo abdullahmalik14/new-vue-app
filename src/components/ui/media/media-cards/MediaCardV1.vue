@@ -172,7 +172,7 @@
           <div ref="menuAnchor" tabindex="0" :class="menuTriggerClass">
             <img v-if="menuTriggerIconUrl" :src="menuTriggerIconUrl" alt="" :class="menuTriggerIconClass" />
           </div>
-          <DropdownMenu ref="menuDropdownRef" :anchor="menuAnchor" :config="menuDropdownConfig">
+          <DropdownMenu v-if="menuAnchor" ref="menuDropdownRef" :anchor="menuAnchor" :config="menuDropdownConfig">
             <div class="py-1 md:py-0">
               <button v-for="option in menuOptions" :key="option.value" type="button"
                 class="flex w-full items-center gap-[0.75rem] hover:bg-[#f2f4f7] px-[0.625rem] md:px-2 py-[0.625rem] text-left"
@@ -229,7 +229,7 @@
           <div ref="menuAnchor" tabindex="0" :class="menuTriggerClass">
             <img v-if="menuTriggerIconUrl" :src="menuTriggerIconUrl" alt="" :class="menuTriggerIconClass" />
           </div>
-          <DropdownMenu ref="menuDropdownRef" :anchor="menuAnchor" :config="menuDropdownConfig">
+          <DropdownMenu v-if="menuAnchor" ref="menuDropdownRef" :anchor="menuAnchor" :config="menuDropdownConfig">
             <div class="py-1 md:py-0">
               <button v-for="option in menuOptions" :key="option.value" type="button"
                 class="flex w-full items-center gap-[0.75rem] hover:bg-[#f2f4f7] h-[4.25rem] md:h-max px-[0.625rem] md:px-2 py-[0.625rem] text-left"

@@ -59,7 +59,7 @@
             <!-- available-balance -->
             <div v-if="!canProceed" class="flex flex-col gap-1 md:gap-2">
               <h3 class="text-base font-medium text-white dark:text-[#e8e6e3]">Available Balance</h3>
-              <span class="text-3xl leading-[2.375rem] font-semibold text-white md:text-4xl md:leading-[2.75rem] md:tracking-[-0.045rem] dark:text-[#e8e6e3]">USD${{ props.engine.state.availableBalance?.toFixed(2) || '30054.40' }}</span>
+              <span class="text-3xl leading-[2.375rem] font-semibold text-white md:text-4xl md:leading-[2.75rem] md:tracking-[-0.045rem] dark:text-[#e8e6e3]">USD${{ formatDecimal(props.engine.state.availableBalance) || '30054.40' }}</span>
             </div>
 
             <!-- payout-summary -->
@@ -85,6 +85,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 import { ref, computed } from 'vue';
+import { formatDecimal } from '@/utils/common/formatters.js';
 
 const props = defineProps({
   engine: {

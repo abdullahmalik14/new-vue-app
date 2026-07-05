@@ -7,22 +7,27 @@
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start justify-between">
           <div class="flex flex-col sm:flex-row gap-6 items-start sm:items-start">
             <div class="flex flex-col gap-2">
-              <DashboardTabs v-model="currentTab" :tabs="tabList" />
+              <DashboardTabs :model-value="currentTab" :tabs="tabList" @update:model-value="handleTabChange" />
               <ShowCodeToggle :code="codeExamples.tabs" />
             </div>
 
             <div class="flex flex-col gap-2">
-              <OrdersTableSearchInput v-model="searchQuery" />
+              <OrdersTableSearchInput
+                :model-value="searchQuery"
+                input-id="orders-search"
+                @update:model-value="handleSearchInput"
+              />
               <ShowCodeToggle :code="codeExamples.search" />
             </div>
           </div>
 
           <div class="flex flex-col gap-2 items-start">
             <BasePlanDropdown
-              v-model="selectedOrderType"
+              :model-value="selectedOrderType"
               :options="orderTypeOptions"
               :unstyled="true"
               widthClass="w-max"
+              @update:model-value="handleOrderTypeChange"
             >
               <template #trigger="{ isOpen }">
                 <div class="flex items-center gap-2 cursor-pointer h-full">
@@ -134,13 +139,16 @@
 </template>
 
 <script setup>
-import { ref, computed, defineComponent, h } from 'vue';
+import { ref, computed, defineComponent, h, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import FlexTable from '@/dev/components/ui/table/FlexTable.vue';
 import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue';
 import BasePlanDropdown from '@/dev/components/plan/parts/BasePlanDropdown.vue';
 import OrdersTableSearchInput from '@/dev/components/ui/table/dashboard/OrdersTableSearchInput.vue';
 import { useAssetUrl } from '@/composables/useAssetUrl.js';
+import { interactionsEngine } from '@/utils/validation/interactionsEngine.js';
+
+const SCOPE_ID = 'premiumOrdersTable';
 
 const ShowCodeToggle = defineComponent({
   props: { code: { type: String, default: '' } },
@@ -181,6 +189,55 @@ const { url: dropdownIconUrl } = useAssetUrl('icon.orders.dropdown');
 const currentTab = ref('All');
 const searchQuery = ref('');
 const selectedOrderType = ref('all');
+
+const searchConfig = { scope: SCOPE_ID, id: 'searchQuery' };
+const tabConfig = { scope: SCOPE_ID, id: 'currentTab' };
+const orderTypeConfig = { scope: SCOPE_ID, id: 'selectedOrderType' };
+
+function handleSearchInput(value) {
+  searchQuery.value = value;
+  const state = interactionsEngine.getFieldState(searchConfig);
+  if (state) {
+    state.value = value;
+    state.touched = true;
+    state.dirty = value !== state.initialValue;
+  }
+}
+
+function handleTabChange(value) {
+  currentTab.value = value;
+  const state = interactionsEngine.getFieldState(tabConfig);
+  if (state) {
+    state.value = value;
+    state.touched = true;
+    state.dirty = value !== state.initialValue;
+  }
+}
+
+function handleOrderTypeChange(value) {
+  selectedOrderType.value = value;
+  const state = interactionsEngine.getFieldState(orderTypeConfig);
+  if (state) {
+    state.value = value;
+    state.touched = true;
+    state.dirty = value !== state.initialValue;
+  }
+}
+
+onMounted(() => {
+  const searchElement = document.getElementById('orders-search');
+  interactionsEngine.register(searchConfig, searchQuery.value, searchElement);
+  interactionsEngine.register(tabConfig, currentTab.value);
+  interactionsEngine.register(orderTypeConfig, selectedOrderType.value);
+
+  if (import.meta.env.DEV) {
+    window.__ordersEngine = interactionsEngine;
+  }
+});
+
+onBeforeUnmount(() => {
+  interactionsEngine.clearScope(SCOPE_ID);
+});
 
 const tabList = computed(() => [
   { id: 'In Progress', labelKey: 'demo.premiumOrders.tabs.inProgress' },
@@ -250,15 +307,41 @@ function linkLabel(linkKey) {
 }
 
 const codeExamples = computed(() => ({
-  tabs: `<!-- DashboardTabs — status filter -->
-<DashboardTabs v-model="currentTab" :tabs="tabList" />
+  tabs: `<!-- DashboardTabs — status filter with interactionsEngine -->
+<DashboardTabs
+  :model-value="currentTab"
+  :tabs="tabList"
+  @update:model-value="handleTabChange"
+/>
 
 <!-- Script -->
-import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
+import DashboardTabs from '@/components/ui/nav/dashboard/DashboardTabs.vue';
+import { interactionsEngine } from '@/utils/validation/interactionsEngine.js';
 
+const SCOPE_ID = 'premiumOrdersTable';
 const { t } = useI18n();
 const currentTab = ref('All');
+const tabConfig = { scope: SCOPE_ID, id: 'currentTab' };
+
+function handleTabChange(value) {
+  currentTab.value = value;
+  const state = interactionsEngine.getFieldState(tabConfig);
+  if (state) {
+    state.value = value;
+    state.touched = true;
+    state.dirty = value !== state.initialValue;
+  }
+}
+
+onMounted(() => {
+  interactionsEngine.register(tabConfig, currentTab.value);
+});
+
+onBeforeUnmount(() => {
+  interactionsEngine.clearScope(SCOPE_ID);
+});
 
 const tabList = computed(() => [
   { id: 'In Progress', labelKey: 'demo.premiumOrders.tabs.inProgress' },
@@ -266,21 +349,44 @@ const tabList = computed(() => [
   { id: 'Canceled', labelKey: 'demo.premiumOrders.tabs.canceled' },
   { id: 'All', labelKey: 'demo.premiumOrders.tabs.all' },
 ]);`,
-  search: `<!-- OrdersTableSearchInput — search filter -->
-<OrdersTableSearchInput v-model="searchQuery" />
+  search: `<!-- OrdersTableSearchInput — search filter with interactionsEngine -->
+<OrdersTableSearchInput
+  :model-value="searchQuery"
+  input-id="orders-search"
+  @update:model-value="handleSearchInput"
+/>
 
 <!-- Script -->
+import { interactionsEngine } from '@/utils/validation/interactionsEngine.js';
 import OrdersTableSearchInput from '@/dev/components/ui/table/dashboard/OrdersTableSearchInput.vue';
 
+const SCOPE_ID = 'premiumOrdersTable';
+const searchConfig = { scope: SCOPE_ID, id: 'searchQuery' };
 const searchQuery = ref('');
 
-<!-- Component uses useAssetUrl('icon.search') + t('demo.premiumOrders.searchPlaceholder') -->`,
-  dropdown: `<!-- BasePlanDropdown — Order Type filter (unstyled) -->
+function handleSearchInput(value) {
+  searchQuery.value = value;
+  const state = interactionsEngine.getFieldState(searchConfig);
+  if (state) {
+    state.value = value;
+    state.touched = true;
+    state.dirty = value !== state.initialValue;
+  }
+}
+
+onMounted(() => {
+  const searchElement = document.getElementById('orders-search');
+  interactionsEngine.register(searchConfig, searchQuery.value, searchElement);
+});
+
+<!-- OrdersTableSearchInput uses useAssetUrl('icon.search') + t('demo.premiumOrders.searchPlaceholder') -->`,
+  dropdown: `<!-- BasePlanDropdown — Order Type filter with interactionsEngine -->
 <BasePlanDropdown
-  v-model="selectedOrderType"
+  :model-value="selectedOrderType"
   :options="orderTypeOptions"
   :unstyled="true"
   widthClass="w-max"
+  @update:model-value="handleOrderTypeChange"
 >
   <template #trigger="{ isOpen }">
     <div class="flex items-center gap-2 cursor-pointer h-full">
@@ -317,11 +423,28 @@ const searchQuery = ref('');
 </BasePlanDropdown>
 
 <!-- Script -->
+import { interactionsEngine } from '@/utils/validation/interactionsEngine.js';
 import BasePlanDropdown from '@/dev/components/plan/parts/BasePlanDropdown.vue';
 import { useAssetUrl } from '@/composables/useAssetUrl.js';
 
+const SCOPE_ID = 'premiumOrdersTable';
+const orderTypeConfig = { scope: SCOPE_ID, id: 'selectedOrderType' };
 const selectedOrderType = ref('all');
 const { url: dropdownIconUrl } = useAssetUrl('icon.orders.dropdown');
+
+function handleOrderTypeChange(value) {
+  selectedOrderType.value = value;
+  const state = interactionsEngine.getFieldState(orderTypeConfig);
+  if (state) {
+    state.value = value;
+    state.touched = true;
+    state.dirty = value !== state.initialValue;
+  }
+}
+
+onMounted(() => {
+  interactionsEngine.register(orderTypeConfig, selectedOrderType.value);
+});
 
 const orderTypeOptions = computed(() => [
   { label: t('demo.premiumOrders.orderTypes.all'), value: 'all' },

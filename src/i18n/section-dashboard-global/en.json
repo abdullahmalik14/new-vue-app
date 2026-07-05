@@ -432,6 +432,59 @@
       "media": "Media"
     }
   },
+  "profile": {
+    "labels": {
+      "followers": "Followers",
+      "likes": "Likes",
+      "subscribers": "Subscribers",
+      "viewAll": "View All",
+      "tip": "Tip",
+      "starting": "Starting",
+      "perMonth": "/mo",
+      "subscribe": "SUBSCRIBE",
+      "subscribeOrBuy": "Subscribe or Buy",
+      "readMore": "Read more",
+      "ellipsis": "...",
+      "votesSuffix": "votes",
+      "voteSingular": "vote",
+      "separator": "/"
+    },
+    "alt": {
+      "logoFull": "Website logo",
+      "logoWhite": "Website logo",
+      "cart": "Cart",
+      "bell": "Notifications",
+      "globe": "Language",
+      "avatar": "Profile avatar",
+      "token": "Token",
+      "call": "Call",
+      "callHover": "Call",
+      "message": "Message",
+      "onlineDot": "Online",
+      "verified": "Verified",
+      "verifiedTick": "Verified",
+      "addNormal": "Add",
+      "addActive": "Added",
+      "likeNormal": "Like",
+      "likeActive": "Liked",
+      "dots": "More options",
+      "dotsHorizontal": "More options",
+      "chevronLeft": "Back",
+      "eye": "Views",
+      "heart": "Likes",
+      "link": "Copy link",
+      "profile": "Followers",
+      "logo": "Subscribers",
+      "hotOffer": "Hot offer",
+      "subscriberBtn": "Subscribe",
+      "subscriberShape": "Subscribe",
+      "video": "Video",
+      "checkCircle": "Selected",
+      "dashboard": "Votes",
+      "notLiked": "Like",
+      "messageText": "Comments"
+    }
+  },
   "mediaCard": {
     "published": "Published",
     "resume": "Resume",
@@ -1525,6 +1578,65 @@
         "merchandise": "<span class=\"font-semibold text-[#FF0066]\">10% off</span> on all Merchandise",
         "customRequest": "<span class=\"font-semibold text-[#FF0066]\">10% off</span> on all Custom Request",
         "payToView": "<span class=\"font-semibold text-[#FF0066]\">10% off</span> on all Pay to View videos"
+      }
+    },
+    "profileComponents": {
+      "sectionTitle": "Profile Section Components",
+      "sectionDescription": "All 18 audited profile-section components, shown with the exact real usage from ProfileWrapper.vue over a hero-style dark backdrop (assetMap + i18n driven).",
+      "badges": {
+        "desktop": "Desktop",
+        "mobileOnly": "Mobile only (<768px)",
+        "always": "Always"
+      },
+      "groups": {
+        "header": "Header Cluster",
+        "hero": "Hero / Meta Cluster",
+        "sharing": "Description & Sharing",
+        "cta": "Subscribe & Right Actions",
+        "cards": "Media Tabs & Cards",
+        "subscription": "Subscription Carousel"
+      },
+      "items": {
+        "profileHeader": "ProfileHeader",
+        "profileHeaderActions": "ProfileHeaderActions",
+        "profileHeaderOptionButtons": "ProfileHeaderOptionButtons",
+        "profileHeaderUserDesktop": "ProfileHeaderUserDesktop",
+        "profileHeaderUserResponsive": "ProfileHeaderUserResponsive",
+        "profileMeta": "ProfileMeta",
+        "profileMetaResponsive": "ProfileMetaResponsive",
+        "profileRightButtons": "ProfileRightButtons",
+        "profileDescription": "ProfileDescription",
+        "profileSharing": "ProfileSharing",
+        "profileSharingResponsive": "ProfileSharingResponsive",
+        "profileSubscribeCta": "ProfileSubscribeCta",
+        "profileMediaTabHeading": "ProfileMediaTabHeading",
+        "feedPollCard": "FeedPollCard",
+        "feedMediaCard": "FeedMediaCard",
+        "profileMediaGrid": "MediaCardV2 (Media Grid)",
+        "merchCard": "MerchCard",
+        "profileSubscriptionCards": "ProfileSubscriptionCards"
+      },
+      "notes": {
+        "mobileOnly": "This component only renders at mobile widths (<768px). Resize the window to preview it.",
+        "wide": "Uses a fixed wide layout (min-width 45rem) — scroll horizontally to see the full button.",
+        "tall": "Full-height carousel, exactly as it appears on the live profile page."
+      },
+      "data": {
+        "pollTitle": "What Should I eat for tonight's live stream?",
+        "pollOptionOrange": "Orange",
+        "pollOptionApple": "Apple",
+        "pollOptionChicken": "Chicken",
+        "pollTimeLeft": "24 hours left to vote",
+        "feedDescription": "Jenny is back! Tonight I will eat mostly fruits. -> 8pm EST time 👅!",
+        "mediaTitle": "Building successful teams through collaboration",
+        "mediaAlt": "Video {n}",
+        "mediaTabPayToView": "Pay to View",
+        "mediaTabSubscription": "Subscription",
+        "merchTitle": "My top (washed) Get Jenny's favourite Mangoes!",
+        "merchDescription": "Get Jenny's favourite Mangoes! Buy them while supply last !Get Jenny's favourite Mangoes! Buy them while supply last !Get Jenny's favourite Mangoes! Buy them while supply last !",
+        "merchDiscount": "10% OFF",
+        "merchTitleOutOfStock": "Out of Stock Item",
+        "merchDescriptionOutOfStock": "This item is out of stock."
       }
     }
   }

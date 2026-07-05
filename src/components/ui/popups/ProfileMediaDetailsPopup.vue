@@ -1,6 +1,6 @@
 <template>
   <BasePopup :modelValue="modelValue" @update:modelValue="(val) => emit('update:modelValue', val)"
-    :popup-config="mediaDetailsPopupConfig">
+    :popupConfig="mediaDetailsPopupConfig">
     <div
       class="h-full [background:linear-gradient(180deg,rgba(255,255,255,0.00)_0%,rgba(255,255,255,0.10)_50%,rgba(255,255,255,0.02)_100%),#0C111D] 
       md:[0px_0px_10px_-10px_#00000080] font-sans p-0 m-0 box-border overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-order-style:none] [scrollbar-width:none]">
@@ -46,7 +46,7 @@
               <!-- Placeholder / Thumbnail State (Inactive) -->
               <template v-else>
                 <!-- background image -->
-                <div class="absolute inset-0 bg-[url('/images/ai-art.png')] bg-cover bg-center">
+                <div class="absolute inset-0 bg-[url('/images/ai-art-girl.png')] bg-cover bg-center">
                 </div>
 
                 <!-- gradient overlay -->
@@ -119,7 +119,7 @@
 
               <!-- Thumbnail Overlay (Visible when paused) -->
               <div v-if="!isPlaying"
-                class="absolute inset-0 bg-[url('/images/ai-art.png')] bg-cover bg-center pointer-events-none">
+                class="absolute inset-0 bg-[url('/images/ai-art-girl.png')] bg-cover bg-center pointer-events-none">
               </div>
               <!-- !-- Gradient Overlay -->
               <div
@@ -749,18 +749,18 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 const mediaDetailsPopupConfig = {
-  actionType: "slidein",
+  actionType: "slideIn",
   from: "right",
   offset: "0px",
   speed: "250ms",
   effect: "ease-in-out",
-  showOverlay: false,
-  closeOnOutside: true,
-  lockScroll: false,
-  escToClose: true,
+  shouldShowOverlay: false,
+  shouldCloseOnOutsideClick: true,
+  shouldLockBodyScroll: false,
+  shouldCloseOnEscape: true,
   width: { default: "90%", "<768": "100%" },
   height: { default: "100%", "<768": "100%" },
-  scrollable: false,
+  scrollable: true,
   closeSpeed: "250ms",
   closeEffect: "cubic-bezier(0.4, 0, 0.2, 1)",
 };
@@ -769,7 +769,8 @@ const gridMediaList = ref([
   {
     id: 101,
     type: 'video',
-    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    poster: '/images/slide-2.webp',
     title: 'Record breaking fried chicken eating ! See my attempt to break world’s record! Watch now!',
     duration: '14:55',
     timeAgo: '5mo',
@@ -783,7 +784,8 @@ const gridMediaList = ref([
   {
     id: 102,
     type: 'video',
-    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    poster: '/images/slide-2.webp',
     title: 'Record breaking fried chicken eating ! See my attempt to break world’s record! Watch now!',
     duration: '14:55',
     timeAgo: '5mo',
@@ -797,7 +799,8 @@ const gridMediaList = ref([
   {
     id: 103,
     type: 'video',
-    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    poster: '/images/slide-2.webp',
     title: 'Record breaking fried chicken eating ! See my attempt to break world’s record! Watch now!',
     duration: '14:55',
     timeAgo: '5mo',
@@ -811,7 +814,8 @@ const gridMediaList = ref([
   {
     id: 104,
     type: 'video',
-    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    poster: '/images/slide-2.webp',
     title: 'Record breaking fried chicken eating ! See my attempt to break world’s record! Watch now!',
     duration: '14:55',
     timeAgo: '5mo',

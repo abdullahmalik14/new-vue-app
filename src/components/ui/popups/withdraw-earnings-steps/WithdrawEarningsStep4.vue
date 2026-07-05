@@ -60,12 +60,12 @@
                     <div class="flex flex-col gap-2">
                         <div class="flex justify-between items-center gap-2">
                             <span class="text-sm font-semibold text-[#0C111D] dark:text-[#dbd8d3]">Available Balance</span>
-                            <span class="text-base font-semibold text-[#0C111D] dark:text-[#dbd8d3]">USD${{ availableBalance.toFixed(2) }}</span>
+                            <span class="text-base font-semibold text-[#0C111D] dark:text-[#dbd8d3]">USD${{ formatDecimal(availableBalance) }}</span>
                         </div>
 
                         <div class="flex justify-between items-center gap-2">
                             <span class="text-sm font-medium text-[#0C111D] dark:text-[#dbd8d3]">Payout Amount</span>
-                            <span class="text-base text-[#0C111D] dark:text-[#dbd8d3]">-USD${{ payoutAmount.toFixed(2) }}</span>
+                            <span class="text-base text-[#0C111D] dark:text-[#dbd8d3]">-USD${{ formatDecimal(payoutAmount) }}</span>
                         </div>
 
                         <hr class="border-t border-black dark:border-[#363b3d]">
@@ -109,6 +109,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 import { computed } from 'vue';
+import { formatDecimal } from '@/utils/common/formatters.js';
 
 const props = defineProps({
   engine: {
@@ -134,7 +135,7 @@ const withdrawAmount = computed(() => props.engine.state.amount || '120.00');
 
 const availableBalance = computed(() => props.engine.state.availableBalance || 30054.40);
 const payoutAmount = computed(() => parseFloat(withdrawAmount.value) || 0);
-const latestBalance = computed(() => (availableBalance.value - payoutAmount.value).toFixed(2));
+const latestBalance = computed(() => formatDecimal(availableBalance.value - payoutAmount.value));
 
 function goBack() {
   props.engine.goToStep(props.engine.step - 1);
