@@ -82,12 +82,12 @@
           </div>
           
           <!-- Loading State (initial only — not on polling refresh) -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-if="showChartLoadingOverlay">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 " v-if="showChartLoadingOverlay">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.loadingChart', 'Loading chart...') }}</span>
           </div>
           <!-- Empty State -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-else-if="analyticsStore.bundleLoaded && !insightData?.total">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 " v-else-if="analyticsStore.bundleLoaded && !insightData?.total">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
             <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
@@ -124,12 +124,12 @@
           </div>
 
           <!-- Loading State (initial only — not on polling refresh) -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-if="showChartLoadingOverlay">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 " v-if="showChartLoadingOverlay">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.loadingChart', 'Loading chart...') }}</span>
           </div>
           <!-- Empty State -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-else-if="analyticsStore.bundleLoaded && !insightData?.totalTokens">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 " v-else-if="analyticsStore.bundleLoaded && !insightData?.totalTokens">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
             <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
