@@ -9,7 +9,12 @@
         </div>
         <!-- User Info -->
         <div class="flex flex-col justify-center items-start gap-0.5 overflow-hidden">
-          <div :data-value="row.name" class="truncate text-gray-900 text-xs font-semibold leading-4">
+          <div
+            :data-value="row.name"
+            data-analytics-metric="contributors.top.name"
+            data-analytics-period="alltime"
+            data-analytics-surface="main"
+            class="truncate text-gray-900 text-xs font-semibold leading-4">
             {{ row.name }}
           </div>
           <div class="flex items-center gap-1">
@@ -25,7 +30,12 @@
     <!-- Custom Total Cell -->
     <template #cell.totalUsd="{ row }">
       <div class="px-4 w-full text-right">
-        <span :data-value="row.total" class="text-gray-900 text-xs font-semibold leading-4 whitespace-nowrap">USD$ {{ $n(row.total) }}</span>
+        <span
+          :data-value="row.total"
+          data-analytics-metric="contributors.top.amount"
+          data-analytics-period="alltime"
+          data-analytics-surface="main"
+          class="text-gray-900 text-xs font-semibold leading-4 whitespace-nowrap">USD$ {{ $n(row.total) }}</span>
       </div>
     </template>
 

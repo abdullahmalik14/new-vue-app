@@ -42,6 +42,14 @@
  * @property {string} message
  */
 
+/**
+ * @typedef {Object} ContractValidationState
+ * @property {Array<{ chartId: string, pass: boolean, errors: string[] }>} results
+ * @property {number} passCount
+ * @property {number} failCount
+ * @property {string|null} ranAt — ISO timestamp when validation last ran
+ */
+
 export function createInitialAnalyticsTestState() {
   return {
     activeTestCase: null,
@@ -64,6 +72,8 @@ export function createInitialAnalyticsTestState() {
     eventHistory: [],
     pauseDomScanBeforeEachStep: false,
     batchResults: [],
+    /** @type {ContractValidationState|null} */
+    contractValidation: null,
   };
 }
 

@@ -14,14 +14,27 @@
             </template>
             <template v-else>
               <div>
-                <span class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">{{ $n(insightData?.total || 0) }} </span>
+                <span
+                  class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']"
+                  :data-value="insightData?.total"
+                  data-analytics-metric="earnings.total"
+                  :data-analytics-period="analyticsContractPeriod"
+                  data-analytics-surface="popup-earnings"
+                >{{ $n(insightData?.total || 0) }} </span>
                 <span class="text-gray-900 text-lg md:text-xl font-bold font-['Poppins']">USD</span>
               </div>
             </template>
             <div class="inline-flex items-center gap-2" v-if="earningsPctChange !== null">
               <div class="flex justify-center items-center gap-1">
                 <img v-if="earningsPctChange >= 0" :src="icon4Url || ''" alt="trend-up" class="h-4 w-4" />
-                <div :class="earningsPctChange >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-xs md:text-sm font-medium font-['Poppins']">{{ earningsPctChange >= 0 ? '+' : '' }}{{ earningsPctChange }}%</div>
+                <div
+                  :class="earningsPctChange >= 0 ? 'text-emerald-700' : 'text-red-500'"
+                  class="text-center text-xs md:text-sm font-medium font-['Poppins']"
+                  :data-value="earningsPctChange"
+                  data-analytics-metric="earnings.total-percentage"
+                  :data-analytics-period="analyticsContractPeriod"
+                  data-analytics-surface="popup-earnings"
+                >{{ earningsPctChange >= 0 ? '+' : '' }}{{ earningsPctChange }}%</div>
               </div>
               <div class="text-slate-500 text-xs font-normal font-['Poppins']">{{ formatComparisonLabel(period) }}</div>
             </div>
@@ -35,14 +48,27 @@
               <span class="text-gray-900 tracking-[-0.045rem] text-3xl font-semibold md:text-4xl">--</span>
             </template>
             <template v-else>
-              <div class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']">
+              <div
+                class="text-gray-900 text-3xl md:text-4xl font-semibold font-['Poppins']"
+                :data-value="insightData?.totalTokens"
+                data-analytics-metric="earnings.tokens-received"
+                :data-analytics-period="analyticsContractPeriod"
+                data-analytics-surface="popup-earnings"
+              >
                 {{ $n(insightData?.totalTokens || 0) }}
               </div>
             </template>
             <div class="inline-flex items-center gap-2" v-if="tokensPctChange !== null">
               <div class="flex justify-center items-center gap-1">
                 <img v-if="tokensPctChange >= 0" :src="icon4Url || ''" alt="trend-up" class="h-4 w-4" />
-                <div :class="tokensPctChange >= 0 ? 'text-emerald-700' : 'text-red-500'" class="text-center text-xs md:text-sm font-medium font-['Poppins']">{{ tokensPctChange >= 0 ? '+' : '' }}{{ tokensPctChange }}%</div>
+                <div
+                  :class="tokensPctChange >= 0 ? 'text-emerald-700' : 'text-red-500'"
+                  class="text-center text-xs md:text-sm font-medium font-['Poppins']"
+                  :data-value="tokensPctChange"
+                  data-analytics-metric="earnings.tokens-percentage"
+                  :data-analytics-period="analyticsContractPeriod"
+                  data-analytics-surface="popup-earnings"
+                >{{ tokensPctChange >= 0 ? '+' : '' }}{{ tokensPctChange }}%</div>
               </div>
               <div class="text-slate-500 text-xs font-normal font-['Poppins']">{{ formatComparisonLabel(period) }}</div>
             </div>
@@ -204,6 +230,7 @@ import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+import { toAnalyticsContractPeriod } from '@/systems/analytics/analyticsPeriodsConfig.js'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -218,6 +245,7 @@ const hasEarningsData = computed(() => props.insightData && props.insightData.to
 
 const analyticsStore = useDashboardAnalyticsStore()
 
+const analyticsContractPeriod = computed(() => toAnalyticsContractPeriod(props.period))
 
 const activePeriod = computed(() => {
   const p = (props.period || 'weekly').toLowerCase().trim()

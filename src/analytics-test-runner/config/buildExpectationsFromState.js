@@ -168,7 +168,7 @@ function buildNewSubscriptionExpectations(testCaseKey, state, fields) {
       location: 'Subscribers card',
       metric: 'NEW subscribers',
       apiPath: 'ui.subscriberInsights.daily.new',
-      scan: { type: 'cardValueByHeading', heading: 'Subscribers', field: 'new' },
+      scan: { type: 'metricSelector', metric: 'subscribers.new', period: 'day', surface: 'main' },
     }, state),
     singularRow(testCaseKey, {
       idSuffix: 'singular.main.earnings.total',
@@ -176,7 +176,7 @@ function buildNewSubscriptionExpectations(testCaseKey, state, fields) {
       location: 'Earnings card',
       metric: 'Total earnings',
       apiPath: 'ui.earningsInsights.daily.total',
-      scan: { type: 'cardValueByHeading', heading: 'Earnings' },
+      scan: { type: 'metricSelector', metric: 'earnings.total', period: 'day', surface: 'main' },
     }, state),
     singularRow(testCaseKey, {
       idSuffix: 'singular.trends.country.sales.day',
@@ -208,7 +208,7 @@ function buildNewSubscriptionExpectations(testCaseKey, state, fields) {
         apiPath: `ui.earningsPopup.${apiP}.total`,
         popup: { openFromHeading: 'Earnings' },
         periodToggle: period,
-        scan: { type: 'popupStatByHeading', heading: 'Total Earnings' },
+        scan: { type: 'metricSelector', metric: 'earnings.total', period, surface: 'popup-earnings' },
       }, state),
       ...(period !== 'day'
         ? [
@@ -216,11 +216,12 @@ function buildNewSubscriptionExpectations(testCaseKey, state, fields) {
               idSuffix: `chart.popup.earnings.total.${period}`,
               view: 'Popup · Earnings',
               location: 'Earnings chart dataset',
-              metric: 'total',
+              metric: 'earnings.total',
               period,
               apiPath: `ui.earningsChart.${apiP}.total`,
               popup: { openFromHeading: 'Earnings' },
               periodToggle: period,
+              scan: { type: 'chartContract', chartId: `sales-${period === 'week' ? 'weekly' : period === 'month' ? 'monthly' : period === 'year' ? 'yearly' : 'alltime'}-bar`, period, metric: 'earnings.total', shape: 'last' },
               chart: earningsChartRule(period, 'total'),
             }, state),
           ]
@@ -229,33 +230,42 @@ function buildNewSubscriptionExpectations(testCaseKey, state, fields) {
         idSuffix: `chart.popup.earnings.subscription.${period}`,
         view: 'Popup · Earnings',
         location: 'Earnings chart dataset',
-        metric: 'subscription',
+        metric: 'earnings.subscription',
         period,
         apiPath: `ui.earningsChart.${apiP}.subscription`,
         popup: { openFromHeading: 'Earnings' },
         periodToggle: period,
+        scan: period === 'day'
+          ? { type: 'chartContract', chartId: 'sales-daily-donut', period, metric: 'earnings.subscription', shape: 'scalar' }
+          : { type: 'chartContract', chartId: `sales-${period === 'week' ? 'weekly' : period === 'month' ? 'monthly' : period === 'year' ? 'yearly' : 'alltime'}-bar`, period, metric: 'earnings.subscription', shape: 'last' },
         chart: earningsChartRule(period, 'subscription'),
       }, state),
       chartRow(testCaseKey, {
         idSuffix: `chart.popup.subscribers.new.${period}`,
         view: 'Popup · Subscribers',
         location: 'Subscribers chart dataset',
-        metric: 'newSubscriber',
+        metric: 'subscribers.new',
         period,
         apiPath: `ui.subsChart.${apiP}.newSubscriber`,
         popup: { openFromHeading: 'Subscribers' },
         periodToggle: period,
+        scan: period === 'day'
+          ? { type: 'chartContract', chartId: 'subs-daily-donut', period, metric: 'subscribers.new', shape: 'scalar' }
+          : { type: 'chartContract', chartId: `subs-${period === 'week' ? 'weekly' : period === 'month' ? 'monthly' : period === 'year' ? 'yearly' : 'alltime'}-bar`, period, metric: 'subscribers.new', shape: 'last' },
         chart: subscribersChartRule(period, 'newSubscriber'),
       }, state),
       chartRow(testCaseKey, {
         idSuffix: `chart.popup.subscribers.plan.${period}`,
         view: 'Popup · Subscribers',
         location: 'Subscribers chart dataset (plan tier)',
-        metric: planTierKey,
+        metric: `subscribers.${planTierKey}`,
         period,
         apiPath: `ui.subsChart.${apiP}.${planTierKey}`,
         popup: { openFromHeading: 'Subscribers' },
         periodToggle: period,
+        scan: period === 'day'
+          ? { type: 'chartContract', chartId: 'tiers-daily-donut', period, metric: `subscribers.${planTierKey}`, shape: 'scalar' }
+          : { type: 'chartContract', chartId: `tiers-${period === 'week' ? 'weekly' : period === 'month' ? 'monthly' : period === 'year' ? 'yearly' : 'alltime'}-bar`, period, metric: `subscribers.${planTierKey}`, shape: 'last' },
         chart: subscribersChartRule(period, planTierKey),
       }, state),
     );
@@ -273,7 +283,7 @@ function buildRecurringSubscriptionExpectations(testCaseKey, state, fields) {
       location: 'Subscribers card',
       metric: 'RECURRING subscribers',
       apiPath: 'ui.subscriberInsights.daily.recurring',
-      scan: { type: 'cardValueByHeading', heading: 'Subscribers', field: 'recurring' },
+      scan: { type: 'metricSelector', metric: 'subscribers.recurring', period: 'day', surface: 'main' },
     }, state),
     buildCountryTrendRowFromState(testCaseKey, state, fields, rowFns),
   );
@@ -288,7 +298,7 @@ function buildMerchOrderExpectations(testCaseKey, state, fields) {
       location: 'Earnings card',
       metric: 'Total earnings',
       apiPath: 'ui.earningsInsights.daily.total',
-      scan: { type: 'cardValueByHeading', heading: 'Earnings' },
+      scan: { type: 'metricSelector', metric: 'earnings.total', period: 'day', surface: 'main' },
     }, state),
     ...buildContributorsPreviewRowsFromState(testCaseKey, state, rowFns),
     ...buildContributorsPopupApiRowsFromState(testCaseKey, state, rowFns),
@@ -331,7 +341,7 @@ function buildTokenOrderExpectations(testCaseKey, state, fields) {
         apiPath: `ui.earningsPopup.${apiP}.totalTokens`,
         popup: { openFromHeading: 'Earnings' },
         periodToggle: period,
-        scan: { type: 'popupStatByHeading', heading: 'Tokens Received' },
+        scan: { type: 'metricSelector', metric: 'earnings.tokens-received', period, surface: 'popup-earnings' },
       }, state),
       chartRow(testCaseKey, {
         idSuffix: `chart.popup.earnings.tipTokens.${period}`,
@@ -362,7 +372,7 @@ function buildFollowExpectations(testCaseKey, state) {
       location: 'Fans card',
       metric: 'NEW FOLLOWERS',
       apiPath: 'ui.fans.daily.newFollowers',
-      scan: { type: 'cardMetricByLabel', heading: 'Fans', label: 'NEW FOLLOWERS' },
+      scan: { type: 'metricSelector', metric: 'fans.new-followers', period: 'day', surface: 'main' },
     }, state),
   ];
   POPUP_SCAN_PERIODS_WITH_ALLTIME.forEach((period) => {
@@ -378,7 +388,7 @@ function buildFollowExpectations(testCaseKey, state) {
         apiPath: `ui.fans.${apiP}.newFollowers`,
         popup: { openFromHeading: 'Fans' },
         periodToggle: period,
-        scan: { type: 'popupStatByHeading', heading: 'New Followers' },
+        scan: { type: 'metricSelector', metric: 'fans.new-followers', period, surface: 'popup-fans' },
       }, state),
     );
     if (chartRule) {
@@ -408,7 +418,7 @@ function buildProfileVisitExpectations(testCaseKey, state) {
       location: 'Fans card',
       metric: 'PROFILE VISIT',
       apiPath: 'ui.fans.daily.profileVisit',
-      scan: { type: 'cardMetricByLabel', heading: 'Fans', label: 'PROFILE VISIT' },
+      scan: { type: 'metricSelector', metric: 'fans.profile-visits', period: 'day', surface: 'main' },
     }, state),
   ];
   POPUP_SCAN_PERIODS_WITH_ALLTIME.forEach((period) => {
@@ -423,7 +433,7 @@ function buildProfileVisitExpectations(testCaseKey, state) {
         apiPath: `ui.fans.${apiP}.profileVisit`,
         popup: { openFromHeading: 'Fans' },
         periodToggle: period,
-        scan: { type: 'popupStatByHeading', heading: 'Total Profile Visit' },
+        scan: { type: 'metricSelector', metric: 'fans.profile-visits', period, surface: 'popup-fans' },
       }, state),
     );
   });
@@ -464,7 +474,7 @@ function buildCancelSubscriptionExpectations(testCaseKey, state) {
       metric: 'Total earnings',
       apiPath: 'ui.earningsInsights.daily.total',
       knownGap: 'Cancel may not reverse earnings in API',
-      scan: { type: 'cardValueByHeading', heading: 'Earnings' },
+      scan: { type: 'metricSelector', metric: 'earnings.total', period: 'day', surface: 'main' },
     }, state),
   ];
 }

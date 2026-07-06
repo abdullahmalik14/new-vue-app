@@ -62,7 +62,7 @@ export function appendMainOverviewPercentageRows(rows, testCaseKey, mapped, sing
         metric: 'NEW subscribers % vs yesterday',
         apiPath: 'ui.subscriberInsights.daily.newPercentage',
         expectedValue: resolveMainSubscribersNewPercentageFromMapped(mapped),
-        scan: { type: 'cardPercentageByHeading', heading: 'Subscribers', field: 'new' },
+        scan: { type: 'metricSelector', metric: 'subscribers.new-percentage', period: 'day', surface: 'main' },
       }),
       mainCardPercentRow(testCaseKey, singularRow, {
         idSuffix: 'singular.main.subscribers.recurringPercentage',
@@ -70,7 +70,7 @@ export function appendMainOverviewPercentageRows(rows, testCaseKey, mapped, sing
         metric: 'RECURRING subscribers % vs yesterday',
         apiPath: 'ui.subscriberInsights.daily.recurringPercentage',
         expectedValue: resolveMainSubscribersRecurringPercentage(mapped),
-        scan: { type: 'cardPercentageByHeading', heading: 'Subscribers', field: 'recurring' },
+        scan: { type: 'metricSelector', metric: 'subscribers.recurring-percentage', period: 'day', surface: 'main' },
       }),
     );
   }
@@ -83,7 +83,7 @@ export function appendMainOverviewPercentageRows(rows, testCaseKey, mapped, sing
         metric: 'Earnings % vs yesterday',
         apiPath: 'ui.earningsInsights.daily.percentage',
         expectedValue: resolveMainEarningsPercentageFromMapped(mapped),
-        scan: { type: 'cardPercentageByHeading', heading: 'Earnings' },
+        scan: { type: 'metricSelector', metric: 'earnings.percentage', period: 'day', surface: 'main' },
       }),
     );
   }
@@ -96,7 +96,7 @@ export function appendMainOverviewPercentageRows(rows, testCaseKey, mapped, sing
         metric: 'NEW FOLLOWERS % vs yesterday',
         apiPath: 'ui.fans.daily.newFollowersPercentage',
         expectedValue: resolveFansMainPercentage(mapped, 'newFollowers'),
-        scan: { type: 'cardMetricPercentage', heading: 'Fans', label: 'NEW FOLLOWERS' },
+        scan: { type: 'metricSelector', metric: 'fans.new-followers-percentage', period: 'day', surface: 'main' },
       }),
       mainCardPercentRow(testCaseKey, singularRow, {
         idSuffix: 'singular.main.fans.profileVisitPercentage',
@@ -104,7 +104,7 @@ export function appendMainOverviewPercentageRows(rows, testCaseKey, mapped, sing
         metric: 'PROFILE VISIT % vs yesterday',
         apiPath: 'ui.fans.daily.profileVisitPercentage',
         expectedValue: resolveFansMainPercentage(mapped, 'profileVisit'),
-        scan: { type: 'cardMetricPercentage', heading: 'Fans', label: 'PROFILE VISIT' },
+        scan: { type: 'metricSelector', metric: 'fans.profile-visits-percentage', period: 'day', surface: 'main' },
       }),
     );
   }
@@ -135,7 +135,7 @@ export function appendLikesPercentageRows(rows, testCaseKey, mapped, singularRow
         metric: `${field.toUpperCase()} % vs yesterday`,
         apiPath: `ui.likes.${field}Percentage`,
         expectedValue: resolveLikesMainPercentage(mapped, field),
-        scan: { type: 'cardMetricPercentage', heading: 'Likes', label: field.toUpperCase() },
+        scan: { type: 'metricSelector', metric: `likes.${field}-percentage`, period: 'day', surface: 'main' },
       }),
     );
   });
@@ -173,8 +173,10 @@ export function appendPopupPercentageRows(rows, testCaseKey, mapped, singularRow
             popup: { openFromHeading: 'Subscribers' },
             periodToggle: period,
             scan: {
-              type: 'popupPercentageByStatHeading',
-              statHeading: field === 'new' ? 'New Subscribers' : 'Recurring Subscribers',
+              type: 'metricSelector',
+              metric: field === 'new' ? 'subscribers.new-percentage' : 'subscribers.recurring-percentage',
+              period,
+              surface: 'popup-subscribers',
             },
           }),
         );
@@ -193,7 +195,7 @@ export function appendPopupPercentageRows(rows, testCaseKey, mapped, singularRow
           expectedValue: resolvePopupEarningsPercent(mapped, period, 'total'),
           popup: { openFromHeading: 'Earnings' },
           periodToggle: period,
-          scan: { type: 'popupPercentageByStatHeading', statHeading: 'Total Earnings' },
+          scan: { type: 'metricSelector', metric: 'earnings.total-percentage', period, surface: 'popup-earnings' },
         }),
         popupPercentRow(testCaseKey, singularRow, {
           idSuffix: `singular.popup.earnings.tokensPercentage.${period}`,
@@ -205,7 +207,7 @@ export function appendPopupPercentageRows(rows, testCaseKey, mapped, singularRow
           expectedValue: resolvePopupEarningsPercent(mapped, period, 'tokens'),
           popup: { openFromHeading: 'Earnings' },
           periodToggle: period,
-          scan: { type: 'popupPercentageByStatHeading', statHeading: 'Tokens Received' },
+          scan: { type: 'metricSelector', metric: 'earnings.tokens-percentage', period, surface: 'popup-earnings' },
         }),
       );
     }
@@ -222,7 +224,7 @@ export function appendPopupPercentageRows(rows, testCaseKey, mapped, singularRow
           expectedValue: resolvePopupEarningsPercent(mapped, period, 'tokens'),
           popup: { openFromHeading: 'Earnings' },
           periodToggle: period,
-          scan: { type: 'popupPercentageByStatHeading', statHeading: 'Tokens Received' },
+          scan: { type: 'metricSelector', metric: 'earnings.tokens-percentage', period, surface: 'popup-earnings' },
         }),
       );
     }
@@ -239,7 +241,7 @@ export function appendPopupPercentageRows(rows, testCaseKey, mapped, singularRow
           expectedValue: resolvePopupFansPercent(mapped, period, 'newFollowers'),
           popup: { openFromHeading: 'Fans' },
           periodToggle: period,
-          scan: { type: 'popupPercentageByStatHeading', statHeading: 'New Followers' },
+          scan: { type: 'metricSelector', metric: 'fans.new-followers-percentage', period, surface: 'popup-fans' },
         }),
         popupPercentRow(testCaseKey, singularRow, {
           idSuffix: `singular.popup.fans.profileVisitPercentage.${period}`,
@@ -251,7 +253,7 @@ export function appendPopupPercentageRows(rows, testCaseKey, mapped, singularRow
           expectedValue: resolvePopupFansPercent(mapped, period, 'profileVisit'),
           popup: { openFromHeading: 'Fans' },
           periodToggle: period,
-          scan: { type: 'popupPercentageByStatHeading', statHeading: 'Total Profile Visit' },
+          scan: { type: 'metricSelector', metric: 'fans.profile-visits-percentage', period, surface: 'popup-fans' },
         }),
       );
     }
@@ -302,7 +304,7 @@ export function appendStatePercentageRows(rows, testCaseKey, state, singularRow)
         expectedValue: resolveMainSubscribersNewPercentageFromState(state),
         tolerance: 0,
         source: 'dom',
-        scan: { type: 'cardPercentageByHeading', heading: 'Subscribers', field: 'new' },
+        scan: { type: 'metricSelector', metric: 'subscribers.new-percentage', period: 'day', surface: 'main' },
       }),
     );
   }
@@ -319,7 +321,7 @@ export function appendStatePercentageRows(rows, testCaseKey, state, singularRow)
         expectedValue: resolveMainEarningsPercentageFromState(state),
         tolerance: 0,
         source: 'dom',
-        scan: { type: 'cardPercentageByHeading', heading: 'Earnings' },
+        scan: { type: 'metricSelector', metric: 'earnings.percentage', period: 'day', surface: 'main' },
       }),
     );
   }
@@ -336,7 +338,7 @@ export function appendStatePercentageRows(rows, testCaseKey, state, singularRow)
         expectedValue: resolveFansPercentageFromState(state, 'newFollowers'),
         tolerance: 0,
         source: 'dom',
-        scan: { type: 'cardMetricPercentage', heading: 'Fans', label: 'NEW FOLLOWERS' },
+        scan: { type: 'metricSelector', metric: 'fans.new-followers-percentage', period: 'day', surface: 'main' },
       }),
     );
   }
@@ -353,7 +355,7 @@ export function appendStatePercentageRows(rows, testCaseKey, state, singularRow)
         expectedValue: resolveFansPercentageFromState(state, 'profileVisit'),
         tolerance: 0,
         source: 'dom',
-        scan: { type: 'cardMetricPercentage', heading: 'Fans', label: 'PROFILE VISIT' },
+        scan: { type: 'metricSelector', metric: 'fans.profile-visits-percentage', period: 'day', surface: 'main' },
       }),
     );
   }
@@ -381,7 +383,7 @@ export function appendStatePercentageRows(rows, testCaseKey, state, singularRow)
         expectedValue: resolveLikesPercentageFromState(state, likesField),
         tolerance: 0,
         source: 'dom',
-        scan: { type: 'cardMetricPercentage', heading: 'Likes', label: likesField.toUpperCase() },
+        scan: { type: 'metricSelector', metric: `likes.${likesField}-percentage`, period: 'day', surface: 'main' },
       }),
     );
   }

@@ -1,7 +1,4 @@
-import {
-  scanCardValueByHeading,
-  scanCardMetricByLabel,
-} from '../scanners/domScanners.js';
+import { scanMetricSelector } from '../scanners/domScanners.js';
 import { getAnalyticsRefreshButton, isRefreshButtonReady } from './trigger.js';
 import { normalizeNumber } from '../utils/normalizeNumber.js';
 import { EVENT_EXPECTATIONS } from '../config/eventExpectations.js';
@@ -40,25 +37,22 @@ function readMetric(result) {
 }
 
 export function captureMainAnalyticsSnapshot() {
-  const earnings = scanCardValueByHeading('Earnings');
-  const subscribers = scanCardValueByHeading('Subscribers');
-  const newFollowers = scanCardMetricByLabel('Fans', 'NEW FOLLOWERS');
-  const profileVisit = scanCardMetricByLabel('Fans', 'PROFILE VISIT');
-  const likesMedia = scanCardMetricByLabel('Likes', 'MEDIA');
-  const likesProfile = scanCardMetricByLabel('Likes', 'PROFILE');
-  const likesMerch = scanCardMetricByLabel('Likes', 'MERCH');
-  const likesFeed = scanCardMetricByLabel('Likes', 'FEED');
+  const main = (metric) =>
+    scanMetricSelector({ metric, period: 'day', surface: 'main' });
 
-  let subscribersNew = null;
-  if (subscribers.ok && Array.isArray(subscribers.foundValue)) {
-    subscribersNew =
-      subscribers.foundValue.find((v) => /new/i.test(v.label))?.num ?? subscribers.foundValue[0]?.num ?? null;
-  }
+  const earnings = main('earnings.total');
+  const subscribersNew = main('subscribers.new');
+  const newFollowers = main('fans.new-followers');
+  const profileVisit = main('fans.profile-visits');
+  const likesMedia = main('likes.media');
+  const likesProfile = main('likes.profile');
+  const likesMerch = main('likes.merch');
+  const likesFeed = main('likes.feed');
 
   return {
     capturedAt: new Date().toISOString(),
     earnings: readMetric(earnings),
-    subscribersNew,
+    subscribersNew: readMetric(subscribersNew),
     newFollowers: readMetric(newFollowers),
     profileVisit: readMetric(profileVisit),
     likesMedia: readMetric(likesMedia),

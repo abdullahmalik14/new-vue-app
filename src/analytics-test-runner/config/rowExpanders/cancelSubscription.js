@@ -16,7 +16,7 @@ export function expandCancelSubscription(testCaseKey, testCase) {
       expectedValue: 0,
       tolerance: 0.01,
       knownGap: 'Backend may not reverse earnings on cancel',
-      scan: { type: 'cardValueByHeading', heading: 'Earnings' },
+      scan: { type: 'metricSelector', metric: 'earnings.total', period: 'day', surface: 'main' },
     }),
   );
 

@@ -12,7 +12,7 @@ export function addMainSubscriptionRows(rows, testCaseKey, { newCount = 1, recur
       period: 'day',
       source: 'dom',
       expectedValue: newCount,
-      scan: { type: 'cardValueByHeading', heading: 'Subscribers', field: 'new' },
+      scan: { type: 'metricSelector', metric: 'subscribers.new', period: 'day', surface: 'main' },
     }),
   );
 
@@ -24,7 +24,7 @@ export function addMainSubscriptionRows(rows, testCaseKey, { newCount = 1, recur
         period: 'day',
         source: 'dom',
         expectedValue: recurringCount,
-        scan: { type: 'cardValueByHeading', heading: 'Subscribers', field: 'recurring' },
+        scan: { type: 'metricSelector', metric: 'subscribers.recurring', period: 'day', surface: 'main' },
       }),
     );
   }
@@ -38,7 +38,7 @@ export function addMainEarningsRow(rows, testCaseKey, amount) {
       period: 'day',
       source: 'dom',
       expectedValue: amount,
-      scan: { type: 'cardValueByHeading', heading: 'Earnings' },
+      scan: { type: 'metricSelector', metric: 'earnings.total', period: 'day', surface: 'main' },
     }),
   );
 }
@@ -77,7 +77,7 @@ export function addEarningsPopupRows(rows, testCaseKey, amount, { subscription =
         expectedValue: amount,
         popup: { openFromHeading: 'Earnings' },
         periodToggle: period,
-        scan: { type: 'popupValueNearLabel', label: 'Total Earnings' },
+        scan: { type: 'metricSelector', metric: 'earnings.total', period, surface: 'popup-earnings' },
       }),
     );
     addPopupDatasetRows(rows, testCaseKey, {
@@ -162,7 +162,7 @@ export function addMainFansMetricRow(rows, testCaseKey, metricLabel, expectedVal
       source: 'dom',
       expectedValue,
       knownGap,
-      scan: { type: 'cardMetricByLabel', heading: 'Fans', label: metricLabel },
+      scan: { type: 'metricSelector', metric: `fans.${metricLabel === 'NEW FOLLOWERS' ? 'new-followers' : 'profile-visits'}`, period: 'day', surface: 'main' },
     }),
   );
 }
@@ -196,7 +196,7 @@ export function addFansPopupRows(rows, testCaseKey, { newFollowers = null, profi
           expectedValue: newFollowers,
           popup: { openFromHeading: 'Fans' },
           periodToggle: period,
-          scan: { type: 'popupStatByHeading', heading: 'New Followers' },
+          scan: { type: 'metricSelector', metric: 'fans.new-followers', period, surface: 'popup-fans' },
         }),
       );
     }
@@ -211,7 +211,7 @@ export function addFansPopupRows(rows, testCaseKey, { newFollowers = null, profi
           expectedValue: profileVisit,
           popup: { openFromHeading: 'Fans' },
           periodToggle: period,
-          scan: { type: 'popupStatByHeading', heading: 'Profile Visit' },
+          scan: { type: 'metricSelector', metric: 'fans.profile-visits', period, surface: 'popup-fans' },
         }),
       );
     }

@@ -40,7 +40,7 @@ export function buildLikesFieldExpectationsFromState(testCaseKey, state, likeFie
       location: 'Likes card',
       metric: label,
       apiPath: `ui.likes.${likeField}`,
-      scan: { type: 'cardMetricByLabel', heading: 'Likes', label },
+      scan: { type: 'metricSelector', metric: `likes.${likeField}`, period: 'day', surface: 'main' },
     }, state),
   );
 
@@ -77,7 +77,7 @@ function buildFollowExpectationsFromState(testCaseKey, state, rowFns) {
       location: 'Fans card',
       metric: 'NEW FOLLOWERS',
       apiPath: 'ui.fans.daily.newFollowers',
-      scan: { type: 'cardMetricByLabel', heading: 'Fans', label: 'NEW FOLLOWERS' },
+      scan: { type: 'metricSelector', metric: 'fans.new-followers', period: 'day', surface: 'main' },
     }, state),
   ];
   POPUP_SCAN_PERIODS_WITH_ALLTIME.forEach((period) => {
@@ -93,7 +93,7 @@ function buildFollowExpectationsFromState(testCaseKey, state, rowFns) {
         apiPath: `ui.fans.${apiP}.newFollowers`,
         popup: { openFromHeading: 'Fans' },
         periodToggle: period,
-        scan: { type: 'popupStatByHeading', heading: 'New Followers' },
+        scan: { type: 'metricSelector', metric: 'fans.new-followers', period, surface: 'popup-fans' },
       }, state),
     );
     if (chartRule) {
@@ -126,7 +126,7 @@ export function buildP2vOrderExpectationsFromState(testCaseKey, state, fields, r
       metric: 'Total earnings',
       apiPath: 'ui.earningsInsights.daily.total',
       knownGap: blockedGap,
-      scan: { type: 'cardValueByHeading', heading: 'Earnings' },
+      scan: { type: 'metricSelector', metric: 'earnings.total', period: 'day', surface: 'main' },
     }, state),
   ];
 
@@ -278,7 +278,7 @@ export function buildContributorsPreviewRowsFromState(testCaseKey, state, rowFns
       metric: 'Top contributor amount (USD)',
       period: CONTRIBUTORS_PREVIEW_PERIOD,
       apiPath: `contributors.topContributors.${apiP}.-1.usdSpent`,
-      scan: { type: 'topContributorsPreview', field: 'total' },
+      scan: { type: 'metricSelector', metric: 'contributors.top.amount', period: 'alltime', surface: 'main' },
     }, state),
     singularRow(testCaseKey, {
       idSuffix: 'singular.main.contributors.name',
@@ -287,7 +287,7 @@ export function buildContributorsPreviewRowsFromState(testCaseKey, state, rowFns
       metric: 'Top contributor name',
       period: CONTRIBUTORS_PREVIEW_PERIOD,
       apiPath: `contributors.topContributors.${apiP}.-1.name`,
-      scan: { type: 'topContributorsPreview', field: 'name' },
+      scan: { type: 'metricSelector', metric: 'contributors.top.name', period: 'alltime', surface: 'main' },
     }, state),
   ];
 }

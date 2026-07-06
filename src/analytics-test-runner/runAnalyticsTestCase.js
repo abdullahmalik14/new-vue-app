@@ -1,4 +1,5 @@
 import { analyticsTestState, resetAnalyticsTestState } from './state.js';
+import { validateAllVisibleChartContracts } from './scanners/chartContractScanner.js';
 import { EVENT_EXPECTATIONS } from './config/eventExpectations.js';
 import { buildTestExpectations } from './config/buildTestExpectations.js';
 import { createEmptyExpectationState, applyMasterEvent } from './config/expectationState.js';
@@ -252,6 +253,21 @@ export async function runAnalyticsTestCase(testCaseKey = 'newSubscription') {
         renderRunnerPanel();
         await sleep(400);
       }
+
+      // Run chart contract schema validation for all currently visible charts
+      setRunnerStep('scan-main', 'Chart contract validation');
+      const contractResult = validateAllVisibleChartContracts();
+      analyticsTestState.contractValidation = {
+        results: contractResult.results,
+        passCount: contractResult.passCount,
+        failCount: contractResult.failCount,
+        ranAt: new Date().toISOString(),
+      };
+      logActivity(
+        `Chart contracts: ${contractResult.passCount} pass, ${contractResult.failCount} fail`,
+        'scan-main',
+      );
+      renderRunnerPanel();
 
       setRunnerStep('scan-popups', 'DOM runner: opening popups — day / week / month / year');
       const popupFound = await executePopupScanBatch(popupRows, analyticsTestState.chartsPayload, {

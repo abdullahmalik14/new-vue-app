@@ -35,6 +35,9 @@
           <template #cell.sales="{ row }">
             <div
               :data-value="row.sales"
+              :data-analytics-metric="`countries.${row.countryId || row.id}.sales`"
+              data-analytics-period="day"
+              data-analytics-surface="trends"
               class="text-right w-full text-gray-900 text-xs font-semibold font-['Poppins'] leading-4 truncate sm:px-1">
               {{ row.sales }}
             </div>
@@ -89,6 +92,7 @@ const topCountriesRows = computed(() => {
   const data = analyticsStore.trendingCountries?.[props.period] || [];
   return data.map((item, index) => ({
     id: index,
+    countryId: item.country,
     rank: item.rank || index + 1,
     country: analyticsCountryCodeToDisplayName[item.country] || item.country,
     sales: `USD$ ${n(item.salesUSD || item.earningsUSD || item.sales_usd || 0)}`

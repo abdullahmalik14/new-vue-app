@@ -16,17 +16,26 @@
             </template>
             <template v-else>
               <span
-                class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]">
+                class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]"
+                :data-value="insightData?.newFollowers"
+                data-analytics-metric="fans.new-followers"
+                :data-analytics-period="analyticsContractPeriod"
+                data-analytics-surface="popup-fans"
+              >
                 {{ $n(insightData?.newFollowers || 0) }}
               </span>
             </template>
             <div class="inline-flex items-center gap-2" v-if="followersPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
                 <img v-if="followersPct >= 0" :src="icon4Url || ''" alt="trend-up" class="h-5 w-5" />
-                <div :class="followersPct >= 0 ? 'text-emerald-700' : 'text-red-500'"
-                  class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ followersPct >= 0 ? '+' : ''
-                  }}{{
-                  followersPct }}%</div>
+                <div
+                  :class="followersPct >= 0 ? 'text-emerald-700' : 'text-red-500'"
+                  class="text-center text-sm font-medium font-['Poppins'] leading-5"
+                  :data-value="followersPct"
+                  data-analytics-metric="fans.new-followers-percentage"
+                  :data-analytics-period="analyticsContractPeriod"
+                  data-analytics-surface="popup-fans"
+                >{{ followersPct >= 0 ? '+' : '' }}{{ followersPct }}%</div>
               </div>
               <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{
                 formatComparisonLabel(period) }}</div>
@@ -45,17 +54,26 @@
             </template>
             <template v-else>
               <span
-                class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]">
+                class="text-gray-900 tracking-[-0.045rem] text-3xl leading-[2.375rem] font-semibold md:text-4xl md:leading-[2.75rem]"
+                :data-value="insightData?.profileVisit"
+                data-analytics-metric="fans.profile-visits"
+                :data-analytics-period="analyticsContractPeriod"
+                data-analytics-surface="popup-fans"
+              >
                 {{ $n(insightData?.profileVisit || 0) }}
               </span>
             </template>
             <div class="inline-flex items-center gap-2" v-if="visitsPct !== null">
               <div class="w-14 flex justify-center items-center gap-1">
                 <img v-if="visitsPct >= 0" :src="icon4Url || ''" alt="trend-up" class="h-5 w-5" />
-                <div :class="visitsPct >= 0 ? 'text-emerald-700' : 'text-red-500'"
-                  class="text-center text-sm font-medium font-['Poppins'] leading-5">{{ visitsPct >= 0 ? '+' : '' }}{{
-                  visitsPct
-                  }}%</div>
+                <div
+                  :class="visitsPct >= 0 ? 'text-emerald-700' : 'text-red-500'"
+                  class="text-center text-sm font-medium font-['Poppins'] leading-5"
+                  :data-value="visitsPct"
+                  data-analytics-metric="fans.profile-visits-percentage"
+                  :data-analytics-period="analyticsContractPeriod"
+                  data-analytics-surface="popup-fans"
+                >{{ visitsPct >= 0 ? '+' : '' }}{{ visitsPct }}%</div>
               </div>
               <div class="text-slate-700 text-xs font-normal font-['Poppins'] leading-4">{{
                 formatComparisonLabel(period) }}
@@ -249,6 +267,7 @@ import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+import { toAnalyticsContractPeriod } from '@/systems/analytics/analyticsPeriodsConfig.js'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -258,6 +277,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'update:period'])
 const { t } = useI18n()
+
+const analyticsContractPeriod = computed(() => toAnalyticsContractPeriod(props.period))
 
 const hasFansData = computed(() => props.insightData && props.insightData.newFollowers != null)
 

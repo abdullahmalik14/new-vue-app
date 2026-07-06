@@ -42,6 +42,7 @@
             <div class="flex flex-col gap-4">
               <!-- subscribers -->
               <DashboardAnalyticsMetricCard
+                data-analytics-card="subscribers"
                 :title="$t('dashboard.analytics.trends.subscribers')"
                 @openTrend="$emit('openSubscribersTrendPopup')">
 
@@ -58,12 +59,16 @@
 
                         <div class="flex justify-between items-end">
                           <span>
-                            <span :data-value="dashboardAnalyticsStore.subscriberInsights?.daily?.new"
+                            <span
+                              :data-value="dashboardAnalyticsStore.subscriberInsights?.daily?.new"
+                              data-analytics-metric="subscribers.new"
+                              data-analytics-period="day"
+                              data-analytics-surface="main"
                               class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{ displayValue(dashboardAnalyticsStore.subscriberInsights?.daily?.new) }}</span>
                           </span>
 
                           <!-- right part only show when data are here -->
-                          <DashboardStatIndicator v-if="dashboardAnalyticsStore.subscriberInsights?.daily?.newPercentage !== undefined && dashboardAnalyticsStore.subscriberInsights?.daily?.newPercentage !== null" :percentage="dashboardAnalyticsStore.subscriberInsights?.daily?.newPercentage" :period-label="$t('dashboard.analytics.trends.vsYesterday')" />
+                          <DashboardStatIndicator v-if="dashboardAnalyticsStore.subscriberInsights?.daily?.newPercentage !== undefined && dashboardAnalyticsStore.subscriberInsights?.daily?.newPercentage !== null" :percentage="dashboardAnalyticsStore.subscriberInsights?.daily?.newPercentage" :period-label="$t('dashboard.analytics.trends.vsYesterday')" analytics-metric="subscribers.new-percentage" analytics-period="day" analytics-surface="main" />
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.subscriberInsights?.daily?.newSparkline?.length > 0">
 <SparkLine :data="dashboardAnalyticsStore.subscriberInsights.daily.newSparkline" color="#22c55e" :height="28" />
@@ -85,11 +90,15 @@
 
                         <div class="flex justify-between items-end">
                           <span>
-                            <span :data-value="dashboardAnalyticsStore.subscriberInsights?.daily?.recurring"
+                            <span
+                              :data-value="dashboardAnalyticsStore.subscriberInsights?.daily?.recurring"
+                              data-analytics-metric="subscribers.recurring"
+                              data-analytics-period="day"
+                              data-analytics-surface="main"
                               class="text-[2.25rem] font-sans font-semibold leading-[2.75rem] tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{ displayValue(dashboardAnalyticsStore.subscriberInsights?.daily?.recurring) }}</span>
                           </span>
                           <!-- right part only show when data are here -->
-                          <DashboardStatIndicator v-if="dashboardAnalyticsStore.subscriberInsights?.daily?.recurringPercentage !== undefined && dashboardAnalyticsStore.subscriberInsights?.daily?.recurringPercentage !== null" :percentage="dashboardAnalyticsStore.subscriberInsights?.daily?.recurringPercentage" :period-label="$t('dashboard.analytics.trends.vsYesterday')" />
+                          <DashboardStatIndicator v-if="dashboardAnalyticsStore.subscriberInsights?.daily?.recurringPercentage !== undefined && dashboardAnalyticsStore.subscriberInsights?.daily?.recurringPercentage !== null" :percentage="dashboardAnalyticsStore.subscriberInsights?.daily?.recurringPercentage" :period-label="$t('dashboard.analytics.trends.vsYesterday')" analytics-metric="subscribers.recurring-percentage" analytics-period="day" analytics-surface="main" />
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.subscriberInsights?.daily?.recurringSparkline?.length > 0">
 <SparkLine :data="dashboardAnalyticsStore.subscriberInsights.daily.recurringSparkline" color="#22c55e" :width="70" :height="28" />
@@ -102,6 +111,7 @@
 
               <!-- fans-->
               <DashboardAnalyticsMetricCard
+                data-analytics-card="fans"
                 :title="$t('dashboard.analytics.trends.fans')"
                 @openTrend="$emit('openFansTrendPopup')">
 
@@ -115,10 +125,14 @@
                           class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.trends.newFollowers', 'NEW FOLLOWERS').toUpperCase() }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="dashboardAnalyticsStore.fans?.daily?.newFollowers"
+                          <span
+                            :data-value="dashboardAnalyticsStore.fans?.daily?.newFollowers"
+                            data-analytics-metric="fans.new-followers"
+                            data-analytics-period="day"
+                            data-analytics-surface="main"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
                             {{ displayValue(dashboardAnalyticsStore.fans?.daily?.newFollowers) }}</span>
-                          <DashboardStatIndicator v-if="dashboardAnalyticsStore.fans?.daily?.newFollowersPercentage !== undefined && dashboardAnalyticsStore.fans?.daily?.newFollowersPercentage !== null" :percentage="dashboardAnalyticsStore.fans?.daily?.newFollowersPercentage" :period-label="$t('dashboard.analytics.trends.vsYesterday')" />
+                          <DashboardStatIndicator v-if="dashboardAnalyticsStore.fans?.daily?.newFollowersPercentage !== undefined && dashboardAnalyticsStore.fans?.daily?.newFollowersPercentage !== null" :percentage="dashboardAnalyticsStore.fans?.daily?.newFollowersPercentage" :period-label="$t('dashboard.analytics.trends.vsYesterday')" analytics-metric="fans.new-followers-percentage" analytics-period="day" analytics-surface="main" />
                         </div>
                         <div class="w-full" v-if="dashboardAnalyticsStore.fans?.daily?.newFollowersSparkline?.length > 0">
 <SparkLine :data="dashboardAnalyticsStore.fans.daily.newFollowersSparkline" color="#ef4444" :width="60" :height="24" />
@@ -131,7 +145,11 @@
                           class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.overview.profileVisit', 'PROFILE VISIT').toUpperCase() }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="dashboardAnalyticsStore.fans?.daily?.profileVisit"
+                          <span
+                            :data-value="dashboardAnalyticsStore.fans?.daily?.profileVisit"
+                            data-analytics-metric="fans.profile-visits"
+                            data-analytics-period="day"
+                            data-analytics-surface="main"
                             class="text-[1.875rem] font-semibold font-sans leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
                             {{ displayValue(dashboardAnalyticsStore.fans?.daily?.profileVisit) }}</span>
                           <div v-if="
@@ -146,7 +164,12 @@
                                 <img :src="analyticsTrendDownUrl || ''" alt="trend-down"
                                   class="h-5 w-5" />
                                 <span
-                                  class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium">{{
+                                  class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium"
+                                  :data-value="dashboardAnalyticsStore.fans?.daily?.profileVisitPercentage"
+                                  data-analytics-metric="fans.profile-visits-percentage"
+                                  data-analytics-period="day"
+                                  data-analytics-surface="main"
+                                >{{
                                     Math.abs(dashboardAnalyticsStore.fans?.daily?.profileVisitPercentage) }}%</span>
                               </span>
                               <span
@@ -169,6 +192,7 @@
             <div class="flex flex-col gap-4">
               <!-- earnings-->
               <DashboardAnalyticsMetricCard
+                data-analytics-card="earnings"
                 :title="$t('dashboard.analytics.trends.earnings')"
                 @openTrend="$emit('openEarningsTrendPopup')">
 
@@ -176,6 +200,9 @@
                     <span>
                       <span
                         :data-value="dashboardAnalyticsStore.earningsInsights?.daily?.total"
+                        data-analytics-metric="earnings.total"
+                        data-analytics-period="day"
+                        data-analytics-surface="main"
                         class="text-[2.25rem] font-semibold leading-[2.75rem] font-sans tracking-[-0.045rem] text-light-text-primary dark:text-dark-text-primary">{{ displayCurrency(dashboardAnalyticsStore.earningsInsights?.daily?.total) }}</span>
                       <span v-if="dashboardAnalyticsStore.earningsInsights?.daily?.total != null"
                         class="text-base font-medium leading-6 font-sans text-light-text-secondary dark:text-dark-text-secondary ml-1">USD</span>
@@ -191,7 +218,12 @@
                             class="h-5 w-5" />
                           <span
                             :class="dashboardAnalyticsStore.earningsInsights.daily.percentage >= 0 ? 'text-light-text-trendGreen' : 'text-light-text-trendRed'"
-                            class="leading-5 text-sm font-medium">{{ Math.abs(dashboardAnalyticsStore.earningsInsights.daily.percentage)
+                            class="leading-5 text-sm font-medium"
+                            :data-value="dashboardAnalyticsStore.earningsInsights.daily.percentage"
+                            data-analytics-metric="earnings.percentage"
+                            data-analytics-period="day"
+                            data-analytics-surface="main"
+                          >{{ Math.abs(dashboardAnalyticsStore.earningsInsights.daily.percentage)
                             }}%</span>
                         </span>
                       </div>
@@ -206,6 +238,7 @@
               <!-- likes -->
               <!-- likes -->
               <DashboardAnalyticsMetricCard
+                data-analytics-card="likes"
                 :title="$t('dashboard.analytics.trends.likes')"
                 @openTrend="$emit('openLikesTrendPopup')">
 
@@ -219,7 +252,11 @@
                           class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.overview.media', 'MEDIA') }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="dashboardAnalyticsStore.likes?.media"
+                          <span
+                            :data-value="dashboardAnalyticsStore.likes?.media"
+                            data-analytics-metric="likes.media"
+                            data-analytics-period="day"
+                            data-analytics-surface="main"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">
                             {{ displayCurrency(dashboardAnalyticsStore.likes?.media) }}</span>
                           <div v-if="
@@ -232,7 +269,12 @@
                                 <img :src="analyticsTrendDownUrl || ''" alt="trend-down"
                                   class="h-5 w-5" />
                                 <span
-                                  class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium">{{
+                                  class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium"
+                                  :data-value="dashboardAnalyticsStore.likes?.mediaPercentage"
+                                  data-analytics-metric="likes.media-percentage"
+                                  data-analytics-period="day"
+                                  data-analytics-surface="main"
+                                >{{
                                     Math.abs(dashboardAnalyticsStore.likes?.mediaPercentage) }}%</span>
                               </span>
                               <span
@@ -253,7 +295,11 @@
                           class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.overview.merch', 'MERCH') }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="dashboardAnalyticsStore.likes?.merch"
+                          <span
+                            :data-value="dashboardAnalyticsStore.likes?.merch"
+                            data-analytics-metric="likes.merch"
+                            data-analytics-period="day"
+                            data-analytics-surface="main"
                             class="text-[1.875rem] font-sans font-semibold leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">{{ displayValue(dashboardAnalyticsStore.likes?.merch) }}</span>
                           <div v-if="
                             dashboardAnalyticsStore.likes?.merchPercentage !== undefined &&
@@ -267,7 +313,12 @@
                                 <img :src="analyticsTrendDownUrl || ''" alt="trend-down"
                                   class="h-5 w-5" />
                                 <span
-                                  class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium">{{
+                                  class="text-light-text-trendRed dark:text-light-text-trendRed leading-5 text-sm font-medium"
+                                  :data-value="dashboardAnalyticsStore.likes?.merchPercentage"
+                                  data-analytics-metric="likes.merch-percentage"
+                                  data-analytics-period="day"
+                                  data-analytics-surface="main"
+                                >{{
                                     Math.abs(dashboardAnalyticsStore.likes?.merchPercentage) }}%</span>
                               </span>
                               <span
@@ -294,7 +345,11 @@
                           class="text-xs font-medium font-sans leading-[1.125rem] whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.overview.profile', 'PROFILE') }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="dashboardAnalyticsStore.likes?.profile"
+                          <span
+                            :data-value="dashboardAnalyticsStore.likes?.profile"
+                            data-analytics-metric="likes.profile"
+                            data-analytics-period="day"
+                            data-analytics-surface="main"
                             class="text-[1.875rem] font-semibold font-sans leading-[2.375rem] text-light-text-primary dark:text-dark-text-primary">{{ displayCurrency(dashboardAnalyticsStore.likes?.profile) }}</span>
                           <div v-if="
                             dashboardAnalyticsStore.likes?.profilePercentage !== undefined &&
@@ -306,7 +361,12 @@
                                 <img :src="analyticsTrendUpUrl || ''" alt="trend-up"
                                   class="h-5 w-5" />
                                 <span
-                                  class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium">{{
+                                  class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium"
+                                  :data-value="dashboardAnalyticsStore.likes?.profilePercentage"
+                                  data-analytics-metric="likes.profile-percentage"
+                                  data-analytics-period="day"
+                                  data-analytics-surface="main"
+                                >{{
                                     Math.abs(dashboardAnalyticsStore.likes?.profilePercentage) }}%</span>
                               </span>
                               <span
@@ -326,7 +386,11 @@
                           class="text-xs font-medium leading-[1.125rem] font-sans whitespace-nowrap text-light-text-tertiary dark:text-dark-text-tertiary">{{ $t('dashboard.analytics.overview.feed', 'FEED') }}</span>
 
                         <div class="flex items-end justify-between w-full gap-1">
-                          <span :data-value="dashboardAnalyticsStore.likes?.feed"
+                          <span
+                            :data-value="dashboardAnalyticsStore.likes?.feed"
+                            data-analytics-metric="likes.feed"
+                            data-analytics-period="day"
+                            data-analytics-surface="main"
                             class="text-[1.875rem] font-semibold leading-[2.375rem] font-sans text-light-text-primary dark:text-dark-text-primary">{{ displayCurrency(dashboardAnalyticsStore.likes?.feed) }}</span>
                           <div v-if="
                             dashboardAnalyticsStore.likes?.feedPercentage !== undefined &&
@@ -338,7 +402,12 @@
                                 <img :src="analyticsTrendUpUrl || ''" alt="trend-up"
                                   class="h-5 w-5" />
                                 <span
-                                  class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium">{{
+                                  class="text-light-text-trendGreen dark:text-light-text-trendGreen leading-5 text-sm font-medium"
+                                  :data-value="dashboardAnalyticsStore.likes?.feedPercentage"
+                                  data-analytics-metric="likes.feed-percentage"
+                                  data-analytics-period="day"
+                                  data-analytics-surface="main"
+                                >{{
                                     Math.abs(dashboardAnalyticsStore.likes?.feedPercentage) }}%</span>
                               </span>
                               <span

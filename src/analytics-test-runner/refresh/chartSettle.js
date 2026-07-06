@@ -18,8 +18,26 @@ function chartSignature(charts, chartIdIncludes) {
 }
 
 /**
- * Poll am5 until chart data signature is stable (or timeout).
+ * Check if a chart container has been stamped with the analytics contract
+ * (i.e. has data-analytics-rendered-at attribute).
+ *
+ * @param {string|undefined} chartIdIncludes
+ * @returns {boolean}
+ */
+function hasContractStamp(chartIdIncludes) {
+  const selector = chartIdIncludes
+    ? `[data-analytics-rendered-at][data-chart-id*="${chartIdIncludes}"], [data-analytics-rendered-at][data-analytics-chart-id*="${chartIdIncludes}"]`
+    : '[data-analytics-rendered-at]';
+  return document.querySelector(selector) !== null;
+}
+
+/**
+ * Poll until chart data signature is stable (or timeout).
+ * Prefers the data-analytics-rendered-at contract stamp over am5 signature polling,
+ * but falls back to the signature approach if stamp is not present.
+ *
  * @param {{ chartIdIncludes?: string, timeoutMs?: number, pollMs?: number, stableTicks?: number }} [options]
+ * @returns {Promise<{ settled: boolean, signature: string, method: 'contract'|'amcharts' }>}
  */
 export async function waitForChartRenderSettle(options = {}) {
   const timeoutMs = options.timeoutMs ?? 8000;
@@ -27,9 +45,21 @@ export async function waitForChartRenderSettle(options = {}) {
   const stableTicks = options.stableTicks ?? 2;
   const chartIdIncludes = options.chartIdIncludes;
 
+  const started = Date.now();
+
+  // First pass: wait for contract stamp (fast path — preferred)
+  while (Date.now() - started < timeoutMs) {
+    if (hasContractStamp(chartIdIncludes)) {
+      return { settled: true, signature: 'contract-stamp', method: 'contract' };
+    }
+    await sleep(pollMs);
+    // If still no stamp after 1 second, fall through to am5 polling
+    if (Date.now() - started >= 1000) break;
+  }
+
+  // Fallback: am5 signature polling
   let stable = 0;
   let lastSignature = '';
-  const started = Date.now();
 
   while (Date.now() - started < timeoutMs) {
     const { charts } = collectRenderedAmChartsData();
@@ -37,7 +67,7 @@ export async function waitForChartRenderSettle(options = {}) {
 
     if (signature && signature === lastSignature) {
       stable += 1;
-      if (stable >= stableTicks) return { settled: true, signature };
+      if (stable >= stableTicks) return { settled: true, signature, method: 'amcharts' };
     } else {
       stable = 0;
       lastSignature = signature;
@@ -46,5 +76,5 @@ export async function waitForChartRenderSettle(options = {}) {
     await sleep(pollMs);
   }
 
-  return { settled: false, signature: lastSignature };
+  return { settled: false, signature: lastSignature, method: 'amcharts' };
 }

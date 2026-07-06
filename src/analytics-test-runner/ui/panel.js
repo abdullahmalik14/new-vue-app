@@ -3,7 +3,7 @@ import { DROPDOWN_TEST_OPTIONS, getDefaultTestCaseKey } from '../config/testCase
 import { RUNNER_STEPS } from './activityLog.js';
 import { initPanelResize } from './panelResize.js';
 
-const PANEL_VERSION = '10';
+const PANEL_VERSION = '11';
 let panelOpen = false;
 
 function el(tag, className, text) {
@@ -241,6 +241,8 @@ export function ensureTestRunnerPanel() {
         <div class="runner-api-log" data-api-log></div>
         <div class="runner-debug-title">JSON validation</div>
         <div class="runner-debug-block" data-validation-summary></div>
+        <div class="runner-debug-title">Chart contract validation</div>
+        <div class="runner-debug-block" data-contract-validation></div>
         <div class="runner-debug-title">Chart debug (last snapshot)</div>
         <div class="runner-debug-block" data-chart-debug></div>
       </div>
@@ -371,6 +373,22 @@ export function renderRunnerPanel() {
       `FAIL ${vr.summary?.fail ?? 0} · WARN ${vr.summary?.warn ?? 0}`,
       ...vr.results.map((r) => `${r.severity} ${r.path}: ${r.message}`),
     ].join('\n');
+  }
+
+  const contractHost = panel.querySelector('[data-contract-validation]');
+  const cv = s.contractValidation;
+  if (!cv) {
+    contractHost.textContent = '';
+  } else if (cv.failCount === 0) {
+    contractHost.textContent = `PASS — all ${cv.passCount} chart contract(s) valid${cv.ranAt ? ` (${cv.ranAt})` : ''}`;
+  } else {
+    const lines = [
+      `FAIL ${cv.failCount} · PASS ${cv.passCount}`,
+      ...(cv.results || [])
+        .filter((r) => !r.pass)
+        .flatMap((r) => r.errors.map((e) => `  ${r.chartId}: ${e}`)),
+    ];
+    contractHost.textContent = lines.join('\n');
   }
 
   const chartHost = panel.querySelector('[data-chart-debug]');

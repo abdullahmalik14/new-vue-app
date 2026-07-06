@@ -911,6 +911,34 @@ const datasetsPromise = configJson.datasets
         chartPeriod,
       });
 
+      // Stamp data-analytics-* contract attributes on the container for test runner
+      if (
+        typeof window !== "undefined" &&
+        window.chartAnalyticsContract?.stampChartAnalyticsContract
+      ) {
+        try {
+          window.chartAnalyticsContract.stampChartAnalyticsContract(chartContainerElement, {
+            chartInstanceId,
+            chartType,
+            fieldConfig,
+            seriesBreakdownKeys,
+            datasetRows,
+          });
+        } catch (stampError) {
+          DebugLogger.log(
+            "ChartsHandler",
+            "[renderChartInstance] [STAMP_WARNING]",
+            JSON.stringify({ message: stampError?.message }),
+            {},
+          );
+        }
+      }
+
+      // Emit chart did render event for test runner settle waiter
+      this.emit("ChartsHandler:chartDidRender", {
+        detail: { chartInstanceId, chartType, chartPeriod },
+      });
+
       // Log successful end of render
       DebugLogger.log(
         "ChartsHandler",
@@ -2007,6 +2035,21 @@ const datasetsPromise = configJson.datasets
         JSON.stringify({ action: "Removed instance from map" }),
         {},
       );
+
+      // Clear data-analytics-* contract attributes from any container using this chart id
+      if (
+        typeof window !== "undefined" &&
+        window.chartAnalyticsContract?.clearChartAnalyticsContract
+      ) {
+        try {
+          const container = document.querySelector(
+            `[data-chart-id="${chartInstanceId}"], [data-analytics-chart-id="${chartInstanceId}"]`,
+          );
+          if (container) {
+            window.chartAnalyticsContract.clearChartAnalyticsContract(container);
+          }
+        } catch (_) {}
+      }
 
       // Dispatch chart disposed custom event
       window.dispatchEvent(

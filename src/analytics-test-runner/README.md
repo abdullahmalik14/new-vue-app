@@ -4,6 +4,9 @@ Browser-injected test suite for the analytics page. Validates visible DOM and am
 
 **API:** Dev proxy targets `http://15.235.59.191` (Node API — see `server-access-guide.pdf`). Do not use the Vercel handler for test runs.
 
+> **Adding a new metric or chart?** See [METRIC_CONTRACT.md](./METRIC_CONTRACT.md) — the canonical guide.  
+> Note: am5 `dataContext` scraping is **deprecated**. All new assertions must use `data-analytics-*` attributes.
+
 ## Test creator
 
 Use **`99999`** — not `566` (shared manual QA data).
@@ -17,6 +20,9 @@ http://localhost:5173/iframe/analytics?creator=99999
 
 | File | Purpose |
 |------|---------|
+| `config/analyticsMetricRegistry.js` | **NEW** — single source of truth for all metric keys + bindings |
+| `config/chartContractSchema.js` | **NEW** — required attributes + metrics per chart container |
+| `config/breakdownKeyToMetric.js` | **NEW** — chart field → metric key mapping |
 | `config/testCreator.js` | Creator id, fan ids, API paths |
 | `config/eventExpectations.js` | Per-master-event triggers and expected views |
 | `config/masterEventChildMap.js` | Master→child metric routing (mirror Node server) |
@@ -24,6 +30,16 @@ http://localhost:5173/iframe/analytics?creator=99999
 | `config/buildExpectationsFromState.js` | Row builder from internal state |
 | `config/mixedBatchScenarios.js` | Multi-event scenarios before one refresh |
 | `GAP_ANALYSIS.md` | Doc vs live gaps (2026-06-30) |
+
+## Scanners
+
+| File | Scan type | Status |
+|------|-----------|--------|
+| `scanners/domScanners.js` → `scanMetricSelector` | `metricSelector` | **Active** |
+| `scanners/chartContractScanner.js` | `chartContract` | **Active** |
+| `scanners/domScanners.js` → `scanCardValueByHeading` | `cardValueByHeading` | Deprecated |
+| `scanners/domScanners.js` → `scanCardMetricByLabel` | `cardMetricByLabel` | Deprecated |
+| `scanners/domScanners.js` → `scanPopupStatByHeading` | `popupStatByHeading` | Deprecated |
 
 ## Build spec
 

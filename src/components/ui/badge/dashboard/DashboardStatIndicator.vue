@@ -2,7 +2,14 @@
   <div class="flex flex-col items-end gap-1">
     <span class="flex gap-1 items-center">
       <img :src="trendIcon" :alt="trendAlt" class="h-5 w-5" />
-      <span :class="trendTextColor" class="leading-5 text-sm font-medium">
+      <span
+        :class="trendTextColor"
+        class="leading-5 text-sm font-medium"
+        :data-analytics-metric="analyticsMetric || undefined"
+        :data-analytics-period="analyticsPeriod || undefined"
+        :data-analytics-surface="analyticsSurface || undefined"
+        :data-value="percentage"
+      >
         {{ formattedPercentage }}%
       </span>
     </span>
@@ -23,7 +30,19 @@ const props = defineProps({
   periodLabel: {
     type: String,
     default: 'vs yesterday'
-  }
+  },
+  analyticsMetric: {
+    type: String,
+    default: null
+  },
+  analyticsPeriod: {
+    type: String,
+    default: null
+  },
+  analyticsSurface: {
+    type: String,
+    default: null
+  },
 })
 
 const isPositive = computed(() => props.percentage >= 0)

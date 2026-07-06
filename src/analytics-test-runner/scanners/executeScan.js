@@ -1,15 +1,9 @@
 import {
-  scanCardValueByHeading,
-  scanCardMetricByLabel,
-  scanCardPercentageByHeading,
-  scanCardMetricPercentage,
-  scanPopupPercentageByStatHeading,
+  scanMetricSelector,
   scanTrendTableCountrySales,
-  scanTopContributorsPreview,
-  scanDataValueNearLabel,
-  scanPopupStatByHeading,
   openTrendPopupFromHeading,
 } from '../scanners/domScanners.js';
+import { scanChartMetric, validateChartContract } from '../scanners/chartContractScanner.js';
 import { closeTrendPopup, waitForPopupPaint, switchPopupPeriod } from '../scanners/popupControls.js';
 import { waitForChartRenderSettle } from '../refresh/chartSettle.js';
 import {
@@ -134,27 +128,6 @@ function scanDatasetField(expected) {
   };
 }
 
-function resolveCardFieldValue(result, field) {
-  if (!result.ok || !Array.isArray(result.foundValue)) return result;
-
-  const values = result.foundValue;
-  let picked = null;
-
-  if (field === 'new') {
-    picked = values.find((v) => /new/i.test(v.label))?.num ?? values[0]?.num ?? null;
-  } else if (field === 'recurring') {
-    picked = values.find((v) => /recurring/i.test(v.label))?.num ?? null;
-  } else {
-    picked = values[0]?.num ?? null;
-  }
-
-  return {
-    ...result,
-    foundValue: picked,
-    rawText: String(picked),
-  };
-}
-
 /**
  * @param {object} expected
  * @param {object} chartsPayload
@@ -190,27 +163,33 @@ export async function executeExpectedScan(expected, chartsPayload, options = {})
     }
 
     let result;
-    if (expected.scan?.type === 'cardValueByHeading') {
-      result = scanCardValueByHeading(expected.scan.heading);
-      if (expected.scan.field) {
-        result = resolveCardFieldValue(result, expected.scan.field);
+    if (expected.scan?.type === 'metricSelector') {
+      result = scanMetricSelector({
+        metric: expected.scan.metric,
+        period: expected.scan.period,
+        surface: expected.scan.surface,
+      });
+    } else if (expected.scan?.type === 'chartContract') {
+      // Validate contract then read the specific metric value
+      const contractResult = validateChartContract(expected.scan.chartId, expected.scan.period);
+      if (!contractResult.pass) {
+        result = {
+          ok: false,
+          foundValue: null,
+          rawText: '',
+          element: contractResult.container,
+          error: `Contract fail for "${expected.scan.chartId}": ${contractResult.errors.join('; ')}`,
+        };
+      } else {
+        result = scanChartMetric({
+          chartId: expected.scan.chartId,
+          period: expected.scan.period,
+          metric: expected.scan.metric,
+          shape: expected.scan.shape || 'last',
+        });
       }
-    } else if (expected.scan?.type === 'popupValueNearLabel') {
-      result = scanDataValueNearLabel(expected.scan.label);
-    } else if (expected.scan?.type === 'cardMetricByLabel') {
-      result = scanCardMetricByLabel(expected.scan.heading, expected.scan.label);
-    } else if (expected.scan?.type === 'cardPercentageByHeading') {
-      result = scanCardPercentageByHeading(expected.scan.heading, expected.scan.field);
-    } else if (expected.scan?.type === 'cardMetricPercentage') {
-      result = scanCardMetricPercentage(expected.scan.heading, expected.scan.label);
-    } else if (expected.scan?.type === 'popupPercentageByStatHeading') {
-      result = scanPopupPercentageByStatHeading(expected.scan.statHeading);
     } else if (expected.scan?.type === 'trendTableCountrySales') {
       result = scanTrendTableCountrySales(expected.scan.tableHeading, expected.scan.countryName);
-    } else if (expected.scan?.type === 'topContributorsPreview') {
-      result = scanTopContributorsPreview(expected.scan.field);
-    } else if (expected.scan?.type === 'popupStatByHeading') {
-      result = scanPopupStatByHeading(expected.scan.heading);
     } else {
       result = { ok: false, foundValue: null, rawText: '', element: null, error: 'Unknown scan type' };
     }
