@@ -256,7 +256,10 @@ const activeTiersViewMode = ref('bar')
 
 // ===== CONFIG HELPERS (Said's field names) =====
 const legendConfig = { enabled: true, class: "absolute -bottom-2 left-0 w-full flex flex-wrap justify-center gap-4", itemClass: "inline-flex items-center gap-1.5 px-2 py-1", markerClass: "w-2.5 h-2.5 rounded-full", labelClass: "text-slate-500 text-xs font-medium font-sans" }
-const subsChartStyles = computed(() => ({ sub: { color: "#4CC9F0", name: t('dashboard.analytics.legends.newSubscriber', 'New Subscriber') }, tip: { color: "#4361EE", name: t('dashboard.analytics.legends.recurringSubscriber', 'Recurring Subscriber') } }))
+const subsChartStyles = computed(() => ({ 
+  sub: { color: "#4CC9F0", name: t('dashboard.analytics.legends.newSubscriber', 'New Subscriber'), label: 'New Subscriber' }, 
+  tip: { color: "#4361EE", name: t('dashboard.analytics.legends.recurringSubscriber', 'Recurring Subscriber'), label: 'Recurring Subscriber' } 
+}))
 const tiersChartStyles = computed(() => ({ free: { color: "#4CC9F0", name: t('dashboard.analytics.legends.free', 'Free') }, tier1: { color: "#4361EE", name: t('dashboard.analytics.legends.tier1', 'Tier 1') }, tier2: { color: "#3A0CA3", name: t('dashboard.analytics.legends.tier2', 'Tier 2') }, tier3: { color: "#AE4AEF", name: t('dashboard.analytics.legends.tier3', 'Tier 3') }, tier4: { color: "#98A2B3", name: t('dashboard.analytics.legends.tier4', 'Tier 4') }, tier5: { color: "#F72485", name: t('dashboard.analytics.legends.tier5', 'Tier 5') } }))
 
 function getSubsBarCfg(dk) {
