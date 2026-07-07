@@ -17,7 +17,7 @@
           @openEarningsTrendPopup="openAnalyticsEarningsTrendPopup"
           @openFansTrendPopup="openAnalyticsFansTrendPopup"
           @openLikesTrendPopup="openAnalyticsLikesTrendPopup"
-          @openTargetTrendPopup="openAnalyticsContributorsTrendPopup"
+          @openContributorsTrendPopup="openAnalyticsContributorsTrendPopup"
           @refresh="refreshDashboardAnalytics"
         />
 
