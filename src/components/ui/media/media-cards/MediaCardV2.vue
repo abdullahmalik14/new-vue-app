@@ -1,5 +1,5 @@
 <template>
-  <li class="relative aspect-video [box-shadow:0_0_10px_-34px_rgba(0,0,0,0.10)] group z-0 hover:z-30 focus-within:z-30">
+  <li :class="['relative', aspectClass, '[box-shadow:0_0_10px_-34px_rgba(0,0,0,0.10)] group z-0 hover:z-30 focus-within:z-30']">
 
     <a
       class="block transition-all duration-150 ease-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible shadow-[0_0_10px_-34px_rgba(0,0,0,0.10)] w-full h-full bg-no-repeat bg-center bg-cover group-hover:delay-[150ms] xl:group-hover:w-[26.25rem] xl:group-hover:h-[21.875rem] xl:group-hover:shrink-0 xl:group-hover:rounded-[0.313rem] xl:group-hover:shadow-[0_0_0.625rem_-2.125rem_rgba(0,0,0,0.10)] outline-none"
@@ -102,6 +102,10 @@ const props = defineProps({
   media: {
     type: Object,
     required: true
+  },
+  aspectClass: {
+    type: String,
+    default: 'aspect-video'
   }
 });
 

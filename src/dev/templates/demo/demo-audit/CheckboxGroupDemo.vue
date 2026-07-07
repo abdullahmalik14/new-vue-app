@@ -24,7 +24,7 @@
                     <CheckboxGroup
                         v-model="checked.checkoutTermsFansocial"
                         :checkbox-class="CHECKOUT_GREEN_CLASS"
-                        label-class="text-sm leading-normal tracking-[0.0175rem] text-[#667085] cursor-pointer"
+                        label-class="text-sm mt-[2px] leading-normal tracking-[0.0175rem] text-[#667085] cursor-pointer"
                         wrapper-class="flex items-center gap-2"
                     >
                         {{ t('demo.checkboxGroup.checkout.fansocialTermsPrefix') }}
@@ -69,7 +69,7 @@
                         v-model="checked[item.key]"
                         :label="t(item.labelKey)"
                         :checkbox-class="SUCCESS_GREEN_CLASS"
-                        label-class="text-sm align-text-top text-[#0c111d]"
+                        label-class="text-sm mt-[2px] align-text-top text-[#0c111d]"
                         wrapper-class="pl-1 flex items-center gap-3"
                     />
                     <ShowCodeToggle :code="code[item.key]" />
@@ -82,7 +82,7 @@
                         :tags="option.tags"
                         :meta-text="option.metaTextKey ? t(option.metaTextKey) : ''"
                         :checkbox-class="`${SUCCESS_GREEN_CLASS} cursor-shrink-0`"
-                        label-class="text-xs leading-normal font-semibold text-[#0C111D] max-w-[100px] truncate sm:max-w-none md:text-lg"
+                        label-class="text-xs mt-[2px] leading-normal font-semibold text-[#0C111D] max-w-[100px] truncate sm:max-w-none md:text-lg"
                         wrapper-class="pl-1 flex items-center gap-2 md:gap-6 w-full"
                     />
                     <ShowCodeToggle :code="code[`planMedia_${option.key}`]" />
@@ -102,16 +102,6 @@
 
             <div class="flex flex-col gap-3">
                 <p class="text-sm font-semibold text-[#344054]">{{ t('demo.checkboxGroup.sections.mediaSubmit') }}</p>
-                <div class="flex flex-col gap-3">
-                    <CheckboxGroup
-                        v-model="checked.mediaSubmitCompact"
-                        :label="t('demo.checkboxGroup.mediaSubmit.item0')"
-                        :checkbox-class="MEDIA_TERMS_COMPACT_CLASS"
-                        label-class="text-[12px] sm:text-[14px] text-[#0C111D] font-[400] cursor-pointer"
-                        wrapper-class="flex items-center gap-2"
-                    />
-                    <ShowCodeToggle :code="code.mediaSubmitCompact" />
-                </div>
                 <div v-for="(labelKey, i) in mediaSubmitLabelKeys" :key="`media-submit-${i}`" class="flex flex-col gap-3">
                     <CheckboxGroup
                         v-model="checked[`mediaSubmit_${i}`]"
@@ -129,9 +119,9 @@
                 <CheckboxGroup
                     v-model="checked.mediaComingSoon"
                     :label="t('demo.checkboxGroup.mediaPublish.comingSoon')"
-                    :checkbox-class="SUCCESS_GREEN_CLASS"
+                    :checkbox-class="`${SUCCESS_GREEN_CLASS} mt-[3px]`"
                     label-class="text-[16px] text-[#000] font-[500] cursor-pointer leading-normal"
-                    wrapper-class="flex items-center gap-2"
+                    wrapper-class="flex gap-2 items-start"
                 />
                 <ShowCodeToggle :code="code.mediaComingSoon" />
             </div>
@@ -317,11 +307,10 @@ import {
     CHECKOUT_GREEN_CLASS,
     CHECKOUT_SAVE_CARD_CLASS,
     MEDIA_TERMS_CLASS,
-    MEDIA_TERMS_COMPACT_CLASS,
     SUCCESS_GREEN_CLASS,
     TOPUP_CHECKBOX_CLASS,
     TRAILER_CHECKBOX_CLASS,
-} from '@/dev/composables/useCheckboxGroupDemoClasses.js';
+} from '@/dev/composables/checkboxGroupDemoClasses.js';
 
 const { t } = useI18n();
 const { url: bookingInstantIconUrl } = useAssetUrl('icon.booking.instant');
@@ -347,7 +336,6 @@ const checked = reactive({
     mediaSubmit_2: false,
     mediaSubmit_3: false,
     mediaSubmit_4: false,
-    mediaSubmitCompact: false,
     mediaComingSoon: false,
     mediaTier1: false,
     mediaTier2: false,
@@ -775,17 +763,6 @@ const code = computed(() => ({
   label-class="text-[12px] sm:text-[14px] text-[#0C111D] font-[400] cursor-pointer"
   wrapper-class="flex items-start gap-2"
 />`,
-    mediaSubmitCompact: `${importLine}
-
-<CheckboxGroup
-  v-model="term1"
-  label="All individuals appearing in the piece of content..."
-  checkbox-class="MEDIA_TERMS_COMPACT_CLASS"
-  label-class="text-[12px] sm:text-[14px] text-[#0C111D] font-[400] cursor-pointer"
-  wrapper-class="flex items-center gap-2"
-/>
-
-<!-- Same as MediaUploaderStepSubmit.vue -->`,
     mediaSubmit_1: `${importLine}
 
 <CheckboxGroup

@@ -419,7 +419,129 @@
       }
     }
   },
+  "mediaUploader": {
+    "search": {
+      "defaultPlaceholder": "Tìm kiếm...",
+      "add": "Thêm",
+      "remove": "Xóa",
+      "maxItemsAlert": "Tối đa {max} mục được phép",
+      "languageLabel": "繁體中文",
+      "iconAlt": "search"
+    },
+    "tagTabs": {
+      "az": "A-Z",
+      "hobby": "癖好",
+      "clothing": "服裝",
+      "scene": "場景",
+      "identity": "身分",
+      "body": "身型"
+    },
+    "thumbnail": {
+      "label": "Thumbnail",
+      "blurToggle": "Làm mờ thumbnail"
+    },
+    "postPreview": {
+      "heading": "XEM TRƯỚC BÀI ĐĂNG",
+      "displayName": "Jelly FISH",
+      "handle": "{'@'}jellyf1sh",
+      "defaultMessage": "Đừng bỏ lỡ—xem nội dung độc quyền này và trải nghiệm đầu tiên!",
+      "linkPreview": "fansocial.app/model/jellyskitchen/..."
+    },
+    "publishDatePicker": {
+      "defaultLabel": "Đặt ngày và giờ xuất bản:",
+      "placeholder": "--/--/----   --:-- --"
+    },
+    "fileUploadPlaceholder": {
+      "alt": "file-upload-placeholder"
+    },
+    "trailerSetting": {
+      "label": "Show Preview Trailer",
+      "paragraph": "Allow non-subscriber to preview your video on your media detail page."
+    },
+    "thumbnailUploader": {
+      "title": "Click to upload",
+      "subtitle": "or drag and drop image file here",
+      "fileInfo": "PNG or JPG (max. 10MB)"
+    }
+  },
   "demo": {
+    "page": {
+      "title": "Trưng bày Component Dashboard",
+      "sections": {
+        "dashboardTextInput": "DashboardTextInput",
+        "heading": "Heading",
+        "paragraph": "Paragraph",
+        "cloudflareSuccess": "CloudflareSuccess",
+        "cookies": "Cookies",
+        "tierCards": "Thẻ Tier",
+        "eventCards": "Thẻ Sự kiện",
+        "shoppingCart": "Giỏ hàng",
+        "spinner": "Spinner",
+        "allButtons": "Tất cả nút — Danh mục đầy đủ"
+      },
+      "mediaCards": {
+        "mediaCardV1Title": "Biến thể Thẻ Media (V1)",
+        "mediaCardV1Description": "Nhiều logic hiển thị và biến thể bố cục cho thẻ media chính của chúng ta.",
+        "creatorMyMedia": "1. Creator: Media của tôi",
+        "continueWatching": "2. Fan: Tiếp tục xem",
+        "latestMedia": "3. Fan: Media mới nhất",
+        "purchasedMedia": "4. Fan: Media đã mua",
+        "gridView": "5. Fan: Lưới (Hiệu ứng Zoom)",
+        "mediaCardV2Title": "Biến thể Thẻ Media (V2)",
+        "mediaCardV2Description": "Ngôn ngữ thiết kế thay thế cho thẻ với hiệu ứng mở rộng khi hover.",
+        "gallery": "Thư viện",
+        "image": "Ảnh",
+        "video": "Video"
+      }
+    },
+    "heading": {
+      "h1Primary": "H1 Chính",
+      "h2Secondary": "H2 Phụ",
+      "h3Section": "H3 Phần",
+      "h2Dashboard": "Tiêu đề Dashboard",
+      "h2Auth": "Đăng nhập",
+      "h4Form": "Cài đặt hồ sơ",
+      "h1Demo": "Demo H1 Đậm",
+      "h3Demo": "Demo H3 Vừa",
+      "withIcon": "Có Icon",
+      "order": "Đơn hàng #1234",
+      "labels": {
+        "h1Primary": "h1 — defaultPrimaryHeading",
+        "h2Secondary": "h2 — defaultSecondaryHeading",
+        "h3Section": "h3 — sectionHeading",
+        "h2Dashboard": "h2 — dashboardHeading",
+        "h2Auth": "h2 — AuthHeading",
+        "h4Form": "h4 — formHeading",
+        "h1Demo": "h1 — demoHeadings",
+        "h3Demo": "h3 — demoHeadings",
+        "withLeftIcon": "Có Icon Trái",
+        "orderHeading": "h1 — orderHeading"
+      }
+    },
+    "paragraph": {
+      "default": "Đây là đoạn văn mặc định với kiểu chuẩn.",
+      "small": "Đoạn văn chữ nhỏ cho chú thích.",
+      "large": "Đoạn văn chữ lớn.",
+      "bold": "Đoạn văn in đậm.",
+      "blue": "Đoạn văn màu xanh.",
+      "error": "Trường này là bắt buộc.",
+      "success": "Thao tác thành công!",
+      "italic": "Đoạn văn in nghiêng cho ghi chú.",
+      "withIcon": "Thông báo thông tin tại đây",
+      "xs": "Văn bản trợ giúp hiển thị bên dưới trường nhập.",
+      "labels": {
+        "default": "Mặc định",
+        "small": "Nhỏ (text-sm)",
+        "large": "Lớn (text-xl)",
+        "bold": "In đậm",
+        "customColor": "Màu tùy chỉnh (Xanh)",
+        "errorRed": "Đỏ lỗi",
+        "successGreen": "Xanh thành công",
+        "italic": "In nghiêng",
+        "withLeftIcon": "Có Icon Trái",
+        "extraSmall": "Cực nhỏ (text-xs)"
+      }
+    },
     "dashboardTextInput": {
       "generalVariations": "Các biến thể chung",
       "bookingPatterns": "Mẫu form đặt lịch ($t + assetMap)",
@@ -483,7 +605,83 @@
     "buttons": {
       "showLoadingState": "Hiển thị trạng thái loading trên tất cả nút catalog (văn bản thay bằng spinner)",
       "loadingSection": "Trạng thái loading — prop loading (văn bản thay bằng spinner)",
-      "clickToLoadHint": "Nhấn bất kỳ nút nào để xem loading — văn bản và icon được thay bằng spinner (không có chữ Loading)."
+      "clickToLoadHint": "Nhấn bất kỳ nút nào để xem loading — văn bản và icon được thay bằng spinner (không có chữ Loading).",
+      "catalogIntro": "Cùng các nút thật dùng trong app (cùng text, variant, size, width và icon) để dev khác copy đúng component.",
+      "sections": {
+        "auth": "Trang auth — login / sign up / onboarding",
+        "checkout": "Checkout / purchase / cart popups",
+        "profileMedia": "Profile / media",
+        "payoutSettings": "Payout settings",
+        "planSharing": "Plan sharing",
+        "mediaUploader": "Media uploader",
+        "dashboardAnalytics": "Dashboard analytics",
+        "eventsAddons": "Events / add-ons / scheduling",
+        "twoPieceButton": "TwoPieceButton — variants"
+      },
+      "labels": {
+        "authSignIn": "authPink — size lg — login/signup submit",
+        "authTransparentSocial": "authTransparent — size lg — social",
+        "checkoutProceed": "checkoutProceedpayment — checkout/buy-now",
+        "actionGreenX": "actionGreen — guest purchase",
+        "profileBack": "profileMediaBtn — ProfileViewAll popup",
+        "payoutSave": "none + custom — PayoutSettings step 2/3",
+        "sendInvite": "simpleBtn — PlanSharing",
+        "addTier": "polygonLeft — Add Tier",
+        "polygonNext": "polygonLeft — Next (enabled + disabled)",
+        "submitMedia": "polygonLeft — Submit",
+        "allOrders": "none + custom — orders table",
+        "trend": "none + custom — metric card",
+        "newEvents": "none + custom — NEW EVENTS",
+        "publishSchedule": "polygonLeft — PUBLISH SCHEDULE",
+        "addonService": "none + custom — add-on service",
+        "addonServiceV2": "none + custom — add-on service v2",
+        "twoPieceLinkX": "link-x — Settings",
+        "twoPiecePremium": "premium-upgrade — Settings",
+        "twoPiecePink": "link-x (pink) — Edit Profile"
+      },
+      "authSignIn": "Sign in",
+      "continueWithX": "Continue with X (Twitter)",
+      "continueWithTelegram": "Continue with Telegram",
+      "proceedPayment": "Proceed Payment",
+      "back": "Back",
+      "save": "SAVE",
+      "sendInvite": "Send invite",
+      "addTier": "Add Tier",
+      "next": "Next",
+      "submitMediaForApproval": "SUBMIT MEDIA FOR APPROVAL",
+      "allOrders": "All Orders",
+      "trend": "Trend",
+      "newEvents": "NEW EVENTS",
+      "publishSchedule": "PUBLISH SCHEDULE",
+      "addonService": "add-on service",
+      "linkYourXAccount": "Link your X account",
+      "upgradeToPremium": "Upgrade To Premium",
+      "unlockPremiumVideos": "Unlock premium to upload videos"
+    },
+    "showCodeToggle": {
+      "showCode": "Show Code",
+      "hideCode": "Hide Code",
+      "copy": "Copy",
+      "copied": "✓ Copied",
+      "vueLabel": "Vue"
+    },
+    "lazySizes": {
+      "pageTitle": "LazySizes — Kiểm tra ảnh & nền",
+      "intro": "Trang này dùng lazysizes với URL từ assetMap. Mở DevTools → Network, lọc Img, tải lại trang và xác nhận tài nguyên demo bên dưới chỉ được tải khi cuộn vào vùng nhìn thấy.",
+      "networkHint": "Mẹo: tắt cache trong tab Network, tải lại ở đầu trang, rồi cuộn chậm xuống.",
+      "scrollHint": "Cuộn xuống ↓ — tài nguyên lazy ở dưới các khoảng trống này",
+      "spacer": "Tiếp tục cuộn ↓",
+      "lazyImageTitle": "Lazy <img> (data-src)",
+      "lazyImageDescription": "Dùng LazyImage với class=\"lazyload\" và data-src từ useAssetUrl('media.demo.poster').",
+      "lazyImageAlt": "Ảnh poster demo",
+      "contentImageLabel": "Content <img> — chính ảnh là UI",
+      "lazyBackgroundTitle": "Lazy CSS background (lớp cover + overlay)",
+      "lazyBackgroundDescription": "Ảnh nền lazy-load phía sau nội dung. Text và nút nằm trên — ảnh chỉ trang trí (không phải <img> nội dung).",
+      "backgroundBadge": "Lớp nền",
+      "backgroundOverlayTitle": "Thẻ hero tier premium",
+      "backgroundOverlaySubtitle": "Đây là UI foreground. Ảnh phía sau là background lazy-load.",
+      "backgroundCta": "Đăng ký ngay",
+      "footer": "Hết trang kiểm tra lazysizes."
     },
     "spinner": {
       "assetMapImage": "Ảnh asset map (icon.spinner)",
@@ -759,6 +957,214 @@
       },
       "withdrawEarnings": {
         "payoutAcceptedTitle": "Your payout request has been accepted."
+      }
+    },
+    "checkoutReusable": {
+      "sectionTitle": "Checkout Reusable Components",
+      "sections": {
+        "mediaPreview": "CheckoutMediaPreview — Subscribe Login Popup",
+        "sectionHeader": "SectionHeader — Subscribe / Cart Checkout Login",
+        "orderSummaryToggle": "SectionToggleHeader — Cart Checkout (ORDER SUMMARY)",
+        "paymentToggle": "SectionToggleHeader no toggleable— Purchase Flow (PAYMENT METHOD)",
+        "addressCard": "AddressCard — Cart Checkout Login",
+        "planDropdown": "BasePlanDropdown — Purchase / Cart Checkout (Dark)",
+        "orderSummary": "OrderSummary — Cart / Guest Purchase",
+        "paymentCompact": "PaymentMethodLoggedIn — Purchase Flow (Compact)",
+        "paymentLarge": "PaymentMethodLoggedIn — Purchase Flow / Fan Booking (Large)",
+        "paymentNotLoggedIn": "PaymentMethodNotLoggedIn — Purchase Flow (max-width)",
+        "subscriptionDefault": "SubscriptionPlanCard — Subscribe Login (Default)",
+        "subscriptionUpdate": "SubscriptionPlanCard — Subscribe Update (Current / New)",
+        "subscriptionNew": "SubscriptionPlanCard — Purchase Flow (variant new)",
+        "notesWithAvatars": "CheckoutNotes — Cart Checkout (showAvatars true)",
+        "notesWithoutAvatars": "CheckoutNotes — Subscribe Login (showAvatars false)",
+        "notesGuest": "CheckoutNotes — Guest Purchase / Subscription Order",
+        "totalAmount": "TotalAmountRow — All Checkout Popups",
+        "accountEmail": "SectionToggleHeader — Tip Step 3 (ACCOUNT EMAIL)",
+        "topUpPayment": "SectionToggleHeader toggleable — Top Up Step 2 (PAYMENT METHOD)",
+        "addressTopUp": "AddressCard — Top Up / Tip (Saved Billing)"
+      },
+      "mediaPreview": {
+        "creatorName": "Princess Carrot Pop",
+        "creatorHandle": "{'@'}sammisjelly187",
+        "description": "Subscribe now to instantly unlock 300+ premium media resources."
+      },
+      "sectionHeader": {
+        "title": "ACCOUNT EMAIL"
+      },
+      "orderSummary": {
+        "title": "ORDER SUMMARY"
+      },
+      "payment": {
+        "title": "PAYMENT METHOD",
+        "holderName": "John Carter"
+      },
+      "address": {
+        "cart": "Chan Tai Man,10/F Block5,Fook Yip Bldg,12345,Kwai Chung,Hong Kong",
+        "topUp": "John Carter, 123 Main Street, Los Angeles, CA, 90001, United States"
+      },
+      "planDropdown": {
+        "country": "Country",
+        "state": "State"
+      },
+      "cart": {
+        "itemName": "Orange (Philippines)",
+        "creatorName": "Princess Carrot Pop",
+        "price": "$5.99/mo",
+        "oldPrice": "$123.45"
+      },
+      "subscription": {
+        "title": "FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.",
+        "priceMonthly": "USD$499.99/mo",
+        "price": "USD$499.99",
+        "footerBillingCycle": "Your membership will update in your next billing cycle (xx-xx-xxxx)",
+        "footerCheckoutStart": "Your subscription will begin as soon as you complete checkout. Your billing cycle will start (02-26-2025)."
+      },
+      "total": {
+        "amount": "USD$6.99"
+      },
+      "paymentLoggedIn": {
+        "deleteCard": "Delete Card",
+        "cardHolderName": "Card Holder Name",
+        "expiryDate": "Expiry Date",
+        "noName": "No Name",
+        "expiryPlaceholder": "MM/YY",
+        "expPrefix": "EXP"
+      },
+      "paymentNotLoggedIn": {
+        "saveCard": "Save this card for faster checkout.",
+        "cardNumber": "Card Number",
+        "expirationDate": "Expiration Date",
+        "cardholderName": "Cardholder Name",
+        "cvv": "CVV"
+      },
+      "notes": {
+        "title": "Notes",
+        "optional": "Optional",
+        "creatorName": "Princess Carrot Pop",
+        "placeholder": "Enter notes to {'@'}jenny1234....",
+        "charactersLeft": "{count} Characters Left"
+      },
+      "totalAmount": {
+        "label": "Total"
+      },
+      "options": {
+        "hongKong": "Hong Kong",
+        "australia": "Australia",
+        "usa": "USA",
+        "florida": "Florida",
+        "hawaii": "Hawaii",
+        "newYork": "New York",
+        "unitedStates": "United States",
+        "canada": "Canada",
+        "unitedKingdom": "United Kingdom",
+        "california": "California",
+        "texas": "Texas"
+      }
+    },
+    "mediaUploaderComponents": {
+      "sectionTitle": "Media Uploader Helper Components",
+      "sections": {
+        "searchTags": "MediaUploaderSearchInput — Media Details (Tags)",
+        "searchCoPerformer": "MediaUploaderSearchInput — Media Details (Co-performer)",
+        "searchInviteList": "MediaUploaderSearchInput — Plan Sharing (Invite list)",
+        "publishDatePicker": "PublishDatePicker — Publish & Sharing (Schedule)",
+        "postPreview": "PostPreview — Publish & Sharing",
+        "socialPreviewThumbnail": "SocialCustomPreview — Publish & Sharing (Thumbnail)",
+        "socialPreviewTrailer": "SocialCustomPreview — Publish & Sharing (Trailer)",
+        "thumbnailUploaderDefault": "ThumbnailUploader — Preview Settings (Upload Thumbnail)",
+        "thumbnailUploaderTrailer": "ThumbnailUploader — Preview Settings (Upload Own Trailer)",
+        "thumbnailUploaderImage": "ThumbnailUploader — Publish & Sharing (Thumbnail Image)",
+        "thumbnailUploaderVideo": "ThumbnailUploader — Publish & Sharing (Trailer File)",
+        "thumbnailUploaderTier": "ThumbnailUploader — Add Tier Popup",
+        "thumbnailUploaderNayTwitter": "ThumbnailUploaderNay — Twitter Repost Settings",
+        "thumbnailUploaderNayBooking": "ThumbnailUploaderNay — Booking Step 1 (Event Image)",
+        "videoThumbnailSelector": "VideoThumbnailSelector — Preview Settings (Choose Screenshot)",
+        "thumbnailSelector": "ThumbnailSelector — Video Thumbnail Selector (child)",
+        "blurEffect": "BlurEffect — Video Thumbnail Selector (child)",
+        "uploadThumbnailPreview": "UploadThumbnailPreview — Preview Settings (Upload Thumbnail)",
+        "systemGeneratedImage": "SystemGeneratedImage — Preview Settings (Site Generated)",
+        "uploadYourOwnTrailer": "UploadYourOwnTrailer — Preview Settings (Upload Own)",
+        "fileUploadPlaceholder": "FileUploadPlaceholder — Preview Settings (Use Placeholder)",
+        "trailerSettingScreenshot": "TrailerSetting — Preview Settings (Screenshot)",
+        "trailerSettingPlaceholder": "TrailerSetting — Preview Settings (Placeholder)",
+        "trailerSettingUpload": "TrailerSetting — Preview Settings (Upload)"
+      },
+      "search": {
+        "tags": {
+          "title": "Tags",
+          "subtitle": "Add maximum of 10 tags to your media.",
+          "placeholder": "Search Tags..."
+        },
+        "coPerformer": {
+          "title": "Co-performer",
+          "subtitle": "If this media includes other performers, please tag them below.",
+          "placeholder": "Jelly"
+        },
+        "inviteList": {
+          "subtitle": "Invite list",
+          "placeholder": "Search fan by username..."
+        }
+      },
+      "publishDatePicker": {
+        "label": "Set date and time for publishing:",
+        "message": "Date must be minimum 2 days ahead."
+      },
+      "socialPreview": {
+        "thumbnailLabel": "Thumbnail",
+        "trailerLabel": "Trailer"
+      },
+      "thumbnailUploader": {
+        "trailerSubtitle": "or drag and drop video file here",
+        "trailerFileInfo": "MP4, AVI, MOV, WEBM, JPEG, PNG. (Max. 2000MB)",
+        "imageSubtitle": "or drag and drop thumbnail image",
+        "imageFileInfo": "SVG, PNG, JPG or GIF (max. 800x400px)",
+        "videoSubtitle": "or drag and drop trailer file",
+        "videoFileInfo": "MP3, MP4, AVI, QUICKTIME, X-MATROSKA, X-MS-WMV, WEBM, OGG. (Max. 2000MB)",
+        "tierTitle": "Click here",
+        "tierSubtitle": "to select image or drag and drop image here",
+        "tierFileInfo": "(Allowed formats: JPEG, PNG. Max size: 10MB)"
+      },
+      "thumbnailUploaderNay": {
+        "clickToUpload": "Click to upload",
+        "dropText": " or drag and drop",
+        "twitterAllowedTypes": "SVG, PNG, JPG or GIF",
+        "twitterMaxSize": "800x400px",
+        "bookingDropText": "or drag and drop image file here",
+        "bookingAllowedTypes": "PNG or JPG (max. 10MB)",
+        "bookingMaxSize": "10MB"
+      },
+      "tags": {
+        "history": {
+          "bluebettle": "Bluebettle",
+          "dhdt": "dhdt",
+          "hello": "Hello"
+        },
+        "list": {
+          "apple": "Apple",
+          "april": "April",
+          "apricote": "Apricote",
+          "bigSmile": "Big smile",
+          "bigEnergy": "Big Energy",
+          "bluebettle": "Bluebettle",
+          "cantonese": "Cantonese",
+          "chinese": "Chinese",
+          "dumplings": "Dumplings",
+          "eeeee": "EEEEE"
+        }
+      },
+      "performers": {
+        "jellyJam": {
+          "name": "Jelly's Jam",
+          "username": "sommijellyll67"
+        },
+        "sammiJelly": {
+          "name": "Sammi's Jelly",
+          "username": "sommijellyll67"
+        }
+      },
+      "planSharing": {
+        "userOne": "User One",
+        "userTwo": "User Two"
       }
     },
     "actionMenuDropdown": {

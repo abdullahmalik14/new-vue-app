@@ -82,12 +82,12 @@
           </div>
           
           <!-- Loading State (initial only — not on polling refresh) -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-if="showChartLoadingOverlay">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 " v-if="showChartLoadingOverlay">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.loadingChart', 'Loading chart...') }}</span>
           </div>
           <!-- Empty State -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-else-if="analyticsStore.bundleLoaded && !insightData?.total">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 " v-else-if="analyticsStore.bundleLoaded && !insightData?.total">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
             <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
@@ -124,12 +124,12 @@
           </div>
 
           <!-- Loading State (initial only — not on polling refresh) -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-if="showChartLoadingOverlay">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 " v-if="showChartLoadingOverlay">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.loadingChart', 'Loading chart...') }}</span>
           </div>
           <!-- Empty State -->
-          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 bg-white dark:bg-dark-bg-container" v-else-if="analyticsStore.bundleLoaded && !insightData?.totalTokens">
+          <div class="absolute top-[40px] left-0 right-0 bottom-[30px] flex flex-col justify-center items-center z-20 " v-else-if="analyticsStore.bundleLoaded && !insightData?.totalTokens">
             <img :src="isDaily ? '/images/empty-donut.svg' : '/images/empty-bar.svg'" alt="illustration" class="w-24 h-24 object-contain mb-2" style="transform: scale(2.5);" />
             <span class="text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary">{{ $t('dashboard.analytics.trends.noTrend', 'No trend to show at the moment') }}</span>
             <a href="#" class="text-[10px] text-light-text-secondary dark:text-dark-text-secondary underline">{{ $t('dashboard.analytics.trends.learnToEarn', 'Learn ways to earn') }}</a>
@@ -246,6 +246,14 @@ function getTokensLineCfg(dk) { return JSON.stringify({ type:"line", period:"slo
 
 function getCountriesMapCfg(dk) { return JSON.stringify({ type:"map", period:"slot", datasetKey:dk, groupColors: { "base": "#e8e8e8", "g1": "#3A0CA3", "g2": "#7209B7", "g3": "#F72585", "g4": "#4CC9F0", "g5": "#00f2fe" }, tooltip: { color: "#344054", valuePrefix: "USD$ " } }) }
 
+function getLatestDailyEarningsRow() {
+  const daily = analyticsStore.earnings?.daily || []
+  if (isDaily.value && props.insightData) {
+    return props.insightData
+  }
+  return daily[daily.length - 1] || daily[0] || {}
+}
+
 function injectChartData() {
   if (!window.chartsHandler) return
   const b = analyticsStore.earnings || {}
@@ -262,7 +270,7 @@ function injectChartData() {
   window.chartsHandler._configs.data['tokens-yearly'] = { slot: b.yearly || [] }
   window.chartsHandler._configs.data['tokens-alltime'] = { slot: b.alltime || [] }
 
-  const lastDaily = (b.daily || [])[0] || {}
+  const lastDaily = getLatestDailyEarningsRow()
   window.chartsHandler._configs.data['sales-donut'] = {
     slot: [
       { name: 'subscription',    value: lastDaily.subscription || 0 },
@@ -363,6 +371,21 @@ watch(() => props.modelValue, async (isOpen) => {
   hasChartsRendered.value = false
   isChartRendering.value = false
 })
+
+watch(() => props.insightData, async () => {
+  if (!props.modelValue) return
+  await nextTick()
+  injectChartData()
+  await renderCurrentCharts({ showLoading: false })
+})
+
+watch(() => props.period, async () => {
+  if (!props.modelValue) return
+  await nextTick()
+  injectChartData()
+  await renderCurrentCharts({ showLoading: false })
+})
+
 onMounted(async () => { if (props.modelValue) { await nextTick(); await renderCurrentCharts({ showLoading: true }) } })
 
 const earningsTopCountriesColumns = [

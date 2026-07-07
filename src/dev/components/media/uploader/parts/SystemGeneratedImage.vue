@@ -1,7 +1,16 @@
+<script setup>
+import { computed } from "vue";
+import { useMediaUploaderAssets } from "@/dev/composables/useMediaUploaderAssets.js";
+
+const { assets } = useMediaUploaderAssets();
+
+const backgroundStyle = computed(() => ({
+  backgroundImage: assets.value.slideImage ? `url('${assets.value.slideImage}')` : undefined,
+}));
+</script>
+
 <template>
-  <div
-    class="relative sm:w-[415px]"
-  >
+  <div class="relative w-full">
     <div class="flex overflow-hidden">
       <input
         type="checkbox"
@@ -9,18 +18,16 @@
       />
       <div
         class="aspect-[16/9] w-full bg-no-repeat bg-center bg-cover"
-        style="
-          background-image: url('/images/slide-2.webp');
-        "
+        :style="backgroundStyle"
       ></div>
     </div>
 
     <div
-      class="absolute bottom-0 left-0 w-6 h-6  flex items-center justify-center cursor-pointer"
+      class="absolute bottom-[-1px] left-[-2px] rounded-bl-sm cursor-pointer z-20 transition-all active:scale-95"
     >
       <img
-        src="/images/video-icon.png"
-        alt="svgviewer-png-output-35"
+        :src="assets.videoIcon"
+        alt="video"
         class="w-5 h-5"
       />
     </div>

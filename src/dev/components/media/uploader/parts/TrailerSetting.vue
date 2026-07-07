@@ -1,43 +1,47 @@
 <script setup>
 import { computed } from "vue";
-import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
+import { useI18n } from 'vue-i18n';
+import CheckboxSwitch from '@/components/forms/checkboxes/CheckboxSwitch.vue';
+import { useMediaUploaderStore } from "@/stores/useMediaUploaderStore";
+
+const { t } = useI18n();
+const uploaderStore = useMediaUploaderStore();
 
 const props = defineProps({
-  uploader: {
-    type: Object,
-    required: true,
-  },
   stateKey: {
     type: String,
-    required: true, // Zaroori hai
+    required: true,
   },
   labelText: {
     type: String,
-    default: "Show Preview Trailer",
+    default: "",
   },
   paragraphText: {
     type: String,
-    default: "Allow non-subscriber to preview your video on your media detail page.",
+    default: "",
   },
 });
 
 const showPreviewModel = computed({
-  get: () => props.uploader.state[props.stateKey] || false,
+  get: () => uploaderStore.form[props.stateKey] || false,
   set: (val) => {
-    props.uploader.setState(props.stateKey, val, { reason: `user:toggle:${props.stateKey}` });
+    uploaderStore.updateFormField(props.stateKey, val);
   }
 });
+
+const resolvedLabel = computed(() => props.labelText || t('mediaUploader.trailerSetting.label'));
+const resolvedParagraph = computed(() => props.paragraphText || t('mediaUploader.trailerSetting.paragraph'));
 </script>
 
 <template>
   <div>
     <CheckboxSwitch 
-      :label="labelText" 
+      :label="resolvedLabel" 
       id="show-preview-toggle" 
       v-model="showPreviewModel" 
     />
     <p class="ml-10 text-[#303437] text-[14px] font-[400]">
-      {{ paragraphText }}
+      {{ resolvedParagraph }}
     </p>
   </div>
 </template>

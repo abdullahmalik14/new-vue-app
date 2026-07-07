@@ -141,15 +141,9 @@ import DashboardSharedTwoColLayout from '@/dev/templates/dashboard/shared/Dashbo
     </div>
     <br />
 
-    <LatestEventCard />
     <br />
 
-    <div class="flex flex-wrap gap-8">
-      <EventCard theme="orange" :hasButton="true" />
-      <EventCard theme="orange" :hasButton="false" />
-      <EventCard theme="pink" :hasButton="true" />
-      <EventCard theme="pink" :hasButton="false" />
-    </div>
+    
 
     <br>
 
@@ -214,8 +208,6 @@ import GuestPurchaseFlowPopup from "@/components/ui/popups/purchase/GuestPurchas
 import UpgradeTierPopup from "@/components/ui/popups/purchase/UpgradeTierPopup.vue";
 import TierCard from "@/components/ui/card/dashboard/TierCard.vue";
 import { tierData } from "/public/data/TierData.js";
-import LatestEventCard from "@/components/ui/card/dashboard/LatestEventCard.vue";
-import EventCard from "@/components/ui/card/dashboard/EventCard.vue";
 import OneOnOneBookingFlowPopup from "@/components/FanBookingFlow/OneOnOneBookingFlow/OneOnOneBookingFlowPopup.vue";
 import TicketEventPopup from "@/components/FanBookingFlow/GroupEventFlow/TicketEventPopup/TicketEventPopup.vue";
 import CrowdFundingEventPopup from "@/components/FanBookingFlow/GroupEventFlow/CrowdFundingEventPopup/CrowdFundingEventPopup.vue";

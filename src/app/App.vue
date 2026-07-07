@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="min-h-screen bg-gray-50 flex flex-col">
+  <div id="app" class="min-h-screen bg-gray-50 flex flex-col isolate">
     <NavigationProgressBar />
     <TemporaryLocaleBanner />
     <div v-if="!hideChromeForEmbed" class="fixed top-2 right-2 z-[90] flex flex-col items-end gap-2">
@@ -24,6 +24,8 @@
                 :is="Component"
                 :key="activeRoute.fullPath"
               />
+
+              
               <Transition
                 v-else
                 :name="routeTransition.name"

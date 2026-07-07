@@ -470,6 +470,15 @@
     ]
   },
   {
+    "slug": "/demo/lazy-sizes",
+    "section": "dashboard-global",
+    "componentPath": "@/dev/lazyimagedemo/LazySizesDemoPage.vue",
+    "requiresAuth": false,
+    "supportedRoles": [
+      "all"
+    ]
+  },
+  {
     "slug": "/demo/audit/base-input",
     "envAccess": "development",
     "section": "demo",
@@ -559,6 +568,16 @@
     ]
   },
   {
+    "slug": "/profile",
+    "envAccess": "development",
+    "section": "dashboard-global",
+    "componentPath": "@/dev/templates/profile/ProfileWrapper.vue",
+    "requiresAuth": false,
+    "supportedRoles": [
+      "all"
+    ]
+  },
+  {
     "slug": "/MediaUploader",
     "section": "misc",
     "componentPath": "@/dev/templates/media/MediaUploaderPage.vue",
@@ -597,15 +616,7 @@
     ],
     "hideLayout": true
   },
-  {
-    "slug": "/home",
-    "section": "misc",
-    "requiresAuth": false,
-    "supportedRoles": [
-      "all"
-    ],
-    "componentPath": "@/dev/templates/home/Home.vue"
-  },
+ 
   {
     "slug": "/:pathMatch(.*)*",
     "redirect": "/404"

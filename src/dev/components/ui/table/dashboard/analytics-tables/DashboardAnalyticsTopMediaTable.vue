@@ -101,6 +101,7 @@ import FlexTable from '@/dev/components/ui/table/FlexTable.vue'
 
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
 import { useAssetUrl } from '@/composables/useAssetUrl.js'
+import { formatDecimal } from '@/utils/common/formatters.js'
 
 const { url: analyticsEmptyStateUrl } = useAssetUrl('dashboard.analytics.emptyContributors')
 
@@ -181,7 +182,7 @@ const p2vSalesRows = computed(() => {
     rank: index + 1,
     title: item.title,
     sales_count: item.salesCount,
-    sales_usd: `USD$ ${item.salesUSD.toFixed(2)}`,
+    sales_usd: `USD$ ${formatDecimal(item.salesUSD)}`,
     image: item.thumbnailUrl || '/images/profile-thumbnail.png'
   }));
 });

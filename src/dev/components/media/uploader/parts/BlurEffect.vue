@@ -8,7 +8,7 @@
         <div class="flex max-w-fit flex-1 items-center gap-1">
           <div class="flex">
             <img
-              src="https://i.ibb.co/RG1fv2YR/svgviewer-png-output-4.webp"
+              :src="assets.blurIcon"
               alt="blur"
               class="h-4 w-4 "
             />
@@ -23,7 +23,7 @@
 
         <div class="flex h-3 w-3 items-center justify-center">
           <img
-            src="https://i.ibb.co/s93QRv59/svgviewer-png-output-5.webp"
+            :src="assets.chevronDownIcon"
             alt="dropdown arrow"
             class="h-3 w-3 transform transition-transform duration-200"
             :class="[isOpen ? 'rotate-0' : 'rotate-180', '']"
@@ -72,6 +72,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useMediaUploaderAssets } from '@/dev/composables/useMediaUploaderAssets.js';
 
 const props = defineProps({
   modelValue: {
@@ -81,6 +82,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue']);
+const { assets } = useMediaUploaderAssets();
 
 const options = ['20px', '50px', '100px'];
 const isOpen = ref(false);

@@ -83,6 +83,7 @@ import { useAssetUrl } from '@/composables/useAssetUrl.js'
 
 import { computed } from 'vue'
 import { useDashboardAnalyticsStore } from '@/stores/useDashboardAnalyticsStore.js'
+import { formatDecimal } from '@/utils/common/formatters.js'
 
 const { url: analyticsEmptyStateUrl } = useAssetUrl('dashboard.analytics.emptyContributors')
 
@@ -105,7 +106,7 @@ const topMerchRows = computed(() => {
     rank: item.rank || index + 1,
     title: item.merch || item.title || `Merch #${index + 1}`,
     views: item.views || 0,
-    sales: `USD$ ${(item.salesUSD || item.sales_usd || 0).toFixed(2)}`,
+    sales: `USD$ ${formatDecimal(item.salesUSD || item.sales_usd || 0)}`,
     image: item.thumbnailUrl || '/images/profile-thumbnail.png'
   }));
 });

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
     <div class="min-h-screen bg-[#F9FAFBE5] md:bg-transparent dark:bg-background-dark-app relative isolate py-16 px-4 md:px-10 font-sans antialiased text-slate-900">
         <div
             v-if="dashboardBgUrl"
@@ -14,7 +14,7 @@
                 </div>
                 <h1
                     class="text-5xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-800 tracking-tighter drop-shadow-sm mb-4">
-                    Dashboard Component Showcase
+                    {{ t('demo.page.title') }}
                 </h1>
 
             </div>
@@ -23,15 +23,15 @@
             <!-- ===== SECTION: MediaCardVariants ===== -->
             <div class="flex flex-col gap-12">
                 <div class="flex flex-col gap-4">
-                    <BaseHeading text="Media Card Variations (V1)" tag="h1" theme="defaultPrimaryHeading" version="basic"
+                    <BaseHeading :text="t('demo.page.mediaCards.mediaCardV1Title')" tag="h1" theme="defaultPrimaryHeading" version="basic"
                         class="!text-black" />
-                    <BaseParagraph text="Multiple display logic and layout variants for our primary media card."
+                    <BaseParagraph :text="t('demo.page.mediaCards.mediaCardV1Description')"
                         class="!text-slate-500" />
                 </div>
 
                 <!-- 1. Creator: My Media -->
                 <section class="flex flex-col gap-6">
-                    <BaseHeading text="1. Creator: My Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                    <BaseHeading :text="t('demo.page.mediaCards.creatorMyMedia')" tag="h2" theme="defaultSecondaryHeading" version="basic"
                         class="!text-black" />
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                         <MediaCardV1 v-for="item in myMediaList" :key="item.id" :media="item" variant="default"
@@ -42,7 +42,7 @@
 
                 <!-- 2. Fan: Continue Watching -->
                 <section class="flex flex-col gap-6">
-                    <BaseHeading text="2. Fan: Continue Watching" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                    <BaseHeading :text="t('demo.page.mediaCards.continueWatching')" tag="h2" theme="defaultSecondaryHeading" version="basic"
                         class="!text-black" />
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                         <MediaCardV1 :media="myMediaList[0]" variant="resume" />
@@ -52,7 +52,7 @@
 
                 <!-- 3. Fan: Latest Media -->
                 <section class="flex flex-col gap-6">
-                    <BaseHeading text="3. Fan: Latest Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                    <BaseHeading :text="t('demo.page.mediaCards.latestMedia')" tag="h2" theme="defaultSecondaryHeading" version="basic"
                         class="!text-black" />
                     <div class="flex items-start gap-4">
                         <MediaCardV1 :media="latestMediaItem" variant="latest" />
@@ -62,7 +62,7 @@
 
                 <!-- 4. Fan: Purchased Media -->
                 <section class="flex flex-col gap-6">
-                    <BaseHeading text="4. Fan: Purchased Media" tag="h2" theme="defaultSecondaryHeading" version="basic"
+                    <BaseHeading :text="t('demo.page.mediaCards.purchasedMedia')" tag="h2" theme="defaultSecondaryHeading" version="basic"
                         class="!text-black" />
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                         <MediaCardV1 :media="purchasedMediaItem" variant="purchased" @menu-action="handleAction" />
@@ -72,7 +72,7 @@
 
                 <!-- 5. Fan: Grid View (Zoom Effect) -->
                 <section class="flex flex-col gap-6">
-                    <BaseHeading text="5. Fan: Grid View (Zoom Effect)" tag="h2" theme="defaultSecondaryHeading"
+                    <BaseHeading :text="t('demo.page.mediaCards.gridView')" tag="h2" theme="defaultSecondaryHeading"
                         version="basic" class="!text-black" />
                     <div
                         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-2 xl:gap-4 w-full gap-y-[5.5rem] md:gap-y-[5rem] xl:gap-y-[5.5rem] relative isolate">
@@ -83,26 +83,26 @@
                 </section>
 
                 <div class="">
-                    <BaseHeading text="Media Card Variations (V2)" tag="h1" theme="defaultPrimaryHeading" version="basic"
+                    <BaseHeading :text="t('demo.page.mediaCards.mediaCardV2Title')" tag="h1" theme="defaultPrimaryHeading" version="basic"
                         class="!text-black" />
-                    <BaseParagraph text="An alternative design language for cards with hover expansion effects."
+                    <BaseParagraph :text="t('demo.page.mediaCards.mediaCardV2Description')"
                         class="!text-slate-500 mt-2" />
                 </div>
 
                 <div class="flex flex-col gap-8">
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-12 gap-x-4 relative isolate">
                         <div class="flex flex-col gap-3">
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Gallery</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">{{ t('demo.page.mediaCards.gallery') }}</span>
                             <MediaCardV2 :media="galleryCard" />
                             <ShowCodeToggle :code="demoSnippets.mediaV2.gallery" />
                         </div>
                         <div class="flex flex-col gap-3">
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Image</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">{{ t('demo.page.mediaCards.image') }}</span>
                             <MediaCardV2 :media="imageCard" />
                             <ShowCodeToggle :code="demoSnippets.mediaV2.image" />
                         </div>
                         <div class="flex flex-col gap-3">
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Video</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">{{ t('demo.page.mediaCards.video') }}</span>
                             <MediaCardV2 :media="videoCard" />
                             <ShowCodeToggle :code="demoSnippets.mediaV2.video" />
                         </div>
@@ -112,7 +112,7 @@
 
             <!-- ===== SECTION: DashboardTextInput ===== -->
             <section class="flex flex-col gap-10">
-                <DemoSectionHeader title="DashboardTextInput" />
+                <DemoSectionHeader :title="t('demo.page.sections.dashboardTextInput')" />
 
                 <p class="text-sm font-semibold text-gray-600 -mb-4">{{ t('demo.dashboardTextInput.generalVariations') }}</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -188,7 +188,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.rightIcon" />
                     </div>
 
-                    <!-- Autofill styling (no icon â€” browser saved email) -->
+                    <!-- Autofill styling (no icon ? browser saved email) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.autofill') }}</span>
                         <DashboardTextInput v-model="inputs.autofillEmail" :placeholder="t('demo.dashboardTextInput.enterEmailPlaceholder')" showLabel
@@ -242,7 +242,7 @@
              
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
-                    <!-- Event title â€” no label (booking step 1) -->
+                    <!-- Event title ? no label (booking step 1) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.noLabelEventTitle') }}</span>
                         <DashboardTextInput v-model="inputs.eventTitle" :placeholder="t('booking.eventTitlePlaceholder')" />
@@ -258,7 +258,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingCoPerformer" />
                     </div>
 
-                    <!-- Session duration â€” Minutes outside input (booking step 1) -->
+                    <!-- Session duration ? Minutes outside input (booking step 1) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.numberMinutes') }}</span>
                         <div class="flex flex-col gap-1.5 w-full">
@@ -273,7 +273,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingDuration" />
                     </div>
 
-                    <!-- Base price â€” Tokens /session outside input -->
+                    <!-- Base price ? Tokens /session outside input -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.basePriceTokens') }}</span>
                         <div class="flex flex-col gap-1.5 w-full">
@@ -314,7 +314,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.numberNoControls" />
                     </div>
 
-                    <!-- Booking fee â€” tooltip only (no suffix inside input) -->
+                    <!-- Booking fee ? tooltip only (no suffix inside input) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.tooltipOnly') }}</span>
                         <DashboardTextInput v-model="inputs.bookingFee" type="number" showLabel
@@ -323,7 +323,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingTooltip" />
                     </div>
 
-                    <!-- Off-hour surcharge â€” % outside input -->
+                    <!-- Off-hour surcharge ? % outside input -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.offHourSurcharge') }}</span>
                         <div class="flex flex-col gap-1.5 w-full">
@@ -378,7 +378,7 @@
                         <ShowCodeToggle :code="demoSnippets.icd.bookingSuccess" />
                     </div>
 
-                    <!-- Remind me â€” inline copy outside input (booking settings) -->
+                    <!-- Remind me ? inline copy outside input (booking settings) -->
                     <div class="flex flex-col gap-3">
                         <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.dashboardTextInput.variations.remindMe') }}</span>
                         <div class="flex flex-wrap items-center gap-2">
@@ -395,14 +395,13 @@
 
             <!-- ===== SECTION: Heading ===== -->
             <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="Heading" />
+                <DemoSectionHeader :title="t('demo.page.sections.heading')" />
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- 1. h1 defaultPrimary -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 â€”
-                            defaultPrimaryHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.heading.labels.h1Primary') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseHeading text="Primary H1" tag="h1" theme="defaultPrimaryHeading" class="!text-black"
+                            <BaseHeading :text="t('demo.heading.h1Primary')" tag="h1" theme="defaultPrimaryHeading" class="!text-black"
                                 version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h1Primary" />
@@ -410,10 +409,9 @@
 
                     <!-- 2. h2 defaultSecondary -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 â€”
-                            defaultSecondaryHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.heading.labels.h2Secondary') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseHeading text="Secondary H2" tag="h2" theme="defaultSecondaryHeading" class="!text-black"
+                            <BaseHeading :text="t('demo.heading.h2Secondary')" tag="h2" theme="defaultSecondaryHeading" class="!text-black"
                                 version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h2Secondary" />
@@ -421,9 +419,9 @@
 
                     <!-- 3. h3 sectionHeading -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h3 â€” sectionHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.heading.labels.h3Section') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseHeading text="Section H3" tag="h3" theme="sectionHeading" class="!text-black"
+                            <BaseHeading :text="t('demo.heading.h3Section')" tag="h3" theme="sectionHeading" class="!text-black"
                                 version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h3Section" />
@@ -431,54 +429,54 @@
 
                     <!-- 4. dashboardHeading -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 â€” dashboardHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.heading.labels.h2Dashboard') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseHeading text="Dashboard Title" tag="h2" theme="dashboardHeading" version="basic" />
+                            <BaseHeading :text="t('demo.heading.h2Dashboard')" tag="h2" theme="dashboardHeading" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h2Dashboard" />
                     </div>
 
                     <!-- 5. AuthHeading -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h2 â€” AuthHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.heading.labels.h2Auth') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseHeading text="Login" tag="h2" theme="AuthHeading" class="!text-black" version="basic" />
+                            <BaseHeading :text="t('demo.heading.h2Auth')" tag="h2" theme="AuthHeading" class="!text-black" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h2Auth" />
                     </div>
 
                     <!-- 6. formHeading -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h4 â€” formHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.heading.labels.h4Form') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseHeading text="Profile Settings" tag="h4" theme="formHeading" version="basic" />
+                            <BaseHeading :text="t('demo.heading.h4Form')" tag="h4" theme="formHeading" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h4Form" />
                     </div>
 
                     <!-- 7. demoHeadings h1 -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 â€” demoHeadings</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.heading.labels.h1Demo') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseHeading text="Demo H1 Bold" tag="h1" theme="demoHeadings" version="basic" />
+                            <BaseHeading :text="t('demo.heading.h1Demo')" tag="h1" theme="demoHeadings" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h1Demo" />
                     </div>
 
                     <!-- 8. demoHeadings h3 -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h3 â€” demoHeadings</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.heading.labels.h3Demo') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseHeading text="Demo H3 Medium" tag="h3" theme="demoHeadings" version="basic" />
+                            <BaseHeading :text="t('demo.heading.h3Demo')" tag="h3" theme="demoHeadings" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.h3Demo" />
                     </div>
 
                     <!-- 9. With left icon -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Left Icon</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.heading.labels.withLeftIcon') }}</span>
 
-                        <BaseHeading text="With Icon" tag="h3" theme="defaultSecondaryHeading" class="!text-black"
+                        <BaseHeading :text="t('demo.heading.withIcon')" tag="h3" theme="defaultSecondaryHeading" class="!text-black"
                             version="basic" :leftIcon="StarIcon" />
 
                         <ShowCodeToggle :code="demoSnippets.heading.withIcon" />
@@ -486,9 +484,9 @@
 
                     <!-- 10. orderHeading -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">h1 â€” orderHeading</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.heading.labels.orderHeading') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseHeading text="Order #1234" tag="h1" theme="orderHeading" version="basic" />
+                            <BaseHeading :text="t('demo.heading.order')" tag="h1" theme="orderHeading" version="basic" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.heading.order" />
                     </div>
@@ -497,76 +495,76 @@
 
             <!-- ===== SECTION: Paragraph ===== -->
             <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="Paragraph" />
+                <DemoSectionHeader :title="t('demo.page.sections.paragraph')" />
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- 1. Default -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Default</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.paragraph.labels.default') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseParagraph text="This is a default paragraph with standard styling." class="!text-black" />
+                            <BaseParagraph :text="t('demo.paragraph.default')" class="!text-black" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.default" />
                     </div>
 
                     <!-- 2. Small font -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Small (text-sm)</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.paragraph.labels.small') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseParagraph text="Small text paragraph for captions." class="!text-black text-sm" />
+                            <BaseParagraph :text="t('demo.paragraph.small')" class="!text-black text-sm" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.small" />
                     </div>
 
                     <!-- 3. Large font -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Large (text-xl)</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.paragraph.labels.large') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseParagraph text="Large paragraph text." class="!text-black text-xl" />
+                            <BaseParagraph :text="t('demo.paragraph.large')" class="!text-black text-xl" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.large" />
                     </div>
 
                     <!-- 4. Bold -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Bold</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.paragraph.labels.bold') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseParagraph text="Bold paragraph text." class="!text-black font-bold" />
+                            <BaseParagraph :text="t('demo.paragraph.bold')" class="!text-black font-bold" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.bold" />
                     </div>
 
                     <!-- 5. Custom color -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Custom Color (Blue)</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.paragraph.labels.customColor') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseParagraph text="Blue paragraph text." fontColor="text-blue-600" />
+                            <BaseParagraph :text="t('demo.paragraph.blue')" fontColor="text-blue-600" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.blue" />
                     </div>
 
                     <!-- 6. Error color -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Error Red</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.paragraph.labels.errorRed') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseParagraph text="This field is required." fontColor="text-red-500" fontSize="text-sm" />
+                            <BaseParagraph :text="t('demo.paragraph.error')" fontColor="text-red-500" fontSize="text-sm" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.error" />
                     </div>
 
                     <!-- 7. Success color -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Success Green</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.paragraph.labels.successGreen') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseParagraph text="Action successful!" fontColor="text-green-600" fontWeight="font-medium" />
+                            <BaseParagraph :text="t('demo.paragraph.success')" fontColor="text-green-600" fontWeight="font-medium" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.success" />
                     </div>
 
                     <!-- 8. Italic -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Italic</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.paragraph.labels.italic') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseParagraph text="Italic paragraph text for notes." fontFamily="italic"
+                            <BaseParagraph :text="t('demo.paragraph.italic')" fontFamily="italic"
                                 fontColor="text-gray-500" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.italic" />
@@ -574,9 +572,9 @@
 
                     <!-- 9. With left icon -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">With Left Icon</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.paragraph.labels.withLeftIcon') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseParagraph text="Info message here" :leftIcon="InformationCircleIcon" fontSize="text-sm"
+                            <BaseParagraph :text="t('demo.paragraph.withIcon')" :leftIcon="InformationCircleIcon" fontSize="text-sm"
                                 fontColor="text-blue-600" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.withIcon" />
@@ -584,9 +582,9 @@
 
                     <!-- 10. Extra small xs -->
                     <div class="flex flex-col gap-3">
-                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Extra Small (text-xs)</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.paragraph.labels.extraSmall') }}</span>
                         <div class="p-2  flex items-center">
-                            <BaseParagraph text="Helper text displayed below the input field." fontSize="text-xs"
+                            <BaseParagraph :text="t('demo.paragraph.xs')" fontSize="text-xs"
                                 fontColor="text-gray-400" />
                         </div>
                         <ShowCodeToggle :code="demoSnippets.paragraph.xs" />
@@ -619,25 +617,41 @@
                 <ShowCodeToggle :code="uploadProgressBarSnippet" />
             </section>
 
+            <!-- ===== SECTION: CloudflareSuccess ===== -->
+            <section class="flex flex-col gap-6">
+                <DemoSectionHeader :title="t('demo.page.sections.cloudflareSuccess')" />
+                <CloudflareSuccess />
+                <ShowCodeToggle :code="cloudflareSuccessSnippet" />
+            </section>
+
+            <!-- ===== SECTION: Checkout Reusable Components ===== -->
+            <CheckoutReusableComponentsDemo />
+
+            <!-- ===== SECTION: Media Uploader Components ===== -->
+            <MediaUploaderComponentsDemo />
+
             <!-- ===== SECTION: DashProfileSettings ===== -->
-            <DashProfileSettings />
+            <DashProfileSettingsDemo />
 
             <!-- ===== SECTION: Cookies ===== -->
             <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="Cookies" />
+                <DemoSectionHeader :title="t('demo.page.sections.cookies')" />
                 <Cookies />
                 <ShowCodeToggle :code="demoSnippets.cookies.default" />
             </section>
 
             <!-- ===== SECTION: PremiumOrdersTable ===== -->
-            <OrdersPremiumTable />
+            <OrdersPremiumTableDemo />
 
             <!-- ===== SECTION: SubscriptionCard ===== -->
             <SubscriptionCardsDemo />
 
+            <!-- ===== SECTION: Profile Section Components ===== -->
+            <ProfileSectionComponentsDemo />
+
             <!-- ===== SECTION: TierCard ===== -->
             <section class="flex flex-col gap-12">
-                <DemoSectionHeader title="Tier Cards" />
+                <DemoSectionHeader :title="t('demo.page.sections.tierCards')" />
                 <p class="text-xs text-slate-500/80 -mt-8">
                     {{ t('demo.tierCard.sectionDescription') }}
                 </p>
@@ -652,7 +666,7 @@
 
             <!-- ===== SECTION: EventCard ===== -->
             <section class="flex flex-col gap-12">
-                <DemoSectionHeader title="Event Cards" />
+                <DemoSectionHeader :title="t('demo.page.sections.eventCards')" />
                 <p class="text-xs text-slate-500/80 -mt-8">
                     {{ t('demo.eventCard.sectionDescription') }}
                 </p>
@@ -667,9 +681,9 @@
 
             <!-- ===== SECTION: Cart component ===== -->
             <section class="flex flex-col gap-12">
-                <DemoSectionHeader title="Shopping Cart" />
+                <DemoSectionHeader :title="t('demo.page.sections.shoppingCart')" />
                 <p class="text-xs text-slate-500/80 -mt-8">
-                    Interactive cart component driven by custom events. Open console to see interaction commands.
+                    {{ t('demo.page.sections.shoppingCartDescription') }}
                 </p>
                 <Cart />
 
@@ -682,8 +696,8 @@
 
             <!-- ===== SECTION: Spinner ===== -->
             <section class="flex flex-col gap-6">
-                <DemoSectionHeader title="Spinner" />
-                <p class="text-sm text-gray-500 -mt-4">{{ t('demo.spinner.assetMapImage') }} â€” useAssetUrl + assetMap (no hardcoded URLs)</p>
+                <DemoSectionHeader :title="t('demo.page.sections.spinner')" />
+                <p class="text-sm text-gray-500 -mt-4">{{ t('demo.spinner.assetMapImage') }} ? useAssetUrl + assetMap (no hardcoded URLs)</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     <div class="flex flex-col items-center gap-3 p-4 border border-gray-200 rounded-lg bg-white/60">
@@ -710,39 +724,38 @@
 
             <!-- ===== SECTION: All Buttons (full catalog) ===== -->
             <section class="flex flex-col gap-8 mb-20">
-                <DemoSectionHeader title="All Buttons â€” Full Catalog" />
+                <DemoSectionHeader :title="t('demo.page.sections.allButtons')" />
 
                 <p class="text-sm text-gray-500 -mt-4">
-                    Exactly the same buttons used across the app (same text, variant, size, width and icons),
-                    so another developer can copy the real thing. Each label shows the variant and where it is used.
+                    {{ t('demo.buttons.catalogIntro') }}
                 </p>
                 <p class="text-sm text-gray-600">{{ t('demo.buttons.clickToLoadHint') }}</p>
 
                 <!-- Auth pages (login / sign up / onboarding) -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Auth pages â€” login / sign up / onboarding</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{{ t('demo.buttons.sections.auth') }}</span>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                         <div class="flex flex-col gap-2 w-full max-w-[380px]">
-                            <DashboardPrimaryButton text="Sign in" variant="authPink" size="lg" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.authSignIn')" variant="authPink" size="lg" type="button"
                                 :loading="buttonLoaders.authSignIn" loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('authSignIn')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authPink Â· size lg Â· login/signup submit</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.authSignIn') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.authSignIn" />
                         </div>
                         <div class="flex flex-col gap-2 w-full max-w-[380px]">
-                            <DashboardPrimaryButton text="Continue with X (Twitter)" variant="authTransparent" size="lg" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.continueWithX')" variant="authTransparent" size="lg" type="button"
                                 :leftIcon="xLogoUrl" leftIconClass="w-8 h-8"
                                 :loading="buttonLoaders.authX" loadingSpinnerColor="text-current"
                                 @click="runButtonDemo('authX')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authTransparent Â· size lg Â· social</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.authTransparentSocial') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.authX" />
                         </div>
                         <div class="flex flex-col gap-2 w-full max-w-[380px]">
-                            <DashboardPrimaryButton text="Continue with Telegram" variant="authTransparent" size="lg" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.continueWithTelegram')" variant="authTransparent" size="lg" type="button"
                                 :leftIcon="telegramIconUrl" leftIconClass="w-8 h-8"
                                 :loading="buttonLoaders.authTelegram" loadingSpinnerColor="text-current"
                                 @click="runButtonDemo('authTelegram')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">authTransparent Â· size lg Â· social</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.authTransparentSocial') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.authTelegram" />
                         </div>
                     </div>
@@ -750,24 +763,24 @@
 
                 <!-- Checkout / purchase / cart popups -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Checkout / purchase / cart popups</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{{ t('demo.buttons.sections.checkout') }}</span>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                         <div class="flex flex-col gap-2 w-full max-w-[380px]">
-                            <DashboardPrimaryButton text="Proceed Payment" variant="checkoutProceedpayment" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.proceedPayment')" variant="checkoutProceedpayment" type="button"
                                 :rightIcon="arrowRightUrl"
                                 :rightIconClass="`w-6 h-6 [filter:brightness(0)_saturate(100%)] group-hover/button:[filter:brightness(0)_saturate(100%)_invert(67%)_sepia(19%)_saturate(5664%)_hue-rotate(95deg)_brightness(112%)_contrast(94%)]`"
                                 :loading="buttonLoaders.checkoutProceed" loadingSpinnerColor="text-black"
                                 @click="runButtonDemo('checkoutProceed')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">checkoutProceedpayment Â· checkout/buy-now</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.checkoutProceed') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.proceedPayment" />
                         </div>
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton text="Continue with X (Twitter)" variant="actionGreen" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.continueWithX')" variant="actionGreen" type="button"
                                 :leftIcon="xLogoUrl"
                                 leftIconClass="w-6 h-6 group-hover/xbtn:[filter:brightness(0)_saturate(100%)_invert(3%)_sepia(58%)_saturate(1835%)_hue-rotate(205deg)_brightness(93%)_contrast(94%)]"
                                 :loading="buttonLoaders.checkoutActionGreenX" loadingSpinnerColor="text-current"
                                 @click="runButtonDemo('checkoutActionGreenX')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">actionGreen Â· guest purchase</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.actionGreenX') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.actionGreenX" />
                         </div>
                     </div>
@@ -775,15 +788,15 @@
 
                 <!-- Profile / media -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Profile / media</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{{ t('demo.buttons.sections.profileMedia') }}</span>
                     <div class="flex flex-wrap items-start gap-6">
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton text="Back" variant="profileMediaBtn" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.back')" variant="profileMediaBtn" type="button"
                                 :leftIcon="arrowLeftUrl"
                                 :leftIconClass="`w-8 h-8 [filter:brightness(0)_saturate(100%)_invert(81%)_sepia(45%)_saturate(3798%)_hue-rotate(87deg)_brightness(100%)_contrast(98%)] drop-shadow-[0px_0px_8px_0px_#00000080]`"
                                 :loading="buttonLoaders.profileBack" loadingSpinnerColor="text-[#07F468]"
                                 @click="runButtonDemo('profileBack')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">profileMediaBtn Â· ProfileViewAll popup</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.profileBack') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.profileBack" />
                         </div>
                     </div>
@@ -791,10 +804,10 @@
 
                 <!-- Payout settings -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Payout settings</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{{ t('demo.buttons.sections.payoutSettings') }}</span>
                     <div class="flex flex-wrap items-start gap-6">
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton variant="none" text="SAVE" type="button"
+                            <DashboardPrimaryButton variant="none" :text="t('demo.buttons.save')" type="button"
                                 customClass="flex items-center gap-2.5 pl-[1.48rem] pr-2 h-10 shadow-[0px_0px_16px_0px_#FFFFFF80] [clip-path:polygon(100%_0%,100%_100%,0%_100%,0.98rem_0%)] bg-black group/button enabled:hover:bg-[#07F468]"
                                 textClass="text-lg font-medium text-[#07F468] group-hover/button:text-black"
                                 :loading="buttonLoaders.payoutSave" loadingSpinnerColor="text-[#07F468]"
@@ -803,7 +816,7 @@
                                     <img v-if="tickCircleUrl" :src="tickCircleUrl" alt="" class="w-6 h-6 [filter:brightness(0)_saturate(100%)_invert(53%)_sepia(97%)_saturate(459%)_hue-rotate(93deg)_brightness(114%)_contrast(94%)] group-hover/button:[filter:brightness(0)_saturate(100%)]" />
                                 </template>
                             </DashboardPrimaryButton>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· PayoutSettings step 2/3</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.payoutSave') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.payoutSave" />
                         </div>
                     </div>
@@ -811,16 +824,16 @@
 
                 <!-- Plan sharing -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Plan sharing</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{{ t('demo.buttons.sections.planSharing') }}</span>
                     <div class="flex flex-wrap items-start gap-6">
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton text="Send invite" variant="simpleBtn" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.sendInvite')" variant="simpleBtn" type="button"
                                 :leftIcon="sendIconUrl"
                                 :leftIconClass="`w-6 h-6 group-hover/button:[filter:brightness(0)_saturate(100%)_invert(74%)_sepia(36%)_saturate(5644%)_hue-rotate(95deg)_brightness(111%)_contrast(94%)]`"
                                 btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468"
                                 :loading="buttonLoaders.sendInvite" loadingSpinnerColor="text-black"
                                 @click="runButtonDemo('sendInvite')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">simpleBtn Â· PlanSharing</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.sendInvite') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.sendInvite" />
                         </div>
                     </div>
@@ -828,42 +841,42 @@
 
                 <!-- Media uploader -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Media uploader</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{{ t('demo.buttons.sections.mediaUploader') }}</span>
                     <div class="flex flex-wrap items-start gap-6">
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton text="Add Tier" variant="polygonLeft" customClass="gap-[2px] text-sm" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.addTier')" variant="polygonLeft" customClass="gap-[2px] text-sm" type="button"
                                 :leftIcon="addTierIconUrl"
                                 :leftIconClass="`w-6 h-6 transition duration-200 [filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)] group-hover:[filter:brightness(0)]`"
                                 btnBg="#000" btnHoverBg="#07f468" btnText="#07f468" btnHoverText="#000"
                                 :loading="buttonLoaders.addTier" loadingSpinnerColor="text-[#07F468]"
                                 @click="runButtonDemo('addTier')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft Â· Add Tier</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.addTier') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.addTier" />
                         </div>
                         <div class="flex flex-col gap-2">
                             <div class="flex flex-wrap items-center gap-3">
-                                <DashboardPrimaryButton text="Next" variant="polygonLeft" type="button"
+                                <DashboardPrimaryButton :text="t('demo.buttons.next')" variant="polygonLeft" type="button"
                                     :rightIcon="polygonArrowUrl"
                                     :rightIconClass="'w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]'"
                                     btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468"
                                     :loading="buttonLoaders.polygonNext" loadingSpinnerColor="text-black"
                                     @click="runButtonDemo('polygonNext')" />
-                                <DashboardPrimaryButton text="Next" variant="polygonLeft" type="button" disabled
+                                <DashboardPrimaryButton :text="t('demo.buttons.next')" variant="polygonLeft" type="button" disabled
                                     :rightIcon="polygonArrowUrl"
                                     :rightIconClass="'w-6 h-6 filter brightness-0 invert-0'"
                                     btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468" />
                             </div>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft Â· Next (enabled + disabled)</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.polygonNext') }}</span>
                         <ShowCodeToggle :code="demoSnippets.buttons.polygonNext" />
                         </div>
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton text="SUBMIT MEDIA FOR APPROVAL" variant="polygonLeft" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.submitMediaForApproval')" variant="polygonLeft" type="button"
                                 :rightIcon="polygonArrowUrl"
                                 :rightIconClass="`w-6 h-6 transition duration-200 filter brightness-0 invert-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]`"
                                 btnBg="#07f468" btnHoverBg="black" btnText="black" btnHoverText="#07f468"
                                 :loading="buttonLoaders.submitMedia" loadingSpinnerColor="text-black"
                                 @click="runButtonDemo('submitMedia')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft Â· Submit</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.submitMedia') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.submitMedia" />
                         </div>
                     </div>
@@ -871,10 +884,10 @@
 
                 <!-- Dashboard analytics -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Dashboard analytics</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{{ t('demo.buttons.sections.dashboardAnalytics') }}</span>
                     <div class="flex flex-wrap items-start gap-6">
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton variant="none" text="All Orders" type="button"
+                            <DashboardPrimaryButton variant="none" :text="t('demo.buttons.allOrders')" type="button"
                                 customClass="inline-flex items-center gap-2.5 pr-2 pl-6 py-1 bg-white border border-gray-200 rounded-none [clip-path:polygon(0_100%,100%_100%,100%_0,16%_0)] shadow-sm enabled:hover:bg-gray-50 transition-colors"
                                 textClass="text-blue-700 text-base font-medium"
                                 :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]"
@@ -887,11 +900,11 @@
                                     </svg>
                                 </template>
                             </DashboardPrimaryButton>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· orders table</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.allOrders') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.allOrders" />
                         </div>
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton variant="none" text="Trend" type="button"
+                            <DashboardPrimaryButton variant="none" :text="t('demo.buttons.trend')" type="button"
                                 customClass="group/button flex items-center justify-center gap-1 pl-[0.9375rem] pr-2 py-1 bg-white [clip-path:polygon(0_0,100%_0,105%_105%,16%_105%)] rounded-none border border-gray-200 enabled:hover:bg-gray-100 transition-colors"
                                 textClass="text-xs font-medium text-gray-700"
                                 :wrapperOverrides="[{target:'wrapper1', removeClass:true}, {target:'wrapper2', removeClass:true}]"
@@ -903,7 +916,7 @@
                                     </svg>
                                 </template>
                             </DashboardPrimaryButton>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· metric card</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.trend') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.trend" />
                         </div>
                     </div>
@@ -911,45 +924,45 @@
 
                 <!-- Events / add-ons / scheduling -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Events / add-ons / scheduling</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{{ t('demo.buttons.sections.eventsAddons') }}</span>
                     <div class="flex flex-wrap items-start gap-6">
                         <div class="flex flex-col gap-2 w-full max-w-[220px]">
-                            <DashboardPrimaryButton text="NEW EVENTS" variant="none" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.newEvents')" variant="none" type="button"
                                 customClass="group w-full h-12 min-h-10 px-4 py-2 text-base font-semibold bg-black rounded-[48px] inline-flex justify-center items-center gap-2 text-[#07F468] enabled:hover:text-black enabled:hover:bg-[#07F468]"
                                 :leftIcon="plusIconUrl"
                                 :leftIconClass="`w-6 h-6 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`"
                                 :loading="buttonLoaders.newEvents" loadingSpinnerColor="text-[#07F468]"
                                 @click="runButtonDemo('newEvents')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· NEW EVENTS</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.newEvents') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.newEvents" />
                         </div>
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton text="PUBLISH SCHEDULE" variant="polygonLeft" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.publishSchedule')" variant="polygonLeft" type="button"
                                 :leftIcon="publishScheduleIconUrl"
                                 :leftIconClass="`w-6 h-6 transition duration-200 filter brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(75%)_sepia(23%)_saturate(7280%)_hue-rotate(93deg)_brightness(109%)_contrast(95%)]`"
                                 :loading="buttonLoaders.publishSchedule" loadingSpinnerColor="text-black"
                                 @click="runButtonDemo('publishSchedule')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">polygonLeft Â· PUBLISH SCHEDULE</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.publishSchedule') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.publishSchedule" />
                         </div>
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton text="add-on service" variant="none" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.addonService')" variant="none" type="button"
                                 customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight enabled:hover:text-black enabled:hover:bg-[#07F468]"
                                 :leftIcon="plusIconUrl"
                                 :leftIconClass="`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)] rounded-sm outline outline-[1.50px] outline-offset-[-0.75px]`"
                                 :loading="buttonLoaders.addonService" loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('addonService')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· add-on service</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.addonService') }}</span>
                         <ShowCodeToggle :code="demoSnippets.buttons.addonService" />
                     </div>
                         <div class="flex flex-col gap-2">
-                            <DashboardPrimaryButton text="add-on service" variant="none" type="button"
+                            <DashboardPrimaryButton :text="t('demo.buttons.addonService')" variant="none" type="button"
                                 customClass="group bg-gray-900 flex justify-center items-center gap-2 min-w-14 px-2 py-1 text-center justify-start text-green-500 text-xs font-semibold capitalize tracking-tight enabled:hover:text-black enabled:hover:bg-[#07F468]"
                                 :leftIcon="plusSmallIconUrl"
                                 :leftIconClass="`w-3 h-3 transition duration-200 group-hover:[filter:brightness(0)_saturate(100%)]`"
                                 :loading="buttonLoaders.addonServiceV2" loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('addonServiceV2')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">none + custom Â· add-on service v2</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.addonServiceV2') }}</span>
                         <ShowCodeToggle :code="demoSnippets.buttons.addonServiceV2" />
                     </div>
                     </div>
@@ -957,10 +970,10 @@
 
                 <!-- TwoPieceButton variants -->
                 <div class="flex flex-col gap-3">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">TwoPieceButton â€” variants</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{{ t('demo.buttons.sections.twoPieceButton') }}</span>
                     <div class="flex flex-wrap items-start gap-8">
                         <div class="flex flex-col gap-2">
-                            <TwoPieceButton variant="link-x" tag="button" text="Link your X account" type="button"
+                            <TwoPieceButton variant="link-x" tag="button" :text="t('demo.buttons.linkYourXAccount')" type="button"
                                 :loading="buttonLoaders.twoPieceLinkX"
                                 loadingSpinnerColor="text-black"
                                 @click="runButtonDemo('twoPieceLinkX')">
@@ -968,11 +981,11 @@
                                     <img v-if="xTwoPieceUrl" :src="xTwoPieceUrl" alt="" class="w-6 h-6 brightness-0 group-hover:[filter:brightness(0)_saturate(100%)_invert(83%)_sepia(37%)_saturate(2897%)_hue-rotate(81deg)_brightness(94%)_contrast(103%)]" />
                                 </template>
                             </TwoPieceButton>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">link-x Â· Settings</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.twoPieceLinkX') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.twoPieceLinkX" />
                         </div>
                         <div class="flex flex-col gap-2">
-                            <TwoPieceButton variant="premium-upgrade" tag="button" text="Upgrade To Premium" textClass="text-lg font-medium text-white" type="button"
+                            <TwoPieceButton variant="premium-upgrade" tag="button" :text="t('demo.buttons.upgradeToPremium')" textClass="text-lg font-medium text-white" type="button"
                                 :loading="buttonLoaders.twoPiecePremium"
                                 loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('twoPiecePremium')">
@@ -980,7 +993,7 @@
                                     <img v-if="starIconUrl" :src="starIconUrl" alt="" class="w-6 h-6" />
                                 </template>
                             </TwoPieceButton>
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">premium-upgrade Â· Settings</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.twoPiecePremium') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.twoPiecePremium" />
                         </div>
                         <div class="flex flex-col gap-2">
@@ -988,11 +1001,11 @@
                                 rootClass="filter drop-shadow-[4px_3px_0px_#000000] group enabled:hover:drop-shadow-[4px_3px_0px_#FF439D] block w-max appearance-button"
                                 contentWrapperClass="flex justify-center items-center gap-2.5 pl-2 pr-[20.5px] min-h-[2rem] [clip-path:polygon(calc(100%-12.5px)_0%,100%_100%,0%_100%,0%_0%)] bg-[linear-gradient(135deg,#F093FB_0%,#FF439D_100%)] group-hover:[background:black]"
                                 textClass="text-lg font-medium text-black group-hover:text-[#FF439D]"
-                                text="Unlock premium to upload videos"
+                                :text="t('demo.buttons.unlockPremiumVideos')"
                                 :loading="buttonLoaders.twoPiecePink"
                                 loadingSpinnerColor="text-white"
                                 @click="runButtonDemo('twoPiecePink')" />
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">link-x (pink) Â· Edit Profile</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">{{ t('demo.buttons.labels.twoPiecePink') }}</span>
                             <ShowCodeToggle :code="demoSnippets.buttons.twoPiecePink" />
                         </div>
                 </div>
@@ -1018,16 +1031,20 @@ import BaseParagraph from '@/components/ui/typography/BaseParagraph.vue';
 // import SubscriptionCard from '@/dev/components/profile/SubscriptionCard.vue';
 import DemoSectionHeader from '@/dev/templates/demo/DemoSectionHeader.vue';
 import ShowCodeToggle from '@/dev/templates/demo/ShowCodeToggle.vue';
-import OrdersPremiumTable from '@/dev/components/ui/table/dashboard/OrdersPremiumTable.vue';
+import OrdersPremiumTableDemo from '@/dev/templates/demo/demo-audit/OrdersPremiumTableDemo.vue';
 import CheckboxGroupDemo from '@/dev/templates/demo/demo-audit/CheckboxGroupDemo.vue';
 import CheckboxSwitchDemo from '@/dev/templates/demo/demo-audit/CheckboxSwitchDemo.vue';
 import NotificationCardDemo from '@/dev/templates/demo/demo-audit/NotificationCardDemo.vue';
 import RadioGroupDemo from '@/dev/templates/demo/demo-audit/RadioGroupDemo.vue';
 import CalendarChatDemo from '@/dev/templates/demo/demo-audit/CalendarChatDemo.vue';
-import DashProfileSettings from '@/dev/components/ui/nav/dashboard/DashProfileSettings.vue';
+import DashProfileSettingsDemo from '@/dev/templates/demo/demo-audit/DashProfileSettingsDemo.vue';
 import UploadingProgressBar from '@/components/ui/progress/UploadingProgressBar.vue';
+import CloudflareSuccess from '@/dev/components/ui/badge/dashboard/CloudflareSuccess.vue';
+import CheckoutReusableComponentsDemo from '@/dev/templates/demo/demo-audit/CheckoutReusableComponentsDemo.vue';
+import MediaUploaderComponentsDemo from '@/dev/templates/demo/demo-audit/MediaUploaderComponentsDemo.vue';
 import ActionMenuDropdownDemo from '@/dev/templates/demo/demo-audit/ActionMenuDropdownDemo.vue';
 import SubscriptionCardsDemo from '@/dev/templates/demo/demo-audit/SubscriptionCardsDemo.vue';
+import ProfileSectionComponentsDemo from '@/dev/templates/demo/demo-audit/ProfileSectionComponentsDemo.vue';
 import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import TwoPieceButton from '@/components/ui/buttons/TwoPieceButton.vue';
 // Heroicons
@@ -1050,6 +1067,9 @@ const uploadProgressBarSnippet = `import UploadingProgressBar from '@/components
 />
 
 <!-- Same as EditProfilePage.vue -->`;
+const cloudflareSuccessSnippet = `import CloudflareSuccess from '@/dev/components/ui/badge/dashboard/CloudflareSuccess.vue';
+
+<CloudflareSuccess />`;
 const { url: dashboardBgUrl } = useAssetUrl('dashboard.bg.gradient');
 const { url: searchIconUrl } = useAssetUrl('icon.search');
 const { url: spinnerIconUrl } = useAssetUrl('icon.spinner');
@@ -1091,7 +1111,7 @@ const vals = reactive({
     ci1: '', ci2: '', ci3: '', ci4: '', ci5: '', ci6: '',
 });
 
-// ===== Media demo data (assetMap + i18n â€” no hardcoded URLs) =====
+// ===== Media demo data (assetMap + i18n ? no hardcoded URLs) =====
 const myMediaList = computed(() => [
     {
         id: 1,
@@ -1369,147 +1389,6 @@ const demoEventCards = [
     { id: 'pinkProgress', theme: 'pink', hasButton: false, labelKey: 'eventCard.demo.labels.pinkProgress' },
 ];
 
-// ===== Subscription card data =====
-const cards = ref([
-    {
-        id: 1,
-        title: 'FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.',
-        price: '30.99',
-        oldPrice: '999.99',
-        followers: '30',
-        videos: '12',
-        photos: '45',
-        mediaCount: '5',
-        image: 'https://i.ibb.co.com/5WQ43b48/sample-bg-image-compressed.webp',
-        features: [
-            '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Merchandise',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Custom Request',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Pay to View videos'
-        ],
-        fullDescription: `Watch all of my mango eating content! content update weekly!<br><br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing`,
-    },
-    {
-        id: 2,
-        title: 'FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.',
-        price: '499.99',
-        oldPrice: '999.99',
-        followers: 'No',
-        videos: '0',
-        photos: '0',
-        mediaCount: '5',
-        isFeatured: true,
-        image: 'https://i.ibb.co.com/Kx9QDc68/auth-bg-compressed.webp',
-        features: [
-            '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Merchandise',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Custom Request',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Pay to View videos'
-        ],
-        fullDescription: `Watch all of my mango eating content! content update weekly!<br><br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing`,
-    },
-    {
-        id: 3,
-        title: 'Library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.',
-        price: '99.99',
-        oldPrice: '999.99',
-        followers: '30',
-        videos: '0',
-        photos: '0',
-        mediaCount: '5',
-        isCurrentSubscription: true,
-        image: 'https://i.ibb.co.com/LXPfFX03/profile-slidein-bg.webp',
-        features: [
-            '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Merchandise',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Custom Request',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Pay to View videos'
-        ],
-        fullDescription: `Watch all of my mango eating content! content update weekly!<br><br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing`,
-    },
-    {
-        id: 4,
-        title: 'FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.',
-        price: '30.99',
-        oldPrice: '999.99',
-        followers: '30',
-        videos: '0',
-        photos: '0',
-        mediaCount: '5',
-        
-        image: 'https://i.ibb.co.com/SwFy98RJ/checkout-header.webp',
-        features: [
-            '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Merchandise',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Custom Request',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Pay to View videos'
-        ],
-        fullDescription: `Watch all of my mango eating content! content update weekly!<br><br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing`,
-    },
-    {
-        id: 5,
-        title: 'FEATURED library of LOREM LPSUM ATIER dolor sit amet, consectetur adipiscing elit.',
-        price: '30.99',
-        oldPrice: '999.99',
-        followers: '30',
-        videos: '0',
-        photos: '0',
-        mediaCount: '5',
-        image: 'https://i.ibb.co.com/7sWfvWC/hero-image-blue.webp',
-        features: [
-            '<span class="font-semibold text-[#FF0066]">10 free tokens</span> each month',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Merchandise',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Custom Request',
-            '<span class="font-semibold text-[#FF0066]">10% off</span> on all Pay to View videos'
-        ],
-        fullDescription: `Watch all of my mango eating content! content update weekly!<br><br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing<br>
-        • 100% real content<br>
-        • no editing`,
-    }
-]);
-
-const handleCardAction = (card) => {
-    alert(`Action triggered for: ${card.title}`);
-};
-
 const demoSnippets = {
     mediaV1: {
         myMedia: `<!-- Template -->\n<MediaCardV1 \n  v-for="item in myMediaList" \n  :key="item.id" \n  :media="item" \n  variant="default" \n  @menu-action="handleAction" \n/>\n\n<!-- Script Data -->\nconst { url: demoPosterUrl } = useAssetUrl('media.demo.poster');\nconst { url: demoAvatarUrl } = useAssetUrl('media.demo.avatar');\nconst { url: demoSampleVideoUrl } = useAssetUrl('media.demo.sampleVideo');\n\nconst myMediaList = computed(() => [{\n  id: 1,\n  type: 'video',\n  videoUrl: demoSampleVideoUrl.value,\n  poster: demoPosterUrl.value,\n  title: t('mediaCard.demo.titles.walkInPark'),\n  duration: '14:55',\n  timeAgo: t('mediaCard.demo.timeAgo.fiveMonths'),\n  likes: 0,\n  views: 4,\n  creatorName: t('mediaCard.demo.creators.creatorAllen'),\n  avatar: demoAvatarUrl.value,\n}]);\n\nconst handleAction = (action) => {\n  console.log("Action triggered:", action);\n};`,
@@ -1586,13 +1465,13 @@ const demoSnippets = {
         5: `<!-- Template -->\n<TierCard :tier="tierSubscribeGreen" />\n\n<!-- Script -->\nimport { computed } from 'vue';\nimport { useI18n } from 'vue-i18n';\nimport TierCard from '@/components/ui/card/dashboard/TierCard.vue';\nimport { useAssetUrl } from '@/composables/useAssetUrl.js';\n\nconst { t } = useI18n();\nconst { url: tierBgUrl } = useAssetUrl('tier.demo.background');\nconst { url: tierButtonGreenUrl } = useAssetUrl('tier.demo.buttonBgGreen');\n\nconst tierSubscribeGreen = computed(() => ({\n  id: 5,\n  title: t('tierCard.demo.title'),\n  backgroundImage: tierBgUrl.value,\n  isFeatured: false,\n  stats: { video: 100, image: 80, audio: 70 },\n  theme: {\n    textPrimary: 'text-[#07F468] dark:text-[#06c454]',\n    textSecondary: 'text-[#FFED29] dark:text-[#FFED29]',\n    shadow: 'shadow-[0px_0px_80px_0px_#07F46840,0px_0px_8px_0px_#07F46880]',\n    barColor: 'bg-[#FFED29] dark:bg-[#ffee37]',\n    barTextColor: 'text-[#FFED29]',\n    featuredBg: 'bg-black dark:bg-[#181a1b]',\n    buttonBgImage: \`url('\${tierButtonGreenUrl.value}')\`,\n    flashLabel: 'text-[#07F468] dark:text-[#06c454]',\n    flashText: '#07F468',\n    textReNew: 'text-white dark:text-[#e8e6e3]',\n    featuredText: 'text-[#07F468] dark:text-[#06c454]',\n  },\n  plans: [/* same plans pattern as tier 1 */],\n  defaultPlan: '6m',\n  flashSale: { active: true, endsIn: t('tierCard.demo.flashSale.endsIn'), originalPrice: t('tierCard.demo.flashSale.originalPrice') },\n  description: t('tierCard.demo.description'),\n  footer: {\n    type: 'subscribe',\n    buttonText: t('tierCard.demo.footer.subscribe'),\n    progress: { visible: false },\n  },\n}));`,
     },
     eventCard: {
-        orangeButton: `<!-- Template -->\n<EventCard theme="orange" :hasButton="true" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'orange' | 'pink'\n// hasButton: true = single progress + CTA button footer\n\n<!-- Assets (inside EventCard via useAssetUrl) -->\n// tier.demo.background â€” card background\n// event.demo.catImage â€” mascot image\n// icon.notification.close â€” dismiss icon\n// icon.media.verified â€” creator badge\n// event.demo.tooltip â€” progress tooltip icon\n\n<!-- i18n (inside EventCard via $t) -->\n// eventCard.demo.titles.subscriberDiscount\n// eventCard.demo.buttons.claimDiscount\n// eventCard.demo.creatorName`,
+        orangeButton: `<!-- Template -->\n<EventCard theme="orange" :hasButton="true" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'orange' | 'pink'\n// hasButton: true = single progress + CTA button footer\n\n<!-- Assets (inside EventCard via useAssetUrl) -->\n// tier.demo.background ? card background\n// event.demo.catImage ? mascot image\n// icon.notification.close ? dismiss icon\n// icon.media.verified ? creator badge\n// event.demo.tooltip ? progress tooltip icon\n\n<!-- i18n (inside EventCard via $t) -->\n// eventCard.demo.titles.subscriberDiscount\n// eventCard.demo.buttons.claimDiscount\n// eventCard.demo.creatorName`,
         orangeProgress: `<!-- Template -->\n<EventCard theme="orange" :hasButton="false" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'orange'\n// hasButton: false = dual progress bars, no CTA button\n\n<!-- i18n keys used -->\n// eventCard.demo.spendMoreClaim\n// eventCard.demo.offersLeft\n// eventCard.demo.progressRatio`,
         pinkButton: `<!-- Template -->\n<EventCard theme="pink" :hasButton="true" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'pink'\n// hasButton: true = single progress + pink CTA button\n\n<!-- i18n keys used -->\n// eventCard.demo.titles.luckyDraw\n// eventCard.demo.buttons.enterLuckyDraw\n// eventCard.demo.chancesLeft`,
         pinkProgress: `<!-- Template -->\n<EventCard theme="pink" :hasButton="false" />\n\n<!-- Script -->\nimport EventCard from '@/components/ui/card/dashboard/EventCard.vue';\n\n<!-- Props -->\n// theme: 'pink'\n// hasButton: false = dual progress + dark overlay (card 4 layout)\n\n<!-- i18n keys used -->\n// eventCard.demo.spendMoreEnter\n// eventCard.demo.chancesLeft\n// eventCard.demo.progressOffer`,
     },
     cart: {
-        default: `<!-- Template -->\n<Cart />\n\n<!-- Interaction Logic (Custom Events) -->\n// To add an item via console or script:\nwindow.dispatchEvent(new CustomEvent('cart:add', {\n  detail: {\n    item: {\n      title: "NBA Hoops Card",\n      productId: "nba123",\n      qty: 1,\n      price: 12.23,\n      originalPrice: 20.00,\n      shipping: 12.23,\n      seller: "Princess Carrot Pop",\n      image: "https://i.ibb.co.com/70sHrpv/featured-media-bg.webp",\n      promoCodes: ["PROMOCODE2025", "MEMBER BENEFIT"]\n    }\n  }\n}));`,
+        default: `<!-- Template -->\n<Cart />\n\n<!-- Interaction Logic (Custom Events) -->\n// To add an item via console or script:\nwindow.dispatchEvent(new CustomEvent('cart:add', {\n  detail: {\n    item: {\n      title: "NBA Hoops Card",\n      productId: "nba123",\n      qty: 1,\n      price: 12.23,\n      originalPrice: 20.00,\n      shipping: 12.23,\n      seller: "Princess Carrot Pop",\n      image: checkout.demo.featuredMediaBg (useAssetUrl),\n      promoCodes: ["PROMOCODE2025", "MEMBER BENEFIT"]\n    }\n  }\n}));`,
     },
     cookies: {
         default: `<!-- Template -->\n<Cookies />\n\n<!-- Script -->\nimport Cookies from '@/components/ui/badge/dashboard/Cookies.vue';`,
@@ -1718,7 +1597,7 @@ const inputs = reactive({
     price: '99.99',
 });
 
-// Button Showcase â€” click any catalog button to preview :loading (spinner only, no text)
+// Button Showcase ? click any catalog button to preview :loading (spinner only, no text)
 const buttonLoaders = reactive({});
 const runButtonDemo = (id) => {
     if (buttonLoaders[id]) return;

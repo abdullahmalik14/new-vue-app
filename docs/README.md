@@ -61,11 +61,20 @@ npm run validate-env
 
 ## 📖 Documentation
 
+**Client review (Linden — lazysizes):** Start at **[DOCUMENTATION_INDEX.md](/docs/DOCUMENTATION_INDEX.md)**
+
+Key deliverables:
+
+- **[Linden response summary](/docs/delivery/LINDEN_LAZYSIZES_RESPONSE.md)** — message to send + FAQ
+- **[Lazysizes integration guide](/docs/integrations/LAZYSIZES.md)** — full technical documentation
+- **[Lazysizes integration audit](/docs/integrations/LAZYSIZES_INTEGRATION_AUDIT.md)** — final audit sign-off
+- **[Project structure overview](/docs/overview/PROJECT_STRUCTURE.md)** — Vue architecture overview
+
 All comprehensive documentation is located in the `/docs/` folder:
 
-- **[Developer Guide](/docs/DEVELOPER_GUIDE.md)** - Complete architecture overview, how everything works, and how to test
-- **[Testing Guide](/docs/TESTING_GUIDE.md)** - Manual testing checklists for all handlers and flows
-- **[Deployment Guide](/docs/DEPLOYMENT_GUIDE.md)** - How to deploy, build, and configure environments
+- **[Documentation Index](/docs/DOCUMENTATION_INDEX.md)** — master index (client + dev)
+- **[Developer Guide](/docs/DEV_GUIDE_COMPLETE.md)** - Complete architecture overview, how everything works, and how to test
+- **[Testing Guide](/docs/TESTING_CHECKLISTS.md)** - Manual testing checklists for all handlers and flows
 - **[Environment Setup](/docs/ENV_SETUP_GUIDE.md)** - Environment variables, validation, and configuration
 
 ## 🏗️ Architecture Overview

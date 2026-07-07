@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import CheckboxSwitch from '@/components/forms/checkboxes/CheckboxSwitch.vue';
 import BaseInput from '@/components/forms/inputs/BaseInput.vue';
 import RadioGroup from '@/components/forms/radio/dashboard/RadioGroup.vue';
-import ReusableSearchInput from '@/dev/components/media/uploader/parts/ReusableSearchInput.vue';
+import MediaUploaderSearchInput from '@/dev/components/media/uploader/parts/MediaUploaderSearchInput.vue';
 import DashboardPrimaryButton from '@/components/ui/buttons/DashboardPrimaryButton.vue';
 import CheckboxGroup from '@/components/forms/checkboxes/CheckboxGroup.vue';
 import { defineProps } from 'vue';
@@ -195,7 +195,7 @@ const copyLink = async () => {
 
                         <div class="flex items-end w-full">
                          
-                         <ReusableSearchInput
+                         <MediaUploaderSearchInput
                         subtitle="Invite list"
                         placeholder="Search fan by username..."
                         type="performer"

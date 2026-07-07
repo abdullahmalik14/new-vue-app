@@ -15,6 +15,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 /* Custom global styles (non-Tailwind) */
 :root {
   --color-primary: #939393;

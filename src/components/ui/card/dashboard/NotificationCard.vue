@@ -2,7 +2,7 @@
   <transition name="fade" mode="out-in">
     <div v-if="isOpen" class="w-full border-b border-[#E5E7EB] flex relative">
       <!-- Left border color -->
-      <div class="toast-border w-[0.188rem] absolute h-full left-0 top-0" :class="variantConfig.leftBorderClass" />
+      <div class="toast-border w-[0.188rem] absolute h-full left-0 top-0" :class="leftBorderClass || variantConfig.leftBorderClass" />
 
       <!-- Card body -->
       <div class="dashboard-toast-inner-wrapper flex gap-4 py-3 px-3 flex-1 min-w-0 min-h-0"
@@ -21,25 +21,27 @@
 
           <!-- Icon -->
           <div v-if="showIconComputed" class="relative">
-            <div class="toast-icon-container w-10 h-10 flex justify-center items-center rounded-lg"
-              :class="variantConfig.iconBgClass">
-              <component v-if="icon && typeof icon !== 'string'" :is="icon" class="w-7 h-7" :class="variantConfig.iconStrokeClass" />
-              <img v-else-if="icon" :src="icon" class="w-7 h-7" />
-              <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" fill="none" class="w-7 h-7"
-                :class="variantConfig.iconStrokeClass">
-                <path
-                  d="M25.666 24.5V22.167c0-2.175-1.487-4.002-3.5-4.52M18.083 3.839A4.666 4.666 0 0 1 21 8.167a4.667 4.667 0 0 1-2.917 4.327M19.833 24.5c0-2.174 0-3.262-.355-4.12a4.666 4.666 0 0 0-2.526-2.525c-.858-.355-1.945-.355-4.12-.355H9.333c-2.174 0-3.262 0-4.12.355A4.666 4.666 0 0 0 2.688 20.38C2.333 21.238 2.333 22.326 2.333 24.5M15.75 8.167a4.667 4.667 0 1 1-9.334 0 4.667 4.667 0 0 1 9.334 0Z"
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
+            <slot name="icon">
+              <div class="toast-icon-container w-10 h-10 flex justify-center items-center rounded-lg"
+                :class="variantConfig.iconBgClass">
+                <component v-if="icon && typeof icon !== 'string'" :is="icon" class="w-7 h-7" :class="variantConfig.iconStrokeClass" />
+                <img v-else-if="icon" :src="icon" class="w-7 h-7" />
+                <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" fill="none" class="w-7 h-7"
+                  :class="variantConfig.iconStrokeClass">
+                  <path
+                    d="M25.666 24.5V22.167c0-2.175-1.487-4.002-3.5-4.52M18.083 3.839A4.666 4.666 0 0 1 21 8.167a4.667 4.667 0 0 1-2.917 4.327M19.833 24.5c0-2.174 0-3.262-.355-4.12a4.666 4.666 0 0 0-2.526-2.525c-.858-.355-1.945-.355-4.12-.355H9.333c-2.174 0-3.262 0-4.12.355A4.666 4.666 0 0 0 2.688 20.38C2.333 21.238 2.333 22.326 2.333 24.5M15.75 8.167a4.667 4.667 0 1 1-9.334 0 4.667 4.667 0 0 1 9.334 0Z"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
 
-              <!-- Badge Icon -->
-              <div v-if="badgeIcon"
-                class="absolute -bottom-2.5 -right-2.5 flex justify-center items-center w-[23px] h-[22px] rounded-lg"
-                :class="variantConfig.badgeBgClass">
-                <component v-if="badgeIcon && typeof badgeIcon !== 'string'" :is="badgeIcon" class="h-4 text-white" />
-                <img v-else :src="badgeIcon" class="h-4 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(97%)_contrast(100%)]" />
+                <!-- Badge Icon -->
+                <div v-if="badgeIcon"
+                  class="absolute -bottom-2.5 -right-2.5 flex justify-center items-center w-[23px] h-[22px] rounded-lg"
+                  :class="variantConfig.badgeBgClass">
+                  <component v-if="badgeIcon && typeof badgeIcon !== 'string'" :is="badgeIcon" class="h-4 text-white" />
+                  <img v-else :src="badgeIcon" class="h-4 [filter:brightness(0)_saturate(100%)_invert(99%)_sepia(99%)_saturate(0)_hue-rotate(176deg)_brightness(97%)_contrast(100%)]" />
+                </div>
               </div>
-            </div>
+            </slot>
           </div>
 
           <!-- Content -->
@@ -47,7 +49,7 @@
             :class="isSingleLineContent ? 'justify-center' : ''">
             <div v-if="title" class="flex flex-col gap-2" :class="hasDescription ? 'pb-2' : ''">
               <div class="flex justify-between items-center pr-1" :class="hasDescription ? 'pt-1' : ''">
-                <span v-if="title" class="toast-heading text-sm" :class="variantConfig.titleTextClass">{{ title
+                <span v-if="title" class="toast-heading text-sm" :class="titleClass || variantConfig.titleTextClass">{{ title
                 }}</span>
                 <slot name="title" />
               </div>
@@ -97,6 +99,16 @@ const props = defineProps({
     default: "",
   },
   linkHref: {
+    type: String,
+    default: "",
+  },
+  // Optional override for the left accent border color class (falls back to variant)
+  leftBorderClass: {
+    type: String,
+    default: "",
+  },
+  // Optional override for the title text color class (falls back to variant)
+  titleClass: {
     type: String,
     default: "",
   },

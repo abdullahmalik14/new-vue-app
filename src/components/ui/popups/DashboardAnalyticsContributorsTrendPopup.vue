@@ -44,13 +44,13 @@
           </div>
         </div>
         <!-- Loading State -->
-        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container" v-if="!analyticsStore.bundleLoaded || isChartRendering">
+        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 " v-if="!analyticsStore.bundleLoaded || isChartRendering">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#101828] dark:border-white"></div>
           <span class="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">Loading Chart...</span>
         </div>
         <!-- Empty State -->
         <div
-          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container"
+          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 "
           v-else-if="!insightData?.topContributors?.length">
           <img src="/images/empty-bar.svg" alt="list" class="w-24 h-24 object-contain" style="transform: scale(2.5);" />
           <div class="flex flex-col gap-1">
@@ -101,13 +101,13 @@
           </div>
         </div>
         <!-- Loading State -->
-        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container" v-if="!analyticsStore.bundleLoaded || isChartRendering">
+        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 " v-if="!analyticsStore.bundleLoaded || isChartRendering">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#101828] dark:border-white"></div>
           <span class="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">Loading Chart...</span>
         </div>
         <!-- Empty State -->
         <div
-          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container"
+          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 "
           v-else-if="!insightData?.topFans?.length">
           <img src="/images/empty-bar.svg" alt="list" class="w-24 h-24 object-contain" style="transform: scale(2.5);" />
           <div class="flex flex-col gap-1">
@@ -162,13 +162,13 @@
           </div>
         </div>
         <!-- Loading State -->
-        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container" v-if="!analyticsStore.bundleLoaded || isChartRendering">
+        <div class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 " v-if="!analyticsStore.bundleLoaded || isChartRendering">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#101828] dark:border-white"></div>
           <span class="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">Loading Chart...</span>
         </div>
         <!-- Empty State -->
         <div
-          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 bg-white dark:bg-dark-bg-container"
+          class="flex flex-col justify-center items-center gap-6 w-full py-12 text-center absolute inset-0 mt-10 z-20 "
           v-else-if="!insightData?.topOrderSpenders?.length">
           <img src="/images/empty-bar.svg" alt="list" class="w-24 h-24 object-contain" style="transform: scale(2.5);" />
           <div class="flex flex-col gap-1">
@@ -242,7 +242,7 @@ function getContribBarCfg(dk) {
     axisLabelColor: "#475467", axisLabelFontSize: "10px",
     xAxis: { minGridDistance: 60 },
     tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "$", valueSuffix: "" } },
-    yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true },
+    yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true },
     legentHint: legendConfig
   })
 }
@@ -258,7 +258,7 @@ function getContribLineCfg(dk) {
     axisLabelColor: "#475467", axisLabelFontSize: "10px",
     xAxis: { minGridDistance: 60 },
     tooltip: { aggregated: { enabled: true, mode: "codepen", valuePrefix: "$", valueSuffix: "" } },
-    yAxis: { autoMax: true, autoMaxBuffer: 0.12, strict: true },
+    yAxis: { min: 0, autoMax: true, autoMaxBuffer: 0.12, strict: true },
     line: { strokeWidth: 4 },
     legentHint: legendConfig
   })
@@ -337,9 +337,18 @@ async function setSpendersView(v) {
 
 async function handlePeriodChange(val) {
   emit('update:period', val)
-  await nextTick()
-  await renderAllCharts()
+  // insightData watcher handles re-render once props update propagates
 }
+
+watch(() => props.insightData, async () => {
+  if (!props.modelValue) return
+  await nextTick()
+  injectChartData()
+  await renderChart(`contrib-top-${activeContribViewMode.value}`)
+  await renderChart(`contrib-fans-${activeFansViewMode.value}`)
+  await renderChart(`contrib-spenders-${activeSpendersViewMode.value}`)
+  isChartRendering.value = false
+})
 
 watch(() => props.modelValue, async (isOpen) => {
   if (isOpen) { await nextTick(); await renderAllCharts() }

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row flex-wrap items-start justify-start gap-6 rounded-2xl" style="max-width: 53.9125rem">
+  <div class="w-full flex flex-row flex-wrap items-start justify-start gap-6 rounded-2xl">
     <div class="flex w-full flex-col md:flex-row flex-wrap justify-end rounded-3xl gap-2 md:gap-0">
       
       <div class="flex w-full items-start justify-start overflow-hidden md:w-1/2">
@@ -33,7 +33,7 @@
         
         <div class="flex items-center gap-2">
           <CheckboxSwitch 
-            label="Blur thumbnail" 
+            :label="t('mediaUploader.thumbnail.blurToggle')" 
             showWrapperLabel 
             id="blur-thumbnail-toggle" 
             v-model="blurModel" 
@@ -50,28 +50,34 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import CheckboxSwitch from "@/components/forms/checkboxes/CheckboxSwitch.vue";
+import { useI18n } from 'vue-i18n';
+import CheckboxSwitch from '@/components/forms/checkboxes/CheckboxSwitch.vue';
 import ThumbnailSelector from "./ThumbnailSelector.vue";
 import BlurEffect from './BlurEffect.vue';
+import { useMediaUploaderStore } from "@/stores/useMediaUploaderStore";
+import { useMediaUploaderAssets } from "@/dev/composables/useMediaUploaderAssets.js";
 
-const props = defineProps({
-  uploader: {
-    type: Object,
-    required: true,
-  }
+const { t } = useI18n();
+const uploaderStore = useMediaUploaderStore();
+const { assets } = useMediaUploaderAssets();
+
+const thumbnails = computed(() => {
+  const { slideImage, thumbA, thumbB } = assets.value;
+  return [
+    slideImage,
+    thumbA,
+    thumbB,
+    thumbA,
+    thumbB,
+    thumbA,
+    thumbB,
+    thumbA,
+    thumbB,
+    thumbB,
+    thumbB,
+    thumbB,
+  ].filter(Boolean);
 });
-
-const thumbnails = [
-  "/images/slide-2.webp",
-  "/images/thumb1.jpg",
-  "/images/thumb2.jpg",
-  "/images/thumb3.jpg",
-  "/images/thumb4.jpg",
-  "/images/thumb2.jpg",
-  "/images/thumb6.jpg",
-  "/images/thumb7.jpg",
-  "/images/thumb3.jpg",
-];
 
 const isLoading = ref(false);
 
@@ -80,27 +86,27 @@ const isLoading = ref(false);
 // ===========================================
 
 const currentThumbnailUrl = computed(() => {
-  return props.uploader.state.thumbnailUrl || thumbnails[0];
+  return uploaderStore.form.thumbnailUrl || thumbnails.value[0] || '';
 });
 
 const currentIndex = computed(() => {
-  const idx = thumbnails.indexOf(currentThumbnailUrl.value);
+  const idx = thumbnails.value.indexOf(currentThumbnailUrl.value);
   return idx === -1 ? 0 : idx;
 });
 
 // 1. Blur ON/OFF Toggle
 const blurModel = computed({
-  get: () => props.uploader.state.blurThumbnail || false,
+  get: () => uploaderStore.form.blurThumbnail || false,
   set: (val) => {
-    props.uploader.setState("blurThumbnail", val, { reason: "user:toggleBlur" });
+    uploaderStore.updateFormField("blurThumbnail", val);
   }
 });
 
-// 2. Blur Level (e.g., '20px')
+// 2. Blur Level (e.g., 'low', 'medium', 'high')
 const blurLevelModel = computed({
-  get: () => props.uploader.state.blurThumbnailLevel || '20px', // Default fallback
+  get: () => uploaderStore.form.blurThumbnailLevel || 'low', // Default fallback
   set: (val) => {
-    props.uploader.setState("blurThumbnailLevel", val, { reason: "user:setBlurLevel" });
+    uploaderStore.updateFormField("blurThumbnailLevel", val);
   }
 });
 
@@ -115,10 +121,18 @@ const imageBlurStyle = computed(() => {
     return {};
   }
   
-  // Agar ON hai, toh selected pixel value use karo
+  // Map labels to pixel values
+  const blurMap = {
+    '20px': '8px',
+    '50px': '20px',
+    '100px': '40px'
+  };
+  
+  const blurValue = blurMap[blurLevelModel.value] || '8px';
+
   return {
-    filter: `blur(${blurLevelModel.value})`,
-    '-webkit-filter': `blur(${blurLevelModel.value})` // Safari support
+    filter: `blur(${blurValue})`,
+    '-webkit-filter': `blur(${blurValue})` // Safari support
   };
 });
 
@@ -127,16 +141,16 @@ const imageBlurStyle = computed(() => {
 // ===========================================
 
 const onThumbnailSelect = (index) => {
-  const selectedUrl = thumbnails[index];
+  const selectedUrl = thumbnails.value[index];
   if (!preloadedImages.value.has(selectedUrl)) {
     isLoading.value = true;
   }
-  props.uploader.setState("thumbnailUrl", selectedUrl, { reason: "user:selectThumbnail" });
+  uploaderStore.updateFormField("thumbnailUrl", selectedUrl);
 };
 
 const preloadedImages = ref(new Set());
 const preloadImages = () => {
-  thumbnails.forEach((src) => {
+  thumbnails.value.forEach((src) => {
     if (!preloadedImages.value.has(src)) {
       const img = new Image();
       img.src = src;
@@ -152,17 +166,16 @@ watch(currentThumbnailUrl, () => {
 });
 
 onMounted(() => {
-  if (!props.uploader.state.thumbnailUrl) {
-    props.uploader.setState("thumbnailUrl", thumbnails[0], { reason: "init:default" });
+  if (!uploaderStore.form.thumbnailUrl && thumbnails.value[0]) {
+    uploaderStore.updateFormField("thumbnailUrl", thumbnails.value[0]);
   }
   
   // Ensure default blur level is set if missing
-  if (!props.uploader.state.blurThumbnailLevel) {
-     props.uploader.setState("blurThumbnailLevel", '20px', { reason: "init:blurDefault" });
+  if (!uploaderStore.form.blurThumbnailLevel) {
+    uploaderStore.updateFormField("blurThumbnailLevel", '20px');
   }
 
-  setTimeout(() => {
-    preloadImages();
-  }, 100);
+  // Preload immediately without delay
+  preloadImages();
 });
 </script>
