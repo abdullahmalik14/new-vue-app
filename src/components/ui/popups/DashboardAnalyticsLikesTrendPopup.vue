@@ -6,7 +6,7 @@
 
       <!-- LIKES INSIGHT CHART -->
       <div class="flex flex-col gap-3 p-4 rounded w-full h-[25rem] relative">
-        <div class="flex justify-between items-center z-10 relative">
+        <div class="flex justify-between items-center z-30 relative">
           <h3 class="text-base font-semibold text-[#101828] dark:text-[#dbd8d3]">Likes Insight</h3>
           <div class="flex gap-1 bg-[#F9FAFB] p-1 rounded-lg border border-[#EAECF0]">
             <button class="p-1.5 rounded-md cursor-pointer transition-all focus:outline-none hover:!bg-transparent"
@@ -163,7 +163,14 @@ async function injectChartData() {
   }
 
   window.chartsHandler._configs.data['likes-chart'] = { slot: mapForChart(dataArr) }
-  isLikesDataAvailable.value = dataArr.length > 0
+  // Length alone isn't enough — the backend sends zero-filled period slots.
+  // Only treat it as data if at least one breakdown value is non-zero.
+  isLikesDataAvailable.value = dataArr.some((item) =>
+    (Number(item.media) || 0) > 0 ||
+    (Number(item.merch) || 0) > 0 ||
+    (Number(item.profile) || 0) > 0 ||
+    (Number(item.feed) || 0) > 0
+  )
 }
 
 // ===== CHART RENDERING =====

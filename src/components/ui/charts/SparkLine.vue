@@ -34,6 +34,8 @@ const clipId = computed(() => `sparkline-clip-${Math.random().toString(36).slice
 const points = computed(() => {
   const d = props.data
   if (!d || d.length < 2) return []
+  // All-zero (or empty) data is "no data" — don't draw a misleading flat line.
+  if (!d.some((v) => Number(v) !== 0)) return []
   const min = Math.min(...d)
   const max = Math.max(...d)
   const range = max - min || 1
