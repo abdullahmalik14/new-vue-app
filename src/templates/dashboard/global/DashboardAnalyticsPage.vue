@@ -2,7 +2,11 @@
   <DashboardSharedTwoColLayout>
     <div class="relative flex flex-col mt-6 gap-6 md:p-[40px]">
       <DashboardSharedHeader v-if="!hideLayout" />
-      <DashboardAnalyticsWelcomeBanner />
+      
+      <!-- ========================================================== -->
+      <!-- JENNY GREETING BANNER & QUOTE SECTION (COMMENTED OUT BELOW) -->
+      <!-- ========================================================== -->
+      <!-- <DashboardAnalyticsWelcomeBanner /> -->
       
       <!-- Analytics Content Wrapper -->
       <div class="flex flex-col gap-6 transition-opacity duration-200" :class="{ 'opacity-50 pointer-events-none': isAnalyticsRefreshing, 'opacity-100': !isAnalyticsRefreshing }">
@@ -13,7 +17,7 @@
           @openEarningsTrendPopup="openAnalyticsEarningsTrendPopup"
           @openFansTrendPopup="openAnalyticsFansTrendPopup"
           @openLikesTrendPopup="openAnalyticsLikesTrendPopup"
-          @openContributorsTrendPopup="openAnalyticsContributorsTrendPopup"
+          @openTargetTrendPopup="openAnalyticsContributorsTrendPopup"
           @refresh="refreshDashboardAnalytics"
         />
 
@@ -145,5 +149,4 @@ onMounted(async () => {
 onUnmounted(() => {
   FlowRefreshManager.stop(ANALYTICS_FETCH_FLOW)
 })
-
 </script>
