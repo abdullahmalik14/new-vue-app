@@ -198,6 +198,12 @@ Before deploying, run through our comprehensive testing checklists:
 
 See `docs/TESTING_CHECKLISTS.md` for complete testing procedures.
 
+### Test Runner Guide
+
+For a comprehensive guide to **running unit tests (Vitest)** and the **dev-only Analytics Test Runner**, see:
+
+- `docs/TEST_RUNNER.md`
+
 ### Manual Testing
 
 #### Preloading Verification
