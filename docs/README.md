@@ -154,6 +154,10 @@ See `/docs/TESTING_GUIDE.md` for comprehensive testing checklists covering:
 - Translation loading
 - Error handling
 
+See `/docs/TEST_RUNNER.md` for how to run:
+- Vitest unit tests (`npm run test:unit`)
+- The dev-only Analytics Test Runner (browser-injected panel)
+
 ## 🌐 Environment Variables
 
 See `/docs/ENV_SETUP_GUIDE.md` for complete environment variable documentation.
